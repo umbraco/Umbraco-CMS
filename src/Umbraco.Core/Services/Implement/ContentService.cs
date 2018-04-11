@@ -1362,7 +1362,7 @@ namespace Umbraco.Core.Services.Implement
                 var originalPath = content.Path;
                 var moveEventInfo = new MoveEventInfo<IContent>(content, originalPath, Constants.System.RecycleBinContent);
                 var moveEventArgs = new MoveEventArgs<IContent>(evtMsgs, moveEventInfo);
-                if (scope.Events.DispatchCancelable(Trashing, this, moveEventArgs))
+                if (scope.Events.DispatchCancelable(Trashing, this, moveEventArgs, nameof(Trashing)))
                 {
                     scope.Complete();
                     return OperationResult.Cancel(evtMsgs); // causes rollback
@@ -1383,7 +1383,7 @@ namespace Umbraco.Core.Services.Implement
 
                 moveEventArgs.CanCancel = false;
                 moveEventArgs.MoveInfoCollection = moveInfo;
-                scope.Events.Dispatch(Trashed, this, moveEventArgs);
+                scope.Events.Dispatch(Trashed, this, moveEventArgs, nameof(Trashed));
                 Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
 
                 scope.Complete();

@@ -29,6 +29,7 @@ using Umbraco.Web.Models;
 using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 using ContentVariation = Umbraco.Core.Models.ContentVariation;
+using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.Editors
 {
@@ -556,7 +557,7 @@ namespace Umbraco.Web.Editors
             }
             return contentItemDisplay;
         }
-
+        
         private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod)
         {
             //If we've reached here it means:
@@ -616,14 +617,41 @@ namespace Umbraco.Web.Editors
             else
             {
                 //publish the item and check if it worked, if not we will show a diff msg below
-                contentItem.PersistedContent.PublishValues(contentItem.LanguageId);
+                contentItem.PersistedContent.PublishValues(contentItem.LanguageId); //we are not checking for a return value here because we've alraedy pre-validated the property values
+                
+                //check if we are publishing other variants and validate them
+                var allLangs = Services.LocalizationService.GetAllLanguages().ToList();
+                var variantsToValidate = contentItem.PublishVariations.Where(x => x.LanguageId != contentItem.LanguageId).ToList();
+                foreach (var publishVariation in variantsToValidate)
+                {
+                    if (!contentItem.PersistedContent.PublishValues(publishVariation.LanguageId))
+                    {
+                        var errMsg = Services.TextService.Localize("speechBubbles/contentLangValidationError", new[]{allLangs.First(x => x.Id == publishVariation.LanguageId).CultureName});
+                        ModelState.AddModelError("publish_variant_" + publishVariation.LanguageId + "_", errMsg);
+                    }
+                }
+
+                //validate any mandatory variants that are not in the list
+                var mandatoryLangs = Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLangs)
+                    .Where(x => variantsToValidate.All(v => v.LanguageId != x.Id)) //don't include variants above
+                    .Where(x => x.Id != contentItem.LanguageId) //don't include the current variant
+                    .Where(x => x.Mandatory);
+                foreach (var lang in mandatoryLangs)
+                {
+                    if (contentItem.PersistedContent.Validate(lang.Id).Length > 0)
+                    {
+                        var errMsg = Services.TextService.Localize("speechBubbles/contentReqLangValidationError", new[]{allLangs.First(x => x.Id == lang.Id).CultureName});
+                        ModelState.AddModelError("publish_variant_" + lang.Id + "_", errMsg);
+                    }
+                }
+
                 publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedCancelledByEvent;
             }
 
-            //return the updated model
+            //get the updated model
             var display = MapToDisplay(contentItem.PersistedContent, contentItem.LanguageId);
-
+            
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
 
@@ -1132,5 +1160,6 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
+        
     }
 }

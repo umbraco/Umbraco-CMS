@@ -28,16 +28,29 @@ namespace Umbraco.Web.Models.Mapping
             var variants = langs.Select(x => new ContentVariation
             {
                 Language = x,
+                Mandatory = x.Mandatory,
                 //fixme these all need to the variant values but we need to wait for the db/service changes
                 Name = source.Name ,                
                 Exists = source.HasVariation(x.Id), //TODO: This needs to be wired up with new APIs when they are ready
-                PublishedState = source.PublishedState.ToString()
+                PublishedState = source.PublishedState.ToString(),
+                //Segment = ?? We'll need to populate this one day when we support segments
             }).ToList();
 
             var langId = context.GetLanguageId();
 
-            //set the current variant being edited to the one found in the context or the default, whichever matches
-            variants.First(x => (langId.HasValue && langId.Value == x.Language.Id) || x.Language.IsDefaultVariantLanguage).IsCurrent = true;
+            //set the current variant being edited to the one found in the context or the default if nothing matches
+            var foundCurrent = false;
+            foreach (var variant in variants)
+            {
+                if (langId.HasValue && langId.Value == variant.Language.Id)
+                {
+                    variant.IsCurrent = true;
+                    foundCurrent = true;
+                    break;
+                }
+            }
+            if (!foundCurrent)
+                variants.First(x => x.Language.IsDefaultVariantLanguage).IsCurrent = true;
 
             return variants;
         }

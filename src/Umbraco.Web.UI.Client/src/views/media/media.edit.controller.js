@@ -155,7 +155,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
     
     $scope.save = function () {
 
-        if (!$scope.busy && formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+        if (!$scope.busy && formHelper.submitForm({ scope: $scope })) {
 
             $scope.busy = true;
             $scope.page.saveButtonState = "busy";

@@ -204,7 +204,7 @@ Use this directive to construct a header inside the main editor window.
 (function() {
     'use strict';
 
-    function EditorHeaderDirective(iconHelper) {
+    function EditorHeaderDirective(iconHelper, $location) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -246,11 +246,9 @@ Use this directive to construct a header inside the main editor window.
                 }
             };
 
-            scope.selectVariant = function(event, variant) {
-                if(scope.onSelectVariant) {
-                    scope.onSelectVariant({"variant": variant});
-                    scope.vm.dropdownOpen = false;
-                }
+            scope.selectVariant = function (event, variant) {
+                scope.vm.dropdownOpen = false;
+                $location.search({ languageId: variant.language.id });
             };
 
             scope.openIconPicker = function() {
@@ -323,7 +321,6 @@ Use this directive to construct a header inside the main editor window.
                 hideDescription: "@",
                 descriptionLocked: "@",
                 variants: "=",
-                onSelectVariant: "&",
                 navigation: "=",
                 key: "=",
                 onBack: "&?",

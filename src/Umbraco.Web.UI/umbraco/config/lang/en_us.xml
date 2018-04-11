@@ -128,6 +128,7 @@
         <key alias="returnToList">Return to list</key>
         <key alias="save">Save</key>
         <key alias="saveAndPublish">Publish</key>
+        <key alias="saveAndPublishMany">Publish…</key>
         <key alias="saveAndSchedule">Save and schedule</key>
         <key alias="saveToPublish">Save and send for approval</key>
         <key alias="saveListView">Save list view</key>
@@ -1418,6 +1419,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="unlockUserError">An error occurred while unlocking the user</key>
         <key alias="memberExportedSuccess">Member was exported to file</key>
         <key alias="memberExportedError">An error occurred while exporting the member</key>
+        <key alias="contentReqLangValidationError">Validation failed for mandatory language '%0%'</key>
+        <key alias="contentLangValidationError">Validation failed for language '%0%'</key>
     </area>
     <area alias="stylesheet">
         <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>

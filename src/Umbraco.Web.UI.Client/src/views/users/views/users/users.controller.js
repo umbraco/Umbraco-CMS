@@ -505,7 +505,7 @@
 
         function createUser(addUserForm) {
 
-            if (formHelper.submitForm({ formCtrl: addUserForm, scope: $scope, statusMessage: "Saving..." })) {
+            if (formHelper.submitForm({ formCtrl: addUserForm, scope: $scope })) {
 
                 vm.newUser.id = -1;
                 vm.newUser.parentId = -1;
@@ -527,7 +527,7 @@
 
         function inviteUser(addUserForm) {
 
-            if (formHelper.submitForm({ formCtrl: addUserForm, scope: $scope, statusMessage: "Saving..." })) {
+            if (formHelper.submitForm({ formCtrl: addUserForm, scope: $scope })) {
                 vm.newUser.id = -1;
                 vm.newUser.parentId = -1;
                 vm.page.createButtonState = "busy";

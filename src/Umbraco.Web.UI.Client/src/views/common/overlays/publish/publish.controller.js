@@ -4,58 +4,49 @@
     function PublishController($scope, $timeout) {
 
         var vm = this;
-        vm.variants = [];
-        vm.loading = true;
+        vm.variants = $scope.model.variants;
+        vm.changeSelection = changeSelection;
 
-        function onInit() {
-
-            vm.loading = true;
-
-            $timeout(function(){
-
-                vm.variants = [
-                    {
-                        "cultureDisplayName": "English (United States)",
-                        "culture": "en-US",
-                        "state": "Published (pending changes)",
-                        "selected": false,
-                        "validationError": false,
-                        "validationErrorMessage": ""
-                    },
-                    {
-                        "cultureDisplayName": "Spanish (Spain)",
-                        "culture": "es-ES",
-                        "state": "Draft",
-                        "selected": false,
-                        "validationError": false,
-                        "validationErrorMessage": ""
-                    },
-                    {
-                        "cultureDisplayName": "French (France)",
-                        "culture": "fr-FR",
-                        "state": "Published (pending changes)",
-                        "selected": false,
-                        "validationError": true,
-                        "validationErrorMessage": "Lorem ipsum dolor sit amet..."
-                    },
-                    {
-                        "cultureDisplayName": "German (Germany)",
-                        "culture": "de-DE",
-                        "state": "Draft",
-                        "selected": false,
-                        "validationError": false,
-                        "validationErrorMessage": ""
+        //watch this model, if it's reset, then re init
+        $scope.$watch(function() {
+                return $scope.model.variants;
+            },
+            function(newVal, oldVal) {
+                vm.variants = newVal;
+                if (oldVal && oldVal.length) {
+                    //re-bind the selections
+                    for (var i = 0; i < oldVal.length; i++) {
+                        var found = _.find(vm.variants, function(v) {
+                            return v.language.id == oldVal[i].language.id;
+                        });
+                        if (found) {
+                            found.publish = oldVal[i].publish;
+                        }
                     }
-                ];
+                }
+                onInit();
+            });
 
-                vm.loading = false;
-
-            }, 1000);
-
+        function changeSelection(variant) {
+            var firstSelected = _.find(vm.variants, function(v) {
+                return v.publish;
+            });
+            $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
         }
 
-        onInit();
-
+        function onInit() {
+            _.each(vm.variants,
+                function (v) {
+                    v.compositeId = v.language.id + "_" + (v.segment ? v.segment : "");
+                    v.htmlId = "publish_variant_" + v.compositeId;
+                });
+            //now sort it so that the current one is at the top
+            vm.variants = _.sortBy(vm.variants, function(v) {
+                return v.current ? 0 : 1;
+            });
+            //ensure that the current one is selected
+            vm.variants[0].publish = true;
+        }
     }
 
     angular.module("umbraco").controller("Umbraco.Overlays.PublishController", PublishController);

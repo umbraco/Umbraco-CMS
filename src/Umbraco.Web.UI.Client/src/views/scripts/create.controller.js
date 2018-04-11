@@ -5,7 +5,6 @@
 
         var vm = this;
         var node = $scope.dialogOptions.currentNode;
-        var localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
 
         vm.creatingFolder = false;
         vm.folderName = "";
@@ -27,7 +26,7 @@
 
         function createFolder(form) {
 
-            if (formHelper.submitForm({scope: $scope, formCtrl: form, statusMessage: localizeCreateFolder})) {
+            if (formHelper.submitForm({scope: $scope, formCtrl: form })) {
 
                 codefileResource.createContainer("scripts", node.id, vm.folderName).then(function (saved) {
 

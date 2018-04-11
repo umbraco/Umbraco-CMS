@@ -12,7 +12,6 @@
     function DocumentTypesEditController($scope, $routeParams, $injector, contentTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper, eventsService) {
 
         var vm = this;
-        var localizeSaving = localizationService.localize("general_saving");
         var evts = [];
 
         var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
@@ -242,7 +241,6 @@
                 vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
 
                 contentEditingHelper.contentEditorPerformSave({
-                    statusMessage: localizeSaving,
                     saveMethod: contentTypeResource.save,
                     scope: $scope,
                     content: vm.contentType,

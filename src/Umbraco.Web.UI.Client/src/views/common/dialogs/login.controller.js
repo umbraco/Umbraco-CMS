@@ -136,7 +136,7 @@
 
         $scope.inviteSavePassword = function () {
 
-            if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+            if (formHelper.submitForm({ scope: $scope })) {
 
                 $scope.invitedUserPasswordModel.buttonState = "busy";
 

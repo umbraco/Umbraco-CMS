@@ -13,8 +13,7 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
         creatingFolder: false
     };
 
-    var node = $scope.dialogOptions.currentNode,
-        localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
+    var node = $scope.dialogOptions.currentNode;
 
 
     $scope.showCreateFolder = function() {
@@ -24,8 +23,7 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
     $scope.createContainer = function () {
         if (formHelper.submitForm({
             scope: $scope,
-            formCtrl: this.createFolderForm,
-            statusMessage: localizeCreateFolder
+            formCtrl: this.createFolderForm
         })) {
             memberTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 
