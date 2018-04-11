@@ -1,6 +1,19 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
-    function ($scope, $q, entityResource, eventsService, $log, searchService, angularHelper, $timeout, localizationService, treeService, contentResource, mediaResource, memberResource) {
+    function ($scope,
+        $q,
+        entityResource,
+        eventsService,
+        $log,
+        searchService,
+        angularHelper,
+        $timeout,
+        localizationService,
+        treeService,
+        contentResource,
+        mediaResource,
+        memberResource,
+        languageResource) {
 
         var tree = null;
         var dialogOptions = $scope.model;
@@ -26,6 +39,50 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         //Some trees can have no items (dictionary & forms email templates)
         $scope.hasItems = true;
         $scope.emptyStateMessage = dialogOptions.emptyStateMessage;
+
+        $scope.languages = [];
+        $scope.selectedLanguage = {};
+        $scope.page = {};
+        $scope.page.languageSelectorIsOpen = false;
+
+        var evts = [];
+
+        // Listen for language updates
+        evts.push(eventsService.on("editors.languages.languageDeleted",
+            function (e, args) {
+                languageResource.getAll().then(function (languages) {
+                    $scope.languages = languages;
+                });
+            }));
+
+        evts.push(eventsService.on("editors.languages.languageCreated",
+            function (e, args) {
+                languageResource.getAll().then(function (languages) {
+                    $scope.languages = languages;
+                });
+            }));
+
+        // load languages
+        languageResource.getAll().then(function (languages) {
+            $scope.languages = languages;
+
+            // select the default language
+            $scope.languages.forEach(function (language) {
+                if (language.isDefault) {
+                    $scope.selectLanguage(language);
+                }
+            });
+        });
+
+        $scope.selectLanguage = function (language, languages) {
+            $scope.selectedLanguage = language;
+            // close the language selector
+            $scope.page.languageSelectorIsOpen = false;
+        };
+
+        $scope.toggleLanguageSelector = function () {
+            $scope.page.languageSelectorIsOpen = !$scope.page.languageSelectorIsOpen;
+        };
 
 
         //This is called from ng-init
@@ -70,8 +127,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
         if (dialogOptions.section === "member") {
             $scope.entityType = "Member";
-        }
-        else if (dialogOptions.section === "media") {
+        } else if (dialogOptions.section === "media") {
             $scope.entityType = "Media";
         }
 
@@ -81,15 +137,17 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         $scope.enableSearh = searchableSections.indexOf($scope.section) !== -1;
 
         //if a alternative startnode is used, we need to check if it is a container
-        if ($scope.enableSearh && dialogOptions.startNodeId && dialogOptions.startNodeId !== -1 && dialogOptions.startNodeId !== "-1") {
-            entityResource.getById(dialogOptions.startNodeId, $scope.entityType).then(function(node) {
-                    if (node.metaData.IsContainer) {
-                        openMiniListView(node);
-                    }
-                    initTree();
-                });
-        }
-        else {
+        if ($scope.enableSearh &&
+            dialogOptions.startNodeId &&
+            dialogOptions.startNodeId !== -1 &&
+            dialogOptions.startNodeId !== "-1") {
+            entityResource.getById(dialogOptions.startNodeId, $scope.entityType).then(function (node) {
+                if (node.metaData.IsContainer) {
+                    openMiniListView(node);
+                }
+                initTree();
+            });
+        } else {
             initTree();
         }
 
@@ -102,11 +160,9 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             //used advanced filtering
             if (angular.isFunction(dialogOptions.filter)) {
                 dialogOptions.filterAdvanced = true;
-            }
-            else if (angular.isObject(dialogOptions.filter)) {
+            } else if (angular.isObject(dialogOptions.filter)) {
                 dialogOptions.filterAdvanced = true;
-            }
-            else {
+            } else {
                 if (dialogOptions.filter.startsWith("!")) {
                     dialogOptions.filterExclude = true;
                     dialogOptions.filter = dialogOptions.filter.substring(1);
@@ -138,17 +194,19 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             if (angular.isArray(args.children)) {
 
                 //iterate children
-                _.each(args.children, function (child) {
+                _.each(args.children,
+                    function (child) {
 
-                    //now we need to look in the already selected search results and
-                    // toggle the check boxes for those ones that are listed
-                    var exists = _.find($scope.searchInfo.selectedSearchResults, function (selected) {
-                        return child.id == selected.id;
+                        //now we need to look in the already selected search results and
+                        // toggle the check boxes for those ones that are listed
+                        var exists = _.find($scope.searchInfo.selectedSearchResults,
+                            function (selected) {
+                                return child.id == selected.id;
+                            });
+                        if (exists) {
+                            child.selected = true;
+                        }
                     });
-                    if (exists) {
-                        child.selected = true;
-                    }
-                });
 
                 //check filter
                 performFiltering(args.children);
@@ -176,16 +234,17 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
                 //remove it from the list view children
                 var listView = args.node.parent();
-                listView.children = _.reject(listView.children, function (child) {
-                    return child.id == args.node.id;
-                });
+                listView.children = _.reject(listView.children,
+                    function (child) {
+                        return child.id == args.node.id;
+                    });
 
                 //remove it from the custom tracked search result list
-                $scope.searchInfo.selectedSearchResults = _.reject($scope.searchInfo.selectedSearchResults, function (i) {
-                    return i.id == args.node.id;
-                });
-            }
-            else {
+                $scope.searchInfo.selectedSearchResults = _.reject($scope.searchInfo.selectedSearchResults,
+                    function (i) {
+                        return i.id == args.node.id;
+                    });
+            } else {
                 eventsService.emit("dialogs.treePickerController.select", args);
 
                 if (args.node.filtered) {
@@ -223,13 +282,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     } else {
                         multiSelectItem(rootNode);
                     }
-                }
-                else {
+                } else {
                     $scope.model.selection.push(rootNode);
                     $scope.model.submit($scope.model);
                 }
-            }
-            else {
+            } else {
 
                 if ($scope.multiPicker) {
 
@@ -242,9 +299,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                         });
                     }
 
-                }
-
-                else {
+                } else {
 
                     $scope.hideSearch();
 
@@ -294,9 +349,10 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
             //remove any list view search nodes from being filtered since these are special nodes that always must
             // be allowed to be clicked on
-            nodes = _.filter(nodes, function (n) {
-                return !angular.isObject(n.metaData.listViewNode);
-            });
+            nodes = _.filter(nodes,
+                function (n) {
+                    return !angular.isObject(n.metaData.listViewNode);
+                });
 
             if (dialogOptions.filterAdvanced) {
 
@@ -305,32 +361,34 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     ? _.filter(nodes, dialogOptions.filter)
                     : _.where(nodes, dialogOptions.filter);
 
-                angular.forEach(filtered, function (value, key) {
-                    value.filtered = true;
-                    if (dialogOptions.filterCssClass) {
-                        if (!value.cssClasses) {
-                            value.cssClasses = [];
-                        }
-                        value.cssClasses.push(dialogOptions.filterCssClass);
-                    }
-                });
-            } else {
-                var a = dialogOptions.filter.toLowerCase().replace(/\s/g, '').split(',');
-                angular.forEach(nodes, function (value, key) {
-
-                    var found = a.indexOf(value.metaData.contentType.toLowerCase()) >= 0;
-
-                    if (!dialogOptions.filterExclude && !found || dialogOptions.filterExclude && found) {
+                angular.forEach(filtered,
+                    function (value, key) {
                         value.filtered = true;
-
                         if (dialogOptions.filterCssClass) {
                             if (!value.cssClasses) {
                                 value.cssClasses = [];
                             }
                             value.cssClasses.push(dialogOptions.filterCssClass);
                         }
-                    }
-                });
+                    });
+            } else {
+                var a = dialogOptions.filter.toLowerCase().replace(/\s/g, '').split(',');
+                angular.forEach(nodes,
+                    function (value, key) {
+
+                        var found = a.indexOf(value.metaData.contentType.toLowerCase()) >= 0;
+
+                        if (!dialogOptions.filterExclude && !found || dialogOptions.filterExclude && found) {
+                            value.filtered = true;
+
+                            if (dialogOptions.filterCssClass) {
+                                if (!value.cssClasses) {
+                                    value.cssClasses = [];
+                                }
+                                value.cssClasses.push(dialogOptions.filterCssClass);
+                            }
+                        }
+                    });
             }
         }
 
@@ -355,11 +413,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             //add/remove to our custom tracked list of selected search results
             if (result.selected) {
                 $scope.searchInfo.selectedSearchResults.push(result);
-            }
-            else {
-                $scope.searchInfo.selectedSearchResults = _.reject($scope.searchInfo.selectedSearchResults, function (i) {
-                    return i.id == result.id;
-                });
+            } else {
+                $scope.searchInfo.selectedSearchResults = _.reject($scope.searchInfo.selectedSearchResults,
+                    function (i) {
+                        return i.id == result.id;
+                    });
             }
 
             //ensure the tree node in the tree is checked/unchecked if it already exists there
@@ -380,66 +438,74 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                 //we need to ensure that any currently displayed nodes that get selected
                 // from the search get updated to have a check box!
                 function checkChildren(children) {
-                    _.each(children, function (child) {
-                        //check if the id is in the selection, if so ensure it's flagged as selected
-                        var exists = _.find($scope.searchInfo.selectedSearchResults, function (selected) {
-                            return child.id == selected.id;
-                        });
-                        //if the curr node exists in selected search results, ensure it's checked
-                        if (exists) {
-                            child.selected = true;
-                        }
-                        //if the curr node does not exist in the selected search result, and the curr node is a child of a list view search result
-                        else if (child.metaData.isSearchResult) {
-                            //if this tree node is under a list view it means that the node was added
-                            // to the tree dynamically under the list view that was searched, so we actually want to remove
-                            // it all together from the tree
-                            var listView = child.parent();
-                            listView.children = _.reject(listView.children, function (c) {
-                                return c.id == child.id;
-                            });
-                        }
-
-                        //check if the current node is a list view and if so, check if there's any new results
-                        // that need to be added as child nodes to it based on search results selected
-                        if (child.metaData.isContainer) {
-
-                            child.cssClasses = _.reject(child.cssClasses, function (c) {
-                                return c === 'tree-node-slide-up-hide-active';
-                            });
-
-                            var listViewResults = _.filter($scope.searchInfo.selectedSearchResults, function (i) {
-                                return i.parentId == child.id;
-                            });
-                            _.each(listViewResults, function (item) {
-                                var childExists = _.find(child.children, function (c) {
-                                    return c.id == item.id;
+                    _.each(children,
+                        function (child) {
+                            //check if the id is in the selection, if so ensure it's flagged as selected
+                            var exists = _.find($scope.searchInfo.selectedSearchResults,
+                                function (selected) {
+                                    return child.id == selected.id;
                                 });
-                                if (!childExists) {
-                                    var parent = child;
-                                    child.children.unshift({
-                                        id: item.id,
-                                        name: item.name,
-                                        cssClass: "icon umb-tree-icon sprTree " + item.icon,
-                                        level: child.level + 1,
-                                        metaData: {
-                                            isSearchResult: true
-                                        },
-                                        hasChildren: false,
-                                        parent: function () {
-                                            return parent;
+                            //if the curr node exists in selected search results, ensure it's checked
+                            if (exists) {
+                                child.selected = true;
+                            }
+                            //if the curr node does not exist in the selected search result, and the curr node is a child of a list view search result
+                            else if (child.metaData.isSearchResult) {
+                                //if this tree node is under a list view it means that the node was added
+                                // to the tree dynamically under the list view that was searched, so we actually want to remove
+                                // it all together from the tree
+                                var listView = child.parent();
+                                listView.children = _.reject(listView.children,
+                                    function (c) {
+                                        return c.id == child.id;
+                                    });
+                            }
+
+                            //check if the current node is a list view and if so, check if there's any new results
+                            // that need to be added as child nodes to it based on search results selected
+                            if (child.metaData.isContainer) {
+
+                                child.cssClasses = _.reject(child.cssClasses,
+                                    function (c) {
+                                        return c === 'tree-node-slide-up-hide-active';
+                                    });
+
+                                var listViewResults = _.filter($scope.searchInfo.selectedSearchResults,
+                                    function (i) {
+                                        return i.parentId == child.id;
+                                    });
+                                _.each(listViewResults,
+                                    function (item) {
+                                        var childExists = _.find(child.children,
+                                            function (c) {
+                                                return c.id == item.id;
+                                            });
+                                        if (!childExists) {
+                                            var parent = child;
+                                            child.children.unshift({
+                                                id: item.id,
+                                                name: item.name,
+                                                cssClass: "icon umb-tree-icon sprTree " + item.icon,
+                                                level: child.level + 1,
+                                                metaData: {
+                                                    isSearchResult: true
+                                                },
+                                                hasChildren: false,
+                                                parent: function () {
+                                                    return parent;
+                                                }
+                                            });
                                         }
                                     });
-                                }
-                            });
-                        }
+                            }
 
-                        //recurse
-                        if (child.children && child.children.length > 0) {
-                            checkChildren(child.children);
-                        }
-                    });
+                            //recurse
+                            if (child.children && child.children.length > 0) {
+                                checkChildren(child.children);
+                            }
+                        });
                 }
+
                 checkChildren(tree.root.children);
             }
 
@@ -456,21 +522,24 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             performFiltering(results);
 
             //now actually remove all filtered items so they are not even displayed
-            results = _.filter(results, function (item) {
-                return !item.filtered;
-            });
+            results = _.filter(results,
+                function (item) {
+                    return !item.filtered;
+                });
 
             $scope.searchInfo.results = results;
 
             //sync with the curr selected results
-            _.each($scope.searchInfo.results, function (result) {
-                var exists = _.find($scope.model.selection, function (selectedId) {
-                    return result.id == selectedId;
+            _.each($scope.searchInfo.results,
+                function (result) {
+                    var exists = _.find($scope.model.selection,
+                        function (selectedId) {
+                            return result.id == selectedId;
+                        });
+                    if (exists) {
+                        result.selected = true;
+                    }
                 });
-                if (exists) {
-                    result.selected = true;
-                }
-            });
 
             $scope.searchInfo.showSearch = true;
         };
@@ -479,11 +548,12 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
         $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
 
-        $scope.$on('$destroy', function () {
-            $scope.dialogTreeEventHandler.unbind("treeLoaded", treeLoadedHandler);
-            $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
-            $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-        });
+        $scope.$on('$destroy',
+            function () {
+                $scope.dialogTreeEventHandler.unbind("treeLoaded", treeLoadedHandler);
+                $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
+                $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
+            });
 
         $scope.selectListViewNode = function (node) {
             select(node.name, node.id);
@@ -498,5 +568,13 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         function openMiniListView(node) {
             $scope.miniListView = node;
         }
+
+        //ensure to unregister from all events!
+        $scope.$on('$destroy',
+            function () {
+                for (var e in evts) {
+                    eventsService.unsubscribe(evts[e]);
+                }
+            });
 
     });
