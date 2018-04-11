@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LanguagesOverviewController($location, $timeout, navigationService, notificationsService, localizationService, languageResource) {
+    function LanguagesOverviewController($location, $timeout, navigationService, notificationsService, localizationService, languageResource, eventsService) {
 
         var vm = this;
 
@@ -58,8 +58,15 @@
                 language.deleteButtonState = "busy";
 
                 languageResource.deleteById(language.id).then(function () {
+
+                    // emit event
+                    var args = { language: language };
+                    eventsService.emit("editors.languages.languageDeleted", args);
+
+                    // remove from list
                     var index = vm.languages.indexOf(language);
                     vm.languages.splice(index, 1);
+
                 }, function (err) {
                     language.deleteButtonState = "error";
 
