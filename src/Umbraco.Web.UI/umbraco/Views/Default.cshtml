@@ -53,7 +53,7 @@
 </head>
 <noscript><h5><strong>&nbsp; JavaScript is disabled. Please enable to continue!</strong></h5></noscript>
 <body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
-
+    <div ng-controller="Umbraco.NodeEditsController"></div>
     <div ng-hide="!authenticated" ng-cloak>
     
         <!-- help dialog controller by the help button - this also forces the backoffice UI to shift 400px  -->

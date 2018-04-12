@@ -5,6 +5,9 @@
 
     'lib/moment/moment.min.js',
 
+    'lib/signalr/jquery.signalR.min.js',
+    'BackOffice/signalr/hubs',
+
     'lib/jquery-ui/jquery-ui.min.js',
     'lib/jquery-ui-touch-punch/jquery.ui.touch-punch.js',
 

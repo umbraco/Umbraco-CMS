@@ -23,6 +23,7 @@
     "jquery": "2.2.4",
     "jquery-ui": "1.11.4",
     "jquery-migrate": "1.4.0",
+    "signalr": "2.2.2",
     "angular-dynamic-locale": "0.1.28",
     "ng-file-upload": "~7.3.8",
     "tinymce": "~4.7.1",
@@ -72,6 +73,7 @@
       "ng-file-upload": "bower_components/ng-file-upload/ng-file-upload.min.js",
       "jquery-ui": "bower_components/jquery-ui/jquery-ui.min.js",
       "jquery-migrate": "bower_components/jquery-migrate/jquery-migrate.min.js",
+      "signalr": "bower_components/signalr/jquery.signalR.min.js",
       "clipboard": "bower_components/clipboard/dist/clipboard.min.js"
     }
   }
