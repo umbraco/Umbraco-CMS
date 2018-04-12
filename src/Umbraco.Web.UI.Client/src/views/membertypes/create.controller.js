@@ -14,7 +14,7 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
     };
 
     var node = $scope.dialogOptions.currentNode;
-
+    var section = appState.getSectionState("currentSection");
 
     $scope.showCreateFolder = function() {
         $scope.model.creatingFolder = true;
@@ -33,8 +33,6 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
 
                 formHelper.resetForm({ scope: $scope });
 
-                var section = appState.getSectionState("currentSection");
-
             }, function(err) {
 
                //TODO: Handle errors
@@ -44,7 +42,7 @@ function MemberTypesCreateController($scope, $location, navigationService, membe
 
     $scope.createMemberType = function() {
         $location.search('create', null);
-        $location.path("/settings/membertypes/edit/" + node.id).search("create", "true");
+        $location.path("/" + section + "/membertypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
     }
 }

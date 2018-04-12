@@ -14,6 +14,7 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
     };
 
     var node = $scope.dialogOptions.currentNode;
+    var section = appState.getSectionState("currentSection");
 
     $scope.showCreateFolder = function() {
         $scope.model.creatingFolder = true;
@@ -29,8 +30,6 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
 
                 formHelper.resetForm({ scope: $scope });
 
-                var section = appState.getSectionState("currentSection");
-
             }, function(err) {
 
                //TODO: Handle errors
@@ -40,7 +39,7 @@ function DataTypeCreateController($scope, $location, navigationService, dataType
 
     $scope.createDataType = function() {
         $location.search('create', null);
-        $location.path("/developer/datatypes/edit/" + node.id).search("create", "true");
+        $location.path("/" + section + "/datatypes/edit/" + node.id).search("create", "true");
         navigationService.hideMenu();
     }
 }

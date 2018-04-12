@@ -23,7 +23,7 @@ namespace Umbraco.Web.PropertyEditors
             // sanitize configuraiton
             var output = base.ToConfigurationEditor(configuration);
 
-            output["multiPicker"] = configuration.MaxNumber > 1 ? "1" : "0";
+            output["multiPicker"] = configuration.MaxNumber > 1 ? true : false;
 
             return output;
         }

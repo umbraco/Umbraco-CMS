@@ -1,6 +1,18 @@
-//this controller simply tells the dialogs service to open a mediaPicker window
-//with a specified callback, this callback will receive an object with a selection on it
 
+/**
+ * The controller that is used for a couple different Property Editors: Multi Node Tree Picker, Content Picker,
+ * since this is used by MNTP and it supports content, media and members, there is code to deal with all 3 of those types
+ * @param {any} $scope
+ * @param {any} entityResource
+ * @param {any} editorState
+ * @param {any} iconHelper
+ * @param {any} $routeParams
+ * @param {any} angularHelper
+ * @param {any} navigationService
+ * @param {any} $location
+ * @param {any} miniEditorHelper
+ * @param {any} localizationService
+ */
 function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, miniEditorHelper, localizationService) {
 
     var unsubscribe;
@@ -89,10 +101,10 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
-    $scope.model.config.multiPicker = ($scope.model.config.multiPicker === "1" ? true : false);
-    $scope.model.config.showOpenButton = ($scope.model.config.showOpenButton === "1" ? true : false);
-    $scope.model.config.showEditButton = ($scope.model.config.showEditButton === "1" ? true : false);
-    $scope.model.config.showPathOnHover = ($scope.model.config.showPathOnHover === "1" ? true : false);
+    $scope.model.config.multiPicker = Object.toBoolean($scope.model.config.multiPicker);
+    $scope.model.config.showOpenButton = Object.toBoolean($scope.model.config.showOpenButton);
+    $scope.model.config.showEditButton = Object.toBoolean($scope.model.config.showEditButton);
+    $scope.model.config.showPathOnHover = Object.toBoolean($scope.model.config.showPathOnHover);
  
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
@@ -105,6 +117,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     //the dialog options for the picker
     var dialogOptions = {
+        view: "treepicker",
         multiPicker: $scope.model.config.multiPicker,
         entityType: entityType,
         filterCssClass: "not-allowed not-published",
@@ -128,7 +141,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the 
     // pre-value config on to the dialog options
     angular.extend(dialogOptions, $scope.model.config);
-
+    
     //We need to manually handle the filter for members here since the tree displayed is different and only contains
     // searchable list views
     if (entityType === "Member") {
@@ -155,7 +168,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             return false;
         }
     }
-
     if ($routeParams.section === "settings" && $routeParams.tree === "documentTypes") {
         //if the content-picker is being rendered inside the document-type editor, we don't need to process the startnode query
         dialogOptions.startNodeId = -1;
@@ -173,7 +185,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     //dialog
     $scope.openContentPicker = function() {
       $scope.contentPickerOverlay = dialogOptions;
-      $scope.contentPickerOverlay.view = "treepicker";
       $scope.contentPickerOverlay.show = true;
 
       $scope.contentPickerOverlay.submit = function(model) {

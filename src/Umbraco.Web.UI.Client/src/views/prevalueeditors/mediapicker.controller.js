@@ -14,6 +14,7 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
     $scope.sortable = false;
 
     var dialogOptions = {
+        view: "treepicker",
         multiPicker: false,
         entityType: "Media",
         section: "media",
@@ -28,7 +29,6 @@ function mediaPickerController($scope, dialogService, entityResource, $log, icon
 
     $scope.openContentPicker = function() {
       $scope.contentPickerOverlay = dialogOptions;
-      $scope.contentPickerOverlay.view = "treePicker";
       $scope.contentPickerOverlay.show = true;
 
       $scope.contentPickerOverlay.submit = function(model) {

@@ -12,6 +12,7 @@ angular.module('umbraco')
         $scope.sortable = false;
 
         var config = {
+            view: "treepicker",
             multiPicker: false,
             entityType: "Document",
             type: "content",
@@ -52,7 +53,6 @@ angular.module('umbraco')
         $scope.openContentPicker = function () {
             $scope.treePickerOverlay = config;
             $scope.treePickerOverlay.section = config.type;
-            $scope.treePickerOverlay.view = "treePicker";
             $scope.treePickerOverlay.show = true;
 
             $scope.treePickerOverlay.submit = function (model) {

@@ -15,174 +15,176 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         memberResource,
         languageResource) {
 
+        //used as the result selection
+        $scope.model.selection = [];
+
+        //the tree object when it loads
         var tree = null;
-        var dialogOptions = $scope.model;
-        $scope.treeReady = false;
-        $scope.dialogTreeEventHandler = $({});
-        $scope.section = dialogOptions.section;
-        $scope.treeAlias = dialogOptions.treeAlias;
-        $scope.multiPicker = dialogOptions.multiPicker;
-        $scope.hideHeader = (typeof dialogOptions.hideHeader) === "boolean" ? dialogOptions.hideHeader : true;
+
+        // Search and listviews is only working for content, media and member section
+        var searchableSections = ["content", "media", "member"];
+
+        var vm = this;
+        vm.treeReady = false;
+        vm.dialogTreeEventHandler = $({});
+        vm.section = $scope.model.section;
+        vm.treeAlias = $scope.model.treeAlias;
+        vm.multiPicker = $scope.model.multiPicker;
+        vm.hideHeader = (typeof $scope.model.hideHeader) === "boolean" ? $scope.model.hideHeader : true;
         // if you need to load a not initialized tree set this value to false - default is true
-        $scope.onlyInitialized = dialogOptions.onlyInitialized;
-        $scope.searchInfo = {
-            searchFromId: dialogOptions.startNodeId,
+        vm.onlyInitialized = $scope.model.onlyInitialized;
+        vm.searchInfo = {
+            searchFromId: $scope.model.startNodeId,
             searchFromName: null,
             showSearch: false,
             results: [],
             selectedSearchResults: []
         }
-
-        $scope.model.selection = [];
-
+        vm.startNodeId = $scope.model.startNodeId;
         //Used for toggling an empty-state message
         //Some trees can have no items (dictionary & forms email templates)
-        $scope.hasItems = true;
-        $scope.emptyStateMessage = dialogOptions.emptyStateMessage;
+        vm.hasItems = true;
+        vm.emptyStateMessage = $scope.model.emptyStateMessage;
+        vm.languages = [];
+        vm.selectedLanguage = {};
+        vm.languageSelectorIsOpen = false;
+        vm.showLanguageSelector = $scope.model.showLanguageSelector;
+        // Allow the entity type to be passed in but defaults to Document for backwards compatibility.
+        vm.entityType = $scope.model.entityType ? $scope.model.entityType : "Document";
+        vm.enableSearh = searchableSections.indexOf(vm.section) !== -1;
 
-        $scope.languages = [];
-        $scope.selectedLanguage = {};
-        $scope.page = {};
-        $scope.page.languageSelectorIsOpen = false;
 
-        var evts = [];
+        vm.toggleLanguageSelector = toggleLanguageSelector;
+        vm.selectLanguage = selectLanguage;
+        vm.onSearchResults = onSearchResults;
+        vm.hideSearch = hideSearch;
+        vm.closeMiniListView = closeMiniListView;
+        vm.selectListViewNode = selectListViewNode;
 
-        // Listen for language updates
-        evts.push(eventsService.on("editors.languages.languageDeleted",
-            function (e, args) {
-                languageResource.getAll().then(function (languages) {
-                    $scope.languages = languages;
+        /**
+         * Performs the initialization of this component
+         */
+        function onInit () {
+            
+            // load languages
+            languageResource.getAll().then(function (languages) {
+                vm.languages = languages;
+
+                // set the default language
+                vm.languages.forEach(function (language) {
+                    if (language.isDefault) {
+                        vm.selectedLanguage = language;
+                        vm.languageSelectorIsOpen = false;
+                    }
                 });
-            }));
-
-        evts.push(eventsService.on("editors.languages.languageCreated",
-            function (e, args) {
-                languageResource.getAll().then(function (languages) {
-                    $scope.languages = languages;
-                });
-            }));
-
-        // load languages
-        languageResource.getAll().then(function (languages) {
-            $scope.languages = languages;
-
-            // select the default language
-            $scope.languages.forEach(function (language) {
-                if (language.isDefault) {
-                    $scope.selectLanguage(language);
-                }
             });
-        });
 
-        $scope.selectLanguage = function (language) {
-            $scope.selectedLanguage = language;
-            // close the language selector
-            $scope.page.languageSelectorIsOpen = false;
-        };
-
-        $scope.toggleLanguageSelector = function () {
-            $scope.page.languageSelectorIsOpen = !$scope.page.languageSelectorIsOpen;
-        };
-
-
-        //This is called from ng-init
-        //it turns out it is called from the angular html : / Have a look at views/common / overlays / contentpicker / contentpicker.html you'll see ng-init. 
-        //this is probably an anti pattern IMO and shouldn't be used
-        $scope.init = function (contentType) {
-
-            if (contentType === "content") {
-                $scope.entityType = "Document";
+            if (vm.treeAlias === "content") {
+                vm.entityType = "Document";
                 if (!$scope.model.title) {
                     $scope.model.title = localizationService.localize("defaultdialogs_selectContent");
                 }
-            } else if (contentType === "member") {
-                $scope.entityType = "Member";
+            }
+            else if (vm.treeAlias === "member" || vm.section) {
+                vm.entityType = "Member";
                 if (!$scope.model.title) {
                     $scope.model.title = localizationService.localize("defaultdialogs_selectMember");
                 }
-            } else if (contentType === "media") {
-                $scope.entityType = "Media";
+            }
+            else if (vm.treeAlias === "media" || vm.section === "media") {
+                vm.entityType = "Media";
                 if (!$scope.model.title) {
                     $scope.model.title = localizationService.localize("defaultdialogs_selectMedia");
                 }
             }
-        }
 
-        var searchText = "Search...";
-        localizationService.localize("general_search").then(function (value) {
-            searchText = value + "...";
-        });
+            //var searchText = "Search...";
+            //localizationService.localize("general_search").then(function (value) {
+            //    searchText = value + "...";
+            //});
 
-        // Allow the entity type to be passed in but defaults to Document for backwards compatibility.
-        $scope.entityType = dialogOptions.entityType ? dialogOptions.entityType : "Document";
+            //min / max values
+            //TODO: Where are these used?
+            if ($scope.model.minNumber) {
+                $scope.model.minNumber = parseInt($scope.model.minNumber, 10);
+            }
+            if ($scope.model.maxNumber) {
+                $scope.model.maxNumber = parseInt($scope.model.maxNumber, 10);
+            }
 
-
-        //min / max values
-        if (dialogOptions.minNumber) {
-            dialogOptions.minNumber = parseInt(dialogOptions.minNumber, 10);
-        }
-        if (dialogOptions.maxNumber) {
-            dialogOptions.maxNumber = parseInt(dialogOptions.maxNumber, 10);
-        }
-
-        if (dialogOptions.section === "member") {
-            $scope.entityType = "Member";
-        } else if (dialogOptions.section === "media") {
-            $scope.entityType = "Media";
-        }
-
-        // Search and listviews is only working for content, media and member section
-        var searchableSections = ["content", "media", "member"];
-
-        $scope.enableSearh = searchableSections.indexOf($scope.section) !== -1;
-
-        //if a alternative startnode is used, we need to check if it is a container
-        if ($scope.enableSearh &&
-            dialogOptions.startNodeId &&
-            dialogOptions.startNodeId !== -1 &&
-            dialogOptions.startNodeId !== "-1") {
-            entityResource.getById(dialogOptions.startNodeId, $scope.entityType).then(function (node) {
-                if (node.metaData.IsContainer) {
-                    openMiniListView(node);
-                }
+            //if a alternative startnode is used, we need to check if it is a container
+            if (vm.enableSearh &&
+                vm.startNodeId &&
+                vm.startNodeId !== -1 &&
+                vm.startNodeId !== "-1") {
+                entityResource.getById(vm.startNodeId, vm.entityType).then(function (node) {
+                    if (node.metaData.IsContainer) {
+                        openMiniListView(node);
+                    }
+                    initTree();
+                });
+            }
+            else {
                 initTree();
-            });
-        } else {
-            initTree();
-        }
+            }
 
-        //Configures filtering
-        if (dialogOptions.filter) {
+            //Configures filtering
+            if ($scope.model.filter) {
 
-            dialogOptions.filterExclude = false;
-            dialogOptions.filterAdvanced = false;
-
-            //used advanced filtering
-            if (angular.isFunction(dialogOptions.filter)) {
-                dialogOptions.filterAdvanced = true;
-            } else if (angular.isObject(dialogOptions.filter)) {
-                dialogOptions.filterAdvanced = true;
-            } else {
-                if (dialogOptions.filter.startsWith("!")) {
-                    dialogOptions.filterExclude = true;
-                    dialogOptions.filter = dialogOptions.filter.substring(1);
-                }
+                $scope.model.filterExclude = false;
+                $scope.model.filterAdvanced = false;
 
                 //used advanced filtering
-                if (dialogOptions.filter.startsWith("{")) {
-                    dialogOptions.filterAdvanced = true;
-                    //convert to object
-                    dialogOptions.filter = angular.fromJson(dialogOptions.filter);
+                if (angular.isFunction($scope.model.filter)) {
+                    $scope.model.filterAdvanced = true;
+                }
+                else if (angular.isObject($scope.model.filter)) {
+                    $scope.model.filterAdvanced = true;
+                }
+                else {
+                    if ($scope.model.filter.startsWith("!")) {
+                        $scope.model.filterExclude = true;
+                        $scope.model.filter = $scope.model.filter.substring(1);
+                    }
+
+                    //used advanced filtering
+                    if ($scope.model.filter.startsWith("{")) {
+                        $scope.model.filterAdvanced = true;
+                        //convert to object
+                        $scope.model.filter = angular.fromJson($scope.model.filter);
+                    }
                 }
             }
         }
 
+        /**
+         * Updates the tree's query parameters
+         */
         function initTree() {
             //create the custom query string param for this tree
-            $scope.customTreeParams = dialogOptions.startNodeId ? "startNodeId=" + dialogOptions.startNodeId : "";
-            $scope.customTreeParams += dialogOptions.customTreeParams ? "&" + dialogOptions.customTreeParams : "";
-            $scope.treeReady = true;
+            var queryParams = {};
+            if (vm.startNodeId) {
+                queryParams["startNodeId"] = $scope.model.startNodeId;
+            }
+            if (vm.selectedLanguage && vm.selectedLanguage.id) {
+                queryParams["languageId"] = vm.selectedLanguage.id;
+            }
+            var queryString = $.param(queryParams); //create the query string from the params object
+            vm.customTreeParams = queryString + (queryString ? "&" : "") + ($scope.model.customTreeParams ? $scope.model.customTreeParams : "");
+
+            vm.treeReady = true;
         }
+
+        function selectLanguage(language) {
+            vm.selectedLanguage = language;
+            // close the language selector
+            vm.languageSelectorIsOpen = false;
+            initTree();
+        };
+
+        function toggleLanguageSelector() {
+            vm.languageSelectorIsOpen = !vm.languageSelectorIsOpen;
+        };
 
         function nodeExpandedHandler(ev, args) {
 
@@ -199,7 +201,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
                         //now we need to look in the already selected search results and
                         // toggle the check boxes for those ones that are listed
-                        var exists = _.find($scope.searchInfo.selectedSearchResults,
+                        var exists = _.find(vm.searchInfo.selectedSearchResults,
                             function (selected) {
                                 return child.id == selected.id;
                             });
@@ -216,7 +218,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         //gets the tree object when it loads
         function treeLoadedHandler(ev, args) {
             //args.tree contains children (args.tree.root.children)
-            $scope.hasItems = args.tree.root.children.length > 0;
+            vm.hasItems = args.tree.root.children.length > 0;
 
             tree = args.tree;
         }
@@ -240,11 +242,12 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     });
 
                 //remove it from the custom tracked search result list
-                $scope.searchInfo.selectedSearchResults = _.reject($scope.searchInfo.selectedSearchResults,
+                vm.searchInfo.selectedSearchResults = _.reject(vm.searchInfo.selectedSearchResults,
                     function (i) {
                         return i.id == args.node.id;
                     });
-            } else {
+            }
+            else {
                 eventsService.emit("dialogs.treePickerController.select", args);
 
                 if (args.node.filtered) {
@@ -255,7 +258,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                 //from the server in this method.
                 if ($scope.model.select) {
                     $scope.model.select(args.node);
-                } else {
+                }
+                else {
                     select(args.node.name, args.node.id);
                     //toggle checked state
                     args.node.selected = args.node.selected === true ? false : true;
@@ -276,40 +280,46 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     name: text
                 };
 
-                if ($scope.multiPicker) {
+                if (vm.multiPicker) {
                     if (entity) {
                         multiSelectItem(entity);
-                    } else {
+                    }
+                    else {
                         multiSelectItem(rootNode);
                     }
-                } else {
+                }
+                else {
                     $scope.model.selection.push(rootNode);
                     $scope.model.submit($scope.model);
                 }
-            } else {
+            }
+            else {
 
-                if ($scope.multiPicker) {
+                if (vm.multiPicker) {
 
                     if (entity) {
                         multiSelectItem(entity);
-                    } else {
+                    }
+                    else {
                         //otherwise we have to get it from the server
-                        entityResource.getById(id, $scope.entityType).then(function (ent) {
+                        entityResource.getById(id, vm.entityType).then(function (ent) {
                             multiSelectItem(ent);
                         });
                     }
 
-                } else {
+                }
+                else {
 
-                    $scope.hideSearch();
+                    hideSearch();
 
                     //if an entity has been passed in, use it
                     if (entity) {
                         $scope.model.selection.push(entity);
                         $scope.model.submit($scope.model);
-                    } else {
+                    }
+                    else {
                         //otherwise we have to get it from the server
-                        entityResource.getById(id, $scope.entityType).then(function (ent) {
+                        entityResource.getById(id, vm.entityType).then(function (ent) {
                             $scope.model.selection.push(ent);
                             $scope.model.submit($scope.model);
                         });
@@ -335,7 +345,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
             if (found) {
                 $scope.model.selection.splice(foundIndex, 1);
-            } else {
+            }
+            else {
                 $scope.model.selection.push(item);
             }
 
@@ -343,7 +354,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
         function performFiltering(nodes) {
 
-            if (!dialogOptions.filter) {
+            if (!$scope.model.filter) {
                 return;
             }
 
@@ -354,52 +365,57 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     return !angular.isObject(n.metaData.listViewNode);
                 });
 
-            if (dialogOptions.filterAdvanced) {
+            if ($scope.model.filterAdvanced) {
 
                 //filter either based on a method or an object
-                var filtered = angular.isFunction(dialogOptions.filter)
-                    ? _.filter(nodes, dialogOptions.filter)
-                    : _.where(nodes, dialogOptions.filter);
+                var filtered = angular.isFunction($scope.model.filter)
+                    ? _.filter(nodes, $scope.model.filter)
+                    : _.where(nodes, $scope.model.filter);
 
                 angular.forEach(filtered,
                     function (value, key) {
                         value.filtered = true;
-                        if (dialogOptions.filterCssClass) {
+                        if ($scope.model.filterCssClass) {
                             if (!value.cssClasses) {
                                 value.cssClasses = [];
                             }
-                            value.cssClasses.push(dialogOptions.filterCssClass);
+                            value.cssClasses.push($scope.model.filterCssClass);
                         }
                     });
-            } else {
-                var a = dialogOptions.filter.toLowerCase().replace(/\s/g, '').split(',');
+            }
+            else {
+                var a = $scope.model.filter.toLowerCase().replace(/\s/g, '').split(',');
                 angular.forEach(nodes,
                     function (value, key) {
 
                         var found = a.indexOf(value.metaData.contentType.toLowerCase()) >= 0;
 
-                        if (!dialogOptions.filterExclude && !found || dialogOptions.filterExclude && found) {
+                        if (!$scope.model.filterExclude && !found || $scope.model.filterExclude && found) {
                             value.filtered = true;
 
-                            if (dialogOptions.filterCssClass) {
+                            if ($scope.model.filterCssClass) {
                                 if (!value.cssClasses) {
                                     value.cssClasses = [];
                                 }
-                                value.cssClasses.push(dialogOptions.filterCssClass);
+                                value.cssClasses.push($scope.model.filterCssClass);
                             }
                         }
                     });
             }
         }
 
-        $scope.multiSubmit = function (result) {
-            entityResource.getByIds(result, $scope.entityType).then(function (ents) {
+        function openMiniListView(node) {
+            vm.miniListView = node;
+        }
+
+        function multiSubmit(result) {
+            entityResource.getByIds(result, vm.entityType).then(function (ents) {
                 $scope.submit(ents);
             });
-        };
+        }
 
         /** method to select a search result */
-        $scope.selectResult = function (evt, result) {
+        function selectResult(evt, result) {
 
             if (result.filtered) {
                 return;
@@ -412,9 +428,10 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
             //add/remove to our custom tracked list of selected search results
             if (result.selected) {
-                $scope.searchInfo.selectedSearchResults.push(result);
-            } else {
-                $scope.searchInfo.selectedSearchResults = _.reject($scope.searchInfo.selectedSearchResults,
+                vm.searchInfo.selectedSearchResults.push(result);
+            }
+            else {
+                vm.searchInfo.selectedSearchResults = _.reject(vm.searchInfo.selectedSearchResults,
                     function (i) {
                         return i.id == result.id;
                     });
@@ -427,10 +444,9 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     found.selected = result.selected;
                 }
             }
+        }
 
-        };
-
-        $scope.hideSearch = function () {
+        function hideSearch() {
 
             //Traverse the entire displayed tree and update each node to sync with the selected search results
             if (tree) {
@@ -441,7 +457,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     _.each(children,
                         function (child) {
                             //check if the id is in the selection, if so ensure it's flagged as selected
-                            var exists = _.find($scope.searchInfo.selectedSearchResults,
+                            var exists = _.find(vm.searchInfo.selectedSearchResults,
                                 function (selected) {
                                     return child.id == selected.id;
                                 });
@@ -470,7 +486,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                                         return c === 'tree-node-slide-up-hide-active';
                                     });
 
-                                var listViewResults = _.filter($scope.searchInfo.selectedSearchResults,
+                                var listViewResults = _.filter(vm.searchInfo.selectedSearchResults,
                                     function (i) {
                                         return i.parentId == child.id;
                                     });
@@ -510,13 +526,13 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             }
 
 
-            $scope.searchInfo.showSearch = false;
-            $scope.searchInfo.searchFromId = dialogOptions.startNodeId;
-            $scope.searchInfo.searchFromName = null;
-            $scope.searchInfo.results = [];
+            vm.searchInfo.showSearch = false;
+            vm.searchInfo.searchFromId = vm.startNodeId;
+            vm.searchInfo.searchFromName = null;
+            vm.searchInfo.results = [];
         }
 
-        $scope.onSearchResults = function (results) {
+        function onSearchResults(results) {
 
             //filter all items - this will mark an item as filtered
             performFiltering(results);
@@ -527,10 +543,10 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     return !item.filtered;
                 });
 
-            $scope.searchInfo.results = results;
+            vm.searchInfo.results = results;
 
             //sync with the curr selected results
-            _.each($scope.searchInfo.results,
+            _.each(vm.searchInfo.results,
                 function (result) {
                     var exists = _.find($scope.model.selection,
                         function (selectedId) {
@@ -541,40 +557,31 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     }
                 });
 
-            $scope.searchInfo.showSearch = true;
-        };
+            vm.searchInfo.showSearch = true;
+        }
 
-        $scope.dialogTreeEventHandler.bind("treeLoaded", treeLoadedHandler);
-        $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
-        $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
-
-        $scope.$on('$destroy',
-            function () {
-                $scope.dialogTreeEventHandler.unbind("treeLoaded", treeLoadedHandler);
-                $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
-                $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-            });
-
-        $scope.selectListViewNode = function (node) {
+        function selectListViewNode(node) {
             select(node.name, node.id);
             //toggle checked state
             node.selected = node.selected === true ? false : true;
-        };
-
-        $scope.closeMiniListView = function () {
-            $scope.miniListView = undefined;
-        };
-
-        function openMiniListView(node) {
-            $scope.miniListView = node;
         }
 
-        //ensure to unregister from all events!
+        function closeMiniListView() {
+            vm.miniListView = undefined;
+        }
+
+        vm.dialogTreeEventHandler.bind("treeLoaded", treeLoadedHandler);
+        vm.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
+        vm.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
+
         $scope.$on('$destroy',
             function () {
-                for (var e in evts) {
-                    eventsService.unsubscribe(evts[e]);
-                }
+                vm.dialogTreeEventHandler.unbind("treeLoaded", treeLoadedHandler);
+                vm.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
+                vm.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
             });
+        
+        //initialize
+        onInit();
 
     });

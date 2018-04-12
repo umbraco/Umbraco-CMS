@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Newtonsoft.Json.Linq;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -8,7 +9,7 @@ namespace Umbraco.Web.PropertyEditors
     public class MultiNodePickerConfiguration
     {
         [ConfigurationField("startNode", "Node type", "treesource")]
-        public string TreeSource { get; set; }
+        public MultiNodePickerConfigurationTreeSource TreeSource { get; set; }
 
         [ConfigurationField("filter", "Allow items of type", "textstring", Description = "Separate with comma")]
         public string Filter { get; set; }
@@ -19,7 +20,7 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("maxNumber", "Maximum number of items", "number")]
         public int MaxNumber { get; set; }
 
-        [ConfigurationField("showOpenButtom", "Show open button (this feature is in preview!)", "boolean", Description = "Opens the node in a dialog")]
+        [ConfigurationField("showOpenButton", "Show open button (this feature is in preview!)", "boolean", Description = "Opens the node in a dialog")]
         public bool ShowOpen { get; set; }
     }
 }

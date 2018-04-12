@@ -230,7 +230,9 @@
         function openContentPicker() {
             vm.contentPicker = {
                 title: vm.labels.selectContentStartNode,
-                view: "contentpicker",
+                view: "treepicker",
+                section: "content",
+                treeAlias: "content",
                 multiPicker: true,
                 selection: vm.user.startContentIds,
                 hideHeader: false,
