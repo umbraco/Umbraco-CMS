@@ -1543,7 +1543,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 
 	<key alias="httpsCheckValidCertificate">Le certificat de votre site a été marqué comme valide.</key>
     <key alias="httpsCheckInvalidCertificate">Erreur de validation du certificat : '%0%'</key>
-    <key alias="httpsCheckInvalidUrl">Erreur en essayant de contacter l'URL %0% - '%1%'</key>
+    <key alias="healthCheckInvalidUrl">Erreur en essayant de contacter l'URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Vous êtes actuellement %0% à voir le site via le schéma HTTPS.</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">La valeur appSetting 'umbracoUseSSL' est fixée à 'false' dans votre fichier web.config. Une fois que vous donnerez accès à ce site en utilisant le schéma HTTPS, cette valeur devra être mise à 'true'.</key>
     <key alias="httpsCheckConfigurationCheckResult">La valeur appSetting 'umbracoUseSSL' est fixée à '%0%' dans votre fichier web.config, vos cookies sont %1% marqués comme étant sécurisés.</key>
@@ -1583,10 +1583,10 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 
     <key alias="clickJackingCheckHeaderFound"><![CDATA[Le header ou meta-tag <strong>X-Frame-Options</strong>, utilisé pour contrôler si un site peut être intégré dans un autre via IFRAME, a été trouvé.]]></key>
     <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Le header ou meta-tag <strong>X-Frame-Options</strong> , utilisé pour contrôler si un site peut être intégré dans un autre via IFRAME, n'a pas été trouvé.]]></key>
-    <key alias="clickJackingSetHeaderInConfig">Configurez le Header dans le fichier Config</key>
+    <key alias="setHeaderInConfig">Configurez le Header dans le fichier Config</key>
     <key alias="clickJackingSetHeaderInConfigDescription">Ajoute une valeur dans la section httpProtocol/customHeaders du fichier web.config afin d'éviter que le site ne soit intégré dans d'autres sites via IFRAME.</key>
     <key alias="clickJackingSetHeaderInConfigSuccess">Une configuration générant un header qui empêche l'intégration du site par d'autres sites via IFRAME a été ajoutée à votre fichier web.config.</key>
-    <key alias="clickJackingSetHeaderInConfigError">Impossible de modifier le fichier web.config. Erreur : %0%</key>
+    <key alias="setHeaderInConfigError">Impossible de modifier le fichier web.config. Erreur : %0%</key>
 
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
