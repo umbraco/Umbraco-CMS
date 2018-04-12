@@ -13,7 +13,7 @@ function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
         saveTourStatus: function (tourStatus) {
 
             if (!tourStatus) {
-                return angularHelper.rejectedPromise({ errorMsg: 'tourStatus cannot be empty' });
+                return $q.reject({ errorMsg: 'tourStatus cannot be empty' });
             }
 
             return umbRequestHelper.resourcePromise(
@@ -37,7 +37,7 @@ function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
         performSetInvitedUserPassword: function (newPassword) {
 
             if (!newPassword) {
-                return angularHelper.rejectedPromise({ errorMsg: 'newPassword cannot be empty' });
+                return $q.reject({ errorMsg: 'newPassword cannot be empty' });
             }
 
             return umbRequestHelper.resourcePromise(

@@ -17,8 +17,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
     var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
     $scope.model.disableTemplates = disableTemplates;
 
-    var node = $scope.dialogOptions.currentNode,
-        localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
+    var node = $scope.dialogOptions.currentNode;
 
     $scope.showCreateFolder = function () {
         $scope.model.creatingFolder = true;
@@ -26,7 +25,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
     $scope.createContainer = function () {
 
-        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm, statusMessage: localizeCreateFolder })) {
+        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createFolderForm })) {
 
             contentTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 

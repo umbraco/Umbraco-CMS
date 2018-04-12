@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
+using System.Web.Http.ModelBinding;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -26,10 +27,14 @@ namespace Umbraco.Web.WebApi.Filters
         where TModelSave : ContentBaseItemSave<TPersisted>
     {
 
+        /// <summary>
+        /// Validates the content item and updates the Response and ModelState accordingly
+        /// </summary>
+        /// <param name="actionContext"></param>
+        /// <param name="argumentName"></param>
         public void ValidateItem(HttpActionContext actionContext, string argumentName)
         {
-            var contentItem = actionContext.ActionArguments[argumentName] as TModelSave;
-            if (contentItem == null)
+            if (!(actionContext.ActionArguments[argumentName] is TModelSave contentItem))
             {
                 actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "No " + typeof(TModelSave) + " found in request");
                 return;
@@ -44,7 +49,7 @@ namespace Umbraco.Web.WebApi.Filters
             //now do each validation step
             if (ValidateExistingContent(contentItem, actionContext) == false) return;
             if (ValidateProperties(contentItem, actionContext) == false) return;
-            if (ValidatePropertyData(contentItem, actionContext) == false) return;
+            if (ValidatePropertyData(contentItem, contentItem.ContentDto, actionContext.ModelState) == false) return;
         }
 
         /// <summary>
@@ -57,7 +62,7 @@ namespace Umbraco.Web.WebApi.Filters
         {
             if (postedItem.PersistedContent == null)
             {
-                var message = string.Format("content with id: {0} was not found", postedItem.Id);
+                var message = $"content with id: {postedItem.Id} was not found";
                 actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
                 return false;
             }
@@ -92,7 +97,7 @@ namespace Umbraco.Web.WebApi.Filters
                     //TODO: Do we return errors here ? If someone deletes a property whilst their editing then should we just
                     //save the property data that remains? Or inform them they need to reload... not sure. This problem exists currently too i think.
 
-                    var message = string.Format("property with alias: {0} was not found", p.Alias);
+                    var message = $"property with alias: {p.Alias} was not found";
                     actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, new InvalidOperationException(message));
                     return false;
                 }
@@ -105,14 +110,15 @@ namespace Umbraco.Web.WebApi.Filters
         /// Validates the data for each property
         /// </summary>
         /// <param name="postedItem"></param>
-        /// <param name="actionContext"></param>
+        /// <param name="dto"></param>
+        /// <param name="modelState"></param>
         /// <returns></returns>
         /// <remarks>
         /// All property data validation goes into the modelstate with a prefix of "Properties"
         /// </remarks>
-        protected virtual bool ValidatePropertyData(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
+        public virtual bool ValidatePropertyData(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, ContentItemDto<TPersisted> dto, ModelStateDictionary modelState)
         {
-            foreach (var p in postedItem.ContentDto.Properties)
+            foreach (var p in dto.Properties)
             {
                 var editor = p.PropertyEditor;
 
@@ -120,8 +126,6 @@ namespace Umbraco.Web.WebApi.Filters
                 {
                     var message = $"Could not find property editor \"{p.DataType.EditorAlias}\" for property with id {p.Id}.";
                     Current.Logger.Warn<ContentItemValidationHelper<TPersisted, TModelSave>>(message);
-                    //actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
-                    //return false;
                     continue;
                 }
 
@@ -135,10 +139,10 @@ namespace Umbraco.Web.WebApi.Filters
                 // validate
                 var valueEditor = editor.GetValueEditor(p.DataType.Configuration);
                 foreach (var r in valueEditor.Validate(postedValue, p.IsRequired, p.ValidationRegExp))
-                    actionContext.ModelState.AddPropertyError(r, p.Alias);
+                    modelState.AddPropertyError(r, p.Alias);
             }
 
-            return actionContext.ModelState.IsValid;
+            return modelState.IsValid;
         }
 
 

@@ -13,8 +13,7 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
         creatingFolder: false
     };
 
-    var node = $scope.dialogOptions.currentNode,
-        localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
+    var node = $scope.dialogOptions.currentNode;
 
     $scope.showCreateFolder = function() {
         $scope.model.creatingFolder = true;
@@ -23,8 +22,7 @@ function MediaTypesCreateController($scope, $location, navigationService, mediaT
     $scope.createContainer = function () {
         if (formHelper.submitForm({
             scope: $scope,
-            formCtrl: this.createFolderForm,
-            statusMessage: localizeCreateFolder
+            formCtrl: this.createFolderForm
         })) {
             mediaTypeResource.createContainer(node.id, $scope.model.folderName).then(function (folderId) {
 

@@ -12,7 +12,6 @@
     function MemberTypesEditController($scope, $rootScope, $routeParams, $log, $filter, memberTypeResource, dataTypeResource, editorState, iconHelper, formHelper, navigationService, contentEditingHelper, notificationsService, $q, localizationService, overlayHelper, contentTypeHelper) {
 
         var vm = this;
-        var localizeSaving = localizationService.localize("general_saving");
 
         vm.save = save;
 
@@ -156,7 +155,6 @@
                 vm.page.saveButtonState = "busy";
 
                 contentEditingHelper.contentEditorPerformSave({
-                    statusMessage: localizeSaving,
                     saveMethod: memberTypeResource.save,
                     scope: $scope,
                     content: vm.contentType,

@@ -5,7 +5,6 @@
 
         var vm = this;
         var node = $scope.dialogOptions.currentNode;
-        var localizeCreateFolder = localizationService.localize("defaultdialog_createFolder");
 
         vm.snippets = [];
         vm.showSnippets = false;
@@ -43,7 +42,7 @@
         }
 
         function createFolder(form) {
-            if (formHelper.submitForm({scope: $scope, formCtrl: form, statusMessage: localizeCreateFolder})) {
+            if (formHelper.submitForm({scope: $scope, formCtrl: form })) {
 
                 codefileResource.createContainer("partialViews", node.id, vm.folderName).then(function(saved) {
 

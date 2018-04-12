@@ -73,9 +73,6 @@
     <PackageReference Include="Examine" Version="1.0.0-beta025" />
     <PackageReference Include="HtmlAgilityPack" Version="1.7.2" />
     <PackageReference Include="LightInject" Version="5.1.2" />
-    <PackageReference Include="Examine" Version="1.0.0-beta025" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.5.1" />
-    <PackageReference Include="LightInject" Version="5.0.3" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Mvc" Version="2.0.0" />
     <PackageReference Include="LightInject.Web" Version="2.0.0" />
@@ -230,6 +227,7 @@
     <Compile Include="Media\ThumbnailProviders\ThumbnailProviderCollection.cs" />
     <Compile Include="Media\ThumbnailProviders\ThumbnailProviderCollectionBuilder.cs" />
     <Compile Include="Models\ContentEditing\ContentVariation.cs" />
+    <Compile Include="Models\ContentEditing\ContentVariationPublish.cs" />
     <Compile Include="Models\ContentEditing\EditorNavigation.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />

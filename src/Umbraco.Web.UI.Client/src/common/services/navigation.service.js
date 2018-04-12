@@ -297,7 +297,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             }
 
             //couldn't sync
-            return angularHelper.rejectedPromise();
+            return $q.reject();
         },
 
         /**

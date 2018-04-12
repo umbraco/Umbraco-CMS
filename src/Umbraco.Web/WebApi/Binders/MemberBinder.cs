@@ -183,46 +183,47 @@ namespace Umbraco.Web.WebApi.Binders
             /// We need to manually validate a few things here like email and login to make sure they are valid and aren't duplicates
             /// </summary>
             /// <param name="postedItem"></param>
-            /// <param name="actionContext"></param>
+            /// <param name="dto"></param>
+            /// <param name="modelState"></param>
             /// <returns></returns>
-            protected override bool ValidatePropertyData(ContentItemBasic<ContentPropertyBasic, IMember> postedItem, HttpActionContext actionContext)
+            public override bool ValidatePropertyData(ContentItemBasic<ContentPropertyBasic, IMember> postedItem, ContentItemDto<IMember> dto, ModelStateDictionary modelState)
             {
                 var memberSave = (MemberSave)postedItem;
 
                 if (memberSave.Username.IsNullOrWhiteSpace())
                 {
-                    actionContext.ModelState.AddPropertyError(
+                    modelState.AddPropertyError(
                             new ValidationResult("Invalid user name", new[] { "value" }),
-                            string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
                 }
 
                 if (memberSave.Email.IsNullOrWhiteSpace() || new EmailAddressAttribute().IsValid(memberSave.Email) == false)
                 {
-                    actionContext.ModelState.AddPropertyError(
+                    modelState.AddPropertyError(
                             new ValidationResult("Invalid email", new[] { "value" }),
-                            string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
                 }
 
                 //default provider!
                 var membershipProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
-                var validEmail = ValidateUniqueEmail(memberSave, membershipProvider, actionContext);
+                var validEmail = ValidateUniqueEmail(memberSave, membershipProvider);
                 if (validEmail == false)
                 {
-                    actionContext.ModelState.AddPropertyError(
+                    modelState.AddPropertyError(
                         new ValidationResult("Email address is already in use", new[] { "value" }),
-                        string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
                 }
 
-                var validLogin = ValidateUniqueLogin(memberSave, membershipProvider, actionContext);
+                var validLogin = ValidateUniqueLogin(memberSave, membershipProvider);
                 if (validLogin == false)
                 {
-                    actionContext.ModelState.AddPropertyError(
+                    modelState.AddPropertyError(
                         new ValidationResult("Username is already in use", new[] { "value" }),
-                        string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
                 }
 
-                return base.ValidatePropertyData(postedItem, actionContext);
+                return base.ValidatePropertyData(postedItem, dto, modelState);
             }
 
             /// <summary>
@@ -263,7 +264,7 @@ namespace Umbraco.Web.WebApi.Binders
                             //this should not happen, this means that there was data posted for a sensitive property that
                             //the user doesn't have access to, which means that someone is trying to hack the values.
 
-                            var message = string.Format("property with alias: {0} cannot be posted", prop.Alias);
+                            var message = $"property with alias: {prop.Alias} cannot be posted";
                             actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, new InvalidOperationException(message));
                             return false;
                         }
@@ -273,10 +274,10 @@ namespace Umbraco.Web.WebApi.Binders
                 return ValidateProperties(propertiesToValidate, postedItem.PersistedContent.Properties.ToList(), actionContext);
             }
             
-            internal bool ValidateUniqueLogin(MemberSave contentItem, MembershipProvider membershipProvider, HttpActionContext actionContext)
+            internal bool ValidateUniqueLogin(MemberSave contentItem, MembershipProvider membershipProvider)
             {
-                if (contentItem == null) throw new ArgumentNullException("contentItem");
-                if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
+                if (contentItem == null) throw new ArgumentNullException(nameof(contentItem));
+                if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
 
                 int totalRecs;
                 var existingByName = membershipProvider.FindUsersByName(contentItem.Username.Trim(), 0, int.MaxValue, out totalRecs);
@@ -307,16 +308,16 @@ namespace Umbraco.Web.WebApi.Binders
                         break;
                     default:
                         //we don't support this for members
-                        throw new HttpResponseException(HttpStatusCode.NotFound);
+                        throw new ArgumentOutOfRangeException();
                 }
 
                 return true;
             }
 
-            internal bool ValidateUniqueEmail(MemberSave contentItem, MembershipProvider membershipProvider, HttpActionContext actionContext)
+            internal bool ValidateUniqueEmail(MemberSave contentItem, MembershipProvider membershipProvider)
             {
-                if (contentItem == null) throw new ArgumentNullException("contentItem");
-                if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
+                if (contentItem == null) throw new ArgumentNullException(nameof(contentItem));
+                if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
 
                 if (membershipProvider.RequiresUniqueEmail == false)
                 {
@@ -351,7 +352,7 @@ namespace Umbraco.Web.WebApi.Binders
                         break;
                     default:
                         //we don't support this for members
-                        throw new HttpResponseException(HttpStatusCode.NotFound);
+                        throw new ArgumentOutOfRangeException();
                 }
 
                 return true;
