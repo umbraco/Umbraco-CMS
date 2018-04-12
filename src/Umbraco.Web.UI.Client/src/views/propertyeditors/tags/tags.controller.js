@@ -37,7 +37,7 @@ angular.module("umbraco")
                     errorMsg: "Value cannot be empty",
                     errorKey: "required"
                 };
-            }
+            };
 
             //Helper method to add a tag on enter or on typeahead select
             function addTag(tagToAdd) {
@@ -52,7 +52,7 @@ angular.module("umbraco")
 
             $scope.addTagOnEnter = function (e) {
                 var code = e.keyCode || e.which;
-                if (code == 13) { //Enter keycode   
+                if (code === 13) { //Enter keycode   
                     if ($element.find('.tags-' + $scope.model.alias).parent().find(".tt-dropdown-menu .tt-cursor").length === 0) {
                         //this is required, otherwise the html form will attempt to submit.
                         e.preventDefault();
@@ -123,7 +123,7 @@ angular.module("umbraco")
                 datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
                 queryTokenizer: Bloodhound.tokenizers.whitespace,
                 dupDetector : function(remoteMatch, localMatch) {
-                    return (remoteMatch["value"] == localMatch["value"]);
+                    return (remoteMatch["value"] === localMatch["value"]);
                 },
                 //pre-fetch the tags for this category
                 prefetch: {
@@ -190,4 +190,4 @@ angular.module("umbraco")
         });
 
     }
-);
+);

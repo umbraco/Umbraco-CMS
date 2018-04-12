@@ -45,7 +45,7 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
                     if ($scope.model.dialogData && $scope.model.dialogData.macroData && $scope.model.dialogData.macroData.macroParamsDictionary) {
                         _.each($scope.model.dialogData.macroData.macroParamsDictionary, function (val, key) {
                             var prop = _.find($scope.model.macroParams, function (item) {
-                                return item.alias == key;
+                                return item.alias === key;
                             });
                             if (prop) {
 
@@ -90,7 +90,7 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
     entityResource.getAll("Macro", ($scope.model.dialogData && $scope.model.dialogData.richTextEditor && $scope.model.dialogData.richTextEditor === true) ? "UseInEditor=true" : null)
         .then(function (data) {
 
-            if (angular.isArray(data) && data.length == 0) {
+            if (angular.isArray(data) && data.length === 0) {
                 $scope.nomacros = true;
             }
 

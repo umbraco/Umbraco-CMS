@@ -71,7 +71,7 @@
             } else {
                 return $scope.model.config.tooltipFormat.replace("{0}", value);
             }
-        }
+        };
     }
 
     if (!$scope.model.config.ticks) {
@@ -119,10 +119,10 @@
         var sliderVal = null;
 
         //configure the model value based on if range is enabled or not
-        if ($scope.model.config.enableRange == true) {
+        if ($scope.model.config.enableRange === true) {
             //If no value saved yet - then use default value
             //If it contains a single value - then also create a new array value
-            if (!$scope.model.value || $scope.model.value.indexOf(",") == -1) {
+            if (!$scope.model.value || $scope.model.value.indexOf(",") === -1) {
                 var i1 = parseFloat($scope.model.config.initVal1);
                 var i2 = parseFloat($scope.model.config.initVal2);
                 sliderVal = [
@@ -185,7 +185,7 @@
         the model with the currently selected slider value(s) **/
     function setModelValueFromSlider(sliderVal) {
         //Get the value from the slider and format it correctly, if it is a range we want a comma delimited value
-        if ($scope.model.config.enableRange == true) {
+        if ($scope.model.config.enableRange === true) {
             $scope.model.value = sliderVal.join(",");
         }
         else {
@@ -204,7 +204,7 @@
             //here we declare a special method which will be called whenever the value has changed from the server
             //this is instead of doing a watch on the model.value = faster
             $scope.model.onValueChanged = function (newVal, oldVal) {                
-                if (newVal != oldVal) {
+                if (newVal !== oldVal) {
                     createSlider();
                 }
             };

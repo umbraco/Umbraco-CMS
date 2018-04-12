@@ -30,7 +30,7 @@ function ContentEditDialogController($scope, editorState, $routeParams, $q, $tim
         }
 
         return entity;
-    };
+    }
     
     function init(content) {
         var buttons = contentEditingHelper.configureContentEditorButtons({

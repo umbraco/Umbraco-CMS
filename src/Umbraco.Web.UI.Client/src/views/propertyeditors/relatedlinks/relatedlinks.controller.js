@@ -90,7 +90,7 @@
                   $scope.model.value = [];
 				}
 				
-                if ($scope.newCaption == "") {
+                if ($scope.newCaption === "") {
                     $scope.hasError = true;
                 } else {
                     if ($scope.addExternal) {
@@ -151,12 +151,12 @@
             //helper for determining if a user can add items
             $scope.canAdd = function () {
                 return $scope.model.config.max <= 0 || $scope.model.config.max > countVisible();
-            }
+            };
 
             //helper that returns if an item can be sorted
             $scope.canSort = function () {
                 return countVisible() > 1;
-            }
+            };
 
             $scope.sortableOptions = {
                 axis: 'y',
@@ -217,7 +217,7 @@
 
             function getElementIndexByUrl(url) {
                 for (var i = 0; i < $scope.model.value.length; i++) {
-                    if ($scope.model.value[i].link == url) {
+                    if ($scope.model.value[i].link === url) {
                         return i;
                     }
                 }

@@ -80,7 +80,7 @@ angular.module("umbraco")
                 } else {
                     //if a target is specified, go look it up - generally this target will just contain ids not the actual full
                     //media object so we need to look it up
-                    var id = $scope.target.udi ? $scope.target.udi : $scope.target.id
+                    var id = $scope.target.udi ? $scope.target.udi : $scope.target.id;
                     var altText = $scope.target.altText;
                     mediaResource.getById(id)
                         .then(function (node) {

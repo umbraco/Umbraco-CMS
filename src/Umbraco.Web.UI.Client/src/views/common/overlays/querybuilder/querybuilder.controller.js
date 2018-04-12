@@ -123,12 +123,12 @@
 
         function trashFilter(query, filter) {
             for (var i = 0; i < query.filters.length; i++) {
-                if (query.filters[i] == filter) {
+                if (query.filters[i] === filter) {
                     query.filters.splice(i, 1);
                 }
             }
             //if we remove the last one, add a new one to generate ui for it.
-            if (query.filters.length == 0) {
+            if (query.filters.length === 0) {
                 query.filters.push({});
             }
 

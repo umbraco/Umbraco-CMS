@@ -53,7 +53,7 @@ angular.module("umbraco")
             var stylesheets = [];
             var styleFormats = [];
             var await = [];
-            if (!editorConfig.maxImageSize && editorConfig.maxImageSize != 0) {
+            if (!editorConfig.maxImageSize && editorConfig.maxImageSize !== 0) {
                 editorConfig.maxImageSize = tinyMceService.defaultPrevalues().maxImageSize;
             }
 
@@ -69,20 +69,20 @@ angular.module("umbraco")
                     angular.forEach(rules, function (rule) {
                         var r = {};
                         r.title = rule.name;
-                        if (rule.selector[0] == ".") {
+                        if (rule.selector[0] === ".") {
                             r.inline = "span";
                             r.classes = rule.selector.substring(1);
                         }
-                        else if (rule.selector[0] == "#") {
+                        else if (rule.selector[0] === "#") {
                             r.inline = "span";
                             r.attributes = { id: rule.selector.substring(1) };
                         }
-                        else if (rule.selector[0] != "." && rule.selector.indexOf(".") > -1) {
+                        else if (rule.selector[0] !== "." && rule.selector.indexOf(".") > -1) {
                             var split = rule.selector.split(".");
                             r.block = split[0];
                             r.classes = rule.selector.substring(rule.selector.indexOf(".") + 1).replace(".", " ");
                         }
-                        else if (rule.selector[0] != "#" && rule.selector.indexOf("#") > -1) {
+                        else if (rule.selector[0] !== "#" && rule.selector.indexOf("#") > -1) {
                             var split = rule.selector.split("#");
                             r.block = split[0];
                             r.classes = rule.selector.substring(rule.selector.indexOf("#") + 1);
@@ -378,7 +378,7 @@ angular.module("umbraco")
                 $scope.$on('$destroy', function () {
                     unsubscribe();
 					if (tinyMceEditor !== undefined && tinyMceEditor != null) {
-						tinyMceEditor.destroy()
+						tinyMceEditor.destroy();
 					}
                 });
             });

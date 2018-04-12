@@ -117,7 +117,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 	        $scope.searchInfo.searchFromId = null;
 	        $scope.searchInfo.searchFromName = null;
 	        $scope.searchInfo.results = [];
-	    }
+	    };
 
 	    // method to select a search result
 	    $scope.selectResult = function (evt, result) {

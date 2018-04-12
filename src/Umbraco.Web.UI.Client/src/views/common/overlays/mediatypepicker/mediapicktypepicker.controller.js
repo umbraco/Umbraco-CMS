@@ -5,6 +5,6 @@ angular.module("umbraco").controller("Umbraco.Overlays.MediaTypePickerController
 			$scope.model.selectedType = mediatype;
 			$scope.model.submit($scope.model);
 			$scope.model.show = false;
-		}
+		};
 	    
 	});

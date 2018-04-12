@@ -37,6 +37,6 @@ function textboxController($scope) {
                 $scope.model.count = 0;
             }
         }
-    }
+    };
 }
 angular.module('umbraco').controller("Umbraco.PropertyEditors.textboxController", textboxController);

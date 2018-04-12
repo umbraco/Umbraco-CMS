@@ -81,7 +81,7 @@
          if ($scope.model.embed.constrain) {
             width = parseInt($scope.model.embed.width, 10);
             height = parseInt($scope.model.embed.height, 10);
-            if (type == 'width') {
+            if (type === 'width') {
                origHeight = Math.round((width / origWidth) * height);
                $scope.model.embed.height = origHeight;
             } else {
