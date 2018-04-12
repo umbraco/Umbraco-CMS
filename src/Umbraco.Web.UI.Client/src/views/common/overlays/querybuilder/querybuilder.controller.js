@@ -3,12 +3,18 @@
 
     function QueryBuilderOverlayController($scope, templateQueryResource, localizationService) {
 
+        var vm = this;
+
         var everything = "";
         var myWebsite = "";
         var ascendingTranslation = "";
         var descendingTranslation = "";
-
-        var vm = this;
+        var throttledFunc = _.throttle(function() {
+            templateQueryResource.postTemplateQuery(vm.query)
+                .then(function(response) {
+                    $scope.model.result = response;
+                });
+        },200);
 
         vm.properties = [];
         vm.contentTypes = [];
@@ -185,16 +191,6 @@
                 throttledFunc();
             }
         }
-
-        var throttledFunc = _.throttle(function() {
-
-                templateQueryResource.postTemplateQuery(vm.query)
-                    .then(function(response) {
-                        $scope.model.result = response;
-                    });
-
-            },
-            200);
 
         localizationService.localizeMany([
                 "template_allContent", "template_websiteRoot", "template_ascending", "template_descending"

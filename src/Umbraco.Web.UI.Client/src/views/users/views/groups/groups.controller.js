@@ -27,7 +27,7 @@
 
                     // only allow editing and selection if user is member of the group or admin
                     vm.userGroups = _.map(userGroups, function (ug) {
-                        return { group: ug, hasAccess: user.userGroups.indexOf(ug.alias) !== -1 || user.userGroups.indexOf("admin") !== -1}
+                        return { group: ug, hasAccess: user.userGroups.indexOf(ug.alias) !== -1 || user.userGroups.indexOf("admin") !== -1};
                     });
 
                     vm.loading = false;
@@ -40,7 +40,7 @@
             // clear all query params
             $location.search({});
             // go to create user group
-            $location.path('users/users/group/-1').search("create", "true");;
+            $location.path('users/users/group/-1').search("create", "true");
         }
 
         function clickUserGroup(userGroup) {

@@ -62,7 +62,7 @@ function RowConfigController($scope) {
     	if ($scope.currentCell === cell) {
     		$scope.currentCell = undefined;
     	}
-    	var index = row.areas.indexOf(cell)
+    	var index = row.areas.indexOf(cell);
     	row.areas.splice(index, 1);
     };
 
@@ -83,7 +83,7 @@ function RowConfigController($scope) {
             $scope.availableRowSpace = $scope.columns - total;
 
             if (originalName) {
-                if (originalName != row.name) {
+                if (originalName !== row.name) {
                     $scope.nameChanged = true;
                 }
                 else {

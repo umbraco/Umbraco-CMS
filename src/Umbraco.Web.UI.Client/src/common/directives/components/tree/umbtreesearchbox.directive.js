@@ -20,6 +20,8 @@ function treeSearchBox(localizationService, searchService, $q) {
         templateUrl: 'views/components/tree/umb-tree-search-box.html',
         link: function (scope, element, attrs, ctrl) {
 
+            var searcher = searchService.searchContent;
+
             scope.term = "";
             scope.hideSearch = function() {
                 scope.term = "";
@@ -76,7 +78,6 @@ function treeSearchBox(localizationService, searchService, $q) {
                 });
             }, 200));
 
-            var searcher = searchService.searchContent;
             //search
             if (scope.section === "member") {
                 searcher = searchService.searchMembers;

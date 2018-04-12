@@ -9,8 +9,8 @@ angular.module("umbraco")
             var dialogData = {
                 richTextEditor: true,
                 macroData: $scope.control.value || {
-                    macroAlias: $scope.control.editor.config && $scope.control.editor.config.macroAlias
-                      ? $scope.control.editor.config.macroAlias : ""
+                    macroAlias: $scope.control.editor.config && $scope.control.editor.config.macroAlias ? 
+                    $scope.control.editor.config.macroAlias : ""
                 }
             };
 

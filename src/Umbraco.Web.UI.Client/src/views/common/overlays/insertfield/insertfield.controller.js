@@ -5,11 +5,11 @@
         
         var vm = this;
 
-        vm.field;
-        vm.altField;
-        vm.altText;
-        vm.insertBefore;
-        vm.insertAfter;
+        vm.field = "";
+        vm.altField = "";
+        vm.altText = "";
+        vm.insertBefore = "";
+        vm.insertAfter = "";
         vm.recursive = false;
         vm.properties = [];
         vm.standardFields = [];

@@ -306,7 +306,7 @@
         }
 
         function getUserFromArrayById(userId, users) {
-            return _.find(users, function (u) { return u.id === userId });
+            return _.find(users, function (u) { return u.id === userId; });
         }
 
         function openBulkUserGroupPicker(event) {
@@ -427,7 +427,7 @@
             angular.forEach(array, function (item) {
                 if (item.selected) {
                     if (!found) {
-                        name = item.name
+                        name = item.name;
                         found = true;
                     } else {
                         name = name + ", " + item.name;

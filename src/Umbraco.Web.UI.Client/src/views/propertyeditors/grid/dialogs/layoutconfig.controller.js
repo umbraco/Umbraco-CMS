@@ -53,7 +53,7 @@ angular.module("umbraco")
     			if ($scope.currentSection === section) {
     				$scope.currentSection = undefined;
     			}
-    			var index = template.sections.indexOf(section)
+    			var index = template.sections.indexOf(section);
     			template.sections.splice(index, 1);
     		};
     		

@@ -51,7 +51,7 @@
         vm.openEditorSettingsOverlay = openEditorSettingsOverlay;
 
         userService.getCurrentUser().then(function(user) {
-            vm.showSensitiveData = user.userGroups.indexOf("sensitiveData") != -1;
+            vm.showSensitiveData = user.userGroups.indexOf("sensitiveData") !== -1;
         });
 
         function activate() {
