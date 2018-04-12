@@ -90,7 +90,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
                         scope.eventhandler.load = function (section) {
                             scope.section = section;
-                            loadTree();
+                            return loadTree();
                         };
 
                         scope.eventhandler.reloadNode = function (node) {
@@ -100,8 +100,10 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                             }
 
                             if (node) {
-                                scope.loadChildren(node, true);
+                                return scope.loadChildren(node, true);
                             }
+
+                            return $q.reject();
                         };
 
                         /**
@@ -267,7 +269,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                             args["queryString"] = scope.customtreeparams;
                         }
 
-                        treeService.getTree(args)
+                        return treeService.getTree(args)
                             .then(function (data) {
                                 //set the data once we have it
                                 scope.tree = data;
@@ -280,11 +282,15 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                                 scope.activeTree = scope.tree.root;
                                 emitEvent("treeLoaded", { tree: scope.tree });
                                 emitEvent("treeNodeExpanded", { tree: scope.tree, node: scope.tree.root, children: scope.tree.root.children });
-
+                                return $q.when(data);
                             }, function (reason) {
                                 scope.loading = false;
                                 notificationsService.error("Tree Error", reason);
+                                return $q.reject(reason);
                             });
+                    }
+                    else {
+                        return $q.reject();
                     }
                 }
 
@@ -420,8 +426,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     emitEvent("treeNodeAltSelect", { element: elem, tree: scope.tree, node: n, event: ev });
                 };
 
-                //watch for section changes and customtreeparams changes
-                scope.$watchCollection("[section, customtreeparams]", function (newVal, oldVal) {
+                //watch for section changes
+                scope.$watch("section", function (newVal, oldVal) {
 
                     if (!scope.tree) {
                         loadTree();
@@ -441,7 +447,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         lastSection = newVal;
                     }
                 });
-
+                
                 setupExternalEvents();
                 loadTree();
             };

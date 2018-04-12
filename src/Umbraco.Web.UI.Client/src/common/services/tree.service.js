@@ -475,8 +475,6 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          */
         getTree: function (args) {
 
-            var deferred = $q.defer();
-
             //set defaults
             if (!args) {
                 args = { section: 'content', cacheKey: null };
@@ -489,12 +487,11 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             
             //return the cache if it exists
             if (cacheKey && treeCache[cacheKey] !== undefined) {
-                deferred.resolve(treeCache[cacheKey]);
-                return deferred.promise;
+                return $q.when(treeCache[cacheKey]);
             }
 
             var self = this;
-            treeResource.loadApplication(args)
+            return treeResource.loadApplication(args)
                 .then(function(data) {
                     //this will be called once the tree app data has loaded
                     var result = {
@@ -507,16 +504,14 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
 
                     //cache this result if a cache key is specified - generally a cache key should ONLY
                     // be specified for application trees, dialog trees should not be cached.
-                    if (cacheKey) {                        
+                    if (cacheKey) {
                         treeCache[cacheKey] = result;
-                        deferred.resolve(treeCache[cacheKey]);
+                        return $q.when(treeCache[cacheKey]);
                     }
 
                     //return un-cached
-                    deferred.resolve(result);
+                    return $q.when(result);
                 });
-            
-            return deferred.promise;
         },
 
         /**
