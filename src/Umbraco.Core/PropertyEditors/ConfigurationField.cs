@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.IO;
@@ -62,6 +63,12 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         [JsonIgnore]
         public string PropertyName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the property clr type of the field.
+        /// </summary>
+        [JsonIgnore]
+        public Type PropertyType { get; set; }
 
         /// <summary>
         /// Gets or sets the description of the field.

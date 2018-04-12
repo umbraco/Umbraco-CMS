@@ -11,6 +11,7 @@ function memberPickerController($scope, dialogService, entityResource, $log, ico
     $scope.allowRemove = true;
 
     var dialogOptions = {
+        view: "treepicker",
         multiPicker: false,
         entityType: "Member",
         section: "member",
@@ -40,7 +41,6 @@ function memberPickerController($scope, dialogService, entityResource, $log, ico
 
     $scope.openMemberPicker = function() {
        $scope.memberPickerOverlay = dialogOptions;
-       $scope.memberPickerOverlay.view = "memberPicker";
        $scope.memberPickerOverlay.show = true;
 
        $scope.memberPickerOverlay.submit = function(model) {

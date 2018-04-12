@@ -124,7 +124,9 @@
         function openContentPicker() {
             vm.contentPicker = {
                 title: vm.labels.selectContentStartNode,
-                view: "contentpicker",
+                view: "treepicker",
+                section: "content",
+                treeAlias: "content",
                 hideSubmitButton: true,
                 hideHeader: false,
                 show: true,
@@ -215,7 +217,9 @@
         function openGranularPermissionsPicker() {
             vm.contentPicker = {
                 title: vm.labels.selectNode,
-                view: "contentpicker",
+                view: "treepicker",
+                section: "content",
+                treeAlias: "content",
                 hideSubmitButton: true,
                 show: true,
                 submit: function (model) {

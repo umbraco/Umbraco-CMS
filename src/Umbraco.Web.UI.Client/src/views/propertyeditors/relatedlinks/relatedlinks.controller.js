@@ -21,11 +21,14 @@
             $scope.internal = function($event) {
                $scope.currentEditLink = null;
 
-               $scope.contentPickerOverlay = {};
-               $scope.contentPickerOverlay.view = "contentpicker";
-               $scope.contentPickerOverlay.multiPicker = false;
-               $scope.contentPickerOverlay.show = true;
-               $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
+                $scope.contentPickerOverlay = {
+                    view: "treepicker",
+                    section: "content",
+                    treeAlias: "content",
+                    multiPicker: false,
+                    show: true,
+                    idType: $scope.model.config.idType ? $scope.model.config.idType : "int"
+                };
 
                $scope.contentPickerOverlay.submit = function(model) {
 
@@ -46,12 +49,15 @@
             $scope.selectInternal = function ($event, link) {
                $scope.currentEditLink = link;
 
-               $scope.contentPickerOverlay = {};
-               $scope.contentPickerOverlay.view = "contentpicker";
-               $scope.contentPickerOverlay.multiPicker = false;
-               $scope.contentPickerOverlay.show = true;
-               $scope.contentPickerOverlay.idType = $scope.model.config.idType ? $scope.model.config.idType : "int";
-
+                $scope.contentPickerOverlay = {
+                    view: "treepicker",
+                    section: "content",
+                    treeAlias: "content",
+                    multiPicker: false,
+                    show: true,
+                    idType: $scope.model.config.idType ? $scope.model.config.idType : "int"
+                };
+               
                $scope.contentPickerOverlay.submit = function(model) {
 
                   select(model.selection[0]);

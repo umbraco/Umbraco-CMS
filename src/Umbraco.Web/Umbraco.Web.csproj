@@ -313,6 +313,7 @@
     <Compile Include="PropertyEditors\MemberPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\MultiNodePickerConfiguration.cs" />
     <Compile Include="PropertyEditors\MultiNodePickerConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MultiNodePickerConfigurationTreeSource.cs" />
     <Compile Include="PropertyEditors\MultiNodeTreePickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultipleTestStringConfiguration.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringConfigurationEditor.cs" />

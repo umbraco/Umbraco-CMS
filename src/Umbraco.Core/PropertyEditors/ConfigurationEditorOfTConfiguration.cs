@@ -44,6 +44,7 @@ namespace Umbraco.Core.PropertyEditors
                         Key = string.IsNullOrWhiteSpace(attribute.Key) ? property.Name : attribute.Key,
                         Name = attribute.Name,
                         PropertyName = property.Name,
+                        PropertyType = property.PropertyType,
                         Description = attribute.Description,
                         HideLabel = attribute.HideLabel,
                         View = attribute.View
@@ -67,6 +68,7 @@ namespace Umbraco.Core.PropertyEditors
                 fields.Add(field);
 
                 field.PropertyName = property.Name;
+                field.PropertyType = property.PropertyType;
 
                 if (!string.IsNullOrWhiteSpace(attribute.Key))
                     field.Key = attribute.Key;
@@ -137,7 +139,25 @@ namespace Umbraco.Core.PropertyEditors
                 // only keep fields that have a non-null/empty value
                 // rest will fall back to default during ToObject()
                 if (editorValues.TryGetValue(field.Key, out var value) && value != null && (!(value is string stringValue) || !string.IsNullOrWhiteSpace(stringValue)))
-                    o[field.PropertyName] = value is JToken jtoken ? jtoken : JToken.FromObject(value);
+                {
+                    if (value is JToken jtoken)
+                    {
+                        //if it's a jtoken then set it
+                        o[field.PropertyName] = jtoken;
+                    }
+                    else if (field.PropertyType == typeof(bool) && value is string sBool)
+                    {
+                        //if it's a boolean property type but a string is found, try to do a conversion
+                        var converted = sBool.TryConvertTo<bool>();
+                        if (converted)
+                            o[field.PropertyName] = converted.Result;
+                    }
+                    else
+                    {
+                        //default behavior
+                        o[field.PropertyName] = JToken.FromObject(value);
+                    }
+                }
             }
 
             return o.ToObject<TConfiguration>();
