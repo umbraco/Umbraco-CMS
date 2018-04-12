@@ -166,6 +166,9 @@ namespace Umbraco.Core.Persistence.Migrations
             var targetVersionToCompare = _targetVersion.GetVersion(3);
             var currentVersionToCompare = _currentVersion.GetVersion(3);
 
+            if(currentVersionToCompare <= targetVersionToCompare)
+                throw new ArgumentException("When downgrading, make sure that the target version is lower than the current version.");
+
             var migrations = (from migration in foundMigrations
                 let migrationAttributes = migration.GetType().GetCustomAttributes<MigrationAttribute>(false)
                 from migrationAttribute in migrationAttributes
@@ -176,7 +179,7 @@ namespace Umbraco.Core.Persistence.Migrations
                     migrationAttribute.ProductName == _productName &&
                     //filter if the migration specifies a minimum current version for which to execute
                     (migrationAttribute.MinimumCurrentVersion == null || currentVersionToCompare >= migrationAttribute.MinimumCurrentVersion)
-                orderby migrationAttribute.TargetVersion, migrationAttribute.SortOrder descending
+                orderby migrationAttribute.TargetVersion descending, migrationAttribute.SortOrder descending
                 select migration).Distinct();
             return migrations;
         }
