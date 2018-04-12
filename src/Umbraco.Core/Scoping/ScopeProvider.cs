@@ -66,17 +66,22 @@ namespace Umbraco.Core.Scoping
         // tests, any other things (see https://msdn.microsoft.com/en-us/library/dn458353(v=vs.110).aspx),
         // but we don't want to make all of our objects serializable since they are *not* meant to be
         // used in cross-AppDomain scenario anyways.
+        //
         // in addition, whatever goes into the logical call context is serialized back and forth any
-        // time cross-AppDomain code executes, so if we put an "object" there, we'll can *another*
-        // "object" instance - and so we cannot use a random object as a key.
+        // time cross-AppDomain code executes, so if we put an "object" there, we'll get *another*
+        // "object" instance back - and so we cannot use a random object as a key.
+        //
         // so what we do is: we register a guid in the call context, and we keep a table mapping those
         // guids to the actual objects. the guid serializes back and forth without causing any issue,
         // and we can retrieve the actual objects from the table.
-        // only issue: how are we supposed to clear the table? we can't, really. objects should take
-        // care of de-registering themselves from context.
-        // everything we use does, except the NoScope scope, which just stays there
         //
-        // during tests, NoScope can to into call context... nothing much we can do about it
+        // so far, the only objects that go into this table are scopes (using ScopeItemKey) and
+        // scope contexts (using ContextItemKey).
+        //
+        // there is no automatic way to garbage-collect the table. Normal scopes and scope contexts
+        // takes great care removing themselves when disposed, so it is safe. OTOH the NoScope
+        // *CANNOT* remove itself, so it *WILL* leak, and there is nothing we can do about it. NoScope
+        // exists for backward compatibility reasons, but ... relying on it is greatly discouraged.
 
         private static readonly object StaticCallContextObjectsLock = new object();
         private static readonly Dictionary<Guid, object> StaticCallContextObjects
