@@ -2474,6 +2474,68 @@ namespace Umbraco.Tests.Services
             */
         }
 
+        [Test]
+        public void Can_SaveAndRead_Names()
+        {
+            var languageService = ServiceContext.LocalizationService;
+
+            var langFr = new Language("fr-FR");
+            var langUk = new Language("en-UK");
+            languageService.Save(langFr);
+            languageService.Save(langUk);
+
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var contentType = contentTypeService.Get("umbTextpage");
+            contentType.Variations = ContentVariation.CultureNeutral;
+            contentTypeService.Save(contentType);
+
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.Create("Home US", - 1, "umbTextpage");
+
+            content.SetValue("author", "Barack Obama");
+            content.SetName("fr-FR", "name-fr");
+            content.SetName("en-UK", "name-uk");
+
+            contentService.Save(content);
+
+            var content2 = contentService.GetById(content.Id);
+
+            Assert.AreEqual("Home US", content2.Name);
+            Assert.AreEqual("name-fr", content2.GetName("fr-FR"));
+            Assert.AreEqual("name-uk", content2.GetName("en-UK"));
+
+            content.PublishValues(langFr.Id);
+            content.PublishValues(langUk.Id);
+            contentService.SaveAndPublish(content);
+
+            content2 = contentService.GetById(content.Id);
+
+            Assert.AreEqual("Home US", content2.Name);
+            Assert.AreEqual("name-fr", content2.GetName("fr-FR"));
+            Assert.AreEqual("name-uk", content2.GetName("en-UK"));
+
+            Assert.AreEqual("Home US", content2.PublishName);
+            Assert.AreEqual("name-fr", content2.GetPublishName("fr-FR"));
+            Assert.AreEqual("name-uk", content2.GetPublishName("en-UK"));
+
+            content.SetName(null, "Home US2");
+            content.SetName("fr-FR", "name-fr2");
+            content.SetName("en-UK", "name-uk2");
+
+            contentService.Save(content);
+
+            content2 = contentService.GetById(content.Id);
+
+            Assert.AreEqual("Home US2", content2.Name);
+            Assert.AreEqual("name-fr2", content2.GetName("fr-FR"));
+            Assert.AreEqual("name-uk2", content2.GetName("en-UK"));
+
+            Assert.AreEqual("Home US", content2.PublishName);
+            Assert.AreEqual("name-fr", content2.GetPublishName("fr-FR"));
+            Assert.AreEqual("name-uk", content2.GetPublishName("en-UK"));
+        }
+
         private IEnumerable<IContent> CreateContentHierarchy()
         {
             var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
@@ -2513,7 +2575,8 @@ namespace Umbraco.Tests.Services
             var templateRepository = new TemplateRepository(accessor, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
             var tagRepository = new TagRepository(accessor, DisabledCache, Logger);
             contentTypeRepository = new ContentTypeRepository(accessor, DisabledCache, Logger, templateRepository);
-            var repository = new DocumentRepository(accessor, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            var languageRepository = new LanguageRepository(accessor, DisabledCache, Logger);
+            var repository = new DocumentRepository(accessor, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
             return repository;
         }
     }

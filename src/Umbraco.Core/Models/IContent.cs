@@ -1,11 +1,14 @@
 ﻿using System;
-using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Defines a Content object
+    /// Represents a document.
     /// </summary>
+    /// <remarks>
+    /// <para>A document can be published, rendered by a template.</para>
+    /// </remarks>
     public interface IContent : IContentBase
     {
         /// <summary>
@@ -76,6 +79,36 @@ namespace Umbraco.Core.Models
         /// Gets the current status of the content.
         /// </summary>
         ContentStatus Status { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether a given culture is available.
+        /// </summary>
+        /// <remarks>
+        /// <para>A culture becomes available whenever values for this culture are published,
+        /// and it becomes unavailable whenever values for this culture are unpublished.</para>
+        /// fixme - what's setting this?
+        /// </remarks>
+        bool IsCultureAvailable(string languageId);
+
+        /// <summary>
+        /// Gets the name of the published version of the content for a given culture.
+        /// </summary>
+        /// <remarks>
+        /// <para>When editing the content, the name can change, but this will not until the content is published.</para>
+        /// <para>When <paramref name="languageId"/> is <c>null</c>, gets the invariant
+        /// language, which is the value of the <see cref="PublishName"/> property.</para>
+        /// fixme - what's setting this?
+        /// </remarks>
+        string GetPublishName(string languageId);
+
+        /// <summary>
+        /// Gets the published names of the content.
+        /// </summary>
+        /// <remarks>
+        /// <para>Because a dictionary key cannot be <c>null</c> this cannot get the invariant
+        /// name, which must be get via the <see cref="PublishName"/> property.</para>
+        /// </remarks>
+        IReadOnlyDictionary<string, string> PublishNames { get; }
 
         // fixme - these two should move to some kind of service
 

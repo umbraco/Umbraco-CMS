@@ -35,10 +35,12 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private DocumentRepository CreateRepository(IScopeAccessor scopeAccessor, out ContentTypeRepository contentTypeRepository)
         {
-            var templateRepository = new TemplateRepository(scopeAccessor, CacheHelper.CreateDisabledCacheHelper(), Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
-            var tagRepository = new TagRepository(scopeAccessor, CacheHelper.CreateDisabledCacheHelper(), Logger);
-            contentTypeRepository = new ContentTypeRepository(scopeAccessor, CacheHelper.CreateDisabledCacheHelper(), Logger, templateRepository);
-            var repository = new DocumentRepository(scopeAccessor, CacheHelper.CreateDisabledCacheHelper(), Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
+            var templateRepository = new TemplateRepository(scopeAccessor, cacheHelper, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
+            var tagRepository = new TagRepository(scopeAccessor, cacheHelper, Logger);
+            contentTypeRepository = new ContentTypeRepository(scopeAccessor, cacheHelper, Logger, templateRepository);
+            var languageRepository = new LanguageRepository(scopeAccessor, cacheHelper, Logger);
+            var repository = new DocumentRepository(scopeAccessor, cacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
             return repository;
         }
 

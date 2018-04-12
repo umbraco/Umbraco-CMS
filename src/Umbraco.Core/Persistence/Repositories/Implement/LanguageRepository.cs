@@ -20,7 +20,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly Dictionary<string, int> _codeIdMap = new Dictionary<string, int>();
         private readonly Dictionary<int, string> _idCodeMap = new Dictionary<int, string>();
-        private FullDataSetRepositoryCachePolicy<ILanguage, int> _cachePolicy;
 
         public LanguageRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
@@ -28,8 +27,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override IRepositoryCachePolicy<ILanguage, int> CreateCachePolicy()
         {
-            return _cachePolicy = new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
+            return new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
         }
+
+        private FullDataSetRepositoryCachePolicy<ILanguage, int> TypedCachePolicy => (FullDataSetRepositoryCachePolicy<ILanguage, int>) CachePolicy;
 
         #region Overrides of RepositoryBase<int,Language>
 
@@ -208,7 +209,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public ILanguage GetByIsoCode(string isoCode)
         {
-            _cachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
+            TypedCachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
             var id = GetIdByIsoCode(isoCode);
             return Get(id);
         }
@@ -217,7 +218,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // _codeIdMap is rebuilt whenever PerformGetAll runs
         public int GetIdByIsoCode(string isoCode)
         {
-            _cachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
+            TypedCachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
             lock (_codeIdMap)
             {
                 if (_codeIdMap.TryGetValue(isoCode, out var id)) return id;
@@ -229,12 +230,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // _idCodeMap is rebuilt whenever PerformGetAll runs
         public string GetIsoCodeById(int id)
         {
-            _cachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
+            TypedCachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
             lock (_codeIdMap) // yes, we want to lock _codeIdMap
             {
                 if (_idCodeMap.TryGetValue(id, out var isoCode)) return isoCode;
             }
-            throw new ArgumentException($"Id {id} does not correspond to an existing language.", nameof(id),);
+            throw new ArgumentException($"Id {id} does not correspond to an existing language.", nameof(id));
         }
     }
 }

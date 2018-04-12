@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -24,12 +23,8 @@ namespace Umbraco.Core.Models
         private int _contentTypeId;
         protected IContentTypeComposition ContentTypeBase;
         private int _writerId;
-
-        // fixme need to deal with localized names, how?
-        // for the time being, this is the node text = unique
-        private string _name;
-
         private PropertyCollection _properties;
+        private Dictionary<string, string> _names;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
@@ -59,7 +54,7 @@ namespace Umbraco.Core.Models
             Id = 0; // no identity
             VersionId = 0; // no versions
 
-            Name = _name = name;
+            Name = name;
             _contentTypeId = contentType.Id;
             _properties = properties ?? throw new ArgumentNullException(nameof(properties));
             _properties.EnsurePropertyTypes(PropertyTypes);
@@ -71,6 +66,8 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
             public readonly PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
             public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.WriterId);
+            // fixme how can that work / comparison?
+            public readonly PropertyInfo NamesSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyDictionary<string, string>>(x => x.Names);
         }
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -122,6 +119,47 @@ namespace Umbraco.Core.Models
                 _properties = value;
                 _properties.CollectionChanged += PropertiesChanged;
             }
+        }
+
+        /// <inheritdoc />
+        [DataMember]
+        public virtual IReadOnlyDictionary<string, string> Names
+        {
+            get => _names;
+            set
+            {
+                foreach (var (languageId, name) in value)
+                    SetName(languageId, name);
+            }
+        }
+
+        /// <inheritdoc />
+        public virtual void SetName(string languageId, string name)
+        {
+            if (languageId == null)
+            {
+                Name = name;
+                return;
+            }
+
+            if ((ContentTypeBase.Variations & (ContentVariation.CultureNeutral | ContentVariation.CultureSegment)) == 0)
+                throw new NotSupportedException("Content type does not support varying name by culture.");
+
+            // fixme validate language?
+
+            if (_names == null)
+                _names = new Dictionary<string, string>();
+
+            _names[languageId] = name;
+            OnPropertyChanged(Ps.Value.NamesSelector);
+        }
+
+        /// <inheritdoc />
+        public virtual string GetName(string languageId)
+        {
+            if (languageId == null) return Name;
+            if (_names == null) return null;
+            return _names.TryGetValue(languageId, out var name) ? name : null;
         }
 
         /// <summary>
