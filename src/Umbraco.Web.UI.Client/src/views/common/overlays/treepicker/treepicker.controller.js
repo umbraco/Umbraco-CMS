@@ -18,7 +18,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             showSearch: false,
             results: [],
             selectedSearchResults: []
-        }
+        };
 
         $scope.model.selection = [];
 
@@ -49,7 +49,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     $scope.model.title = localizationService.localize("defaultdialogs_selectMedia");
                 }
             }
-        }
+        };
 
         var searchText = "Search...";
         localizationService.localize("general_search").then(function (value) {
@@ -143,7 +143,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     //now we need to look in the already selected search results and
                     // toggle the check boxes for those ones that are listed
                     var exists = _.find($scope.searchInfo.selectedSearchResults, function (selected) {
-                        return child.id == selected.id;
+                        return child.id === selected.id;
                     });
                     if (exists) {
                         child.selected = true;
@@ -177,12 +177,12 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                 //remove it from the list view children
                 var listView = args.node.parent();
                 listView.children = _.reject(listView.children, function (child) {
-                    return child.id == args.node.id;
+                    return child.id === args.node.id;
                 });
 
                 //remove it from the custom tracked search result list
                 $scope.searchInfo.selectedSearchResults = _.reject($scope.searchInfo.selectedSearchResults, function (i) {
-                    return i.id == args.node.id;
+                    return i.id === args.node.id;
                 });
             }
             else {
@@ -195,7 +195,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                 //This is a tree node, so we don't have an entity to pass in, it will need to be looked up
                 //from the server in this method.
                 if ($scope.model.select) {
-                    $scope.model.select(args.node)
+                    $scope.model.select(args.node);
                 } else {
                     select(args.node.name, args.node.id);
                     //toggle checked state
@@ -301,9 +301,9 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             if (dialogOptions.filterAdvanced) {
 
                 //filter either based on a method or an object
-                var filtered = angular.isFunction(dialogOptions.filter)
-                    ? _.filter(nodes, dialogOptions.filter)
-                    : _.where(nodes, dialogOptions.filter);
+                var filtered = angular.isFunction(dialogOptions.filter) ? 
+                    _.filter(nodes, dialogOptions.filter) : 
+                    _.where(nodes, dialogOptions.filter);
 
                 angular.forEach(filtered, function (value, key) {
                     value.filtered = true;
@@ -358,7 +358,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             }
             else {
                 $scope.searchInfo.selectedSearchResults = _.reject($scope.searchInfo.selectedSearchResults, function (i) {
-                    return i.id == result.id;
+                    return i.id === result.id;
                 });
             }
 
@@ -383,7 +383,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     _.each(children, function (child) {
                         //check if the id is in the selection, if so ensure it's flagged as selected
                         var exists = _.find($scope.searchInfo.selectedSearchResults, function (selected) {
-                            return child.id == selected.id;
+                            return child.id === selected.id;
                         });
                         //if the curr node exists in selected search results, ensure it's checked
                         if (exists) {
@@ -396,7 +396,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                             // it all together from the tree
                             var listView = child.parent();
                             listView.children = _.reject(listView.children, function (c) {
-                                return c.id == child.id;
+                                return c.id === child.id;
                             });
                         }
 
@@ -409,11 +409,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                             });
 
                             var listViewResults = _.filter($scope.searchInfo.selectedSearchResults, function (i) {
-                                return i.parentId == child.id;
+                                return i.parentId === child.id;
                             });
                             _.each(listViewResults, function (item) {
                                 var childExists = _.find(child.children, function (c) {
-                                    return c.id == item.id;
+                                    return c.id === item.id;
                                 });
                                 if (!childExists) {
                                     var parent = child;
@@ -448,7 +448,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             $scope.searchInfo.searchFromId = dialogOptions.startNodeId;
             $scope.searchInfo.searchFromName = null;
             $scope.searchInfo.results = [];
-        }
+        };
 
         $scope.onSearchResults = function (results) {
 
@@ -465,7 +465,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             //sync with the curr selected results
             _.each($scope.searchInfo.results, function (result) {
                 var exists = _.find($scope.model.selection, function (selectedId) {
-                    return result.id == selectedId;
+                    return result.id === selectedId;
                 });
                 if (exists) {
                     result.selected = true;

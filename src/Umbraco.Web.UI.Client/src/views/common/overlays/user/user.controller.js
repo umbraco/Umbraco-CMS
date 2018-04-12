@@ -77,7 +77,7 @@ angular.module("umbraco")
                         //set the linked logins
                         for (var login in logins) {
                             var found = _.find($scope.externalLoginProviders, function (i) {
-                                return i.authType == login;
+                                return i.authType === login;
                             });
                             if (found) {
                                 found.linkedProviderKey = logins[login];
@@ -98,7 +98,7 @@ angular.module("umbraco")
             authResource.unlinkLogin(loginProvider, providerKey).then(function (a, b, c) {
                 updateUserInfo();
             });
-        }
+        };
 
         updateUserInfo();
 
@@ -167,7 +167,7 @@ angular.module("umbraco")
         $scope.togglePasswordFields = function() {
            clearPasswordFields();
            $scope.showPasswordFields = !$scope.showPasswordFields;
-        }
+        };
 
         function clearPasswordFields() {
            $scope.changePasswordModel.value.oldPassword = "";
