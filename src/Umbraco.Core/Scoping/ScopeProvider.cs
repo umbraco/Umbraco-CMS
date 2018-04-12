@@ -210,9 +210,12 @@ namespace Umbraco.Core.Scoping
                 .Where(x => x.Value is NoScope noScope && noScope.Timestamp < threshold)
                 .Select(x => x.Key)
                 .ToList();
-            LogHelper.Warn<ScopeProvider>($"Collected {guids.Count} NoScope instances from StaticCallContextObjects.");
-            foreach (var guid in guids)
-                StaticCallContextObjects.Remove(guid);
+            if (guids.Count > 0)
+            {
+                LogHelper.Warn<ScopeProvider>($"Collected {guids.Count} NoScope instances from StaticCallContextObjects.");
+                foreach (var guid in guids)
+                    StaticCallContextObjects.Remove(guid);
+            }
             // ReSharper restore InconsistentlySynchronizedField
 
             _staticCallContextLastCollect = now;
