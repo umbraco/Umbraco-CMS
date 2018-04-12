@@ -170,7 +170,16 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                 queryParams["languageId"] = vm.selectedLanguage.id;
             }
             var queryString = $.param(queryParams); //create the query string from the params object
-            vm.customTreeParams = queryString + (queryString ? "&" : "") + ($scope.model.customTreeParams ? $scope.model.customTreeParams : "");
+            
+            if (!queryString) {
+                vm.customTreeParams = $scope.model.customTreeParams;
+            }
+            else {
+                vm.customTreeParams = queryString;
+                if ($scope.model.customTreeParams) {
+                    vm.customTreeParams += "&" + $scope.model.customTreeParams;
+                }
+            }
 
             vm.treeReady = true;
         }

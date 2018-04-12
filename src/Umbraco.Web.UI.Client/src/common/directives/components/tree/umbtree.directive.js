@@ -420,8 +420,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     emitEvent("treeNodeAltSelect", { element: elem, tree: scope.tree, node: n, event: ev });
                 };
 
-                //watch for section changes
-                scope.$watch("section", function (newVal, oldVal) {
+                //watch for section changes and customtreeparams changes
+                scope.$watchCollection("[section, customtreeparams]", function (newVal, oldVal) {
 
                     if (!scope.tree) {
                         loadTree();
