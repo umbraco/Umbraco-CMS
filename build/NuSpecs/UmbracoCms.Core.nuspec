@@ -21,7 +21,7 @@
       <dependency id="Microsoft.Owin.Security.Cookies" version="[4.0.0, 5.0.0)" />
       <dependency id="Microsoft.Owin.Security.OAuth" version="[4.0.0, 5.0.0)" />
       <dependency id="Microsoft.Owin.Host.SystemWeb" version="[4.0.0, 5.0.0)" />
-      <dependency id="MiniProfiler" version="[3.2.0.157, 4.0.0)" />
+      <dependency id="MiniProfiler" version="[3.2.0.157, 3.9.999)" />
       <dependency id="HtmlAgilityPack" version="[1.7.2, 2.0.0)" />
       <dependency id="Lucene.Net" version="[3.0.3, 4.0.0.0)" />
       <dependency id="MySql.Data" version="[6.10.6, 7.0.0)" />
@@ -33,7 +33,7 @@
       <dependency id="LightInject.Web" version="[2.0.0, 3.0.0)" />
       <dependency id="LightInject.WebApi" version="[2.0.0, 3.0.0)" />
       <dependency id="Newtonsoft.Json" version="[11.0.2, 12.0.0)" />
-      <dependency id="Examine" version="[1.0.0-beta025, 3.0.0)" />
+      <dependency id="Examine" version="[1.0.0-beta025, 1.666.666)" />
       <dependency id="ImageProcessor" version="[2.6.0, 3.0.0)" />
       <dependency id="ImageProcessor.Web" version="[4.8.7, 5.0.0)" />
       <dependency id="semver" version="[2.0.4, 3.0.0)" />
@@ -41,6 +41,8 @@
       <dependency id="log4net" version="[2.0.8, 3.0.0)" />
       <dependency id="System.Threading.Tasks.Dataflow" version="[4.8.0, 5.0.0)" />
       <dependency id="System.ValueTuple" version="[4.4.0, 5.0.0)" />
+      <dependency id="NPoco" version="3.9.0" />
+      <dependency id="NuGet.Core" version="2.14.0" />
     </dependencies>
   </metadata>
   <files>

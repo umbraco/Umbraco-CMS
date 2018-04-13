@@ -181,7 +181,7 @@
     <PackageReference Include="System.Xml.XPath" Version="4.3.0" />
     <PackageReference Include="System.Xml.XPath.XDocument" Version="4.3.0" />
     <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
-    <PackageReference Include="Umbraco.ModelsBuilder" Version="8.0.0-alpha.15" />
+    <PackageReference Include="Umbraco.ModelsBuilder" Version="8.0.0-alpha.17" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
@@ -751,11 +751,9 @@
   <PropertyGroup>
     <NuGetPackages>$(NuGetPackageFolders.Split(';')[0])</NuGetPackages>
   </PropertyGroup>
-  
   <!-- import targets -->
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
-  
   <!-- web project -->
   <ProjectExtensions>
     <VisualStudio>
@@ -821,7 +819,6 @@
     <Message Text="-AfterBuild-" Importance="high" />
     <Message Text="Copy Web.$(Configuration).config.transformed over to Web.config (this is Visual Studio)" Importance="high" Condition="$(BuildingInsideVisualStudio) == true" />
     <Copy SourceFiles="$(ProjectDir)Web.$(Configuration).config.transformed" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="$(BuildingInsideVisualStudio) == true" />
-    <Copy Condition="'$(BuildingInsideVisualStudio)' == 'true'" SourceFiles="$(ProjectDir)..\Umbraco.Compat7\bin\$(Configuration)\Umbraco.Compat7.dll" DestinationFolder="$(ProjectDir)bin" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" />
   </Target>
   <Target Name="BelleBuild">
     <Exec WorkingDirectory="$(ProjectDir)\..\..\" Command="powershell -ExecutionPolicy RemoteSigned -Command &quot;&amp;{ $ubuild = &amp;&quot;$pwd\build\build.ps1&quot; -get ; $ubuild.CompileBelle() }&quot;" />

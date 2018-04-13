@@ -153,7 +153,6 @@
 
     $src = "$($this.SolutionRoot)\src"
     $log = "$($this.BuildTemp)\msbuild.umbraco.log"
-    $log7 = "$($this.BuildTemp)\msbuild.compat7.log"
 
     if ($this.BuildEnv.VisualStudio -eq $null)
     {
@@ -180,24 +179,6 @@
       > $log
 
     if (-not $?) { throw "Failed to compile Umbraco.Web.UI." }
-
-    Write-Host "Logging to $log7"
-
-    &$this.BuildEnv.VisualStudio.MsBuild "$src\Umbraco.Compat7\Umbraco.Compat7.csproj" `
-      /p:WarningLevel=0 `
-      /p:Configuration=$buildConfiguration `
-      /p:Platform=AnyCPU `
-      /p:UseWPP_CopyWebApplication=True `
-      /p:PipelineDependsOnBuild=False `
-      /p:OutDir="$($this.BuildTemp)\bin\\" `
-      /p:WebProjectOutputDir="$($this.BuildTemp)\WebApp\\" `
-      /p:Verbosity=minimal `
-      /t:Rebuild `
-      /tv:"$($this.BuildEnv.VisualStudio.ToolsVersion)" `
-      /p:UmbracoBuild=True `
-      > $log7
-
-    if (-not $?) { throw "Failed to compile Umbraco.Compat7." }
 
     # /p:UmbracoBuild tells the csproj that we are building from PS, not VS
   })
@@ -342,14 +323,14 @@
     Write-Host "Zip all binaries"
     &$this.BuildEnv.Zip a -r "$out\UmbracoCms.AllBinaries.$($this.Version.Semver).zip" `
       "$tmp\bin\*" `
-      "-x!dotless.Core.*" "-x!Umbraco.Compat7.*" `
+      "-x!dotless.Core.*" `
       > $null
     if (-not $?) { throw "Failed to zip UmbracoCms.AllBinaries." }
 
     Write-Host "Zip cms"
     &$this.BuildEnv.Zip a -r "$out\UmbracoCms.$($this.Version.Semver).zip" `
       "$tmp\WebApp\*" `
-      "-x!dotless.Core.*" "-x!Content_Types.xml" "-x!*.pdb" "-x!Umbraco.Compat7.*" `
+      "-x!dotless.Core.*" "-x!Content_Types.xml" "-x!*.pdb" `
       > $null
     if (-not $?) { throw "Failed to zip UmbracoCms." }
   })
@@ -427,12 +408,6 @@
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cms.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms." }
 
-    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Compat7.nuspec" `
-        -Properties BuildTmp="$($this.BuildTemp)" `
-        -Version $this.Version.Semver.ToString() `
-        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.compat7.log"
-    if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Compat7." }
-
     # run hook
     if ($this.HasMethod("PostPackageNuGet"))
     {
@@ -445,8 +420,8 @@
   $ubuild.DefineMethod("VerifyNuGet",
   {
     $this.VerifyNuGetConsistency(
-      ("UmbracoCms", "UmbracoCms.Core", "UmbracoCms.Compat7"),
-      ("Umbraco.Core", "Umbraco.Web", "Umbraco.Web.UI", "Umbraco.Examine", "Umbraco.Compat7"))
+      ("UmbracoCms", "UmbracoCms.Core"),
+      ("Umbraco.Core", "Umbraco.Web", "Umbraco.Web.UI", "Umbraco.Examine"))
     if ($this.OnError()) { return }
   })
 

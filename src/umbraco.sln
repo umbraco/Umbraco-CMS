@@ -28,7 +28,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5BD12C1
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{227C3B55-80E5-4E7E-A802-BE16C5128B9D}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\NuSpecs\UmbracoCms.Compat7.nuspec = ..\build\NuSpecs\UmbracoCms.Compat7.nuspec
 		..\build\NuSpecs\UmbracoCms.Core.nuspec = ..\build\NuSpecs\UmbracoCms.Core.nuspec
 		..\build\NuSpecs\UmbracoCms.nuspec = ..\build\NuSpecs\UmbracoCms.nuspec
 	EndProjectSection
@@ -85,12 +84,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{5B03EF4E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Benchmarks", "Umbraco.Tests.Benchmarks\Umbraco.Tests.Benchmarks.csproj", "{86DEB346-089F-4106-89C8-D852B9CF2A33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Compat7", "Umbraco.Compat7\Umbraco.Compat7.csproj", "{185E098F-5706-4B97-B404-EB974F05F633}"
-	ProjectSection(ProjectDependencies) = postProject
-		{651E1350-91B6-44B7-BD60-7207006D7003} = {651E1350-91B6-44B7-BD60-7207006D7003}
-		{31785BC3-256C-4613-B2F5-A1B0BDDED8C1} = {31785BC3-256C-4613-B2F5-A1B0BDDED8C1}
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,10 +116,6 @@ Global
 		{86DEB346-089F-4106-89C8-D852B9CF2A33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86DEB346-089F-4106-89C8-D852B9CF2A33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86DEB346-089F-4106-89C8-D852B9CF2A33}.Release|Any CPU.Build.0 = Release|Any CPU
-		{185E098F-5706-4B97-B404-EB974F05F633}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{185E098F-5706-4B97-B404-EB974F05F633}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{185E098F-5706-4B97-B404-EB974F05F633}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{185E098F-5706-4B97-B404-EB974F05F633}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
