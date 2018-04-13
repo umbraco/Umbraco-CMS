@@ -1,9 +1,11 @@
 ﻿<div id="published" ng-controller="Umbraco.Dashboard.PublishedStatusController">
-    <h3>Published Status</h3>
-
-    <div ng-show="loading">
-        Loading...
-    </div>
-
-    <div ng-include="includeUrl"></div>
+    <h3 class="bold">Published Status</h3>
+    <umb-box>
+        <umb-box-content>
+            <div ng-show="loading">
+                Loading...
+            </div>
+            <div ng-include="includeUrl"></div>
+        </umb-box-content>
+    </umb-box>
 </div>

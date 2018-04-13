@@ -185,3 +185,30 @@
     border: none !important;
     background: none !important;
 }
+
+.umb-training-videos {
+	display: grid;
+	grid-gap: 10px;
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.umb-training-video {
+	background: @white;
+	box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
+	border-radius: @baseBorderRadius;
+	transition: box-shadow 0.1s ease-in-out, border 0.1s ease-in-out;
+	box-sizing: border-box;
+	padding: 20px;
+}
+
+.umb-training-video:hover {
+	box-shadow: 0 3px 6px 0 rgba(0,0,0,0.16);
+	text-decoration: none;
+}
+
+.umb-training-video__label {
+    font-weight: bold;
+	margin-top: 20px;
+	display: block;
+	text-align: center;
+}
