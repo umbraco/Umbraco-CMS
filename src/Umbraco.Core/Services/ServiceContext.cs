@@ -26,9 +26,9 @@ namespace Umbraco.Core.Services
         {
             return (IMediaServiceOperations)mediaService;
         }
-        public static IMemberServiceOperations WithResult(this IMemberService mediaService)
+        public static IMemberServiceOperations WithResult(this IMemberService memberService)
         {
-            return (IMemberServiceOperations)mediaService;
+            return (IMemberServiceOperations)memberService;
         }
     }
 
