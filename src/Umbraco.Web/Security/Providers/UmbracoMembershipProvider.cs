@@ -194,10 +194,12 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override bool DeleteUser(string username, bool deleteAllRelatedData)
         {
-            var member = MemberService.GetByUsername(username);
+            var memberService = UmbracoContext.Current.Application.Services.MemberService;
+
+            var member = memberService.GetByUsername(username);
             if (member == null) return false;
 
-            MemberService.Delete(member);
+            memberService.WithResult().DeleteAttempt(member, UmbracoContext.Current.Security.GetUserId());
             return true;
         }
 

@@ -333,6 +333,7 @@ namespace Umbraco.Web.Editors
 
             //save the IMember - 
             //TODO: When we support the CustomProviderWithUmbracoLink scenario, we'll need to save the custom properties for that here too
+            Attempt<OperationStatus> saveResult = new Attempt<OperationStatus>();
             if (MembershipScenario == MembershipScenario.NativeUmbraco)
             {
                 //save the item
@@ -341,27 +342,31 @@ namespace Umbraco.Web.Editors
                 contentItem.PersistedContent.RawPasswordValue = null;
 
                 //create/save the IMember
-                Services.MemberService.Save(contentItem.PersistedContent);
+                saveResult = Services.MemberService.WithResult().Save(contentItem.PersistedContent, Security.GetUserId());
             }
 
-            //Now let's do the role provider stuff - now that we've saved the content item (that is important since
-            // if we are changing the username, it must be persisted before looking up the member roles).
-            if (rolesToRemove.Any())
+            if (saveResult.Success)
             {
-                Roles.RemoveUserFromRoles(contentItem.PersistedContent.Username, rolesToRemove);
-            }
-            //find the ones to add and add them
-            var toAdd = contentItem.Groups.Except(currRoles).ToArray();
-            if (toAdd.Any())
-            {
-                //add the ones submitted
-                Roles.AddUserToRoles(contentItem.PersistedContent.Username, toAdd);
-            }
+                //Now let's do the role provider stuff - now that we've saved the content item (that is important since
+                // if we are changing the username, it must be persisted before looking up the member roles).
+                if (rolesToRemove.Any())
+                {
+                    Roles.RemoveUserFromRoles(contentItem.PersistedContent.Username, rolesToRemove);
+                }
 
-            //set the generated password (if there was one) - in order to do this we'll chuck the gen'd password into the
-            // additional data of the IUmbracoEntity of the persisted item - then we can retrieve this in the model mapper and set 
-            // the value to be given to the UI. Hooray for AdditionalData :)
-            contentItem.PersistedContent.AdditionalData["GeneratedPassword"] = generatedPassword;
+                //find the ones to add and add them
+                var toAdd = contentItem.Groups.Except(currRoles).ToArray();
+                if (toAdd.Any())
+                {
+                    //add the ones submitted
+                    Roles.AddUserToRoles(contentItem.PersistedContent.Username, toAdd);
+                }
+
+                //set the generated password (if there was one) - in order to do this we'll chuck the gen'd password into the
+                // additional data of the IUmbracoEntity of the persisted item - then we can retrieve this in the model mapper and set 
+                // the value to be given to the UI. Hooray for AdditionalData :)
+                contentItem.PersistedContent.AdditionalData["GeneratedPassword"] = generatedPassword;
+            }
 
             //return the updated model
             var display = AutoMapperExtensions.MapWithUmbracoContext<IMember, MemberDisplay>(contentItem.PersistedContent, UmbracoContext);
@@ -375,8 +380,17 @@ namespace Umbraco.Web.Editors
             {
                 case ContentSaveAction.Save:
                 case ContentSaveAction.SaveNew:
-                    display.AddSuccessNotification(localizedTextService.Localize("speechBubbles/editMemberSaved"), localizedTextService.Localize("speechBubbles/editMemberSaved"));
-                    break;
+                    if (saveResult.Success == false)
+                    {
+                        AddCancelMessage(display);
+                        throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
+                    }
+                    else
+                    {
+                        display.AddSuccessNotification(localizedTextService.Localize("speechBubbles/editMemberSaved"),
+                            localizedTextService.Localize("speechBubbles/editMemberSaved"));
+                        break;
+                    }
             }
 
             return display;
@@ -647,7 +661,7 @@ namespace Umbraco.Web.Editors
                     //We are using a custom membership provider, we'll create an empty IMember first to get the unique id to use
                     // as the provider user key.                    
                     //create it - this persisted item has already been set in the MemberBinder based on the 'Member' member type:
-                    Services.MemberService.Save(contentItem.PersistedContent);
+                    Services.MemberService.WithResult().Save(contentItem.PersistedContent, Security.GetUserId());
 
                     //TODO: We are not supporting q/a - passing in empty here
                     membershipUser = _provider.CreateUser(
@@ -771,13 +785,13 @@ namespace Umbraco.Web.Editors
                     {
                         return HandleContentNotFound(key, false);
                     }
-                    Services.MemberService.Delete(foundMember);
+                    Services.MemberService.WithResult().DeleteAttempt(foundMember, Security.GetUserId());
                     break;
                 case MembershipScenario.CustomProviderWithUmbracoLink:
                     foundMember = Services.MemberService.GetByKey(key);
                     if (foundMember != null)
                     {
-                        Services.MemberService.Delete(foundMember);
+                        Services.MemberService.WithResult().DeleteAttempt(foundMember, Security.GetUserId());
                     }
                     foundMembershipUser = _provider.GetUser(key, false);
                     if (foundMembershipUser != null)

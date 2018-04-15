@@ -25,7 +25,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Represents the MemberService.
     /// </summary>
-    public class MemberService : ScopeRepositoryService, IMemberService
+    public class MemberService : ScopeRepositoryService, IMemberService, IMemberServiceOperations
     {
         private readonly IMemberGroupService _memberGroupService;
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
@@ -231,6 +231,8 @@ namespace Umbraco.Core.Services
         /// <param name="memberTypeId">Id of the MemberType</param>
         public void DeleteMembersOfType(int memberTypeId)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (new WriteLock(Locker))
             {
                 using (var uow = UowProvider.GetUnitOfWork())
@@ -250,7 +252,7 @@ namespace Umbraco.Core.Services
                     foreach (var member in members)
                     {
                         // permantly delete the member
-                        Delete(uow, member);
+                        DeleteUow(uow, member, 0, evtMsgs);
                     }
 
                     uow.Commit();
@@ -959,20 +961,36 @@ namespace Umbraco.Core.Services
         /// <param name="member"><see cref="IMember"/> to Delete</param>
         public void Delete(IMember member)
         {
+            Delete(member, 0);
+        }
+
+        /// <summary>
+        /// Deletes an <see cref="IMember"/>
+        /// </summary>
+        /// <param name="member"><see cref="IMember"/> to Delete</param>
+        /// <param name="userId">Id of the User deleting the member</param>
+        public void Delete(IMember member, int userId)
+        {
+            ((IMemberServiceOperations)this).DeleteAttempt(member, userId);
+        }
+        
+        public Attempt<OperationStatus> DeleteAttempt(IMember member, int userId = 0)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                Delete(uow, member);
+                var ret = DeleteUow(uow, member, userId, evtMsgs);
                 uow.Commit();
+                return ret;
             }
         }
 
-        private void Delete(IScopeUnitOfWork uow, IMember member)
+        private Attempt<OperationStatus> DeleteUow(IScopeUnitOfWork uow, IMember member, int userId, EventMessages evtMsgs)
         {
             var deleteEventArgs = new DeleteEventArgs<IMember>(member);
             if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
             {
-                uow.Commit();
-                return;
+                return OperationStatus.Cancelled(evtMsgs);
             }
 
             var repository = RepositoryFactory.CreateMemberRepository(uow);
@@ -981,8 +999,12 @@ namespace Umbraco.Core.Services
 
             deleteEventArgs.CanCancel = false;
             uow.Events.Dispatch(Deleted, this, deleteEventArgs);
-        }
 
+            Audit(uow, AuditType.Delete, "Delete Member performed by user", userId, member.Id);
+
+            return OperationStatus.Success(evtMsgs);
+        }
+        
         /// <summary>
         /// Saves an <see cref="IMember"/>
         /// </summary>
@@ -991,6 +1013,24 @@ namespace Umbraco.Core.Services
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IMember entity, bool raiseEvents = true)
         {
+            ((IMemberServiceOperations)this).Save(entity, 0, raiseEvents);
+        }
+
+        /// <summary>
+        /// Saves a list of <see cref="IMember"/> objects
+        /// </summary>
+        /// <param name="entities"><see cref="IEnumerable{IMember}"/> to save</param>
+        /// <param name="raiseEvents">Optional parameter to raise events.
+        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
+        public void Save(IEnumerable<IMember> entities, bool raiseEvents = true)
+        {
+            ((IMemberServiceOperations)this).Save(entities, 0, raiseEvents);
+        }
+
+        public Attempt<OperationStatus> Save(IMember entity, int userId = 0, bool raiseEvents = true)
+        {
+            var evtMsgs = EventMessagesFactory.Get();
+
             //trimming username and email to make sure we have no trailing space
             entity.Username = entity.Username.Trim();
             entity.Email = entity.Email.Trim();
@@ -1003,7 +1043,7 @@ namespace Umbraco.Core.Services
                     if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                     {
                         uow.Commit();
-                        return;
+                        return OperationStatus.Cancelled(evtMsgs);
                     }
                 }
 
@@ -1022,25 +1062,29 @@ namespace Umbraco.Core.Services
                 }
 
                 uow.Commit();
-
+                
                 if (raiseEvents)
                 {
                     saveEventArgs.CanCancel = false;
                     uow.Events.Dispatch(Saved, this, saveEventArgs);
                 }
-            }
 
+                Audit(uow, AuditType.Save, "Save Member performed by user", userId, entity.Id);
+            }
+            
+            return OperationStatus.Success(evtMsgs);
         }
 
         /// <summary>
-        /// Saves a list of <see cref="IMember"/> objects
+        /// Saves a single <see cref="IMember"/> object
         /// </summary>
-        /// <param name="entities"><see cref="IEnumerable{IMember}"/> to save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IEnumerable<IMember> entities, bool raiseEvents = true)
+        /// <param name="media">The <see cref="IMedia"/> to save</param>
+        /// <param name="userId">Id of the User saving the Media</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        Attempt<OperationStatus> IMemberServiceOperations.Save(IEnumerable<IMember> entities, int userId, bool raiseEvents)
         {
             var asArray = entities.ToArray();
+            var evtMsgs = EventMessagesFactory.Get();
 
             using (new WriteLock(Locker))
             {
@@ -1050,7 +1094,7 @@ namespace Umbraco.Core.Services
                     if (raiseEvents && uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                     {
                         uow.Commit();
-                        return;
+                        return OperationStatus.Cancelled(evtMsgs);
                     }
 
                     var repository = RepositoryFactory.CreateMemberRepository(uow);
@@ -1073,12 +1117,13 @@ namespace Umbraco.Core.Services
                         saveEventArgs.CanCancel = false;
                         uow.Events.Dispatch(Saved, this, saveEventArgs);
                     }
+
+                    Audit(uow, AuditType.Save, "Save Members performed by user", userId, -1);
                 }
-
-
             }
-        }
 
+            return OperationStatus.Success(evtMsgs);
+        }
         #endregion
 
         #region IMembershipRoleService Implementation

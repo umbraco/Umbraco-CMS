@@ -1,15 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Net.Http;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
-{
+{    /// <summary>
+     /// A temporary interface until we are in v8, this is used to return a different result for the same method and this interface gets implemented
+     /// explicitly. These methods will replace the normal ones in IContentService in v8 and this will be removed.
+     /// </summary>
+    public interface IMemberServiceOperations
+    {
+        //TODO: Remove this class in v8
+
+        /// <summary>
+        /// Permanently deletes an <see cref="IMember"/> object
+        /// </summary>
+        /// <param name="member">The <see cref="IMember"/> to delete</param>
+        /// <param name="userId">Id of the User deleting the member</param>
+        Attempt<OperationStatus> DeleteAttempt(IMember member, int userId = 0);
+
+        /// <summary>
+        /// Saves a single <see cref="IMember"/> object
+        /// </summary>
+        /// <param name="member">The <see cref="IMember"/> to save</param>
+        /// <param name="userId">Id of the User saving the member</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        Attempt<OperationStatus> Save(IMember member, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Saves a collection of <see cref="IMember"/> objects
+        /// </summary>
+        /// <param name="members">Collection of <see cref="IMember"/> to save</param>
+        /// <param name="userId">Id of the User saving the member</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
+        Attempt<OperationStatus> Save(IEnumerable<IMember> members, int userId = 0, bool raiseEvents = true);
+    }
     /// <summary>
     /// Defines the MemberService, which is an easy access to operations involving (umbraco) members.
     /// </summary>
