@@ -118,13 +118,18 @@ namespace Umbraco.Web.Editors
                 var contents = File.ReadAllText(tourFile);
                 var tours = JsonConvert.DeserializeObject<BackOfficeTour[]>(contents);
 
+                var backOfficeTours = tours.Where(x =>
+                    aliasFilters.Count == 0 || aliasFilters.All(filter => filter.IsMatch(x.Alias)) == false);
+
+                var localizedTours = backOfficeTours.Where(x =>
+                    string.IsNullOrWhiteSpace(x.Culture) || x.Culture.Equals(Security.CurrentUser.Language,
+                        StringComparison.InvariantCultureIgnoreCase)).ToList();
+
                 var tour = new BackOfficeTourFile
                 {
                     FileName = Path.GetFileNameWithoutExtension(tourFile),
                     PluginName = pluginName,
-                    Tours = tours
-                        .Where(x => aliasFilters.Count == 0 || aliasFilters.All(filter => filter.IsMatch(x.Alias)) == false)
-                        .ToArray()
+                    Tours = localizedTours
                 };
 
                 //don't add if all of the tours are filtered
