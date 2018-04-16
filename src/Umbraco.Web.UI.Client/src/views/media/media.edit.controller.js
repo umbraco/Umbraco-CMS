@@ -7,6 +7,14 @@
  * The controller for the media editor
  */
 function mediaEditController($scope, $routeParams, appState, mediaResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper, editorState, umbRequestHelper, $http) {
+    
+    var nodeId = null;
+
+    if($scope.model && $scope.model.node && $scope.model.node.id) {
+        nodeId = $scope.model.node.id;
+    } else {
+        nodeId = $routeParams.id;
+    }
 
     //setup scope vars
     $scope.currentSection = appState.getSectionState("currentSection");
@@ -19,6 +27,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
     $scope.page.menu.currentNode = null; //the editors affiliated node
     $scope.page.listViewPath = null;
     $scope.page.saveButtonState = "init";
+    $scope.page.submitButtonLabel = "Save";
 
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */
     function syncTreeNode(content, path, initialLoad) {
@@ -47,7 +56,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
 
         $scope.page.loading = true;
 
-        mediaResource.getScaffold($routeParams.id, $routeParams.doctype)
+        mediaResource.getScaffold(nodeId, $routeParams.doctype)
             .then(function (data) {
                 $scope.content = data;
 
@@ -66,7 +75,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
 
         $scope.page.loading = true;
 
-        mediaResource.getById($routeParams.id)
+        mediaResource.getById(nodeId)
             .then(function (data) {
 
                 $scope.content = data;
@@ -85,11 +94,13 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
 
-                syncTreeNode($scope.content, data.path, true);
+                if($scope.model && !$scope.model.infiniteMode) {
+                    syncTreeNode($scope.content, data.path, true); 
+                }
                
                 if ($scope.content.parentId && $scope.content.parentId != -1) {
                     //We fetch all ancestors of the node to generate the footer breadcrump navigation
-                    entityResource.getAncestors($routeParams.id, "media")
+                    entityResource.getAncestors(nodeId, "media")
                         .then(function (anc) {
                             $scope.ancestors = anc;
                         });
@@ -151,6 +162,11 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
         // set first app to active
         $scope.content.apps[0].active = true;
 
+        // setup infinite mode
+        if($scope.model && $scope.model.infiniteMode === true) {
+            $scope.page.submitButtonLabel = "Save and Close";
+        }
+
     }
     
     $scope.save = function () {
@@ -174,9 +190,18 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                     editorState.set($scope.content);
                     $scope.busy = false;
 
-                    syncTreeNode($scope.content, data.path);
+                    if($scope.model && !$scope.model.infiniteMode) {
+                        syncTreeNode($scope.content, data.path);
+                    }
+
+                    init($scope.content);
 
                     $scope.page.saveButtonState = "success";
+
+                    // close the editor if it's infinite mode
+                    if($scope.model && $scope.model.infiniteMode && $scope.model.submit) {
+                        $scope.model.submit($scope.model);
+                    }
 
                 }, function(err) {
 
@@ -206,6 +231,12 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
 
     $scope.backToListView = function() {
         $location.path($scope.page.listViewPath);
+    };
+
+    $scope.close = function() {
+        if($scope.model.close) {
+            $scope.model.close($scope.model);
+        }
     };
 
 }

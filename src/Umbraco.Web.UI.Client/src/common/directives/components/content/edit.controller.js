@@ -96,7 +96,6 @@
                         tab.hide = true;
                     }
                 });
-
             }
 
             $scope.content.apps.push(contentApp);

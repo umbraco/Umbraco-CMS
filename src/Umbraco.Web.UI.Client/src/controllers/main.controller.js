@@ -8,13 +8,13 @@
  * The main application controller
  * 
  */
-function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper, tmhDynamicLocale, localStorageService, tourService) {
+function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper, tmhDynamicLocale, localStorageService, tourService, editorService) {
 
     //the null is important because we do an explicit bool check on this in the view
     $scope.authenticated = null;
     $scope.touchDevice = appState.getGlobalState("touchDevice");
+    $scope.editors = [];
     $scope.overlay = {};
-
 
     $scope.removeNotification = function (index) {
         notificationsService.remove(index);
@@ -152,6 +152,10 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
     // events for backdrop
     evts.push(eventsService.on("appState.backdrop", function (name, args) {
         $scope.backdrop = args;
+    }));
+
+    evts.push(eventsService.on("appState.editors", function (name, args) {
+        $scope.editors = args;
     }));
 
     //ensure to unregister from all events!

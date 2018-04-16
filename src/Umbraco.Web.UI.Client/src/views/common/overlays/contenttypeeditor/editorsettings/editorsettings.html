@@ -11,7 +11,7 @@
             <localize key="name"></localize>
         </label>
         <div class="controls">
-            <input type="text" ng-model="model.dataType.name" class="umb-editor" umb-auto-focus focus-on-filled="true" required />
+            <input type="text" ng-model="model.dataType.name" class="umb-property-editor" umb-auto-focus focus-on-filled="true" required />
         </div>
     </div>
     </div>
@@ -19,7 +19,7 @@
     <h5><localize key="contentTypeEditor_configuration"></localize></h5>
 
     <umb-property property="preValue" ng-repeat="preValue in model.dataType.preValues">
-    <umb-editor model="preValue" is-pre-value="true"></umb-editor>
+    <umb-property-editor model="preValue" is-pre-value="true"></umb-property-editor>
     </umb-property>
 
 </div>
