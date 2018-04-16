@@ -39,10 +39,11 @@
                       isdialog="true"
                       onlyinitialized="{{vm.onlyInitialized}}"
                       customtreeparams="{{vm.customTreeParams}}"
-                      eventhandler="vm.dialogTreeEventHandler"
                       enablelistviewsearch="true"
                       enablelistviewexpand="true"
-                      enablecheckboxes="{{vm.multiPicker}}">
+                      enablecheckboxes="{{vm.multiPicker}}"
+                      on-init="vm.initDialogTree()"
+                      api="vm.dialogTreeApi">
             </umb-tree>
         </div>
 

@@ -1265,33 +1265,6 @@
     <Compile Include="umbraco.presentation\umbracoPageHolder.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\actions\delete.aspx.cs">
-      <DependentUpon>delete.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\actions\delete.aspx.designer.cs">
-      <DependentUpon>delete.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\actions\editContent.aspx.cs">
-      <DependentUpon>editContent.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\actions\editContent.aspx.designer.cs">
-      <DependentUpon>editContent.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\actions\preview.aspx.cs">
-      <DependentUpon>preview.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\actions\preview.aspx.designer.cs">
-      <DependentUpon>preview.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\actions\publish.aspx.cs">
-      <DependentUpon>publish.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\actions\publish.aspx.designer.cs">
-      <DependentUpon>publish.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\ContentControl.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ContentPicker.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControl.cs" />
@@ -1483,13 +1456,6 @@
     <Compile Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx.designer.cs">
       <DependentUpon>EditDictionaryItem.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\editLanguage.aspx.cs">
-      <DependentUpon>editLanguage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\editLanguage.aspx.designer.cs">
-      <DependentUpon>editLanguage.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\ITreeService.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1636,7 +1602,6 @@
     <Content Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx">
       <SubType>Form</SubType>
@@ -1659,12 +1624,6 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\Preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\actions\delete.aspx" />
-    <Content Include="umbraco.presentation\umbraco\actions\editContent.aspx" />
-    <Content Include="umbraco.presentation\umbraco\actions\preview.aspx" />
-    <Content Include="umbraco.presentation\umbraco\actions\publish.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltVisualize.aspx" />

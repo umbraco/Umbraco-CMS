@@ -265,13 +265,6 @@
       <DependentUpon>sort.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Umbraco\Dialogs\Publish.aspx.cs">
-      <DependentUpon>publish.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Dialogs\Publish.aspx.designer.cs">
-      <DependentUpon>publish.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Masterpages\Default.Master.cs">
       <DependentUpon>default.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -455,17 +448,7 @@
     <Content Include="Umbraco_client\Dialogs\SortDialog.js" />
     <Content Include="Umbraco_Client\Dialogs\AssignDomain2.js" />
     <Content Include="Umbraco_Client\Dialogs\AssignDomain2.css" />
-    <Content Include="Umbraco_Client\Dialogs\PublishDialog.css" />
-    <Content Include="Umbraco_Client\Dialogs\PublishDialog.js" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
-    <Content Include="Umbraco_Client\Editors\EditXslt.css" />
-    <Content Include="Umbraco_Client\Editors\EditXslt.js" />
-    <Content Include="Umbraco_Client\Editors\DirectoryBrowser.css" />
-    <Content Include="Umbraco_Client\Editors\EditMacro.css" />
-    <Content Include="Umbraco_Client\Editors\EditStyleSheet.js" />
-    <Content Include="Umbraco_Client\Editors\EditTemplate.js" />
-    <Content Include="Umbraco_Client\Editors\EditView.js" />
-    <Content Include="Umbraco_Client\PunyCode\punycode.min.js" />
     <Content Include="Umbraco_Client\Splitbutton\InsertMacroSplitButton.js" />
     <Content Include="Umbraco_Client\Tablesorting\img\asc.gif" />
     <Content Include="Umbraco_Client\Tablesorting\img\desc.gif" />
@@ -503,10 +486,6 @@
     <Content Include="Umbraco\Controls\Tree\TreeControl.ascx" />
     <Content Include="Umbraco_Client\CodeArea\UmbracoEditor.js" />
     <Content Include="default.aspx" />
-    <Content Include="Umbraco\Actions\delete.aspx" />
-    <Content Include="Umbraco\Actions\editContent.aspx" />
-    <Content Include="Umbraco\Actions\preview.aspx" />
-    <Content Include="Umbraco\Actions\publish.aspx" />
     <Content Include="Umbraco\Config\Lang\da.xml" />
     <Content Include="Umbraco\Config\Lang\de.xml" />
     <Content Include="Umbraco\Config\Lang\es.xml" />
@@ -539,7 +518,6 @@
     <Content Include="Umbraco\Dialogs\notifications.aspx" />
     <Content Include="Umbraco\Developer\Packages\installer.aspx" />
     <Content Include="Umbraco\Dialogs\protectPage.aspx" />
-    <Content Include="Umbraco\Dialogs\publish.aspx" />
     <Content Include="Umbraco\Dialogs\rollBack.aspx" />
     <Content Include="Umbraco\Dialogs\sendToTranslation.aspx" />
     <Content Include="Umbraco\Dialogs\treePicker.aspx" />
@@ -662,7 +640,6 @@
       <SubType>Form</SubType>
     </Content>
     <Content Include="Umbraco\Settings\EditDictionaryItem.aspx" />
-    <Content Include="Umbraco\Settings\editLanguage.aspx" />
     <Content Include="Umbraco\Settings\Modals\ShowUmbracoTags.aspx" />
     <Content Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx" />
     <Content Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx" />
@@ -751,11 +728,9 @@
   <PropertyGroup>
     <NuGetPackages>$(NuGetPackageFolders.Split(';')[0])</NuGetPackages>
   </PropertyGroup>
-  
   <!-- import targets -->
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
-  
   <!-- web project -->
   <ProjectExtensions>
     <VisualStudio>

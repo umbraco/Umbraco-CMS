@@ -28,7 +28,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
         var vm = this;
         vm.treeReady = false;
-        vm.dialogTreeEventHandler = $({});
+        vm.dialogTreeApi = {};
+        vm.initDialogTree = initDialogTree;
         vm.section = $scope.model.section;
         vm.treeAlias = $scope.model.treeAlias;
         vm.multiPicker = $scope.model.multiPicker;
@@ -63,11 +64,17 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         vm.closeMiniListView = closeMiniListView;
         vm.selectListViewNode = selectListViewNode;
 
+        function initDialogTree() {
+            vm.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
+            vm.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
+            vm.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
+        }
+
         /**
          * Performs the initialization of this component
          */
         function onInit () {
-            
+
             // load languages
             languageResource.getAll().then(function (languages) {
                 vm.languages = languages;
@@ -100,13 +107,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                 }
             }
 
-            //var searchText = "Search...";
-            //localizationService.localize("general_search").then(function (value) {
-            //    searchText = value + "...";
-            //});
-
-            //min / max values
-            //TODO: Where are these used?
+            //TODO: Seems odd this logic is here, i don't think it needs to be and should just exist on the property editor using this
             if ($scope.model.minNumber) {
                 $scope.model.minNumber = parseInt($scope.model.minNumber, 10);
             }
@@ -196,7 +197,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             $timeout(function () { //execute in the next digest since the $watch needs to update first
 
                 //reload the tree with it's updated querystring args
-                vm.dialogTreeEventHandler.load(vm.section).then(function () {
+                vm.dialogTreeApi.load(vm.section).then(function () {
 
                     //this is sequential promise chaining, it's not pretty but we need to do it this way. $q.all doesn't execute promises in
                     //sequence but that's what we need to do here
@@ -204,7 +205,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     //create the list of promises
                     var promises = [];
                     for (var i = 0; i < expandedPaths.length; i++) {
-                        promises.push(vm.dialogTreeEventHandler.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));
+                        promises.push(vm.dialogTreeApi.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));
                     }
 
                     //now execute them in sequence... sorry there's no other good way to do it with angular promises
@@ -264,7 +265,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             });
         }
 
-        function nodeExpandedHandler(ev, args) {
+        function nodeExpandedHandler(args) {
 
             //store the reference to the expanded node path
             if (args.node) {
@@ -299,7 +300,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         }
 
         //gets the tree object when it loads
-        function treeLoadedHandler(ev, args) {
+        function treeLoadedHandler(args) {
             //args.tree contains children (args.tree.root.children)
             vm.hasItems = args.tree.root.children.length > 0;
 
@@ -307,7 +308,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         }
 
         //wires up selection
-        function nodeSelectHandler(ev, args) {
+        function nodeSelectHandler(args) {
             args.event.preventDefault();
             args.event.stopPropagation();
 
@@ -652,17 +653,6 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         function closeMiniListView() {
             vm.miniListView = undefined;
         }
-
-        vm.dialogTreeEventHandler.bind("treeLoaded", treeLoadedHandler);
-        vm.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
-        vm.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
-
-        $scope.$on('$destroy',
-            function () {
-                vm.dialogTreeEventHandler.unbind("treeLoaded", treeLoadedHandler);
-                vm.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
-                vm.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-            });
         
         //initialize
         onInit();

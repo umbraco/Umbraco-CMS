@@ -214,7 +214,7 @@ angular.module('umbraco.directives')
     };
 })
 
-.directive('onRightClick',function(){
+.directive('onRightClick',function($parse){
 
     document.oncontextmenu = function (e) {
        if(e.target.hasAttribute('on-right-click')) {
@@ -228,7 +228,10 @@ angular.module('umbraco.directives')
         el.on('contextmenu',function(e){
             e.preventDefault();
             e.stopPropagation();
-            scope.$apply(attrs.onRightClick);
+            var fn = $parse(attrs.onRightClick);
+            scope.$apply(function () {
+                fn(scope, { $event: event });
+            });
             return false;
         });
     };

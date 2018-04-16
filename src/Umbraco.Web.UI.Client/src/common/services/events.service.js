@@ -10,6 +10,7 @@
     app.ysod
     app.reInitialize
     app.userRefresh
+    app.navigationReady
 */
 
 function eventsService($q, $rootScope) {

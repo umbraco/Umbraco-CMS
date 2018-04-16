@@ -4,7 +4,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 
 	    var tree = null;
 	    var dialogOptions = $scope.dialogOptions;
-	    $scope.dialogTreeEventHandler = $({});
+	    $scope.dialogTreeApi = {};
 	    $scope.section = dialogOptions.section;
 	    $scope.treeAlias = dialogOptions.treeAlias;
 	    $scope.multiPicker = dialogOptions.multiPicker;
@@ -138,7 +138,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    }
 
         //gets the tree object when it loads
-	    function treeLoadedHandler(ev, args) {
+	    function treeLoadedHandler(args) {
 	        tree = args.tree;
 	    }
 
@@ -419,13 +419,10 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	        $scope.searchInfo.showSearch = true;
 	    };
 
-	    $scope.dialogTreeEventHandler.bind("treeLoaded", treeLoadedHandler);
-	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
-	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
+        $scope.onTreeInit = function () {
+            $scope.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
+            $scope.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
+            $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
+        }
 
-	    $scope.$on('$destroy', function () {
-	        $scope.dialogTreeEventHandler.unbind("treeLoaded", treeLoadedHandler);
-	        $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
-	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-	    });
 	});

@@ -19,7 +19,8 @@
             <div id="tree" ng-if="authenticated">
                 <umb-tree
                     cachekey="_"
-                    eventhandler="treeEventHandler"
+                    api="treeApi"
+                    on-init="onTreeInit()"
                     section="{{currentSection}}">
                 </umb-tree>
             </div>

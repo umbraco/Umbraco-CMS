@@ -15,14 +15,18 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, $injector, dialogService, umbModelMapper, treeService, notificationsService, historyService, appState, angularHelper) {
+function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, $injector, eventsService, dialogService, umbModelMapper, treeService, notificationsService, historyService, appState, angularHelper) {
 
+    //the main tree's API reference, this is acquired when the tree has initialized
+    var mainTreeApi = null;
+
+    eventsService.on("app.navigationReady", function (e, args) {
+        mainTreeApi = args.treeApi;
+    });
 
     //used to track the current dialog object
     var currentDialog = null;
-
-    //the main tree event handler, which gets assigned via the setupTreeEvents method
-    var mainTreeEventHandler = null;
+        
     //tracks the user profile dialog
     var userDialog = null;
 
@@ -166,100 +170,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         },
 
         /**
-            Called to assign the main tree event handler - this is called by the navigation controller.
-            TODO: Potentially another dev could call this which would kind of mung the whole app so potentially there's a better way.
-        */
-        setupTreeEvents: function(treeEventHandler) {
-            mainTreeEventHandler = treeEventHandler;
-
-            //when a tree is loaded into a section, we need to put it into appState
-            mainTreeEventHandler.bind("treeLoaded", function(ev, args) {
-                appState.setTreeState("currentRootNode", args.tree);
-            });
-
-            //when a tree node is synced this event will fire, this allows us to set the currentNode
-            mainTreeEventHandler.bind("treeSynced", function (ev, args) {
-
-                if (args.activate === undefined || args.activate === true) {
-                    //set the current selected node
-                    appState.setTreeState("selectedNode", args.node);
-                    //when a node is activated, this is the same as clicking it and we need to set the
-                    //current menu item to be this node as well.
-                    appState.setMenuState("currentNode", args.node);
-                }
-            });
-
-            //this reacts to the options item in the tree
-            mainTreeEventHandler.bind("treeOptionsClick", function(ev, args) {
-                ev.stopPropagation();
-                ev.preventDefault();
-
-                //Set the current action node (this is not the same as the current selected node!)
-                appState.setMenuState("currentNode", args.node);
-
-                if (args.event && args.event.altKey) {
-                    args.skipDefault = true;
-                }
-
-                service.showMenu(ev, args);
-            });
-
-            mainTreeEventHandler.bind("treeNodeAltSelect", function(ev, args) {
-                ev.stopPropagation();
-                ev.preventDefault();
-
-                args.skipDefault = true;
-                service.showMenu(ev, args);
-            });
-
-            //this reacts to tree items themselves being clicked
-            //the tree directive should not contain any handling, simply just bubble events
-            mainTreeEventHandler.bind("treeNodeSelect", function (ev, args) {
-                var n = args.node;
-                ev.stopPropagation();
-                ev.preventDefault();
-
-                if (n.metaData && n.metaData["jsClickCallback"] && angular.isString(n.metaData["jsClickCallback"]) && n.metaData["jsClickCallback"] !== "") {
-                    //this is a legacy tree node!
-                    var jsPrefix = "javascript:";
-                    var js;
-                    if (n.metaData["jsClickCallback"].startsWith(jsPrefix)) {
-                        js = n.metaData["jsClickCallback"].substr(jsPrefix.length);
-                    }
-                    else {
-                        js = n.metaData["jsClickCallback"];
-                    }
-                    try {
-                        var func = eval(js);
-                        //this is normally not necessary since the eval above should execute the method and will return nothing.
-                        if (func != null && (typeof func === "function")) {
-                            func.call();
-                        }
-                    }
-                    catch(ex) {
-                        $log.error("Error evaluating js callback from legacy tree node: " + ex);
-                    }
-                }
-                else if (n.routePath) {
-                    //add action to the history service
-                    historyService.add({ name: n.name, link: n.routePath, icon: n.icon });
-
-                    //put this node into the tree state
-                    appState.setTreeState("selectedNode", args.node);
-                    //when a node is clicked we also need to set the active menu node to this node
-                    appState.setMenuState("currentNode", args.node);
-
-                    //not legacy, lets just set the route value and clear the query string if there is one.
-                    $location.path(n.routePath).search("");
-                }
-                else if (args.element.section) {
-                    $location.path(args.element.section).search("");
-                }
-
-                service.hideNavigation();
-            });
-        },
-        /**
          * @ngdoc method
          * @name umbraco.services.navigationService#syncTree
          * @methodOf umbraco.services.navigationService
@@ -288,12 +198,9 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 throw "args.tree cannot be null";
             }
 
-            if (mainTreeEventHandler) {                
-               
-                if (mainTreeEventHandler.syncTree) {
-                    //returns a promise,
-                    return mainTreeEventHandler.syncTree(args);
-                }
+            if (mainTreeApi) {
+                //returns a promise,
+                return mainTreeApi.syncTree(args);
             }
 
             //couldn't sync
@@ -305,33 +212,23 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             have to set an active tree and then sync, the new API does this in one method by using syncTree
         */
         _syncPath: function(path, forceReload) {
-            if (mainTreeEventHandler) {
-                mainTreeEventHandler.syncTree({ path: path, forceReload: forceReload });
+            if (mainTreeApi) {
+                mainTreeApi.syncTree({ path: path, forceReload: forceReload });
             }
         },
 
         //TODO: This should return a promise
         reloadNode: function(node) {
-            if (mainTreeEventHandler) {
-                mainTreeEventHandler.reloadNode(node);
+            if (mainTreeApi) {
+                mainTreeApi.reloadNode(node);
             }
         },
 
         //TODO: This should return a promise
         reloadSection: function(sectionAlias) {
-            if (mainTreeEventHandler) {
-                mainTreeEventHandler.clearCache({ section: sectionAlias });
-                mainTreeEventHandler.load(sectionAlias);
-            }
-        },
-
-        /**
-            Internal method that should ONLY be used by the legacy API wrapper, the legacy API used to
-            have to set an active tree and then sync, the new API does this in one method by using syncTreePath
-        */
-        _setActiveTreeType: function (treeAlias, loadChildren) {
-            if (mainTreeEventHandler) {
-                mainTreeEventHandler._setActiveTreeType(treeAlias, loadChildren);
+            if (mainTreeApi) {
+                mainTreeApi.clearCache({ section: sectionAlias });
+                mainTreeApi.load(sectionAlias);
             }
         },
 
@@ -364,7 +261,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          *
          * @param {Event} event the click event triggering the method, passed from the DOM element
          */
-        showMenu: function(event, args) {
+        showMenu: function(args) {
 
             var deferred = $q.defer();
             var self = this;

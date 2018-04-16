@@ -64,9 +64,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
             var nodePath = string.Format(BaseTree.GetTreePathFromFilePath(path) +
                         ",{0}_{1}", path, HttpUtility.UrlEncode(_stylesheetproperty.Name));
 
-            ClientTools
-                    .SetActiveTreeType(Constants.Trees.Stylesheets)
-                    .SyncTree(nodePath, IsPostBack);
+            ClientTools.SyncTree(nodePath, IsPostBack);
 
             prStyles.Attributes["style"] = _stylesheetproperty.Value;
 

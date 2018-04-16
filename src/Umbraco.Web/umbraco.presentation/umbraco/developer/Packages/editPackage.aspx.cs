@@ -58,7 +58,6 @@ namespace umbraco.presentation.developer.packages
                 if (Page.IsPostBack == false)
                 {
                     ClientTools
-                        .SetActiveTreeType(Constants.Trees.Packages)
                         .SyncTree("-1,created," + createdPackage.Data.Id, false);
 
                     packageAuthorName.Text = pack.Author;
@@ -194,7 +193,6 @@ namespace umbraco.presentation.developer.packages
                 else
                 {
                     ClientTools
-                        .SetActiveTreeType(Constants.Trees.Packages)
                         .SyncTree("-1,created," + createdPackage.Data.Id, true);
                 }
             }

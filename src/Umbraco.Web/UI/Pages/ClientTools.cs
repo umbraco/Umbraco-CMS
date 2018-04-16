@@ -54,7 +54,6 @@ namespace Umbraco.Web.UI.Pages
             public static string CopyNode { get { return GetMainTree + ".copyNode('{0}', '{1}');"; } }
             public static string MoveNode { get { return GetMainTree + ".moveNode('{0}', '{1}');"; } }
             public static string ReloadActionNode { get { return GetMainTree + ".reloadActionNode({0}, {1}, null);"; } }
-            public static string SetActiveTreeType { get { return GetMainTree + ".setActiveTreeType('{0}');"; } }
             public static string RefreshTree { get { return GetMainTree + ".refreshTree();"; } }
             public static string RefreshTreeType { get { return GetMainTree + ".refreshTree('{0}');"; } }
             public static string CloseModalWindow()
@@ -280,25 +279,6 @@ namespace Umbraco.Web.UI.Pages
         public ClientTools ReloadActionNode(bool reselect, bool reloadChildren)
         {
             RegisterClientScript(string.Format(Scripts.ReloadActionNode, (!reselect).ToString().ToLower(), (!reloadChildren).ToString().ToLower()));
-            return this;
-        }
-
-        /// <summary>
-        /// When the application searches for a node, it searches for nodes in specific tree types.
-        /// If SyncTree is used, it will sync the tree nodes with the active tree type, therefore if
-        /// a developer wants to sync a specific tree, they can call this method to set the type to sync.
-        /// </summary>
-        /// <remarks>
-        /// Each branch of a particular tree should theoretically be the same type, however, developers can
-        /// override the type of each branch in their BaseTree's but this is not standard practice. If there
-        /// are multiple types of branches in one tree, then only those branches that have the Active tree type
-        /// will be searched for syncing.
-        /// </remarks>
-        /// <param name="treeType"></param>
-        /// <returns></returns>
-        public ClientTools SetActiveTreeType(string treeType)
-        {
-            RegisterClientScript(string.Format(Scripts.SetActiveTreeType, treeType));
             return this;
         }
 
