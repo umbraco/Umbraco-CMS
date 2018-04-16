@@ -36,6 +36,41 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             return treeCache;
         },
 
+        /** Internal method to track expanded paths on a tree */
+        _trackExpandedPaths: function (node, expandedPaths) {
+            if (!node.children || !angular.isArray(node.children) || node.children.length == 0) {
+                return;
+            }
+
+            //take the last child
+            var childPath = this.getPath(node.children[node.children.length - 1]).join(",");
+            //check if this already exists, if so exit
+            if (expandedPaths.indexOf(childPath) !== -1) {
+                return;
+            }
+
+            if (expandedPaths.length === 0) {
+                expandedPaths.push(childPath); //track it
+                return;
+            }
+
+            var clonedPaths = expandedPaths.slice(0); //make a copy to iterate over so we can modify the original in the iteration
+
+            _.each(clonedPaths, function (p) {
+                if (childPath.startsWith(p + ",")) {
+                    //this means that the node's path supercedes this path stored so we can remove the current 'p' and replace it with node.path
+                    expandedPaths.splice(expandedPaths.indexOf(p), 1); //remove it
+                    expandedPaths.push(childPath); //replace it
+                }
+                else if (p.startsWith(childPath + ",")) {
+                    //this means we've already tracked a deeper node so we shouldn't track this one
+                }
+                else {
+                    expandedPaths.push(childPath); //track it
+                }
+            });
+        },
+        
         /** Internal method that ensures there's a routePath, parent and level property on each tree node and adds some icon specific properties so that the nodes display properly */
         _formatNodeDataForUseInUI: function (parentNode, treeNodes, section, level) {
             //if no level is set, then we make it 1   

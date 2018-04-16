@@ -9,12 +9,15 @@
  *
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $rootScope, $location, $log, $routeParams, $timeout, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource) {
+function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource) {
 
     $scope.treeApi = {};
 
     //Bind to the main tree events
     $scope.onTreeInit = function () {
+
+        $scope.treeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
+
         //when a tree is loaded into a section, we need to put it into appState
         $scope.treeApi.callbacks.treeLoaded(function (args) {
             appState.setTreeState("currentRootNode", args.tree);
@@ -106,11 +109,13 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
         eventsService.emit("app.navigationReady", { treeApi: $scope.treeApi});
     }
 
-    //Put the navigation service on this scope so we can use it's methods/properties in the view.
+    //TODO: Remove this, this is not healthy
+    // Put the navigation service on this scope so we can use it's methods/properties in the view.
     // IMPORTANT: all properties assigned to this scope are generally available on the scope object on dialogs since
     //   when we create a dialog we pass in this scope to be used for the dialog's scope instead of creating a new one.
     $scope.nav = navigationService;
-    // TODO: Lets fix this, it is less than ideal to be passing in the navigationController scope to something else to be used as it's scope,
+    // TODO: Remove this, this is not healthy
+    // it is less than ideal to be passing in the navigationController scope to something else to be used as it's scope,
     // this is going to lead to problems/confusion. I really don't think passing scope's around is very good practice.
     $rootScope.nav = navigationService;
 
@@ -127,7 +132,11 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     $scope.page.languageSelectorIsOpen = false;
 
     $scope.currentSection = appState.getSectionState("currentSection");
+    $scope.customTreeParams = null;
+    $scope.treeCacheKey = "_";
     $scope.showNavigation = appState.getGlobalState("showNavigation");
+    // tracks all expanded paths so when the language is switched we can resync it with the already loaded paths
+    var expandedPaths = [];
 
     //trigger search with a hotkey:
     keyboardService.bind("ctrl+shift+s", function () {
@@ -238,10 +247,77 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
 
     }));
 
+    /**
+    * Updates the tree's query parameters
+    */
+    function initTree() {
+        //create the custom query string param for this tree
+        var queryParams = {};
+        if ($scope.selectedLanguage && $scope.selectedLanguage.id) {
+            queryParams["languageId"] = $scope.selectedLanguage.id;
+        }
+        var queryString = $.param(queryParams); //create the query string from the params object
+
+        if (queryString) {
+            $scope.customTreeParams = queryString;
+            $scope.treeCacheKey = queryString; // this tree uses caching but we need to change it's cache key per lang
+        }
+        else {
+            $scope.treeCacheKey = "_"; // this tree uses caching, there's no lang selected so use the default
+        }
+    }
+
+    function nodeExpandedHandler(args) {
+        //store the reference to the expanded node path
+        if (args.node) {
+            treeService._trackExpandedPaths(args.node, expandedPaths);
+        }
+    }
+
     $scope.selectLanguage = function(language, languages) {
         $scope.selectedLanguage = language;
         // close the language selector
         $scope.page.languageSelectorIsOpen = false;
+
+        initTree(); //this will reset the tree params and the tree directive will pick up the changes in a $watch
+
+        //reload the tree with it's updated querystring args
+        $scope.treeApi.load($scope.currentSection).then(function () {
+
+            //this is sequential promise chaining, it's not pretty but we need to do it this way. $q.all doesn't execute promises in
+            //sequence but that's what we need to do here
+
+            
+            //re-sync to currently edited node
+            var currNode = appState.getTreeState("selectedNode");
+            //create the list of promises
+            var promises = [];
+            //starting with syncing to the currently selected node if there is one
+            if (currNode) {
+                var path = treeService.getPath(currNode);
+                promises.push($scope.treeApi.syncTree({ path: path, activate: true }));
+            }
+            for (var i = 0; i < expandedPaths.length; i++) {
+                promises.push($scope.treeApi.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));
+            }
+
+            //now execute them in sequence... sorry there's no other good way to do it with angular promises
+            var j = 0;
+            function pExec(promise) {
+                j++;
+                promise.then(function (data) {
+                    if (j === promises.length) {
+                        return $q.when(data); //exit
+                    }
+                    else {
+                        return pExec(promises[j]); //recurse
+                    }
+                });
+            }
+            if (promises.length > 0) {
+                pExec(promises[0]); //start the promise chain
+            }
+        });
     };
 
     //this reacts to the options item in the tree

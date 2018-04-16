@@ -47,10 +47,11 @@ namespace Umbraco.Web.Trees
         /// <inheritdoc />
         protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormDataCollection queryStrings)
         {
+            var langId = queryStrings["languageId"].TryConvertTo<int?>();
+            
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(entity);
-            if (CanUserAccessNode(entity, allowedUserOptions))
+            if (CanUserAccessNode(entity, allowedUserOptions, langId.Success ? langId.Result : null))
             {
-
                 //Special check to see if it ia a container, if so then we'll hide children.
                 var isContainer = entity.IsContainer;   // && (queryStrings.Get("isDialog") != "true");
 

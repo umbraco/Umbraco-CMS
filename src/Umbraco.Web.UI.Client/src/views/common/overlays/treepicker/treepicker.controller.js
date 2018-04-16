@@ -194,82 +194,46 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
             initTree(); //this will reset the tree params and the tree directive will pick up the changes in a $watch
 
-            $timeout(function () { //execute in the next digest since the $watch needs to update first
+            //reload the tree with it's updated querystring args
+            vm.dialogTreeApi.load(vm.section).then(function () {
 
-                //reload the tree with it's updated querystring args
-                vm.dialogTreeApi.load(vm.section).then(function () {
+                //this is sequential promise chaining, it's not pretty but we need to do it this way. $q.all doesn't execute promises in
+                //sequence but that's what we need to do here
 
-                    //this is sequential promise chaining, it's not pretty but we need to do it this way. $q.all doesn't execute promises in
-                    //sequence but that's what we need to do here
+                //create the list of promises
+                var promises = [];
+                for (var i = 0; i < expandedPaths.length; i++) {
+                    promises.push(vm.dialogTreeApi.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));
+                }
 
-                    //create the list of promises
-                    var promises = [];
-                    for (var i = 0; i < expandedPaths.length; i++) {
-                        promises.push(vm.dialogTreeApi.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));
-                    }
-
-                    //now execute them in sequence... sorry there's no other good way to do it with angular promises
-                    var j = 0;
-                    function pExec(promise) {
-                        j++;
-                        promise.then(function (data) {
-                            if (j === promises.length) {
-                                return $q.when(data); //exit
-                            }
-                            else {
-                                return pExec(promises[j]); //recurse
-                            }
-                        });
-                    }
+                //now execute them in sequence... sorry there's no other good way to do it with angular promises
+                var j = 0;
+                function pExec(promise) {
+                    j++;
+                    promise.then(function (data) {
+                        if (j === promises.length) {
+                            return $q.when(data); //exit
+                        }
+                        else {
+                            return pExec(promises[j]); //recurse
+                        }
+                    });
+                }
+                if (promises.length > 0) {
                     pExec(promises[0]); //start the promise chain
-                });
+                }
             });
         };
 
         function toggleLanguageSelector() {
             vm.languageSelectorIsOpen = !vm.languageSelectorIsOpen;
         };
-
-        function trackExpandedPaths(node) {
-
-            if (!node.children || !angular.isArray(node.children) || node.children.length == 0) {
-                return;
-            }
-
-            //take the last child
-            var childPath = treeService.getPath(node.children[node.children.length - 1]).join(",");
-            //check if this already exists, if so exit
-            if (expandedPaths.indexOf(childPath) !== -1) {
-                return;
-            }
-
-            if (expandedPaths.length === 0) {
-                expandedPaths.push(childPath); //track it
-                return;
-            }
-
-            var clonedPaths = expandedPaths.slice(0); //make a copy to iterate over so we can modify the original in the iteration
-
-            _.each(clonedPaths, function (p) {
-                if (childPath.startsWith(p + ",")) {
-                    //this means that the node's path supercedes this path stored so we can remove the current 'p' and replace it with node.path
-                    expandedPaths.splice(expandedPaths.indexOf(p), 1); //remove it
-                    expandedPaths.push(childPath); //replace it
-                }
-                else if (p.startsWith(childPath + ",")) {
-                    //this means we've already tracked a deeper node so we shouldn't track this one
-                }
-                else {
-                    expandedPaths.push(childPath); //track it
-                }
-            });
-        }
-
+        
         function nodeExpandedHandler(args) {
 
             //store the reference to the expanded node path
             if (args.node) {
-                trackExpandedPaths(args.node);
+                treeService._trackExpandedPaths(args.node, expandedPaths);
             }
 
             // open mini list view for list views

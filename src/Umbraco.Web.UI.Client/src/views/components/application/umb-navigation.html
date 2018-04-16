@@ -18,10 +18,11 @@
             <!-- the tree -->
             <div id="tree" ng-if="authenticated">
                 <umb-tree
-                    cachekey="_"
+                    cachekey="{{treeCacheKey}}"
                     api="treeApi"
                     on-init="onTreeInit()"
-                    section="{{currentSection}}">
+                    section="{{currentSection}}"
+                    customtreeparams="{{customTreeParams}}">
                 </umb-tree>
             </div>
         </div>
