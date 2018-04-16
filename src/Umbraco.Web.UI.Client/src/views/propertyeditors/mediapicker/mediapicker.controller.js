@@ -97,7 +97,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         $scope.editItem = function(item) {
 
             var mediaEditor = {
-                "view": "views/media/edit.html",
                 "node": item,
                 submit: function(model) {
                     console.log("submitted", model);
@@ -109,14 +108,12 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 }
             };
 
-            editorService.open(mediaEditor);
+            editorService.mediaEditor(mediaEditor);
             
         };
 
         $scope.add = function() {
             var mediaPicker = {
-                "view": "views/editors/mediapicker/mediapicker.html",
-                "size": "small",
                 startNodeId: $scope.model.config.startNodeId,
                 startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
                 multiPicker: multiPicker,
@@ -150,7 +147,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 }
             }
 
-            editorService.open(mediaPicker);
+            editorService.mediaPicker(mediaPicker);
 
        };
 

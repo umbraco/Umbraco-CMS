@@ -78,9 +78,22 @@
 
         }
 
+        function mediaEditor(editor) {
+            editor.view = "views/media/edit.html",
+            open(editor)
+        }
+
+        function mediaPicker(editor) {
+            editor.view = "views/editors/mediapicker/mediapicker.html",
+            editor.size = "small",
+            open(editor)
+        }
+
         var service = {
             open: open,
-            close: close
+            close: close,
+            mediaEditor: mediaEditor,
+            mediaPicker: mediaPicker
         };
 
         return service;

@@ -386,7 +386,6 @@ angular.module("umbraco")
             $scope.editMediaItem = function(item) {
                 
                 var mediaEditor = {
-                    "view": "views/media/edit.html",
                     "node": item,
                     submit: function(model) {
                         editorService.close(model.id);
@@ -396,7 +395,7 @@ angular.module("umbraco")
                     }
                 };
 
-                editorService.open(mediaEditor);
+                editorService.mediaEditor(mediaEditor);
 
             };
 
