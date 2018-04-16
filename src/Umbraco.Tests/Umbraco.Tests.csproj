@@ -30,7 +30,6 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
-    <NugetPackages Condition="$(NugetPackages) == '' Or $(NugetPackages) == '*Undefined*'">$(SolutionDir)\packages</NugetPackages>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
