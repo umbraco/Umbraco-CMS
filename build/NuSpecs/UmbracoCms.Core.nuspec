@@ -19,7 +19,6 @@
         <dependency id="ClientDependency" version="[1.9.6,1.666666)" />
         <dependency id="ClientDependency-Mvc5" version="[1.8.0.0,1.666666)" />
         <dependency id="CSharpTest.Net.Collections" version="[14.906.1403.1082,14.666666)" />
-        <!--<dependency id="dotless" version="[1.5.2,1.666666)" />-->
         <dependency id="Examine" version="[1.0.0-beta025,1.666666)" />
         <dependency id="HtmlAgilityPack" version="[1.7.2,1.666666)" />
         <dependency id="ImageProcessor.Web" version="[4.9.1.2,4.666666)" />
@@ -49,7 +48,6 @@
         <dependency id="NPoco" version="[3.9.3,3.666666)" />
         <dependency id="NuGet.Core" version="[2.14.0,2.666666)" />
         <dependency id="Semver" version="[2.0.4,2.666666)" />
-        <!--<dependency id="SqlServerCE" version="[4.0.0.1,4.666666)" />-->
         <dependency id="System.Net.Http" version="[4.3.3,4.666666) "/>
         <dependency id="System.Reflection.Metadata" version="[1.5.0,1.666666)" />
         <dependency id="System.Reflection.Primitives" version="[4.3.0,4.666666)" />
@@ -61,7 +59,14 @@
         <dependency id="System.ValueTuple" version="[4.4.0,4.666666)" />
         <dependency id="System.Xml.ReaderWriter" version="[4.3.1,4.666666)" />
         <dependency id="Umbraco.ModelsBuilder" version="[8.0.0-alpha.17,8.666666)" />
+        <!--
+          although these are package references in csproj files, they cannot or
+          should not be part of nuspecs, either because we directly distribute the
+          DLLs (SqlServerCE) of ... well ... I don't know
+        -->
         <!--<dependency id="xmlrpcnet" version="[3.0.0.266,3.666666)" />-->
+        <!--<dependency id="dotless" version="[1.5.2,1.666666)" />-->
+        <!--<dependency id="SqlServerCE" version="[4.0.0.1,4.666666)" />-->
     </dependencies>
   </metadata>
   <files>
