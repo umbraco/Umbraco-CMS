@@ -1757,7 +1757,7 @@
     </PropertyGroup>
     <ItemGroup>
       <!-- we want to exclude all facade references ?! -->
-      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple'" />
+      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http'" />
     </ItemGroup>
     <Delete Files="$(TargetDir)$(TargetName).XmlSerializers.dll" ContinueOnError="true" />
     <!--

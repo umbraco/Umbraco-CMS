@@ -124,7 +124,6 @@
     <PackageReference Include="MySql.Data" Version="6.10.6" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="SqlServerCE" Version="4.0.0.1" />
-    <PackageReference Include="System.Net.Http" Version="4.3.3" />
     <PackageReference Include="System.Reflection.Metadata" Version="1.5.0" />
     <PackageReference Include="System.Reflection.Primitives" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Handles" Version="4.3.0" />

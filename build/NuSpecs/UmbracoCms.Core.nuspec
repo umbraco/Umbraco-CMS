@@ -48,7 +48,6 @@
         <dependency id="NPoco" version="[3.9.3,3.666666)" />
         <dependency id="NuGet.Core" version="[2.14.0,2.666666)" />
         <dependency id="Semver" version="[2.0.4,2.666666)" />
-        <dependency id="System.Net.Http" version="[4.3.3,4.666666) "/>
         <dependency id="System.Reflection.Metadata" version="[1.5.0,1.666666)" />
         <dependency id="System.Reflection.Primitives" version="[4.3.0,4.666666)" />
         <dependency id="System.Runtime.Handles" version="[4.3.0,4.666666)" />
