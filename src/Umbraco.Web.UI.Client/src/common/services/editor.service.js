@@ -84,7 +84,7 @@
         }
 
         function mediaPicker(editor) {
-            editor.view = "views/editors/mediapicker/mediapicker.html",
+            editor.view = "views/pickers/mediapicker/mediapicker.html",
             editor.size = "small",
             open(editor)
         }
