@@ -103,84 +103,36 @@
     <PackageReference Include="ClientDependency" Version="1.9.6" />
     <PackageReference Include="ClientDependency-Mvc5" Version="1.8.0.0" />
     <PackageReference Include="Examine" Version="1.0.0-beta025" />
-    <PackageReference Include="ImageProcessor" Version="2.6.0" />
     <PackageReference Include="ImageProcessor.Web" Version="4.9.1.2" />
     <PackageReference Include="ImageProcessor.Web.Config" Version="2.4.0" />
     <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="Log4Net.Async" Version="2.0.4" />
-    <PackageReference Include="Lucene.Net" Version="3.0.3" />
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
-    <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.1" />
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.1" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.4" />
-    <PackageReference Include="Microsoft.AspNet.Razor" Version="3.2.4" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.4" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.4" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.4" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.4" />
-    <PackageReference Include="Microsoft.AspNet.WebPages" Version="3.2.4" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.7.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="2.7.0" />
     <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="1.0.8" />
-    <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="1.2.2" />
     <PackageReference Include="Microsoft.Net.Compilers" Version="2.7.0">
       <PrivateAssets>All</PrivateAssets>
       <!-- development dependency -->
     </PackageReference>
-    <PackageReference Include="Microsoft.Owin" Version="4.0.0" />
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.0" />
-    <PackageReference Include="Microsoft.Owin.Security" Version="4.0.0" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.0" />
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.0" />
-    <PackageReference Include="Microsoft.Web.Infrastructure" Version="1.0.0.0" />
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
     <PackageReference Include="MySql.Data" Version="6.10.6" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="Owin" Version="1.0" />
-    <PackageReference Include="SharpZipLib" Version="0.86.0" />
     <PackageReference Include="SqlServerCE" Version="4.0.0.1" />
-    <PackageReference Include="System.AppContext" Version="4.3.0" />
-    <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.4.0" />
-    <PackageReference Include="System.Console" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.FileVersionInfo" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.StackTrace" Version="4.3.0" />
-    <PackageReference Include="System.Diagnostics.Tools" Version="4.3.0" />
-    <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
-    <PackageReference Include="System.Globalization" Version="4.3.0" />
-    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
-    <PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
-    <PackageReference Include="System.IO.FileSystem.Primitives" Version="4.3.0" />
-    <PackageReference Include="System.Linq" Version="4.3.0" />
-    <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
-    <PackageReference Include="System.Reflection" Version="4.3.0" />
+    <PackageReference Include="System.Net.Http" Version="4.3.3" />
     <PackageReference Include="System.Reflection.Metadata" Version="1.5.0" />
     <PackageReference Include="System.Reflection.Primitives" Version="4.3.0" />
-    <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
-    <PackageReference Include="System.Runtime" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
     <PackageReference Include="System.Runtime.Handles" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.Numerics" Version="4.3.0" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
-    <PackageReference Include="System.Security.Cryptography.Encoding" Version="4.3.0" />
-    <PackageReference Include="System.Security.Cryptography.Primitives" Version="4.3.0" />
     <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
-    <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" />
-    <PackageReference Include="System.Text.Encoding.Extensions" Version="4.3.0" />
-    <PackageReference Include="System.Threading" Version="4.3.0" />
-    <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
-    <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
-    <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
     <PackageReference Include="System.Xml.ReaderWriter" Version="4.3.1" />
-    <PackageReference Include="System.Xml.XDocument" Version="4.3.0" />
-    <PackageReference Include="System.Xml.XPath" Version="4.3.0" />
-    <PackageReference Include="System.Xml.XPath.XDocument" Version="4.3.0" />
-    <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
     <PackageReference Include="Umbraco.ModelsBuilder" Version="8.0.0-alpha.17" />
   </ItemGroup>
   <ItemGroup>
