@@ -51,7 +51,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             };
         },
 
-        controller: function ($scope) {
+        controller: function ($scope, $element) {
 
             var vm = this;
 
@@ -372,7 +372,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
               about it.
             */
             $scope.options = function (n, ev) {
-                emitEvent("treeOptionsClick", { element: elem, node: n, event: ev });
+                emitEvent("treeOptionsClick", { element: $element, node: n, event: ev });
             };
 
             /**
@@ -393,11 +393,11 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 //reset current node selection
                 $scope.currentNode = null;
 
-                emitEvent("treeNodeSelect", { element: elem, node: n, event: ev });
+                emitEvent("treeNodeSelect", { element: $element, node: n, event: ev });
             };
 
             $scope.altSelect = function (n, ev) {
-                emitEvent("treeNodeAltSelect", { element: elem, tree: $scope.tree, node: n, event: ev });
+                emitEvent("treeNodeAltSelect", { element: $element, tree: $scope.tree, node: n, event: ev });
             };
 
             //watch for section changes

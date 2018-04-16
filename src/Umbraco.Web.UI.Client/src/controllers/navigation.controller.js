@@ -95,8 +95,8 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
                 //not legacy, lets just set the route value and clear the query string if there is one.
                 $location.path(n.routePath).search("");
             }
-            else if (args.element.section) {
-                $location.path(args.element.section).search("");
+            else if (n.section) {
+                $location.path(n.section).search("");
             }
 
             navigationService.hideNavigation();
