@@ -3,6 +3,14 @@ angular.module("umbraco").controller("Umbraco.Notifications.ConfirmRouteChangeCo
 	function ($scope, $location, $log, notificationsService) {	
 
 		$scope.discard = function(not){
+
+			// allow for a callback for discard click
+			if(not.args.onDiscard) {
+				not.args.onDiscard()
+				return;
+			}
+
+			// when no callback is added run the normal functionality of the discard button
 			not.args.listener();
 			
 			$location.search("");

@@ -1,23 +1,23 @@
-using Umbraco.Core;
+﻿using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MarkdownEditorAlias, "Markdown editor", "markdowneditor", ValueType = PropertyEditorValueTypes.Text, Icon="icon-code", Group="rich content")]
-    public class MarkdownPropertyEditor : PropertyEditor
+    /// <summary>
+    /// Represents a markdown editor.
+    /// </summary>
+    [DataEditor(Constants.PropertyEditors.Aliases.MarkdownEditor, "Markdown editor", "markdowneditor", ValueType = ValueTypes.Text, Icon="icon-code", Group="rich content")]
+    public class MarkdownPropertyEditor : DataEditor
     {
-        protected override PreValueEditor CreatePreValueEditor()
-        {
-            return new MarkdownPreValueEditor();   
-        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MarkdownPropertyEditor"/> class.
+        /// </summary>
+        public MarkdownPropertyEditor(ILogger logger)
+            : base(logger)
+        { }
 
-        internal class MarkdownPreValueEditor : PreValueEditor
-        {
-            [PreValueField("preview", "Preview", "boolean", Description = "Display a live preview")]
-            public bool DisplayLivePreview { get; set; }
-
-            [PreValueField("defaultValue", "Default value", "textarea", Description = "If value is blank, the editor will show this")]
-            public string DefaultValue { get; set; }
-        }
+        /// <inheritdoc />
+        protected override IConfigurationEditor CreateConfigurationEditor() => new MarkdownConfigurationEditor();
     }
 }

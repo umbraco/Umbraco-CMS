@@ -62,7 +62,7 @@ namespace Umbraco.Core.Media.Exif
             // Search and read sections until we reach the end of file.
             while (stream.Position != stream.Length)
             {
-                // Read the next section marker. Section markers are two bytes 
+                // Read the next section marker. Section markers are two bytes
                 // with values 0xFF, 0x?? where ?? must not be 0x00 or 0xFF.
                 if (stream.Read(markerbytes, 0, 2) != 2 || markerbytes[0] != 0xFF || markerbytes[1] == 0x00 || markerbytes[1] == 0xFF)
                     throw new NotValidJPEGFileException();
@@ -74,7 +74,7 @@ namespace Umbraco.Core.Media.Exif
                 if (marker != JPEGMarker.SOI && marker != JPEGMarker.EOI && !(marker >= JPEGMarker.RST0 && marker <= JPEGMarker.RST7))
                 {
                     // Length of the header including the length bytes.
-                    // This value is a 16-bit unsigned integer 
+                    // This value is a 16-bit unsigned integer
                     // in big endian byte-order.
                     byte[] lengthbytes = new byte[2];
                     if (stream.Read(lengthbytes, 0, 2) != 2)
@@ -194,7 +194,7 @@ namespace Umbraco.Core.Media.Exif
             // Write sections
             foreach (JPEGSection section in Sections)
             {
-                // Section header (including length bytes and section marker) 
+                // Section header (including length bytes and section marker)
                 // must not exceed 64 kB.
                 if (section.Header.Length + 2 + 2 > 64 * 1024)
                     throw new SectionExceeds64KBException();

@@ -1,8 +1,8 @@
 <%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master" Title="ShowUmbracoTags"
     Codebehind="ShowUmbracoTags.aspx.cs" AutoEventWireup="True"
   Inherits="umbraco.cms.presentation.settings.modal.ShowUmbracoTags" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 <%@ Import Namespace="Umbraco.Core.IO" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
     <style type="text/css">

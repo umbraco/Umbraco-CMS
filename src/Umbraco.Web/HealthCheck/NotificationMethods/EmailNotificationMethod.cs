@@ -1,52 +1,35 @@
 ﻿using System;
 using System.Net.Mail;
+using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.HealthChecks;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.NotificationMethods
 {
     [HealthCheckNotificationMethod("email")]
-    public class EmailNotificationMethod : NotificationMethodBase, IHealthCheckNotificatationMethod
+    public class EmailNotificationMethod : NotificationMethodBase
     {
         private readonly ILocalizedTextService _textService;
 
-        /// <summary>
-        /// Default constructor which is used in the provider model
-        /// </summary>
-        /// <param name="enabled"></param>
-        /// <param name="failureOnly"></param>
-        /// <param name="verbosity"></param>
-        /// <param name="recipientEmail"></param>
-        public EmailNotificationMethod(bool enabled, bool failureOnly, HealthCheckNotificationVerbosity verbosity,
-                string recipientEmail)
-            : this(enabled, failureOnly, verbosity, recipientEmail, ApplicationContext.Current.Services.TextService)
+        public EmailNotificationMethod(ILocalizedTextService textService)
         {
-        }
+            var recipientEmail = Settings["recipientEmail"]?.Value;
+            if (string.IsNullOrWhiteSpace(recipientEmail))
+            {
+                Enabled = false;
+                return;
+            }
 
-        /// <summary>
-        /// Constructor that could be used for testing
-        /// </summary>
-        /// <param name="enabled"></param>
-        /// <param name="failureOnly"></param>
-        /// <param name="verbosity"></param>
-        /// <param name="recipientEmail"></param>
-        /// <param name="textService"></param>
-        internal EmailNotificationMethod(bool enabled, bool failureOnly, HealthCheckNotificationVerbosity verbosity,
-            string recipientEmail, ILocalizedTextService textService)
-            : base(enabled, failureOnly, verbosity)
-        {
-            if (textService == null) throw new ArgumentNullException("textService");
-            _textService = textService;
             RecipientEmail = recipientEmail;
-            Verbosity = verbosity;
+
+            _textService = textService ?? throw new ArgumentNullException(nameof(textService));
         }
 
-        public string RecipientEmail { get; private set; }
+        public string RecipientEmail { get; }
 
-        public async Task SendAsync(HealthCheckResults results)
+        public override async Task SendAsync(HealthCheckResults results, CancellationToken token)
         {
             if (ShouldSend(results) == false)
             {
@@ -68,17 +51,23 @@ namespace Umbraco.Web.HealthCheck.NotificationMethods
             var subject = _textService.Localize("healthcheck/scheduledHealthCheckEmailSubject");
 
             var mailSender = new EmailSender();
-            using (var mailMessage = new MailMessage(UmbracoConfig.For.UmbracoSettings().Content.NotificationEmailAddress,
-                RecipientEmail,
-                string.IsNullOrEmpty(subject) ? "Umbraco Health Check Status" : subject,
-                message)
-            {
-                IsBodyHtml = message.IsNullOrWhiteSpace() == false
-                             && message.Contains("<") && message.Contains("</")
-            })
+            using (var mailMessage = CreateMailMessage(subject, message))
             {
                 await mailSender.SendAsync(mailMessage);
             }
+        }
+
+        private MailMessage CreateMailMessage(string subject, string message)
+        {
+            var to = UmbracoConfig.For.UmbracoSettings().Content.NotificationEmailAddress;
+
+            if (string.IsNullOrWhiteSpace(subject))
+                subject = "Umbraco Health Check Status";
+
+            return new MailMessage(to, RecipientEmail, subject, message)
+            {
+                IsBodyHtml = message.IsNullOrWhiteSpace() == false && message.Contains("<") && message.Contains("</")
+            };
         }
     }
 }

@@ -12,7 +12,6 @@
     function MediaTypesEditController($scope, $routeParams, mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, formHelper, navigationService, iconHelper, contentTypeHelper, notificationsService, $filter, $q, localizationService, overlayHelper, eventsService) {
 
         var vm = this;
-        var localizeSaving = localizationService.localize("general_saving");
         var evts = [];
 
         vm.save = save;
@@ -206,7 +205,6 @@
                 vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
 
                 contentEditingHelper.contentEditorPerformSave({
-                    statusMessage: localizeSaving,
                     saveMethod: mediaTypeResource.save,
                     scope: $scope,
                     content: vm.contentType,

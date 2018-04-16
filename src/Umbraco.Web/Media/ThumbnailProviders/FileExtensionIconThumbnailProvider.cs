@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-	[Weight(2000)]
+    [Weight(2000)]
     public class FileExtensionIconThumbnailProvider : AbstractThumbnailProvider
     {
         protected override IEnumerable<string> SupportedExtensions

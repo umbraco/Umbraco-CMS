@@ -1,26 +1,17 @@
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Migrations;
-using Umbraco.Core.Persistence.SqlSyntax;
+﻿using Umbraco.Core.Migrations;
 
 namespace Umbraco.Tests.Migrations.Stubs
 {
-    [Migration("6.0.0", 2, "Test")]
     public class SixZeroMigration2 : MigrationBase
     {
-        public SixZeroMigration2(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public SixZeroMigration2(IMigrationContext context)
+            : base(context)
+        { }
 
-        public override void Up()
+
+        public override void Migrate()
         {
             Alter.Table("umbracoUser").AddColumn("secondEmail").AsString(255);
         }
-
-        public override void Down()
-        {
-            Alter.Table("umbracoUser").AlterColumn("sendEmail").AsBoolean();
-        }
-
-        
     }
 }

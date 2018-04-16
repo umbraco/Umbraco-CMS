@@ -1,0 +1,34 @@
+<div ng-controller="Umbraco.Overlays.PublishController as vm" >
+    
+    <div style="margin-bottom: 15px;">
+        <p>What languages would you like to publish?</p>
+    </div>
+
+    <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
+        <umb-load-indicator></umb-load-indicator>
+    </div>
+
+    <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
+        <div class="umb-list-item" ng-repeat="variant in vm.variants">
+            <ng-form name="publishVariantSelectorForm">
+                <label class="flex" for="{{variant.htmlId}}">
+                    <input
+                        id="{{variant.htmlId}}"
+                        name="publishVariantSelector"
+                        type="checkbox"
+                        ng-model="variant.publish"
+                        ng-change="vm.changeSelection(variant)"
+                        ng-disabled="variant.validationError"
+                        style="margin-right: 8px;"
+                        val-server-field="{{variant.htmlId}}"/>
+                    <div>
+                        <div ng-class="{'bold': variant.published}" style="margin-bottom: 2px;">{{ variant.language.name }}</div>
+                        <div class="umb-permission__description" ng-if="!variant.validationError">{{ variant.state }}</div>
+                        <div class="umb-permission__description" style="color: #F02E28;" val-msg-for="publishVariantSelector" val-toggle-msg="valServerField"></div>
+                    </div>
+                </label>
+            </ng-form>
+        </div>
+    </div>
+
+</div>

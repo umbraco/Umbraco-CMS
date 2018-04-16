@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models.Membership
@@ -12,7 +12,7 @@ namespace Umbraco.Core.Models.Membership
     [EditorBrowsable(EditorBrowsableState.Never)]
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class UserType : Entity, IUserType
+    internal class UserType : EntityBase, IUserType
     {
         private string _alias;
         private string _name;
@@ -23,6 +23,16 @@ namespace Umbraco.Core.Models.Membership
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<UserType, string>(x => x.Name);
             public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<UserType, string>(x => x.Alias);
             public readonly PropertyInfo PermissionsSelector = ExpressionHelper.GetPropertyInfo<UserType, IEnumerable<string>>(x => x.Permissions);
+        }
+
+        public UserType(string name, string alias)
+        {
+            Name = name;
+            Alias = alias;
+        }
+
+        public UserType()
+        {
         }
 
         [DataMember]

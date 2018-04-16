@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.TestHelpers.Entities;
 
@@ -45,9 +45,8 @@ namespace Umbraco.Tests.Models
             member.SortOrder = 5;
             member.Trashed = false;
             member.UpdateDate = DateTime.Now;
-            member.Version = Guid.NewGuid();            
-            ((IUmbracoEntity)member).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)member).AdditionalData.Add("test2", "hello");
+            member.AdditionalData.Add("test1", 123);
+            member.AdditionalData.Add("test2", "hello");
 
             // Act
             var clone = (Member)member.DeepClone();
@@ -56,8 +55,8 @@ namespace Umbraco.Tests.Models
             Assert.AreNotSame(clone, member);
             Assert.AreEqual(clone, member);
             Assert.AreEqual(clone.Id, member.Id);
-            Assert.AreEqual(clone.Version, member.Version);
-            Assert.AreEqual(((IUmbracoEntity)clone).AdditionalData, ((IUmbracoEntity)member).AdditionalData);
+            Assert.AreEqual(clone.VersionId, member.VersionId);
+            Assert.AreEqual(clone.AdditionalData, member.AdditionalData);
             Assert.AreNotSame(clone.ContentType, member.ContentType);
             Assert.AreEqual(clone.ContentType, member.ContentType);
             Assert.AreEqual(clone.ContentType.PropertyGroups.Count, member.ContentType.PropertyGroups.Count);
@@ -90,7 +89,7 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.LastPasswordChangeDate, member.LastPasswordChangeDate);
             Assert.AreEqual(clone.Trashed, member.Trashed);
             Assert.AreEqual(clone.UpdateDate, member.UpdateDate);
-            Assert.AreEqual(clone.Version, member.Version);
+            Assert.AreEqual(clone.VersionId, member.VersionId);
             Assert.AreEqual(clone.PasswordQuestion, member.PasswordQuestion);
             Assert.AreEqual(clone.ProviderUserKey, member.ProviderUserKey);
             Assert.AreEqual(clone.RawPasswordAnswerValue, member.RawPasswordAnswerValue);
@@ -145,9 +144,8 @@ namespace Umbraco.Tests.Models
             member.SortOrder = 5;
             member.Trashed = false;
             member.UpdateDate = DateTime.Now;
-            member.Version = Guid.NewGuid();
-            ((IUmbracoEntity)member).AdditionalData.Add("test1", 123);
-            ((IUmbracoEntity)member).AdditionalData.Add("test2", "hello");
+            member.AdditionalData.Add("test1", 123);
+            member.AdditionalData.Add("test2", "hello");
 
             var result = ss.ToStream(member);
             var json = result.ResultStream.ToJsonString();

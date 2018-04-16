@@ -1,10 +1,10 @@
 ﻿using System;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class DictionaryTranslationFactory 
+    internal class DictionaryTranslationFactory
     {
         private readonly Guid _uniqueId;
 
@@ -25,8 +25,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                 item.Id = dto.PrimaryKey;
 
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
+                // reset dirty initial properties (U4-1946)
                 item.ResetDirtyProperties(false);
                 return item;
             }

@@ -1,5 +1,6 @@
 ﻿using System;
-using Umbraco.Core;
+using AutoMapper;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -12,25 +13,19 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyDtoConverter : ContentPropertyBasicConverter<ContentPropertyDto>
     {
-        public ContentPropertyDtoConverter(Lazy<IDataTypeService> dataTypeService)
-            : base(dataTypeService)
-        {
-        }
+        public ContentPropertyDtoConverter(IDataTypeService dataTypeService, ILogger logger, PropertyEditorCollection propertyEditors)
+            : base(dataTypeService, logger, propertyEditors)
+        { }
 
-        protected override ContentPropertyDto ConvertCore(Property originalProperty)
+        public override ContentPropertyDto Convert(Property originalProperty, ContentPropertyDto dest, ResolutionContext context)
         {
-            var propertyDto = base.ConvertCore(originalProperty);
-
-            var dataTypeService = DataTypeService.Value;
+            var propertyDto = base.Convert(originalProperty, dest, context);
 
             propertyDto.IsRequired = originalProperty.PropertyType.Mandatory;
             propertyDto.ValidationRegExp = originalProperty.PropertyType.ValidationRegExp;
             propertyDto.Description = originalProperty.PropertyType.Description;
             propertyDto.Label = originalProperty.PropertyType.Name;
-            
-            //TODO: We should be able to look both of these up at the same time!
-            propertyDto.DataType = dataTypeService.GetDataTypeDefinitionById(originalProperty.PropertyType.DataTypeDefinitionId);
-            propertyDto.PreValues = dataTypeService.GetPreValuesCollectionByDataTypeId(originalProperty.PropertyType.DataTypeDefinitionId);
+            propertyDto.DataType = DataTypeService.GetDataType(originalProperty.PropertyType.DataTypeId);
 
             return propertyDto;
         }

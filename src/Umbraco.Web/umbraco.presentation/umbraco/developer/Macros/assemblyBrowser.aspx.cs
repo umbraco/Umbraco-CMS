@@ -1,24 +1,14 @@
 using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
 using System.Reflection;
-using System.Collections.Specialized;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web;
-using Umbraco.Core.PropertyEditors;
-using umbraco.BusinessLogic;
-using System.Collections.Generic;
-using MacroProperty = umbraco.cms.businesslogic.macro.MacroProperty;
+using Umbraco.Web.Composing;
+using Umbraco.Web.UI.Pages;
 using UserControl = System.Web.UI.UserControl;
 
 namespace umbraco.developer
@@ -26,11 +16,11 @@ namespace umbraco.developer
     /// <summary>
     /// Summary description for assemblyBrowser.
     /// </summary>
-    public partial class assemblyBrowser : BasePages.UmbracoEnsuredPage
+    public partial class assemblyBrowser : UmbracoEnsuredPage
     {
         public assemblyBrowser()
         {
-            CurrentApp = DefaultApps.developer.ToString();
+            CurrentApp = Constants.Applications.Developer.ToString();
         }
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -58,7 +48,7 @@ namespace umbraco.developer
                         }
                     }
                     IOHelper.ValidateEditPath(fileName, SystemDirectories.UserControls);
-                    
+
                     if (System.IO.File.Exists(IOHelper.MapPath(fileName)))
                     {
                         var oControl = (UserControl)LoadControl(fileName);
@@ -108,7 +98,7 @@ namespace umbraco.developer
                                 li.Selected = true;
                         }
                     }
-        
+
                 }
             }
             catch (Exception err)
@@ -119,20 +109,20 @@ namespace umbraco.developer
             }
 
         }
-        
+
         protected void Button1_Click(object sender, EventArgs e)
         {
             var result = "";
 
             // Get the macro object
-            var macroObject = ApplicationContext.Current.Services.MacroService.GetById(Convert.ToInt32(Request.QueryString["macroID"]));
-            
+            var macroObject = Current.Services.MacroService.GetById(Convert.ToInt32(Request.QueryString["macroID"]));
+
             //// Load all macroPropertyTypes
             //var macroPropertyTypes = new Hashtable();
             //var macroPropertyIds = new Hashtable();
 
             //var macroPropTypes = ParameterEditorResolver.Current.ParameterEditors.ToArray();
-            
+
             //foreach (var mpt in macroPropTypes)
             //{
             //    macroPropertyIds.Add(mpt.Alias, mpt.Id.ToString());
@@ -151,7 +141,7 @@ namespace umbraco.developer
                     {
                         Name = SpaceCamelCasing(li.Text),
                         Alias = li.Text.Substring(0, li.Text.IndexOf(" ", StringComparison.Ordinal)),
-                        EditorAlias = macroPropertyTypeAlias                        
+                        EditorAlias = macroPropertyTypeAlias
                     });
 
                     changed = true;
@@ -164,7 +154,7 @@ namespace umbraco.developer
 
             if (changed)
             {
-                ApplicationContext.Current.Services.MacroService.Save(macroObject);    
+                Current.Services.MacroService.Save(macroObject);
             }
 
             ChooseProperties.Visible = false;
@@ -196,16 +186,16 @@ namespace umbraco.developer
             switch (baseTypeName)
             {
                 case "Int32":
-                    return Constants.PropertyEditors.IntegerAlias;
+                    return Constants.PropertyEditors.Aliases.Integer;
                 case "Decimal":
                     //we previously only had an integer editor too! - this would of course
                     // fail if someone enters a real long number
-                    return Constants.PropertyEditors.IntegerAlias;                
+                    return Constants.PropertyEditors.Aliases.Integer;
                 case "Boolean":
-                    return Constants.PropertyEditors.TrueFalseAlias;
+                    return Constants.PropertyEditors.Aliases.Boolean;
                 case "String":
                 default:
-                    return Constants.PropertyEditors.TextboxAlias;
+                    return Constants.PropertyEditors.Aliases.TextBox;
             }
         }
 

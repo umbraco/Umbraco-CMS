@@ -1,32 +1,31 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Web.Cache
 {
-    /// <summary>
-    /// Handles Application cache invalidation/refreshing
-    /// </summary>
     public sealed class ApplicationCacheRefresher : CacheRefresherBase<ApplicationCacheRefresher>
     {
-        protected override ApplicationCacheRefresher Instance
-        {
-            get { return this; }
-        }
+        public ApplicationCacheRefresher(CacheHelper cacheHelper)
+            : base(cacheHelper)
+        { }
 
-        public override Guid UniqueIdentifier
-        {
-            get { return Guid.Parse(DistributedCache.ApplicationCacheRefresherId); }
-        }
+        #region Define
 
-        public override string Name
-        {
-            get { return "Applications cache refresher"; }
-        }
+        protected override ApplicationCacheRefresher This => this;
+
+        public static readonly Guid UniqueId = Guid.Parse("B15F34A1-BC1D-4F8B-8369-3222728AB4C8");
+
+        public override Guid RefresherUniqueId => UniqueId;
+
+        public override string Name => "Application Cache Refresher";
+
+        #endregion
+
+        #region Refresher
 
         public override void RefreshAll()
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationsCacheKey);
+            CacheHelper.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationsCacheKey);
             base.RefreshAll();
         }
 
@@ -38,9 +37,10 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationsCacheKey);
+            CacheHelper.RuntimeCache.ClearCacheItem(CacheKeys.ApplicationsCacheKey);
             base.Remove(id);
         }
 
+        #endregion
     }
 }

@@ -3,7 +3,7 @@ using ClientDependency.Core;
 
 namespace Umbraco.Web.UI.Bundles
 {
-    /// <summary> 
+    /// <summary>
     /// The umb tree libs
     /// </summary>
     [ClientDependency(ClientDependencyType.Javascript, "Tree/jquery.tree.js", "UmbracoClient", Priority = 0, Group = 10)]

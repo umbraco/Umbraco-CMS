@@ -1,28 +1,21 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
+using Umbraco.Core.Exceptions;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
-using Umbraco.Web.Models.ContentEditing;
-using umbraco.BusinessLogic.Actions;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// Auth filter to check if the current user has access to the content item (by id). 
+    /// Auth filter to check if the current user has access to the content item (by id).
     /// </summary>
     /// <remarks>
-    /// 
+    ///
     /// This first checks if the user can access this based on their start node, and then checks node permissions
-    /// 
+    ///
     /// By default the permission that is checked is browse but this can be specified in the ctor.
     /// NOTE: This cannot be an auth filter because that happens too soon and we don't have access to the action params.
     /// </remarks>
@@ -42,8 +35,7 @@ namespace Umbraco.Web.WebApi.Filters
 
         public EnsureUserPermissionForContentAttribute(string paramName)
         {
-            if (string.IsNullOrWhiteSpace(paramName)) throw new ArgumentException("Value cannot be null or whitespace.", "paramName");
-
+            if (string.IsNullOrEmpty(paramName)) throw new ArgumentNullOrEmptyException(nameof(paramName));
             _paramName = paramName;
             _permissionToCheck = ActionBrowse.Instance.Letter;
         }
@@ -53,11 +45,8 @@ namespace Umbraco.Web.WebApi.Filters
         {
             _permissionToCheck = permissionToCheck;
         }
-        
-        public override bool AllowMultiple
-        {
-            get { return true; }
-        }
+
+        public override bool AllowMultiple => true;
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
@@ -70,7 +59,7 @@ namespace Umbraco.Web.WebApi.Filters
             int nodeId;
             if (_nodeId.HasValue == false)
             {
-                var parts = _paramName.Split(new char[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
+                var parts = _paramName.Split(new[] {'.'}, StringSplitOptions.RemoveEmptyEntries);
 
                 if (actionContext.ActionArguments[parts[0]] == null)
                 {
@@ -90,7 +79,7 @@ namespace Umbraco.Web.WebApi.Filters
                     {
                         throw new InvalidOperationException("No argument found for the current action with the name: " + _paramName);
                     }
-                    nodeId = (int)prop.GetValue(actionContext.ActionArguments[parts[0]]);                    
+                    nodeId = (int)prop.GetValue(actionContext.ActionArguments[parts[0]]);
                 }
             }
             else
@@ -101,9 +90,9 @@ namespace Umbraco.Web.WebApi.Filters
             if (ContentController.CheckPermissions(
                 actionContext.Request.Properties,
                 UmbracoContext.Current.Security.CurrentUser,
-                ApplicationContext.Current.Services.UserService,
-                ApplicationContext.Current.Services.ContentService, 
-                ApplicationContext.Current.Services.EntityService, 
+                Current.Services.UserService,
+                Current.Services.ContentService,
+                Current.Services.EntityService,
                 nodeId, _permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null))
             {
                 base.OnActionExecuting(actionContext);
@@ -112,10 +101,10 @@ namespace Umbraco.Web.WebApi.Filters
             {
                 throw new HttpResponseException(actionContext.Request.CreateUserNoAccessResponse());
             }
-            
+
         }
 
-        
+
 
     }
 }

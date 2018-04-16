@@ -27,7 +27,7 @@ namespace Umbraco.Core.Media.Exif
         {
             get
             {
-                if (mName == null || mName.Length == 0)
+                if (string.IsNullOrEmpty(mName))
                     return ExifTagFactory.GetTagName(mTag);
                 else
                     return mName;
@@ -130,7 +130,7 @@ namespace Umbraco.Core.Media.Exif
         protected string mValue;
         protected override object _Value { get { return Value; } set { Value = (string)value; } }
         public new string Value { get { return mValue; } set { mValue = value; } }
-        
+
         public Encoding Encoding { get; private set; }
 
         static public implicit operator string(ExifAscii obj) { return obj.mValue; }
@@ -182,7 +182,7 @@ namespace Umbraco.Core.Media.Exif
     }
 
     /// <summary>
-    /// Represents an array of 16-bit unsigned integers. 
+    /// Represents an array of 16-bit unsigned integers.
     /// (EXIF Specification: SHORT with count > 1)
     /// </summary>
     internal class ExifUShortArray : ExifProperty
@@ -251,7 +251,7 @@ namespace Umbraco.Core.Media.Exif
     }
 
     /// <summary>
-    /// Represents an array of 16-bit unsigned integers. 
+    /// Represents an array of 16-bit unsigned integers.
     /// (EXIF Specification: LONG with count > 1)
     /// </summary>
     internal class ExifUIntArray : ExifProperty
@@ -292,7 +292,7 @@ namespace Umbraco.Core.Media.Exif
     }
 
     /// <summary>
-    /// Represents a rational number defined with a 32-bit unsigned numerator 
+    /// Represents a rational number defined with a 32-bit unsigned numerator
     /// and denominator. (EXIF Specification: RATIONAL)
     /// </summary>
     internal class ExifURational : ExifProperty
@@ -333,7 +333,7 @@ namespace Umbraco.Core.Media.Exif
     }
 
     /// <summary>
-    /// Represents an array of unsigned rational numbers. 
+    /// Represents an array of unsigned rational numbers.
     /// (EXIF Specification: RATIONAL with count > 1)
     /// </summary>
     internal class ExifURationalArray : ExifProperty
@@ -448,7 +448,7 @@ namespace Umbraco.Core.Media.Exif
     }
 
     /// <summary>
-    /// Represents an array of 32-bit signed integers. 
+    /// Represents an array of 32-bit signed integers.
     /// (EXIF Specification: SLONG with count > 1)
     /// </summary>
     internal class ExifSIntArray : ExifProperty
@@ -489,7 +489,7 @@ namespace Umbraco.Core.Media.Exif
     }
 
     /// <summary>
-    /// Represents a rational number defined with a 32-bit signed numerator 
+    /// Represents a rational number defined with a 32-bit signed numerator
     /// and denominator. (EXIF Specification: SRATIONAL)
     /// </summary>
     internal class ExifSRational : ExifProperty
@@ -530,7 +530,7 @@ namespace Umbraco.Core.Media.Exif
     }
 
     /// <summary>
-    /// Represents an array of signed rational numbers. 
+    /// Represents an array of signed rational numbers.
     /// (EXIF Specification: SRATIONAL with count > 1)
     /// </summary>
     internal class ExifSRationalArray : ExifProperty

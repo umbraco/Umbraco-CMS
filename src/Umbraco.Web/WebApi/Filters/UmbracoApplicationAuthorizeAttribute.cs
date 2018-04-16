@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Web.Http;
 using System.Web.Http.Controllers;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -34,9 +35,9 @@ namespace Umbraco.Web.WebApi.Filters
                 return true;
             }
 
-            var authorized = UmbracoContext.Current.Security.CurrentUser != null
-                   && _appNames.Any(app => UmbracoContext.Current.Security.UserHasSectionAccess(
-                       app, UmbracoContext.Current.Security.CurrentUser));
+            var authorized = Current.UmbracoContext.Security.CurrentUser != null
+                   && _appNames.Any(app => Current.UmbracoContext.Security.UserHasSectionAccess(
+                       app, Current.UmbracoContext.Security.CurrentUser));
 
             return authorized;
         }

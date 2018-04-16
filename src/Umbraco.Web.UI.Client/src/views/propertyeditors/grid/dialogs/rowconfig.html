@@ -10,14 +10,14 @@
           data for any existing content that is based on this configuration.</p>
           <p><strong>Modifying only the label will not result in data loss.</strong></p>
       </div>
+
+       <umb-control-group label="@general_name">
+           <input type="text" ng-model="currentRow.name" />
+       </umb-control-group>
        
        <umb-control-group label="@general_label">
            <input type="text" ng-model="currentRow.label" placeholder="Overrides name" />
        </umb-control-group>
-
-      <umb-control-group label="@general_name">
-          <input type="text" ng-model="currentRow.name" />
-      </umb-control-group>
 
       <div class="uSky-templates-template"
            style="margin: 0; width: 350px; position: relative;">

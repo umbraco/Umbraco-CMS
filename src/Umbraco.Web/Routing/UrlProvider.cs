@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Routing
 {
@@ -24,10 +25,9 @@ namespace Umbraco.Web.Routing
         /// <param name="urlProviders">The list of url providers.</param>
         public UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-            if (routingSettings == null) throw new ArgumentNullException("routingSettings");
+            if (routingSettings == null) throw new ArgumentNullException(nameof(routingSettings));
 
-            _umbracoContext = umbracoContext;
+            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _urlProviders = urlProviders;
 
             var provider = UrlProviderMode.Auto;
@@ -36,7 +36,7 @@ namespace Umbraco.Web.Routing
             if (Enum<UrlProviderMode>.TryParse(routingSettings.UrlProviderMode, out provider))
             {
                 Mode = provider;
-            }    
+            }
         }
 
         /// <summary>
@@ -47,9 +47,7 @@ namespace Umbraco.Web.Routing
         /// <param name="provider"></param>
         public UrlProvider(UmbracoContext umbracoContext, IEnumerable<IUrlProvider> urlProviders, UrlProviderMode provider = UrlProviderMode.Auto)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
-
-            _umbracoContext = umbracoContext;
+            _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _urlProviders = urlProviders;
 
             Mode = provider;
@@ -78,7 +76,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id)
         {
-            var intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            var intId = Current.Services.EntityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1);
         }
 
@@ -95,7 +93,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id, bool absolute)
         {
-            var intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            var intId = Current.Services.EntityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, absolute);
         }
 
@@ -113,7 +111,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id, Uri current, bool absolute)
         {
-            var intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            var intId = Current.Services.EntityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, current, absolute);
         }
 
@@ -129,7 +127,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id, UrlProviderMode mode)
         {
-            var intId = _umbracoContext.Application.Services.EntityService.GetIdForKey(id, UmbracoObjectTypes.Document);
+            var intId = Current.Services.EntityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, mode);
         }
 
@@ -218,7 +216,7 @@ namespace Umbraco.Web.Routing
         internal string GetUrlFromRoute(int id, string route)
         {
             var provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
-            var url = provider == null 
+            var url = provider == null
                 ? route // what else?
                 : provider.GetUrlFromRoute(route, UmbracoContext.Current, id, _umbracoContext.CleanedUmbracoUrl, Mode);
             return url ?? "#";

@@ -10,7 +10,7 @@ namespace Umbraco.Web.Models.Trees
     /// <remarks>
     /// This is required to return the tree data for a given section. Some sections may only contain one tree which means it's section
     /// root should also display a menu, whereas other sections have multiple trees and the section root shouldn't display a menu.
-    /// 
+    ///
     /// The section root also contains an explicit collection of children.
     /// </remarks>
     [DataContract(Name = "node", Namespace = "")]
@@ -45,7 +45,7 @@ namespace Umbraco.Web.Models.Trees
             //default to false
             IsContainer = false;
         }
-        
+
         [DataMember(Name = "isContainer")]
         public bool IsContainer { get; private set; }
 

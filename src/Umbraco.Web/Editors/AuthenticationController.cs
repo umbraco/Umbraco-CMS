@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Collections.Generic;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Web;
@@ -13,8 +13,6 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
@@ -26,6 +24,9 @@ using Umbraco.Web.Security;
 using Umbraco.Web.Security.Identity;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Web.Composing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 
 namespace Umbraco.Web.Editors
@@ -40,6 +41,7 @@ namespace Umbraco.Web.Editors
     public class AuthenticationController : UmbracoApiController
     {
 
+        //fixme inject these
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
         protected BackOfficeUserManager<BackOfficeIdentityUser> UserManager
@@ -100,7 +102,7 @@ namespace Umbraco.Web.Editors
 
             await SignInManager.SignInAsync(identityUser, false, false);
 
-            var user = ApplicationContext.Services.UserService.GetUserById(id);
+            var user = Services.UserService.GetUserById(id);
 
             return Mapper.Map<UserDisplay>(user);
         }
@@ -141,7 +143,6 @@ namespace Umbraco.Web.Editors
             return false;
         }
 
-
         /// <summary>
         /// Returns the currently logged in Umbraco user
         /// </summary>
@@ -169,8 +170,8 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// When a user is invited they are not approved but we need to resolve the partially logged on (non approved) 
-        /// user. 
+        /// When a user is invited they are not approved but we need to resolve the partially logged on (non approved)
+        /// user.
         /// </summary>
         /// <returns></returns>
         /// <remarks>
@@ -204,7 +205,7 @@ namespace Umbraco.Web.Editors
         [ValidateAngularAntiForgeryToken]
         public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
         {
-            var identityUser = await UserManager.FindByIdAsync(UmbracoContext.Security.GetUserId());
+            var identityUser = await UserManager.FindByIdAsync(UmbracoContext.Security.GetUserId().ResultOr(0));
             return identityUser.Logins.ToDictionary(x => x.LoginProvider, x => x.ProviderKey);
         }
 
@@ -218,7 +219,7 @@ namespace Umbraco.Web.Editors
             var http = EnsureHttpContext();
             var owinContext = TryGetOwinContext().Result;
 
-            //Sign the user in with username/password, this also gives a chance for developers to 
+            //Sign the user in with username/password, this also gives a chance for developers to
             //custom verify the credentials and auto-link user accounts with a custom IBackOfficePasswordChecker
             var result = await SignInManager.PasswordSignInAsync(
                 loginModel.Username, loginModel.Password, isPersistent: true, shouldLockout: true);
@@ -226,7 +227,7 @@ namespace Umbraco.Web.Editors
             switch (result)
             {
                 case SignInStatus.Success:
-                    
+
                     //get the user
                     var user = Services.UserService.GetByUsername(loginModel.Username);
                     UserManager.RaiseLoginSuccessEvent(user.Id);
@@ -305,13 +306,13 @@ namespace Umbraco.Web.Editors
 
                     var message = Services.TextService.Localize("resetPasswordEmailCopyFormat",
                         //Ensure the culture of the found user is used for the email!
-                        UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService),
+                        UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings),
                         new[] { identityUser.UserName, callbackUrl });
 
                     await UserManager.SendEmailAsync(identityUser.Id,
                         Services.TextService.Localize("login/resetPasswordEmailCopySubject",
                             //Ensure the culture of the found user is used for the email!
-                            UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService)),
+                            UserExtensions.GetUserCulture(identityUser.Culture, Services.TextService, GlobalSettings)),
                         message);
 
                     UserManager.RaiseForgotPasswordRequestedEvent(user.Id);
@@ -406,22 +407,19 @@ namespace Umbraco.Web.Editors
                 if (lockedOut)
                 {
                     Logger.Info<AuthenticationController>(
-                        "User {0} is currently locked out, unlocking and resetting AccessFailedCount",
-                        () => model.UserId);
+                        $"User {model.UserId} is currently locked out, unlocking and resetting AccessFailedCount");
 
                     //var user = await UserManager.FindByIdAsync(model.UserId);
                     var unlockResult = await UserManager.SetLockoutEndDateAsync(model.UserId, DateTimeOffset.Now);
                     if (unlockResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController>("Could not unlock for user {0} - error {1}",
-                                        () => model.UserId, () => unlockResult.Errors.First());
+                        Logger.Warn<AuthenticationController>(() => $"Could not unlock for user {model.UserId} - error {unlockResult.Errors.First()}");
                     }
 
                     var resetAccessFailedCountResult = await UserManager.ResetAccessFailedCountAsync(model.UserId);
                     if (resetAccessFailedCountResult.Succeeded == false)
                     {
-                        Logger.Warn<AuthenticationController>("Could not reset access failed count {0} - error {1}",
-                            () => model.UserId, () => unlockResult.Errors.First());
+                        Logger.Warn<AuthenticationController>(() => $"Could not reset access failed count {model.UserId} - error {unlockResult.Errors.First()}");
                     }
                 }
 
@@ -447,9 +445,7 @@ namespace Umbraco.Web.Editors
                 Core.Constants.Security.BackOfficeAuthenticationType,
                 Core.Constants.Security.BackOfficeExternalAuthenticationType);
 
-            Logger.Info<AuthenticationController>("User {0} from IP address {1} has logged out",
-                            () => User.Identity == null ? "UNKNOWN" : User.Identity.Name,
-                            () => owinContext.Request.RemoteIpAddress);
+            Logger.Info<AuthenticationController>($"User {(User.Identity == null ? "UNKNOWN" : User.Identity.Name)} from IP address {owinContext.Request.RemoteIpAddress} has logged out");
 
             if (UserManager != null)
             {
@@ -470,7 +466,7 @@ namespace Umbraco.Web.Editors
         private HttpResponseMessage SetPrincipalAndReturnUserDetail(IUser user, IPrincipal principal)
         {
             if (user == null) throw new ArgumentNullException("user");
-            if (principal == null) throw new ArgumentNullException("principal");
+            if (principal == null) throw new ArgumentNullException(nameof(principal));
 
             var userDetail = Mapper.Map<UserDetail>(user);
             //update the userDetail and set their remaining seconds
@@ -493,13 +489,13 @@ namespace Umbraco.Web.Editors
             var action = urlHelper.Action("ValidatePasswordResetCode", "BackOffice",
                 new
                 {
-                    area = GlobalSettings.UmbracoMvcArea,
+                    area = GlobalSettings.GetUmbracoMvcArea(),
                     u = userId,
                     r = code
                 });
 
             // Construct full URL using configured application URL (which will fall back to request)
-            var applicationUri = new Uri(ApplicationContext.UmbracoApplicationUrl);
+            var applicationUri = Current.RuntimeState.ApplicationUrl;
             var callbackUri = new Uri(applicationUri, action);
             return callbackUri.ToString();
         }

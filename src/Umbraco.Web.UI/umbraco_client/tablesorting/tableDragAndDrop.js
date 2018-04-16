@@ -326,7 +326,6 @@ jQuery.tableDnD = {
                         return null;
                     }
                 }
-                return row;
             }
         }
         return null;

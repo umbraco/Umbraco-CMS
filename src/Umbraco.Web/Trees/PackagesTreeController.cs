@@ -1,22 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Net;
 using System.Net.Http.Formatting;
-using System.Web.Http;
-using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
-using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.packager;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
+using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {
@@ -24,7 +16,6 @@ namespace Umbraco.Web.Trees
     [Tree(Constants.Applications.Developer, Constants.Trees.Packages, null, sortOrder: 0)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
-    [LegacyBaseTree(typeof(loadPackager))]
     public class PackagesTreeController : TreeController
     {
         /// <summary>
@@ -49,7 +40,7 @@ namespace Umbraco.Web.Trees
             var nodes = new TreeNodeCollection();
 
             var createdPackages = CreatedPackage.GetAllCreatedPackages();
-            
+
             if (id == "created")
             {
                 nodes.AddRange(
@@ -60,7 +51,7 @@ namespace Umbraco.Web.Trees
                             var node = CreateTreeNode(dt.Data.Id.ToString(), id, queryStrings, dt.Data.Name, "icon-inbox", false,
                                 string.Format("/{0}/framed/{1}",
                                     queryStrings.GetValue<string>("application"),
-                                    Uri.EscapeDataString("developer/Packages/EditPackage.aspx?id=" + dt.Data.Id)));                            
+                                    Uri.EscapeDataString("developer/Packages/EditPackage.aspx?id=" + dt.Data.Id)));
                             return node;
                         }));
             }
@@ -76,7 +67,7 @@ namespace Umbraco.Web.Trees
                     createdPackages.Count > 0,
                     string.Empty);
 
-                
+
 
                 //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
                 node.AdditionalData["jsClickCallback"] = "javascript:void(0);";
@@ -84,7 +75,7 @@ namespace Umbraco.Web.Trees
                 nodes.Add(node);
             }
 
-            
+
 
             return nodes;
         }
@@ -110,7 +101,7 @@ namespace Umbraco.Web.Trees
             else
             {
                 //it's a package node
-                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
             }
 
             return menu;

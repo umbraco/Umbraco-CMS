@@ -1,4 +1,4 @@
-using Microsoft.Owin;
+﻿using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Infrastructure;
 using Owin;
@@ -13,8 +13,8 @@ namespace Umbraco.Web.Security.Identity
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
         public ForceRenewalCookieAuthenticationMiddleware(
-            OwinMiddleware next, 
-            IAppBuilder app, 
+            OwinMiddleware next,
+            IAppBuilder app,
             UmbracoBackOfficeCookieAuthOptions options,
             IUmbracoContextAccessor umbracoContextAccessor) : base(next, app, options)
         {

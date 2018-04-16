@@ -1,10 +1,10 @@
-using System.Collections.Generic;
-using umbraco.interfaces;
+﻿using System.Collections.Generic;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Sync
 {
     /// <summary>
-    /// Used for any 'Batched' <see cref="IServerMessenger"/> instances which specifies a set of <see cref="RefreshInstruction"/> targeting a collection of 
+    /// Used for any 'Batched' <see cref="IServerMessenger"/> instances which specifies a set of <see cref="RefreshInstruction"/> targeting a collection of
     /// <see cref="IServerAddress"/>
     /// </summary>
     public sealed class RefreshInstructionEnvelope

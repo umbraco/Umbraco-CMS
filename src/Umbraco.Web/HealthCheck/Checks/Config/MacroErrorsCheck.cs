@@ -9,27 +9,15 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         Group = "Configuration")]
     public class MacroErrorsCheck : AbstractConfigCheck
     {
-        private readonly ILocalizedTextService _textService;
+        public MacroErrorsCheck(ILocalizedTextService textService)
+            : base(textService)
+        { }
 
-        public MacroErrorsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
-        {
-            _textService = healthCheckContext.ApplicationContext.Services.TextService;
-        }
+        public override string FilePath => "~/Config/umbracoSettings.config";
 
-        public override string FilePath
-        {
-            get { return "~/Config/umbracoSettings.config"; }
-        }
+        public override string XPath => "/settings/content/MacroErrors";
 
-        public override string XPath
-        {
-            get { return "/settings/content/MacroErrors"; }
-        }
-
-        public override ValueComparisonType ValueComparisonType
-        {
-            get { return ValueComparisonType.ShouldEqual; }
-        }
+        public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldEqual;
 
         public override IEnumerable<AcceptableConfiguration> Values
         {
@@ -52,12 +40,12 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
                 return values;
             }
         }
-        
+
         public override string CheckSuccessMessage
         {
             get
             {
-                return _textService.Localize("healthcheck/macroErrorModeCheckSuccessMessage",
+                return TextService.Localize("healthcheck/macroErrorModeCheckSuccessMessage",
                     new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
             }
         }
@@ -66,7 +54,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return _textService.Localize("healthcheck/macroErrorModeCheckErrorMessage",
+                return TextService.Localize("healthcheck/macroErrorModeCheckErrorMessage",
                     new[] { CurrentValue, Values.First(v => v.IsRecommended).Value });
             }
         }
@@ -75,7 +63,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         {
             get
             {
-                return _textService.Localize("healthcheck/macroErrorModeCheckRectifySuccessMessage",
+                return TextService.Localize("healthcheck/macroErrorModeCheckRectifySuccessMessage",
                     new[] { Values.First(v => v.IsRecommended).Value });
             }
         }

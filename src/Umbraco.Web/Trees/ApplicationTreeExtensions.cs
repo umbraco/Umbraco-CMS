@@ -14,7 +14,9 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
+using Current = Umbraco.Web.Composing.Current;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
 using UrlHelper = System.Web.Http.Routing.UrlHelper;
 
@@ -22,7 +24,6 @@ namespace Umbraco.Web.Trees
 {
     internal static class ApplicationTreeExtensions
     {
-
         private static readonly ConcurrentDictionary<Type, TreeAttribute> TreeAttributeCache = new ConcurrentDictionary<Type, TreeAttribute>();
 
         internal static TreeAttribute GetTreeAttribute(this Type treeControllerType)
@@ -68,9 +69,9 @@ namespace Umbraco.Web.Trees
         internal static Attempt<Type> TryGetControllerTree(this ApplicationTree appTree)
         {
             //get reference to all TreeApiControllers
-            var controllerTrees = UmbracoApiControllerResolver.Current.RegisteredUmbracoApiControllers
-                                                              .Where(TypeHelper.IsTypeAssignableFrom<TreeController>)
-                                                              .ToArray();
+            var controllerTrees = Current.UmbracoApiControllerTypes
+                .Where(TypeHelper.IsTypeAssignableFrom<TreeController>)
+                .ToArray();
 
             //find the one we're looking for
             var foundControllerTree = controllerTrees.FirstOrDefault(x => x == appTree.GetRuntimeType());
@@ -89,7 +90,7 @@ namespace Umbraco.Web.Trees
         /// <param name="controllerContext"></param>
         /// <returns></returns>
         /// <remarks>
-        /// This ensures that authorization filters are applied to the sub request 
+        /// This ensures that authorization filters are applied to the sub request
         /// </remarks>
         internal static async Task<Attempt<TreeNode>> TryGetRootNodeFromControllerTree(this ApplicationTree appTree, FormDataCollection formCollection, HttpControllerContext controllerContext)
         {
@@ -98,17 +99,17 @@ namespace Umbraco.Web.Trees
             {
                 return Attempt<TreeNode>.Fail(foundControllerTreeAttempt.Exception);
             }
-            
+
             var foundControllerTree = foundControllerTreeAttempt.Result;
             //instantiate it, since we are proxying, we need to setup the instance with our current context
             var instance = (TreeController)DependencyResolver.Current.GetService(foundControllerTree);
 
-            //NOTE: This is all required in order to execute the auth-filters for the sub request, we 
+            //NOTE: This is all required in order to execute the auth-filters for the sub request, we
             // need to "trick" web-api into thinking that it is actually executing the proxied controller.
 
             var urlHelper = controllerContext.Request.GetUrlHelper();
             //create the proxied URL for the controller action
-            var proxiedUrl = controllerContext.Request.RequestUri.GetLeftPart(UriPartial.Authority) + 
+            var proxiedUrl = controllerContext.Request.RequestUri.GetLeftPart(UriPartial.Authority) +
                 urlHelper.GetUmbracoApiService("GetRootNode", instance.GetType());
             //add the query strings to it
             proxiedUrl += "?" + formCollection.ToQueryString();
@@ -128,12 +129,12 @@ namespace Umbraco.Web.Trees
 
             if (WebApiVersionCheck.WebApiVersion >= Version.Parse("5.0.0"))
             {
-                //In WebApi2, this is required to be set: 
+                //In WebApi2, this is required to be set:
                 //      proxiedControllerContext.RequestContext = controllerContext.RequestContext
                 // but we need to do this with reflection because of codebase changes between version 4/5
                 //NOTE: Use TypeHelper here since the reflection is cached
                 var controllerContextRequestContext = TypeHelper.GetProperty(controllerContext.GetType(), "RequestContext").GetValue(controllerContext);
-                TypeHelper.GetProperty(proxiedControllerContext.GetType(), "RequestContext").SetValue(proxiedControllerContext, controllerContextRequestContext);                
+                TypeHelper.GetProperty(proxiedControllerContext.GetType(), "RequestContext").SetValue(proxiedControllerContext, controllerContextRequestContext);
             }
 
             instance.ControllerContext = proxiedControllerContext;
@@ -157,28 +158,30 @@ namespace Umbraco.Web.Trees
             {
                 throw new HttpResponseException(result);
             }
-            
+
             //return the root
             var node = instance.GetRootNode(formCollection);
             return node == null
-                ? Attempt<TreeNode>.Fail(new InvalidOperationException("Could not return a root node for tree " + appTree.Type)) 
+                ? Attempt<TreeNode>.Fail(new InvalidOperationException("Could not return a root node for tree " + appTree.Type))
                 : Attempt<TreeNode>.Succeed(node);
         }
 
-        internal static  Attempt<TreeNodeCollection> TryLoadFromControllerTree(this ApplicationTree appTree, string id, FormDataCollection formCollection, HttpControllerContext controllerContext)
+        internal static Attempt<TreeNodeCollection> TryLoadFromControllerTree(this ApplicationTree appTree, string id, FormDataCollection formCollection, HttpControllerContext controllerContext)
         {
             var foundControllerTreeAttempt = appTree.TryGetControllerTree();
             if (foundControllerTreeAttempt.Success == false)
-            {
                 return Attempt<TreeNodeCollection>.Fail(foundControllerTreeAttempt.Exception);
-            }
-            var foundControllerTree = foundControllerTreeAttempt.Result;
 
-            //instantiate it, since we are proxying, we need to setup the instance with our current context
-            var instance = (TreeController)DependencyResolver.Current.GetService(foundControllerTree);
+            // instantiate it, since we are proxying, we need to setup the instance with our current context
+            var foundControllerTree = foundControllerTreeAttempt.Result;
+            var instance = (TreeController) DependencyResolver.Current.GetService(foundControllerTree);
+            if (instance == null)
+                throw new Exception("Failed to get tree " + foundControllerTree.FullName + ".");
+
             instance.ControllerContext = controllerContext;
             instance.Request = controllerContext.Request;
-            //return it's data
+
+            // return its data
             return Attempt.Succeed(instance.GetNodes(id, formCollection));
         }
 
@@ -196,11 +199,12 @@ namespace Umbraco.Web.Trees
                 return Attempt<TreeNode>.Succeed(null);
             }
 
-            var legacyController = new LegacyTreeController(xmlTreeNodeAttempt.Result, appTree.Alias, currentSection, urlHelper);
-            var newRoot = legacyController.GetRootNode(formCollection);
+            //var temp = new LegacyTreeController(xmlTreeNodeAttempt.Result, appTree.Alias, currentSection, urlHelper);
+            var temp = new TreeControllerBaseStuffForLegacy(appTree.Alias, xmlTreeNodeAttempt.Result.Text, urlHelper);
+            var newRoot = temp.GetRootNode(formCollection);
 
             return Attempt.Succeed(newRoot);
-            
+
         }
 
         internal static Attempt<XmlTreeNode> TryGetRootXmlNodeFromLegacyTree(this ApplicationTree appTree, FormDataCollection formCollection, UrlHelper urlHelper)
@@ -216,7 +220,7 @@ namespace Umbraco.Web.Trees
             bTree.SetTreeParameters(treeParams);
 
             var xmlRoot = bTree.RootNode;
-            
+
             return Attempt.Succeed(xmlRoot);
         }
 
@@ -224,8 +228,8 @@ namespace Umbraco.Web.Trees
         {
             //This is how the legacy trees worked....
             var treeDef = TreeDefinitionCollection.Instance.FindTree(appTree.Alias);
-            return treeDef == null 
-                ? Attempt<TreeDefinition>.Fail(new InstanceNotFoundException("Could not find tree of type " + appTree.Alias)) 
+            return treeDef == null
+                ? Attempt<TreeDefinition>.Fail(new InstanceNotFoundException("Could not find tree of type " + appTree.Alias))
                 : Attempt<TreeDefinition>.Succeed(treeDef);
         }
 
@@ -249,7 +253,7 @@ namespace Umbraco.Web.Trees
 
             var currentSection = formCollection.GetRequiredString("section");
 
-            var result = LegacyTreeDataConverter.ConvertFromLegacyMenu(rootAttempt.Result, currentSection);            
+            var result = LegacyTreeDataConverter.ConvertFromLegacyMenu(rootAttempt.Result, currentSection);
             return Attempt.Succeed(result);
         }
 
@@ -301,5 +305,5 @@ namespace Umbraco.Web.Trees
         }
 
     }
-    
+
 }

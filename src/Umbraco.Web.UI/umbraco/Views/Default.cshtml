@@ -11,8 +11,9 @@
 @using Umbraco.Web
 @using Umbraco.Web.Editors
 @using umbraco
+@using Umbraco.Core.Configuration
 
-@inherits System.Web.Mvc.WebViewPage
+@inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
 
 @{
     var isDebug = false;
@@ -28,7 +29,6 @@
 
     Html
         .RequiresCss("assets/css/umbraco.css", "Umbraco")
-        .RequiresCss("tree/treeicons.css", "UmbracoClient")
         .RequiresCss("lib/bootstrap-social/bootstrap-social.css", "Umbraco")
         .RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
 }
@@ -37,7 +37,7 @@
 
 <html lang="en">
 <head>
-    <base href="@GlobalSettings.Path.EnsureEndsWith('/')" />
+    <base href="@Model.Path.EnsureEndsWith('/')" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -60,23 +60,27 @@
 
             <umb-app-header></umb-app-header>
 
-            <umb-navigation></umb-navigation>
+            <div class="umb-app-content">
+            
+              <umb-navigation></umb-navigation>
 
-            <section id="contentwrapper">
+              <section id="contentwrapper">
+
+                  <div id="contentcolumn">
+
+                      <div class="umb-editor" ng-view></div>
+                      <div class="umb-editor__overlay" ng-if="editors.length > 0"></div>
+
+                      <umb-editor
+                          ng-repeat="editor in editors"
+                          model="editor">
+                      </umb-editor>
+
+                  </div>
+
+              </section>
                 
-                <div id="contentcolumn">
-
-                    <div class="umb-editor" ng-view></div>
-                    <div class="umb-editor__overlay" ng-if="editors.length > 0"></div>
-
-                    <umb-editor
-                        ng-repeat="editor in editors"
-                        model="editor">
-                    </umb-editor>
-
-                </div>
-
-            </section>
+            </div>
 
             <umb-tour
                 ng-if="tour.show"
@@ -101,13 +105,20 @@
     </umb-backdrop>
 
     <umb-overlay
+        ng-if="overlay.show"
+        model="overlay"
+        position="{{overlay.position}}"
+        view="overlay.view">
+    </umb-overlay>
+
+    <umb-overlay
         ng-if="ysodOverlay.show"
         model="ysodOverlay"
         position="right"
         view="ysodOverlay.view">
     </umb-overlay>
 
-    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }))
+    @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewBag.UmbracoPath }), Model.Features, UmbracoConfig.For.GlobalSettings())
 
     <script type="text/javascript">
         document.angularReady = function(app) {
@@ -124,7 +135,6 @@
 
     @if (isDebug)
     {
-        <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
         @Html.RenderProfiler()
     }
 

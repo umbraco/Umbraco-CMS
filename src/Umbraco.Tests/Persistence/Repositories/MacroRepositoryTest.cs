@@ -3,25 +3,27 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class MacroRepositoryTest : BaseDatabaseFactoryTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class MacroRepositoryTest : TestWithDatabaseBase
     {
-        [SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
             CreateTestData();
         }
@@ -30,16 +32,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Cannot_Add_Duplicate_Macros()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            // Act
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                var macro = new Macro("test1", "Test", "~/usercontrol/blah.ascx", "MyAssembly", "test.xslt", "~/views/macropartials/test.cshtml");
-                repository.AddOrUpdate(macro);
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
-                Assert.Throws<SqlCeException>(unitOfWork.Commit);
+                var macro = new Macro("test1", "Test", "~/usercontrol/blah.ascx", "MyAssembly", "test.xslt", "~/views/macropartials/test.cshtml");
+                ;
+
+                Assert.Throws<SqlCeException>(() => repository.Save(macro));
             }
 
         }
@@ -48,16 +49,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Cannot_Update_To_Duplicate_Macro_Alias()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            // Act
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 var macro = repository.Get(1);
                 macro.Alias = "test2";
-                repository.AddOrUpdate(macro);
-                Assert.Throws<SqlCeException>(unitOfWork.Commit);
+                
+                Assert.Throws<SqlCeException>(() => repository.Save(macro));
             }
 
         }
@@ -66,12 +66,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-
-            // Act
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 // Assert
                 Assert.That(repository, Is.Not.Null);
             }
@@ -81,10 +80,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 // Act
                 var macro = repository.Get(1);
 
@@ -111,12 +111,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 // Act
-                var macros = repository.GetAll();
+                var macros = repository.GetMany();
 
                 // Assert
                 Assert.That(macros.Count(), Is.EqualTo(3));
@@ -128,13 +129,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetByQuery_On_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 // Act
-                var query = Query<IMacro>.Builder.Where(x => x.Alias.ToUpper() == "TEST1");
-                var result = repository.GetByQuery(query);
+                var query = scope.SqlContext.Query<IMacro>().Where(x => x.Alias.ToUpper() == "TEST1");
+                var result = repository.Get(query);
 
                 // Assert
                 Assert.AreEqual(1, result.Count());
@@ -145,12 +147,13 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Count_On_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 // Act
-                var query = Query<IMacro>.Builder.Where(x => x.Name.StartsWith("Test"));
+                var query = scope.SqlContext.Query<IMacro>().Where(x => x.Name.StartsWith("Test"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -162,15 +165,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 // Act
                 var macro = new Macro("test", "Test", "~/usercontrol/blah.ascx", "MyAssembly", "test.xslt", "~/views/macropartials/test.cshtml");
                 macro.Properties.Add(new MacroProperty("test", "Test", 0, "test"));
-                repository.AddOrUpdate(macro);
-                unitOfWork.Commit();
+                repository.Save(macro);
 
                 // Assert
                 Assert.That(macro.HasIdentity, Is.True);
@@ -183,10 +186,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 // Act
                 var macro = repository.Get(2);
                 macro.Name = "Hello";
@@ -200,8 +204,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 macro.UseInEditor = true;
                 macro.XsltPath = "";
 
-                repository.AddOrUpdate(macro);
-                unitOfWork.Commit();
+                repository.Save(macro);
 
                 var macroUpdated = repository.Get(2);
 
@@ -224,15 +227,15 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 // Act
                 var macro = repository.Get(3);
                 Assert.IsNotNull(macro);
                 repository.Delete(macro);
-                unitOfWork.Commit();
 
                 var exists = repository.Exists(3);
 
@@ -245,10 +248,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_Repository()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 // Act
                 var exists = repository.Exists(3);
                 var doesntExist = repository.Exists(10);
@@ -263,16 +267,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Add_Property_For_Macro()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 var macro = repository.Get(1);
                 macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
 
-                repository.AddOrUpdate(macro);
+                repository.Save(macro);
 
-                unitOfWork.Commit();
 
                 // Assert
                 Assert.Greater(macro.Properties.First().Id, 0); //ensure id is returned
@@ -290,16 +294,16 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Add_New_Macro_With_Property()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 var macro = new Macro("newmacro", "A new macro", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
                 macro.Properties.Add(new MacroProperty("blah1", "New1", 4, "test.editor"));
 
-                repository.AddOrUpdate(macro);
+                repository.Save(macro);
 
-                unitOfWork.Commit();
 
                 // Assert
                 var result = repository.Get(macro.Id);
@@ -315,19 +319,18 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Remove_Macro_Property()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 var macro = new Macro("newmacro", "A new macro", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
                 macro.Properties.Add(new MacroProperty("blah1", "New1", 4, "test.editor"));
-                repository.AddOrUpdate(macro);
-                unitOfWork.Commit();
+                repository.Save(macro);
 
                 var result = repository.Get(macro.Id);
                 result.Properties.Remove("blah1");
-                repository.AddOrUpdate(result);
-                unitOfWork.Commit();
+                repository.Save(result);
 
                 // Assert
                 result = repository.Get(macro.Id);
@@ -340,10 +343,11 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Add_Remove_Macro_Properties()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 var macro = new Macro("newmacro", "A new macro", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml");
                 var prop1 = new MacroProperty("blah1", "New1", 4, "test.editor");
                 var prop2 = new MacroProperty("blah2", "New2", 3, "test.editor");
@@ -355,8 +359,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 macro.Properties.Remove("blah2");
                 macro.Properties.Add(prop2);
 
-                repository.AddOrUpdate(macro);
-                unitOfWork.Commit();
+                repository.Save(macro);
 
                 // Assert
                 var result = repository.Get(macro.Id);
@@ -371,20 +374,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Update_Property_For_Macro()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 var macro = repository.Get(1);
                 macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
-                repository.AddOrUpdate(macro);
-                unitOfWork.Commit();
+                repository.Save(macro);
 
                 //Act
                 macro = repository.Get(1);
                 macro.Properties["new1"].Name = "this is a new name";
-                repository.AddOrUpdate(macro);
-                unitOfWork.Commit();
+                repository.Save(macro);
 
 
                 // Assert
@@ -399,20 +401,19 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Update_Macro_Property_Alias()
         {
             // Arrange
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
                 var macro = repository.Get(1);
                 macro.Properties.Add(new MacroProperty("new1", "New1", 3, "test"));
-                repository.AddOrUpdate(macro);
-                unitOfWork.Commit();
+                repository.Save(macro);
 
                 //Act
                 macro = repository.Get(1);
                 macro.Properties.UpdateProperty("new1", newAlias: "newAlias");
-                repository.AddOrUpdate(macro);
-                unitOfWork.Commit();
+                repository.Save(macro);
 
                 // Assert
                 var result = repository.Get(1);
@@ -428,14 +429,15 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         public void CreateTestData()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                repository.AddOrUpdate(new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml"));
-                repository.AddOrUpdate(new Macro("test2", "Test2", "~/usercontrol/test2.ascx", "MyAssembly2", "test2.xslt", "~/views/macropartials/test2.cshtml"));
-                repository.AddOrUpdate(new Macro("test3", "Tet3", "~/usercontrol/test3.ascx", "MyAssembly3", "test3.xslt", "~/views/macropartials/test3.cshtml"));
-                unitOfWork.Commit();
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
+                repository.Save(new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml"));
+                repository.Save(new Macro("test2", "Test2", "~/usercontrol/test2.ascx", "MyAssembly2", "test2.xslt", "~/views/macropartials/test2.cshtml"));
+                repository.Save(new Macro("test3", "Tet3", "~/usercontrol/test3.ascx", "MyAssembly3", "test3.xslt", "~/views/macropartials/test3.cshtml"));
+                scope.Complete();
             }
 
         }

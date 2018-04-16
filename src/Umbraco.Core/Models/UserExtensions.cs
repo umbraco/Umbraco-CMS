@@ -5,9 +5,8 @@ using System.Linq;
 using System.Net;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
@@ -24,6 +23,25 @@ namespace Umbraco.Core.Models
         {
             var apps = user.AllowedSections;
             return apps.Any(uApp => uApp.InvariantEquals(app));
+        }
+
+        /// <summary>
+        /// Determines whether this user is the 'super' user.
+        /// </summary>
+        public static bool IsSuper(this IUser user)
+        {
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            return user.Id == Constants.Security.SuperId;
+        }
+
+        /// <summary>
+        /// Determines whether this user belongs to the administrators group.
+        /// </summary>
+        /// <remarks>The 'super' user does not automatically belongs to the administrators group.</remarks>
+        public static bool IsAdmin(this IUser user)
+        {
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.AdminGroupAlias);
         }
 
         /// <summary>
@@ -82,7 +100,7 @@ namespace Umbraco.Core.Models
             }
 
             //use the custom avatar
-            var avatarUrl = FileSystemProviderManager.Current.MediaFileSystem.GetUrl(user.Avatar);
+            var avatarUrl = Current.FileSystems.MediaFileSystem.GetUrl(user.Avatar);
             return new[]
             {
                 avatarUrl  + "?width=30&height=30&mode=crop",
@@ -94,20 +112,30 @@ namespace Umbraco.Core.Models
 
         }
 
+        public static void ClearAllowedSections(this IUser user)
+        {
+            var allowed = user.AllowedSections.ToArray();
+            foreach (var s in allowed)
+            {
+                user.RemoveAllowedSection(s);
+            }
+        }
+
         /// <summary>
         /// Returns the culture info associated with this user, based on the language they're assigned to in the back office
         /// </summary>
         /// <param name="user"></param>
         /// <param name="textService"></param>
+        /// <param name="globalSettings"></param>
         /// <returns></returns>
-        public static CultureInfo GetUserCulture(this IUser user, ILocalizedTextService textService)
+        public static CultureInfo GetUserCulture(this IUser user, ILocalizedTextService textService, IGlobalSettings globalSettings)
         {
-            if (user == null) throw new ArgumentNullException("user");
-            if (textService == null) throw new ArgumentNullException("textService");
-            return GetUserCulture(user.Language, textService);
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            if (textService == null) throw new ArgumentNullException(nameof(textService));
+            return GetUserCulture(user.Language, textService, globalSettings);
         }
 
-        internal static CultureInfo GetUserCulture(string userLanguage, ILocalizedTextService textService)
+        internal static CultureInfo GetUserCulture(string userLanguage, ILocalizedTextService textService, IGlobalSettings globalSettings)
         {
             try
             {
@@ -121,7 +149,7 @@ namespace Umbraco.Core.Models
             catch (CultureNotFoundException)
             {
                 //return the default one
-                return CultureInfo.GetCultureInfo(GlobalSettings.DefaultUILanguage);
+                return CultureInfo.GetCultureInfo(globalSettings.DefaultUILanguage);
             }
         }
 
@@ -167,10 +195,10 @@ namespace Umbraco.Core.Models
                     throw new NotSupportedException("Path access is only determined on content or media");
             }
         }
-        
+
         internal static bool HasPathAccess(string path, int[] startNodeIds, int recycleBinId)
         {
-            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", "path");
+            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
 
             // check for no access
             if (startNodeIds.Length == 0)
@@ -206,7 +234,7 @@ namespace Umbraco.Core.Models
 
         internal static bool IsInBranchOfStartNode(string path, int[] startNodeIds, string[] startNodePaths, out bool hasPathAccess)
         {
-            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", "path");
+            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(path));
 
             hasPathAccess = false;
 
@@ -219,7 +247,7 @@ namespace Umbraco.Core.Models
             {
                 hasPathAccess = true;
                 return true;
-            }                
+            }
 
             //is it self?
             var self = startNodePaths.Any(x => x == path);
@@ -233,7 +261,7 @@ namespace Umbraco.Core.Models
             var ancestor = startNodePaths.Any(x => x.StartsWith(path));
             if (ancestor)
             {
-                hasPathAccess = false;
+                //hasPathAccess = false;
                 return true;
             }
 
@@ -244,21 +272,18 @@ namespace Umbraco.Core.Models
                 hasPathAccess = true;
                 return true;
             }
-            
+
             return false;
         }
 
         /// <summary>
-        /// Determines whether this user is an admin.
+        /// Determines whether this user has access to view sensitive data
         /// </summary>
         /// <param name="user"></param>
-        /// <returns>
-        /// 	<c>true</c> if this user is admin; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsAdmin(this IUser user)
+        public static bool HasAccessToSensitiveData(this IUser user)
         {
             if (user == null) throw new ArgumentNullException("user");
-            return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.AdminGroupAlias);
+            return user.Groups != null && user.Groups.Any(x => x.Alias == Constants.Security.SensitiveDataGroupAlias);
         }
 
         // calc. start nodes, combining groups' and user's, and excluding what's in the bin
@@ -320,13 +345,11 @@ namespace Umbraco.Core.Models
         private static T FromUserCache<T>(IUser user, string cacheKey)
             where T: class
         {
-            var entityUser = user as User;
-            if (entityUser == null) return null;
+            if (!(user is User entityUser)) return null;
 
             lock (entityUser.AdditionalDataLock)
             {
-                object allContentStartNodes;
-                return entityUser.AdditionalData.TryGetValue(cacheKey, out allContentStartNodes)
+                return entityUser.AdditionalData.TryGetValue(cacheKey, out var allContentStartNodes)
                     ? allContentStartNodes as T
                     : null;
             }
@@ -335,8 +358,7 @@ namespace Umbraco.Core.Models
         private static void ToUserCache<T>(IUser user, string cacheKey, T vals)
             where T: class
         {
-            var entityUser = user as User;
-            if (entityUser == null) return;
+            if (!(user is User entityUser)) return;
 
             lock (entityUser.AdditionalDataLock)
             {
@@ -361,7 +383,7 @@ namespace Umbraco.Core.Models
                     binPath += Constants.System.RecycleBinMedia;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("objectType");
+                    throw new ArgumentOutOfRangeException(nameof(objectType));
             }
             return binPath;
         }
@@ -371,7 +393,9 @@ namespace Umbraco.Core.Models
             // assume groupSn and userSn each don't contain duplicates
 
             var asn = groupSn.Concat(userSn).Distinct().ToArray();
-            var paths = entityService.GetAllPaths(objectType, asn).ToDictionary(x => x.Id, x => x.Path);
+            var paths = asn.Length > 0
+                ? entityService.GetAllPaths(objectType, asn).ToDictionary(x => x.Id, x => x.Path)
+                : new Dictionary<int, string>();
 
             paths[Constants.System.Root] = Constants.System.Root.ToString(); // entityService does not get that one
 
@@ -380,8 +404,7 @@ namespace Umbraco.Core.Models
             var lsn = new List<int>();
             foreach (var sn in groupSn)
             {
-                string snp;
-                if (paths.TryGetValue(sn, out snp) == false) continue; // ignore rogue node (no path)
+                if (paths.TryGetValue(sn, out var snp) == false) continue; // ignore rogue node (no path)
 
                 if (StartsWithPath(snp, binPath)) continue; // ignore bin
 
@@ -393,8 +416,7 @@ namespace Umbraco.Core.Models
             var usn = new List<int>();
             foreach (var sn in userSn)
             {
-                string snp;
-                if (paths.TryGetValue(sn, out snp) == false) continue; // ignore rogue node (no path)
+                if (paths.TryGetValue(sn, out var snp) == false) continue; // ignore rogue node (no path)
 
                 if (StartsWithPath(snp, binPath)) continue; // ignore bin
 

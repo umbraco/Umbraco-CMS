@@ -1,23 +1,14 @@
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Migrations;
-using Umbraco.Core.Persistence.SqlSyntax;
+﻿using Umbraco.Core.Migrations;
 
 namespace Umbraco.Tests.Migrations.Stubs
 {
-    [Migration("5.0.0", 0, "Test")]
     public class FiveZeroMigration : MigrationBase
     {
-        public FiveZeroMigration(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
-        {
-        }
+        public FiveZeroMigration(IMigrationContext context)
+            : base(context)
+        { }
 
-        public override void Up()
-        {
-        }
-
-        public override void Down()
-        {
-        }
-        
+        public override void Migrate()
+        { }
     }
 }

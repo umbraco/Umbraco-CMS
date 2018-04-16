@@ -8,9 +8,9 @@ namespace Umbraco.Web.Models.ContentEditing
     {
         public Notification()
         {
-            
+
         }
-        
+
         public Notification(string header, string message, SpeechBubbleIcon notificationType)
         {
             Header = header;

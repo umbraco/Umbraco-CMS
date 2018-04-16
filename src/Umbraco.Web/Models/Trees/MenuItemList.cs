@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core;
-using umbraco.BusinessLogic.Actions;
-using umbraco.interfaces;
+using Umbraco.Web.Composing;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Models.Trees
 {
@@ -15,12 +15,12 @@ namespace Umbraco.Web.Models.Trees
     public class MenuItemList : List<MenuItem>
     {
         public MenuItemList()
-        {           
+        {
         }
 
         public MenuItemList(IEnumerable<MenuItem> items)
             : base(items)
-        {            
+        {
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace Umbraco.Web.Models.Trees
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="hasSeparator"></param>
@@ -123,7 +123,7 @@ namespace Umbraco.Web.Models.Trees
         internal MenuItem CreateMenuItem<T>(string name, bool hasSeparator = false, IDictionary<string, object> additionalData = null)
             where T : IAction
         {
-            var item = ActionsResolver.Current.GetAction<T>();
+            var item = Current.Actions.GetAction<T>();
             if (item != null)
             {
                 var menuItem = new MenuItem(item, name)
@@ -153,7 +153,7 @@ namespace Umbraco.Web.Models.Trees
         }
 
         /// <summary>
-        /// Checks if the IAction type passed in is attributed with LegacyActionMenuItemAttribute and if so 
+        /// Checks if the IAction type passed in is attributed with LegacyActionMenuItemAttribute and if so
         /// ensures that the correct action metadata is added.
         /// </summary>
         /// <param name="actionType"></param>

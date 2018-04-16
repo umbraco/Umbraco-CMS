@@ -3,7 +3,7 @@
 namespace Umbraco.Core.Media.Exif
 {
     /// <summary>
-    /// An endian-aware converter for converting between base data types 
+    /// An endian-aware converter for converting between base data types
     /// and an array of bytes.
     /// </summary>
     internal class BitConverterEx

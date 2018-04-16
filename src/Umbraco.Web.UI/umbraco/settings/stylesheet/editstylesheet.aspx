@@ -1,32 +1,33 @@
 <%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master" CodeBehind="editstylesheet.aspx.cs" AutoEventWireup="True"
     Inherits="Umbraco.Web.UI.Umbraco.Settings.Stylesheet.EditStyleSheet" ValidateRequest="False" %>
 <%@ Import Namespace="Umbraco.Core" %>
+<%@ Import Namespace="Umbraco.Web.Mvc" %>
 
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="cdf" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <cdf:JsInclude runat="server" FilePath="Editors/EditStyleSheet.js" PathNameAlias="UmbracoClient"></cdf:JsInclude>
 
     <script type="text/javascript">
-        
+
         (function ($) {
             $(document).ready(function () {
                 var editor = new Umbraco.Editors.EditStyleSheet({
                     nameTxtBox: $('#<%= NameTxt.ClientID %>'),
                     originalFileName: '<%= NameTxt.Text %>',
                     saveButton: $("#<%= ((Control)SaveButton).ClientID %>"),
-                    editorSourceElement: $('#<%= editorSource.ClientID %>'), 
+                    editorSourceElement: $('#<%= editorSource.ClientID %>'),
                     restServiceLocation: "<%= Url.GetSaveFileServicePath() %>",
                     treeSyncPath: "<%= TreeSyncPath %>",
                     lttPathElement: $('#<%= lttPath.ClientID %>')
                 });
                 editor.init();
-                
+
                 //bind save shortcut
                 UmbClientMgr.appActions().bindSaveShortCut();
             });
-                
+
             })(jQuery);
 
     </script>

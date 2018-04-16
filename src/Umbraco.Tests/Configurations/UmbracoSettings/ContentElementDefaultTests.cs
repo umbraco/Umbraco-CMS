@@ -37,12 +37,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         }
 
         [Test]
-        public override void TidyCharEncoding()
-        {
-            Assert.IsTrue(SettingsSection.Content.TidyCharEncoding == "UTF8");
-        }
-
-        [Test]
         public override void XmlContentCheckForDiskChanges()
         {
             Assert.IsTrue(SettingsSection.Content.XmlContentCheckForDiskChanges == false);

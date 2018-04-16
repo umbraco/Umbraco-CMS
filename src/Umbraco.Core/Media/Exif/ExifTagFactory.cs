@@ -51,7 +51,7 @@ namespace Umbraco.Core.Media.Exif
         }
 
         /// <summary>
-        /// Returns the string representation for the given exif tag including 
+        /// Returns the string representation for the given exif tag including
         /// IFD section and tag id.
         /// </summary>
         public static string GetTagLongName(ExifTag tag)

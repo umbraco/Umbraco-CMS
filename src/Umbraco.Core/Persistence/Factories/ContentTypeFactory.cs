@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Factories
     // IMediaType (media types)
     // IMemberType (member types)
     //
-    internal class ContentTypeFactory 
+    internal class ContentTypeFactory
     {
         #region IContentType
 
@@ -28,8 +28,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                 BuildCommonEntity(contentType, dto);
 
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
+                // reset dirty initial properties (U4-1946)
                 contentType.ResetDirtyProperties(false);
                 return contentType;
             }
@@ -52,8 +51,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                 BuildCommonEntity(contentType, dto);
 
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
+                // reset dirty initial properties (U4-1946)
                 contentType.ResetDirtyProperties(false);
             }
             finally
@@ -84,7 +82,8 @@ namespace Umbraco.Core.Persistence.Factories
                 NodeId = entity.Id,
                 PropertyTypeId = x.Id,
                 CanEdit = memberType.MemberCanEditProperty(x.Alias),
-                ViewOnProfile = memberType.MemberCanViewProperty(x.Alias)
+                ViewOnProfile = memberType.MemberCanViewProperty(x.Alias),
+                IsSensitive = memberType.IsSensitiveProperty(x.Alias)
             }).ToList();
             return dtos;
         }
@@ -110,17 +109,18 @@ namespace Umbraco.Core.Persistence.Factories
             entity.AllowedAsRoot = dto.AllowAtRoot;
             entity.IsContainer = dto.IsContainer;
             entity.Trashed = dto.NodeDto.Trashed;
+            entity.Variations = (ContentVariation) dto.Variations;
         }
 
         public ContentTypeDto BuildContentTypeDto(IContentTypeBase entity)
         {
             Guid nodeObjectType;
             if (entity is IContentType)
-                nodeObjectType = Constants.ObjectTypes.DocumentTypeGuid;
+                nodeObjectType = Constants.ObjectTypes.DocumentType;
             else if (entity is IMediaType)
-                nodeObjectType = Constants.ObjectTypes.MediaTypeGuid;
+                nodeObjectType = Constants.ObjectTypes.MediaType;
             else if (entity is IMemberType)
-                nodeObjectType = Constants.ObjectTypes.MemberTypeGuid;
+                nodeObjectType = Constants.ObjectTypes.MemberType;
             else
                 throw new Exception("Invalid entity.");
 
@@ -133,6 +133,7 @@ namespace Umbraco.Core.Persistence.Factories
                 NodeId = entity.Id,
                 AllowAtRoot = entity.AllowedAsRoot,
                 IsContainer = entity.IsContainer,
+                Variations = (byte) entity.Variations,
                 NodeDto = BuildNodeDto(entity, nodeObjectType)
             };
             return contentTypeDto;

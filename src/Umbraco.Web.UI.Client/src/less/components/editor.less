@@ -100,9 +100,9 @@ input.umb-editor-header__name-input {
 	height: 32px;
 	line-height: 32px;
 	width: 100%;
-	padding: 0 15px;
-	background: @gray-10;
-	border-radius: 3px;
+	padding: 0 10px;
+	background: @white;
+	border: 1px solid @gray-8;
 	&:hover {
 		background-color: @gray-10;
 		border: 1px solid @gray-8;
@@ -127,15 +127,17 @@ a.umb-editor-header__close-split-view:hover {
 .umb-variant-switcher__toggle {
 	display: flex;
 	align-items: center;
-	padding: 0 15px;
+	padding: 0 10px;
 	text-decoration: none !important;
 	font-size: 13px;
-	border-left: none;
 	color: @gray-4;
-	background-color: @gray-10;
+	background-color: @white;
+	border: 1px solid @gray-8;
+	border-left: none;
 	transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+	margin-left: -1px;
 	&:hover {
-		background-color: @gray-9;
+		background-color: @gray-10;
 	}
 }
 
@@ -157,6 +159,11 @@ a.umb-editor-header__close-split-view:hover {
 	border-bottom: none;
 }
 
+.umb-variant-switcher_item--current .umb-variant-switcher__name-wrapper {
+	background-color: @gray-10;
+	border-left: 2px solid @turquoise;
+}
+
 .umb-variant-switcher__item:hover,
 .umb-variant-switcher__item:focus,
 .umb-variant-switcher__name-wrapper:hover,
@@ -172,11 +179,11 @@ a.umb-editor-header__close-split-view:hover {
 
 .umb-variant-switcher__name-wrapper {
 	font-size: 14px;
-	padding: 5px 20px;
 	flex: 1;
 	cursor: pointer;
-	padding-top: 6px;
-	padding-bottom: 6px;
+	padding-top: 6px !important;
+	padding-bottom: 6px !important;
+	border-left: 2px solid transparent;
 }
 
 .umb-variant-switcher__name {

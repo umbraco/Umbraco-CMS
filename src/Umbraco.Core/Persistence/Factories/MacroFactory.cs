@@ -1,28 +1,26 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    
-    internal class MacroFactory 
+    internal class MacroFactory
     {
         public IMacro BuildEntity(MacroDto dto)
         {
-            var model = new Macro(dto.Id, dto.UniqueId, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.ScriptType, dto.ScriptAssembly, dto.Xslt, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.Python);
+            var model = new Macro(dto.Id, dto.UniqueId, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.ScriptType, dto.ScriptAssembly, dto.Xslt, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.MacroFilePath);
 
             try
             {
                 model.DisableChangeTracking();
 
-                foreach (var p in dto.MacroPropertyDtos)
+                foreach (var p in dto.MacroPropertyDtos.EmptyNull())
                 {
                     model.Properties.Add(new MacroProperty(p.Id, p.UniqueId, p.Alias, p.Name, p.SortOrder, p.EditorAlias));
                 }
 
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
+                // reset dirty initial properties (U4-1946)
                 model.ResetDirtyProperties(false);
                 return model;
             }
@@ -42,7 +40,7 @@ namespace Umbraco.Core.Persistence.Factories
                     CachePersonalized = entity.CacheByMember,
                     DontRender = entity.DontRender,
                     Name = entity.Name,
-                    Python = entity.ScriptPath,
+                    MacroFilePath = entity.ScriptPath,
                     RefreshRate = entity.CacheDuration,
                     ScriptAssembly = entity.ControlAssembly,
                     ScriptType = entity.ControlType,

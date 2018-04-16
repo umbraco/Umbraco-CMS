@@ -10,11 +10,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Key_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new DictionaryTranslationMapper().Map("Key");
+            string column = new DictionaryTranslationMapper().Map(new SqlCeSyntaxProvider(), "Key");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsLanguageText].[UniqueId]"));
@@ -23,11 +21,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Language_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new DictionaryTranslationMapper().Map("Language");
+            string column = new DictionaryTranslationMapper().Map(new SqlCeSyntaxProvider(), "Language");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsLanguageText].[languageId]"));
@@ -36,11 +32,9 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Value_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
 
             // Act
-            string column = new DictionaryTranslationMapper().Map("Value");
+            string column = new DictionaryTranslationMapper().Map(new SqlCeSyntaxProvider(), "Value");
 
             // Assert
             Assert.That(column, Is.EqualTo("[cmsLanguageText].[value]"));

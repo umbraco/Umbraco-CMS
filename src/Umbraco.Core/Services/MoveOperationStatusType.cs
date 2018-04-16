@@ -1,5 +1,5 @@
-namespace Umbraco.Core.Services
-{    
+﻿namespace Umbraco.Core.Services
+{
 
     /// <summary>
     /// A status type of the result of moving an item

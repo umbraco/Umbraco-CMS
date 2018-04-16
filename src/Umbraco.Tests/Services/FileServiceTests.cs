@@ -3,29 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
-    [TestFixture, RequiresSTA]
-    public class FileServiceTests : BaseServiceTest
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class FileServiceTests : TestWithSomeContentBase
     {
-
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void Create_Template_Then_Assign_Child()
         {

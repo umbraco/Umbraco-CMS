@@ -8,7 +8,6 @@ namespace Umbraco.Tests.FrontEnd
     [TestFixture]
     public class UmbracoHelperTests
     {
-       
         [Test]
         public void Truncate_Simple()
         {
@@ -90,7 +89,7 @@ namespace Umbraco.Tests.FrontEnd
             var encryptedRouteString = UmbracoHelper.CreateEncryptedRouteString("FormController", "FormAction", "", additionalRouteValues);
             var result = encryptedRouteString.DecryptWithMachineKey();
             var expectedResult = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
-            
+
             Assert.AreEqual(expectedResult, result);
         }
 

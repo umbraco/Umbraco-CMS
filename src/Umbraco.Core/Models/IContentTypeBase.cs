@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -44,6 +44,11 @@ namespace Umbraco.Core.Models
         bool IsContainer { get; set; }
 
         /// <summary>
+        /// Gets or sets the content variation of the content type.
+        /// </summary>
+        ContentVariation Variations { get; set; }
+
+        /// <summary>
         /// Gets or Sets a list of integer Ids of the ContentTypes allowed under the ContentType
         /// </summary>
         IEnumerable<ContentTypeSort> AllowedContentTypes { get; set; }
@@ -74,12 +79,6 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <param name="propertyGroupName">Name of the <see cref="PropertyGroup"/> to remove</param>
         void RemovePropertyGroup(string propertyGroupName);
-
-        /// <summary>
-        /// Sets the ParentId from the lazy integer id
-        /// </summary>
-        /// <param name="id">Id of the Parent</param>
-        void SetLazyParentId(Lazy<int> id);
 
         /// <summary>
         /// Checks whether a PropertyType with a given alias already exists

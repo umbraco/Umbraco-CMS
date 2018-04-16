@@ -1,20 +1,15 @@
 ﻿using System;
-using System.Collections;
-using System.Globalization;
 using System.Linq;
-using System.Web.UI.WebControls;
-using System.Xml;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Web;
-using umbraco.BasePages;
-using umbraco.BusinessLogic.Actions;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic.web;
 using System.Web.UI;
 using System.Collections.Generic;
-using umbraco.businesslogic.Exceptions;
+using Umbraco.Web.Composing;
+using Umbraco.Web.UI.Pages;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.cms.presentation
 {
@@ -39,7 +34,7 @@ namespace umbraco.cms.presentation
 
         protected override void OnInit(EventArgs e)
         {
-            CurrentApp = helper.Request("app");
+            CurrentApp = Request.GetItemAsString("app");
 
             ParentIdAsString = Request.GetItemAsString("ID");
             int parentId;
@@ -61,7 +56,7 @@ namespace umbraco.cms.presentation
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            sortDone.Text = ui.Text("sort", "sortDone");
+            sortDone.Text = Services.TextService.Localize("sort/sortDone");
         }
         protected override void OnPreRender(EventArgs e)
         {
@@ -73,13 +68,13 @@ namespace umbraco.cms.presentation
             var app = Request.GetItemAsString("app");
 
             var icon = "../images/umbraco/doc.gif";
-            
+
             if (ParentIdAsInt.HasValue)
             {
                 if (app == Constants.Applications.Media)
                 {
                     icon = "../images/umbraco/mediaPhoto.gif";
-                    var mediaService = ApplicationContext.Current.Services.MediaService;
+                    var mediaService = Current.Services.MediaService;
 
                     if (ParentIdAsInt.Value == -1)
                     {
@@ -96,7 +91,7 @@ namespace umbraco.cms.presentation
 
                 if (app == Constants.Applications.Content)
                 {
-                    var contentService = ApplicationContext.Current.Services.ContentService;
+                    var contentService = Current.Services.ContentService;
 
                     if (ParentIdAsInt.Value == -1)
                     {
@@ -110,7 +105,7 @@ namespace umbraco.cms.presentation
                             _nodes.Add(CreateNode(child.Id.ToInvariantString(), child.SortOrder, child.Name, child.CreateDate, icon));
                     }
                 }
-                
+
                 bindNodesToList(string.Empty);
             }
             else
@@ -129,11 +124,11 @@ namespace umbraco.cms.presentation
 
                     var sort = 0;
                     foreach (var child in stylesheet.Properties)
-                    {                        
+                    {
                         _nodes.Add(CreateNode(child.Name, sort, child.Name, DateTime.Now, icon));
                         sort++;
                     }
-                    
+
                     bindNodesToList(string.Empty);
                 }
             }
@@ -173,7 +168,7 @@ namespace umbraco.cms.presentation
             return node;
         }
 
-        public struct SortableNode
+        public class SortableNode
         {
             public string id;
             public int sortOrder;
@@ -207,7 +202,7 @@ namespace umbraco.cms.presentation
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.ProgressBar prog1;
+        protected global::Umbraco.Web._Legacy.Controls.ProgressBar prog1;
 
         /// <summary>
         /// sortDone control.
@@ -225,7 +220,7 @@ namespace umbraco.cms.presentation
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane sortPane;
+        protected global::Umbraco.Web._Legacy.Controls.Pane sortPane;
 
         /// <summary>
         /// lt_nodes control.

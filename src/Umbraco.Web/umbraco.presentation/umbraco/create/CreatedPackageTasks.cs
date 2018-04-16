@@ -1,22 +1,18 @@
-using System;
-using System.Data;
-using System.Web.Security;
-using Umbraco.Core.Logging;
+﻿using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
-using umbraco.BusinessLogic;
-using umbraco.DataLayer;
-using umbraco.BasePages;
-using Umbraco.Core.IO;
-using umbraco.cms.businesslogic.member;
+using Umbraco.Core;
+using Umbraco.Web;
+using Umbraco.Web.Composing;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco
 {
     public class CreatedPackageTasks : LegacyDialogTask
     {
-        
+
         public override bool PerformSave()
         {
-            LogHelper.Info<CreatedPackageTasks>("Xml save started");
+            Current.Logger.Info<CreatedPackageTasks>("Xml save started");
             int id = cms.businesslogic.packager.CreatedPackage.MakeNew(Alias).Data.Id;
             _returnUrl = string.Format("developer/packages/editPackage.aspx?id={0}", id);
             return true;
@@ -42,7 +38,7 @@ namespace umbraco
 
         public override string AssignedApp
         {
-            get { return DefaultApps.developer.ToString(); }
+            get { return Constants.Applications.Developer.ToString(); }
         }
     }
 }

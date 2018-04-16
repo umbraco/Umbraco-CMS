@@ -96,7 +96,7 @@ namespace Umbraco.Core.Media.Exif
         }
 
         /// <summary>
-        /// Returns an unsigned rational number converted from the first 
+        /// Returns an unsigned rational number converted from the first
         /// eight bytes of the given byte array. The first four bytes are
         /// assumed to be the numerator and the next four bytes are the
         /// denumerator.
@@ -112,7 +112,7 @@ namespace Umbraco.Core.Media.Exif
         }
 
         /// <summary>
-        /// Returns a signed rational number converted from the first 
+        /// Returns a signed rational number converted from the first
         /// eight bytes of the given byte array. The first four bytes are
         /// assumed to be the numerator and the next four bytes are the
         /// denumerator.
@@ -128,7 +128,7 @@ namespace Umbraco.Core.Media.Exif
         }
 
         /// <summary>
-        /// Returns an array of 16-bit unsigned integers converted from 
+        /// Returns an array of 16-bit unsigned integers converted from
         /// the given byte array.
         /// Numbers are converted from the given byte-order to platform byte-order.
         /// </summary>
@@ -145,7 +145,7 @@ namespace Umbraco.Core.Media.Exif
         }
 
         /// <summary>
-        /// Returns an array of 32-bit unsigned integers converted from 
+        /// Returns an array of 32-bit unsigned integers converted from
         /// the given byte array.
         /// Numbers are converted from the given byte-order to platform byte-order.
         /// </summary>
@@ -162,7 +162,7 @@ namespace Umbraco.Core.Media.Exif
         }
 
         /// <summary>
-        /// Returns an array of 32-bit signed integers converted from 
+        /// Returns an array of 32-bit signed integers converted from
         /// the given byte array.
         /// Numbers are converted from the given byte-order to platform byte-order.
         /// </summary>
@@ -179,7 +179,7 @@ namespace Umbraco.Core.Media.Exif
         }
 
         /// <summary>
-        /// Returns an array of unsigned rational numbers converted from 
+        /// Returns an array of unsigned rational numbers converted from
         /// the given byte array.
         /// Numbers are converted from the given byte-order to platform byte-order.
         /// </summary>
@@ -198,7 +198,7 @@ namespace Umbraco.Core.Media.Exif
         }
 
         /// <summary>
-        /// Returns an array of signed rational numbers converted from 
+        /// Returns an array of signed rational numbers converted from
         /// the given byte array.
         /// Numbers are converted from the given byte-order to platform byte-order.
         /// </summary>

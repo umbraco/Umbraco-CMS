@@ -10,6 +10,6 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "score")]
         public float Score { get; set; }
-        
+
     }
 }

@@ -1,7 +1,7 @@
 ﻿namespace Umbraco.Web.Models
 {
     /// <summary>
-    /// A base model containing a value to indicate to Umbraco where to redirect to after Posting if 
+    /// A base model containing a value to indicate to Umbraco where to redirect to after Posting if
     /// a developer doesn't want the controller to redirect to the current Umbraco page - which is the default.
     /// </summary>
     public class PostRedirectModel

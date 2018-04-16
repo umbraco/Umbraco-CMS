@@ -1,45 +1,50 @@
+﻿using Moq;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
-using umbraco.BusinessLogic;
 using Umbraco.Core.Models;
+using Umbraco.Tests.Testing;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Routing
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
-	[TestFixture]
-	public class ContentFinderByNiceUrlAndTemplateTests : BaseRoutingTest
-	{
+    [TestFixture]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    public class ContentFinderByNiceUrlAndTemplateTests : BaseWebTest
+    {
         Template CreateTemplate(string alias)
         {
-            var template = new Template(alias, alias, alias);
+            var template = new Template(alias, alias);
             template.Content = ""; // else saving throws with a dirty internal error
-            ApplicationContext.Services.FileService.SaveTemplate(template);
+            Current.Services.FileService.SaveTemplate(template);
             return template;
         }
 
-		[TestCase("/blah")]
-		[TestCase("/default.aspx/blah")] //this one is actually rather important since this is the path that comes through when we are running in pre-IIS 7 for the root document '/' !
-		[TestCase("/home/Sub1/blah")]
-		[TestCase("/Home/Sub1/Blah")] //different cases
-		[TestCase("/home/Sub1.aspx/blah")]
-		public void Match_Document_By_Url_With_Template(string urlAsString)
-		{
-            var template = CreateTemplate("test");
-            var altTemplate = CreateTemplate("blah");
-			var routingContext = GetRoutingContext(urlAsString, template);
-			var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
-			var docRequest = new PublishedContentRequest(url, routingContext);
-			var lookup = new ContentFinderByNiceUrlAndTemplate();
+        [TestCase("/blah")]
+        [TestCase("/default.aspx/blah")] //this one is actually rather important since this is the path that comes through when we are running in pre-IIS 7 for the root document '/' !
+        [TestCase("/home/Sub1/blah")]
+        [TestCase("/Home/Sub1/Blah")] //different cases
+        [TestCase("/home/Sub1.aspx/blah")]
+        public void Match_Document_By_Url_With_Template(string urlAsString)
+        {
 
-		    SettingsForTests.HideTopLevelNodeFromPath = false;
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
 
-			var result = lookup.TryFindContent(docRequest);
+            var template1 = CreateTemplate("test");
+            var template2 = CreateTemplate("blah");
+            var umbracoContext = GetUmbracoContext(urlAsString, template1.Id, globalSettings:globalSettings.Object);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var lookup = new ContentFinderByNiceUrlAndTemplate(Logger);
 
-			Assert.IsTrue(result);
-			Assert.IsNotNull(docRequest.PublishedContent);
-			Assert.IsNotNull(docRequest.TemplateAlias);
-			Assert.AreEqual("blah".ToUpperInvariant(), docRequest.TemplateAlias.ToUpperInvariant());
-		}
-	}
+            var result = lookup.TryFindContent(frequest);
+
+            Assert.IsTrue(result);
+            Assert.IsNotNull(frequest.PublishedContent);
+            Assert.IsNotNull(frequest.TemplateAlias);
+            Assert.AreEqual("blah".ToUpperInvariant(), frequest.TemplateAlias.ToUpperInvariant());
+        }
+    }
 }

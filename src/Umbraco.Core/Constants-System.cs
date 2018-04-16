@@ -58,13 +58,8 @@
             /// </remarks>
             public const string RecycleBinMediaPathPrefix = "-1,-21,";
 
-            public const int DefaultContentListViewDataTypeId = -95;
-            public const int DefaultMediaListViewDataTypeId = -96;
-            public const int DefaultMembersListViewDataTypeId = -97;
-
             public const string UmbracoConnectionName = "umbracoDbDSN";
-            public const string UmbracoMigrationName = "Umbraco";
+            public const string UmbracoUpgradePlanName = "Umbraco.Core";
         }
-
     }
 }

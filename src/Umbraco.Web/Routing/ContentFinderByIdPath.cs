@@ -1,65 +1,65 @@
-using System;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
+﻿using Umbraco.Core.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
 {
-	/// <summary>
-	/// Provides an implementation of <see cref="IContentFinder"/> that handles page identifiers.
-	/// </summary>
-	/// <remarks>
-	/// <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
-	/// </remarks>
-	public class ContentFinderByIdPath : IContentFinder
+    /// <summary>
+    /// Provides an implementation of <see cref="IContentFinder"/> that handles page identifiers.
+    /// </summary>
+    /// <remarks>
+    /// <para>Handles <c>/1234</c> where <c>1234</c> is the identified of a document.</para>
+    /// </remarks>
+    public class ContentFinderByIdPath : IContentFinder
     {
-	    private readonly IWebRoutingSection _webRoutingSection;
+        private readonly ILogger _logger;
+        private readonly IWebRoutingSection _webRoutingSection;
 
-	    public ContentFinderByIdPath()
+        public ContentFinderByIdPath(ILogger logger)
             : this(UmbracoConfig.For.UmbracoSettings().WebRouting)
-	    {
-	        
-	    }
+        {
+            _logger = logger;
+        }
 
-	    public ContentFinderByIdPath(IWebRoutingSection webRoutingSection)
-	    {
-	        _webRoutingSection = webRoutingSection;
-	    }
+        public ContentFinderByIdPath(IWebRoutingSection webRoutingSection)
+        {
+            _webRoutingSection = webRoutingSection;
+        }
 
-	    /// <summary>
-		/// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
-		/// </summary>
-		/// <param name="docRequest">The <c>PublishedContentRequest</c>.</param>		
-		/// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
-		public bool TryFindContent(PublishedContentRequest docRequest)
+        /// <summary>
+        /// Tries to find and assign an Umbraco document to a <c>PublishedContentRequest</c>.
+        /// </summary>
+        /// <param name="frequest">The <c>PublishedContentRequest</c>.</param>
+        /// <returns>A value indicating whether an Umbraco document was found and assigned.</returns>
+        public bool TryFindContent(PublishedRequest frequest)
         {
 
-            if (docRequest.RoutingContext.UmbracoContext != null && docRequest.RoutingContext.UmbracoContext.InPreviewMode == false
+            if (frequest.UmbracoContext != null && frequest.UmbracoContext.InPreviewMode == false
                 && _webRoutingSection.DisableFindContentByIdPath)
                 return false;
 
             IPublishedContent node = null;
-			var path = docRequest.Uri.GetAbsolutePathDecoded();
+            var path = frequest.Uri.GetAbsolutePathDecoded();
 
             var nodeId = -1;
-			if (path != "/") // no id if "/"
+            if (path != "/") // no id if "/"
             {
-				var noSlashPath = path.Substring(1);
+                var noSlashPath = path.Substring(1);
 
-                if (!Int32.TryParse(noSlashPath, out nodeId))
+                if (int.TryParse(noSlashPath, out nodeId) == false)
                     nodeId = -1;
 
                 if (nodeId > 0)
                 {
-					LogHelper.Debug<ContentFinderByIdPath>("Id={0}", () => nodeId);
-                    node = docRequest.RoutingContext.UmbracoContext.ContentCache.GetById(nodeId);
+                    _logger.Debug<ContentFinderByIdPath>(() => $"Id={nodeId}");
+                    node = frequest.UmbracoContext.ContentCache.GetById(nodeId);
 
                     if (node != null)
                     {
-						docRequest.PublishedContent = node;
-						LogHelper.Debug<ContentFinderByIdPath>("Found node with id={0}", () => docRequest.PublishedContent.Id);
+                        frequest.PublishedContent = node;
+                        _logger.Debug<ContentFinderByIdPath>(() => $"Found node with id={frequest.PublishedContent.Id}");
                     }
                     else
                     {
@@ -69,7 +69,7 @@ namespace Umbraco.Web.Routing
             }
 
             if (nodeId == -1)
-				LogHelper.Debug<ContentFinderByIdPath>("Not a node id");
+                _logger.Debug<ContentFinderByIdPath>("Not a node id");
 
             return node != null;
         }

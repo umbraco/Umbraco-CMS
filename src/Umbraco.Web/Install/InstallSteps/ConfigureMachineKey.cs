@@ -1,9 +1,6 @@
-﻿using System;
-using System.Configuration;
-using System.Linq;
+﻿using System.Linq;
 using System.Web.Configuration;
 using System.Xml.Linq;
-using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Security;
 using Umbraco.Web.Install.Models;
@@ -16,26 +13,15 @@ namespace Umbraco.Web.Install.InstallSteps
         PerformsAppRestart = true)]
     internal class ConfigureMachineKey : InstallSetupStep<bool?>
     {
-        private readonly ApplicationContext _appContext;
-
-        public ConfigureMachineKey(ApplicationContext appContext)
-        {
-            if (appContext == null) throw new ArgumentNullException("appContext");
-            _appContext = appContext;
-        }
-
-        public override string View
-        {
-            get { return HasMachineKey() == false ? base.View : ""; }
-        }
+        public override string View => HasMachineKey() == false ? base.View : "";
 
         /// <summary>
         /// Don't display the view or execute if a machine key already exists
         /// </summary>
         /// <returns></returns>
-        private bool HasMachineKey()
+        private static bool HasMachineKey()
         {
-            var section = (MachineKeySection)WebConfigurationManager.GetSection("system.web/machineKey");
+            var section = (MachineKeySection) WebConfigurationManager.GetSection("system.web/machineKey");
             return section.ElementInformation.Source != null;
         }
 
@@ -49,7 +35,7 @@ namespace Umbraco.Web.Install.InstallSteps
             if (model.HasValue && model.Value == false) return null;
 
             //install the machine key
-            var fileName = IOHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
+            var fileName = IOHelper.MapPath($"{SystemDirectories.Root}/web.config");
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var systemWeb = xml.Root.DescendantsAndSelf("system.web").Single();

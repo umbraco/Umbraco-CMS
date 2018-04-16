@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using umbraco.cms.businesslogic.member;
 using Umbraco.Core;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models
@@ -15,13 +14,12 @@ namespace Umbraco.Web.Models
     public class RegisterModel : PostRedirectModel
     {
         /// <summary>
-        /// Creates a new empty RegisterModel
+        /// Creates a new empty RegisterModel.
         /// </summary>
         /// <returns></returns>
         public static RegisterModel CreateModel()
         {
-            var model = new RegisterModel(false);
-            return model;
+            return new RegisterModel(false);
         }
 
         private RegisterModel(bool doLookup)
@@ -32,9 +30,9 @@ namespace Umbraco.Web.Models
             MemberProperties = new List<UmbracoProperty>();
             LoginOnSuccess = true;
             CreatePersistentLoginCookie = true;
-            if (doLookup && UmbracoContext.Current != null)
+            if (doLookup && Current.UmbracoContext != null)
             {
-                var helper = new MembershipHelper(UmbracoContext.Current);
+                var helper = new MembershipHelper(Current.UmbracoContext);
                 var model = helper.CreateRegistrationModel(MemberTypeAlias);
                 MemberProperties = model.MemberProperties;
             }
@@ -43,8 +41,7 @@ namespace Umbraco.Web.Models
         [Obsolete("Do not use this ctor as it will perform business logic lookups. Use the MembershipHelper.CreateRegistrationModel or the static RegisterModel.CreateModel() to create an empty model.")]
         public RegisterModel()
             : this(true)
-        {   
-        }
+        { }
 
         [Required]
         [RegularExpression(@"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
@@ -55,7 +52,7 @@ namespace Umbraco.Web.Models
         /// Returns the member properties
         /// </summary>
         public List<UmbracoProperty> MemberProperties { get; set; }
-        
+
         /// <summary>
         /// The member type alias to use to register the member
         /// </summary>
@@ -72,11 +69,11 @@ namespace Umbraco.Web.Models
         /// </summary>
         [Required]
         public string Password { get; set; }
-        
+
         [ReadOnly(true)]
         [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
         public bool RedirectOnSucces { get; set; }
- 
+
         /// <summary>
         /// The username of the model, if UsernameIsEmail is true then this is ignored.
         /// </summary>
@@ -86,7 +83,7 @@ namespace Umbraco.Web.Models
         /// Flag to determine if the username should be the email address, if true then the Username property is ignored
         /// </summary>
         public bool UsernameIsEmail { get; set; }
-        
+
         /// <summary>
         /// Specifies if the member should be logged in if they are succesfully created
         /// </summary>
@@ -107,6 +104,5 @@ namespace Umbraco.Web.Models
                 return RegisterModel.CreateModel();
             }
         }
-
     }
 }

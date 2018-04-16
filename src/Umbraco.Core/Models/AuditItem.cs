@@ -1,8 +1,8 @@
-﻿using Umbraco.Core.Models.EntityBase;
+﻿using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
-    public sealed class AuditItem : Entity, IAuditItem
+    public sealed class AuditItem : EntityBase, IAuditItem
     {
         /// <summary>
         /// Constructor for creating an item to be created
@@ -23,9 +23,8 @@ namespace Umbraco.Core.Models
             EnableChangeTracking();
         }
 
-        public string Comment { get; private set; }
-        public AuditType AuditType { get; private set; }
-        public int UserId { get; private set; }
-     
+        public string Comment { get; }
+        public AuditType AuditType { get; }
+        public int UserId { get; }     
     }
 }

@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public override void Servers()
         {
-            Assert.IsTrue(SettingsSection.DistributedCall.Servers.Count() == 0);
+            Assert.IsTrue(SettingsSection.DistributedCall.Servers.Any() == false);
         }
     }
 }

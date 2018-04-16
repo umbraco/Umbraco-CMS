@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Web.Http;
 using Umbraco.Web;
@@ -12,7 +12,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
         public TestControllerActivator(Func<HttpRequestMessage, UmbracoHelper, ApiController> factory)
         {
             _factory = factory;
-        }        
+        }
 
         protected override ApiController CreateController(Type controllerType, HttpRequestMessage msg, UmbracoHelper helper)
         {

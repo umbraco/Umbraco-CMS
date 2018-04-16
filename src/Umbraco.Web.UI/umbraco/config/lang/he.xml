@@ -30,6 +30,7 @@
     <key alias="sendtopublish">שלח לפירסום</key>
     <key alias="sendToTranslate">שלח לתירגום</key>
     <key alias="sort">מיין</key>
+    <key alias="toPublish">שלח לפירסום</key>
     <key alias="translate">תרגם</key>
     <key alias="update">עדכן</key>
     <key alias="LastRunInfoAction">יומן משימות מתוזמנות</key>
@@ -807,6 +808,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="postContent">הוסף אחרי השדה</key>
     <key alias="preContent">הוסף לפני השדה</key>
     <key alias="recursive">רקורסיבי</key>
+    <key alias="removeParagraph">הסר תגי פסקה</key>
+    <key alias="removeParagraphHelp">מסיר את כל ה- &amp;lt;P&amp;gt; בתחילת ובסוף הטקסט</key>
     <key alias="uppercase">אותיות גדולות</key>
     <key alias="urlEncode">קידוד URL</key>
     <key alias="urlEncodeHelp">תווים מיוחדים יעוצבו ב- URL</key>
@@ -890,6 +893,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="stylesheets">גיליונות סגנון</key>
     <key alias="templates">תבניות</key>
     <key alias="xslt">קבצי XSLT</key>
+    <key alias="userPermissions">הרשאות משתמש</key>
+    <key alias="userTypes">משתמש מקליד</key>
+    <key alias="users">משתמש</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">עידכון חדש זמין</key>
@@ -927,6 +933,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="startnode">התחלה בפריט התוכן</key>
     <key alias="username">שם תצוגה</key>
     <key alias="userPermissions">הרשאות משתמש</key>
+    <key alias="usertype">סוג משתמש</key>
+    <key alias="userTypes">סוגי משתמש</key>
     <key alias="writer">כותב</key>
   </area>
 </language>

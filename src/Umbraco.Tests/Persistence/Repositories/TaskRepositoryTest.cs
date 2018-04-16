@@ -1,39 +1,42 @@
-using System;
+﻿using System;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class TaskRepositoryTest : BaseDatabaseFactoryTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class TaskRepositoryTest : TestWithDatabaseBase
     {
         [Test]
         public void Can_Delete()
         {
-             var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+
                 var created = DateTime.Now;
                 var task = new Task(new TaskType("asdfasdf"))
                 {
-                    AssigneeUserId = 0,
+                    AssigneeUserId = Constants.Security.SuperId,
                     Closed = false,
                     Comment = "hello world",
                     EntityId = -1,
-                    OwnerUserId = 0
+                    OwnerUserId = Constants.Security.SuperId
                 };
-                repo.AddOrUpdate(task);
-                unitOfWork.Commit();
+                repo.Save(task);
+                
 
                 repo.Delete(task);
-                unitOfWork.Commit();
+                
 
                 task = repo.Get(task.Id);
                 Assert.IsNull(task);
@@ -43,91 +46,94 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Can_Add()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+
                 var created = DateTime.Now;
-                repo.AddOrUpdate(new Task(new TaskType("asdfasdf"))
+                repo.Save(new Task(new TaskType("asdfasdf"))
                 {
-                    AssigneeUserId = 0,
+                    AssigneeUserId = Constants.Security.SuperId,
                     Closed = false,
                     Comment = "hello world",
                     EntityId = -1,
-                    OwnerUserId = 0
+                    OwnerUserId = Constants.Security.SuperId
                 });
-                unitOfWork.Commit();
+                
 
-                var found = repo.GetAll().ToArray();
+                var found = repo.GetMany().ToArray();
 
-                Assert.AreEqual(1, found.Count());
-                Assert.AreEqual(0, found.First().AssigneeUserId);
+                Assert.AreEqual(1, found.Length);
+                Assert.AreEqual(Constants.Security.SuperId, found.First().AssigneeUserId);
                 Assert.AreEqual(false, found.First().Closed);
                 Assert.AreEqual("hello world", found.First().Comment);
                 Assert.GreaterOrEqual(found.First().CreateDate.TruncateTo(DateTimeExtensions.DateTruncate.Second), created.TruncateTo(DateTimeExtensions.DateTruncate.Second));
                 Assert.AreEqual(-1, found.First().EntityId);
-                Assert.AreEqual(0, found.First().OwnerUserId);
+                Assert.AreEqual(Constants.Security.SuperId, found.First().OwnerUserId);
                 Assert.AreEqual(true, found.First().HasIdentity);
                 Assert.AreEqual(true, found.First().TaskType.HasIdentity);
-            }            
+            }
         }
 
         [Test]
         public void Can_Update()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+
                 var task = new Task(new TaskType("asdfasdf"))
                 {
-                    AssigneeUserId = 0,
+                    AssigneeUserId = Constants.Security.SuperId,
                     Closed = false,
                     Comment = "hello world",
                     EntityId = -1,
-                    OwnerUserId = 0
+                    OwnerUserId = Constants.Security.SuperId
                 };
 
-                repo.AddOrUpdate(task);
-                unitOfWork.Commit();
+                repo.Save(task);
+                
 
-                //re-get 
+                //re-get
                 task = repo.Get(task.Id);
 
                 task.Comment = "blah";
                 task.Closed = true;
 
-                repo.AddOrUpdate(task);
-                unitOfWork.Commit();
+                repo.Save(task);
+                
 
-                //re-get 
+                //re-get
                 task = repo.Get(task.Id);
 
                 Assert.AreEqual(true, task.Closed);
                 Assert.AreEqual("blah", task.Comment);
-            }            
+            }
         }
 
         [Test]
         public void Get_By_Id()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+
                 var task = new Task(new TaskType("asdfasdf"))
                 {
-                    AssigneeUserId = 0,
+                    AssigneeUserId = Constants.Security.SuperId,
                     Closed = false,
                     Comment = "hello world",
                     EntityId = -1,
-                    OwnerUserId = 0
+                    OwnerUserId = Constants.Security.SuperId
                 };
 
-                repo.AddOrUpdate(task);
-                unitOfWork.Commit();
+                repo.Save(task);
+                
 
-                //re-get 
+                //re-get
                 task = repo.Get(task.Id);
 
                 Assert.IsNotNull(task);
@@ -139,11 +145,12 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             CreateTestData(false, 20);
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
-                var found = repo.GetAll().ToArray();
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+
+                var found = repo.GetMany().ToArray();
                 Assert.AreEqual(20, found.Count());
             }
         }
@@ -154,10 +161,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 10);
             CreateTestData(true, 5);
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+
                 var found = repo.GetTasks(includeClosed: true).ToArray();
                 Assert.AreEqual(15, found.Count());
             }
@@ -169,10 +177,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 10, -20);
             CreateTestData(false, 5, -21);
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+
                 var found = repo.GetTasks(itemId:-20).ToArray();
                 Assert.AreEqual(10, found.Count());
             }
@@ -184,10 +193,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData(false, 10);
             CreateTestData(true, 5);
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+
                 var found = repo.GetTasks(includeClosed: false);
                 Assert.AreEqual(10, found.Count());
             }
@@ -195,23 +205,24 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private void CreateTestData(bool closed, int count, int entityId = -1)
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+
                 for (int i = 0; i < count; i++)
                 {
-                    repo.AddOrUpdate(new Task(new TaskType("asdfasdf"))
+                    repo.Save(new Task(new TaskType("asdfasdf"))
                     {
-                        AssigneeUserId = 0,
+                        AssigneeUserId = Constants.Security.SuperId,
                         Closed = closed,
                         Comment = "hello world " + i,
                         EntityId = entityId,
-                        OwnerUserId = 0
+                        OwnerUserId = Constants.Security.SuperId
                     });
-                    unitOfWork.Commit();
                 }
-                
+
+                scope.Complete();
             }
         }
     }

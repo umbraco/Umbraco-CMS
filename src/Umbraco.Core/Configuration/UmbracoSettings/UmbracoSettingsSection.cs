@@ -44,11 +44,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (DeveloperElement)this["developer"]; }
         }
 
-        [ConfigurationProperty("viewstateMoverModule")]
-        internal ViewstateMoverModuleElement ViewstateMoverModule
-        {
-            get { return (ViewstateMoverModuleElement)this["viewstateMoverModule"]; }
-        }
 
         [ConfigurationProperty("logging")]
         internal LoggingElement Logging
@@ -91,7 +86,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                             new RepositoryElement() {Name = "Umbraco package Repository", Id = new Guid("65194810-1f85-11dd-bd0b-0800200c9a66")}
                         };
 
-                    
+
                     _defaultRepositories = new RepositoriesElement()
                         {
                             Repositories = collection
@@ -104,7 +99,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 var reposElement = (RepositoriesElement)base["repositories"];
                 if (reposElement.Repositories.All(x => x.Id != new Guid("65194810-1f85-11dd-bd0b-0800200c9a66")))
                 {
-                    reposElement.Repositories.Add(new RepositoryElement() { Name = "Umbraco package Repository", Id = new Guid("65194810-1f85-11dd-bd0b-0800200c9a66") });                    
+                    reposElement.Repositories.Add(new RepositoryElement() { Name = "Umbraco package Repository", Id = new Guid("65194810-1f85-11dd-bd0b-0800200c9a66") });
                 }
 
                 return reposElement;
@@ -117,24 +112,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (ProvidersElement)this["providers"]; }
         }
 
-        [ConfigurationProperty("help")]
-        internal HelpElement Help
-        {
-            get { return (HelpElement)this["help"]; }
-        }
-
         [ConfigurationProperty("web.routing")]
         internal WebRoutingElement WebRouting
         {
             get { return (WebRoutingElement)this["web.routing"]; }
         }
 
-        [ConfigurationProperty("scripting")]
-        internal ScriptingElement Scripting
-        {
-            get { return (ScriptingElement)this["scripting"]; }
-        }
-        
         IContentSection IUmbracoSettingsSection.Content
         {
             get { return Content; }
@@ -165,11 +148,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return Developer; }
         }
 
-        IViewStateMoverModuleSection IUmbracoSettingsSection.ViewStateMoverModule
-        {
-            get { return ViewstateMoverModule; }
-        }
-
         ILoggingSection IUmbracoSettingsSection.Logging
         {
             get { return Logging; }
@@ -195,21 +173,10 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return Providers; }
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This is no longer used and will be removed in future versions")]
-        IHelpSection IUmbracoSettingsSection.Help
-        {
-            get { return Help; }
-        }
-
         IWebRoutingSection IUmbracoSettingsSection.WebRouting
         {
             get { return WebRouting; }
         }
 
-        IScriptingSection IUmbracoSettingsSection.Scripting
-        {
-            get { return Scripting; }
-        }
     }
 }

@@ -7,6 +7,7 @@ using System.Web.Http.Filters;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
@@ -26,44 +27,39 @@ namespace Umbraco.Web.Editors
         {
         }
 
+        // fixme wtf is this?
         public MediaPostValidateAttribute(IMediaService mediaService, IEntityService entityService, WebSecurity security)
         {
-            if (mediaService == null) throw new ArgumentNullException("mediaService");
-            if (security == null) throw new ArgumentNullException("security");
-            _mediaService = mediaService;
+            _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             _entityService = entityService;
-            _security = security;
+            _security = security ?? throw new ArgumentNullException(nameof(security));
         }
+
+        // fixme all these should be injected properties
 
         private IMediaService MediaService
-        {
-            get { return _mediaService ?? ApplicationContext.Current.Services.MediaService; }
-        }
+            => _mediaService ?? Current.Services.MediaService;
 
         private IEntityService EntityService
-        {
-            get { return _entityService ?? ApplicationContext.Current.Services.EntityService; }
-        }
+            => _entityService ?? Current.Services.EntityService;
 
         private WebSecurity Security
-        {
-            get { return _security ?? UmbracoContext.Current.Security; }
-        }
-        
+            => _security ?? UmbracoContext.Current.Security;
+
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             var mediaItem = (MediaItemSave)actionContext.ActionArguments["contentItem"];
 
             //We now need to validate that the user is allowed to be doing what they are doing.
             //Then if it is new, we need to lookup those permissions on the parent.
-            IMedia contentToCheck = null;
+            IMedia contentToCheck;
             int contentIdToCheck;
             switch (mediaItem.Action)
             {
                 case ContentSaveAction.Save:
                     contentToCheck = mediaItem.PersistedContent;
                     contentIdToCheck = contentToCheck.Id;
-                    break;                
+                    break;
                 case ContentSaveAction.SaveNew:
                     contentToCheck = MediaService.GetById(mediaItem.ParentId);
 
@@ -87,10 +83,8 @@ namespace Umbraco.Web.Editors
             if (MediaController.CheckPermissions(
                 actionContext.Request.Properties,
                 Security.CurrentUser,
-                MediaService,
-                EntityService,
-                contentIdToCheck,
-                contentToCheck) == false)
+                MediaService, EntityService,
+                contentIdToCheck, contentToCheck) == false)
             {
                 throw new HttpResponseException(actionContext.Request.CreateUserNoAccessResponse());
             }

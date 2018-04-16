@@ -1,27 +1,30 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Repositories.Implement;
 
 namespace Umbraco.Web.Cache
 {
     public sealed class RelationTypeCacheRefresher : CacheRefresherBase<RelationTypeCacheRefresher>
     {
-        protected override RelationTypeCacheRefresher Instance
-        {
-            get { return this; }
-        }
+        public RelationTypeCacheRefresher(CacheHelper cacheHelper)
+            : base(cacheHelper)
+        { }
 
-        public override Guid UniqueIdentifier
-        {
-            get { return DistributedCache.RelationTypeCacheRefresherGuid; }
-        }
+        #region Define
 
-        public override string Name
-        {
-            get { return "Relation Type Cache Refresher"; }
-        }
+        protected override RelationTypeCacheRefresher This => this;
+
+        public static readonly Guid UniqueId = Guid.Parse("D8375ABA-4FB3-4F86-B505-92FBA1B6F7C9");
+
+        public override Guid RefresherUniqueId => UniqueId;
+
+        public override string Name => "Relation Type Cache Refresher";
+
+        #endregion
+
+        #region Refresher
 
         public override void RefreshAll()
         {
@@ -31,8 +34,8 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(int id)
         {
-            var cache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IRelationType>();
-            if (cache) cache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IRelationType>(id));
+            var cache = CacheHelper.IsolatedRuntimeCache.GetCache<IRelationType>();
+            if (cache) cache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IRelationType>(id));
             base.Refresh(id);
         }
 
@@ -44,9 +47,11 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            var cache = ApplicationContext.Current.ApplicationCache.IsolatedRuntimeCache.GetCache<IRelationType>();
-            if (cache) cache.Result.ClearCacheItem(RepositoryBase.GetCacheIdKey<IRelationType>(id));
+            var cache = CacheHelper.IsolatedRuntimeCache.GetCache<IRelationType>();
+            if (cache) cache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IRelationType>(id));
             base.Remove(id);
         }
+
+        #endregion
     }
 }

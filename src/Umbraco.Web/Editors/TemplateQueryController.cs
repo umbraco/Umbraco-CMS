@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using System;
 using System.Diagnostics;
-using Umbraco.Web.Dynamics;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Models.TemplateQuery;
 using Umbraco.Core.Services;
 
@@ -19,13 +18,6 @@ namespace Umbraco.Web.Editors
     [JsonCamelCaseFormatter]
     public class TemplateQueryController : UmbracoAuthorizedJsonController
     {
-        public TemplateQueryController()
-        { }
-
-        public TemplateQueryController(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        { }
-
         private IEnumerable<OperathorTerm> Terms
         {
             get
@@ -67,7 +59,7 @@ namespace Umbraco.Web.Editors
 
         public QueryResultModel PostTemplateQuery(QueryModel model)
         {
-            var umbraco = new UmbracoHelper(UmbracoContext);
+            var umbraco = new UmbracoHelper(UmbracoContext, Services, ApplicationCache);
 
             var queryResult = new QueryResultModel();
 
@@ -75,11 +67,12 @@ namespace Umbraco.Web.Editors
             var indention = Environment.NewLine + "\t\t\t\t\t\t";
 
             sb.Append("Model.Content.Site()");
+
             var timer = new Stopwatch();
 
             timer.Start();
 
-            var currentPage = umbraco.TypedContentAtRoot().FirstOrDefault();
+            var currentPage = umbraco.ContentAtRoot().FirstOrDefault();
             timer.Stop();
 
             var pointerNode = currentPage;
@@ -87,7 +80,7 @@ namespace Umbraco.Web.Editors
             // adjust the "FROM"
             if (model != null && model.Source != null && model.Source.Id > 0)
             {
-                var targetNode = umbraco.TypedContent(model.Source.Id);
+                var targetNode = umbraco.Content(model.Source.Id);
 
                 if (targetNode != null)
                 {
@@ -166,12 +159,14 @@ namespace Umbraco.Web.Editors
                     timer.Start();
 
                     //trial-run the tokenized clause to time the execution
-                    //for review - this uses a tonized query rather then the normal linq query. 
-                    contents = contents.AsQueryable().Where(tokenizedClause, model.Filters.Select(this.GetConstraintValue).ToArray());
+                    //for review - this uses a tonized query rather then the normal linq query.
+                    // fixme - that cannot work anymore now that we have killed dynamic support
+                    //contents = contents.AsQueryable().Where(clause, model.Filters.Select(this.GetConstraintValue).ToArray());
+                    throw new NotImplementedException();
+
                     contents = contents.Where(x => x.IsVisible());
 
                     timer.Stop();
-
 
                     //the query to output to the editor
                     sb.Append(indention);
@@ -297,12 +292,11 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IEnumerable<ContentTypeModel> GetContentTypes()
         {
-            var contentTypes =
-                ApplicationContext.Services.ContentTypeService.GetAllContentTypes()
-                    .Select(x => new ContentTypeModel() { Alias = x.Alias, Name = Services.TextService.Localize("template/contentOfType", tokens: new string[] { x.Name }) })
-                    .OrderBy(x => x.Name).ToList();
+            var contentTypes = Services.ContentTypeService.GetAll()
+                .Select(x => new ContentTypeModel { Alias = x.Alias, Name = Services.TextService.Localize("template/contentOfType", tokens: new string[] { x.Name } ) })
+                .OrderBy(x => x.Name).ToList();
 
-            contentTypes.Insert(0, new ContentTypeModel() { Alias = string.Empty, Name = Services.TextService.Localize("template/allContent") });
+            contentTypes.Insert(0, new ContentTypeModel { Alias = string.Empty, Name = Services.TextService.Localize("template/allContent") });
 
             return contentTypes;
         }

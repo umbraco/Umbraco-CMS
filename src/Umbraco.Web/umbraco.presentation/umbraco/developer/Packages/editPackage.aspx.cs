@@ -1,37 +1,34 @@
+ï»¿using Umbraco.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
 using System.Xml;
-
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.macro;
-using umbraco.cms.businesslogic.template;
-using umbraco.cms.businesslogic.web;
-using umbraco.cms.presentation.Trees;
 using umbraco.controls;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web.UI;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.developer.packages
 {
-    public partial class _Default : BasePages.UmbracoEnsuredPage
+    public partial class _Default : UmbracoEnsuredPage
     {
 
         public _Default()
         {
-            CurrentApp = BusinessLogic.DefaultApps.developer.ToString();
+            CurrentApp = Constants.Applications.Developer.ToString();
 
         }
-        public uicontrols.TabPage packageInfo;
-        public uicontrols.TabPage packageContents;
-        public uicontrols.TabPage packageFiles;
-        public uicontrols.TabPage packageOutput;
-        public uicontrols.TabPage packageAbout;
-        public uicontrols.TabPage packageActions;
+        public Umbraco.Web._Legacy.Controls.TabPage packageInfo;
+        public Umbraco.Web._Legacy.Controls.TabPage packageContents;
+        public Umbraco.Web._Legacy.Controls.TabPage packageFiles;
+        public Umbraco.Web._Legacy.Controls.TabPage packageOutput;
+        public Umbraco.Web._Legacy.Controls.TabPage packageAbout;
+        public Umbraco.Web._Legacy.Controls.TabPage packageActions;
 
         protected ContentPicker cp;
         private cms.businesslogic.packager.PackageInstance pack;
@@ -48,10 +45,10 @@ namespace umbraco.presentation.developer.packages
 
                 cp = new ContentPicker();
                 content.Controls.Add(cp);
-                
+
                 if (string.IsNullOrEmpty(pack.PackagePath) == false)
                 {
-                    packageUmbFile.Text = " &nbsp; <a href='" + Page.ResolveClientUrl(pack.PackagePath) + "'>Download</a>";                    
+                    packageUmbFile.Text = " &nbsp; <a href='" + Page.ResolveClientUrl(pack.PackagePath) + "'>Download</a>";
                 }
                 else
                 {
@@ -86,10 +83,11 @@ namespace umbraco.presentation.developer.packages
 
 
                     /*TEMPLATES */
-                    Template[] umbTemplates = Template.GetAllAsList().ToArray();
-                    foreach (Template tmp in umbTemplates)
+                    var nTemplates = Services.FileService.GetTemplates();
+                    //Template[] umbTemplates = Template.GetAllAsList().ToArray();
+                    foreach (var tmp in nTemplates)
                     {
-                        ListItem li = new ListItem(tmp.Text, tmp.Id.ToString());
+                        ListItem li = new ListItem(tmp.Name, tmp.Id.ToString());
 
                         if (pack.Templates.Contains(tmp.Id.ToString()))
                             li.Selected = true;
@@ -98,10 +96,12 @@ namespace umbraco.presentation.developer.packages
                     }
 
                     /* DOC TYPES */
-                    DocumentType[] docs = DocumentType.GetAllAsList().ToArray();
-                    foreach (DocumentType dc in docs)
+                    // fixme - media types? member types?
+                    var nContentTypes = Services.ContentTypeService.GetAll();
+                    //DocumentType[] docs = DocumentType.GetAllAsList().ToArray();
+                    foreach (var dc in nContentTypes)
                     {
-                        ListItem li = new ListItem(dc.Text, dc.Id.ToString());
+                        ListItem li = new ListItem(dc.Name, dc.Id.ToString());
                         if (pack.Documenttypes.Contains(dc.Id.ToString()))
                             li.Selected = true;
 
@@ -122,8 +122,9 @@ namespace umbraco.presentation.developer.packages
                     }
 
                     /* MACROS */
-                    Macro[] umbMacros = Macro.GetAll();
-                    foreach (Macro m in umbMacros)
+                    var nMacros = Services.MacroService.GetAll();
+                    //Macro[] umbMacros = Macro.GetAll();
+                    foreach (var m in nMacros)
                     {
                         ListItem li = new ListItem(m.Name, m.Id.ToString());
                         if (pack.Macros.Contains(m.Id.ToString()))
@@ -133,52 +134,56 @@ namespace umbraco.presentation.developer.packages
                     }
 
                     /*Langauges */
-                    Language[] umbLanguages = Language.getAll;
-                    foreach (Language l in umbLanguages)
+                    var nLanguages = Services.LocalizationService.GetAllLanguages();
+                    //Language[] umbLanguages = Language.getAll;
+                    foreach (var l in nLanguages)
                     {
-                        ListItem li = new ListItem(l.FriendlyName, l.id.ToString());
-                        if (pack.Languages.Contains(l.id.ToString()))
+                        ListItem li = new ListItem(l.CultureName, l.Id.ToString());
+                        if (pack.Languages.Contains(l.Id.ToString()))
                             li.Selected = true;
 
                         languages.Items.Add(li);
                     }
 
                     /*Dictionary Items*/
-                    Dictionary.DictionaryItem[] umbDictionary = Dictionary.getTopMostItems;
-                    foreach (Dictionary.DictionaryItem d in umbDictionary)
+                    var umbDictionary = Services.LocalizationService.GetRootDictionaryItems();
+                    foreach (var d in umbDictionary)
                     {
 
-                        string liName = d.key;
-                        if (d.hasChildren)
+                        string liName = d.ItemKey;
+                        var children = Services.LocalizationService.GetDictionaryItemChildren(d.Key);
+                        if (children.Any())
                             liName += " <small>(Including all child items)</small>";
 
-                        ListItem li = new ListItem(liName, d.id.ToString());
+                        var li = new ListItem(liName, d.Id.ToString());
 
-                        if (pack.DictionaryItems.Contains(d.id.ToString()))
+                        if (pack.DictionaryItems.Contains(d.Id.ToString()))
                             li.Selected = true;
 
                         dictionary.Items.Add(li);
                     }
 
-                    /*Data types */
-                    cms.businesslogic.datatype.DataTypeDefinition[] umbDataType = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
+                    //TODO: Fix this with the new services and apis! and then remove since this should all be in angular
+
+                    ///*Data types */
+                    //cms.businesslogic.datatype.DataTypeDefinition[] umbDataType = cms.businesslogic.datatype.DataTypeDefinition.GetAll();
 
                     // sort array by name
-                    Array.Sort(umbDataType, delegate(cms.businesslogic.datatype.DataTypeDefinition umbDataType1, cms.businesslogic.datatype.DataTypeDefinition umbDataType2)
-                    {
-                        return umbDataType1.Text.CompareTo(umbDataType2.Text);
-                    });
+                    //Array.Sort(umbDataType, delegate(cms.businesslogic.datatype.DataTypeDefinition umbDataType1, cms.businesslogic.datatype.DataTypeDefinition umbDataType2)
+                    //{
+                    //    return umbDataType1.Text.CompareTo(umbDataType2.Text);
+                    //});
 
-                    foreach (cms.businesslogic.datatype.DataTypeDefinition umbDtd in umbDataType)
-                    {
+                    //foreach (cms.businesslogic.datatype.DataTypeDefinition umbDtd in umbDataType)
+                    //{
 
-                        ListItem li = new ListItem(umbDtd.Text, umbDtd.Id.ToString());
+                    //    ListItem li = new ListItem(umbDtd.Text, umbDtd.Id.ToString());
 
-                        if (pack.DataTypes.Contains(umbDtd.Id.ToString()))
-                            li.Selected = true;
+                    //    if (pack.DataTypes.Contains(umbDtd.Id.ToString()))
+                    //        li.Selected = true;
 
-                        cbl_datatypes.Items.Add(li);
-                    }
+                    //    cbl_datatypes.Items.Add(li);
+                    //}
 
                     /* FILES */
                     packageFilesRepeater.DataSource = pack.Files;
@@ -205,7 +210,7 @@ namespace umbraco.presentation.developer.packages
 
                 try
                 {
-                    //we try to load an xml document with the potential malformed xml to ensure that this is actual action xml... 
+                    //we try to load an xml document with the potential malformed xml to ensure that this is actual action xml...
                     XmlDocument xd = new XmlDocument();
                     xd.LoadXml(actions);
                     e.IsValid = true;
@@ -224,7 +229,7 @@ namespace umbraco.presentation.developer.packages
 
             if (!Page.IsValid)
             {
-                this.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.error, "Saved failed.", "Some fields have not been filled-out correctly");
+                this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, "Saved failed.", "Some fields have not been filled-out correctly");
             }
             else
             {
@@ -245,11 +250,11 @@ namespace umbraco.presentation.developer.packages
 
                         packageUmbFile.Text = " &nbsp; <a href='" + IOHelper.ResolveUrl(pack.PackagePath) + "'>Download</a>";
 
-                        this.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.success, "Package saved and published", "");
+                        this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Success, "Package saved and published", "");
                     }
                     else
                     {
-                        this.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.error, "Save failed", "check your umbraco log.");
+                        this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Error, "Save failed", "check your umbraco log.");
                     }
                 }
             }
@@ -352,7 +357,7 @@ namespace umbraco.presentation.developer.packages
             createdPackage.Save();
 
             if (showNotification)
-                this.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.save, "Package Saved", "");
+                this.ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, "Package Saved", "");
         }
 
         protected void addFileToPackage(object sender, EventArgs e)
@@ -385,13 +390,13 @@ namespace umbraco.presentation.developer.packages
             {
                 string tmpFFFF = ((TextBox)rItem.FindControl("packageFilePath")).Text;
                 if (tmpFFFF.Trim() != "")
-                    tmpFilePathString += tmpFFFF + "¤";
+                    tmpFilePathString += tmpFFFF + "ï¿½";
             }
 
             cms.businesslogic.packager.CreatedPackage createdPackage = cms.businesslogic.packager.CreatedPackage.GetById(int.Parse(Request.QueryString["id"]));
             cms.businesslogic.packager.PackageInstance pack = createdPackage.Data;
 
-            pack.Files = new List<string>(tmpFilePathString.Trim('¤').Split('¤'));
+            pack.Files = new List<string>(tmpFilePathString.Trim('ï¿½').Split('ï¿½'));
             pack.Files.TrimExcess();
 
             createdPackage.Save();
@@ -430,16 +435,16 @@ namespace umbraco.presentation.developer.packages
             packageActions.Controls.Add(Pane4);
 
             var pubs = TabView1.Menu.NewButton();
-            pubs.Text = ui.Text("publish");
+            pubs.Text = Services.TextService.Localize("publish");
             pubs.CommandName = "publish";
             pubs.Command += new CommandEventHandler(saveOrPublish);
             pubs.ID = "saveAndPublish";
 
             var saves = TabView1.Menu.NewButton();
-            saves.Text = ui.Text("save");
+            saves.Text = Services.TextService.Localize("save");
             saves.CommandName = "save";
             saves.Command += new CommandEventHandler(saveOrPublish);
-            saves.ButtonType = uicontrols.MenuButtonType.Primary;
+            saves.ButtonType = Umbraco.Web._Legacy.Controls.MenuButtonType.Primary;
             saves.ID = "save";
 
 

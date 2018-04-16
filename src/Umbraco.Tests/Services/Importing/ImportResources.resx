@@ -142,9 +142,6 @@
   <data name="CheckboxList_Content_Package" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>checkboxlist-content-package.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <data name="CheckboxList_Content_Package_LegacyIds" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>checkboxlist-content-package-legacyids.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
-  </data>
   <data name="Dictionary_Package" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>dictionary-package.xml;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>

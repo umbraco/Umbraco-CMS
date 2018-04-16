@@ -1,22 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
-using System.Web.Http;
 using System.Web.Http.ModelBinding;
-using System.Web.Http.Results;
 using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.WebApi
 {
-    
+
     public static class HttpRequestMessageExtensions
     {
 
@@ -27,6 +20,10 @@ namespace Umbraco.Web.WebApi
         /// <returns></returns>
         internal static Attempt<IOwinContext> TryGetOwinContext(this HttpRequestMessage request)
         {
+            // occurs in unit tests?
+            if (request.Properties.TryGetValue("MS_OwinContext", out var o) && o is IOwinContext owinContext)
+                return Attempt.Succeed(owinContext);
+
             var httpContext = request.TryGetHttpContext();
             try
             {

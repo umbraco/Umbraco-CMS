@@ -8,7 +8,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Xml;
-using umbraco;
 using umbraco.cms.businesslogic.packager;
 using umbraco.cms.businesslogic.packager.repositories;
 using umbraco.cms.presentation.Trees;
@@ -21,6 +20,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -70,7 +71,7 @@ namespace Umbraco.Web.Editors
                     .Where(x => x.Data.Name == pack.Data.Name && x.Data.Id != pack.Data.Id))
                 {
                     //remove from teh xml
-                    installed.Delete(Security.GetUserId());
+                    installed.Delete(Security.GetUserId().ResultOr(0));
                 }
             }
             catch (Exception e)
@@ -96,7 +97,7 @@ namespace Umbraco.Web.Editors
             var removedMacros = new List<IMacro>();
             var removedContentTypes = new List<IContentType>();
             var removedDictionaryItems = new List<IDictionaryItem>();
-            var removedDataTypes = new List<IDataTypeDefinition>();
+            var removedDataTypes = new List<IDataType>();
             var removedFiles = new List<string>();
 
             //Uninstall templates
@@ -108,7 +109,7 @@ namespace Umbraco.Web.Editors
                 if (found != null)
                 {
                     removedTemplates.Add(found);
-                    ApplicationContext.Services.FileService.DeleteTemplate(found.Alias, Security.GetUserId());
+                    Services.FileService.DeleteTemplate(found.Alias, Security.GetUserId().ResultOr(0));
                 }
                 pack.Data.Templates.Remove(nId.ToString());
             }
@@ -134,7 +135,7 @@ namespace Umbraco.Web.Editors
             {
                 int nId;
                 if (int.TryParse(item, out nId) == false) continue;
-                var contentType = contentTypeService.GetContentType(nId);
+                var contentType = contentTypeService.Get(nId);
                 if (contentType == null) continue;
                 contentTypes.Add(contentType);
                 pack.Data.Documenttypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
@@ -172,7 +173,7 @@ namespace Umbraco.Web.Editors
             {
                 int nId;
                 if (int.TryParse(item, out nId) == false) continue;
-                var dtd = Services.DataTypeService.GetDataTypeDefinitionById(nId);
+                var dtd = Services.DataTypeService.GetDataType(nId);
                 if (dtd != null)
                 {
                     removedDataTypes.Add(dtd);
@@ -193,7 +194,7 @@ namespace Umbraco.Web.Editors
                     var actionsXml = new XmlDocument();
                     actionsXml.LoadXml("<Actions>" + pack.Data.Actions + "</Actions>");
 
-                    LogHelper.Debug<PackageInstallController>("executing undo actions: {0}", () => actionsXml.OuterXml);
+                    Logger.Debug<PackageInstallController>(() => $"executing undo actions: {actionsXml.OuterXml}");
 
                     foreach (XmlNode n in actionsXml.DocumentElement.SelectNodes("//Action"))
                     {
@@ -204,13 +205,13 @@ namespace Umbraco.Web.Editors
                         }
                         catch (Exception ex)
                         {
-                            LogHelper.Error<PackageInstallController>("An error occurred running undo actions", ex);
+                            Logger.Error<PackageInstallController>("An error occurred running undo actions", ex);
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<PackageInstallController>("An error occurred running undo actions", ex);
+                    Logger.Error<PackageInstallController>("An error occurred running undo actions", ex);
                 }
             }
 
@@ -230,11 +231,12 @@ namespace Umbraco.Web.Editors
 
                     if (File.Exists(filePath))
                         File.Delete(filePath);
+
                 }
                 pack.Data.Files.Remove(file);
             }
             pack.Save();
-            pack.Delete(Security.GetUserId());
+            pack.Delete(Security.GetUserId().ResultOr(0));
 
             // create a summary of what was actually removed, for PackagingService.UninstalledPackage
             var summary = new UninstallationSummary
@@ -252,13 +254,7 @@ namespace Umbraco.Web.Editors
             // trigger the UninstalledPackage event
             PackagingService.OnUninstalledPackage(new UninstallPackageEventArgs<UninstallationSummary>(summary, false));
 
-            //TODO: Legacy - probably not needed
-            if (refreshCache)
-            {
-                library.RefreshContent();
-            }
             TreeDefinitionCollection.Instance.ReRegisterTrees();
-            global::umbraco.BusinessLogic.Actions.Action.ReRegisterActionsAndHandlers();
         }
 
         /// <summary>
@@ -337,7 +333,6 @@ namespace Umbraco.Web.Editors
             model.ConflictingStyleSheetNames = ins.ConflictingStyleSheetNames;
             model.ConflictingTemplateAliases = ins.ConflictingTemplateAliases;
             model.ContainsBinaryFileErrors = ins.ContainsBinaryFileErrors;
-            model.ContainsLegacyPropertyEditors = ins.ContainsLegacyPropertyEditors;
             model.ContainsMacroConflict = ins.ContainsMacroConflict;
             model.ContainsStyleSheetConflicts = ins.ContainsStyleSheeConflicts;
             model.ContainsTemplateConflicts = ins.ContainsTemplateConflicts;
@@ -479,7 +474,7 @@ namespace Umbraco.Web.Editors
             string path = Path.Combine("packages", packageGuid + ".umb");
             if (File.Exists(IOHelper.MapPath(Path.Combine(SystemDirectories.Data, path))) == false)
             {
-                path = Services.PackagingService.FetchPackageFile(Guid.Parse(packageGuid), UmbracoVersion.Current, Security.GetUserId());
+                path = Services.PackagingService.FetchPackageFile(Guid.Parse(packageGuid), UmbracoVersion.Current, Security.GetUserId().ResultOr(0));
             }
 
             var model = new LocalPackageInstallModel
@@ -545,8 +540,8 @@ namespace Umbraco.Web.Editors
             ins.InstallFiles(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
 
             //set a restarting marker and reset the app pool
-            ApplicationContext.RestartApplicationPool(Request.TryGetHttpContext().Result);
-            
+            Current.RestartAppPool(Request.TryGetHttpContext().Result);
+
             model.IsRestarting = true;
 
             return model;
@@ -593,14 +588,12 @@ namespace Umbraco.Web.Editors
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallCleanUp(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
 
-            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(ApplicationContext.ProfilingLogger.Logger);
+            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(Logger);
             var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
 
             //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.
             //these bits are super old, but cant find another way to do this currently
             global::umbraco.cms.presentation.Trees.TreeDefinitionCollection.Instance.ReRegisterTrees();
-            global::umbraco.BusinessLogic.Actions.Action.ReRegisterActionsAndHandlers();
-
 
             var redirectUrl = "";
             if (ins.Control.IsNullOrWhiteSpace() == false)

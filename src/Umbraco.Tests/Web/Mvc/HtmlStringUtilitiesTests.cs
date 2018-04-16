@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.Web.Mvc
@@ -11,7 +11,7 @@ namespace Umbraco.Tests.Web.Mvc
         [SetUp]
         public virtual void Initialize()
         {
-            
+
             _htmlStringUtilities = new HtmlStringUtilities();
         }
 

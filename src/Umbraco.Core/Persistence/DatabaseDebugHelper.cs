@@ -16,8 +16,8 @@ namespace Umbraco.Core.Persistence
 
         public static void SetCommand(IDbCommand command, string context)
         {
-            var prof = command as StackExchange.Profiling.Data.ProfiledDbCommand;
-            if (prof != null) command = prof.InternalCommand;
+            command = command.UnwrapUmbraco();
+
             lock (Commands)
             {
                 Commands.Enqueue(Tuple.Create(context, new WeakReference<IDbCommand>(command)));
@@ -40,10 +40,11 @@ namespace Umbraco.Core.Persistence
 
         public static string GetReferencedObjects(IDbConnection con)
         {
-            var prof = con as StackExchange.Profiling.Data.ProfiledDbConnection;
-            if (prof != null) con = prof.InnerConnection;
+            con = con.UnwrapUmbraco();
+
             var ceCon = con as System.Data.SqlServerCe.SqlCeConnection;
             if (ceCon != null) return null; // "NotSupported: SqlCE";
+
             var dbCon = con as DbConnection;
             return dbCon == null
                 ? "NotSupported: " + con.GetType()
@@ -164,7 +165,7 @@ namespace Umbraco.Core.Persistence
                 }
             }
 
-            return result == null ? null : result.ToString();
+            return result?.ToString();
         }
     }
 }

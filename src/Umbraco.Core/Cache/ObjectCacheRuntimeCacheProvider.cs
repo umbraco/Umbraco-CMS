@@ -5,6 +5,7 @@ using System.Runtime.Caching;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web.Caching;
+using Umbraco.Core.Composing;
 using CacheItemPriority = System.Web.Caching.CacheItemPriority;
 
 namespace Umbraco.Core.Cache
@@ -224,8 +225,7 @@ namespace Umbraco.Core.Cache
             //return result.Value;
 
             var value = result.Value; // will not throw (safe lazy)
-            var eh = value as DictionaryCacheProviderBase.ExceptionHolder;
-            if (eh != null) throw eh.Exception; // throw once!
+            if (value is DictionaryCacheProviderBase.ExceptionHolder eh) eh.Exception.Throw(); // throw once!
             return value;
         }
 

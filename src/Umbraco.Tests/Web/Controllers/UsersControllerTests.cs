@@ -1,21 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
-using Microsoft.AspNet.Identity;
+using System.Web.Http;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Security;
+using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.ControllerTesting;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Tests.Testing;
+using Umbraco.Web;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.Models.ContentEditing;
@@ -23,25 +26,35 @@ using IUser = Umbraco.Core.Models.Membership.IUser;
 
 namespace Umbraco.Tests.Web.Controllers
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NoDatabasePerFixture)]
     [TestFixture]
-    public class UsersControllerTests : BaseDatabaseFactoryTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.None)]
+    public class UsersControllerTests : TestWithDatabaseBase
     {
-        protected override void FreezeResolution()
+        protected override void ComposeApplication(bool withApplication)
         {
-            FeaturesResolver.Current = new FeaturesResolver(new UmbracoFeatures());
-            base.FreezeResolution();
+            base.ComposeApplication(withApplication);
+            //if (!withApplication) return;
+
+            // replace the true IUserService implementation with a mock
+            // so that each test can configure the service to their liking
+            Container.RegisterSingleton(f => Mock.Of<IUserService>());
+
+            // kill the true IEntityService too
+            Container.RegisterSingleton(f => Mock.Of<IEntityService>());
+            
+            Container.RegisterSingleton<UmbracoFeatures>();
         }
 
         [Test]
-        public async void Save_User()
+        public async System.Threading.Tasks.Task Save_User()
         {
-            var runner = new TestRunner((message, helper) =>
+            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
             {
                 //setup some mocks
                 Umbraco.Core.Configuration.GlobalSettings.HasSmtpServer = true;
 
-                var userServiceMock = Mock.Get(helper.UmbracoContext.Application.Services.UserService);
+                var userServiceMock = Mock.Get(Current.Services.UserService);
+
                 userServiceMock.Setup(service => service.Save(It.IsAny<IUser>(), It.IsAny<bool>()))
                     .Callback((IUser u, bool raiseEvents) =>
                     {
@@ -52,13 +65,12 @@ namespace Umbraco.Tests.Web.Controllers
                 userServiceMock.Setup(service => service.GetUserGroupsByAlias(It.IsAny<string[]>()))
                     .Returns(new[] { Mock.Of<IUserGroup>(group => group.Id == 123 && group.Alias == "writers" && group.Name == "Writers") });
                 userServiceMock.Setup(service => service.GetUserById(It.IsAny<int>()))
-                    .Returns(new User(1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]));
-                
-                //we need to manually apply automapper mappings with the mocked applicationcontext
-                InitializeMappers(helper.UmbracoContext.Application);
+                    .Returns((int id) => id == 1234 ? new User(1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]) : null);
 
-                return new UsersController(helper.UmbracoContext);
-            });
+                var usersController = new UsersController();
+                Container.InjectProperties(usersController);
+                return usersController;
+            }
 
             var userSave = new UserSave
             {
@@ -69,9 +81,10 @@ namespace Umbraco.Tests.Web.Controllers
                 Name = "Test",
                 UserGroups = new[] { "writers" }
             };
+
+            var runner = new TestRunner(Factory);
             var response = await runner.Execute("Users", "PostSaveUser", HttpMethod.Post,
                 new ObjectContent<UserSave>(userSave, new JsonMediaTypeFormatter()));
-
             var obj = JsonConvert.DeserializeObject<UserDisplay>(response.Item2);
 
             Assert.AreEqual(userSave.Name, obj.Name);
@@ -83,18 +96,42 @@ namespace Umbraco.Tests.Web.Controllers
                 Assert.IsTrue(userGroupAliases.Contains(group));
             }
         }
-        
+
+        private void MockForGetPagedUsers()
+        {
+            Mock.Get(Current.SqlContext)
+                .Setup(x => x.Query<IUser>())
+                .Returns(new Query<IUser>(Current.SqlContext));
+
+            var syntax = new SqlCeSyntaxProvider();
+
+            Mock.Get(Current.SqlContext)
+                .Setup(x => x.SqlSyntax)
+                .Returns(syntax);
+
+            var mappers = new MapperCollection(new []
+            {
+                new UserMapper()
+            });
+
+            Mock.Get(Current.SqlContext)
+                .Setup(x => x.Mappers)
+                .Returns(mappers);
+        }
 
         [Test]
-        public async void GetPagedUsers_Empty()
+        public async System.Threading.Tasks.Task GetPagedUsers_Empty()
         {
-            var runner = new TestRunner((message, helper) =>
+            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
             {
-                //we need to manually apply automapper mappings with the mocked applicationcontext
-                InitializeMappers(helper.UmbracoContext.Application);
+                var usersController = new UsersController();
+                Container.InjectProperties(usersController);
+                return usersController;
+            }
 
-                return new UsersController(helper.UmbracoContext);
-            });
+            MockForGetPagedUsers();
+
+            var runner = new TestRunner(Factory);
             var response = await runner.Execute("Users", "GetPagedUsers", HttpMethod.Get);
 
             var obj = JsonConvert.DeserializeObject<PagedResult<UserDisplay>>(response.Item2);
@@ -102,24 +139,27 @@ namespace Umbraco.Tests.Web.Controllers
         }
 
         [Test]
-        public async void GetPagedUsers_10()
+        public async System.Threading.Tasks.Task GetPagedUsers_10()
         {
-            var runner = new TestRunner((message, helper) =>
+            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
             {
                 //setup some mocks
-                var userServiceMock = Mock.Get(helper.UmbracoContext.Application.Services.UserService);
+                var userServiceMock = Mock.Get(Current.Services.UserService);
                 var users = MockedUser.CreateMulipleUsers(10);
                 long outVal = 10;
                 userServiceMock.Setup(service => service.GetAll(
-                    It.IsAny<long>(), It.IsAny<int>(), out outVal, It.IsAny<string>(), It.IsAny<Direction>(),
-                    It.IsAny<UserState[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<IQuery<IUser>>()))
+                        It.IsAny<long>(), It.IsAny<int>(), out outVal, It.IsAny<string>(), It.IsAny<Direction>(),
+                        It.IsAny<UserState[]>(), It.IsAny<string[]>(), It.IsAny<string[]>(), It.IsAny<IQuery<IUser>>()))
                     .Returns(() => users);
 
-                //we need to manually apply automapper mappings with the mocked applicationcontext
-                InitializeMappers(helper.UmbracoContext.Application);
+                var usersController = new UsersController();
+                Container.InjectProperties(usersController);
+                return usersController;
+            }
 
-                return new UsersController(helper.UmbracoContext);
-            });
+            MockForGetPagedUsers();
+
+            var runner = new TestRunner(Factory);
             var response = await runner.Execute("Users", "GetPagedUsers", HttpMethod.Get);
 
             var obj = JsonConvert.DeserializeObject<PagedResult<UserDisplay>>(response.Item2);

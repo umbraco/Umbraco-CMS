@@ -1,19 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Strings;
-using Umbraco.Core.Models;
-using Umbraco.Core.Publishing;
-using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
-using umbraco;
 
 namespace Umbraco.Web.WebServices
 {
     /// <summary>
-    /// A REST controller used for accessing Core.Strings services.
+    /// Represents a REST controller used for accessing Core.Strings services.
     /// </summary>
     public class CoreStringsController : UmbracoAuthorizedController
     {
@@ -23,7 +17,7 @@ namespace Umbraco.Web.WebServices
         {
             // always return a proper camel-cased alias
             // when checking... javascript does a case-unsensitive comparison
-            return value == null 
+            return value == null
                 ? Json(new {error = "no value."}, JsonRequestBehavior.AllowGet)
                 : Json(new { alias = value.ToCleanString(CleanStringType.Alias | CleanStringType.CamelCase) }, JsonRequestBehavior.AllowGet);
         }
@@ -32,7 +26,7 @@ namespace Umbraco.Web.WebServices
         public JavaScriptResult ServicesJavaScript()
         {
             var controllerPath = Url.GetCoreStringsControllerPath();
-            var js = ShortStringHelperResolver.Current.Helper.GetShortStringServicesJavaScript(controllerPath);
+            var js = Current.ShortStringHelper.GetShortStringServicesJavaScript(controllerPath);
             return JavaScript(js);
         }
     }

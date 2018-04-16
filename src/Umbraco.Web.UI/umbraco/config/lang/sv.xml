@@ -12,6 +12,7 @@
     <key alias="copy">Kopiera</key>
     <key alias="create">Skapa</key>
     <key alias="createPackage">Skapa paket</key>
+    <key alias="defaultValue">Standardvärde</key>
     <key alias="delete">Ta bort</key>
     <key alias="disable">Avaktivera</key>
     <key alias="emptyTrashcan">Töm papperskorgen</key>
@@ -31,6 +32,7 @@
     <key alias="sendtopublish">Skicka för publicering</key>
     <key alias="sendToTranslate">Skicka för översättning</key>
     <key alias="sort">Sortera</key>
+    <key alias="toPublish">Skicka för publicering</key>
     <key alias="translate">Översätt</key>
     <key alias="unpublish">Avpublicera</key>
     <key alias="update">Uppdatera</key>
@@ -80,12 +82,13 @@
     <key alias="returnToList">Återvänd till lista</key>
     <key alias="save">Spara</key>
     <key alias="saveAndPublish">Spara och publicera</key>
+    <key alias="saveAndSchedule">Spara och schemalägg</key>
     <key alias="saveToPublish">Spara och skicka för godkännande</key>
     <key alias="select">Välj</key>
     <key alias="selectCurrentFolder">Välj aktuell mapp</key>
     <key alias="showPage">Förhandsgranska</key>
     <key alias="showPageDisabled">Förhandsgranskning är avstängt på grund av att det inte finns någon mall tilldelad</key>
-    <key alias="somethingElse">Annat</key>
+    <key alias="somethingElse">Ångra</key>
     <key alias="styleChoose">Välj stil</key>
     <key alias="styleShow">Visa stil</key>
     <key alias="tableInsert">Infoga tabell</key>
@@ -169,7 +172,6 @@
     <key alias="noDocumentTypes"><![CDATA[Det finns inga giltiga dokumenttyper tillgängliga. Du måste aktivera dessa under sektionen inställningar och under <strong>"dokumenttyper"</strong>.]]></key>
     <key alias="noMediaTypes"><![CDATA[Det finns inga giltiga mediatyper tillgängliga. Du måste aktivera dessa under sektionen inställningar och under <strong>"mediatyper"</strong>.]]></key>
     <key alias="updateData">Välj typ och rubrik</key>
-    <key alias="documentTypeWithoutTemplate">Dokumenttyp utan sidmall</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Surfa på din webbplats</key>
@@ -605,7 +607,7 @@
   <area alias="publicAccess">
     <key alias="paAdvanced">Rollbaserat lösenordsskydd</key>
     <key alias="paAdvancedHelp"><![CDATA[Välj detta alternativ om du vill skydda sidan med hjälp av rollbaserat lösenordsskydd.<br /> Då används Umbracos medlemsgrupper.]]></key>
-    <key alias="paAdvancedNoGroups">Du måste skapa en medlemsgrupp innan du kan använda rollbaserat lösenordsskydd.</key>
+    <key alias="paAdvancedNoGroups"><![CDATA[Du måste skapa en medlemsgrupp innan du kan använda <br />rollbaserat lösenordsskydd.]]></key>
     <key alias="paErrorPage">Sida med felmeddelande</key>
     <key alias="paErrorPageHelp">Används när en användare är inloggad, men saknar rättigheter att se sidan</key>
     <key alias="paHowWould">Välj hur du vill lösenordsskydda sidan</key>
@@ -836,6 +838,8 @@
     <key alias="postContent">Infoga efter fält</key>
     <key alias="preContent">Infoga före fält</key>
     <key alias="recursive">Rekursiv</key>
+    <key alias="removeParagraph">Avlägsna stycke-taggar</key>
+    <key alias="removeParagraphHelp">Kommer att avlägsna alla &amp;lt;P&amp;gt; i början och slutet av texten</key>
     <key alias="standardFields">Standardfält</key>
     <key alias="uppercase">Versaler</key>
     <key alias="urlEncode">URL-koda</key>
@@ -902,6 +906,9 @@
     <key alias="stylesheets">Stilmallar</key>
     <key alias="templates">Sidmallar</key>
     <key alias="xslt">XSLT-filer</key>
+    <key alias="userPermissions">Användarrättigheter</key>
+    <key alias="userTypes">Användartyper</key>
+    <key alias="users">Användare</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Ny uppdatering tillgänglig</key>
@@ -945,6 +952,8 @@
     <key alias="startnode">Startnod i innehåll</key>
     <key alias="username">Användarens namn</key>
     <key alias="userPermissions">Användarrättigheter</key>
+    <key alias="usertype">Användartyp</key>
+    <key alias="userTypes">Användartyper</key>
     <key alias="writer">Skribent</key>
     <key alias="yourHistory">Din nuvarande historik</key>
     <key alias="translator">Översättare</key>

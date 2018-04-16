@@ -147,7 +147,7 @@ namespace Umbraco.Core.Media.Exif
     }
 
     /// <summary>
-    /// Represents the exif version as a 4 byte ASCII string. (EXIF Specification: UNDEFINED) 
+    /// Represents the exif version as a 4 byte ASCII string. (EXIF Specification: UNDEFINED)
     /// Used for the ExifVersion, FlashpixVersion, InteroperabilityVersion and GPSVersionID fields.
     /// </summary>
     internal class ExifVersion : ExifProperty
@@ -191,7 +191,7 @@ namespace Umbraco.Core.Media.Exif
 
     /// <summary>
     /// Represents the location and area of the subject (EXIF Specification: 2xSHORT)
-    /// The coordinate values, width, and height are expressed in relation to the 
+    /// The coordinate values, width, and height are expressed in relation to the
     /// upper left as origin, prior to rotation processing as per the Rotation tag.
     /// </summary>
     internal class ExifPointSubjectArea : ExifUShortArray
@@ -222,7 +222,7 @@ namespace Umbraco.Core.Media.Exif
 
     /// <summary>
     /// Represents the location and area of the subject (EXIF Specification: 3xSHORT)
-    /// The coordinate values, width, and height are expressed in relation to the 
+    /// The coordinate values, width, and height are expressed in relation to the
     /// upper left as origin, prior to rotation processing as per the Rotation tag.
     /// </summary>
     internal class ExifCircularSubjectArea : ExifPointSubjectArea
@@ -251,7 +251,7 @@ namespace Umbraco.Core.Media.Exif
 
     /// <summary>
     /// Represents the location and area of the subject (EXIF Specification: 4xSHORT)
-    /// The coordinate values, width, and height are expressed in relation to the 
+    /// The coordinate values, width, and height are expressed in relation to the
     /// upper left as origin, prior to rotation processing as per the Rotation tag.
     /// </summary>
     internal class ExifRectangularSubjectArea : ExifPointSubjectArea
@@ -342,7 +342,7 @@ namespace Umbraco.Core.Media.Exif
     }
 
     /// <summary>
-    /// Represents an ASCII string. (EXIF Specification: BYTE) 
+    /// Represents an ASCII string. (EXIF Specification: BYTE)
     /// Used by Windows XP.
     /// </summary>
     internal class WindowsByteString : ExifProperty

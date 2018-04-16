@@ -1,22 +1,29 @@
-using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+﻿using System.Runtime.Serialization;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
     /// <summary>
-    /// Represents a Tag, which is composed of a Text, Group and NodeCount property.
+    /// Represents a tag entity.
     /// </summary>
-    public interface ITag : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
+    public interface ITag : IEntity, IRememberBeingDirty
     {
-        [DataMember]
-        string Text { get; set; }
-
+        /// <summary>
+        /// Gets or sets the tag group.
+        /// </summary>
         [DataMember]
         string Group { get; set; }
 
-        int NodeCount { get; }
+        /// <summary>
+        /// Gets or sets the tag text.
+        /// </summary>
+        [DataMember]
+        string Text { get; set; }
 
-        //TODO: enable this at some stage
-        //int ParentId { get; set; }
+        /// <summary>
+        /// Gets the number of nodes tagged with this tag.
+        /// </summary>
+        /// <remarks>Only when returning from queries.</remarks>
+        int NodeCount { get; }
     }
 }

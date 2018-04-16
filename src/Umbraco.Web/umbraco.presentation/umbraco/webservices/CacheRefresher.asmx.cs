@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Web;
 using System.Web.Services;
@@ -10,18 +10,20 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
-using umbraco.interfaces;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
+using Umbraco.Core.Xml;
 using Umbraco.Web.Security;
+using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace umbraco.presentation.webservices
 {
-	/// <summary>
-	/// CacheRefresher web service.
-	/// </summary>
-	[WebService(Namespace="http://umbraco.org/webservices/")]
-	public class CacheRefresher : WebService
+    /// <summary>
+    /// CacheRefresher web service.
+    /// </summary>
+    [WebService(Namespace="http://umbraco.org/webservices/")]
+    public class CacheRefresher : WebService
     {
         #region Helpers
 
@@ -32,18 +34,15 @@ namespace umbraco.presentation.webservices
             if (string.IsNullOrEmpty(hash)) return false; // no hash = don't know = not self
             if (hash != WebServiceServerMessenger.GetCurrentServerHash()) return false;
 
-            LogHelper.Debug<CacheRefresher>(
-                "Ignoring self-message. (server: {0}, appId: {1}, hash: {2})",
-                () => NetworkHelper.MachineName,
-                () => HttpRuntime.AppDomainAppId,
-                () => hash);
+            Current.Logger.Debug<CacheRefresher>(() =>
+                $"Ignoring self-message. (server: {NetworkHelper.MachineName}, appId: {HttpRuntime.AppDomainAppId}, hash: {hash})");
 
             return true;
         }
 
         private static ICacheRefresher GetRefresher(Guid id)
         {
-            var refresher = CacheRefreshersResolver.Current.GetById(id);
+            var refresher = Current.CacheRefreshers[id];
             if (refresher == null)
                 throw new InvalidOperationException("Cache refresher with ID \"" + id + "\" does not exist.");
             return refresher;
@@ -58,20 +57,20 @@ namespace umbraco.presentation.webservices
         {
             var jsonRefresher = refresher as IJsonCacheRefresher;
             if (jsonRefresher == null)
-                throw new InvalidOperationException("Cache refresher with ID \"" + refresher.UniqueIdentifier + "\" does not implement " + typeof(IJsonCacheRefresher) + ".");
+                throw new InvalidOperationException("Cache refresher with ID \"" + refresher.RefresherUniqueId + "\" does not implement " + typeof(IJsonCacheRefresher) + ".");
             return jsonRefresher;
         }
 
         private bool Authorized(string login, string rawPassword)
         {
-            //TODO: This technique of passing the raw password in is a legacy idea and isn't really 
-            // a very happy way to secure this webservice. To prevent brute force attacks, we need 
+            //TODO: This technique of passing the raw password in is a legacy idea and isn't really
+            // a very happy way to secure this webservice. To prevent brute force attacks, we need
             // to ensure that the lockout policies are applied, though because we are not authenticating
             // the user with their real password, we need to do this a bit manually.
 
             var userMgr = Context.GetOwinContext().GetBackOfficeUserManager();
-            
-            var user = ApplicationContext.Current.Services.UserService.GetByUsername(login);
+
+            var user = Current.Services.UserService.GetByUsername(login);
             if (user == null) return false;
 
             var u = userMgr.FindById(user.Id);
@@ -114,7 +113,7 @@ namespace umbraco.presentation.webservices
                         break;
                     case RefreshMethodType.RefreshByIds: // not directly supported by ICacheRefresher
                         foreach (var id in JsonConvert.DeserializeObject<int[]>(instruction.JsonIds))
-	                        refresher.Refresh(id);
+                            refresher.Refresh(id);
                         break;
                     case RefreshMethodType.RefreshByJson:
                         GetJsonRefresher(refresher).Refresh(instruction.JsonPayload);
@@ -130,34 +129,34 @@ namespace umbraco.presentation.webservices
             }
         }
 
-		[WebMethod]
-		public void RefreshAll(Guid uniqueIdentifier, string Login, string Password)
-		{
-		    if (Authorized(Login, Password) == false) return;
-			GetRefresher(uniqueIdentifier).RefreshAll();
-		}
+        [WebMethod]
+        public void RefreshAll(Guid uniqueIdentifier, string Login, string Password)
+        {
+            if (Authorized(Login, Password) == false) return;
+            GetRefresher(uniqueIdentifier).RefreshAll();
+        }
 
-	    [WebMethod]
-		public void RefreshByGuid(Guid uniqueIdentifier, Guid Id, string Login, string Password)
-		{
+        [WebMethod]
+        public void RefreshByGuid(Guid uniqueIdentifier, Guid Id, string Login, string Password)
+        {
             if (Authorized(Login, Password) == false) return;
             GetRefresher(uniqueIdentifier).Refresh(Id);
-		}
+        }
 
-		[WebMethod]
-		public void RefreshById(Guid uniqueIdentifier, int Id, string Login, string Password)
-		{
-		    if (Authorized(Login, Password) == false) return;
-			GetRefresher(uniqueIdentifier).Refresh(Id);
-		}
+        [WebMethod]
+        public void RefreshById(Guid uniqueIdentifier, int Id, string Login, string Password)
+        {
+            if (Authorized(Login, Password) == false) return;
+            GetRefresher(uniqueIdentifier).Refresh(Id);
+        }
 
         [WebMethod]
         public void RefreshByIds(Guid uniqueIdentifier, string jsonIds, string Login, string Password)
         {
             if (Authorized(Login, Password) == false) return;
             var refresher = GetRefresher(uniqueIdentifier);
-	        foreach (var id in JsonConvert.DeserializeObject<int[]>(jsonIds))
-	            refresher.Refresh(id);
+            foreach (var id in JsonConvert.DeserializeObject<int[]>(jsonIds))
+                refresher.Refresh(id);
         }
 
         [WebMethod]
@@ -167,27 +166,27 @@ namespace umbraco.presentation.webservices
             GetJsonRefresher(uniqueIdentifier).Refresh(jsonPayload);
         }
 
-	    [WebMethod]
-        public void RemoveById(Guid uniqueIdentifier, int Id, string Login, string Password) 
+        [WebMethod]
+        public void RemoveById(Guid uniqueIdentifier, int Id, string Login, string Password)
         {
             if (Authorized(Login, Password) == false) return;
             GetRefresher(uniqueIdentifier).Remove(Id);
         }
 
-	    [WebMethod]
-		public XmlDocument GetRefreshers(string Login, string Password)
-	    {
-	        if (Authorized(Login, Password) == false) return null;
+        [WebMethod]
+        public XmlDocument GetRefreshers(string Login, string Password)
+        {
+            if (Authorized(Login, Password) == false) return null;
 
-			var xd = new XmlDocument();
-			xd.LoadXml("<cacheRefreshers/>");
-			foreach (var cr in CacheRefreshersResolver.Current.CacheRefreshers) 
-			{
-				var n = xmlHelper.addTextNode(xd, "cacheRefresher", cr.Name);
-				n.Attributes.Append(xmlHelper.addAttribute(xd, "uniqueIdentifier", cr.UniqueIdentifier.ToString()));
-				xd.DocumentElement.AppendChild(n);
-			}
-			return xd;
-		}
-	}
+            var xd = new XmlDocument();
+            xd.LoadXml("<cacheRefreshers/>");
+            foreach (var cr in Current.CacheRefreshers)
+            {
+                var n = XmlHelper.AddTextNode(xd, "cacheRefresher", cr.Name);
+                n.Attributes.Append(XmlHelper.AddAttribute(xd, "uniqueIdentifier", cr.RefresherUniqueId.ToString()));
+                xd.DocumentElement.AppendChild(n);
+            }
+            return xd;
+        }
+    }
 }

@@ -2256,7 +2256,9 @@ table th, td {border: 0px solid #fff;}
   <DictionaryItems />
   <Languages />
   <DataTypes>
-    <DataType Name="SW Page Picker" Id="7e062c13-7c41-4ad9-b389-41d88aeef87c" Definition="d719387b-8261-48ac-b94b-00654896d114" DatabaseType="Ntext">
+    <DataType Name="SW Page Picker" Id="7e062c13-7c41-4ad9-b389-41d88aeef87c" Definition="d719387b-8261-48ac-b94b-00654896d114" DatabaseType="Ntext"
+              Configuration="{&quot;x&quot;:3}" />
+      <!--
       <PreValues>
         <PreValue Id="5" Value="content" />
         <PreValue Id="6" Value="" />
@@ -2272,7 +2274,7 @@ table th, td {border: 0px solid #fff;}
         <PreValue Id="16" Value="200" />
         <PreValue Id="17" Value="0" />
       </PreValues>
-    </DataType>
+    -->
   </DataTypes>
   <control>/usercontrols/StandardWebsiteInstall.ascx</control>
 </umbPackage>

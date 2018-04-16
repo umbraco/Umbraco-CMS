@@ -1,15 +1,12 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {
-    
+
     [TestFixture]
     public class ContentFinderByAliasWithDomainsTests : ContentFinderByAliasTests
     {
-
-        
-
         [TestCase("http://domain1.com/this/is/my/alias", "de-DE", -1001)] // alias to domain's page fails - no alias on domain's home
         [TestCase("http://domain1.com/page2/alias", "de-DE", 10011)] // alias to sub-page works
         [TestCase("http://domain1.com/en/flux", "en-US", -10011)] // alias to domain's page fails - no alias on domain's home
@@ -24,22 +21,22 @@ namespace Umbraco.Tests.Routing
         {
             //SetDomains1();
 
-            var routingContext = GetRoutingContext(inputUrl);
-            var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
-            var pcr = new PublishedContentRequest(url, routingContext);
+            var umbracoContext = GetUmbracoContext(inputUrl);
+            var publishedRouter = CreatePublishedRouter();
+            var request = publishedRouter.CreateRequest(umbracoContext);
             // must lookup domain
-            pcr.Engine.FindDomain();
+            publishedRouter.FindDomain(request);
 
             if (expectedNode > 0)
-                Assert.AreEqual(expectedCulture, pcr.Culture.Name);
+                Assert.AreEqual(expectedCulture, request.Culture.Name);
 
-            var finder = new ContentFinderByUrlAlias();
-            var result = finder.TryFindContent(pcr);
+            var finder = new ContentFinderByUrlAlias(Logger);
+            var result = finder.TryFindContent(request);
 
             if (expectedNode > 0)
             {
                 Assert.IsTrue(result);
-                Assert.AreEqual(pcr.PublishedContent.Id, expectedNode);
+                Assert.AreEqual(request.PublishedContent.Id, expectedNode);
             }
             else
             {

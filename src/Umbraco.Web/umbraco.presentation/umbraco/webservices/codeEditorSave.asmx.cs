@@ -1,27 +1,14 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
 using System.Web.Script.Services;
 using System.Web.Services;
-using System.Web.UI;
-using System.Xml;
-using System.Xml.Xsl;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Web.WebServices;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.macro;
-using umbraco.cms.businesslogic.template;
-using umbraco.cms.businesslogic.web;
-using System.Net;
-using System.Collections;
-using umbraco.NodeFactory;
+using Umbraco.Web.Macros;
 
 namespace umbraco.presentation.webservices
 {
@@ -34,34 +21,10 @@ namespace umbraco.presentation.webservices
     [ScriptService]
     public class codeEditorSave : UmbracoAuthorizedWebService
     {
-
-        [Obsolete("This method has been superceded by the REST service /Umbraco/RestServices/SaveFile/SaveStylesheet which is powered by the SaveFileController.")]
-        [WebMethod]
-        public string SaveCss(string fileName, string oldName, string fileContents, int fileID)
-        {
-            if (AuthorizeRequest(DefaultApps.settings.ToString()))
-            {
-                var stylesheet = Services.FileService.GetStylesheetByName(oldName.EnsureEndsWith(".css"));
-                if (stylesheet == null) throw new InvalidOperationException("No stylesheet found with name " + oldName);
-
-                stylesheet.Content = fileContents;
-                if (fileName.InvariantEquals(oldName) == false)
-                {
-                    //it's changed which means we need to change the path
-                    stylesheet.Path = stylesheet.Path.TrimEnd(oldName.EnsureEndsWith(".css")) + fileName.EnsureEndsWith(".css");
-                }
-
-                Services.FileService.SaveStylesheet(stylesheet, Security.CurrentUser.Id);
-
-                return "true";
-            }
-            return "false";
-        }
-
         [WebMethod]
         public string SaveXslt(string fileName, string oldName, string fileContents, bool ignoreDebugging)
         {
-            if (AuthorizeRequest(DefaultApps.developer.ToString()))
+            if (AuthorizeRequest(Constants.Applications.Developer.ToString()))
             {
                 IOHelper.EnsurePathExists(SystemDirectories.Xslt);
 
@@ -71,7 +34,7 @@ namespace umbraco.presentation.webservices
                 // validate extension
                 IOHelper.ValidateFileExtension(IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName),
                                                new List<string>() { "xsl", "xslt" });
-                
+
                 StreamWriter SW;
                 string tempFileName = IOHelper.MapPath(SystemDirectories.Xslt + "/" + DateTime.Now.Ticks + "_temp.xslt");
                 SW = File.CreateText(tempFileName);
@@ -81,12 +44,16 @@ namespace umbraco.presentation.webservices
                 // Test the xslt
                 string errorMessage = "";
 
-                if (!ignoreDebugging)
+                if (ignoreDebugging == false)
                 {
                     try
                     {
+                        if (UmbracoContext.ContentCache.HasContent())
+                            XsltMacroEngine.TestXsltTransform(ProfilingLogger, fileContents);
+
+                        /*
                         // Check if there's any documents yet
-                        string xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "/root/node" : "/root/*";
+                        string xpath = "/root/*";
                         if (content.Instance.XmlContent.SelectNodes(xpath).Count > 0)
                         {
                             var macroXML = new XmlDocument();
@@ -123,11 +90,12 @@ namespace umbraco.presentation.webservices
                                 File.Delete(tempFileName);
                             }
                         }
+                        */
                         else
                         {
-                            //errorMessage = ui.Text("developer", "xsltErrorNoNodesPublished");
+                            //errorMessage = Services.TextService.Localize("developer/xsltErrorNoNodesPublished");
                             File.Delete(tempFileName);
-                            //base.speechBubble(speechBubbleIcon.info, ui.Text("errors", "xsltErrorHeader", base.getUser()), "Unable to validate xslt as no published content nodes exist.");
+                            //base.speechBubble(speechBubbleIcon.info, Services.TextService.Localize("errors/xsltErrorHeader"), "Unable to validate xslt as no published content nodes exist.");
                         }
                     }
                     catch (Exception errorXslt)
@@ -183,7 +151,7 @@ namespace umbraco.presentation.webservices
 
                 if (errorMessage == "" && fileName.ToLower().EndsWith(".xslt"))
                 {
-                    //Hardcoded security-check... only allow saving files in xslt directory... 
+                    //Hardcoded security-check... only allow saving files in xslt directory...
                     var savePath = IOHelper.MapPath(SystemDirectories.Xslt + "/" + fileName);
 
                     if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Xslt + "/")))
@@ -202,7 +170,7 @@ namespace umbraco.presentation.webservices
                         SW.Close();
                         errorMessage = "true";
 
-                       
+
                     }
                     else
                     {
@@ -216,236 +184,5 @@ namespace umbraco.presentation.webservices
             }
             return "false";
         }
-
-        [WebMethod]
-        public string SaveDLRScript(string fileName, string oldName, string fileContents, bool ignoreDebugging)
-        {
-            if (AuthorizeRequest(DefaultApps.developer.ToString()))
-            {
-                if (string.IsNullOrEmpty(fileName))
-                    throw new ArgumentNullException("fileName");
-
-                var allowedExtensions = new List<string>();
-                foreach (var lang in MacroEngineFactory.GetSupportedUILanguages())
-                {
-                    if (!allowedExtensions.Contains(lang.Extension))
-                        allowedExtensions.Add(lang.Extension);
-                }
-
-
-                // validate file
-                IOHelper.ValidateEditPath(IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + fileName),
-                                          SystemDirectories.MacroScripts);
-                // validate extension
-                IOHelper.ValidateFileExtension(IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + fileName),
-                                               allowedExtensions);
-
-
-                //As Files Can Be Stored In Sub Directories, So We Need To Get The Exeuction Directory Correct
-                var lastOccurance = fileName.LastIndexOf('/') + 1;
-                var directory = fileName.Substring(0, lastOccurance);
-                var fileNameWithExt = fileName.Substring(lastOccurance);
-                var tempFileName =
-                    IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + directory + DateTime.Now.Ticks + "_" +
-                                     fileNameWithExt);
-
-                using (var sw = new StreamWriter(tempFileName, false, Encoding.UTF8))
-                {
-                    sw.Write(fileContents);
-                    sw.Close();    
-                }
-
-                var errorMessage = "";
-                if (!ignoreDebugging)
-                {
-                    var root = Document.GetRootDocuments().FirstOrDefault();
-                    if (root != null)
-                    {
-                        var args = new Hashtable();
-                        var n = new Node(root.Id);
-                        args.Add("currentPage", n);
-
-                        try
-                        {
-                            var engine = MacroEngineFactory.GetByFilename(tempFileName);
-                            var tempErrorMessage = "";
-                            var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "/root/node" : "/root/*";
-                            if (
-                                !engine.Validate(fileContents, tempFileName, Node.GetNodeByXpath(xpath),
-                                                 out tempErrorMessage))
-                                errorMessage = tempErrorMessage;
-                        }
-                        catch (Exception err)
-                        {
-                            errorMessage = err.ToString();
-                        }
-                    }
-                }
-
-                if (errorMessage == "")
-                {
-                    var savePath = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + fileName);
-
-                    //deletes the file
-                    if (fileName != oldName)
-                    {
-                        var p = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + oldName);
-                        if (File.Exists(p))
-                            File.Delete(p);
-                    }
-
-                    using (var sw = new StreamWriter(savePath, false, Encoding.UTF8))
-                    {
-                        sw.Write(fileContents);
-                        sw.Close();
-                    }
-                    errorMessage = "true";
-
-                    
-                }
-
-                File.Delete(tempFileName);
-
-
-                return errorMessage.Replace("\n", "<br/>\n");
-            }
-
-            return "false";
-        }
-
-		//[WebMethod]
-		//public string SavePartialView(string filename, string oldName, string contents)
-		//{
-		//	if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
-		//	{
-		//		var folderPath = SystemDirectories.MvcViews + "/Partials/";
-
-		//		// validate file
-		//		IOHelper.ValidateEditPath(IOHelper.MapPath(folderPath + filename), folderPath);
-		//		// validate extension
-		//		IOHelper.ValidateFileExtension(IOHelper.MapPath(folderPath + filename), new[] {"cshtml"}.ToList());
-
-
-		//		var val = contents;
-		//		string returnValue;
-		//		var saveOldPath = oldName.StartsWith("~/") ? IOHelper.MapPath(oldName) : IOHelper.MapPath(folderPath + oldName);
-		//		var savePath = filename.StartsWith("~/") ? IOHelper.MapPath(filename) : IOHelper.MapPath(folderPath + filename);
-
-		//		//Directory check.. only allow files in script dir and below to be edited
-		//		if (savePath.StartsWith(IOHelper.MapPath(folderPath)))
-		//		{
-		//			//deletes the old file
-		//			if (savePath != saveOldPath)
-		//			{
-		//				if (File.Exists(saveOldPath))
-		//					File.Delete(saveOldPath);
-		//			}
-		//			using (var sw = File.CreateText(savePath))
-		//			{
-		//				sw.Write(val);
-		//			}
-		//			returnValue = "true";
-		//		}
-		//		else
-		//		{
-		//			returnValue = "illegalPath";
-		//		}
-
-		//		return returnValue;
-		//	}
-		//	return "false";
-		//}
-
-        [Obsolete("This method has been superceded by the REST service /Umbraco/RestServices/SaveFile/SaveScript which is powered by the SaveFileController.")]
-        [WebMethod]
-        public string SaveScript(string filename, string oldName, string contents)
-        {
-            if (AuthorizeRequest(DefaultApps.settings.ToString()))
-            {
-
-                // validate file
-                IOHelper.ValidateEditPath(IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename),
-                                          SystemDirectories.Scripts);
-                // validate extension
-                IOHelper.ValidateFileExtension(IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename),
-                                               UmbracoConfig.For.UmbracoSettings().Content.ScriptFileTypes.ToList());
-
-
-                var val = contents;
-                string returnValue;
-                try
-                {
-                    var saveOldPath = "";
-                    saveOldPath = oldName.StartsWith("~/") 
-                        ? IOHelper.MapPath(oldName) 
-                        : IOHelper.MapPath(SystemDirectories.Scripts + "/" + oldName);
-
-                    var savePath = "";
-                    savePath = filename.StartsWith("~/") 
-                        ? IOHelper.MapPath(filename) 
-                        : IOHelper.MapPath(SystemDirectories.Scripts + "/" + filename);
-                    
-                    //Directory check.. only allow files in script dir and below to be edited
-                    if (savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Scripts + "/")) || savePath.StartsWith(IOHelper.MapPath(SystemDirectories.Masterpages + "/")))
-                    {
-                        //deletes the old file
-                        if (savePath != saveOldPath)
-                        {
-                            if (File.Exists(saveOldPath))
-                                File.Delete(saveOldPath);
-                        }
-
-                        //ensure the folder exists before saving
-                        Directory.CreateDirectory(Path.GetDirectoryName(savePath));
-
-                        using (var sw = File.CreateText(savePath))
-                        {
-                            sw.Write(val);
-                            sw.Close();
-                        }
-                       
-                        returnValue = "true";
-                    }
-                    else
-                    {
-                        returnValue = "illegalPath";
-                    }
-                }
-                catch
-                {
-                    returnValue = "false";
-                }
-
-
-                return returnValue;
-            }
-            return "false";
-        }
-        
-		[Obsolete("This method has been superceded by the REST service /Umbraco/RestServices/SaveFile/SaveTemplate which is powered by the SaveFileController.")]
-        [WebMethod]
-        public string SaveTemplate(string templateName, string templateAlias, string templateContents, int templateID, int masterTemplateID)
-        {
-            if (AuthorizeRequest(DefaultApps.settings.ToString()))
-            {
-                var _template = new Template(templateID);
-                string retVal = "false";
-
-                if (_template != null)
-                {
-                    _template.Text = templateName;
-                    _template.Alias = templateAlias;
-                    _template.MasterTemplate = masterTemplateID;
-                    _template.Design = templateContents;
-
-                    _template.Save();
-
-                    retVal = "true";                    
-                }
-                return retVal;
-            }
-            return "false";
-        }
-
     }
 }

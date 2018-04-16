@@ -1,28 +1,30 @@
-﻿using System;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Collections;
 using System.Globalization;
 using System.Web;
-using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Web.UI;
-using umbraco.BasePages;
+using Umbraco.Web;
+using Umbraco.Web._Legacy.UI;
+
 namespace umbraco.cms.presentation.create.controls
 {
     /// <summary>
-    ///		Summary description for language.
+    ///        Summary description for language.
     /// </summary>
-    public partial class language : UserControl
+    public partial class language : global::Umbraco.Web.UI.Controls.UmbracoUserControl
     {
         protected void Page_Load(object sender, EventArgs e)
         {
             // get all existing languages
 
-            pp1.Text = ui.Text("choose") + " " + ui.Text("language");
-            sbmt.Text = ui.Text("create");
+            pp1.Text = Services.TextService.Localize("choose") + " " + Services.TextService.Localize("language");
+            sbmt.Text = Services.TextService.Localize("create");
 
             var sortedCultures = new SortedList();
             Cultures.Items.Clear();
-            Cultures.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
+            Cultures.Items.Add(new ListItem(Services.TextService.Localize("choose") + "...", ""));
             foreach (var cultureInfo in CultureInfo.GetCultures(CultureTypes.AllCultures))
                 sortedCultures.Add(cultureInfo.DisplayName + "|||" + Guid.NewGuid(), cultureInfo.Name);
 
@@ -39,12 +41,12 @@ namespace umbraco.cms.presentation.create.controls
         {
             LegacyDialogHandler.Create(
                 new HttpContextWrapper(Context),
-                BasePage.Current.getUser(),
-                helper.Request("nodeType"),
+                Security.CurrentUser,
+                Request.GetItemAsString("nodeType"),
                 -1,
                 Cultures.SelectedValue);
 
-            BasePage.Current.ClientTools
+            ClientTools
                 .ReloadActionNode(false, true)
                 .CloseModalWindow();
         }
@@ -56,7 +58,7 @@ namespace umbraco.cms.presentation.create.controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp1;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp1;
 
         /// <summary>
         /// Cultures control.

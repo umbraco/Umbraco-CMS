@@ -1,23 +1,19 @@
-using System;
-using System.Xml;
-using System.Web.Caching;
+﻿using System;
 using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
-
-using System.Data;
 using System.Web.UI;
 using System.Collections;
-using System.Collections.Generic;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
-using umbraco.DataLayer;
-using umbraco.BusinessLogic;
 using Umbraco.Core.IO;
 using System.Web;
+using Umbraco.Core.Models;
+using Umbraco.Core.Xml;
+using Umbraco.Web.Composing;
+using Umbraco.Web.Macros;
 
 namespace umbraco
 {
@@ -56,7 +52,7 @@ namespace umbraco
             get { return _masterTemplate; }
         }
 
-        //added fallback to the default template to avoid nasty .net errors. 
+        //added fallback to the default template to avoid nasty .net errors.
         //This is referenced in /default.aspx.cs during page rendering.
         public string MasterPageFile
         {
@@ -92,7 +88,7 @@ namespace umbraco
                 using (var fs = new FileStream(originalPath, FileMode.Open, FileAccess.ReadWrite))
                 using (var f = new StreamReader(fs))
                 {
-                    newFile = f.ReadToEnd();                    
+                    newFile = f.ReadToEnd();
                 }
 
                 newFile = newFile.Replace("MasterPageFile=\"~/masterpages/", "MasterPageFile=\"");
@@ -225,7 +221,7 @@ namespace umbraco
             Control pageContent = new Control();
 
             bool stop = false;
-            bool debugMode = umbraco.presentation.UmbracoContext.Current.Request.IsDebug;
+            bool debugMode = UmbracoContext.Current.HttpContext.IsDebuggingEnabled;
 
             while (!stop)
             {
@@ -239,7 +235,7 @@ namespace umbraco
                     tempOutput.Remove(0, tagIndex);
 
                     String tag = tempOutput.ToString().Substring(0, tempOutput.ToString().IndexOf(">") + 1);
-                    Hashtable attributes = helper.ReturnAttributes(tag);
+                    Hashtable attributes = new Hashtable(XmlHelper.GetAttributesFromElement(tag));
 
                     // Check whether it's a single tag (<?.../>) or a tag with children (<?..>...</?...>)
                     if (tag.Substring(tag.Length - 2, 1) != "/" && tag.IndexOf(" ") > -1)
@@ -278,19 +274,16 @@ namespace umbraco
                         }
                         else
                         {
-                            macro tempMacro;
-                            String macroID = helper.FindAttribute(attributes, "macroid");
-                            if (macroID != String.Empty)
-                                tempMacro = getMacro(macroID);
-                            else
-                                tempMacro = macro.GetMacro(helper.FindAttribute(attributes, "macroalias"));
-
+                            var macroId = helper.FindAttribute(attributes, "macroid");
+                            if (macroId == string.Empty) macroId = helper.FindAttribute(attributes, "macroalias");
+                            var tempMacro = GetMacro(macroId);
                             if (tempMacro != null)
                             {
 
                                 try
                                 {
-                                    Control c = tempMacro.renderMacro(attributes, umbPage.Elements, umbPage.PageID);
+                                    var renderer = new MacroRenderer(Current.ProfilingLogger);
+                                    var c = renderer.Render(tempMacro, umbPage.Elements, umbPage.PageID, attributes).GetAsControl();
                                     if (c != null)
                                         pageContent.Controls.Add(c);
                                     else
@@ -326,32 +319,34 @@ namespace umbraco
                             {
                                 try
                                 {
-                                    if (helper.FindAttribute(attributes, "nodeId") != "" && int.Parse(helper.FindAttribute(attributes, "nodeId")) != 0)
-                                    {
-                                        cms.businesslogic.Content c = new umbraco.cms.businesslogic.Content(int.Parse(helper.FindAttribute(attributes, "nodeId")));
-                                        item umbItem = new item(c.getProperty(helper.FindAttribute(attributes, "field")).Value.ToString(), attributes);
-                                        tempElementContent = umbItem.FieldContent;
+                                    //TODO: Make this work again - but let's make sure this whole class is overhauled and useful
 
-                                        // Check if the content is published
-                                        if (c.nodeObjectType == cms.businesslogic.web.Document._objectType)
-                                        {
-                                            try
-                                            {
-                                                cms.businesslogic.web.Document d = (cms.businesslogic.web.Document)c;
-                                                if (!d.Published)
-                                                    tempElementContent = "";
-                                            }
-                                            catch { }
-                                        }
+                                    //if (helper.FindAttribute(attributes, "nodeId") != "" && int.Parse(helper.FindAttribute(attributes, "nodeId")) != 0)
+                                    //{
+                                    //    cms.businesslogic.Content c = new umbraco.cms.businesslogic.Content(int.Parse(helper.FindAttribute(attributes, "nodeId")));
+                                    //    item umbItem = new item(c.getProperty(helper.FindAttribute(attributes, "field")).Value.ToString(), attributes);
+                                    //    tempElementContent = umbItem.FieldContent;
 
-                                    }
-                                    else
-                                    {
-                                        // NH adds Live Editing test stuff
-                                        item umbItem = new item(umbPage.Elements, attributes);
-                                        //								item umbItem = new item(umbPage.PageElements[helper.FindAttribute(attributes, "field")].ToString(), attributes);
-                                        tempElementContent = umbItem.FieldContent;
-                                    }
+                                    //    // Check if the content is published
+                                    //    if (c.nodeObjectType == cms.businesslogic.web.Document._objectType)
+                                    //    {
+                                    //        try
+                                    //        {
+                                    //            cms.businesslogic.web.Document d = (cms.businesslogic.web.Document)c;
+                                    //            if (!d.Published)
+                                    //                tempElementContent = "";
+                                    //        }
+                                    //        catch { }
+                                    //    }
+
+                                    //}
+                                    //else
+                                    //{
+                                    //    // NH adds Live Editing test stuff
+                                    //    item umbItem = new item(umbPage.Elements, attributes);
+                                    //    //                                item umbItem = new item(umbPage.PageElements[helper.FindAttribute(attributes, "field")].ToString(), attributes);
+                                    //    tempElementContent = umbItem.FieldContent;
+                                    //}
 
                                     if (debugMode)
                                         tempElementContent =
@@ -379,15 +374,10 @@ namespace umbraco
 
         }
 
-		[Obsolete("Use Umbraco.Web.Templates.TemplateUtilities.ParseInternalLinks instead")]
-        public static string ParseInternalLinks(string pageContents)
-		{
-			return Umbraco.Web.Templates.TemplateUtilities.ParseInternalLinks(pageContents);
-		}
 
         /// <summary>
         /// Parses the content of the templateOutput stringbuilder, and matches any tags given in the
-        /// XML-file /umbraco/config/umbracoTemplateTags.xml. 
+        /// XML-file /umbraco/config/umbracoTemplateTags.xml.
         /// Replaces the found tags in the StringBuilder object, with "real content"
         /// </summary>
         /// <param name="umbPage"></param>
@@ -402,17 +392,14 @@ namespace umbraco
 
             foreach (Match tag in tags)
             {
-                Hashtable attributes = helper.ReturnAttributes(tag.Value.ToString());
+                Hashtable attributes = new Hashtable(XmlHelper.GetAttributesFromElement(tag.Value));
 
 
                 if (tag.ToString().ToLower().IndexOf("umbraco_macro") > -1)
                 {
-                    String macroID = helper.FindAttribute(attributes, "macroid");
-                    if (macroID != "")
-                    {
-                        macro tempMacro = getMacro(macroID);
-                        _templateOutput.Replace(tag.Value.ToString(), tempMacro.MacroContent.ToString());
-                    }
+                    var macroId = helper.FindAttribute(attributes, "macroid");
+                    if (macroId != "")
+                        _templateOutput.Replace(tag.Value, string.Empty);
                 }
                 else
                 {
@@ -420,21 +407,17 @@ namespace umbraco
                     {
                         try
                         {
-                            String tempElementContent = umbPage.Elements[helper.FindAttribute(attributes, "field")].ToString();
-                            MatchCollection tempMacros = Regex.Matches(tempElementContent, "<\\?UMBRACO_MACRO(?<attributes>[^>]*)><img[^>]*><\\/\\?UMBRACO_MACRO>", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+                            var tempElementContent = umbPage.Elements[helper.FindAttribute(attributes, "field")].ToString();
+                            var tempMacros = Regex.Matches(tempElementContent, "<\\?UMBRACO_MACRO(?<attributes>[^>]*)><img[^>]*><\\/\\?UMBRACO_MACRO>", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
                             foreach (Match tempMacro in tempMacros)
                             {
-                                Hashtable tempAttributes = helper.ReturnAttributes(tempMacro.Groups["attributes"].Value.ToString());
-                                String macroID = helper.FindAttribute(tempAttributes, "macroid");
-                                if (Convert.ToInt32(macroID) > 0)
-                                {
-                                    macro tempContentMacro = getMacro(macroID);
-                                    _templateOutput.Replace(tag.Value.ToString(), tempContentMacro.MacroContent.ToString());
-                                }
-
+                                var tempAttributes = new Hashtable(XmlHelper.GetAttributesFromElement(tempMacro.Groups["attributes"].Value));
+                                var macroId = helper.FindAttribute(tempAttributes, "macroid");
+                                if (Convert.ToInt32(macroId) > 0)
+                                    _templateOutput.Replace(tag.Value, string.Empty);
                             }
 
-                            _templateOutput.Replace(tag.Value.ToString(), tempElementContent);
+                            _templateOutput.Replace(tag.Value, tempElementContent);
                         }
                         catch (Exception e)
                         {
@@ -453,30 +436,16 @@ namespace umbraco
 
         #region private methods
 
-        private macro getMacro(String macroID)
+        private static MacroModel GetMacro(string macroId)
         {
-            System.Web.HttpContext.Current.Trace.Write("umbracoTemplate", "Starting macro (" + macroID.ToString() + ")");
-            return macro.GetMacro(Convert.ToInt16(macroID));
+            HttpContext.Current.Trace.Write("umbracoTemplate", "Starting macro (" + macroId + ")");
+            // it's all obsolete anyways...
+            var macro = Current.Services.MacroService.GetByAlias(macroId);
+            return macro == null ? null : new MacroModel(macro);
         }
-
-        private String FindAttribute(Hashtable attributes, String key)
-        {
-            if (attributes[key] != null)
-                return attributes[key].ToString();
-            else
-                return "";
-        }
-
 
         #endregion
-        /// <summary>
-        /// Unused, please do not use
-        /// </summary>
-        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
-        protected static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
+
         #region constructors
 
         public static string GetMasterPageName(int templateID)
@@ -487,9 +456,9 @@ namespace umbraco
         public static string GetMasterPageName(int templateID, string templateFolder)
         {
             var t = new template(templateID);
-            
-            return !string.IsNullOrEmpty(templateFolder) 
-                ? t.AlternateMasterPageFile(templateFolder) 
+
+            return !string.IsNullOrEmpty(templateFolder)
+                ? t.AlternateMasterPageFile(templateFolder)
                 : t.MasterPageFile;
         }
 
@@ -497,29 +466,32 @@ namespace umbraco
         {
             var tId = templateID;
 
-            var t = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<template>(
+            var t = Current.ApplicationCache.RuntimeCache.GetCacheItem<template>(
                string.Format("{0}{1}", CacheKeys.TemplateFrontEndCacheKey, tId), () =>
                {
-                   using (var sqlHelper = Application.SqlHelper)
-                   using (var templateData = sqlHelper.ExecuteReader(@"select nodeId, alias, node.parentID as master, text, design
+                   dynamic templateData;
+                   using (var scope = Current.ScopeProvider.CreateScope())
+                   {
+                       templateData = scope.Database.FirstOrDefault<dynamic>(
+                           @"select nodeId, alias, node.parentID as master, text, design
 from cmsTemplate
 inner join umbracoNode node on (node.id = cmsTemplate.nodeId)
 where nodeId = @templateID",
-                           sqlHelper.CreateParameter("@templateID", templateID)))
-                    {
-                       if (templateData.Read())
-                       {
-                           // Get template master and replace content where the template
-                           if (!templateData.IsNull("master"))
-                               _masterTemplate = templateData.GetInt("master");
-                           if (!templateData.IsNull("alias"))
-                               _templateAlias = templateData.GetString("alias");
-                           if (!templateData.IsNull("text"))
-                               _templateName = templateData.GetString("text");
-                           if (!templateData.IsNull("design"))
-                               _templateDesign = templateData.GetString("design");
-                       }
-                    }
+                           new { templateID = templateID });
+                   }
+                   if (templateData != null)
+                   {
+                       // Get template master and replace content where the template
+                       if (templateData.master != null)
+                           _masterTemplate = templateData.master;
+                       if (templateData.alias != null)
+                           _templateAlias = templateData.alias;
+                       if (templateData.text != null)
+                           _templateName = templateData.text;
+                       if (templateData.design != null)
+                           _templateDesign = templateData.design;
+                   }
+
                    return this;
                });
 
@@ -537,7 +509,7 @@ where nodeId = @templateID",
             {
                 checkForMaster(tId);
             }
-                
+
         }
 
         private void checkForMaster(int templateID) {
@@ -555,8 +527,22 @@ where nodeId = @templateID",
             } else {
                 if (_masterTemplate == templateID)
                 {
-                    cms.businesslogic.template.Template t = cms.businesslogic.template.Template.GetTemplate(templateID);
-                    string templateName = (t != null) ? t.Text : string.Format("'Template with id: '{0}", templateID);
+                    var t = Current.Services.FileService.GetTemplate(templateID);
+                    var text = t.Name;
+                    if (text.StartsWith("#"))
+                    {
+                        var lang = Current.Services.LocalizationService.GetLanguageByIsoCode(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
+                        if (lang != null && Current.Services.LocalizationService.DictionaryItemExists(text.Substring(1)))
+                        {
+                            var di = Current.Services.LocalizationService.GetDictionaryItemByKey(text.Substring(1));
+                            text = di.GetTranslatedValue(lang.Id);
+                        }
+                        else
+                        {
+                            text = "[" + text + "]";
+                        }
+                    }
+                    string templateName = (t != null) ? text : string.Format("'Template with id: '{0}", templateID);
                     System.Web.HttpContext.Current.Trace.Warn("template",
                         String.Format("Master template is the same as the current template. It would cause an endless loop! Make sure that the current template '{0}' has another Master Template than itself. You can change this in the template editor under 'Settings'", templateName));
                     _templateOutput.Append(_templateDesign);
@@ -567,7 +553,7 @@ where nodeId = @templateID",
         [Obsolete("Use ApplicationContext.Current.ApplicationCache.ClearCacheForTemplate instead")]
         public static void ClearCachedTemplate(int templateID)
         {
-            DistributedCache.Instance.RefreshTemplateCache(templateID);
+            Current.DistributedCache.RefreshTemplateCache(templateID);
         }
 
         public template(String templateContent)
@@ -578,7 +564,4 @@ where nodeId = @templateID",
 
         #endregion
     }
-
-    
-
 }

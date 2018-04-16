@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -17,14 +17,16 @@ namespace Umbraco.Core.Security
     {
         private readonly ILogger _logger;
         private readonly IOwinRequest _request;
+        private readonly IGlobalSettings _globalSettings;
 
-        public BackOfficeSignInManager(UserManager<BackOfficeIdentityUser, int> userManager, IAuthenticationManager authenticationManager, ILogger logger, IOwinRequest request)
+        public BackOfficeSignInManager(UserManager<BackOfficeIdentityUser, int> userManager, IAuthenticationManager authenticationManager, ILogger logger, IGlobalSettings globalSettings, IOwinRequest request)
             : base(userManager, authenticationManager)
         {
             if (logger == null) throw new ArgumentNullException("logger");
             if (request == null) throw new ArgumentNullException("request");
             _logger = logger;
             _request = request;
+            _globalSettings = globalSettings;
             AuthenticationType = Constants.Security.BackOfficeAuthenticationType;
         }
 
@@ -33,12 +35,13 @@ namespace Umbraco.Core.Security
             return user.GenerateUserIdentityAsync((BackOfficeUserManager<BackOfficeIdentityUser>)UserManager);
         }
 
-        public static BackOfficeSignInManager Create(IdentityFactoryOptions<BackOfficeSignInManager> options, IOwinContext context, ILogger logger)
+        public static BackOfficeSignInManager Create(IdentityFactoryOptions<BackOfficeSignInManager> options, IOwinContext context, IGlobalSettings globalSettings, ILogger logger)
         {
             return new BackOfficeSignInManager(
                 context.GetBackOfficeUserManager(),
                 context.Authentication,
                 logger,
+                globalSettings,
                 context.Request);
         }
 
@@ -55,31 +58,19 @@ namespace Umbraco.Core.Security
             {
                 case SignInStatus.Success:
                     _logger.WriteCore(TraceEventType.Information, 0,
-                        string.Format(
-                            "User: {0} logged in from IP address {1}",
-                            userName,
-                            _request.RemoteIpAddress), null, null);
+                        $"User: {userName} logged in from IP address {_request.RemoteIpAddress}", null, null);
                     break;
                 case SignInStatus.LockedOut:
                     _logger.WriteCore(TraceEventType.Information, 0,
-                        string.Format(
-                            "Login attempt failed for username {0} from IP address {1}, the user is locked",
-                            userName,
-                            _request.RemoteIpAddress), null, null);
+                        $"Login attempt failed for username {userName} from IP address {_request.RemoteIpAddress}, the user is locked", null, null);
                     break;
                 case SignInStatus.RequiresVerification:
                     _logger.WriteCore(TraceEventType.Information, 0,
-                        string.Format(
-                            "Login attempt requires verification for username {0} from IP address {1}",
-                            userName,
-                            _request.RemoteIpAddress), null, null);
+                        $"Login attempt requires verification for username {userName} from IP address {_request.RemoteIpAddress}", null, null);
                     break;
                 case SignInStatus.Failure:
                     _logger.WriteCore(TraceEventType.Information, 0,
-                        string.Format(
-                            "Login attempt failed for username {0} from IP address {1}",
-                            userName,
-                            _request.RemoteIpAddress), null, null);
+                        $"Login attempt failed for username {userName} from IP address {_request.RemoteIpAddress}", null, null);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -104,12 +95,12 @@ namespace Umbraco.Core.Security
             }
 
             var user = await UserManager.FindByNameAsync(userName);
-            
+
             //if the user is null, create an empty one which can be used for auto-linking
-            if (user == null)            
-                user = BackOfficeIdentityUser.CreateNew(userName, null, GlobalSettings.DefaultUILanguage);            
-            
-            //check the password for the user, this will allow a developer to auto-link 
+            if (user == null)
+                user = BackOfficeIdentityUser.CreateNew(userName, null, _globalSettings.DefaultUILanguage);
+
+            //check the password for the user, this will allow a developer to auto-link
             //an account if they have specified an IBackOfficeUserPasswordChecker
             if (await UserManager.CheckPasswordAsync(user, password))
             {
@@ -132,7 +123,7 @@ namespace Umbraco.Core.Security
                 if (await UserManager.IsLockedOutAsync(user.Id))
                 {
                     //at this point we've just locked the user out after too many failed login attempts
-                    
+
                     if (requestContext != null)
                     {
                         var backofficeUserManager = requestContext.GetBackOfficeUserManager();
@@ -143,7 +134,7 @@ namespace Umbraco.Core.Security
                     return SignInStatus.LockedOut;
                 }
             }
-            
+
             if (requestContext != null)
             {
                 var backofficeUserManager = requestContext.GetBackOfficeUserManager();
@@ -152,7 +143,7 @@ namespace Umbraco.Core.Security
             }
 
             return SignInStatus.Failure;
-        }        
+        }
 
         /// <summary>
         /// Borrowed from Micorosoft's underlying sign in manager which is not flexible enough to tell it to use a different cookie type
@@ -202,7 +193,7 @@ namespace Umbraco.Core.Security
                     IsPersistent = isPersistent,
                     AllowRefresh = true,
                     IssuedUtc = nowUtc,
-                    ExpiresUtc = nowUtc.AddMinutes(GlobalSettings.TimeOutInMinutes)
+                    ExpiresUtc = nowUtc.AddMinutes(_globalSettings.TimeOutInMinutes)
                 }, userIdentity, rememberBrowserIdentity);
             }
             else
@@ -212,7 +203,7 @@ namespace Umbraco.Core.Security
                     IsPersistent = isPersistent,
                     AllowRefresh = true,
                     IssuedUtc = nowUtc,
-                    ExpiresUtc = nowUtc.AddMinutes(GlobalSettings.TimeOutInMinutes)
+                    ExpiresUtc = nowUtc.AddMinutes(_globalSettings.TimeOutInMinutes)
                 }, userIdentity);
             }
 

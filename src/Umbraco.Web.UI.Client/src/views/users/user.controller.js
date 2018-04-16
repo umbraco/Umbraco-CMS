@@ -119,7 +119,7 @@
 
         function save() {
 
-            if (formHelper.submitForm({ scope: $scope, statusMessage: vm.labels.saving })) {
+            if (formHelper.submitForm({ scope: $scope })) {
 
                 //anytime a user is changing another user's password, we are in effect resetting it so we need to set that flag here
                 if (vm.user.changePassword) {
@@ -230,7 +230,9 @@
         function openContentPicker() {
             vm.contentPicker = {
                 title: vm.labels.selectContentStartNode,
-                view: "contentpicker",
+                view: "treepicker",
+                section: "content",
+                treeAlias: "content",
                 multiPicker: true,
                 selection: vm.user.startContentIds,
                 hideHeader: false,

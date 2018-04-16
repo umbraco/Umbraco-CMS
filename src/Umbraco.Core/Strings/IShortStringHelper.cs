@@ -10,12 +10,6 @@ namespace Umbraco.Core.Strings
     public interface IShortStringHelper
     {
         /// <summary>
-        /// Freezes the helper so it can prevents its configuration from being modified.
-        /// </summary>
-        /// <remarks>Will be called by <c>ShortStringHelperResolver</c> when resolution freezes.</remarks>
-        void Freeze();
-
-        /// <summary>
         /// Gets the JavaScript code defining client-side short string services.
         /// </summary>
         string GetShortStringServicesJavaScript(string controllerPath);
@@ -104,7 +98,7 @@ namespace Umbraco.Core.Strings
         /// Cleans a string.
         /// </summary>
         /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default, 
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <returns>The clean string.</returns>
         /// <remarks>The string is cleaned in the context of the IShortStringHelper default culture.</remarks>
@@ -114,7 +108,7 @@ namespace Umbraco.Core.Strings
         /// Cleans a string, using a specified separator.
         /// </summary>
         /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default, 
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="separator">The separator.</param>
         /// <returns>The clean string.</returns>
@@ -125,7 +119,7 @@ namespace Umbraco.Core.Strings
         /// Cleans a string in the context of a specified culture.
         /// </summary>
         /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default, 
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
@@ -135,7 +129,7 @@ namespace Umbraco.Core.Strings
         /// Cleans a string in the context of a specified culture, using a specified separator.
         /// </summary>
         /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default, 
+        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default,
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="separator">The separator.</param>
         /// <param name="culture">The culture.</param>

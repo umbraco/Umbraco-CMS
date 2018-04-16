@@ -1,29 +1,15 @@
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Web.Http;
-using AutoMapper;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Mvc;
-using umbraco;
 using Umbraco.Web.WebApi;
 using System;
 using System.Net.Http.Headers;
 using System.Web;
-using System.IO;
-using Umbraco.Core.Models;
-using System.Text.RegularExpressions;
-using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
-    
     public class CanvasDesignerController : UmbracoApiController
     {
-
         [HttpGet]
         public HttpResponseMessage GetGoogleFont()
         {
@@ -51,7 +37,7 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage Load()
         {
 
-            // Get style less url 
+            // Get style less url
             var pageId = int.Parse(HttpContext.Current.Request["pageId"]);
 
             // Get all parameters
@@ -59,7 +45,7 @@ namespace Umbraco.Web.Editors
 
             // Prepare string parameter result
             string[] paramLines = paramBlock.Trim().Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-            IList<string> parameters = new List<string>();          
+            IList<string> parameters = new List<string>();
             foreach (var line in paramLines)
             {
                 if (!line.Contains("@import"))

@@ -1,7 +1,7 @@
 <%@ Page Language="c#" CodeBehind="TreeInit.aspx.cs" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Umbraco.TreeInit" %>
 <%@ Register Src="controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web.UI.JavaScript" Assembly="Umbraco.Web" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 

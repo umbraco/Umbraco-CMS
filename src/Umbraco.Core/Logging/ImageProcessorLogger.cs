@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using ImageProcessor.Common.Exceptions;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Logging
-{   
+{
 
     /// <summary>
     /// A logger for explicitly logging ImageProcessor exceptions.
     /// <remarks>
     /// Creating this logger is enough for ImageProcessor to find and replace its in-built debug logger
-    /// without any additional configuration required. This class currently has to be public in order 
+    /// without any additional configuration required. This class currently has to be public in order
     /// to do so.
     /// </remarks>
     /// </summary>
@@ -25,8 +26,8 @@ namespace Umbraco.Core.Logging
         public void Log<T>(string text, [CallerMemberName] string callerName = null, [CallerLineNumber] int lineNumber = 0)
         {
             // Using LogHelper since the ImageProcessor logger expects a parameterless constructor.
-            var message = string.Format("{0} {1} : {2}", callerName, lineNumber, text);
-            LogHelper.Error<T>(string.Empty, new ImageProcessingException(message));
+            var message = $"{callerName} {lineNumber} : {text}";
+            Current.Logger.Error<T>(string.Empty, new ImageProcessingException(message));
         }
 
         /// <summary>
@@ -39,8 +40,8 @@ namespace Umbraco.Core.Logging
         public void Log(Type type, string text, [CallerMemberName] string callerName = null, [CallerLineNumber] int lineNumber = 0)
         {
             // Using LogHelper since the ImageProcessor logger expects a parameterless constructor.
-            var message = string.Format("{0} {1} : {2}", callerName, lineNumber, text);
-            LogHelper.Error(type, string.Empty, new ImageProcessingException(message));
+            var message = $"{callerName} {lineNumber} : {text}";
+            Current.Logger.Error(type, string.Empty, new ImageProcessingException(message));
         }
     }
 }

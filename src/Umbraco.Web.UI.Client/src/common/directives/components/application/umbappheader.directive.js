@@ -64,14 +64,19 @@
             };
 
             scope.avatarClick = function () {
-                scope.userDialog = {
-                    view: "user",
-                    show: true,
-                    close: function (oldModel) {
-                        scope.userDialog.show = false;
-                        scope.userDialog = null;
-                    }
-                };
+                if(!scope.userDialog) {
+                    scope.userDialog = {
+                        view: "user",
+                        show: true,
+                        close: function (oldModel) {
+                            scope.userDialog.show = false;
+                            scope.userDialog = null;
+                        }
+                    };
+                } else {
+                    scope.userDialog.show = false;
+                    scope.userDialog = null;
+                }
             };
 
         }

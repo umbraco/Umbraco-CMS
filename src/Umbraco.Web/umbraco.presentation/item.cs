@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Web;
 using System.Xml;
@@ -6,14 +6,16 @@ using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Strings;
+using Umbraco.Web.Composing;
 
 namespace umbraco
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public class item
     {
@@ -73,7 +75,7 @@ namespace umbraco
                 //check for published content and get its value using that
                 if (publishedContent != null && (publishedContent.HasProperty(_fieldName) || recursive))
                 {
-                    var pval = publishedContent.GetPropertyValue(_fieldName, recursive);
+                    var pval = publishedContent.Value(_fieldName, recursive);
                     var rval = pval == null ? string.Empty : pval.ToString();
                     _fieldContent = rval.IsNullOrWhiteSpace() ? _fieldContent : rval;
                 }
@@ -93,7 +95,7 @@ namespace umbraco
                     {
                         if (publishedContent != null && (publishedContent.HasProperty(altFieldName) || recursive))
                         {
-                            var pval = publishedContent.GetPropertyValue(altFieldName, recursive);
+                            var pval = publishedContent.Value(altFieldName, recursive);
                             var rval = pval == null ? string.Empty : pval.ToString();
                             _fieldContent = rval.IsNullOrWhiteSpace() ? _fieldContent : rval;
                         }
@@ -119,11 +121,15 @@ namespace umbraco
         /// <returns></returns>
         private string GetRecursiveValueLegacy(IDictionary elements)
         {
-            using (DisposableTimer.DebugDuration<item>("Checking recusively"))
+            using (Current.ProfilingLogger.DebugDuration<item>("Checking recusively"))
             {
                 var content = "";
 
-                var umbracoXml = presentation.UmbracoContext.Current.GetXml();
+                var umbracoContext = UmbracoContext.Current;
+                var cache = umbracoContext.ContentCache as Umbraco.Web.PublishedCache.XmlPublishedCache.PublishedContentCache;
+                if (cache == null)
+                    throw new InvalidOperationException("Unsupported IPublishedContentCache, only the Xml one is supported.");
+                var umbracoXml = cache.GetXml(umbracoContext.InPreviewMode);
 
                 var splitpath = (String[])elements["splitpath"];
                 for (int i = 0; i < splitpath.Length - 1; i++)
@@ -133,7 +139,7 @@ namespace umbraco
                     if (element == null)
                         continue;
 
-                    var xpath = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "./data [@alias = '{0}']" : "./{0}";
+                    var xpath = "./{0}";
                     var currentNode = element.SelectSingleNode(string.Format(xpath, _fieldName));
 
                     //continue if all is null
@@ -151,7 +157,7 @@ namespace umbraco
 
         private void ParseItem(IDictionary attributes)
         {
-            using (DisposableTimer.DebugDuration<item>("Start parsing " + _fieldName))
+            using (Current.ProfilingLogger.DebugDuration<item>("Start parsing " + _fieldName))
             {
                 HttpContext.Current.Trace.Write("item", "Start parsing '" + _fieldName + "'");
                 if (helper.FindAttribute(attributes, "textIfEmpty") != "" && _fieldContent == "")

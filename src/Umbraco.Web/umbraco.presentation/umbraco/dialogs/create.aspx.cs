@@ -1,26 +1,20 @@
 ﻿using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+using System.Linq;
 using System.Globalization;
 using System.Linq;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
 using System.Xml;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Web;
 using umbraco.cms.businesslogic;
-using umbraco.cms.presentation;
-using umbraco.presentation;
-using umbraco.BusinessLogic.Actions;
-using umbraco.BasePages;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
+using Umbraco.Web.UI.Pages;
+using Umbraco.Web._Legacy.Actions;
+using Button = System.Web.UI.WebControls.Button;
+using UserControl = System.Web.UI.UserControl;
 
 namespace umbraco.dialogs
 {
@@ -40,7 +34,7 @@ namespace umbraco.dialogs
                 {
                     _app = Request.CleanForXss("app");
                     //validate the app
-                    if (BusinessLogic.Application.getAll().Any(x => x.alias.InvariantEquals(_app)) == false)
+                    if (Services.SectionService.GetSections().Any(x => x.Alias.InvariantEquals(_app)) == false)
                     {
                         throw new InvalidOperationException("A requested app: " + Request.GetItemAsString("app") + " was not found");
                     }
@@ -54,8 +48,8 @@ namespace umbraco.dialogs
             // Put user code to initialize the page here
             if (Request.GetItemAsString("nodeId") == "")
             {
-                var appType = ui.Text("sections", App).ToLower();
-                pane_chooseNode.Text = ui.Text("create", "chooseNode", appType, UmbracoUser) + "?";
+                var appType = Services.TextService.Localize("sections", App).ToLower();
+                pane_chooseNode.Text = Services.TextService.Localize("create/chooseNode", new[] { appType }) + "?";
 
                 DataBind();
             }
@@ -65,7 +59,8 @@ namespace umbraco.dialogs
                 //ensure they have access to create under this node!!
                 if (App.InvariantEquals(Constants.Applications.Media) || CheckCreatePermissions(nodeId))
                 {
-                    var c = new CMSNode(nodeId);
+                    //var c = new CMSNode(nodeId);
+                    var c = Services.EntityService.Get(nodeId);
                     path.Value = c.Path;
                     pane_chooseNode.Visible = false;
                     panel_buttons.Visible = false;
@@ -81,26 +76,25 @@ namespace umbraco.dialogs
                 }
                 else
                 {
-                    PageNameHolder.type = uicontrols.Feedback.feedbacktype.error;
-                    PageNameHolder.Text = ui.GetText("rights") + " " + ui.GetText("error");
+                    PageNameHolder.type = Umbraco.Web._Legacy.Controls.Feedback.feedbacktype.error;
+                    PageNameHolder.Text = Services.TextService.Localize("rights") + " " + Services.TextService.Localize("error");
                     JTree.DataBind();
                 }
             }
-
         }
 
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
 
-            ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices) + "/cmsnode.asmx"));
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices) + "/legacyAjaxCalls.asmx"));
         }
 
         private bool CheckCreatePermissions(int nodeId)
         {
-            return CurrentUser.GetPermissions(new CMSNode(nodeId).Path)
-                .Contains(ActionNew.Instance.Letter.ToString(CultureInfo.InvariantCulture));
+            var c = Services.EntityService.Get(nodeId);
+            var permission = Services.UserService.GetPermissions(Security.CurrentUser, c.Path);
+            return permission.AssignedPermissions.Contains(ActionNew.Instance.Letter.ToString(CultureInfo.InvariantCulture), StringComparer.Ordinal);
         }
 
 
@@ -120,7 +114,7 @@ namespace umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_chooseNode;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_chooseNode;
 
         /// <summary>
         /// JTree control.
@@ -147,7 +141,7 @@ namespace umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Feedback PageNameHolder;
+        protected global::Umbraco.Web._Legacy.Controls.Feedback PageNameHolder;
 
         /// <summary>
         /// pane_chooseName control.
@@ -156,7 +150,7 @@ namespace umbraco.dialogs
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_chooseName;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_chooseName;
 
         /// <summary>
         /// phCreate control.

@@ -6,29 +6,19 @@ using System.Linq;
 using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
-using Umbraco.Core.Packaging.Models;
+using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Services.Importing;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class PackagingServiceTests : BaseServiceTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class PackagingServiceTests : TestWithSomeContentBase
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
         [Test]
         public void PackagingService_Can_Export_Macro()
         {
@@ -86,7 +76,7 @@ namespace Umbraco.Tests.Services
         private static string GetTestPackagePath(string packageName)
         {
             const string testPackagesDirName = "Packaging\\Packages";
-            string path = Path.Combine(Core.Configuration.GlobalSettings.FullpathToRoot, testPackagesDirName, packageName);
+            string path = Path.Combine(Core.Configuration.GlobalSettings.FullPathToRoot, testPackagesDirName, packageName);
             return path;
         }
 

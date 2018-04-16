@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class AvailablePropertyEditorsResolver : ValueResolver<IDataTypeDefinition, IEnumerable<PropertyEditorBasic>>
+    internal class AvailablePropertyEditorsResolver
     {
         private readonly IContentSection _contentSection;
 
@@ -18,15 +17,10 @@ namespace Umbraco.Web.Models.Mapping
             _contentSection = contentSection;
         }
 
-        protected override IEnumerable<PropertyEditorBasic> ResolveCore(IDataTypeDefinition source)
+        public IEnumerable<PropertyEditorBasic> Resolve(IDataType source)
         {
-            return PropertyEditorResolver.Current.PropertyEditors
-                .Where(x =>
-                {                    
-                    if (_contentSection.ShowDeprecatedPropertyEditors)
-                        return true;
-                    return source.PropertyEditorAlias == x.Alias || x.IsDeprecated == false;
-                })
+            return Current.PropertyEditors
+                .Where(x => !x.IsDeprecated || _contentSection.ShowDeprecatedPropertyEditors || source.EditorAlias == x.Alias)
                 .OrderBy(x => x.Name)
                 .Select(Mapper.Map<PropertyEditorBasic>);
         }

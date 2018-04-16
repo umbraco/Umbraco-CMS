@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -6,6 +6,7 @@ using System.Web.Routing;
 using System.Web.SessionState;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Mvc
@@ -16,6 +17,7 @@ namespace Umbraco.Web.Mvc
         /// Creates a custom individual route for the specified controller plugin. Individual routes
         /// are required by controller plugins to map to a unique URL based on ID.
         /// </summary>
+        /// <param name="globalSettings"></param>
         /// <param name="controllerName"></param>
         /// <param name="controllerType"></param>
         /// <param name="routes">An existing route collection</param>
@@ -37,26 +39,28 @@ namespace Umbraco.Web.Mvc
         /// </param>
         /// <remarks>
         /// </remarks>
-        internal static Route RouteControllerPlugin(this AreaRegistration area, string controllerName, Type controllerType, RouteCollection routes,
-                                                    string controllerSuffixName, string defaultAction, object defaultId,
-                                                    string umbracoTokenValue = "backoffice",
-                                                    string routeTokens = "{action}/{id}",
-                                                    bool isMvc = true,
-                                                    string areaPathPrefix = "")
+        internal static Route RouteControllerPlugin(this AreaRegistration area,
+            IGlobalSettings globalSettings,
+            string controllerName, Type controllerType, RouteCollection routes,
+            string controllerSuffixName, string defaultAction, object defaultId,
+            string umbracoTokenValue = "backoffice",
+            string routeTokens = "{action}/{id}",
+            bool isMvc = true,
+            string areaPathPrefix = "")
         {
-            Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
-            Mandate.ParameterNotNull(controllerSuffixName, "controllerSuffixName");
-            
-            Mandate.ParameterNotNull(controllerType, "controllerType");
-            Mandate.ParameterNotNull(routes, "routes");
-            Mandate.ParameterNotNull(defaultId, "defaultId");
+            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (controllerSuffixName == null) throw new ArgumentNullException(nameof(controllerSuffixName));
 
-            var umbracoArea = GlobalSettings.UmbracoMvcArea;
+            if (controllerType == null) throw new ArgumentNullException(nameof(controllerType));
+            if (routes == null) throw new ArgumentNullException(nameof(routes));
+            if (defaultId == null) throw new ArgumentNullException(nameof(defaultId));
+
+            var umbracoArea = globalSettings.GetUmbracoMvcArea();
 
             //routes are explicitly named with controller names and IDs
-            var url = umbracoArea + "/" + 
-                (areaPathPrefix.IsNullOrWhiteSpace() ? "" : areaPathPrefix + "/") + 
-                area.AreaName + "/" + controllerName + "/" + routeTokens;
+            var url = umbracoArea + "/" +
+                      (areaPathPrefix.IsNullOrWhiteSpace() ? "" : areaPathPrefix + "/") +
+                      area.AreaName + "/" + controllerName + "/" + routeTokens;
 
             Route controllerPluginRoute;
             //var meta = PluginController.GetMetadata(controllerType);
@@ -87,12 +91,13 @@ namespace Umbraco.Web.Mvc
                     string.Format("umbraco-{0}-{1}-{2}", "api", area.AreaName, controllerName),
                     //url format
                     url,
-                    new { controller = controllerName, id = defaultId });
+                    new {controller = controllerName, id = defaultId});
                 //web api routes don't set the data tokens object
                 if (controllerPluginRoute.DataTokens == null)
                 {
                     controllerPluginRoute.DataTokens = new RouteValueDictionary();
                 }
+
                 //look in this namespace to create the controller
                 controllerPluginRoute.DataTokens.Add("Namespaces", new[] {controllerType.Namespace});
 
@@ -107,7 +112,7 @@ namespace Umbraco.Web.Mvc
             //Don't look anywhere else except this namespace!
             controllerPluginRoute.DataTokens.Add("UseNamespaceFallback", false);
 
-            //constraints: only match controllers ending with 'controllerSuffixName' and only match this controller's ID for this route            
+            //constraints: only match controllers ending with 'controllerSuffixName' and only match this controller's ID for this route
             if (controllerSuffixName.IsNullOrWhiteSpace() == false)
             {
                 controllerPluginRoute.Constraints = new RouteValueDictionary(

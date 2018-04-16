@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models
     /// Defines a File
     /// </summary>
     /// <remarks>Used for Scripts, Stylesheets and Templates</remarks>
-    public interface IFile : IAggregateRoot
+    public interface IFile : IEntity
     {
         /// <summary>
         /// Gets the Name of the File including extension

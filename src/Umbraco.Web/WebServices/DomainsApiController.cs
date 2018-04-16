@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Web.Http;
-using System.Web.Services.Description;
 using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Models;
-using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 //using umbraco.cms.businesslogic.language;
-using umbraco.BusinessLogic.Actions;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.WebServices
 {
@@ -28,7 +25,7 @@ namespace Umbraco.Web.WebServices
         // can't pass multiple complex args in json post request...
         public PostBackModel SaveLanguageAndDomains(PostBackModel model)
         {
-            var node = ApplicationContext.Current.Services.ContentService.GetById(model.NodeId);
+            var node = Services.ContentService.GetById(model.NodeId);
 
             if (node == null)
             {
@@ -38,7 +35,9 @@ namespace Umbraco.Web.WebServices
                 throw new HttpResponseException(response);
             }
 
-            if (UmbracoUser.GetPermissions(node.Path).Contains(ActionAssignDomain.Instance.Letter) == false)
+            var permission = Services.UserService.GetPermissions(Security.CurrentUser, node.Path);
+
+            if (permission.AssignedPermissions.Contains(ActionAssignDomain.Instance.Letter.ToString(), StringComparer.Ordinal) == false)
             {
                 var response = Request.CreateResponse(HttpStatusCode.BadRequest);
                 response.Content = new StringContent("You do not have permission to assign domains on that node.");
@@ -75,7 +74,7 @@ namespace Umbraco.Web.WebServices
                 {
                     var response = Request.CreateResponse(HttpStatusCode.BadRequest);
                     response.Content = new StringContent("Saving domain failed");
-                    response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
+                    response.ReasonPhrase = saveAttempt.Result.Result.ToString();
                     throw new HttpResponseException(response);
                 }
             }
@@ -132,7 +131,7 @@ namespace Umbraco.Web.WebServices
                             xnames.Add(xcontent.Name);
                             if (xcontent.ParentId < -1)
                                 xnames.Add("Recycle Bin");
-                            xcontent = xcontent.Parent();
+                            xcontent = xcontent.Parent(Services.ContentService);
                         }
                         xnames.Reverse();
                         domainModel.Other = "/" + string.Join("/", xnames);
@@ -151,7 +150,7 @@ namespace Umbraco.Web.WebServices
                     {
                         var response = Request.CreateResponse(HttpStatusCode.BadRequest);
                         response.Content = new StringContent("Saving new domain failed");
-                        response.ReasonPhrase = saveAttempt.Result.StatusType.ToString();
+                        response.ReasonPhrase = saveAttempt.Result.Result.ToString();
                         throw new HttpResponseException(response);
                     }
                 }

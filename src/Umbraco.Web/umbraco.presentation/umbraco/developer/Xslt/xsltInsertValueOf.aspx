@@ -1,6 +1,6 @@
 <%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoDialog.Master" Codebehind="xsltInsertValueOf.aspx.cs" AutoEventWireup="True"  Inherits="umbraco.developer.xsltInsertValueOf" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 <script type="text/javascript">
@@ -56,6 +56,6 @@ body{margin: 0px; padding: 0px;}
 </cc1:Pane>
 
 <p>
-          <input type="button" value="Insert value" onclick="doSubmit();" /> <em><%= umbraco.ui.Text("or") %></em> <a href="#" onclick="UmbClientMgr.closeModalWindow(); return false;"><%= umbraco.ui.Text("cancel") %></a>
+          <input type="button" value="Insert value" onclick="doSubmit();" /> <em><%= Services.TextService.Localize("or") %></em> <a href="#" onclick="UmbClientMgr.closeModalWindow(); return false;"><%= Services.TextService.Localize("cancel") %></a>
 </p>
 </asp:Content>

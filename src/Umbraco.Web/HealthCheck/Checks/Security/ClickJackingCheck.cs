@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Core.Configuration;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 
@@ -20,15 +21,19 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
     public class ClickJackingCheck : HealthCheck
     {
         private readonly ILocalizedTextService _textService;
+        private readonly IRuntimeState _runtime;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         private const string SetFrameOptionsHeaderInConfigActiobn = "setFrameOptionsHeaderInConfig";
 
         private const string XFrameOptionsHeader = "X-Frame-Options";
         private const string XFrameOptionsValue = "sameorigin"; // Note can't use "deny" as that would prevent Umbraco itself using IFRAMEs
 
-        public ClickJackingCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
+        public ClickJackingCheck(ILocalizedTextService textService, IRuntimeState runtime, IHttpContextAccessor httpContextAccessor)
         {
-            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+            _textService = textService;
+            _runtime = runtime;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>
@@ -63,7 +68,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             var success = false;
 
             // Access the site home page and check for the click-jack protection header or meta tag
-            var url = HealthCheckContext.SiteUrl;
+            var url = _runtime.ApplicationUrl;
             var request = WebRequest.Create(url);
             request.Method = "GET";
             try
@@ -85,7 +90,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             }
             catch (Exception ex)
             {
-                message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { url, ex.Message });
+                message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { url.ToString(), ex.Message });
             }
 
             var actions = new List<HealthCheckAction>();

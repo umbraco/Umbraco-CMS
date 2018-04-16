@@ -1,21 +1,7 @@
-using System;
-using System.Data;
-using System.Configuration;
-using System.Threading;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using System.Collections.Generic;
-using Umbraco.Core;
-using Umbraco.Core.Logging;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Web;
-using umbraco.interfaces;
-using umbraco.BusinessLogic.Utils;
-using umbraco.BusinessLogic;
-using umbraco.BasePages;
+using Umbraco.Web.Composing;
 
 namespace umbraco.cms.presentation.Trees
 {
@@ -33,10 +19,10 @@ namespace umbraco.cms.presentation.Trees
 
         public static TreeDefinitionCollection Instance
         {
-            get 
+            get
             {
-				instance.EnsureTreesRegistered();
-                return instance; 
+                instance.EnsureTreesRegistered();
+                return instance;
             }
         }
 
@@ -45,13 +31,13 @@ namespace umbraco.cms.presentation.Trees
         /// </summary>
         /// <param name="tree"></param>
         /// <returns></returns>
-        public TreeDefinition FindTree(ITree tree)
+        public TreeDefinition FindTree(BaseTree tree)
         {
-			EnsureTreesRegistered();
+            EnsureTreesRegistered();
 
             var foundTree = this.Find(
-            	t => t.TreeType == tree.GetType()
-            	);
+                t => t.TreeType == tree.GetType()
+                );
             if (foundTree != null)
                 return foundTree;
 
@@ -63,9 +49,9 @@ namespace umbraco.cms.presentation.Trees
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public TreeDefinition FindTree<T>() where T : ITree
+        public TreeDefinition FindTree<T>() where T : BaseTree
         {
-			EnsureTreesRegistered();
+            EnsureTreesRegistered();
 
             var foundTree = this.Find(
                delegate(TreeDefinition t)
@@ -88,11 +74,11 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public TreeDefinition FindTree(string alias)
         {
-			EnsureTreesRegistered();
+            EnsureTreesRegistered();
 
             var foundTree = this.Find(
-            	t => t.Tree.Alias.ToLower() == alias.ToLower()
-            	);
+                t => t.Tree.Alias.ToLower() == alias.ToLower()
+                );
             if (foundTree != null)
                 return foundTree;
 
@@ -106,11 +92,11 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public List<TreeDefinition> FindTrees(string appAlias)
         {
-			EnsureTreesRegistered();
+            EnsureTreesRegistered();
 
             return this.FindAll(
-            	tree => (tree.App != null && tree.App.alias.ToLower() == appAlias.ToLower())
-            	);
+                tree => (tree.App != null && tree.App.Alias.ToLower() == appAlias.ToLower())
+                );
         }
 
         /// <summary>
@@ -120,11 +106,11 @@ namespace umbraco.cms.presentation.Trees
         /// <returns></returns>
         public List<TreeDefinition> FindActiveTrees(string appAlias)
         {
-			EnsureTreesRegistered();
+            EnsureTreesRegistered();
 
             return this.FindAll(
-            	tree => (tree.App != null && tree.App.alias.ToLower() == appAlias.ToLower() && tree.Tree.Initialize)
-            	);
+                tree => (tree.App != null && tree.App.Alias.ToLower() == appAlias.ToLower() && tree.Tree.Initialize)
+                );
         }
 
         public void ReRegisterTrees()
@@ -140,7 +126,7 @@ namespace umbraco.cms.presentation.Trees
         /// <summary>
         /// Finds all instances of ITree in loaded assemblies, then finds their associated ApplicationTree and Application objects
         /// and stores them together in a TreeDefinition class and adds the definition to our list.
-        /// This will also store an instance of each tree object in the TreeDefinition class which should be 
+        /// This will also store an instance of each tree object in the TreeDefinition class which should be
         /// used when referencing all tree classes.
         /// </summary>
         private void EnsureTreesRegistered()
@@ -152,18 +138,15 @@ namespace umbraco.cms.presentation.Trees
                     if (_ensureTrees == false)
                     {
 
-                        var foundITrees = PluginManager.Current.ResolveTrees();
+                        var foundITrees = Current.TypeLoader.GetTrees();
 
-                        var objTrees = ApplicationTree.getAll();
-                        var appTrees = new List<ApplicationTree>();
-                        appTrees.AddRange(objTrees);
-
-                        var apps = Application.getAll();
+                        var appTrees = Current.Services.ApplicationTreeService.GetAll().ToList();
+                        var apps = Current.Services.SectionService.GetSections().ToList();
 
                         foreach (var type in foundITrees)
                         {
 
-                            //find the Application tree's who's combination of assembly name and tree type is equal to 
+                            //find the Application tree's who's combination of assembly name and tree type is equal to
                             //the Type that was found's full name.
                             //Since a tree can exist in multiple applications we'll need to register them all.
 
@@ -173,15 +156,8 @@ namespace umbraco.cms.presentation.Trees
                             var appTreesForType = appTrees.FindAll(
                                 tree =>
                                 {
-                                    //match the type on assembly qualified name if the assembly attribute is empty or if the
-                                    // tree type contains a comma (meaning it is assembly qualified)
-                                    if (tree.AssemblyName.IsNullOrWhiteSpace() || tree.Type.Contains(","))
-                                    {
-                                        return tree.GetRuntimeType() == type;
-                                    }
-
-                                    //otherwise match using legacy match rules
-                                    return (string.Format("{0}.{1}", tree.AssemblyName, tree.Type).InvariantEquals(type.FullName));
+                                    //match the type on assembly qualified name
+                                    return tree.GetRuntimeType() == type;
                                 }
                                 );
 
@@ -189,7 +165,7 @@ namespace umbraco.cms.presentation.Trees
                             {
                                 //find the Application object whos name is the same as our appTree ApplicationAlias
                                 var app = apps.Find(
-                                    a => (a.alias == appTree.ApplicationAlias)
+                                    a => (a.Alias == appTree.ApplicationAlias)
                                     );
 
                                 var def = new TreeDefinition(type, appTree, app);
@@ -206,6 +182,6 @@ namespace umbraco.cms.presentation.Trees
 
 
         }
-       
+
     }
 }

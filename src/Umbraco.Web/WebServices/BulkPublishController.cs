@@ -4,16 +4,13 @@ using System.Text;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
-using umbraco;
-using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Web.WebServices
 {
     /// <summary>
-    /// A REST controller used for the publish dialog in order to publish bulk items at once
+    /// Represents a REST controller used for the publish dialog in order to bulk-publish bulk content items.
     /// </summary>
     [ValidateMvcAngularAntiForgeryToken]
     public class BulkPublishController : UmbracoAuthorizedController
@@ -29,44 +26,42 @@ namespace Umbraco.Web.WebServices
         public JsonResult PublishDocument(int documentId, bool publishDescendants, bool includeUnpublished)
         {
             var content = Services.ContentService.GetById(documentId);
-            var doc = new Document(content);
-            //var contentService = (ContentService) Services.ContentService;
+
             if (publishDescendants == false)
             {
-                //var result = contentService.SaveAndPublishInternal(content);
-                var result = doc.SaveAndPublish(UmbracoUser.Id);
+                content.PublishValues(); // fixme variants? validation - when this returns null?
+                var result = Services.ContentService.SaveAndPublish(content, Security.CurrentUser.Id);
                 return Json(new
                     {
                         success = result.Success,
-                        message = GetMessageForStatus(result.Result)
+                        message = GetMessageForStatus(result)
                     });
             }
             else
             {
-                /*var result = ((ContentService) Services.ContentService)
-                    .PublishWithChildrenInternal(content, UmbracoUser.Id, includeUnpublished)
-                    .ToArray();*/
-                var result = doc.PublishWithSubs(UmbracoUser.Id, includeUnpublished).ToArray();
+                // fixme variants?
+                var result = Services.ContentService.SaveAndPublishBranch(content, includeUnpublished);
+
                 return Json(new
                     {
                         success = result.All(x => x.Success),
-                        message = GetMessageForStatuses(result.Select(x => x.Result).ToArray(), content)
+                        message = GetMessageForStatuses(result.ToArray(), content)
                     });
             }
         }
 
-        private string GetMessageForStatuses(PublishStatus[] statuses, IContent doc)
+        private string GetMessageForStatuses(PublishResult[] statuses, IContent doc)
         {
             //if all are successful then just say it was successful
-            if (statuses.All(x => ((int) x.StatusType) < 10))
+            if (statuses.All(x => x.Success))
             {
-                return ui.Text("publish", "nodePublishAll", doc.Name, UmbracoUser);
+                return Services.TextService.Localize("publish/nodePublishAll", new[] { doc.Name});
             }
 
             //if they are not all successful the we'll add each error message to the output (one per line)
             var sb = new StringBuilder();
             foreach (var msg in statuses
-                .Where(x => ((int)x.StatusType) >= 10)
+                .Where(x => ((int)x.Result) >= 10)
                 .Select(GetMessageForStatus)
                 .Where(msg => msg.IsNullOrWhiteSpace() == false))
             {
@@ -75,32 +70,31 @@ namespace Umbraco.Web.WebServices
             return sb.ToString();
         }
 
-        private string GetMessageForStatus(PublishStatus status)
+        private string GetMessageForStatus(PublishResult status)
         {
-            switch (status.StatusType)
+            switch (status.Result)
             {
-                case PublishStatusType.Success:
-                case PublishStatusType.SuccessAlreadyPublished:
-                    return ui.Text("publish", "nodePublish", status.ContentItem.Name, UmbracoUser);
-                case PublishStatusType.FailedPathNotPublished:
-                    return ui.Text("publish", "contentPublishedFailedByParent", 
-                                   string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id), UmbracoUser);
-                case PublishStatusType.FailedHasExpired:                    
-                case PublishStatusType.FailedAwaitingRelease:
-                case PublishStatusType.FailedIsTrashed:
-                    return "Cannot publish document with a status of " + status.StatusType;
-                case PublishStatusType.FailedCancelledByEvent:
-                    return ui.Text("publish", "contentPublishedFailedByEvent",
-                                   string.Format("'{0}' ({1})", status.ContentItem.Name, status.ContentItem.Id), UmbracoUser);
-                case PublishStatusType.FailedContentInvalid:
-                    return ui.Text("publish", "contentPublishedFailedInvalid",
+                case PublishResultType.Success:
+                case PublishResultType.SuccessAlready:
+                    return Services.TextService.Localize("publish/nodePublish", new[] { status.Content.Name});
+                case PublishResultType.FailedPathNotPublished:
+                    return Services.TextService.Localize("publish/contentPublishedFailedByParent",
+                                   new [] { string.Format("{0} ({1})", status.Content.Name, status.Content.Id) });
+                case PublishResultType.FailedHasExpired:
+                case PublishResultType.FailedAwaitingRelease:
+                case PublishResultType.FailedIsTrashed:
+                    return "Cannot publish document with a status of " + status.Result;
+                case PublishResultType.FailedCancelledByEvent:
+                    return Services.TextService.Localize("publish/contentPublishedFailedByEvent",
+                                   new [] { string.Format("'{0}' ({1})", status.Content.Name, status.Content.Id) });
+                case PublishResultType.FailedContentInvalid:
+                    return Services.TextService.Localize("publish/contentPublishedFailedInvalid",
                                    new []{
-                                       string.Format("'{0}' ({1})", status.ContentItem.Name, status.ContentItem.Id), 
+                                       string.Format("'{0}' ({1})", status.Content.Name, status.Content.Id),
                                        string.Format("'{0}'", string.Join(", ", status.InvalidProperties.Select(x => x.Alias)))
-                                   }, 
-                                   UmbracoUser);  
+                                   });
                 default:
-                    return status.StatusType.ToString();
+                    return status.Result.ToString();
             }
         }
     }

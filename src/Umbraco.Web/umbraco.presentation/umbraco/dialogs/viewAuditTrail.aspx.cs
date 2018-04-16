@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
@@ -8,61 +8,67 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core;
+using Umbraco.Core.Services;
+using Umbraco.Web;
+using Umbraco.Web.Composing;
+using Umbraco.Web._Legacy.Actions;
+using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
-	/// <summary>
-	/// Summary description for viewAuditTrail.
-	/// </summary>
-	public partial class viewAuditTrail : BasePages.UmbracoEnsuredPage
-	{
-	    public viewAuditTrail()
-	    {
-            CurrentApp = BusinessLogic.DefaultApps.content.ToString();
+    /// <summary>
+    /// Summary description for viewAuditTrail.
+    /// </summary>
+    public partial class viewAuditTrail : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
+    {
+        public viewAuditTrail()
+        {
+            CurrentApp = Constants.Applications.Content.ToString();
 
-	    }
-	
-		protected void Page_Load(object sender, System.EventArgs e)
-		{
-			// Put user code to initialize the page here
-			//nodeName.Text = new cms.businesslogic.CMSNode(int.Parse(helper.Request("nodeID"))).Text;
-			auditLog.DataSource = BusinessLogic.Log.Instance.GetAuditLogItems(int.Parse(UmbracoContext.Current.Request["nodeID"]));
-			auditLog.DataBind();
-			auditLog.BorderWidth = 0;
-			auditLog.BorderStyle = BorderStyle.None;
-		}
+        }
 
-		public string FormatAction(string action) 
-		{
-			action = action.ToLower();
-			if (action == "new")
-				action = "create";
-			ArrayList actions = BusinessLogic.Actions.Action.GetAll();
-			foreach (interfaces.IAction a in actions)
-			{
-			    return ui.Text(action);
+        protected void Page_Load(object sender, System.EventArgs e)
+        {
+            // Put user code to initialize the page here
+            //nodeName.Text = new cms.businesslogic.CMSNode(int.Parse(helper.Request("nodeID"))).Text;
+            auditLog.DataSource = Services.AuditService.GetLogs(int.Parse(Request["nodeID"]));
+            auditLog.DataBind();
+            auditLog.BorderWidth = 0;
+            auditLog.BorderStyle = BorderStyle.None;
+        }
+
+        public string FormatAction(string action)
+        {
+            action = action.ToLower();
+            if (action == "new")
+                action = "create";
+            var actions = Current.Actions;
+            foreach (var a in actions)
+            {
+                return Services.TextService.Localize(action);
             }
-            return	action;		
-		}
+            return    action;
+        }
 
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
+        #region Web Form Designer generated code
+        override protected void OnInit(EventArgs e)
+        {
+            //
+            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
+            //
+            InitializeComponent();
+            base.OnInit(e);
+        }
 
-		}
-		#endregion
-	}
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+
+        }
+        #endregion
+    }
 }

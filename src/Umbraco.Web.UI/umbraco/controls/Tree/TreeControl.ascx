@@ -1,9 +1,7 @@
 ﻿<%@ Control Language="C#" AutoEventWireup="true" Inherits="umbraco.controls.Tree.TreeControl" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
-<%@ Register TagPrefix="umbClient" Namespace="Umbraco.Web.UI.Bundles" Assembly="umbraco" %>
+<%@ Register TagPrefix="umbClient" Namespace="Umbraco.Web.UI.Bundles" Assembly="Umbraco.Web" %>
 
-<umb:CssInclude ID="CssInclude2" runat="server" FilePath="Tree/treeIcons.css" PathNameAlias="UmbracoClient" Priority="10" />
-<umb:CssInclude ID="CssInclude3" runat="server" FilePath="Tree/menuIcons.css" PathNameAlias="UmbracoClient" Priority="11" />
 <umb:CssInclude ID="CssInclude1" runat="server" FilePath="Tree/Themes/umbraco/style.css" PathNameAlias="UmbracoClient" Priority="12" />
 
 <umbClient:JsApplicationLib ID="JsUmbracoApplicationLib1" runat="server"/>
@@ -27,7 +25,7 @@ jQuery(document).ready(function() {
         doNotInit: <%#ManualInitialization.ToString().ToLower()%>,
         jsonFullMenu: ctxMenu,
         appActions: UmbClientMgr.appActions(),
-        deletingText: '<%=umbraco.ui.GetText("deleting")%>',
+        deletingText: '<%=Services.TextService.Localize("deleting")%>',
         app: app,
         showContext: showContext,
         isDialog: isDialog,

@@ -1,28 +1,14 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
-using System.Web.Caching;
 using System.Web.UI;
 using System.Xml;
-using StackExchange.Profiling;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Macros;
-using Umbraco.Core.Profiling;
-using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.web;
-using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 
 namespace umbraco.presentation.templateControls
 {
@@ -87,7 +73,7 @@ namespace umbraco.presentation.templateControls
                 {
                     writer.Write(finalResult);
                 }
-                
+
             }
             catch (Exception renderException)
             {
@@ -118,11 +104,15 @@ namespace umbraco.presentation.templateControls
                 if (tempNodeId != null && tempNodeId.Value != 0)
                 {
                     //moved the following from the catch block up as this will allow fallback options alt text etc to work
-                    var cache = Umbraco.Web.UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
-                    if (cache == null) throw new InvalidOperationException("Unsupported IPublishedContentCache, only the Xml one is supported.");
-                    var xml = cache.GetXml(Umbraco.Web.UmbracoContext.Current, Umbraco.Web.UmbracoContext.Current.InPreviewMode);
-                    var itemPage = new page(xml.GetElementById(tempNodeId.ToString()));
-                    tempElementContent = 
+                    // stop using GetXml
+                    //var cache = Umbraco.Web.UmbracoContext.Current.ContentCache.InnerCache as PublishedContentCache;
+                    //if (cache == null) throw new InvalidOperationException("Unsupported IPublishedContentCache, only the Xml one is supported.");
+                    //var xml = cache.GetXml(Umbraco.Web.UmbracoContext.Current, Umbraco.Web.UmbracoContext.Current.InPreviewMode);
+                    //var itemPage = new page(xml.GetElementById(tempNodeId.ToString()));
+                    var c = Umbraco.Web.UmbracoContext.Current.ContentCache.GetById(tempNodeId.Value);
+                    var itemPage = new page(c);
+
+                    tempElementContent =
                         new item(item.ContentItem, itemPage.Elements, item.LegacyAttributes).FieldContent;
                 }
             }
@@ -149,7 +139,7 @@ namespace umbraco.presentation.templateControls
         /// <param name="item">The item.</param>
         public virtual void Load(Item item)
         {
-            using (DisposableTimer.DebugDuration<ItemRenderer>(string.Format("Item: {0}", item.Field)))
+            using (Current.ProfilingLogger.DebugDuration<ItemRenderer>(string.Format("Item: {0}", item.Field)))
             {
                 ParseMacros(item);
             }
@@ -160,11 +150,11 @@ namespace umbraco.presentation.templateControls
         /// </summary>
         /// <param name="item">The item.</param>
         protected virtual void ParseMacros(Item item)
-        {  
+        {
             // do nothing if the macros have already been rendered
             if (item.Controls.Count > 0)
                 return;
-            
+
             var elementText = GetFieldContents(item);
 
             //Don't parse macros if there's a content item assigned since the content value
@@ -175,7 +165,7 @@ namespace umbraco.presentation.templateControls
             }
             else
             {
-                using (DisposableTimer.DebugDuration<ItemRenderer>("Parsing Macros"))
+                using (Current.ProfilingLogger.DebugDuration<ItemRenderer>("Parsing Macros"))
                 {
 
                     MacroTagParser.ParseMacros(
@@ -199,7 +189,7 @@ namespace umbraco.presentation.templateControls
                         });
                 }
             }
-            
+
         }
 
         /// <summary>
@@ -220,7 +210,7 @@ namespace umbraco.presentation.templateControls
                 // prepare support for XSLT extensions
                 StringBuilder namespaceList = new StringBuilder();
                 StringBuilder namespaceDeclaractions = new StringBuilder();
-                foreach (KeyValuePair<string, object> extension in macro.GetXsltExtensions())
+                foreach (KeyValuePair<string, object> extension in Umbraco.Web.Macros.XsltMacroEngine.GetXsltExtensions())
                 {
                     namespaceList.Append(extension.Key).Append(' ');
                     namespaceDeclaractions.AppendFormat("xmlns:{0}=\"urn:{0}\" ", extension.Key);
@@ -235,10 +225,11 @@ namespace umbraco.presentation.templateControls
                 parameters.Add("itemData", itemData);
 
                 // apply the XSLT transformation
-                XmlTextReader xslReader = new XmlTextReader(new StringReader(xslt));
-                System.Xml.Xsl.XslCompiledTransform xsl = macro.CreateXsltTransform(xslReader, false);
-                itemData = macro.GetXsltTransformResult(new XmlDocument(), xsl, parameters);
-                xslReader.Close();
+                using (var xslReader = new XmlTextReader(new StringReader(xslt)))
+                {
+                    var transform = Umbraco.Web.Macros.XsltMacroEngine.GetXsltTransform(xslReader, false);
+                    return Umbraco.Web.Macros.XsltMacroEngine.ExecuteItemRenderer(Current.ProfilingLogger, transform, itemData);
+                }
             }
             return itemData;
         }
@@ -266,62 +257,5 @@ namespace umbraco.presentation.templateControls
             return item.TextIfEmpty;
         }
 
-        /// <summary>
-        /// Gets the field content from database instead of the published XML via the APIs.
-        /// </summary>
-        /// <param name="itemAttributes"></param>
-        /// <param name="nodeIdInt">The node id.</param>
-        /// <param name="currentField">The field that should be fetched.</param>
-        /// <returns>The contents of the <paramref name="currentField"/> from the <paramref name="nodeIdInt"/> content object</returns>
-        [Obsolete("This is no longer used in the codebase and will be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        protected virtual string GetContentFromDatabase(AttributeCollectionAdapter itemAttributes, int nodeIdInt, string currentField)
-        {
-            var c = new Content(nodeIdInt);
-
-            var property = c.getProperty(currentField);
-            if (property == null)
-                throw new ArgumentException(String.Format("Could not find property {0} of node {1}.", currentField, nodeIdInt));
-
-            var umbItem = new item(property.Value.ToString(), itemAttributes);
-            var tempElementContent = umbItem.FieldContent;
-
-            // If the current content object is a document object, we'll only output it if it's published
-            if (c.nodeObjectType == Document._objectType)
-            {
-                try
-                {
-                    var d = (Document)c;
-                    if (!d.Published)
-                        tempElementContent = "";
-                }
-                catch { }
-            }
-
-            // Add the content to the cache
-            if (!string.IsNullOrEmpty(tempElementContent))
-            {
-                ApplicationContext.Current.ApplicationCache.RuntimeCache.InsertCacheItem(
-                    string.Format("{0}{1}_{2}", CacheKeys.ContentItemCacheKey, nodeIdInt, currentField),
-                    priority:       CacheItemPriority.Default, 
-                    getCacheItem:   () => tempElementContent);
-            }
-            return tempElementContent;
-        }
-
-        /// <summary>
-        /// Gets the content from cache.
-        /// </summary>
-        /// <param name="nodeIdInt">The node id.</param>
-        /// <param name="field">The field.</param>
-        /// <returns>The cached contents of the <paramref name="field"/> from the <paramref name="nodeIdInt"/> content object</returns>
-        [Obsolete("This is no longer used in the codebase and will be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        protected virtual object GetContentFromCache(int nodeIdInt, string field)
-        {
-            var content = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<object>(
-                string.Format("{0}{1}_{2}", CacheKeys.ContentItemCacheKey, nodeIdInt, field));
-            return content;
-        }
     }
 }

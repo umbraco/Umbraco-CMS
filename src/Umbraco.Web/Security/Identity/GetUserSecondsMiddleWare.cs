@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -25,31 +25,32 @@ namespace Umbraco.Web.Security.Identity
     internal class GetUserSecondsMiddleWare : OwinMiddleware
     {
         private readonly UmbracoBackOfficeCookieAuthOptions _authOptions;
+        private readonly IGlobalSettings _globalSettings;
         private readonly ISecuritySection _security;
         private readonly ILogger _logger;
 
         public GetUserSecondsMiddleWare(
             OwinMiddleware next,
             UmbracoBackOfficeCookieAuthOptions authOptions,
+            IGlobalSettings globalSettings,
             ISecuritySection security,
             ILogger logger)
             : base(next)
         {
-            if (authOptions == null) throw new ArgumentNullException("authOptions");
-            if (logger == null) throw new ArgumentNullException("logger");
-            _authOptions = authOptions;
+            _authOptions = authOptions ?? throw new ArgumentNullException(nameof(authOptions));
+            _globalSettings = globalSettings;
             _security = security;
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public override async Task Invoke(IOwinContext context)
         {
             var request = context.Request;
             var response = context.Response;
-            
+
             if (request.Uri.Scheme.InvariantStartsWith("http")
                 && request.Uri.AbsolutePath.InvariantEquals(
-                    string.Format("{0}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds", GlobalSettings.Path)))
+                    $"{_globalSettings.Path}/backoffice/UmbracoApi/Authentication/GetRemainingTimeoutSeconds"))
             {
                 var cookie = _authOptions.CookieManager.GetRequestCookie(context, _security.AuthCookieName);
                 if (cookie.IsNullOrWhiteSpace() == false)
@@ -68,7 +69,7 @@ namespace Umbraco.Web.Security.Identity
                         response.Headers.Add("Expires", new[] { "-1" });
                         response.Headers.Add("Date", new[] { _authOptions.SystemClock.UtcNow.ToString("R") });
 
-                        //Ok, so here we need to check if we want to process/renew the auth ticket for each 
+                        //Ok, so here we need to check if we want to process/renew the auth ticket for each
                         // of these requests. If that is the case, the user will really never be logged out until they
                         // close their browser (there will be edge cases of that, especially when debugging)
                         if (_security.KeepUserLoggedIn)
@@ -107,7 +108,7 @@ namespace Umbraco.Web.Security.Identity
                             }
 
                             //We also need to re-validate the user's session if we are relying on this ping to keep their session alive
-                            await SessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context, _authOptions.CookieManager, _authOptions.SystemClock, issuedUtc, ticket.Identity);
+                            await SessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context, _authOptions.CookieManager, _authOptions.SystemClock, issuedUtc, ticket.Identity, _globalSettings);
                         }
                         else if (remainingSeconds <= 30)
                         {

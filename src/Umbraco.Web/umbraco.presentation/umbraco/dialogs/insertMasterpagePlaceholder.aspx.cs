@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
+﻿using Umbraco.Core.Services;
+using System;
+using Umbraco.Core;
 
 namespace umbraco.presentation.umbraco.dialogs {
-    public partial class insertMasterpagePlaceholder : BasePages.UmbracoEnsuredPage {
+    public partial class insertMasterpagePlaceholder : Umbraco.Web.UI.Pages.UmbracoEnsuredPage {
 
         public insertMasterpagePlaceholder()
         {
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
         }
         protected void Page_Load(object sender, EventArgs e) {
             //labels
-            pp_placeholder.Text = ui.Text("placeHolderID");
-           
+            pp_placeholder.Text = Services.TextService.Localize("placeHolderID");
+
         }
     }
 }

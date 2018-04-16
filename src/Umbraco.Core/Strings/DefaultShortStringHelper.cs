@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Globalization;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Core.Strings
@@ -19,30 +18,17 @@ namespace Umbraco.Core.Strings
     /// </remarks>
     public class DefaultShortStringHelper : IShortStringHelper
     {
-        private readonly IUmbracoSettingsSection _umbracoSettings;
-
         #region Ctor and vars
 
-        [Obsolete("Use the other ctor that specifies all dependencies")]
-        public DefaultShortStringHelper()
+        public DefaultShortStringHelper(IUmbracoSettingsSection settings)
         {
-            _umbracoSettings = _umbracoSettings;
-            InitializeLegacyUrlReplaceCharacters();
+            _config = new DefaultShortStringHelperConfig().WithDefault(settings);
         }
 
-        public DefaultShortStringHelper(IUmbracoSettingsSection umbracoSettings)
+        // clones the config so it cannot be changed at runtime
+        public DefaultShortStringHelper(DefaultShortStringHelperConfig config)
         {
-            _umbracoSettings = umbracoSettings;
-            InitializeLegacyUrlReplaceCharacters();
-        }
-
-        /// <summary>
-        /// Freezes the helper so it can prevents its configuration from being modified.
-        /// </summary>
-        /// <remarks>Will be called by <c>ShortStringHelperResolver</c> when resolution freezes.</remarks>
-        public void Freeze()
-        {
-            _frozen = true;
+            _config = config.Clone();
         }
 
         // see notes for CleanAsciiString
@@ -50,9 +36,7 @@ namespace Umbraco.Core.Strings
         //const string ValidStringCharactersSource = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         //readonly static char[] ValidStringCharacters;
 
-        private CultureInfo _defaultCulture = CultureInfo.InvariantCulture;
-        private bool _frozen;
-        private readonly Dictionary<CultureInfo, Dictionary<CleanStringType, Config>> _configs = new Dictionary<CultureInfo, Dictionary<CleanStringType, Config>>();
+        private readonly DefaultShortStringHelperConfig _config;
 
         // see notes for CleanAsciiString
         //static DefaultShortStringHelper()
@@ -64,27 +48,6 @@ namespace Umbraco.Core.Strings
 
         #region Filters
 
-        private readonly Dictionary<string, string> _urlReplaceCharacters = new Dictionary<string, string>();
-
-        private void InitializeLegacyUrlReplaceCharacters()
-        {
-            foreach (var node in _umbracoSettings.RequestHandler.CharCollection)
-            {
-                if (string.IsNullOrEmpty(node.Char) == false)
-                    _urlReplaceCharacters[node.Char] = node.Replacement;
-            }
-        }
-
-        /// <summary>
-        /// Returns a new string in which characters have been replaced according to the Umbraco settings UrlReplaceCharacters.
-        /// </summary>
-        /// <param name="s">The string to filter.</param>
-        /// <returns>The filtered string.</returns>
-        public string ApplyUrlReplaceCharacters(string s)
-        {
-            return s.ReplaceMany(_urlReplaceCharacters);
-        }
-
         // ok to be static here because it's not configureable in any way
         private static readonly char[] InvalidFileNameChars =
             Path.GetInvalidFileNameChars()
@@ -95,200 +58,6 @@ namespace Umbraco.Core.Strings
         public static bool IsValidFileNameChar(char c)
         {
             return InvalidFileNameChars.Contains(c) == false;
-        }
-
-        public static string CutMaxLength(string text, int length)
-        {
-            return text.Length <= length ? text : text.Substring(0, length);
-        }
-
-        #endregion
-
-        #region Configuration
-
-        private void EnsureNotFrozen()
-        {
-            if (_frozen)
-                throw new InvalidOperationException("Cannot configure the helper once it is frozen.");
-        }
-
-        /// <summary>
-        /// Sets a default culture.
-        /// </summary>
-        /// <param name="culture">The default culture.</param>
-        /// <returns>The short string helper.</returns>
-        public DefaultShortStringHelper WithDefaultCulture(CultureInfo culture)
-        {
-            EnsureNotFrozen();
-            _defaultCulture = culture;
-            return this;
-        }
-
-        public DefaultShortStringHelper WithConfig(Config config)
-        {
-            return WithConfig(_defaultCulture, CleanStringType.RoleMask, config);
-        }
-
-        public DefaultShortStringHelper WithConfig(CleanStringType stringRole, Config config)
-        {
-            return WithConfig(_defaultCulture, stringRole, config);
-        }
-
-        public DefaultShortStringHelper WithConfig(CultureInfo culture, CleanStringType stringRole, Config config)
-        {
-            if (config == null)
-                throw new ArgumentNullException("config");
-
-            EnsureNotFrozen();
-            if (_configs.ContainsKey(culture) == false)
-                _configs[culture] = new Dictionary<CleanStringType, Config>();
-            _configs[culture][stringRole] = config.Clone(); // clone so it can't be changed
-            return this;
-        }
-
-        /// <summary>
-        /// Sets the default configuration.
-        /// </summary>
-        /// <returns>The short string helper.</returns>
-        public DefaultShortStringHelper WithDefaultConfig()
-        {
-            var urlSegmentConvertTo = CleanStringType.Utf8;
-            if (_umbracoSettings.RequestHandler.ConvertUrlsToAscii)
-                urlSegmentConvertTo = CleanStringType.Ascii;
-            if (_umbracoSettings.RequestHandler.TryConvertUrlsToAscii)
-                urlSegmentConvertTo = CleanStringType.TryAscii;
-
-            return WithConfig(CleanStringType.UrlSegment, new Config
-            {
-                PreFilter = ApplyUrlReplaceCharacters,
-                PostFilter = x => CutMaxLength(x, 240),
-                IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
-                StringType = urlSegmentConvertTo | CleanStringType.LowerCase,
-                BreakTermsOnUpper = false,
-                Separator = '-'
-            }).WithConfig(CleanStringType.FileName, new Config
-            {
-                PreFilter = ApplyUrlReplaceCharacters,
-                IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
-                StringType = CleanStringType.Utf8 | CleanStringType.LowerCase,
-                BreakTermsOnUpper = false,
-                Separator = '-'
-            }).WithConfig(CleanStringType.Alias, new Config
-            {
-                PreFilter = ApplyUrlReplaceCharacters,
-                IsTerm = (c, leading) => leading
-                    ? char.IsLetter(c) // only letters
-                    : (char.IsLetterOrDigit(c) || c == '_'), // letter, digit or underscore
-                StringType = CleanStringType.Ascii | CleanStringType.UmbracoCase,
-                BreakTermsOnUpper = false
-            }).WithConfig(CleanStringType.UnderscoreAlias, new Config
-            {
-                PreFilter = ApplyUrlReplaceCharacters,
-                IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
-                StringType = CleanStringType.Ascii | CleanStringType.UmbracoCase,
-                BreakTermsOnUpper = false
-            }).WithConfig(CleanStringType.ConvertCase, new Config
-            {
-                PreFilter = null,
-                IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
-                StringType = CleanStringType.Ascii,
-                BreakTermsOnUpper = true
-            });
-        }
-
-        public sealed class Config
-        {
-            public Config()
-            {
-                StringType = CleanStringType.Utf8 | CleanStringType.Unchanged;
-                PreFilter = null;
-                PostFilter = null;
-                IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c);
-                BreakTermsOnUpper = false;
-                CutAcronymOnNonUpper = false;
-                GreedyAcronyms = false;
-                Separator = Char.MinValue;
-            }
-
-            public Config Clone()
-            {
-                return new Config
-                {
-                    PreFilter = PreFilter,
-                    PostFilter = PostFilter,
-                    IsTerm = IsTerm,
-                    StringType = StringType,
-                    BreakTermsOnUpper = BreakTermsOnUpper,
-                    CutAcronymOnNonUpper = CutAcronymOnNonUpper,
-                    GreedyAcronyms = GreedyAcronyms,
-                    Separator = Separator
-                };
-            }
-
-            public Func<string, string> PreFilter { get; set; }
-            public Func<string, string> PostFilter { get; set; }
-            public Func<char, bool, bool> IsTerm { get; set; }
-
-            public CleanStringType StringType { get; set; }
-
-            // indicate whether an uppercase within a term eg "fooBar" is to break
-            // into a new term, or to be considered as part of the current term
-            public bool BreakTermsOnUpper { get; set; }
-
-            // indicate whether a non-uppercase within an acronym eg "FOOBar" is to cut
-            // the acronym (at "B" or "a" depending on GreedyAcronyms) or to give
-            // up the acronym and treat the term as a word
-            public bool CutAcronymOnNonUpper { get; set; }
-
-            // indicates whether acronyms parsing is greedy ie whether "FOObar" is
-            // "FOO" + "bar" (greedy) or "FO" + "Obar" (non-greedy)
-            public bool GreedyAcronyms { get; set; }
-
-            // the separator char
-            // but then how can we tell we dont want any?
-            public char Separator { get; set; }
-
-            // extends the config
-            public CleanStringType StringTypeExtend(CleanStringType stringType)
-            {
-                var st = StringType;
-                foreach (var mask in new[] { CleanStringType.CaseMask, CleanStringType.CodeMask })
-                {
-                    var a = stringType & mask;
-                    if (a == 0) continue;
-
-                    st = st & ~mask; // clear what we have
-                    st = st | a; // set the new value
-                }
-                return st;
-            }
-
-            internal static readonly Config NotConfigured = new Config();
-        }
-
-        private Config GetConfig(CleanStringType stringType, CultureInfo culture)
-        {
-            stringType = stringType & CleanStringType.RoleMask;
-
-            Dictionary<CleanStringType, Config> config;
-            if (_configs.ContainsKey(culture))
-            {
-                config = _configs[culture];
-                if (config.ContainsKey(stringType)) // have we got a config for _that_ role?
-                    return config[stringType];
-                if (config.ContainsKey(CleanStringType.RoleMask)) // have we got a generic config for _all_ roles?
-                    return config[CleanStringType.RoleMask];
-            }
-            else if (_configs.ContainsKey(_defaultCulture))
-            {
-                config = _configs[_defaultCulture];
-                if (config.ContainsKey(stringType)) // have we got a config for _that_ role?
-                    return config[stringType];
-                if (config.ContainsKey(CleanStringType.RoleMask)) // have we got a generic config for _all_ roles?
-                    return config[CleanStringType.RoleMask];
-            }
-
-            return Config.NotConfigured;
         }
 
         #endregion
@@ -339,8 +108,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// </summary>
         public string GetShortStringServicesJavaScript(string controllerPath)
         {
-            return string.Format(SssjsFormat,
-                _umbracoSettings.Content.ForceSafeAliases ? "true" : "false", controllerPath);
+                return string.Format(SssjsFormat, _config.ForceSafeAliases ? "true" : "false", controllerPath);
         }
 
         #endregion
@@ -358,7 +126,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// </remarks>
         public virtual string CleanStringForSafeAlias(string text)
         {
-            return CleanStringForSafeAlias(text, _defaultCulture);
+            return CleanStringForSafeAlias(text, _config.DefaultCulture);
         }
 
         /// <summary>
@@ -386,7 +154,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// </remarks>
         public virtual string CleanStringForUrlSegment(string text)
         {
-            return CleanStringForUrlSegment(text, _defaultCulture);
+            return CleanStringForUrlSegment(text, _config.DefaultCulture);
         }
 
         /// <summary>
@@ -412,7 +180,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// <remarks>Legacy says this was used to "overcome an issue when Umbraco is used in IE in an intranet environment" but that issue is not documented.</remarks>
         public virtual string CleanStringForSafeFileName(string text)
         {
-            return CleanStringForSafeFileName(text, _defaultCulture);
+            return CleanStringForSafeFileName(text, _config.DefaultCulture);
         }
 
         /// <summary>
@@ -458,10 +226,10 @@ function validateSafeAlias(input, value, immediate, callback) {{
         // - Leading digits are removed.
         // - Many consecutive separators are folded into one unique separator.
 
-        const byte StateBreak = 1;
-        const byte StateUp = 2;
-        const byte StateWord = 3;
-        const byte StateAcronym = 4;
+        private const byte StateBreak = 1;
+        private const byte StateUp = 2;
+        private const byte StateWord = 3;
+        private const byte StateAcronym = 4;
 
         /// <summary>
         /// Cleans a string.
@@ -473,7 +241,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// <remarks>The string is cleaned in the context of the default culture.</remarks>
         public string CleanString(string text, CleanStringType stringType)
         {
-            return CleanString(text, stringType, _defaultCulture, null);
+            return CleanString(text, stringType, _config.DefaultCulture, null);
         }
 
         /// <summary>
@@ -487,7 +255,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// <remarks>The string is cleaned in the context of the default culture.</remarks>
         public string CleanString(string text, CleanStringType stringType, char separator)
         {
-            return CleanString(text, stringType, _defaultCulture, separator);
+            return CleanString(text, stringType, _config.DefaultCulture, separator);
         }
 
         /// <summary>
@@ -520,13 +288,11 @@ function validateSafeAlias(input, value, immediate, callback) {{
         protected virtual string CleanString(string text, CleanStringType stringType, CultureInfo culture, char? separator)
         {
             // be safe
-            if (text == null)
-                throw new ArgumentNullException("text");
-            if (culture == null)
-                throw new ArgumentNullException("culture");
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (culture == null) throw new ArgumentNullException(nameof(culture));
 
             // get config
-            var config = GetConfig(stringType, culture);
+            var config = _config.For(stringType, culture);
             stringType = config.StringTypeExtend(stringType);
 
             // apply defaults
@@ -554,7 +320,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
                     text = Utf8ToAsciiConverter.ToAsciiString(text);
                     break;
                 case CleanStringType.TryAscii:
-                    const char ESC = (char)27;
+                    const char ESC = (char) 27;
                     var ctext = Utf8ToAsciiConverter.ToAsciiString(text, ESC);
                     if (ctext.Contains(ESC) == false) text = ctext;
                     break;
@@ -601,7 +367,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         // that the utf8 version. Micro-optimizing sometimes isn't such a good idea.
 
         // note: does NOT support surrogate pairs in text
-        internal string CleanCodeString(string text, CleanStringType caseType, char separator, CultureInfo culture, Config config)
+        internal string CleanCodeString(string text, CleanStringType caseType, char separator, CultureInfo culture, DefaultShortStringHelperConfig.Config config)
         {
             int opos = 0, ipos = 0;
             var state = StateBreak;
@@ -844,7 +610,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException("caseType");
+                    throw new ArgumentOutOfRangeException(nameof(caseType));
             }
         }
 
@@ -864,7 +630,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         {
             // be safe
             if (text == null)
-                throw new ArgumentNullException("text");
+                throw new ArgumentNullException(nameof(text));
 
             var input = text.ToCharArray();
             var output = new char[input.Length * 2];
@@ -914,20 +680,12 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// <returns>The filtered string.</returns>
         public virtual string ReplaceMany(string text, IDictionary<string, string> replacements)
         {
-            if (text == null)
-            {
-                throw new ArgumentNullException("text");
-            }
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (replacements == null) throw new ArgumentNullException(nameof(replacements));
 
-            if (replacements == null)
-            {
-                throw new ArgumentNullException("replacements");
-            }
 
             foreach (KeyValuePair<string, string> item in replacements)
-            {
                 text = text.Replace(item.Key, item.Value);
-            }
 
             return text;
         }
@@ -941,20 +699,12 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// <returns>The filtered string.</returns>
         public virtual string ReplaceMany(string text, char[] chars, char replacement)
         {
-            if (text == null)
-            {
-                throw new ArgumentNullException("text");
-            }
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (chars == null) throw new ArgumentNullException(nameof(chars));
 
-            if (chars == null)
-            {
-                throw new ArgumentNullException("chars");
-            }
 
             for (int i = 0; i < chars.Length; i++)
-            {
                 text = text.Replace(chars[i], replacement);
-            }
 
             return text;
         }

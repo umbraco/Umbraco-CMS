@@ -30,6 +30,7 @@
     <key alias="sendtopublish">Enviar para Publicação</key>
     <key alias="sendToTranslate">Enviar para Tradução</key>
     <key alias="sort">Classificar</key>
+    <key alias="toPublish">Enviar para publicação</key>
     <key alias="translate">Traduzir</key>
     <key alias="update">Atualizar</key>
   </area>
@@ -564,7 +565,7 @@ Você pode remover com segurança do seu sistema clicando em "desinstalar pacote
   <area alias="publicAccess">
     <key alias="paAdvanced">Proteção baseada em função</key>
     <key alias="paAdvancedHelp"><![CDATA[Se você deseja controlar o acesso à página usando autenticação baseada em funções, <br /> usando grupos de membros do Umbraco.]]></key>
-    <key alias="paAdvancedNoGroups">Você precisa criar um grupo de membros antes que possa usar autenticação baseada em função.</key>
+    <key alias="paAdvancedNoGroups"><![CDATA[Você precisa criar um grupo de membros antes que possa usar <br /> autenticação baseada em função.]]></key>
     <key alias="paErrorPage">Página de Erro</key>
     <key alias="paErrorPageHelp">Usado quando as pessoas estão logadas, mas não para ter acesso</key>
     <key alias="paHowWould">Escolha como restringir o acesso à esta página</key>
@@ -777,6 +778,8 @@ Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>pub
     <key alias="postContent">Inserir após campo</key>
     <key alias="preContent">Inserir antes do campo</key>
     <key alias="recursive">Recursivo</key>
+    <key alias="removeParagraph">Remover etiquetas de parágrafo</key>
+    <key alias="removeParagraphHelp">Removerá quaisquer &amp;lt;P&amp;gt; do começo ao fim do texto</key>
     <key alias="uppercase">Maiúscula</key>
     <key alias="urlEncode">Codificar URL</key>
     <key alias="urlEncodeHelp">Vai formatar caracteres especiais em URLs</key>
@@ -856,6 +859,9 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Modelos</key>
     <key alias="xslt">Arquivos XSLT</key>
+    <key alias="userPermissions">Permissões de usuário</key>
+    <key alias="userTypes">Tipos de Usuários</key>
+    <key alias="users">Usuários</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Nova atualização pronta</key>
@@ -893,6 +899,8 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
     <key alias="startnode">Nó Inicial do Conteúdo</key>
     <key alias="username">Nome de Usuário</key>
     <key alias="userPermissions">Permissões de usuário</key>
+    <key alias="usertype">Tipo de usuário</key>
+    <key alias="userTypes">Tipos de usuários</key>
     <key alias="writer">Escrevente</key>
   </area>
 </language>

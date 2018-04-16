@@ -3,7 +3,7 @@
 namespace Umbraco.Core.Media.Exif
 {
     /// <summary>
-    /// Represents the JFIF version as a 16 bit unsigned integer. (EXIF Specification: SHORT) 
+    /// Represents the JFIF version as a 16 bit unsigned integer. (EXIF Specification: SHORT)
     /// </summary>
     internal class JFIFVersion : ExifUShort
     {
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Media.Exif
         }
     }
     /// <summary>
-    /// Represents a JFIF thumbnail. (EXIF Specification: BYTE) 
+    /// Represents a JFIF thumbnail. (EXIF Specification: BYTE)
     /// </summary>
     internal class JFIFThumbnailProperty : ExifProperty
     {

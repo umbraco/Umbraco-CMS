@@ -1,27 +1,23 @@
 ﻿using System;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
-    [PropertyValueType(typeof(string))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class MemberGroupPickerValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
-            {
-                return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.MemberGroupPickerAlias);
-            }
-            return false;
-        }
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.MemberGroupPicker);
 
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+            => typeof (string);
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+            => PropertyCacheLevel.Element;
+
+        public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
-            return source == null ? string.Empty : source.ToString();
+            return source?.ToString() ?? string.Empty;
         }
-        
     }
 }

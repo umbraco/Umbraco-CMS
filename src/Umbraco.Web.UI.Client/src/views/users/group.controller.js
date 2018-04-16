@@ -4,8 +4,6 @@
     function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper) {
 
         var vm = this;
-        var localizeSaving = localizationService.localize("general_saving");
-
 
         vm.page = {};        
         vm.page.rootIcon = "icon-folder";
@@ -78,7 +76,6 @@
             vm.page.saveButtonState = "busy";
 
             contentEditingHelper.contentEditorPerformSave({
-                statusMessage: localizeSaving,
                 saveMethod: userGroupsResource.saveUserGroup,
                 scope: $scope,
                 content: vm.userGroup,
@@ -127,7 +124,9 @@
         function openContentPicker() {
             vm.contentPicker = {
                 title: vm.labels.selectContentStartNode,
-                view: "contentpicker",
+                view: "treepicker",
+                section: "content",
+                treeAlias: "content",
                 hideSubmitButton: true,
                 hideHeader: false,
                 show: true,
@@ -218,7 +217,9 @@
         function openGranularPermissionsPicker() {
             vm.contentPicker = {
                 title: vm.labels.selectNode,
-                view: "contentpicker",
+                view: "treepicker",
+                section: "content",
+                treeAlias: "content",
                 hideSubmitButton: true,
                 show: true,
                 submit: function (model) {

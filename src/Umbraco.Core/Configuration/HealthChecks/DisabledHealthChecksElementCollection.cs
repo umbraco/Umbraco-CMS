@@ -4,7 +4,7 @@ using System.Configuration;
 namespace Umbraco.Core.Configuration.HealthChecks
 {
     [ConfigurationCollection(typeof(DisabledHealthCheckElement), AddItemName = "check")]
-    public class DisabledHealthChecksElementCollection : ConfigurationElementCollection, IEnumerable<IDisabledHealthCheck> 
+    public class DisabledHealthChecksElementCollection : ConfigurationElementCollection, IEnumerable<IDisabledHealthCheck>
     {
         protected override ConfigurationElement CreateNewElement()
         {

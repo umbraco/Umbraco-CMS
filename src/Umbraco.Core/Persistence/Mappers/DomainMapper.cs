@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
@@ -11,17 +10,9 @@ namespace Umbraco.Core.Persistence.Mappers
     {
         private static readonly ConcurrentDictionary<string, DtoMapModel> PropertyInfoCacheInstance = new ConcurrentDictionary<string, DtoMapModel>();
 
-        public DomainMapper()
-        {
-            BuildMap();
-        }
+        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
-
-        internal override void BuildMap()
+        protected override void BuildMap()
         {
             CacheMap<UmbracoDomain, DomainDto>(src => src.Id, dto => dto.Id);
             CacheMap<UmbracoDomain, DomainDto>(src => src.RootContentId, dto => dto.RootStructureId);

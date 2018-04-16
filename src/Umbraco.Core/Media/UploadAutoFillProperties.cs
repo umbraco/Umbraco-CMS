@@ -32,8 +32,8 @@ namespace Umbraco.Core.Media
         /// <returns>The auto-fill configuration for the specified property alias, or null.</returns>
         public IImagingAutoFillUploadField GetConfig(string propertyTypeAlias)
         {
-            var autoFillConfigs = _contentSettings.ImageAutoFillProperties;            
-            return autoFillConfigs == null ? null : autoFillConfigs.FirstOrDefault(x => x.Alias == propertyTypeAlias);
+            var autoFillConfigs = _contentSettings.ImageAutoFillProperties;
+            return autoFillConfigs?.FirstOrDefault(x => x.Alias == propertyTypeAlias);
         }
 
         /// <summary>
@@ -41,17 +41,19 @@ namespace Umbraco.Core.Media
         /// </summary>
         /// <param name="content">The content item.</param>
         /// <param name="propertyTypeAlias">The property type alias.</param>
-        public void Reset(IContentBase content, string propertyTypeAlias)
+        /// <param name="languageId">Variation language.</param>
+        /// <param name="segment">Variation segment.</param>
+        public void Reset(IContentBase content, string propertyTypeAlias, int? languageId, string segment)
         {
-            if (content == null) throw new ArgumentNullException("content");
-            if (propertyTypeAlias == null) throw new ArgumentNullException("propertyTypeAlias");
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (propertyTypeAlias == null) throw new ArgumentNullException(nameof(propertyTypeAlias));
 
             // get the config, no config = nothing to do
             var autoFillConfig = GetConfig(propertyTypeAlias);
             if (autoFillConfig == null) return; // nothing
 
             // reset
-            Reset(content, autoFillConfig);
+            Reset(content, autoFillConfig, languageId, segment);
         }
 
         /// <summary>
@@ -59,12 +61,14 @@ namespace Umbraco.Core.Media
         /// </summary>
         /// <param name="content">The content item.</param>
         /// <param name="autoFillConfig">The auto-fill configuration.</param>
-        public void Reset(IContentBase content, IImagingAutoFillUploadField autoFillConfig)
+        /// <param name="languageId">Variation language.</param>
+        /// <param name="segment">Variation segment.</param>
+        public void Reset(IContentBase content, IImagingAutoFillUploadField autoFillConfig, int? languageId, string segment)
         {
-            if (content == null) throw new ArgumentNullException("content");
-            if (autoFillConfig == null) throw new ArgumentNullException("autoFillConfig");
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (autoFillConfig == null) throw new ArgumentNullException(nameof(autoFillConfig));
 
-            ResetProperties(content, autoFillConfig);
+            ResetProperties(content, autoFillConfig, languageId, segment);
         }
 
         /// <summary>
@@ -73,10 +77,12 @@ namespace Umbraco.Core.Media
         /// <param name="content">The content item.</param>
         /// <param name="propertyTypeAlias">The property type alias.</param>
         /// <param name="filepath">The filesystem-relative filepath, or null to clear properties.</param>
-        public void Populate(IContentBase content, string propertyTypeAlias, string filepath)
+        /// <param name="languageId">Variation language.</param>
+        /// <param name="segment">Variation segment.</param>
+        public void Populate(IContentBase content, string propertyTypeAlias, string filepath, int? languageId, string segment)
         {
-            if (content == null) throw new ArgumentNullException("content");
-            if (propertyTypeAlias == null) throw new ArgumentNullException("propertyTypeAlias");
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (propertyTypeAlias == null) throw new ArgumentNullException(nameof(propertyTypeAlias));
 
             // no property = nothing to do
             if (content.Properties.Contains(propertyTypeAlias) == false) return;
@@ -86,7 +92,7 @@ namespace Umbraco.Core.Media
             if (autoFillConfig == null) return; // nothing
 
             // populate
-            Populate(content, autoFillConfig, filepath);
+            Populate(content, autoFillConfig, filepath, languageId, segment);
         }
 
         /// <summary>
@@ -96,10 +102,12 @@ namespace Umbraco.Core.Media
         /// <param name="propertyTypeAlias">The property type alias.</param>
         /// <param name="filepath">The filesystem-relative filepath, or null to clear properties.</param>
         /// <param name="filestream">The stream containing the file data.</param>
-        public void Populate(IContentBase content, string propertyTypeAlias, string filepath, Stream filestream)
+        /// <param name="languageId">Variation language.</param>
+        /// <param name="segment">Variation segment.</param>
+        public void Populate(IContentBase content, string propertyTypeAlias, string filepath, Stream filestream, int? languageId, string segment)
         {
-            if (content == null) throw new ArgumentNullException("content");
-            if (propertyTypeAlias == null) throw new ArgumentNullException("propertyTypeAlias");
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (propertyTypeAlias == null) throw new ArgumentNullException(nameof(propertyTypeAlias));
 
             // no property = nothing to do
             if (content.Properties.Contains(propertyTypeAlias) == false) return;
@@ -109,7 +117,7 @@ namespace Umbraco.Core.Media
             if (autoFillConfig == null) return; // nothing
 
             // populate
-            Populate(content, autoFillConfig, filepath, filestream);
+            Populate(content, autoFillConfig, filepath, filestream, languageId, segment);
         }
 
         /// <summary>
@@ -119,15 +127,17 @@ namespace Umbraco.Core.Media
         /// <param name="autoFillConfig">The auto-fill configuration.</param>
         /// <param name="filepath">The filesystem path to the uploaded file.</param>
         /// <remarks>The <paramref name="filepath"/> parameter is the path relative to the filesystem.</remarks>
-        public void Populate(IContentBase content, IImagingAutoFillUploadField autoFillConfig, string filepath)
+        /// <param name="languageId">Variation language.</param>
+        /// <param name="segment">Variation segment.</param>
+        public void Populate(IContentBase content, IImagingAutoFillUploadField autoFillConfig, string filepath, int? languageId, string segment)
         {
-            if (content == null) throw new ArgumentNullException("content");
-            if (autoFillConfig == null) throw new ArgumentNullException("autoFillConfig");
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (autoFillConfig == null) throw new ArgumentNullException(nameof(autoFillConfig));
 
             // no file = reset, file = auto-fill
             if (filepath.IsNullOrWhiteSpace())
             {
-                ResetProperties(content, autoFillConfig);
+                ResetProperties(content, autoFillConfig, languageId, segment);
             }
             else
             {
@@ -138,14 +148,13 @@ namespace Umbraco.Core.Media
                     {
                         var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
                         var size = _mediaFileSystem.IsImageFile(extension) ? (Size?) _mediaFileSystem.GetDimensions(filestream) : null;
-                        SetProperties(content, autoFillConfig, size, filestream.Length, extension);
+                        SetProperties(content, autoFillConfig, size, filestream.Length, extension, languageId, segment);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(typeof(UploadAutoFillProperties), "Could not populate upload auto-fill properties for file \""
-                        + filepath + "\".", ex);
-                    ResetProperties(content, autoFillConfig);
+                    _logger.Error(typeof(UploadAutoFillProperties), $"Could not populate upload auto-fill properties for file \"{filepath}\".", ex);
+                    ResetProperties(content, autoFillConfig, languageId, segment);
                 }
             }
         }
@@ -157,58 +166,60 @@ namespace Umbraco.Core.Media
         /// <param name="autoFillConfig"></param>
         /// <param name="filepath">The filesystem-relative filepath, or null to clear properties.</param>
         /// <param name="filestream">The stream containing the file data.</param>
-        public void Populate(IContentBase content, IImagingAutoFillUploadField autoFillConfig, string filepath, Stream filestream)
+        /// <param name="languageId">Variation language.</param>
+        /// <param name="segment">Variation segment.</param>
+        public void Populate(IContentBase content, IImagingAutoFillUploadField autoFillConfig, string filepath, Stream filestream, int? languageId, string segment)
         {
-            if (content == null) throw new ArgumentNullException("content");
-            if (autoFillConfig == null) throw new ArgumentNullException("autoFillConfig");
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (autoFillConfig == null) throw new ArgumentNullException(nameof(autoFillConfig));
 
             // no file = reset, file = auto-fill
             if (filepath.IsNullOrWhiteSpace() || filestream == null)
             {
-                ResetProperties(content, autoFillConfig);
+                ResetProperties(content, autoFillConfig, languageId, segment);
             }
             else
             {
                 var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
                 var size = _mediaFileSystem.IsImageFile(extension) ? (Size?)_mediaFileSystem.GetDimensions(filestream) : null;
-                SetProperties(content, autoFillConfig, size, filestream.Length, extension);
+                SetProperties(content, autoFillConfig, size, filestream.Length, extension, languageId, segment);
             }
         }
 
-        private static void SetProperties(IContentBase content, IImagingAutoFillUploadField autoFillConfig, Size? size, long length, string extension)
+        private static void SetProperties(IContentBase content, IImagingAutoFillUploadField autoFillConfig, Size? size, long length, string extension, int? languageId, string segment)
         {
-            if (content == null) throw new ArgumentNullException("content");
-            if (autoFillConfig == null) throw new ArgumentNullException("autoFillConfig");
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (autoFillConfig == null) throw new ArgumentNullException(nameof(autoFillConfig));
 
             if (content.Properties.Contains(autoFillConfig.WidthFieldAlias))
-                content.Properties[autoFillConfig.WidthFieldAlias].Value = size.HasValue ? size.Value.Width.ToInvariantString() : string.Empty;
+                content.Properties[autoFillConfig.WidthFieldAlias].SetValue(size.HasValue ? size.Value.Width.ToInvariantString() : string.Empty, languageId, segment);
 
             if (content.Properties.Contains(autoFillConfig.HeightFieldAlias))
-                content.Properties[autoFillConfig.HeightFieldAlias].Value = size.HasValue ? size.Value.Height.ToInvariantString() : string.Empty;
+                content.Properties[autoFillConfig.HeightFieldAlias].SetValue(size.HasValue ? size.Value.Height.ToInvariantString() : string.Empty, languageId, segment);
 
             if (content.Properties.Contains(autoFillConfig.LengthFieldAlias))
-                content.Properties[autoFillConfig.LengthFieldAlias].Value = length;
+                content.Properties[autoFillConfig.LengthFieldAlias].SetValue(length, languageId, segment);
 
             if (content.Properties.Contains(autoFillConfig.ExtensionFieldAlias))
-                content.Properties[autoFillConfig.ExtensionFieldAlias].Value = extension;
-}
+                content.Properties[autoFillConfig.ExtensionFieldAlias].SetValue(extension, languageId, segment);
+        }
 
-        private static void ResetProperties(IContentBase content, IImagingAutoFillUploadField autoFillConfig)
+        private static void ResetProperties(IContentBase content, IImagingAutoFillUploadField autoFillConfig, int? languageId, string segment)
         {
-            if (content == null) throw new ArgumentNullException("content");
-            if (autoFillConfig == null) throw new ArgumentNullException("autoFillConfig");
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (autoFillConfig == null) throw new ArgumentNullException(nameof(autoFillConfig));
 
             if (content.Properties.Contains(autoFillConfig.WidthFieldAlias))
-                content.Properties[autoFillConfig.WidthFieldAlias].Value = string.Empty;
+                content.Properties[autoFillConfig.WidthFieldAlias].SetValue(string.Empty, languageId, segment);
 
             if (content.Properties.Contains(autoFillConfig.HeightFieldAlias))
-                content.Properties[autoFillConfig.HeightFieldAlias].Value = string.Empty;
+                content.Properties[autoFillConfig.HeightFieldAlias].SetValue(string.Empty, languageId, segment);
 
             if (content.Properties.Contains(autoFillConfig.LengthFieldAlias))
-                content.Properties[autoFillConfig.LengthFieldAlias].Value = string.Empty;
+                content.Properties[autoFillConfig.LengthFieldAlias].SetValue(string.Empty, languageId, segment);
 
             if (content.Properties.Contains(autoFillConfig.ExtensionFieldAlias))
-                content.Properties[autoFillConfig.ExtensionFieldAlias].Value = string.Empty;
+                content.Properties[autoFillConfig.ExtensionFieldAlias].SetValue(string.Empty, languageId, segment);
         }
     }
 }

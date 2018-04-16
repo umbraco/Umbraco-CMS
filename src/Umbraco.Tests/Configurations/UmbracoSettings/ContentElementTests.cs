@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Macros;
 
 namespace Umbraco.Tests.Configurations.UmbracoSettings
 {
@@ -39,7 +40,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(2).ContentKey == new Guid("8560867F-B88F-4C74-A9A4-679D8E5B3BFC"));
             Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(2).HasContentKey);
             Assert.IsFalse(SettingsSection.Content.Error404Collection.ElementAt(2).HasContentId);
-        }    
+        }
 
         [Test]
         public void ScriptFolderPath()
@@ -108,21 +109,8 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.IsTrue(SettingsSection.Content.EnsureUniqueNaming == true);
         }
-        [Test]
-        public void TidyEditorContent()
-        {
-            Assert.IsTrue(SettingsSection.Content.TidyEditorContent == false);
-        }
-        [Test]
-        public virtual void TidyCharEncoding()
-        {
-            Assert.IsTrue(SettingsSection.Content.TidyCharEncoding == "Raw");
-        }
-        [Test]
-        public void UseLegacyXmlSchema()
-        {
-            Assert.IsTrue(SettingsSection.Content.UseLegacyXmlSchema == false);
-        }
+
+
         [Test]
         public void ForceSafeAliases()
         {
@@ -173,7 +161,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.IsTrue(SettingsSection.Content.MacroErrorBehaviour == MacroErrorBehaviour.Inline);
         }
-        
+
         [Test]
         public void DisallowedUploadFiles()
         {

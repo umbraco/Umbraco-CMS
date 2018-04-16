@@ -7,7 +7,7 @@ namespace Umbraco.Web.Models.ContentEditing
 {
     /// <summary>
     /// A model representing a content item to be displayed in the back office
-    /// </summary>    
+    /// </summary>
     [DataContract(Name = "content", Namespace = "")]
     public class ContentItemDisplay : ListViewAwareContentItemDisplayBase<ContentPropertyDisplay, IContent>
     {
@@ -25,6 +25,12 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "removeDate")]
         public DateTime? ExpireDate { get; set; }
 
+        /// <summary>
+        /// Represents the variant info for a content item
+        /// </summary>
+        [DataMember(Name = "variants")]
+        public IEnumerable<ContentVariation> Variants { get; set; }
+        
         [DataMember(Name = "template")]
         public string TemplateAlias { get; set; }
 

@@ -1,28 +1,18 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.UserPickerAlias, "User picker", PropertyEditorValueTypes.Integer, "entitypicker", Group="People", Icon="icon-user")]
-    public class UserPickerPropertyEditor : PropertyEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.UserPicker, "User picker", "entitypicker", ValueType = ValueTypes.Integer, Group = "People", Icon = "icon-user")]
+    public class UserPickerPropertyEditor : DataEditor
     {
-        private IDictionary<string, object> _defaultPreValues;
+        public UserPickerPropertyEditor(ILogger logger)
+            : base(logger)
+        { }
 
-        public UserPickerPropertyEditor()
-        {
-            _defaultPreValues = new Dictionary<string, object>
-                {
-                    {"entityType", "User"}
-                };
-        }
-
-        public override IDictionary<string, object> DefaultPreValues
-        {
-            get { return _defaultPreValues; }
-            set { _defaultPreValues = value; }
-        }
+        protected override IConfigurationEditor CreateConfigurationEditor() => new UserPickerConfiguration();
     }
 }

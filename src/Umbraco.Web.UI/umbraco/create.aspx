@@ -1,5 +1,5 @@
 <%@ Page Language="c#" MasterPageFile="masterpages/umbracoDialog.Master" Codebehind="CreateDialog.aspx.cs" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Umbraco.CreateDialog" %>
-<%@ Register Namespace="umbraco" TagPrefix="umb" Assembly="umbraco" %>
+<%@ Register Namespace="umbraco" TagPrefix="umb" Assembly="Umbraco.Web" %>
 
 
 <asp:Content ContentPlaceHolderID="head" runat="server">

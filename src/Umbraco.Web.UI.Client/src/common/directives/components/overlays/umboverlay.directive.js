@@ -59,7 +59,6 @@
 </pre>
 
 <h1>General Options</h1>
-Lorem ipsum dolor sit amet..
 <table>
     <thead>
         <tr>
@@ -74,7 +73,7 @@ Lorem ipsum dolor sit amet..
         <td>Set the title of the overlay.</td>
     </tr>
     <tr>
-        <td>model.subTitle</td>
+        <td>model.subtitle</td>
         <td>String</td>
         <td>Set the subtitle of the overlay.</td>
     </tr>
@@ -87,6 +86,11 @@ Lorem ipsum dolor sit amet..
         <td>model.submitButtonLabelKey</td>
         <td>String</td>
         <td>Set an alternate submit button label key for localized texts</td>
+    </tr>
+    <tr>
+        <td>model.submitButtonState</td>
+        <td>String</td>
+        <td>Set the state for the submit button</td>
     </tr>
     <tr>
         <td>model.hideSubmitButton</td>
@@ -408,7 +412,7 @@ Opens an overlay to show a custom YSOD. </br>
 (function() {
    'use strict';
 
-   function OverlayDirective($timeout, formHelper, overlayHelper, localizationService) {
+   function OverlayDirective($timeout, formHelper, overlayHelper, localizationService, $q) {
 
       function link(scope, el, attr, ctrl) {
 
@@ -439,7 +443,7 @@ Opens an overlay to show a custom YSOD. </br>
                // this has to be done inside a timeout to ensure the destroy
                // event on other overlays is run before registering a new one
                registerOverlay();
-
+               
                setOverlayIndent();
 
             });
@@ -496,6 +500,7 @@ Opens an overlay to show a custom YSOD. </br>
                      var activeElementType = document.activeElement.tagName;
                      var clickableElements = ["A", "BUTTON"];
                      var submitOnEnter = document.activeElement.hasAttribute("overlay-submit-on-enter");
+                     var submitOnEnterValue = submitOnEnter ? document.activeElement.getAttribute("overlay-submit-on-enter") : "";
 
                      if(clickableElements.indexOf(activeElementType) === 0) {
                         document.activeElement.click();
@@ -503,7 +508,9 @@ Opens an overlay to show a custom YSOD. </br>
                      } else if(activeElementType === "TEXTAREA" && !submitOnEnter) {
 
 
-                     } else {
+                     } else if (submitOnEnter && submitOnEnterValue === "false") {
+                         // don't do anything
+                     }else {
                         scope.$apply(function () {
                            scope.submitForm(scope.model);
                         });
@@ -554,8 +561,8 @@ Opens an overlay to show a custom YSOD. </br>
             var overlayWidth = el.context.clientWidth;
 
             el.css('width', overlayWidth - indentSize);
-
-            if(scope.position === "center" || scope.position === "target") {
+            
+            if(scope.position === "center" && overlayIndex > 0 || scope.position === "target" && overlayIndex > 0) {
                var overlayTopPosition = el.context.offsetTop;
                el.css('top', overlayTopPosition + indentSize);
             }
@@ -630,15 +637,22 @@ Opens an overlay to show a custom YSOD. </br>
 
          scope.submitForm = function(model) {
             if(scope.model.submit) {
-                 if (formHelper.submitForm({scope: scope})) {
-                    formHelper.resetForm({ scope: scope });
-
-                    if(scope.model.confirmSubmit && scope.model.confirmSubmit.enable && !scope.directive.enableConfirmButton) {
-                        scope.model.submit(model, modelCopy, scope.directive.enableConfirmButton);
-                    } else {
-                        unregisterOverlay();
-                        scope.model.submit(model, modelCopy, scope.directive.enableConfirmButton);
-                    }
+                if (formHelper.submitForm({ scope: scope, skipValidation: scope.model.skipFormValidation})) {
+                    
+                     if (scope.model.confirmSubmit && scope.model.confirmSubmit.enable && !scope.directive.enableConfirmButton) {
+                        //wrap in a when since we don't know if this is a promise or not
+                         $q.when(scope.model.submit(model, modelCopy, scope.directive.enableConfirmButton)).then(
+                             function() {
+                                 formHelper.resetForm({ scope: scope });
+                             }, angular.noop);
+                     } else {
+                         unregisterOverlay();
+                         //wrap in a when since we don't know if this is a promise or not
+                         $q.when(scope.model.submit(model, modelCopy, scope.directive.enableConfirmButton)).then(
+                             function() {
+                                 formHelper.resetForm({ scope: scope });
+                             }, angular.noop);
+                     }
 
                  }
              }

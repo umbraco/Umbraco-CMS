@@ -83,6 +83,7 @@
     <key alias="returnToList">Tilbake til listen</key>
     <key alias="save">Lagre</key>
     <key alias="saveAndPublish">Lagre og publiser</key>
+    <key alias="saveAndSchedule">Lagre og planlegge</key>
     <key alias="saveToPublish">Lagre og send til publisering</key>
     <key alias="showPage">Forhåndsvis</key>
     <key alias="showPageDisabled">Forhåndsvisning er deaktivert siden det ikke er angitt noen mal</key>
@@ -975,6 +976,9 @@ Vennlig hilsen Umbraco roboten
     <key alias="templates">Maler</key>
     <key alias="xslt">XSLT Filer</key>
     <key alias="analytics">Analytics</key>
+    <key alias="userPermissions">Brukertillatelser</key>
+    <key alias="userTypes">Brukertyper typer</key>
+    <key alias="users">Brukere</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Ny oppdatering er klar</key>

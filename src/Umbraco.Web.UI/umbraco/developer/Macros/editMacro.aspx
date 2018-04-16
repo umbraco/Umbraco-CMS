@@ -1,7 +1,7 @@
 <%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master" Title="Edit macro"
     CodeBehind="EditMacro.aspx.cs" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Umbraco.Developer.Macros.EditMacro" %>
 
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 <%@ Register TagPrefix="CD" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
@@ -58,9 +58,6 @@
         <cc1:PropertyPanel runat="server" Text="Alias">
             <asp:TextBox ID="macroAlias" runat="server" CssClass="guiInputText"></asp:TextBox>
         </cc1:PropertyPanel>
-        <cc1:PropertyPanel runat="server" Text="Key">
-            <asp:Label ID="macroKey" runat="server" CssClass="guiLabel"></asp:Label>
-        </cc1:PropertyPanel>
     </cc1:Pane>
 
 
@@ -83,12 +80,6 @@
                     <asp:DropDownList ID="userControlList" runat="server">
                     </asp:DropDownList>
                     <asp:PlaceHolder ID="assemblyBrowserUserControl" runat="server"></asp:PlaceHolder>
-        </cc1:PropertyPanel>
-
-        <cc1:PropertyPanel runat="server" Text="Razor script">
-             <asp:TextBox ID="macroPython" runat="server" CssClass="guiInputText"></asp:TextBox>
-                    <asp:DropDownList ID="pythonFiles" runat="server">
-                    </asp:DropDownList>
         </cc1:PropertyPanel>
 
         <asp:PlaceHolder runat="server" Visible="false">
@@ -132,16 +123,16 @@
                     <thead>
                         <tr>
                             <th>
-                                <%=umbraco.ui.Text("general", "alias",UmbracoUser)%>
+                                <%=Services.TextService.Localize("general/alias")%>
                             </th>
                             <th>
-                                <%=umbraco.ui.Text("general", "name",UmbracoUser)%>
+                                <%=Services.TextService.Localize("general/name")%>
                             </th>
                             <th>
-                                <%=umbraco.ui.Text("general", "type",UmbracoUser)%>
+                                <%=Services.TextService.Localize("general/type")%>
                             </th>
                             <th>
-                                <%=umbraco.ui.Text("general", "sort",UmbracoUser)%>
+                                <%=Services.TextService.Localize("general/sort")%>
                             </th>
                             <th></th>
                         </tr>

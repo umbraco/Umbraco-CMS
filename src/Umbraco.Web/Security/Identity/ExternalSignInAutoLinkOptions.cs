@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Web.Security.Identity
@@ -13,21 +14,6 @@ namespace Umbraco.Web.Security.Identity
     /// </summary>
     public class ExternalSignInAutoLinkOptions
     {
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the overload specifying user groups instead and defaultAllowedSections now serves no purpose")]
-        public ExternalSignInAutoLinkOptions(
-            bool autoLinkExternalAccount = false,
-            string defaultUserType = "editor", 
-            string[] defaultAllowedSections = null, 
-            string defaultCulture = null)
-        {
-            Mandate.ParameterNotNullOrEmpty(defaultUserType, "defaultUserType");
-
-            _defaultUserGroups = new[] {defaultUserType};
-            _autoLinkExternalAccount = autoLinkExternalAccount;
-            _defaultCulture = defaultCulture ?? GlobalSettings.DefaultUILanguage;
-        }
-
         /// <summary>
         /// Creates a new <see cref="ExternalSignInAutoLinkOptions"/> instance
         /// </summary>
@@ -41,7 +27,7 @@ namespace Umbraco.Web.Security.Identity
         {
             _defaultUserGroups = defaultUserGroups ?? new[] { "editor" };
             _autoLinkExternalAccount = autoLinkExternalAccount;
-            _defaultCulture = defaultCulture ?? GlobalSettings.DefaultUILanguage;
+            _defaultCulture = defaultCulture ?? UmbracoConfig.For.GlobalSettings().DefaultUILanguage;
         }
 
         private readonly string[] _defaultUserGroups;
@@ -87,16 +73,16 @@ namespace Umbraco.Web.Security.Identity
         /// <summary>
         /// For private external auth providers such as Active Directory, which when set to true will automatically
         /// create a local user if the external provider login was successful.
-        /// 
+        ///
         /// For public auth providers this should always be false!!!
         /// </summary>
         public bool ShouldAutoLinkExternalAccount(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
             return _autoLinkExternalAccount;
         }
-        
+
         private readonly string _defaultCulture;
-       
+
         /// <summary>
         /// The default Culture to use for auto-linking users
         /// </summary>

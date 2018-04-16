@@ -1,17 +1,15 @@
 <%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="True" Inherits="umbraco.presentation.umbraco.dialogs.protectPage" %>
 
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <script type="text/javascript">
         function updateLoginId() {
-            var treePicker = window.showModalDialog('<%=umbraco.cms.presentation.Trees.TreeService.GetPickerUrl(true,"content","content")%>', 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')
+            var treePicker = window.showModalDialog('<%=umbraco.cms.presentation.Trees.TreeService.GetPickerUrl("content","content")%>', 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')
 	    if (treePicker != undefined) {
 	        document.getElementById("loginId").value = treePicker;
 	        if (treePicker > 0) {
-	            umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbraco.BasePages.BasePage.umbracoUserContextID%>', treePicker, updateLoginTitle);
+	            umbraco.presentation.webservices.CMSNode.GetNodeName('<%=Security.CurrentUser.Id%>', treePicker, updateLoginTitle);
 					} else
-					    document.getElementById("loginTitle").innerHTML =  "<strong><%=umbraco.ui.Text("content", base.getUser())%></strong>";
+					    document.getElementById("loginTitle").innerHTML =  "<strong><%=Services.TextService.Localize("content")%></strong>";
                 }
             }
 
@@ -20,13 +18,13 @@
             }
 
             function updateErrorId() {
-                var treePicker = window.showModalDialog('<%=umbraco.cms.presentation.Trees.TreeService.GetPickerUrl(true,"content","content")%>', 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')
+                var treePicker = window.showModalDialog('<%=umbraco.cms.presentation.Trees.TreeService.GetPickerUrl("content","content")%>', 'treePicker', 'dialogWidth=350px;dialogHeight=300px;scrollbars=no;center=yes;border=thin;help=no;status=no')
 			    if (treePicker != undefined) {
 			        document.getElementById("errorId").value = treePicker;
 			        if (treePicker > 0) {
-			            umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbraco.BasePages.BasePage.umbracoUserContextID%>', treePicker, updateErrorTitle);
+			            umbraco.presentation.webservices.CMSNode.GetNodeName('<%=Security.CurrentUser.Id%>', treePicker, updateErrorTitle);
 					} else
-					    document.getElementById("errorTitle").innerHTML =  "<strong><%=umbraco.ui.Text("content", base.getUser())%></strong>";
+					    document.getElementById("errorTitle").innerHTML =  "<strong><%=Services.TextService.Localize("content")%></strong>";
                 }
             }
             function updateErrorTitle(result) {
@@ -91,8 +89,8 @@
                 <asp:RadioButton GroupName="mode" ID="rb_simple" runat="server" Checked="true" />
 
                 <label for="body_rb_simple">
-                    <h4 class="pa-access-header"><%= umbraco.ui.Text("publicAccess", "paSimple", base.getUser())%></h4>
-                    <p class="pa-access-description"><%= umbraco.ui.Text("publicAccess", "paSimpleHelp", base.getUser())%></p>
+                    <h4 class="pa-access-header"><%= Services.TextService.Localize("publicAccess/paSimple")%></h4>
+                    <p class="pa-access-description"><%= Services.TextService.Localize("publicAccess/paSimpleHelp")%></p>
                 </label>
             </div>
 
@@ -101,12 +99,13 @@
                 <asp:RadioButton GroupName="mode" ID="rb_advanced" runat="server"/>
 
                 <label for="body_rb_advanced">
-                    <h4 class="pa-access-header"><%= umbraco.ui.Text("publicAccess", "paAdvanced", base.getUser())%></h4>
-                    <p class="pa-access-description"><%= umbraco.ui.Text("publicAccess", "paAdvancedHelp", base.getUser())%></p>
-                    <br />
+                    <h4 class="pa-access-header"><%= Services.TextService.Localize("publicAccess/paAdvanced")%></h4>
+                    <p class="pa-access-description"><%= Services.TextService.Localize("publicAccess/paAdvancedHelp")%></p>
 
-                    <asp:Panel runat="server" Visible="false" ID="p_noGroupsFound" CssClass="alert alert-danger">
-                        <span><%= umbraco.ui.Text("publicAccess", "paAdvancedNoGroups", UmbracoUser)%></span>
+                    <asp:Panel runat="server" Visible="false" ID="p_noGroupsFound" CssClass="error">
+                        <p>
+                            <%= Services.TextService.Localize("publicAccess/paAdvancedNoGroups")%>
+                        </p>
                     </asp:Panel>
                 </label>
             </div>
@@ -115,7 +114,7 @@
         </div>
 
         <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-            <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
+            <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("cancel")%></a>
             <asp:Button ID="bt_selectMode" runat="server" Text="select" CssClass="btn btn-primary" OnClick="selectMode" />
         </div>
     </asp:Panel>
@@ -136,14 +135,14 @@
             </cc1:PropertyPanel>
         </div>
 
-        <asp:CustomValidator CssClass="alert alert-danger" runat="server" ID="SimpleLoginNameValidator" Display="Dynamic" EnableViewState="False">
+        <asp:CustomValidator CssClass="pa-validation-message error" runat="server" ID="SimpleLoginNameValidator" Display="Dynamic" EnableViewState="False">
            <p class="alert">Member name already exists, click <asp:LinkButton runat="server" OnClick="ChangeOnClick" CssClass="btn btn-mini btn-warning">Change</asp:LinkButton> to use a different name or Update to continue</p>
         </asp:CustomValidator>
     </cc1:Pane>
 
     <cc1:Pane ID="pane_advanced" runat="server" Visible="false" Text="Role based protection">
         <cc1:PropertyPanel ID="PropertyPanel3" runat="server">
-            <p><%= umbraco.ui.Text("publicAccess", "paSelectRoles", UmbracoUser)%></p>
+            <p><%= Services.TextService.Localize("publicAccess/paSelectRoles")%></p>
         </cc1:PropertyPanel>
         <cc1:PropertyPanel ID="PropertyPanel2" runat="server">
             <asp:PlaceHolder ID="groupsSelector" runat="server"></asp:PlaceHolder>
@@ -155,7 +154,7 @@
 
             <cc1:PropertyPanel runat="server" ID="pp_loginPage" CssClass="pa-select-pages">
                 <small class="umb-detail">
-                    <%=umbraco.ui.Text("paLoginPageHelp")%>
+                    <%=Services.TextService.Localize("paLoginPageHelp")%>
                 </small>
                 <div class="pa-choose-page">
                     <asp:PlaceHolder ID="ph_loginpage" runat="server" />
@@ -167,7 +166,7 @@
 
             <cc1:PropertyPanel runat="server" ID="pp_errorPage" CssClass="pa-select-pages">
                 <small class="umb-detail">
-                    <%=umbraco.ui.Text("paErrorPageHelp")%>
+                    <%=Services.TextService.Localize("paErrorPageHelp")%>
                 </small>
                 <div class="pa-choose-page">
                     <asp:PlaceHolder ID="ph_errorpage" runat="server" />
@@ -179,7 +178,7 @@
 
 
         <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-            <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
+            <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("cancel")%></a>
             <asp:Button ID="bt_protect" CssClass="btn btn-primary" runat="server" OnCommand="protect_Click"></asp:Button>
             <asp:Button ID="bt_buttonRemoveProtection" CssClass="btn btn-danger" runat="server" Visible="False" OnClick="buttonRemoveProtection_Click" />
         </div>

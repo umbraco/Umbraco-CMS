@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using Umbraco.Core.IO;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -13,7 +13,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public abstract class File : Entity, IFile
+    public abstract class File : EntityBase, IFile
     {
         private string _path;
         private string _originalPath;
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Models
             get
             {
                 if (_alias == null)
-                {                   
+                {
                     var name = System.IO.Path.GetFileName(Path);
                     if (name == null) return string.Empty;
                     var lastIndexOf = name.LastIndexOf(".", StringComparison.InvariantCultureIgnoreCase);
@@ -96,7 +96,7 @@ namespace Umbraco.Core.Models
                 _alias = null;
                 _name = null;
 
-                SetPropertyValueAndDetectChanges(SanitizePath(value), ref _path, Ps.Value.PathSelector);                
+                SetPropertyValueAndDetectChanges(SanitizePath(value), ref _path, Ps.Value.PathSelector);
             }
         }
 
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Models
             {
                 SetPropertyValueAndDetectChanges(
                     value ?? string.Empty, // cannot set to null
-                    ref _content, Ps.Value.ContentSelector);                
+                    ref _content, Ps.Value.ContentSelector);
             }
         }
 

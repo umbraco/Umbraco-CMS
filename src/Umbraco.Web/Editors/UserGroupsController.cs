@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -25,7 +25,7 @@ namespace Umbraco.Web.Editors
         [UserGroupValidate]
         public UserGroupDisplay PostSaveUserGroup(UserGroupSave userGroupSave)
         {
-            if (userGroupSave == null) throw new ArgumentNullException("userGroupSave");
+            if (userGroupSave == null) throw new ArgumentNullException(nameof(userGroupSave));
 
             //authorize that the user has access to save this user group
             var authHelper = new UserGroupEditorAuthorizationHelper(
@@ -52,7 +52,7 @@ namespace Umbraco.Web.Editors
 
             //save the group
             Services.UserService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());
-            
+
             //deal with permissions
 
             //remove ones that have been removed
@@ -68,7 +68,7 @@ namespace Umbraco.Web.Editors
             foreach (var assignedPermission in userGroupSave.AssignedPermissions)
             {
                 Services.UserService.ReplaceUserGroupPermissions(
-                    userGroupSave.PersistedUserGroup.Id, 
+                    userGroupSave.PersistedUserGroup.Id,
                     assignedPermission.Value.Select(x => x[0]),
                     assignedPermission.Key);
             }
@@ -81,7 +81,7 @@ namespace Umbraco.Web.Editors
 
         /// <summary>
         /// Returns the scaffold for creating a new user group
-        /// </summary>        
+        /// </summary>
         /// <returns></returns>
         public UserGroupDisplay GetEmptyUserGroup()
         {
@@ -122,7 +122,7 @@ namespace Umbraco.Web.Editors
             var found = Services.UserService.GetUserGroupById(id);
             if (found == null)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-            
+
             var display =  Mapper.Map<UserGroupDisplay>(found);
 
             return display;

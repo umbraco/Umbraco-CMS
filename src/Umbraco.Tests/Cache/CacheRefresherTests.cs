@@ -1,7 +1,5 @@
-using System;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Umbraco.Core.Sync;
-using umbraco.presentation.webservices;
 
 namespace Umbraco.Tests.Cache
 {

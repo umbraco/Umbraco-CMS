@@ -6,7 +6,7 @@
 
         FailedNoPrivileges = 100,
 
-        //FailedTimedOut, 
+        //FailedTimedOut,
 
         FailedNoContextId = 101,
         FailedNoSsl = 102

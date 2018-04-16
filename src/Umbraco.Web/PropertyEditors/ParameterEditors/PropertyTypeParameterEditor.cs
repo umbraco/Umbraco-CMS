@@ -1,16 +1,19 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core.Logging;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
-    [ParameterEditor("propertyTypePicker", "Property Type Picker", "entitypicker")]
-    public class PropertyTypeParameterEditor : ParameterEditor
+    [DataEditor("propertyTypePicker", EditorType.MacroParameter, "Property Type Picker", "entitypicker")]
+    public class PropertyTypeParameterEditor : DataEditor
     {
-        public PropertyTypeParameterEditor()
+        public PropertyTypeParameterEditor(ILogger logger)
+            : base(logger)
         {
-            Configuration.Add("multiple", "0");
-            Configuration.Add("entityType", "PropertyType");
-            //don't publish the id for a property type, publish it's alias
-            Configuration.Add("publishBy", "alias");
+            // configure
+            DefaultConfiguration.Add("multiple", "0");
+            DefaultConfiguration.Add("entityType", "PropertyType");
+            //don't publish the id for a property type, publish its alias
+            DefaultConfiguration.Add("publishBy", "alias");
         }
     }
 }

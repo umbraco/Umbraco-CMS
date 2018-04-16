@@ -2,8 +2,8 @@
 
 namespace Umbraco.Web.Mvc
 {
-	public interface IHtmlTagWrapper
-	{
-		void WriteToHtmlTextWriter(HtmlTextWriter html);
-	}
+    public interface IHtmlTagWrapper
+    {
+        void WriteToHtmlTextWriter(HtmlTextWriter html);
+    }
 }

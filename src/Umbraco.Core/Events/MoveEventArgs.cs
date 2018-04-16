@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -120,11 +120,11 @@ namespace Umbraco.Core.Events
                     throw new InvalidOperationException("MoveInfoCollection must have at least one item");
                 }
 
-                _moveInfoCollection = value;                
+                _moveInfoCollection = value;
 
-                //assign the legacy props                
+                //assign the legacy props
                 EventObject = first.Entity;
-                ParentId = first.NewParentId;                
+                ParentId = first.NewParentId;
             }
         }
 

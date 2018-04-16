@@ -376,18 +376,6 @@ Umbraco.Application.Actions = function() {
 
         },
 
-        actionDisable: function() {
-            /// <summary>
-            /// Used for users when disable is selected.
-            /// </summary>
-
-            if (confirm(uiKeys['defaultdialogs_confirmdisable'] + ' "' + UmbClientMgr.mainTree().getActionNode().nodeName + '"?\n\n')) {
-                umbraco.presentation.webservices.legacyAjaxCalls.DisableUser(UmbClientMgr.mainTree().getActionNode().nodeId, function() {
-                    UmbClientMgr.mainTree().reloadActionNode();
-                });
-            }
-        },
-
         _debug: function(strMsg) {
             if (this._isDebug) {
                 Sys.Debug.trace("AppActions: " + strMsg);

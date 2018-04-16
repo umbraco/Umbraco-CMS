@@ -3,24 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
 using AutoMapper;
-using umbraco;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Search;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, null, sortOrder: 6)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.DocumentTypes, null, sortOrder: 0)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
-    [LegacyBaseTree(typeof(loadNodeTypes))]
     public class ContentTypeTreeController : TreeController, ISearchableTree
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -35,7 +33,7 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren(), "");
+                        var node = CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, "icon-folder", dt.HasChildren, "");
                         node.Path = dt.Path;
                         node.NodeType = "container";
                         //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
@@ -51,10 +49,10 @@ namespace Umbraco.Web.Trees
                     .OrderBy(entity => entity.Name)
                     .Select(dt =>
                     {
-                        var node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentTypeGuid, id, queryStrings, "icon-item-arrangement",
-                            //NOTE: Since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to. 
-                            //We need this check to keep supporting sites where childs have already been created.
-                            dt.HasChildren());
+                        // since 7.4+ child type creation is enabled by a config option. It defaults to on, but can be disabled if we decide to.
+                        // need this check to keep supporting sites where childs have already been created.
+                        var hasChildren = dt.HasChildren;
+                        var node = CreateTreeNode(dt, Constants.ObjectTypes.DocumentType, id, queryStrings, "icon-item-arrangement", hasChildren);
 
                         node.Path = dt.Path;
                         return node;
@@ -74,9 +72,9 @@ namespace Umbraco.Web.Trees
                 //set the default to create
                 menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
-                // root actions              
+                // root actions
                 menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-                menu.Items.Add<ActionImport>(Services.TextService.Localize(string.Format("actions/{0}", ActionImport.Instance.Alias)), true).ConvertLegacyMenuItem(new UmbracoEntity
+                menu.Items.Add<ActionImport>(Services.TextService.Localize(string.Format("actions/{0}", ActionImport.Instance.Alias)), true).ConvertLegacyMenuItem(new EntitySlim
                 {
                     Id = int.Parse(id),
                     Level = 1,
@@ -100,19 +98,19 @@ namespace Umbraco.Web.Trees
                     Icon = "icon icon-edit"
                 });
 
-                if (container.HasChildren() == false)
+                if (container.HasChildren == false)
                 {
                     //can delete doc type
                     menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
                 }
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
 
-                
+
             }
             else
             {
-                var ct = Services.ContentTypeService.GetContentType(int.Parse(id));
-                var parent = ct == null ? null : Services.ContentTypeService.GetContentType(ct.ParentId);
+                var ct = Services.ContentTypeService.Get(int.Parse(id));
+                var parent = ct == null ? null : Services.ContentTypeService.Get(ct.ParentId);
 
                 if (enableInheritedDocumentTypes)
                 {
@@ -134,7 +132,7 @@ namespace Umbraco.Web.Trees
                     }
                 }
                 menu.Items.Add<ActionCopy>(Services.TextService.Localize(string.Format("actions/{0}", ActionCopy.Instance.Alias)));
-                menu.Items.Add<ActionExport>(Services.TextService.Localize(string.Format("actions/{0}", ActionExport.Instance.Alias)), true).ConvertLegacyMenuItem(new UmbracoEntity
+                menu.Items.Add<ActionExport>(Services.TextService.Localize(string.Format("actions/{0}", ActionExport.Instance.Alias)), true).ConvertLegacyMenuItem(new EntitySlim
                 {
                     Id = int.Parse(id),
                     Level = 1,
@@ -151,7 +149,7 @@ namespace Umbraco.Web.Trees
 
         public IEnumerable<SearchResultItem> Search(string query, int pageSize, long pageIndex, out long totalFound, string searchFrom = null)
         {
-            var results = Services.EntityService.GetPagedDescendantsFromRoot(UmbracoObjectTypes.DocumentType, pageIndex, pageSize, out totalFound, filter: query);
+            var results = Services.EntityService.GetPagedDescendants(UmbracoObjectTypes.DocumentType, pageIndex, pageSize, out totalFound, filter: query);
             return Mapper.Map<IEnumerable<SearchResultItem>>(results);
         }
     }

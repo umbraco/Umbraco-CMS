@@ -1,31 +1,22 @@
 ﻿using System;
-using System.Linq;
-using System.Text;
 using System.Web.Mvc;
-using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Web.Macros;
 using Umbraco.Web.Mvc;
-using umbraco;
-using umbraco.cms.businesslogic.macro;
 using System.Collections.Generic;
-using umbraco.cms.helpers;
+using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Template = umbraco.cms.businesslogic.template.Template;
+using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Web.WebServices
 {
     /// <summary>
-    /// A REST controller used to save files such as templates, partial views, macro files, etc...
+    /// Represents REST controller used to save files such as templates, partial views, macro files, etc.
     /// </summary>
-    /// <remarks>
-    /// This isn't fully implemented yet but we should migrate all of the logic in the umbraco.presentation.webservices.codeEditorSave
-    /// over to this controller.
-    /// </remarks>
+    /// <remarks>This isn't fully implemented yet but we should migrate all of the logic
+    /// in the umbraco.presentation.webservices.codeEditorSave over to this controller.</remarks>
     [ValidateMvcAngularAntiForgeryToken]
     public class SaveFileController : UmbracoAuthorizedController
     {
@@ -98,7 +89,7 @@ namespace Umbraco.Web.WebServices
                     oldname = oldname.TrimStart(pathPrefix);
             }
 
-            var currentView = oldname.IsNullOrWhiteSpace() 
+            var currentView = oldname.IsNullOrWhiteSpace()
                 ? get(svce, filename)
                 : get(svce, oldname);
 
@@ -108,7 +99,7 @@ namespace Umbraco.Web.WebServices
                 currentView.Path = filename;
             currentView.Content = contents;
 
-            
+
 
 
             Attempt<IPartialView> attempt;
@@ -116,91 +107,98 @@ namespace Umbraco.Web.WebServices
             {
                 var partialView = currentView as PartialView;
                 if (partialView != null && validate != null && validate(svce, partialView) == false)
-                    return Failed(ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
+                    return Failed(Services.TextService.Localize("speechBubbles/partialViewErrorText"), Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
                                     new FileSecurityException("File '" + currentView.Path + "' is not a valid partial view file."));
 
                 attempt = save(svce, currentView);
             }
             catch (Exception e)
             {
-                return Failed(ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"), e);
+                return Failed(Services.TextService.Localize("speechBubbles/partialViewErrorText"), Services.TextService.Localize("speechBubbles/partialViewErrorHeader"), e);
             }
 
             if (attempt.Success == false)
             {
-                return Failed(ui.Text("speechBubbles", "partialViewErrorText"), ui.Text("speechBubbles", "partialViewErrorHeader"),
+                return Failed(Services.TextService.Localize("speechBubbles/partialViewErrorText"), Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
                                 attempt.Exception);
             }
 
 
-            return Success(ui.Text("speechBubbles", "partialViewSavedText"), ui.Text("speechBubbles", "partialViewSavedHeader"), new { name = currentView.Name, path = currentView.Path });
+            return Success(Services.TextService.Localize("speechBubbles/partialViewSavedText"), Services.TextService.Localize("speechBubbles/partialViewSavedHeader"), new { name = currentView.Name, path = currentView.Path });
         }
 
-        /// <summary>
-        /// Saves a template
-        /// </summary>
-        /// <param name="templateName"></param>
-        /// <param name="templateAlias"></param>
-        /// <param name="templateContents"></param>
-        /// <param name="templateId"></param>
-        /// <param name="masterTemplateId"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public JsonResult SaveTemplate(string templateName, string templateAlias, string templateContents, int templateId, int masterTemplateId)
-        {
-            //TODO: Change this over to use the new API - Also this will be migrated to a TemplateEditor or ViewEditor when it's all moved to angular
+        // fixme - remove code
+        ///// <summary>
+        ///// Saves a template
+        ///// </summary>
+        ///// <param name="templateName"></param>
+        ///// <param name="templateAlias"></param>
+        ///// <param name="templateContents"></param>
+        ///// <param name="templateId"></param>
+        ///// <param name="masterTemplateId"></param>
+        ///// <returns></returns>
+        //[HttpPost]
+        //public JsonResult SaveTemplate(string templateName, string templateAlias, string templateContents, int templateId, int masterTemplateId)
+        //{
+        //    //TODO: Change this over to use the new API - Also this will be migrated to a TemplateEditor or ViewEditor when it's all moved to angular
 
-            Template t;
-            bool pathChanged = false;
-            try
-            {
-                t = new Template(templateId)
-                {
-                    Text = templateName.CleanForXss('[', ']', '(', ')', ':'),
-                    Alias = templateAlias.CleanForXss('[', ']', '(', ')', ':'),
-                    Design = templateContents
-                };
+        //    Template t;
+        //    bool pathChanged = false;
+        //    try
+        //    {
+        //        t = new Template(templateId)
+        //        {
+        //            Text = templateName.CleanForXss('[', ']', '(', ')', ':'),
+        //            Alias = templateAlias.CleanForXss('[', ']', '(', ')', ':'),
+        //            Design = templateContents
+        //        };
 
-                //check if the master page has changed - we need to normalize both - if it's 0 or -1, then make it 0... this is easy
-                // to do with Math.Max
-                if (Math.Max(t.MasterTemplate, 0) != Math.Max(masterTemplateId, 0))
-                {
-                    t.MasterTemplate = Math.Max(masterTemplateId, 0);
-                    pathChanged = true;                  
-                }
-            }
-            catch (ArgumentException ex)
-            {
-                //the template does not exist
-                return Failed("Template does not exist", ui.Text("speechBubbles", "templateErrorHeader"), ex);
-            }
+        //        //check if the master page has changed - we need to normalize both - if it's 0 or -1, then make it 0... this is easy
+        //        // to do with Math.Max
+        //        if (Math.Max(t.MasterTemplate, 0) != Math.Max(masterTemplateId, 0))
+        //        {
+        //            t.MasterTemplate = Math.Max(masterTemplateId, 0);
+        //            pathChanged = true;
+        //        }
+        //    }
+        //    catch (ArgumentException ex)
+        //    {
+        //        //the template does not exist
+        //        return Failed("Template does not exist", Services.TextService.Localize("speechBubbles/templateErrorHeader"), ex);
+        //    }
 
-            try
-            {
-                t.Save();
+        //    try
+        //    {
+        //        t.Save();
 
-                //ensure the correct path is synced as the parent might have been changed
-                // http://issues.umbraco.org/issue/U4-2300                
-                if (pathChanged)
-                {
-                    //need to re-look it up
-                    t = new Template(templateId);
-                }
-                var syncPath = "-1,init," + t.Path.Replace("-1,", "");
+        //        //ensure the correct path is synced as the parent might have been changed
+        //        // http://issues.umbraco.org/issue/U4-2300
+        //        if (pathChanged)
+        //        {
+        //            //need to re-look it up
+        //            t = new Template(templateId);
+        //        }
+        //        var syncPath = "-1,init," + t.Path.Replace("-1,", "");
 
-                return Success(ui.Text("speechBubbles", "templateSavedText"), ui.Text("speechBubbles", "templateSavedHeader"),
-                    new
-                    {
-                        path = syncPath,
-                        contents = t.Design,
-                        alias = t.Alias // might have been updated!
-                    });
-            }
-            catch (Exception ex)
-            {
-                return Failed(ui.Text("speechBubbles", "templateErrorText"), ui.Text("speechBubbles", "templateErrorHeader"), ex);
-            }
-        }
+        //        return Success(Services.TextService.Localize("speechBubbles/templateSavedText"), Services.TextService.Localize("speechBubbles/templateSavedHeader"),
+        //            new
+        //            {
+        //                path = syncPath,
+        //                contents = t.Design,
+        //                alias = t.Alias // might have been updated!
+        //            });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Failed(Services.TextService.Localize("speechBubbles/templateErrorText"), Services.TextService.Localize("speechBubbles/templateErrorHeader"), ex);
+        //    }
+        //}
+
+        //[HttpPost]
+        //public JsonResult SaveXslt(string fileName, string oldName, string fileContents, bool ignoreDebugging)
+        //{
+
+        //}
 
         [HttpPost]
         public JsonResult SaveScript(string filename, string oldName, string contents)
@@ -221,20 +219,20 @@ namespace Umbraco.Web.WebServices
             try
             {
                 if (svce.ValidateScript(script) == false)
-                    return Failed(ui.Text("speechBubbles", "scriptErrorText"), ui.Text("speechBubbles", "scriptErrorHeader"),
+                    return Failed(Services.TextService.Localize("speechBubbles/scriptErrorText"), Services.TextService.Localize("speechBubbles/scriptErrorHeader"),
                                     new FileSecurityException("File '" + filename + "' is not a valid script file."));
-                
+
                 svce.SaveScript(script);
             }
             catch (Exception e)
             {
-                return Failed(ui.Text("speechBubbles", "scriptErrorText"), ui.Text("speechBubbles", "scriptErrorHeader"), e);
+                return Failed(Services.TextService.Localize("speechBubbles/scriptErrorText"), Services.TextService.Localize("speechBubbles/scriptErrorHeader"), e);
             }
 
-            return Success(ui.Text("speechBubbles", "scriptSavedText"), ui.Text("speechBubbles", "scriptSavedHeader"),
+            return Success(Services.TextService.Localize("speechBubbles/scriptSavedText"), Services.TextService.Localize("speechBubbles/scriptSavedHeader"),
                 new
                 {
-                    path = DeepLink.GetTreePathFromFilePath(script.Path),
+                    path = BaseTree.GetTreePathFromFilePath(script.Path),
                     name = script.Path,
                     url = script.VirtualPath,
                     contents = script.Content
@@ -261,20 +259,20 @@ namespace Umbraco.Web.WebServices
             try
             {
                 if (svce.ValidateStylesheet(stylesheet) == false)
-                    return Failed(ui.Text("speechBubbles", "cssErrorText"), ui.Text("speechBubbles", "cssErrorHeader"),
+                    return Failed(Services.TextService.Localize("speechBubbles/cssErrorText"), Services.TextService.Localize("speechBubbles/cssErrorHeader"),
                                     new FileSecurityException("File '" + filename + "' is not a valid stylesheet file."));
 
                 svce.SaveStylesheet(stylesheet);
             }
             catch (Exception e)
             {
-                return Failed(ui.Text("speechBubbles", "cssErrorText"), ui.Text("speechBubbles", "cssErrorHeader"), e);
+                return Failed(Services.TextService.Localize("speechBubbles/cssErrorText"), Services.TextService.Localize("speechBubbles/cssErrorHeader"), e);
             }
 
-            return Success(ui.Text("speechBubbles", "cssSavedText"), ui.Text("speechBubbles", "cssSavedHeader"),
+            return Success(Services.TextService.Localize("speechBubbles/cssSavedText"), Services.TextService.Localize("speechBubbles/cssSavedHeader"),
                 new
                 {
-                    path = DeepLink.GetTreePathFromFilePath(stylesheet.Path),
+                    path = BaseTree.GetTreePathFromFilePath(stylesheet.Path),
                     name = stylesheet.Path,
                     url = stylesheet.VirtualPath,
                     contents = stylesheet.Content
@@ -308,7 +306,7 @@ namespace Umbraco.Web.WebServices
         private JsonResult Failed(string message, string header, Exception exception = null)
         {
             if (exception != null)
-                LogHelper.Error<SaveFileController>("An error occurred saving a file. " + message, exception);
+                Logger.Error<SaveFileController>("An error occurred saving a file. " + message, exception);
             return Json(new
             {
                 success = false,

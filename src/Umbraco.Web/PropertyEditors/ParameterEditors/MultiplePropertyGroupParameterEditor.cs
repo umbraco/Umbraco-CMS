@@ -1,16 +1,19 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Core.Logging;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
-    [ParameterEditor("tabPickerMultiple", "Multiple Tab Picker", "entitypicker")]
-    public class MultiplePropertyGroupParameterEditor : ParameterEditor
+    [DataEditor("tabPickerMultiple", EditorType.MacroParameter, "Multiple Tab Picker", "entitypicker")]
+    public class MultiplePropertyGroupParameterEditor : DataEditor
     {
-        public MultiplePropertyGroupParameterEditor()
+        public MultiplePropertyGroupParameterEditor(ILogger logger)
+            : base(logger)
         {
-            Configuration.Add("multiple", "1");
-            Configuration.Add("entityType", "PropertyGroup");
-            //don't publish the id for a property group, publish it's alias (which is actually just it's lower cased name)
-            Configuration.Add("publishBy", "alias");
+            // configure
+            DefaultConfiguration.Add("multiple", true);
+            DefaultConfiguration.Add("entityType", "PropertyGroup");
+            //don't publish the id for a property group, publish its alias, which is actually just its lower cased name
+            DefaultConfiguration.Add("publishBy", "alias");
         }
     }
 }

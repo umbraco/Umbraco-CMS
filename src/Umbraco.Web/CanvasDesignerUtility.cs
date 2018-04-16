@@ -17,6 +17,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web
 {
@@ -34,7 +35,7 @@ namespace Umbraco.Web
         internal static string frontBasePath = HttpContext.Current.Server.MapPath(@"\css\canvasdesigner\");
 
         // get style box by tag
-        internal static String GetStyleBlock(string source, string name) 
+        internal static String GetStyleBlock(string source, string name)
         {
 
             string startTag = string.Format("/***start-{0}***/", name);
@@ -55,7 +56,7 @@ namespace Umbraco.Web
         {
 
             // Load current page
-            var contentService = ApplicationContext.Current.Services.ContentService;
+            var contentService = Current.Services.ContentService;
             IContent content = contentService.GetById(pageId);
 
             // Get less file path from the page Id
@@ -79,7 +80,7 @@ namespace Umbraco.Web
         }
 
         // Get inherited pageId with canvasdesigner
-        internal static int GetParentOrSelfTunedPageId(string[] path, bool preview) 
+        internal static int GetParentOrSelfTunedPageId(string[] path, bool preview)
         {
 
             string styleCanvasdesigner = preview ? @"{0}{1}.less" : "{0}{1}.css";
@@ -116,7 +117,7 @@ namespace Umbraco.Web
         {
 
             // Load current page
-            var contentService = ApplicationContext.Current.Services.ContentService;
+            var contentService = Current.Services.ContentService;
             IContent content = contentService.GetById(pageId);
 
             // Get less file path from the page Id
@@ -191,11 +192,11 @@ namespace Umbraco.Web
         }
 
         // Save and publish less style
-        internal static void SaveAndPublishStyle(string parameters, int pageId, bool inherited) 
+        internal static void SaveAndPublishStyle(string parameters, int pageId, bool inherited)
         {
 
             // Get inherited tuned pageId and path
-            var contentService = ApplicationContext.Current.Services.ContentService;
+            var contentService = Current.Services.ContentService;
             IContent content = contentService.GetById(pageId);
             int inheritedTunedPageId = CanvasDesignerUtility.GetParentOrSelfTunedPageId(content.Path.Split(','), true);
 
@@ -208,7 +209,7 @@ namespace Umbraco.Web
 
             // Update pageId if parameters have changed
             if (inherited) pageId = inheritedTunedPageId;
-            
+
             // Create front directory if necesary
             if (!Directory.Exists(frontBasePath))
                 Directory.CreateDirectory(frontBasePath);
@@ -253,7 +254,7 @@ namespace Umbraco.Web
         {
 
             // Get inherited tuned pageId and path
-            var contentService = ApplicationContext.Current.Services.ContentService;
+            var contentService = Current.Services.ContentService;
             IContent content = contentService.GetById(pageId);
             int inheritedTunedPageId = CanvasDesignerUtility.GetParentOrSelfTunedPageId(content.Path.Split(','), true);
 

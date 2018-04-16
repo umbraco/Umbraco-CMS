@@ -1,52 +1,52 @@
-using System;
-using Umbraco.Core.Profiling;
+﻿using System;
 
 namespace Umbraco.Core.Logging
 {
     /// <summary>
-    /// Used to create DisposableTimer instances for debugging or tracing durations
+    /// Provides debug or trace logging with duration management.
     /// </summary>
     public sealed class ProfilingLogger
     {
-        public ILogger Logger { get; private set; }
-        public IProfiler Profiler { get; private set; }
+        public ILogger Logger { get; }
+
+        public IProfiler Profiler { get; }
 
         public ProfilingLogger(ILogger logger, IProfiler profiler)
         {
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+            if (profiler == null) throw new ArgumentNullException(nameof(profiler));
             Logger = logger;
             Profiler = profiler;
-            if (logger == null) throw new ArgumentNullException("logger");
-            if (profiler == null) throw new ArgumentNullException("profiler");           
-        }
-
-        public DisposableTimer TraceDuration<T>(string startMessage, string completeMessage)
-        {
-            return new DisposableTimer(Logger, DisposableTimer.LogType.Info, Profiler, typeof(T), startMessage, completeMessage);
         }
 
         public DisposableTimer TraceDuration<T>(string startMessage)
         {
-            return new DisposableTimer(Logger, DisposableTimer.LogType.Info, Profiler, typeof(T), startMessage, "Complete");
+            return TraceDuration<T>(startMessage, "Completed.");
         }
 
-        public DisposableTimer TraceDuration(Type loggerType, string startMessage, string completeMessage)
+        public DisposableTimer TraceDuration<T>(string startMessage, string completeMessage, string failMessage = null)
         {
-            return new DisposableTimer(Logger, DisposableTimer.LogType.Info, Profiler, loggerType, startMessage, completeMessage);
+            return new DisposableTimer(Logger, DisposableTimer.LogType.Info, Profiler, typeof(T), startMessage, completeMessage, failMessage);
         }
 
-        public DisposableTimer DebugDuration<T>(string startMessage, string completeMessage)
+        public DisposableTimer TraceDuration(Type loggerType, string startMessage, string completeMessage, string failMessage = null)
         {
-            return new DisposableTimer(Logger, DisposableTimer.LogType.Debug, Profiler, typeof(T), startMessage, completeMessage);
+            return new DisposableTimer(Logger, DisposableTimer.LogType.Info, Profiler, loggerType, startMessage, completeMessage, failMessage);
         }
 
         public DisposableTimer DebugDuration<T>(string startMessage)
         {
-            return new DisposableTimer(Logger, DisposableTimer.LogType.Debug, Profiler, typeof(T), startMessage, "Complete");
+            return DebugDuration<T>(startMessage, "Completed.");
         }
 
-        public DisposableTimer DebugDuration(Type loggerType, string startMessage, string completeMessage)
+        public DisposableTimer DebugDuration<T>(string startMessage, string completeMessage, string failMessage = null, int thresholdMilliseconds = 0)
         {
-            return new DisposableTimer(Logger, DisposableTimer.LogType.Debug, Profiler, loggerType, startMessage, completeMessage);
+            return new DisposableTimer(Logger, DisposableTimer.LogType.Debug, Profiler, typeof(T), startMessage, completeMessage, failMessage, thresholdMilliseconds);
+        }
+
+        public DisposableTimer DebugDuration(Type loggerType, string startMessage, string completeMessage, string failMessage = null, int thresholdMilliseconds = 0)
+        {
+            return new DisposableTimer(Logger, DisposableTimer.LogType.Debug, Profiler, loggerType, startMessage, completeMessage, failMessage, thresholdMilliseconds);
         }
     }
 }

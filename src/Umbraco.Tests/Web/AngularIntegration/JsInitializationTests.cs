@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Web.AngularIntegration
         [Test]
         public void Parse_Main()
         {
-            var result = JsInitialization.ParseMain(new[] {"[World]", "Hello" });
+            var result = JsInitialization.WriteScript(new[] {"[World]", "Hello" });
 
             Assert.AreEqual(@"LazyLoad.js([World], function () {
     //we need to set the legacy UmbClientMgr path

@@ -1,10 +1,11 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -15,61 +16,42 @@ namespace Umbraco.Web.PropertyEditors
     /// This is required for legacy/backwards compatibility, otherwise we'd just store the string version and cache the string version without
     /// needing additional lookups.
     /// </remarks>
-    internal class PublishValueValueEditor : PropertyValueEditorWrapper
+    internal class PublishValueValueEditor : DataValueEditor
     {
-        private readonly IDataTypeService _dataTypeService;
+        private readonly ILogger _logger;
 
-        internal PublishValueValueEditor(IDataTypeService dataTypeService, PropertyValueEditor wrapped)
-            : base(wrapped)
+        internal PublishValueValueEditor(DataEditorAttribute attribute, ILogger logger)
+            : base(attribute)
         {
-            _dataTypeService = dataTypeService;
+            _logger = logger;
         }
 
-        public PublishValueValueEditor(PropertyValueEditor wrapped)
-            : this(ApplicationContext.Current.Services.DataTypeService, wrapped)
+        /// <inheritdoc />
+        public override string ConvertDbToString(PropertyType propertyType, object value, IDataTypeService dataTypeService)
         {
-        }
-
-        /// <summary>
-        /// Need to lookup the pre-values and put the string version in cache, not the ID (which is what is stored in the db)
-        /// </summary>
-        /// <param name="property"></param>
-        /// <param name="propertyType"></param>
-        /// <param name="dataTypeService"></param>
-        /// <returns></returns>
-        public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
-        {
-            if (property.Value == null)
+            if (value == null)
                 return null;
 
-            var idAttempt = property.Value.TryConvertTo<int>();
+            // get the configuration items
+            // if none, fallback to base
+            var configuration = dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ValueListConfiguration>();
+            if (configuration == null)
+                return base.ConvertDbToString(propertyType, value, dataTypeService);
+
+            var items = configuration.Items;
+
+            var idAttempt = value.TryConvertTo<int>();
             if (idAttempt.Success)
             {
-                var preValId = idAttempt.Result;
-                var preVals = GetPreValues(property);
-                if (preVals != null)
-                {
-                    if (preVals.Any(x => x.Value.Id == preValId))
-                    {
-                        return preVals.Single(x => x.Value.Id == preValId).Value.Value;
-                    }
+                var itemId = idAttempt.Result;
+                var item = items.FirstOrDefault(x => x.Id == itemId);
+                if (item != null) return item.Value;
 
-                    LogHelper.Warn<PublishValueValueEditor>("Could not find a pre value with ID " + preValId + " for property alias " + property.Alias);
-                }
+                _logger.Warn<PublishValueValueEditor>("Could not find a configuration item with ID " + itemId + " for property alias " + propertyType.Alias);
             }
-            
-            return base.ConvertDbToString(property, propertyType, dataTypeService);
-        }
 
-        protected IDictionary<string, PreValue> GetPreValues(Property property)
-        {
-            var preVals = _dataTypeService.GetPreValuesCollectionByDataTypeId(property.PropertyType.DataTypeDefinitionId);
-            if (preVals != null)
-            {
-                var dictionary = preVals.FormatAsDictionary();
-                return dictionary;
-            }
-            return null;
+            // fallback to default
+            return base.ConvertDbToString(propertyType, value, dataTypeService);
         }
     }
 }

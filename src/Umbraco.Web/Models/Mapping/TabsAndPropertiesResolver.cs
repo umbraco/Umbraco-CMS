@@ -1,92 +1,30 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using umbraco;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    /// <summary>
-    /// Creates the tabs collection with properties assigned for display models
-    /// </summary>
-    internal class TabsAndPropertiesResolver : ValueResolver<IContentBase, IEnumerable<Tab<ContentPropertyDisplay>>>
+    internal abstract class TabsAndPropertiesResolver
     {
-        private readonly ILocalizedTextService _localizedTextService;
+        protected ILocalizedTextService LocalizedTextService { get; }
         protected IEnumerable<string> IgnoreProperties { get; set; }
 
-        public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService)
+        protected TabsAndPropertiesResolver(ILocalizedTextService localizedTextService)
         {
-            if (localizedTextService == null) throw new ArgumentNullException("localizedTextService");
-            _localizedTextService = localizedTextService;
+            LocalizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             IgnoreProperties = new List<string>();
         }
 
-        public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
+        protected TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
             : this(localizedTextService)
         {
-            if (ignoreProperties == null) throw new ArgumentNullException("ignoreProperties");
-            IgnoreProperties = ignoreProperties;
-        }
-
-        /// <summary>
-        /// Maps properties on to the generic properties tab
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="display"></param>
-        /// <param name="localizedTextService"></param>
-        /// <param name="customProperties">
-        /// Any additional custom properties to assign to the generic properties tab. 
-        /// </param>
-        /// <param name="onGenericPropertiesMapped"></param>
-        /// <remarks>
-        /// The generic properties tab is mapped during AfterMap and is responsible for 
-        /// setting up the properties such as Created date, updated date, template selected, etc...
-        /// </remarks>
-        public static void MapGenericProperties<TPersisted>(
-            TPersisted content,
-            ContentItemDisplayBase<ContentPropertyDisplay, TPersisted> display,
-            ILocalizedTextService localizedTextService,
-            IEnumerable<ContentPropertyDisplay> customProperties = null,
-            Action<List<ContentPropertyDisplay>> onGenericPropertiesMapped = null)
-            where TPersisted : IContentBase
-        {
-            var genericProps = display.Tabs.Single(x => x.Id == 0);
-
-            //store the current props to append to the newly inserted ones
-            var currProps = genericProps.Properties.ToArray();
-
-            var contentProps = new List<ContentPropertyDisplay>();
-
-            if (customProperties != null)
-            {
-                //add the custom ones
-                contentProps.AddRange(customProperties);
-            }
-
-            //now add the user props
-            contentProps.AddRange(currProps);
-
-            //callback
-            if (onGenericPropertiesMapped != null)
-            {
-                onGenericPropertiesMapped(contentProps);
-            }
-
-            //re-assign
-            genericProps.Properties = contentProps;
-
-            //Show or hide properties tab based on wether it has or not any properties 
-            if (genericProps.Properties.Any() == false)
-            {
-                display.Tabs = display.Tabs.Where(x => x.Id != 0);
-            }
+            IgnoreProperties = ignoreProperties ?? throw new ArgumentNullException(nameof(ignoreProperties));
         }
 
         /// <summary>
@@ -105,43 +43,43 @@ namespace Umbraco.Web.Models.Mapping
             switch (entityType)
             {
                 case "content":
-                    dtdId = Constants.System.DefaultContentListViewDataTypeId;
+                    dtdId = Constants.DataTypes.DefaultContentListView;
 
                     break;
                 case "media":
-                    dtdId = Constants.System.DefaultMediaListViewDataTypeId;
+                    dtdId = Constants.DataTypes.DefaultMediaListView;
                     break;
                 case "member":
-                    dtdId = Constants.System.DefaultMembersListViewDataTypeId;
+                    dtdId = Constants.DataTypes.DefaultMembersListView;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException("entityType does not match a required value");
+                    throw new ArgumentOutOfRangeException(nameof(entityType), "entityType does not match a required value");
             }
 
             //first try to get the custom one if there is one
-            var dt = dataTypeService.GetDataTypeDefinitionByName(customDtdName)
-                ?? dataTypeService.GetDataTypeDefinitionById(dtdId);
+            var dt = dataTypeService.GetDataType(customDtdName)
+                ?? dataTypeService.GetDataType(dtdId);
 
             if (dt == null)
             {
                 throw new InvalidOperationException("No list view data type was found for this document type, ensure that the default list view data types exists and/or that your custom list view data type exists");
             }
 
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(dt.Id);
-
-            var editor = PropertyEditorResolver.Current.GetByAlias(dt.PropertyEditorAlias);
+            var editor = Current.PropertyEditors[dt.EditorAlias];
             if (editor == null)
             {
-                throw new NullReferenceException("The property editor with alias " + dt.PropertyEditorAlias + " does not exist");
+                throw new NullReferenceException("The property editor with alias " + dt.EditorAlias + " does not exist");
             }
 
-            var listViewTab = new Tab<ContentPropertyDisplay>();
-            listViewTab.Alias = Constants.Conventions.PropertyGroups.ListViewGroupName;
-            listViewTab.Label = localizedTextService.Localize("content/childItems");
-            listViewTab.Id = display.Tabs.Count() + 1;
-            listViewTab.IsActive = true;
+            var listViewTab = new Tab<ContentPropertyDisplay>
+            {
+                Alias = Constants.Conventions.PropertyGroups.ListViewGroupName,
+                Label = localizedTextService.Localize("content/childItems"),
+                Id = display.Tabs.Count() + 1,
+                IsActive = true
+            };
 
-            var listViewConfig = editor.PreValueEditor.ConvertDbToEditor(editor.DefaultPreValues, preVals);
+            var listViewConfig = editor.GetConfigurationEditor().ToConfigurationEditor(dt.Configuration);
             //add the entity type to the config
             listViewConfig["entityType"] = entityType;
 
@@ -156,10 +94,10 @@ namespace Umbraco.Web.Models.Mapping
             var listViewProperties = new List<ContentPropertyDisplay>();
             listViewProperties.Add(new ContentPropertyDisplay
             {
-                Alias = string.Format("{0}containerView", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}containerView",
                 Label = "",
                 Value = null,
-                View = editor.ValueEditor.View,
+                View = editor.GetValueEditor().View,
                 HideLabel = true,
                 Config = listViewConfig
             });
@@ -168,14 +106,28 @@ namespace Umbraco.Web.Models.Mapping
             SetChildItemsTabPosition(display, listViewConfig, listViewTab);
         }
 
+        private static int GetTabNumberFromConfig(IDictionary<string, object> listViewConfig)
+        {
+            if (!listViewConfig.TryGetValue("displayAtTabNumber", out var displayTabNum))
+                return -1;
+            switch (displayTabNum)
+            {
+                case int i:
+                    return i;
+                case string s when int.TryParse(s, out var parsed):
+                    return parsed;
+            }
+            return -1;
+        }
+
         private static void SetChildItemsTabPosition<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display,
                 IDictionary<string, object> listViewConfig,
                 Tab<ContentPropertyDisplay> listViewTab)
             where TPersisted : IContentBase
         {
             // Find position of tab from config
-            var tabIndexForChildItems = 0;
-            if (listViewConfig["displayAtTabNumber"] != null && int.TryParse((string)listViewConfig["displayAtTabNumber"], out tabIndexForChildItems))
+            var tabIndexForChildItems = GetTabNumberFromConfig(listViewConfig);
+            if (tabIndexForChildItems != -1)
             {
                 // Tab position is recorded 1-based but we insert into collection 0-based
                 tabIndexForChildItems--;
@@ -191,6 +143,7 @@ namespace Umbraco.Web.Models.Mapping
                     tabIndexForChildItems = display.Tabs.Count();
                 }
             }
+            else tabIndexForChildItems = 0;
 
             // Recreate tab list with child items tab at configured position
             var tabs = new List<Tab<ContentPropertyDisplay>>();
@@ -199,15 +152,122 @@ namespace Umbraco.Web.Models.Mapping
             display.Tabs = tabs;
         }
 
-        protected override IEnumerable<Tab<ContentPropertyDisplay>> ResolveCore(IContentBase content)
+        /// <summary>
+        /// Returns a collection of custom generic properties that exist on the generic properties tab
+        /// </summary>
+        /// <returns></returns>
+        protected virtual IEnumerable<ContentPropertyDisplay> GetCustomGenericProperties(IContentBase content)
         {
+            return Enumerable.Empty<ContentPropertyDisplay>();
+        }
+
+        /// <summary>
+        /// Maps properties on to the generic properties tab
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        /// <param name="content"></param>
+        /// <param name="tabs"></param>
+        /// <param name="context"></param>
+        /// <remarks>
+        /// The generic properties tab is responsible for 
+        /// setting up the properties such as Created date, updated date, template selected, etc...
+        /// </remarks>
+        protected virtual void MapGenericProperties(UmbracoContext umbracoContext, IContentBase content, List<Tab<ContentPropertyDisplay>> tabs, ResolutionContext context)
+        {
+            // add the generic properties tab, for properties that don't belong to a tab
+            // get the properties, map and translate them, then add the tab
+            var noGroupProperties = content.GetNonGroupedProperties()
+                .Where(x => IgnoreProperties.Contains(x.Alias) == false) // skip ignored
+                .ToList();
+            var genericproperties = MapProperties(umbracoContext, content, noGroupProperties, context);
+
+            tabs.Add(new Tab<ContentPropertyDisplay>
+            {
+                Id = 0,
+                Label = LocalizedTextService.Localize("general/properties"),
+                Alias = "Generic properties",
+                Properties = genericproperties
+            });
+
+            var genericProps = tabs.Single(x => x.Id == 0);
+
+            //store the current props to append to the newly inserted ones
+            var currProps = genericProps.Properties.ToArray();
+
+            var contentProps = new List<ContentPropertyDisplay>();
+
+            var customProperties = GetCustomGenericProperties(content);
+            if (customProperties != null)
+            {
+                //add the custom ones
+                contentProps.AddRange(customProperties);
+            }
+
+            //now add the user props
+            contentProps.AddRange(currProps);
+
+            //re-assign
+            genericProps.Properties = contentProps;
+
+            //Show or hide properties tab based on wether it has or not any properties 
+            if (genericProps.Properties.Any() == false)
+            {
+                //loop throug the tabs, remove the one with the id of zero and exit the loop
+                for (var i = 0; i < tabs.Count; i++)
+                {
+                    if (tabs[i].Id != 0) continue;
+                    tabs.RemoveAt(i);
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Maps a list of <see cref="Property"/> to a list of <see cref="ContentPropertyDisplay"/>
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        /// <param name="content"></param>
+        /// <param name="properties"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        protected virtual List<ContentPropertyDisplay> MapProperties(UmbracoContext umbracoContext, IContentBase content, List<Property> properties, ResolutionContext context)
+        {
+            //we need to map this way to pass the context through, I don't like it but we'll see what AutoMapper says: https://github.com/AutoMapper/AutoMapper/issues/2588
+            var result = context.Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(
+                    // Sort properties so items from different compositions appear in correct order (see U4-9298). Map sorted properties.
+                    properties.OrderBy(prop => prop.PropertyType.SortOrder),
+                    null,
+                    context)
+                .ToList();
+
+            return result;
+        }
+    }
+
+    /// <summary>
+    /// Creates the tabs collection with properties assigned for display models
+    /// </summary>
+    internal class TabsAndPropertiesResolver<TSource, TDestination> : TabsAndPropertiesResolver, IValueResolver<TSource, TDestination, IEnumerable<Tab<ContentPropertyDisplay>>>
+        where TSource : IContentBase
+    {
+        public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService)
+            : base(localizedTextService)
+        { }
+
+        public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
+            : base(localizedTextService, ignoreProperties)
+        { }
+
+        public virtual IEnumerable<Tab<ContentPropertyDisplay>> Resolve(TSource source, TDestination destination, IEnumerable<Tab<ContentPropertyDisplay>> destMember, ResolutionContext context)
+        {
+            var umbracoContext = context.GetUmbracoContext();
             var tabs = new List<Tab<ContentPropertyDisplay>>();
 
             // add the tabs, for properties that belong to a tab
             // need to aggregate the tabs, as content.PropertyGroups contains all the composition tabs,
-            // and there might be duplicates (content does not work like contentType and there is no 
+            // and there might be duplicates (content does not work like contentType and there is no
             // content.CompositionPropertyGroups).
-            var groupsGroupsByName = content.PropertyGroups.OrderBy(x => x.SortOrder).GroupBy(x => x.Name);
+            var groupsGroupsByName = source.PropertyGroups.OrderBy(x => x.SortOrder).GroupBy(x => x.Name);
             foreach (var groupsByName in groupsGroupsByName)
             {
                 var properties = new List<Property>();
@@ -215,7 +275,7 @@ namespace Umbraco.Web.Models.Mapping
                 // merge properties for groups with the same name
                 foreach (var group in groupsByName)
                 {
-                    var groupProperties = content.GetPropertiesForGroup(group)
+                    var groupProperties = source.GetPropertiesForGroup(group)
                         .Where(x => IgnoreProperties.Contains(x.Alias) == false); // skip ignored
 
                     properties.AddRange(groupProperties);
@@ -224,14 +284,12 @@ namespace Umbraco.Web.Models.Mapping
                 if (properties.Count == 0)
                     continue;
 
-                // Sort properties so items from different compositions appear in correct order (see U4-9298). Map sorted properties.
-                var mappedProperties = Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(properties.OrderBy(prop => prop.PropertyType.SortOrder));
-
-                TranslateProperties(mappedProperties);
+                //map the properties
+                var mappedProperties = MapProperties(umbracoContext, source, properties, context);
 
                 // add the tab
                 // we need to pick an identifier... there is no "right" way...
-                var g = groupsByName.FirstOrDefault(x => x.Id == content.ContentTypeId) // try local
+                var g = groupsByName.FirstOrDefault(x => x.Id == source.ContentTypeId) // try local
                     ?? groupsByName.First(); // else pick one randomly
                 var groupId = g.Id;
                 var groupName = groupsByName.Key;
@@ -239,41 +297,19 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     Id = groupId,
                     Alias = groupName,
-                    Label = _localizedTextService.UmbracoDictionaryTranslate(groupName),
+                    Label = LocalizedTextService.UmbracoDictionaryTranslate(groupName),
                     Properties = mappedProperties,
                     IsActive = false
                 });
             }
 
-            // add the generic properties tab, for properties that don't belong to a tab
-            // get the properties, map and translate them, then add the tab
-            var noGroupProperties = content.GetNonGroupedProperties()
-                .Where(x => IgnoreProperties.Contains(x.Alias) == false); // skip ignored
-            var genericproperties = Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(noGroupProperties).ToList();
-            TranslateProperties(genericproperties);
+            MapGenericProperties(umbracoContext, source, tabs, context);
 
-            tabs.Add(new Tab<ContentPropertyDisplay>
-            {
-                Id = 0,
-                Label = _localizedTextService.Localize("general/properties"),
-                Alias = "Generic properties",
-                Properties = genericproperties
-            });
-
-            // activate the first tab
-            tabs.First().IsActive = true;
+            // activate the first tab, if any
+            if (tabs.Count > 0)
+                tabs[0].IsActive = true;
 
             return tabs;
-        }
-
-        private void TranslateProperties(IEnumerable<ContentPropertyDisplay> properties)
-        {
-            // Not sure whether it's a good idea to add this to the ContentPropertyDisplay mapper
-            foreach (var prop in properties)
-            {
-                prop.Label = _localizedTextService.UmbracoDictionaryTranslate(prop.Label);
-                prop.Description = _localizedTextService.UmbracoDictionaryTranslate(prop.Description);
-            }
         }
     }
 }

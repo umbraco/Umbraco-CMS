@@ -1,31 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
+﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
     [TestFixture]
-    public class PartialViewRepositoryTests : BaseUmbracoApplicationTest
+    [UmbracoTest(WithApplication = true, Database = UmbracoTestOptions.Database.NewEmptyPerFixture)]
+    public class PartialViewRepositoryTests : TestWithDatabaseBase
     {
         private IFileSystem _fileSystem;
 
-        [SetUp]
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
 
             _fileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews + "/Partials/");
+        }
+
+        protected override void Compose()
+        {
+            base.Compose();
+
+            Container.RegisterSingleton(f => new DataEditorCollection(Enumerable.Empty<DataEditor>()));
         }
 
         [Test]
@@ -33,64 +37,63 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // unless noted otherwise, no changes / 7.2.8
 
-            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
-            var unitOfWork = provider.GetUnitOfWork();
-            var repository = new PartialViewRepository(unitOfWork, _fileSystem);
-
-            var partialView = new PartialView(PartialViewType.PartialView, "test-path-1.cshtml") { Content = "// partialView" };
-            repository.AddOrUpdate(partialView);
-            unitOfWork.Commit();
-            Assert.IsTrue(_fileSystem.FileExists("test-path-1.cshtml"));
-            Assert.AreEqual("test-path-1.cshtml", partialView.Path);
-            Assert.AreEqual("/Views/Partials/test-path-1.cshtml", partialView.VirtualPath);
-
-            partialView = new PartialView(PartialViewType.PartialView, "path-2/test-path-2.cshtml") { Content = "// partialView" };
-            repository.AddOrUpdate(partialView);
-            unitOfWork.Commit();
-            Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.cshtml"));
-            Assert.AreEqual("path-2\\test-path-2.cshtml", partialView.Path); // fixed in 7.3 - 7.2.8 does not update the path
-            Assert.AreEqual("/Views/Partials/path-2/test-path-2.cshtml", partialView.VirtualPath);
-
-            partialView = (PartialView) repository.Get("path-2/test-path-2.cshtml");
-            Assert.IsNotNull(partialView);
-            Assert.AreEqual("path-2\\test-path-2.cshtml", partialView.Path);
-            Assert.AreEqual("/Views/Partials/path-2/test-path-2.cshtml", partialView.VirtualPath);
-
-            partialView = new PartialView(PartialViewType.PartialView, "path-2\\test-path-3.cshtml") { Content = "// partialView" };
-            repository.AddOrUpdate(partialView);
-            unitOfWork.Commit();
-            Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.cshtml"));
-            Assert.AreEqual("path-2\\test-path-3.cshtml", partialView.Path);
-            Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
-
-            partialView = (PartialView) repository.Get("path-2/test-path-3.cshtml");
-            Assert.IsNotNull(partialView);
-            Assert.AreEqual("path-2\\test-path-3.cshtml", partialView.Path);
-            Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
-
-            partialView = (PartialView) repository.Get("path-2\\test-path-3.cshtml");
-            Assert.IsNotNull(partialView);
-            Assert.AreEqual("path-2\\test-path-3.cshtml", partialView.Path);
-            Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
-
-            partialView = new PartialView(PartialViewType.PartialView, "\\test-path-4.cshtml") { Content = "// partialView" };
-            Assert.Throws<FileSecurityException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                repository.AddOrUpdate(partialView);
-            });
+                var repository = new PartialViewRepository(_fileSystem);
 
-            partialView = (PartialView) repository.Get("missing.cshtml");
-            Assert.IsNull(partialView);
+                var partialView = new PartialView(PartialViewType.PartialView, "test-path-1.cshtml") { Content = "// partialView" };
+                repository.Save(partialView);
+                Assert.IsTrue(_fileSystem.FileExists("test-path-1.cshtml"));
+                Assert.AreEqual("test-path-1.cshtml", partialView.Path);
+                Assert.AreEqual("/Views/Partials/test-path-1.cshtml", partialView.VirtualPath);
 
-            // fixed in 7.3 - 7.2.8 used to...
-            Assert.Throws<FileSecurityException>(() =>
-            {
-                partialView = (PartialView) repository.Get("\\test-path-4.cshtml"); // outside the filesystem, does not exist
-            });
-            Assert.Throws<FileSecurityException>(() =>
-            {
-                partialView = (PartialView) repository.Get("../../packages.config"); // outside the filesystem, exists
-            });
+                partialView = new PartialView(PartialViewType.PartialView, "path-2/test-path-2.cshtml") { Content = "// partialView" };
+                repository.Save(partialView);
+                Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-2.cshtml"));
+                Assert.AreEqual("path-2\\test-path-2.cshtml", partialView.Path); // fixed in 7.3 - 7.2.8 does not update the path
+                Assert.AreEqual("/Views/Partials/path-2/test-path-2.cshtml", partialView.VirtualPath);
+
+                partialView = (PartialView) repository.Get("path-2/test-path-2.cshtml");
+                Assert.IsNotNull(partialView);
+                Assert.AreEqual("path-2\\test-path-2.cshtml", partialView.Path);
+                Assert.AreEqual("/Views/Partials/path-2/test-path-2.cshtml", partialView.VirtualPath);
+
+                partialView = new PartialView(PartialViewType.PartialView, "path-2\\test-path-3.cshtml") { Content = "// partialView" };
+                repository.Save(partialView);
+                Assert.IsTrue(_fileSystem.FileExists("path-2/test-path-3.cshtml"));
+                Assert.AreEqual("path-2\\test-path-3.cshtml", partialView.Path);
+                Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
+
+                partialView = (PartialView) repository.Get("path-2/test-path-3.cshtml");
+                Assert.IsNotNull(partialView);
+                Assert.AreEqual("path-2\\test-path-3.cshtml", partialView.Path);
+                Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
+
+                partialView = (PartialView) repository.Get("path-2\\test-path-3.cshtml");
+                Assert.IsNotNull(partialView);
+                Assert.AreEqual("path-2\\test-path-3.cshtml", partialView.Path);
+                Assert.AreEqual("/Views/Partials/path-2/test-path-3.cshtml", partialView.VirtualPath);
+
+                partialView = new PartialView(PartialViewType.PartialView, "\\test-path-4.cshtml") { Content = "// partialView" };
+                Assert.Throws<FileSecurityException>(() => // fixed in 7.3 - 7.2.8 used to strip the \
+                {
+                    repository.Save(partialView);
+                });
+
+                partialView = (PartialView) repository.Get("missing.cshtml");
+                Assert.IsNull(partialView);
+
+                // fixed in 7.3 - 7.2.8 used to...
+                Assert.Throws<FileSecurityException>(() =>
+                {
+                    partialView = (PartialView) repository.Get("\\test-path-4.cshtml"); // outside the filesystem, does not exist
+                });
+                Assert.Throws<FileSecurityException>(() =>
+                {
+                    partialView = (PartialView) repository.Get("../../packages.config"); // outside the filesystem, exists
+                });
+            }
         }
 
         [TearDown]

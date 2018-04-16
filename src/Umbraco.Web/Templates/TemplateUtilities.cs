@@ -4,11 +4,12 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Templates
 {
-    //NOTE: I realize there is only one class in this namespace but I'm pretty positive that there will be more classes in 
+    //NOTE: I realize there is only one class in this namespace but I'm pretty positive that there will be more classes in
     //this namespace once we start migrating and cleaning up more code.
 
     /// <summary>
@@ -19,18 +20,9 @@ namespace Umbraco.Web.Templates
         //TODO: Pass in an Umbraco context!!!!!!!! Don't rely on the singleton so things are more testable
         internal static string ParseInternalLinks(string text, bool preview)
         {
-            // save and set for url provider
-            var inPreviewMode = UmbracoContext.Current.InPreviewMode;
-            UmbracoContext.Current.InPreviewMode = preview;
-
-            try
+            using (UmbracoContext.Current.ForcedPreview(preview)) // force for url provider
             {
                 text = ParseInternalLinks(text);
-            }
-            finally
-            {
-                // restore
-                UmbracoContext.Current.InPreviewMode = inPreviewMode;
             }
 
             return text;
@@ -70,7 +62,7 @@ namespace Umbraco.Web.Templates
                     {
                         var newLink = urlProvider.GetUrl(intId);
                         text = text.Replace(tag.Value, "href=\"" + newLink);
-                    }                    
+                    }
                 }
             }
 
@@ -84,17 +76,15 @@ namespace Umbraco.Web.Templates
         /// <returns></returns>
         [Obsolete("Use the overload specifying all dependencies instead")]
         public static string ParseInternalLinks(string text)
-        {   
+        {
             //don't attempt to proceed without a context as we cannot lookup urls without one
-            if (UmbracoContext.Current == null || UmbracoContext.Current.RoutingContext == null)
-            {
+            if (UmbracoContext.Current == null)
                 return text;
-            }
 
             var urlProvider = UmbracoContext.Current.UrlProvider;
             return ParseInternalLinks(text, urlProvider);
         }
-        
+
         // static compiled regex for faster performance
         private static readonly Regex LocalLinkPattern = new Regex(@"href=""[/]?(?:\{|\%7B)localLink:([a-zA-Z0-9-://]+)(?:\}|\%7D)",
             RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
@@ -115,11 +105,11 @@ namespace Umbraco.Web.Templates
         {
             if (UmbracoConfig.For.UmbracoSettings().Content.ResolveUrlsFromTextString == false) return text;
 
-            using (var timer = DisposableTimer.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
+            using (var timer = Current.ProfilingLogger.DebugDuration(typeof(IOHelper), "ResolveUrlsFromTextString starting", "ResolveUrlsFromTextString complete"))
             {
                 // find all relative urls (ie. urls that contain ~)
                 var tags = ResolveUrlPattern.Matches(text);
-                LogHelper.Debug(typeof(IOHelper), "After regex: " + timer.Stopwatch.ElapsedMilliseconds + " matched: " + tags.Count);
+                Current.Logger.Debug(typeof(IOHelper), "After regex: " + timer.Stopwatch.ElapsedMilliseconds + " matched: " + tags.Count);
                 foreach (Match tag in tags)
                 {
                     var url = "";

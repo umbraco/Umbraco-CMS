@@ -1,8 +1,8 @@
 ﻿<%@ Page Language="C#" MasterPageFile="../../masterpages/umbracoDialog.Master" AutoEventWireup="true"
     CodeBehind="xsltVisualize.aspx.cs" ValidateRequest="false" Inherits="umbraco.presentation.umbraco.developer.Xslt.xsltVisualize" %>
 
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-<%@ Register TagPrefix="cc2" Namespace="umbraco.controls" Assembly="umbraco" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
+<%@ Register TagPrefix="cc2" Namespace="umbraco.controls" Assembly="Umbraco.Web" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="head">
 

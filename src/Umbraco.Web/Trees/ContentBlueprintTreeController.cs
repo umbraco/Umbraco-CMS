@@ -1,21 +1,13 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Net;
+﻿using System.Linq;
 using System.Net.Http.Formatting;
-using System.Web.Http;
-using umbraco;
-using umbraco.businesslogic.Actions;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
@@ -53,7 +45,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 //get all blueprint content types
-                var contentTypeAliases = entities.Select(x => ((UmbracoEntity) x).ContentTypeAlias).Distinct();
+                var contentTypeAliases = entities.Select(x => ((ContentEntitySlim) x).ContentTypeAlias).Distinct();
                 //get the ids
                 var contentTypeIds = Services.ContentTypeService.GetAllContentTypeIds(contentTypeAliases.ToArray()).ToArray();
 
@@ -65,7 +57,7 @@ namespace Umbraco.Web.Trees
                 nodes.AddRange(docTypeEntities
                     .Select(entity =>
                     {
-                        var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprintGuid, id, queryStrings, "icon-item-arrangement", true);
+                        var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings, "icon-item-arrangement", true);
                         treeNode.Path = string.Format("-1,{0}", entity.Id);
                         treeNode.NodeType = "document-type-blueprints";
                         //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.
@@ -75,22 +67,20 @@ namespace Umbraco.Web.Trees
 
                 return nodes;
             }
-            else
-            {
-                var intId = id.TryConvertTo<int>();
-                //Get the content type
-                var ct = Services.ContentTypeService.GetContentType(intId.Result);
-                if (ct == null) return nodes;
 
-                var blueprintsForDocType = entities.Where(x => ct.Alias == ((UmbracoEntity) x).ContentTypeAlias);
-                nodes.AddRange(blueprintsForDocType
-                    .Select(entity =>
-                    {
-                        var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprintGuid, id, queryStrings, "icon-blueprint", false);
-                        treeNode.Path = string.Format("-1,{0},{1}", ct.Id, entity.Id);
-                        return treeNode;
-                    }));
-            }
+            var intId = id.TryConvertTo<int>();
+            //Get the content type
+            var ct = Services.ContentTypeService.Get(intId.Result);
+            if (ct == null) return nodes;
+
+            var blueprintsForDocType = entities.Where(x => ct.Alias == ((ContentEntitySlim) x).ContentTypeAlias);
+            nodes.AddRange(blueprintsForDocType
+                .Select(entity =>
+                {
+                    var treeNode = CreateTreeNode(entity, Constants.ObjectTypes.DocumentBlueprint, id, queryStrings, "icon-blueprint", false);
+                    treeNode.Path = $"-1,{ct.Id},{entity.Id}";
+                    return treeNode;
+                }));
 
             return nodes;
         }
@@ -110,16 +100,16 @@ namespace Umbraco.Web.Trees
             //only refresh & create if it's a content type
             if (cte != null)
             {
-                var ct = Services.ContentTypeService.GetContentType(cte.Id);
-                var createItem = menu.Items.Add<ActionCreateBlueprintFromContent>(Services.TextService.Localize(string.Format("actions/{0}", ActionCreateBlueprintFromContent.Instance.Alias)));
+                var ct = Services.ContentTypeService.Get(cte.Id);
+                var createItem = menu.Items.Add<ActionCreateBlueprintFromContent>(Services.TextService.Localize($"actions/{ActionCreateBlueprintFromContent.Instance.Alias}"));
                 createItem.NavigateToRoute("/settings/contentBlueprints/edit/-1?create=true&doctype=" + ct.Alias);
 
-                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
+                menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize($"actions/{ActionRefresh.Instance.Alias}"), true);
 
                 return menu;
             }
 
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+            menu.Items.Add<ActionDelete>(Services.TextService.Localize($"actions/{ActionDelete.Instance.Alias}"));
 
             return menu;
         }

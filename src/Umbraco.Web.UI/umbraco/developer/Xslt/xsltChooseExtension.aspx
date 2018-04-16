@@ -1,7 +1,8 @@
 <%@ Page Language="c#" Codebehind="xsltChooseExtension.aspx.cs" MasterPageFile="../../masterpages/umbracoDialog.Master"  AutoEventWireup="True"
   Inherits="umbraco.developer.xsltChooseExtension" %>
-<%@ Import Namespace="Umbraco.Web" %>  <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-  
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
+<%@ Import Namespace="Umbraco.Web" %>
+
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <script type="text/javascript">
         function returnResult() {
@@ -13,7 +14,7 @@
             if (result.substring(result.length - 1, result.length) == " ")
                 result = result.substring(0, result.length - 2);
             result = result + ")";
-            
+
             document.location = 'xsltInsertValueOf.aspx?objectId=<%=Request.CleanForXss("objectId")%>&value=' + result;
         }
     </script>
@@ -23,7 +24,7 @@ div.code{padding: 7px 0px 7px 0px;  font-family: Consolas,courier;}
 div.code input{border: none; background:#F6F6F9; color: #000; padding: 5px; font-family: Consolas,courier;}
 </style>
 
-</asp:Content> 
+</asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
 <cc1:Pane runat="server" Text="Choose xslt extension">
@@ -37,7 +38,7 @@ div.code input{border: none; background:#F6F6F9; color: #000; padding: 5px; font
 </cc1:Pane>
 
 <p>
-  <asp:Button ID="bt_insert" OnClientClick="returnResult(); return false;" Enabled="false" runat="server" Text="Insert" /> <em><%= umbraco.ui.Text("or") %></em> <a href="xsltInsertValueOf.aspx"><%= umbraco.ui.Text("cancel") %></a>
-</p> 
+  <asp:Button ID="bt_insert" OnClientClick="returnResult(); return false;" Enabled="false" runat="server" Text="Insert" /> <em><%= Services.TextService.Localize("or") %></em> <a href="xsltInsertValueOf.aspx"><%= Services.TextService.Localize("cancel") %></a>
+</p>
 
 </asp:Content>

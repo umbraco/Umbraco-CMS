@@ -2,7 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ExceptionServices;
 using System.Text.RegularExpressions;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Cache
 {
@@ -44,7 +46,7 @@ namespace Umbraco.Core.Cache
                 }
                 catch (Exception e)
                 {
-                    return new ExceptionHolder(e);
+                    return new ExceptionHolder(ExceptionDispatchInfo.Capture(e));
                 }
             });
         }
@@ -74,12 +76,12 @@ namespace Umbraco.Core.Cache
 
         internal class ExceptionHolder
         {
-            public ExceptionHolder(Exception e)
+            public ExceptionHolder(ExceptionDispatchInfo e)
             {
                 Exception = e;
             }
 
-            public Exception Exception { get; private set; }
+            public ExceptionDispatchInfo Exception { get; }
         }
 
         #region Clear

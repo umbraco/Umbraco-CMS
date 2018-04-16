@@ -1,16 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web.Security;
 using Umbraco.Core.Models;
-using umbraco;
+using Umbraco.Core.Services;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using LightInject;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Routing
 {
     internal static class UrlProviderExtensions
     {
+        // fixme inject
+        private static ILocalizedTextService TextService => Current.Services.TextService;
+        private static IContentService ContentService => Current.Services.ContentService;
+        private static ILogger Logger => Current.Logger;
+
         /// <summary>
         /// Gets the URLs for the content item
         /// </summary>
@@ -23,26 +28,26 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public static IEnumerable<string> GetContentUrls(this IContent content, UmbracoContext umbracoContext)
         {
-            if (content == null) throw new ArgumentNullException("content");
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (content == null) throw new ArgumentNullException(nameof(content));
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
 
             var urls = new List<string>();
 
-            if (content.HasPublishedVersion == false)
+            if (content.Published == false)
             {
-                urls.Add(ui.Text("content", "itemNotPublished", umbracoContext.Security.CurrentUser));
+                urls.Add(TextService.Localize("content/itemNotPublished"));
                 return urls;
             }
 
             string url;
-            var urlProvider = umbracoContext.RoutingContext.UrlProvider;
+            var urlProvider = umbracoContext.UrlProvider;
             try
             {
                 url = urlProvider.GetUrl(content.Id);
             }
             catch (Exception e)
             {
-                LogHelper.Error<UrlProvider>("GetUrl exception.", e);
+                Logger.Error<UrlProvider>("GetUrl exception.", e);
                 url = "#ex";
             }
             if (url == "#")
@@ -52,18 +57,17 @@ namespace Umbraco.Web.Routing
                 var parent = content;
                 do
                 {
-                    parent = parent.ParentId > 0 ? parent.Parent() : null;
+                    parent = parent.ParentId > 0 ? parent.Parent(ContentService) : null;
                 }
                 while (parent != null && parent.Published);
 
-                if (parent == null) // oops - internal error
-                    urls.Add(ui.Text("content", "parentNotPublishedAnomaly", umbracoContext.Security.CurrentUser));
-                else
-                    urls.Add(ui.Text("content", "parentNotPublished", parent.Name, umbracoContext.Security.CurrentUser));
+                urls.Add(parent == null
+                    ? TextService.Localize("content/parentNotPublishedAnomaly") // oops - internal error
+                    : TextService.Localize("content/parentNotPublished", new[] { parent.Name }));
             }
             else if (url == "#ex")
             {
-                urls.Add(ui.Text("content", "getUrlException", umbracoContext.Security.CurrentUser));
+                urls.Add(TextService.Localize("content/getUrlException"));
             }
             else
             {
@@ -71,12 +75,13 @@ namespace Umbraco.Web.Routing
                 var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
                 if (uri.IsAbsoluteUri == false) uri = uri.MakeAbsolute(UmbracoContext.Current.CleanedUmbracoUrl);
                 uri = UriUtility.UriToUmbraco(uri);
-                var pcr = new PublishedContentRequest(uri, UmbracoContext.Current.RoutingContext, UmbracoConfig.For.UmbracoSettings().WebRouting, s => Roles.Provider.GetRolesForUser(s));
-                pcr.Engine.TryRouteRequest();
+                var r = Core.Composing.Current.Container.GetInstance<PublishedRouter>(); // fixme inject or ?
+                var pcr = r.CreateRequest(UmbracoContext.Current, uri);
+                r.TryRouteRequest(pcr);
 
                 if (pcr.HasPublishedContent == false)
                 {
-                    urls.Add(ui.Text("content", "routeError", "(error)", umbracoContext.Security.CurrentUser));
+                    urls.Add(TextService.Localize("content/routeError", new[] { "(error)" }));
                 }
                 else if (pcr.PublishedContent.Id != content.Id)
                 {
@@ -98,7 +103,7 @@ namespace Umbraco.Web.Routing
                         s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent.Id + ")";
 
                     }
-                    urls.Add(ui.Text("content", "routeError", s, umbracoContext.Security.CurrentUser));
+                    urls.Add(TextService.Localize("content/routeError", s));
                 }
                 else
                 {

@@ -1,27 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
     /// The value editor for the file upload property editor.
     /// </summary>
-    internal class FileUploadPropertyValueEditor : PropertyValueEditorWrapper
+    internal class FileUploadPropertyValueEditor : DataValueEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
 
-        public FileUploadPropertyValueEditor(PropertyValueEditor wrapped, MediaFileSystem mediaFileSystem)
-            : base(wrapped)
+        public FileUploadPropertyValueEditor(DataEditorAttribute attribute, MediaFileSystem mediaFileSystem)
+            : base(attribute)
         {
-            _mediaFileSystem = mediaFileSystem;
+            _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
         }
 
         /// <summary>
@@ -42,7 +40,7 @@ namespace Umbraco.Web.PropertyEditors
         /// Other places (FileUploadPropertyEditor...) do NOT deal with multiple files, and our logic for reusing
         /// folders would NOT work, etc.</para>
         /// </remarks>
-        public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
+        public override object FromEditor(ContentPropertyData editorValue, object currentValue)
         {
             currentValue = currentValue ?? string.Empty;
 
@@ -54,7 +52,7 @@ namespace Umbraco.Web.PropertyEditors
             // check the editorValue value to see whether we need to clear files
             var editorJsonValue = editorValue.Value as JObject;
             var clears = editorJsonValue != null && editorJsonValue["clearFiles"] != null && editorJsonValue["clearFiles"].Value<bool>();
-            var uploads = editorValue.AdditionalData.ContainsKey("files") && editorValue.AdditionalData["files"] is IEnumerable<ContentItemFile>;
+            var uploads = editorValue.Files != null && editorValue.Files.Length > 0;
 
             // nothing = no changes, return what we have already (leave existing files intact)
             if (clears == false && uploads == false)
@@ -70,25 +68,19 @@ namespace Umbraco.Web.PropertyEditors
             if (clears)
             {
                 foreach (var pathToRemove in currentPaths)
-                    _mediaFileSystem.DeleteFile(pathToRemove, true);
+                    _mediaFileSystem.DeleteFile(pathToRemove);
                 return string.Empty; // no more files
             }
 
             // ensure we have the required guids
-            if (editorValue.AdditionalData.ContainsKey("cuid") == false // for the content item
-                || editorValue.AdditionalData.ContainsKey("puid") == false) // and the property type
-                throw new Exception("Missing cuid/puid additional data.");
-            var cuido = editorValue.AdditionalData["cuid"];
-            var puido = editorValue.AdditionalData["puid"];
-            if ((cuido is Guid) == false || (puido is Guid) == false)
-                throw new Exception("Invalid cuid/puid additional data.");
-            var cuid = (Guid) cuido;
-            var puid = (Guid) puido;
-            if (cuid == Guid.Empty || puid == Guid.Empty)
-                throw new Exception("Invalid cuid/puid additional data.");
+            var cuid = editorValue.ContentKey;
+            if (cuid == Guid.Empty) throw new Exception("Invalid content key.");
+            var puid = editorValue.PropertyTypeKey;
+            if (puid == Guid.Empty) throw new Exception("Invalid property type key.");
 
             // process the files
-            var files = ((IEnumerable<ContentItemFile>) editorValue.AdditionalData["files"]).ToArray();
+            var files = editorValue.Files;
+            if (files == null) throw new Exception("Invalid files.");
 
             var newPaths = new List<string>();
             const int maxLength = 1; // we only process ONE file
@@ -109,14 +101,15 @@ namespace Umbraco.Web.PropertyEditors
                 {
                     _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
 
-                    var ext = _mediaFileSystem.GetExtension(filepath);
-                    if (_mediaFileSystem.IsImageFile(ext))
-                    {
-                        var preValues = editorValue.PreValues.FormatAsDictionary();
-                        var sizes = preValues.Any() ? preValues.First().Value.Value : string.Empty;
-                        using (var image = Image.FromStream(filestream))
-                            _mediaFileSystem.GenerateThumbnails(image, filepath, sizes);
-                    }
+                    // fixme - remove this code
+                    //var ext = _mediaFileSystem.GetExtension(filepath);
+                    //if (_mediaFileSystem.IsImageFile(ext))
+                    //{
+                    //    var preValues = editorValue.PreValues.FormatAsDictionary();
+                    //    var sizes = preValues.Any() ? preValues.First().Value.Value : string.Empty;
+                    //    using (var image = Image.FromStream(filestream))
+                    //        _mediaFileSystem.GenerateThumbnails(image, filepath, sizes);
+                    //}
 
                     // all related properties (auto-fill) are managed by FileUploadPropertyEditor
                     // when the content is saved (through event handlers)
@@ -131,7 +124,7 @@ namespace Umbraco.Web.PropertyEditors
 
             // remove files that are not there anymore
             foreach (var pathToRemove in currentPaths.Except(newPaths))
-                _mediaFileSystem.DeleteFile(pathToRemove, true);
+                _mediaFileSystem.DeleteFile(pathToRemove);
 
 
             return string.Join(",", newPaths.Select(x => _mediaFileSystem.GetUrl(x)));

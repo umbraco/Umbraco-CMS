@@ -15,7 +15,7 @@ namespace Umbraco.Tests.Configurations.DashboardSettings
         public void Init()
         {
             var config = new FileInfo(TestHelper.MapPathForTest("~/Configurations/DashboardSettings/web.config"));
-            
+
             var fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = config.FullName };
             var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
 
@@ -52,7 +52,7 @@ namespace Umbraco.Tests.Configurations.DashboardSettings
         [Test]
         public void Test_Section_Access()
         {
-            
+
             Assert.AreEqual(3, SettingsSection.Sections.ElementAt(3).AccessRights.Rules.Count());
 
             Assert.AreEqual("translator", SettingsSection.Sections.ElementAt(3).AccessRights.Rules.ElementAt(0).Value);
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Configurations.DashboardSettings
             Assert.AreEqual(true, SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(0).ShowOnce);
             Assert.AreEqual(true, SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(0).AddPanel);
             Assert.AreEqual("hello", SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(0).PanelCaption);
-            Assert.AreEqual("views/dashboard/settings/settingsdashboardintro.html", 
+            Assert.AreEqual("views/dashboard/settings/settingsdashboardintro.html",
                 SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(0).ControlPath);
 
             Assert.AreEqual(false, SettingsSection.Sections.ElementAt(0).Tabs.ElementAt(0).Controls.ElementAt(1).ShowOnce);

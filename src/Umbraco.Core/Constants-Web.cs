@@ -3,8 +3,8 @@ using System.ComponentModel;
 
 namespace Umbraco.Core
 {
-	public static partial class Constants
-	{		
+    public static partial class Constants
+    {
         /// <summary>
         /// Defines the identifiers for Umbraco system nodes.
         /// </summary>
@@ -21,6 +21,8 @@ namespace Umbraco.Core
             /// </summary>
             public const string PreviewCookieName = "UMB_PREVIEW";
 
+            public const string InstallerCookieName = "umb_installId";
+
             /// <summary>
             /// The auth cookie name
             /// </summary>
@@ -29,6 +31,5 @@ namespace Umbraco.Core
             public const string AuthCookieName = "UMB_UCONTEXT";
 
         }
-        
-	}
+    }
 }

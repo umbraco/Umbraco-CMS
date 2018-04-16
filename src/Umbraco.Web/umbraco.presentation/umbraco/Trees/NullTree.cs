@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Configuration;
 using System.Web;
@@ -8,8 +8,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.Collections.Generic;
-using umbraco.interfaces;
-using umbraco.BusinessLogic.Actions;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.cms.presentation.Trees
 {
@@ -20,13 +19,13 @@ namespace umbraco.cms.presentation.Trees
     public class NullTree : BaseTree
     {
 
-		public NullTree(string application) : base(application) { }
+        public NullTree(string application) : base(application) { }
 
-		protected override void CreateRootNodeActions(ref List<IAction> actions)
-		{
-			actions.Clear();
-			actions.Add(ActionRefresh.Instance);
-		}
+        protected override void CreateRootNodeActions(ref List<IAction> actions)
+        {
+            actions.Clear();
+            actions.Add(ActionRefresh.Instance);
+        }
 
         public override void RenderJS(ref System.Text.StringBuilder Javascript) { }
 
@@ -42,11 +41,11 @@ namespace umbraco.cms.presentation.Trees
                 tree.Add(xNode);
                 OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
             }
-            
+
         }
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
-        {            
+        {
             rootNode.Menu = null;
             rootNode.Text = "Error";
         }

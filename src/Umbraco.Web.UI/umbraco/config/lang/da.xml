@@ -40,11 +40,13 @@
     <key alias="sendToTranslate">Send til oversættelse</key>
     <key alias="setGroup">Sæt gruppe</key>
     <key alias="sort">Sortér</key>
+    <key alias="toPublish">Send til udgivelse</key>
     <key alias="translate">Oversæt</key>
     <key alias="update">Opdatér</key>
     <key alias="setPermissions">Sæt rettigheder</key>
     <key alias="unlock">Lås op</key>
     <key alias="createblueprint">Opret indholdsskabelon</key>
+    <key alias="defaultValue">Standard værdi</key>
   </area>
   <area alias="actionCategories">
     <key alias="content">Indhold</key>
@@ -123,10 +125,11 @@
     <key alias="returnToList">Tilbage til listen</key>
     <key alias="save">Gem</key>
     <key alias="saveAndPublish">Gem og udgiv</key>
+    <key alias="saveAndSchedule">Gem og planlæg</key>
     <key alias="saveToPublish">Gem og send til udgivelse</key>
     <key alias="saveListView">Gem listevisning</key>
-    <key alias="showPage">Forhåndsvisning</key>
-    <key alias="showPageDisabled">Forhåndsvisning er deaktiveret fordi der ikke er nogen skabelon tildelt</key>
+    <key alias="showPage">Se siden</key>
+    <key alias="showPageDisabled">Preview er deaktiveret fordi der ikke er nogen skabelon tildelt</key>
     <key alias="styleChoose">Vælg formattering</key>
     <key alias="styleShow">Vis koder</key>
     <key alias="tableInsert">Indsæt tabel</key>
@@ -376,7 +379,6 @@
     <key alias="selectUsers">Vælg brugere</key>
     <key alias="noIconsFound">Ingen ikoner blev fundet</key>
     <key alias="noMacroParams">Der er ingen parametre for denne makro</key>
-    <key alias="noMacros">Der er ikke tilføjet nogen makroer</key>
     <key alias="linkYour">Link dit</key>
     <key alias="unLinkYour">Fjern link fra dit</key>
     <key alias="account">konto</key>
@@ -645,22 +647,12 @@
 
     <key alias="toggleListView">Brug listevisning</key>
     <key alias="toggleAllowAsRoot">Tillad på rodniveau</key>
-
-    <key alias="commentLine">Comment/Uncomment lines</key>
-    <key alias="removeLine">Remove line</key>
-    <key alias="copyLineUp">Copy Lines Up</key>
-    <key alias="copyLineDown">Copy Lines Down</key>
-    <key alias="moveLineUp">Move Lines Up</key>
-    <key alias="moveLineDown">Move Lines Down</key>
-
-    <key alias="generalHeader">General</key>
-    <key alias="editorHeader">Editor</key>
   </area>
 
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Baggrundsfarve</key>
     <key alias="bold">Fed</key>
-    <key alias="color">Tekst farve</key>
+    <key alias="color">Tekstfarve</key>
     <key alias="font">Skrifttype</key>
     <key alias="text">Tekst</key>
   </area>
@@ -898,7 +890,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="publicAccess">
     <key alias="paAdvanced">Rollebaseret beskyttelse</key>
     <key alias="paAdvancedHelp">Hvis du ønsker at kontrollere adgang til siden ved hjælp af rollebaseret godkendelse via Umbracos medlemsgrupper.</key>
-    <key alias="paAdvancedNoGroups">Du skal oprette en medlemsgruppe før du kan bruge rollebaseret godkendelse</key>
+    <key alias="paAdvancedNoGroups"><![CDATA[Du skal oprette en medlemsgruppe før du kan bruge <br />rollebaseret godkendelse]]></key>
     <key alias="paErrorPage">Fejlside</key>
     <key alias="paErrorPageHelp">Brugt når folk er logget ind, men ingen adgang</key>
     <key alias="paHowWould">Vælg hvordan siden skal beskyttes</key>
@@ -1108,116 +1100,17 @@ Mange hilsner fra Umbraco robotten
     <key alias="preview">Forhåndsvisning</key>
     <key alias="styles">Styles</key>
   </area>
-
   <area alias="template">
     <key alias="edittemplate">Rediger skabelon</key>
-
-    <key alias="insertSections">Sektioner</key>
     <key alias="insertContentArea">Indsæt indholdsområde</key>
-    <key alias="insertContentAreaPlaceHolder">Indsæt pladsholder for indholdsområde</key>
-
-    <key alias="insert">Indsæt</key>
-    <key alias="insertDesc">Hvad vil du indsætte?</key>
-
-    <key alias="insertDictionaryItem">Oversættelse</key>
-    <key alias="insertDictionaryItemDesc">Indsætter en oversætbar tekst, som skifter efter det sprog, som websitet vises i.</key>
-
-    <key alias="insertMacro">Makro</key>
-    <key alias="insertMacroDesc">
-      En makro er et element, som kan have forskellige indstillinger, når det indsættes. 
-      Brug det som en genbrugelig del af dit design såsom gallerier, formularer og lister.
-    </key>
-
-    <key alias="insertPageField">Sideværdi</key>
-    <key alias="insertPageFieldDesc">
-      Viser værdien af et felt fra den nuværende side. Kan indstilles til at bruge rekursive værdier eller 
-      vise en standardværdi i tilfælde af, at feltet er tomt.
-    </key>
-
-    <key alias="insertPartialView">Partial view</key>
-    <key alias="insertPartialViewDesc">
-      Et Partial View er et skabelonelement, som kan indsættes i andre skabeloner og derved 
-      genbruges og deles på tværs af sideskabelonerne.
-    </key>
-
+    <key alias="insertContentAreaPlaceHolder">Indsæt indholdsområdemarkering</key>
+    <key alias="insertDictionaryItem">Indsæt ordbogselement</key>
+    <key alias="insertMacro">Indsæt makro</key>
+    <key alias="insertPageField">Indsæt Umbraco sidefelt</key>
     <key alias="mastertemplate">Master skabelon</key>
-    <key alias="noMastertemplate">Ingen masterskabelon</key>
-    <key alias="noMaster">Ingen master</key>
-
-    <key alias="renderBody">Indsæt en underliggende skabelon</key>
-    <key alias="renderBodyDesc">
-      <![CDATA[
-      Henter indholdet af en underliggende skabelon ind, ved at 
-      indsætte et <code>@RenderBody()</code> element.
-      ]]>
-    </key>
-
-
-    <key alias="defineSection">Definer en sektion</key>
-    <key alias="defineSectionDesc">
-      <![CDATA[
-         Definerer en del af din skabelon som en navngivet sektion, ved at 
-         omkranse den i <code>@section { ... }</code>. Herefter kan denne sektion flettes ind i 
-         overliggende skabelon ved at indsætte et <code>@RenderSection</code> element.
-      ]]>
-    </key>
-
-    <key alias="renderSection">Indsæt en sektion</key>
-    <key alias="renderSectionDesc">
-      <![CDATA[
-      Henter indholdet af en sektion fra den underliggende skabelon ind, ved at indsætte et 
-      <code>@RenderSection(name)</code> element. Den underliggende skabelon skal have 
-      defineret en sektion via et <code>@section [name]{ ... }</code> element.
-      ]]>
-    </key>
-
-    <key alias="sectionName">Sektionsnavn</key>
-    <key alias="sectionMandatory">Sektionen er obligatorisk</key>
-    
-    <key alias="sectionMandatoryDesc">
-      Hvis obligatorisk, skal underskabelonen indeholde en <code>@section</code> -definition.
-    </key>
-
-
-    <key alias="queryBuilder">Query builder</key>
-    <key alias="itemsReturned">sider returneret, på</key>
-
-    <key alias="iWant">Returner</key>
-    <key alias="allContent">alt indhold</key>
-    <key alias="contentOfType">indhold af typen &quot;%0%&quot;</key>
-    
-    <key alias="from">fra</key>
-    <key alias="websiteRoot">mit website</key>
-    <key alias="where">hvor</key>
-    <key alias="and">og</key>
-
-    <key alias="is">er</key>
-    <key alias="isNot">ikke er</key>
-    <key alias="before">er før</key>
-    <key alias="beforeIncDate">er før (inkl. valgte dato)</key>
-    <key alias="after">er efter</key>
-    <key alias="afterIncDate">er efter (inkl. valgte dato)</key>
-    <key alias="equals">er</key>
-    <key alias="doesNotEqual">ikke er</key>
-    <key alias="contains">indeholder</key>
-    <key alias="doesNotContain">ikke indeholder</key>
-    <key alias="greaterThan">er større end</key>
-    <key alias="greaterThanEqual">er større end eller det samme som</key>
-    <key alias="lessThan">er mindre end</key>
-    <key alias="lessThanEqual">er mindre end eller det samme som</key>
-
-    <key alias="id">Id</key>
-    <key alias="name">Navn</key>
-    <key alias="createdDate">Oprettelsesdato</key>
-    <key alias="lastUpdatedDate">Sidste opdatering</key>
-
-    <key alias="orderBy">Sortér efter</key>
-    <key alias="ascending">stigende rækkefølge</key>
-    <key alias="descending">faldende rækkefølge</key>
-
+    <key alias="quickGuide">Lynguide til Umbracos skabelontags</key>
     <key alias="template">Skabelon</key>
   </area>
-  
   <area alias="grid">
     <key alias="rte">Rich Text Editor</key>
     <key alias="media">Image</key>
@@ -1231,7 +1124,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="addElement">Tilføj indhold</key>
     <key alias="dropElement">Slip indhold</key>
     <key alias="settingsApplied">Indstillinger tilføjet</key>
-
+ 
     <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
     <key alias="contentAllowed">Indholdet er tilladt her</key>
 
@@ -1258,9 +1151,9 @@ Mange hilsner fra Umbraco robotten
 
 
     <key alias="styles">Typografi</key>
-    <key alias="stylesDetails">Vælg, hvilke typografiværdier, en redaktør kan ændre</key>
+    <key alias="stylesDetails">Vælg hvilke typografiværdier en redaktør kan ændre</key>
 
-    <key alias="settingDialogDetails">Indstillinger gemmes kun, hvis den indtaste json-konfiguration er gyldig</key>
+    <key alias="settingDialogDetails">Indstillinger gemmes kun, hvis den indtastede json-konfiguration er gyldig</key>
 
     <key alias="allowAllEditors">Tillad alle editorer</key>
     <key alias="allowAllRowConfigurations">Tillad alle rækkekonfigurationer</key>
@@ -1271,7 +1164,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="areAdded">er tilføjet</key>
 
     <key alias="maxItems">Maksimalt emner</key>
-    <key alias="maxItemsDescription">Efterlad blank eller sat til 0 ubegrænset for</key>
+    <key alias="maxItemsDescription">Efterlad blank eller sæt til 0 for ubegrænset</key>
 
   </area>
   <area alias="contentTypeEditor">
@@ -1281,7 +1174,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="addNewTab">Tilføj ny fane</key>
     <key alias="addAnotherTab">Tilføj endnu en fane</key>
     <key alias="inheritedFrom">Nedarvet fra</key>
-    <key alias="addProperty">Tilføj property</key>
+    <key alias="addProperty">Tilføj egenskab</key>
     <key alias="requiredLabel">Påkrævet label</key>
 
     <key alias="enableListViewHeading">Aktiver listevisning</key>
@@ -1350,6 +1243,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="postContent">Indsæt efter felt</key>
     <key alias="preContent">Indsæt før felt</key>
     <key alias="recursive">Rekursivt</key>
+    <key alias="removeParagraph">Fjern paragraf-tags</key>
+    <key alias="removeParagraphHelp">Fjerner eventuelle &amp;lt;P&amp;gt; omkring teksten</key>
     <key alias="standardFields">Standard felter</key>
     <key alias="uppercase">Uppercase</key>
     <key alias="urlEncode">URL encode</key>
@@ -1410,8 +1305,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="relationTypes">Relationstyper</key>
     <key alias="packager">Pakker</key>
     <key alias="packages">Pakker</key>
-    <key alias="partialViews">Partial Views</key>
-    <key alias="partialViewMacros">Partial View Makro Filer</key>
     <key alias="python">Python</key>
     <key alias="repositories">Installer fra "repository"</key>
     <key alias="runway">Installer Runway</key>
@@ -1422,6 +1315,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="templates">Skabeloner</key>
     <key alias="xslt">XSLT-filer</key>
     <key alias="analytics">Analytics</key>
+    <key alias="userPermissions">Brugertilladelser</key>
+    <key alias="userTypes">Bruger Typer</key>
     <key alias="users">Brugere</key>
   </area>
   <area alias="update">
@@ -1472,7 +1367,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="noLogin">har endnu ikke logget ind</key>
     <key alias="oldPassword">Gammelt kodeord</key>
     <key alias="password">Adgangskode</key>
-    <key alias="removePhoto">Fjern billede</key>
     <key alias="resetPassword">Nulstil kodeord</key>
     <key alias="passwordChanged">Dit kodeord er blevet ændret!</key>
     <key alias="passwordConfirm">Bekræft venligst dit nye kodeord</key>
@@ -1573,8 +1467,5 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="emptyStates">
     <key alias="emptyDictionaryTree">Ingen ordbog elementer at vælge imellem</key>
-  </area>
-  <area alias="textbox">
-    <key alias="characters_left">Karakterer tilbage</key>
   </area>
 </language>

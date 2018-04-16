@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Media;
 using umbraco;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Media
 {
@@ -49,7 +50,7 @@ namespace Umbraco.Web.Media
                     else
                     {
                         var p = UmbracoContext.Current.ContentCache.GetById(nodeId.GetValueOrDefault());
-                        var v = p.GetPropertyValue(field);
+                        var v = p.Value(field);
                         fieldValue = v == null ? string.Empty : v.ToString();
                     }
                 }
@@ -83,13 +84,13 @@ namespace Umbraco.Web.Media
 
         private static IImageUrlProvider GetProvider(string provider)
         {
-            return ImageUrlProviderResolver.Current.GetProvider(provider);
+            return Current.ImageUrlProviders[provider];
         }
 
         private static object GetContentFromCache(int nodeIdInt, string field)
         {
-            var content = ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<object>(
-                string.Format("{0}{1}_{2}", CacheKeys.ContentItemCacheKey, nodeIdInt.ToString(CultureInfo.InvariantCulture), field));            
+            var content = Current.ApplicationCache.RuntimeCache.GetCacheItem<object>(
+                string.Format("{0}{1}_{2}", CacheKeys.ContentItemCacheKey, nodeIdInt.ToString(CultureInfo.InvariantCulture), field));
             return content;
         }
     }

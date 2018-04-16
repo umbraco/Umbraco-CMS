@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Umbraco.Core;
+using Umbraco.Core.Collections;
 using Umbraco.Core.IO;
 using Umbraco.Web.Install.Models;
 
@@ -37,7 +38,7 @@ namespace Umbraco.Web.Install
         }
 
         public static void ClearFiles()
-        {   
+        {
             var dir = IOHelper.MapPath("~/App_Data/TEMP/Install/");
             if (Directory.Exists(dir))
             {
@@ -130,7 +131,7 @@ namespace Umbraco.Web.Install
                 trackingItem.AdditionalData = additionalData;
             }
             trackingItem.IsComplete = true;
-            
+
             //save the file
             var file = GetFile(installId);
             var serialized = JsonConvert.SerializeObject(new List<InstallTrackingItem>(_steps));
@@ -140,6 +141,6 @@ namespace Umbraco.Web.Install
         public static IEnumerable<InstallTrackingItem> GetStatus()
         {
             return new List<InstallTrackingItem>(_steps).OrderBy(x => x.ServerOrder);
-        } 
+        }
     }
 }

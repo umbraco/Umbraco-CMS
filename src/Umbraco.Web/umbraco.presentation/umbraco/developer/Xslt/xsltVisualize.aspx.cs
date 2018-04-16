@@ -9,68 +9,55 @@ using System.Xml;
 using System.IO;
 using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web;
+using Umbraco.Web.Composing;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.umbraco.developer.Xslt
 {
     [WebformsPageTreeAuthorize(Constants.Trees.Xslt)]
-    public partial class xsltVisualize : BasePages.UmbracoEnsuredPage
+    public partial class xsltVisualize : UmbracoEnsuredPage
     {
-        
-		// zb-00004 #29956 : refactor cookies names & handling
-		static global::umbraco.BusinessLogic.StateHelper.Cookies.Cookie cookie
-			= new global::umbraco.BusinessLogic.StateHelper.Cookies.Cookie("UMB_XSLTVISPG", TimeSpan.FromMinutes(20)); // was "XSLTVisualizerPage"
+        private const string XsltVisualizeCookieName = "UMB_XSLTVISPG";
 
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
                 // Check if cookie exists in the current request.
-				// zb-00004 #29956 : refactor cookies names & handling
-				if (cookie.HasValue)
-                    contentPicker.Value = cookie.GetValue();
-            }            
+                // zb-00004 #29956 : refactor cookies names & handling
+                if (Request.HasCookieValue(XsltVisualizeCookieName))
+                    contentPicker.Value = Request.GetCookieValue(XsltVisualizeCookieName);
+            }
 
         }
 
         protected void visualizeDo_Click(object sender, EventArgs e)
         {
-
             // get xslt file
-            string xslt = "";
+            string xslt;
             if (xsltSelection.Value.Contains("<xsl:stylesheet"))
             {
+                // assume xslt contains everything we need
                 xslt = xsltSelection.Value;
             }
             else
             {
-                System.IO.StreamReader xsltFile =
-                System.IO.File.OpenText(
-                    IOHelper.MapPath(SystemDirectories.Umbraco + "/xslt/templates/clean.xslt")
-                );
-
-                xslt = xsltFile.ReadToEnd();
-                xsltFile.Close();
-
-                // parse xslt
+                // read clean xslt, paste selection, and prepare support for XSLT extensions
+                xslt = File.ReadAllText(IOHelper.MapPath(SystemDirectories.Umbraco + "/xslt/templates/clean.xslt"));
                 xslt = xslt.Replace("<!-- start writing XSLT -->", xsltSelection.Value);
-
-                // prepare support for XSLT extensions
-                xslt = macro.AddXsltExtensionsToHeader(xslt);
-
+                xslt = Umbraco.Web.Macros.XsltMacroEngine.AddXsltExtensionsToHeader(xslt);
             }
 
-            Dictionary<string, object> parameters = new Dictionary<string, object>(1);
-            parameters.Add("currentPage", library.GetXmlNodeById(contentPicker.Value));
+            int pageId;
+            if (int.TryParse(contentPicker.Value, out pageId) == false)
+                pageId = -1;
 
-
-            // apply the XSLT transformation
-            string xsltResult = "";
-            XmlTextReader xslReader = null;
+            // transform
+            string xsltResult;
             try
             {
-                xslReader = new XmlTextReader(new StringReader(xslt));
-                System.Xml.Xsl.XslCompiledTransform xsl = macro.CreateXsltTransform(xslReader, false);
-                xsltResult = macro.GetXsltTransformResult(new XmlDocument(), xsl, parameters);
+                xsltResult = Umbraco.Web.Macros.XsltMacroEngine.TestXsltTransform(Current.ProfilingLogger, xslt, pageId);
             }
             catch (Exception ee)
             {
@@ -78,10 +65,7 @@ namespace umbraco.presentation.umbraco.developer.Xslt
                     "<div class=\"error\"><h3>Error parsing the XSLT:</h3><p>{0}</p></div>",
                     ee.ToString());
             }
-            finally
-            {
-                xslReader.Close();
-            }
+
             visualizeContainer.Visible = true;
 
             // update output
@@ -89,8 +73,11 @@ namespace umbraco.presentation.umbraco.developer.Xslt
 
 
             // add cookie with current page
-			// zb-00004 #29956 : refactor cookies names & handling
-			cookie.SetValue(contentPicker.Value);
+            // zb-00004 #29956 : refactor cookies names & handling
+            Response.Cookies.Set(new HttpCookie(XsltVisualizeCookieName, contentPicker.Value)
+            {
+                Expires = DateTime.Now + TimeSpan.FromMinutes(20)
+            });
         }
 
     }

@@ -1,11 +1,8 @@
-using System.Collections.Generic;
-using System.Web.Mvc;
-using Umbraco.Core.Models;
+﻿using System.Web.Mvc;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using umbraco.cms.businesslogic.macro;
-using umbraco.interfaces;
 using System.Linq;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Macros
 {

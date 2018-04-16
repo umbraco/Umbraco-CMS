@@ -5,7 +5,6 @@
 
         var vm = this;
         var oldMasterTemplateAlias = null;
-        var localizeSaving = localizationService.localize("general_saving");
 
         vm.page = {};
         vm.page.loading = true;
@@ -33,7 +32,6 @@
             vm.template.content = vm.editor.getValue();
 
             contentEditingHelper.contentEditorPerformSave({
-                statusMessage: localizeSaving,
                 saveMethod: templateResource.save,
                 scope: $scope,
                 content: vm.template,
@@ -105,7 +103,7 @@
         vm.init = function () {
 
             //we need to load this somewhere, for now its here.
-            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css");
+            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css", $scope);
 
             //load templates - used in the master template picker
             templateResource.getAll()

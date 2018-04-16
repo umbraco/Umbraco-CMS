@@ -5,6 +5,8 @@ using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Web.Composing;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Trees
 {
@@ -32,7 +34,7 @@ namespace Umbraco.Web.Trees
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error(typeof(LegacyTreeJavascript), "Could not load the JS from the legacy tree " + bTree.TreeAlias, ex);
+                    Current.Logger.Error(typeof(LegacyTreeJavascript), "Could not load the JS from the legacy tree " + bTree.TreeAlias, ex);
                 }
             }
 
@@ -46,7 +48,7 @@ namespace Umbraco.Web.Trees
         public static string GetLegacyIActionJavascript()
         {
             var js = new StringBuilder();
-            foreach (var a in ActionsResolver.Current.Actions.ToList())
+            foreach (var a in Current.Actions)
             {
                 // NH: Added a try/catch block to this as an error in a 3rd party action can crash the whole menu initialization
                 try
@@ -54,17 +56,17 @@ namespace Umbraco.Web.Trees
                     if (string.IsNullOrEmpty(a.Alias) == false && (string.IsNullOrEmpty(a.JsFunctionName) == false || string.IsNullOrEmpty(a.JsSource) == false))
                     {
                         // if the action is using invalid javascript we need to do something about this
-                        if (global::umbraco.BusinessLogic.Actions.Action.ValidateActionJs(a) == false)
+                        if (global::Umbraco.Web._Legacy.Actions.Action.ValidateActionJs(a) == false)
                         {
                             js.AppendLine("function IActionProxy_" + a.Alias.ToSafeAlias() + "() {");
-                            js.AppendLine(global::umbraco.BusinessLogic.Actions.Action.ConvertLegacyJs(a.JsFunctionName));
+                            js.AppendLine(global::Umbraco.Web._Legacy.Actions.Action.ConvertLegacyJs(a.JsFunctionName));
                             js.AppendLine("}");
                         }
                     }
                 }
                 catch (Exception ee)
                 {
-                    LogHelper.Error(typeof(LegacyTreeJavascript), "Error initializing tree action", ee);
+                    Current.Logger.Error(typeof(LegacyTreeJavascript), "Error initializing tree action", ee);
                 }
             }
 

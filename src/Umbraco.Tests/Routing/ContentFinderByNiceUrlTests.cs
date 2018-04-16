@@ -1,16 +1,19 @@
-using System;
+ï»¿using System;
+using System.Globalization;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {
     [TestFixture]
-    public class ContentFinderByNiceUrlTests : BaseRoutingTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class ContentFinderByNiceUrlTests : BaseWebTest
     {
-
-
         [TestCase("/", 1046)]
         [TestCase("/default.aspx", 1046)] //this one is actually rather important since this is the path that comes through when we are running in pre-IIS 7 for the root document '/' !
         [TestCase("/Sub1", 1173)]
@@ -24,18 +27,27 @@ namespace Umbraco.Tests.Routing
         [TestCase("/test-page", 1172)]
         public void Match_Document_By_Url_Hide_Top_Level(string urlString, int expectedId)
         {
-            var routingContext = GetRoutingContext(urlString);
-            var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url
-            var docreq = new PublishedContentRequest(url, routingContext);
-            var lookup = new ContentFinderByNiceUrl();
-            SettingsForTests.HideTopLevelNodeFromPath = true;
+            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(true);
+            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
-            var result = lookup.TryFindContent(docreq);
+            var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var lookup = new ContentFinderByNiceUrl(Logger);
+
+            Assert.IsTrue(UmbracoConfig.For.GlobalSettings().HideTopLevelNodeFromPath);
+
+            // fixme debugging - going further down, the routes cache is NOT empty?!
+            if (urlString == "/home/sub1")
+                System.Diagnostics.Debugger.Break();
+
+            var result = lookup.TryFindContent(frequest);
 
             if (expectedId > 0)
             {
                 Assert.IsTrue(result);
-                Assert.AreEqual(expectedId, docreq.PublishedContent.Id);
+                Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
             }
             else
             {
@@ -51,39 +63,45 @@ namespace Umbraco.Tests.Routing
         [TestCase("/home/Sub1.aspx", 1173)]
         public void Match_Document_By_Url(string urlString, int expectedId)
         {
-            var routingContext = GetRoutingContext(urlString);
-            var url = routingContext.UmbracoContext.CleanedUmbracoUrl; //very important to use the cleaned up umbraco url		
-            var docreq = new PublishedContentRequest(url, routingContext);
-            var lookup = new ContentFinderByNiceUrl();
-            SettingsForTests.HideTopLevelNodeFromPath = false;
+            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
+            
+            var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var lookup = new ContentFinderByNiceUrl(Logger);
 
-            var result = lookup.TryFindContent(docreq);
+            Assert.IsFalse(UmbracoConfig.For.GlobalSettings().HideTopLevelNodeFromPath);
+
+            var result = lookup.TryFindContent(frequest);
 
             Assert.IsTrue(result);
-            Assert.AreEqual(expectedId, docreq.PublishedContent.Id);
+            Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
         }
-
         /// <summary>
         /// This test handles requests with special characters in the URL.
         /// </summary>
         /// <param name="urlString"></param>
         /// <param name="expectedId"></param>
         [TestCase("/", 1046)]
-        [TestCase("/home/sub1/custom-sub-3-with-accént-character", 1179)]
-        [TestCase("/home/sub1/custom-sub-4-with-æøå", 1180)]
+        [TestCase("/home/sub1/custom-sub-3-with-accÃ©nt-character", 1179)]
+        [TestCase("/home/sub1/custom-sub-4-with-Ã¦Ã¸Ã¥", 1180)]
         public void Match_Document_By_Url_With_Special_Characters(string urlString, int expectedId)
         {
-            var routingContext = GetRoutingContext(urlString);
-            var url = routingContext.UmbracoContext
-                .CleanedUmbracoUrl; //very important to use the cleaned up umbraco url		
-            var docreq = new PublishedContentRequest(url, routingContext);
-            var lookup = new ContentFinderByNiceUrl();
-            SettingsForTests.HideTopLevelNodeFromPath = false;
+            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
-            var result = lookup.TryFindContent(docreq);
+            var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            var lookup = new ContentFinderByNiceUrl(Logger);
+            
+            var result = lookup.TryFindContent(frequest);
 
             Assert.IsTrue(result);
-            Assert.AreEqual(expectedId, docreq.PublishedContent.Id);
+            Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
         }
 
         /// <summary>
@@ -95,23 +113,24 @@ namespace Umbraco.Tests.Routing
         /// <param name="urlString"></param>
         /// <param name="expectedId"></param>
         [TestCase("/", 1046)]
-        [TestCase("/home/sub1/custom-sub-3-with-accént-character", 1179)]
-        [TestCase("/home/sub1/custom-sub-4-with-æøå", 1180)]
+        [TestCase("/home/sub1/custom-sub-3-with-accÃ©nt-character", 1179)]
+        [TestCase("/home/sub1/custom-sub-4-with-Ã¦Ã¸Ã¥", 1180)]
         public void Match_Document_By_Url_With_Special_Characters_Using_Hostname(string urlString, int expectedId)
         {
-            var routingContext = GetRoutingContext(urlString);
-            var url = routingContext.UmbracoContext
-                .CleanedUmbracoUrl; //very important to use the cleaned up umbraco url		
-            var docreq = new PublishedContentRequest(url, routingContext);
-            docreq.UmbracoDomain = new UmbracoDomain("mysite");
-            docreq.DomainUri = new Uri("http://mysite/");
-            var lookup = new ContentFinderByNiceUrl();
-            SettingsForTests.HideTopLevelNodeFromPath = false;
+            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
-            var result = lookup.TryFindContent(docreq);
+            var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            frequest.Domain = new DomainAndUri(new Domain(1, "mysite", -1, CultureInfo.CurrentCulture, false), new Uri("http://mysite/"));
+            var lookup = new ContentFinderByNiceUrl(Logger);
+
+            var result = lookup.TryFindContent(frequest);
 
             Assert.IsTrue(result);
-            Assert.AreEqual(expectedId, docreq.PublishedContent.Id);
+            Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
         }
 
         /// <summary>
@@ -122,25 +141,26 @@ namespace Umbraco.Tests.Routing
         /// </summary>
         /// <param name="urlString"></param>
         /// <param name="expectedId"></param>
-        [TestCase("/æøå/", 1046)]
-        [TestCase("/æøå/home/sub1", 1173)]
-        [TestCase("/æøå/home/sub1/custom-sub-3-with-accént-character", 1179)]
-        [TestCase("/æøå/home/sub1/custom-sub-4-with-æøå", 1180)]
+        [TestCase("/Ã¦Ã¸Ã¥/", 1046)]
+        [TestCase("/Ã¦Ã¸Ã¥/home/sub1", 1173)]
+        [TestCase("/Ã¦Ã¸Ã¥/home/sub1/custom-sub-3-with-accÃ©nt-character", 1179)]
+        [TestCase("/Ã¦Ã¸Ã¥/home/sub1/custom-sub-4-with-Ã¦Ã¸Ã¥", 1180)]
         public void Match_Document_By_Url_With_Special_Characters_In_Hostname(string urlString, int expectedId)
         {
-            var routingContext = GetRoutingContext(urlString);
-            var url = routingContext.UmbracoContext
-                .CleanedUmbracoUrl; //very important to use the cleaned up umbraco url		
-            var docreq = new PublishedContentRequest(url, routingContext);
-            docreq.UmbracoDomain = new UmbracoDomain("http://mysite/æøå");
-            docreq.DomainUri = new Uri("http://mysite/æøå");
-            var lookup = new ContentFinderByNiceUrl();
-            SettingsForTests.HideTopLevelNodeFromPath = false;
+            var globalSettingsMock = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettingsMock.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            SettingsForTests.ConfigureSettings(globalSettingsMock.Object);
 
-            var result = lookup.TryFindContent(docreq);
+            var umbracoContext = GetUmbracoContext(urlString, globalSettings:globalSettingsMock.Object);
+            var publishedRouter = CreatePublishedRouter();
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
+            frequest.Domain = new DomainAndUri(new Domain(1, "mysite/Ã¦Ã¸Ã¥", -1, CultureInfo.CurrentCulture, false), new Uri("http://mysite/Ã¦Ã¸Ã¥"));
+            var lookup = new ContentFinderByNiceUrl(Logger);
+            
+            var result = lookup.TryFindContent(frequest);
 
             Assert.IsTrue(result);
-            Assert.AreEqual(expectedId, docreq.PublishedContent.Id);
+            Assert.AreEqual(expectedId, frequest.PublishedContent.Id);
         }
     }
 }

@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Logging
+﻿namespace Umbraco.Core.Logging
 {
     /// <summary>
     /// Borrowed from https://github.com/cjbhaines/Log4Net.Async - will reference Nuget packages directly in v8

@@ -20,13 +20,13 @@
         string IChar.Char
         {
             get { return Char; }
-            
+
         }
 
         string IChar.Replacement
         {
             get { return Replacement; }
-            
+
         }
     }
 }

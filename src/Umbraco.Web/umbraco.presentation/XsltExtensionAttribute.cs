@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Security.Permissions;
 using System.Web;
 
@@ -16,12 +16,12 @@ namespace umbraco
     {
         public XsltExtensionAttribute() : base()
         {
-            
+
         }
 
         public XsltExtensionAttribute(string ns) : base(ns)
         {
-            
+
         }
 
     }

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Umbraco.Core.Logging;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Scheduling;
 
@@ -20,7 +21,7 @@ namespace Umbraco.Tests.Scheduling
         [Timeout(4000)]
         public async Task ThreadResumeIssue()
         {
-            var logger = new ConsoleLogger();
+            var logger = new DebugDiagnosticsLogger();
             var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { KeepAlive = true, LongRunning = true }, logger);
             var work = new ThreadResumeIssueWorkItem();
             runner.Add(work);
@@ -68,14 +69,14 @@ namespace Umbraco.Tests.Scheduling
             public bool IsAsync { get { return true; } }
 
             public void Dispose()
-            {}
+            { }
         }
 
         [Test]
         [Ignore("Only runs in the debugger.")]
         public async Task DebuggerInterferenceIssue()
         {
-            var logger = new ConsoleLogger();
+            var logger = new DebugDiagnosticsLogger();
             var runner = new BackgroundTaskRunner<IBackgroundTask>(new BackgroundTaskRunnerOptions { KeepAlive = true, LongRunning = true }, logger);
             var taskCompleted = false;
             runner.TaskCompleted += (sender, args) =>

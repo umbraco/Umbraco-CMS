@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,7 +8,6 @@ using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Web.UI.Pages;
-using umbraco.BusinessLogic;
 
 namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 {
@@ -17,7 +15,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
     {
         public DirectoryBrowser()
         {
-            CurrentApp = DefaultApps.developer.ToString();
+            CurrentApp = Constants.Applications.Developer;
         }
 
         string _lsScriptName;
@@ -33,7 +31,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 
             Response.Cache.SetExpires(DateTime.Now.AddSeconds(5));
             Response.Cache.SetCacheability(HttpCacheability.Public);
-            
+
             //we need to clean this string:
             //http://issues.umbraco.org/issue/U4-2027
             var target = Request.QueryString.Get("target");
@@ -44,7 +42,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
                 throw new InvalidOperationException("The target query string must be set to a valid html element id");
 
             Target = matched[0].Value;
-            
+
             try
             {
 

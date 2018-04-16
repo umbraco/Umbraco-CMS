@@ -1,16 +1,18 @@
-﻿using Umbraco.Core.Logging;
+﻿using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web;
+using Umbraco.Web.UI.Pages;
+using System;
+using System.Linq;
+using System.Net;
+using System.Net.Mime;
+using Umbraco.Core.IO;
+using Umbraco.Core.Xml;
+using Umbraco.Web.Composing;
 
 namespace dashboardUtilities
 {
-    using System;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Mime;
-    using umbraco;
-    using umbraco.BasePages;
-    using umbraco.BusinessLogic;
-    using Umbraco.Core.IO;
+
 
     public partial class FeedProxy : UmbracoEnsuredPage
     {
@@ -26,8 +28,8 @@ namespace dashboardUtilities
                         Uri requestUri;
                         if (Uri.TryCreate(url, UriKind.Absolute, out requestUri))
                         {
-                            var feedProxyXml = xmlHelper.OpenAsXmlDocument(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
-                            if (feedProxyXml != null 
+                            var feedProxyXml = XmlHelper.OpenAsXmlDocument(IOHelper.MapPath(SystemFiles.FeedProxyConfig));
+                            if (feedProxyXml != null
                                 && feedProxyXml.SelectSingleNode(string.Concat("//allow[@host = '", requestUri.Host, "']")) != null
                                 && requestUri.Port == 80)
                             {
@@ -45,7 +47,7 @@ namespace dashboardUtilities
                             }
                             else
                             {
-                                LogHelper.Debug<FeedProxy>(string.Format("Access to unallowed feedproxy attempted: {0}", requestUri));
+                                Current.Logger.Debug<FeedProxy>(string.Format("Access to unallowed feedproxy attempted: {0}", requestUri));
                             }
                         }
                     }
@@ -53,7 +55,7 @@ namespace dashboardUtilities
             }
             catch (Exception ex)
             {
-                LogHelper.Error<FeedProxy>("Exception occurred", ex);
+                Current.Logger.Error<FeedProxy>("Exception occurred", ex);
             }
         }
     }

@@ -1,56 +1,45 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
-using System.ComponentModel;
 using System.Globalization;
-using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
-using Semver;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Security
 {
     public class BackOfficeCookieAuthenticationProvider : CookieAuthenticationProvider
     {
-        private readonly ApplicationContext _appCtx;
-
-        [Obsolete("Use the ctor specifying all dependencies")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public BackOfficeCookieAuthenticationProvider()
-            : this(ApplicationContext.Current)
+        private readonly IUserService _userService;
+        private readonly IRuntimeState _runtimeState;
+        private readonly IGlobalSettings _globalSettings;
+        
+        public BackOfficeCookieAuthenticationProvider(IUserService userService, IRuntimeState runtimeState, IGlobalSettings globalSettings)
         {
+            _userService = userService;
+            _runtimeState = runtimeState;
+            _globalSettings = globalSettings;
         }
-
-        public BackOfficeCookieAuthenticationProvider(ApplicationContext appCtx)
-        {
-            if (appCtx == null) throw new ArgumentNullException("appCtx");
-            _appCtx = appCtx;
-        }
-
-        private static readonly SemVersion MinUmbracoVersionSupportingLoginSessions = new SemVersion(7, 8);
 
         public override void ResponseSignIn(CookieResponseSignInContext context)
         {
-            var backOfficeIdentity = context.Identity as UmbracoBackOfficeIdentity;
-            if (backOfficeIdentity != null)
+            if (context.Identity is UmbracoBackOfficeIdentity backOfficeIdentity)
             {
                 //generate a session id and assign it
                 //create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
 
-                //NOTE - special check because when we are upgrading to 7.8 we cannot create a session since the db isn't ready and we'll get exceptions
-                var canAcquireSession = _appCtx.IsUpgrading == false || _appCtx.CurrentVersion() >= MinUmbracoVersionSupportingLoginSessions;
-
-                var session = canAcquireSession
-                    ? _appCtx.Services.UserService.CreateLoginSession((int)backOfficeIdentity.Id, context.OwinContext.GetCurrentRequestIpAddress())
+                var session = _runtimeState.Level == RuntimeLevel.Run
+                    ? _userService.CreateLoginSession(backOfficeIdentity.Id, context.OwinContext.GetCurrentRequestIpAddress())
                     : Guid.NewGuid();
 
-                backOfficeIdentity.UserData.SessionId = session.ToString();
-            }            
+                backOfficeIdentity.SessionId = session.ToString();
+            }
 
             base.ResponseSignIn(context);
         }
@@ -58,15 +47,13 @@ namespace Umbraco.Core.Security
         public override void ResponseSignOut(CookieResponseSignOutContext context)
         {
             //Clear the user's session on sign out
-            if (context != null && context.OwinContext != null && context.OwinContext.Authentication != null
-                && context.OwinContext.Authentication.User != null && context.OwinContext.Authentication.User.Identity != null)
+            if (context?.OwinContext?.Authentication?.User?.Identity != null)
             {
                 var claimsIdentity = context.OwinContext.Authentication.User.Identity as ClaimsIdentity;
                 var sessionId = claimsIdentity.FindFirstValue(Constants.Security.SessionIdClaimType);
-                Guid guidSession;
-                if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out guidSession))
+                if (sessionId.IsNullOrWhiteSpace() == false && Guid.TryParse(sessionId, out var guidSession))
                 {
-                    _appCtx.Services.UserService.ClearLoginSession(guidSession);
+                    _userService.ClearLoginSession(guidSession);
                 }
             }
 
@@ -102,12 +89,13 @@ namespace Umbraco.Core.Security
         /// <returns/>
         public override async Task ValidateIdentity(CookieValidateIdentityContext context)
         {
-            EnsureCulture(context);
+            //ensure the thread culture is set
+            context?.Identity?.EnsureCulture();
 
             await EnsureValidSessionId(context);
 
             await base.ValidateIdentity(context);
-        }        
+        }
 
         /// <summary>
         /// Ensures that the user has a valid session id
@@ -115,26 +103,14 @@ namespace Umbraco.Core.Security
         /// <remarks>
         /// So that we are not overloading the database this throttles it's check to every minute
         /// </remarks>
-        protected  virtual async Task EnsureValidSessionId(CookieValidateIdentityContext context)
+        protected virtual async Task EnsureValidSessionId(CookieValidateIdentityContext context)
         {
-            if (_appCtx.IsConfigured && _appCtx.IsUpgrading == false)
-                await SessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context);
+            if (_runtimeState.Level == RuntimeLevel.Run)
+                await SessionIdValidator.ValidateSessionAsync(TimeSpan.FromMinutes(1), context, _globalSettings);
         }
 
-        private void EnsureCulture(CookieValidateIdentityContext context)
-        {
-            var umbIdentity = context.Identity as UmbracoBackOfficeIdentity;
-            if (umbIdentity != null && umbIdentity.IsAuthenticated)
-            {
-                Thread.CurrentThread.CurrentCulture =
-                    Thread.CurrentThread.CurrentUICulture =
-                        UserCultures.GetOrAdd(umbIdentity.Culture, s => new CultureInfo(s));
-            }
-        }
+        
 
-        /// <summary>
-        /// Used so that we aren't creating a new CultureInfo object for every single request
-        /// </summary>
-        private static readonly ConcurrentDictionary<string, CultureInfo> UserCultures = new ConcurrentDictionary<string, CultureInfo>();
+        
     }
 }

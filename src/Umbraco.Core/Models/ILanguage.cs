@@ -1,11 +1,10 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
-    public interface ILanguage : IAggregateRoot, IRememberBeingDirty, ICanBeDirty
+    public interface ILanguage : IEntity, IRememberBeingDirty
     {
         /// <summary>
         /// Gets or sets the Iso Code for the Language
@@ -24,5 +23,15 @@ namespace Umbraco.Core.Models
         /// </summary>
         [IgnoreDataMember]
         CultureInfo CultureInfo { get; }
+
+        /// <summary>
+        /// Defines if this language is the default variant language when language variants are in use
+        /// </summary>
+        bool IsDefaultVariantLanguage { get; set; }
+
+        /// <summary>
+        /// If true, a variant node cannot be published unless this language variant is created
+        /// </summary>
+        bool Mandatory { get; set; }
     }
 }

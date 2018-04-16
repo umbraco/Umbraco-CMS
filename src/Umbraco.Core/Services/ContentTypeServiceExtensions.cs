@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Services
             IContentTypeComposition[] allContentTypes,
             string[] filterContentTypes = null,
             string[] filterPropertyTypes = null)
-        {            
+        {
             filterContentTypes = filterContentTypes == null
                 ? new string[] { }
                 : filterContentTypes.Where(x => x.IsNullOrWhiteSpace() == false).ToArray();
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Services
                     .ToArray();
 
             var sourceId = source != null ? source.Id : 0;
-                        
+
             // find out if any content type uses this content type
             var isUsing = allContentTypes.Where(x => x.ContentTypeComposition.Any(y => y.Id == sourceId)).ToArray();
             if (isUsing.Length > 0)
@@ -68,16 +68,16 @@ namespace Umbraco.Core.Services
                 .Where(x => x.ContentTypeComposition.Any() == false).ToArray();
             foreach (var x in usableContentTypes)
                 list.Add(x);
-            
+
             // indirect types are those that we use, directly or indirectly
             var indirectContentTypes = GetDirectOrIndirect(source).ToArray();
             foreach (var x in indirectContentTypes)
                 list.Add(x);
 
             //At this point we have a list of content types that 'could' be compositions
-            
+
             //now we'll filter this list based on the filters requested
-            var filtered = list                
+            var filtered = list
                 .Where(x =>
                 {
                     //need to filter any content types that are included in this list
@@ -85,13 +85,13 @@ namespace Umbraco.Core.Services
                 })
                 .Where(x =>
                 {
-                    //need to filter any content types that have matching property aliases that are included in this list                    
+                    //need to filter any content types that have matching property aliases that are included in this list
                     //ensure that we don't return if there's any overlapping property aliases from the filtered ones specified
                     return filterPropertyTypes.Intersect(
-                        x.PropertyTypes.Select(p => p.Alias), 
+                        x.PropertyTypes.Select(p => p.Alias),
                         StringComparer.InvariantCultureIgnoreCase).Any() == false;
                 })
-                .OrderBy(x => x.Name)                
+                .OrderBy(x => x.Name)
                 .ToList();
 
             //get ancestor ids - we will filter all ancestors
@@ -146,7 +146,7 @@ namespace Umbraco.Core.Services
                 x => x.Id));
 
             var stack = new Stack<IContentTypeComposition>();
-            
+
             foreach (var x in ctype.ContentTypeComposition)
                 stack.Push(x);
 

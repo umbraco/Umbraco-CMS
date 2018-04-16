@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -9,6 +8,7 @@ using System.Web.Http.ModelBinding;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.WebApi.Filters
@@ -26,11 +26,15 @@ namespace Umbraco.Web.WebApi.Filters
         where TPersisted : class, IContentBase
         where TModelSave : ContentBaseItemSave<TPersisted>
     {
-     
+
+        /// <summary>
+        /// Validates the content item and updates the Response and ModelState accordingly
+        /// </summary>
+        /// <param name="actionContext"></param>
+        /// <param name="argumentName"></param>
         public void ValidateItem(HttpActionContext actionContext, string argumentName)
         {
-            var contentItem = actionContext.ActionArguments[argumentName] as TModelSave;
-            if (contentItem == null)
+            if (!(actionContext.ActionArguments[argumentName] is TModelSave contentItem))
             {
                 actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "No " + typeof(TModelSave) + " found in request");
                 return;
@@ -45,7 +49,7 @@ namespace Umbraco.Web.WebApi.Filters
             //now do each validation step
             if (ValidateExistingContent(contentItem, actionContext) == false) return;
             if (ValidateProperties(contentItem, actionContext) == false) return;
-            if (ValidatePropertyData(contentItem, actionContext) == false) return;
+            if (ValidatePropertyData(contentItem, contentItem.ContentDto, actionContext.ModelState) == false) return;
         }
 
         /// <summary>
@@ -58,7 +62,7 @@ namespace Umbraco.Web.WebApi.Filters
         {
             if (postedItem.PersistedContent == null)
             {
-                var message = string.Format("content with id: {0} was not found", postedItem.Id);
+                var message = $"content with id: {postedItem.Id} was not found";
                 actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
                 return false;
             }
@@ -74,7 +78,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// <returns></returns>
         protected virtual bool ValidateProperties(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
         {
-            return ValidateProperties(postedItem.Properties.ToArray(), postedItem.PersistedContent.Properties.ToArray(), actionContext);
+            return ValidateProperties(postedItem.Properties.ToList(), postedItem.PersistedContent.Properties.ToList(), actionContext);
         }
 
         /// <summary>
@@ -84,7 +88,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// <param name="persistedProperties"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        protected bool ValidateProperties(ContentPropertyBasic[] postedProperties , Property[] persistedProperties, HttpActionContext actionContext)
+        protected bool ValidateProperties(List<ContentPropertyBasic> postedProperties , List<Property> persistedProperties, HttpActionContext actionContext)
         {
             foreach (var p in postedProperties)
             {
@@ -93,91 +97,54 @@ namespace Umbraco.Web.WebApi.Filters
                     //TODO: Do we return errors here ? If someone deletes a property whilst their editing then should we just
                     //save the property data that remains? Or inform them they need to reload... not sure. This problem exists currently too i think.
 
-                    var message = string.Format("property with alias: {0} was not found", p.Alias);
+                    var message = $"property with alias: {p.Alias} was not found";
                     actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, new InvalidOperationException(message));
                     return false;
                 }
 
             }
             return true;
-        } 
+        }
 
         /// <summary>
         /// Validates the data for each property
         /// </summary>
         /// <param name="postedItem"></param>
-        /// <param name="actionContext"></param>
+        /// <param name="dto"></param>
+        /// <param name="modelState"></param>
         /// <returns></returns>
         /// <remarks>
         /// All property data validation goes into the modelstate with a prefix of "Properties"
         /// </remarks>
-        protected virtual bool ValidatePropertyData(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
+        public virtual bool ValidatePropertyData(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, ContentItemDto<TPersisted> dto, ModelStateDictionary modelState)
         {
-            foreach (var p in postedItem.ContentDto.Properties)
+            foreach (var p in dto.Properties)
             {
                 var editor = p.PropertyEditor;
+
                 if (editor == null)
                 {
-                    var message = string.Format("The property editor with alias: {0} was not found for property with id {1}", p.DataType.PropertyEditorAlias, p.Id);
-                    LogHelper.Warn<ContentItemValidationHelper<TPersisted, TModelSave>>(message);
-                    //actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
-                    //return false;
+                    var message = $"Could not find property editor \"{p.DataType.EditorAlias}\" for property with id {p.Id}.";
+                    Current.Logger.Warn<ContentItemValidationHelper<TPersisted, TModelSave>>(message);
                     continue;
                 }
 
-                //get the posted value for this property
-                var postedValue = postedItem.Properties.Single(x => x.Alias == p.Alias).Value;
+                //get the posted value for this property, this may be null in cases where the property was marked as readonly which means
+                //the angular app will not post that value.
+                var postedProp = postedItem.Properties.FirstOrDefault(x => x.Alias == p.Alias);
+                if (postedProp == null) continue;
 
-                //get the pre-values for this property
-                var preValues = p.PreValues;
+                var postedValue = postedProp.Value;
 
-                //TODO: when we figure out how to 'override' certain pre-value properties we'll either need to:
-                // * Combine the preValues with the overridden values stored with the document type property (but how to combine?)
-                // * Or, pass in the overridden values stored with the doc type property separately
-
-                foreach (var result in editor.ValueEditor.Validators.SelectMany(v => v.Validate(postedValue, preValues, editor)))
-                {
-                    actionContext.ModelState.AddPropertyError(result, p.Alias);
-                }
-
-                //Now we need to validate the property based on the PropertyType validation (i.e. regex and required)
-                // NOTE: These will become legacy once we have pre-value overrides.
-                if (p.IsRequired)
-                {
-                    foreach (var result in p.PropertyEditor.ValueEditor.RequiredValidator.Validate(postedValue, "", preValues, editor))
-                    {
-                        actionContext.ModelState.AddPropertyError(result, p.Alias);
-                    }
-                }
-
-                if (p.ValidationRegExp.IsNullOrWhiteSpace() == false)
-                {
-
-                    //We only want to execute the regex statement if:
-                    // * the value is null or empty AND it is required OR
-                    // * the value is not null or empty
-                    //See: http://issues.umbraco.org/issue/U4-4669
-
-                    var asString = postedValue as string;
-
-                    if (
-                        //Value is not null or empty
-                        (postedValue != null && asString.IsNullOrWhiteSpace() == false)
-                        //It's required
-                        || (p.IsRequired))
-                    {
-                        foreach (var result in p.PropertyEditor.ValueEditor.RegexValidator.Validate(postedValue, p.ValidationRegExp, preValues, editor))
-                        {
-                            actionContext.ModelState.AddPropertyError(result, p.Alias);
-                        }
-                    }
-                    
-                }
+                // validate
+                var valueEditor = editor.GetValueEditor(p.DataType.Configuration);
+                foreach (var r in valueEditor.Validate(postedValue, p.IsRequired, p.ValidationRegExp))
+                    modelState.AddPropertyError(r, p.Alias);
             }
 
-            return actionContext.ModelState.IsValid;
+            return modelState.IsValid;
         }
 
-        
+
     }
 }

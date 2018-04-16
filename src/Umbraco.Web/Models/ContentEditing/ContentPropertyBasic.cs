@@ -11,7 +11,7 @@ namespace Umbraco.Web.Models.ContentEditing
     public class ContentPropertyBasic
     {
         /// <summary>
-        /// This is the cmsPropertyData ID
+        /// This is the PropertyData ID
         /// </summary>
         /// <remarks>
         /// This is not really used for anything
@@ -30,12 +30,17 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "editor", IsRequired = false)]
         public string Editor { get; set; }
 
+        /// <summary>
+        /// Flags the property to denote that it can contain sensitive data
+        /// </summary>
+        [DataMember(Name = "isSensitive", IsRequired = false)]
+        public bool IsSensitive { get; set; }
 
         /// <summary>
         /// Used internally during model mapping
         /// </summary>
         [IgnoreDataMember]
-        internal PropertyEditor PropertyEditor { get; set; }
+        internal IDataEditor PropertyEditor { get; set; }
 
     }
 }

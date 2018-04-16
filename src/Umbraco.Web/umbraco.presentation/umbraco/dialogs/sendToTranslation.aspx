@@ -1,5 +1,5 @@
 <%@ Page Language="C#" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="true" Codebehind="sendToTranslation.aspx.cs" Inherits="umbraco.presentation.dialogs.sendToTranslation" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 <style type="text/css">
@@ -30,8 +30,7 @@
 <asp:Panel ID="pl_buttons" runat="server">
 <p>
 <asp:Button ID="doTranslation" runat="Server" OnClick="doTranslation_Click" />
-&nbsp; <em><%= umbraco.ui.Text("or") %></em> &nbsp;<a href="#" onClick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
+&nbsp; <em><%= Services.TextService.Localize("or") %></em> &nbsp;<a href="#" onClick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("cancel")%></a>
 </p>
 </asp:Panel>
 </asp:Content>
-      

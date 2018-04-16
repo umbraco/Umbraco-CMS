@@ -1,47 +1,113 @@
-using System;
+﻿using System;
 using System.Linq;
 
 namespace Umbraco.Core.Logging
 {
     /// <summary>
-    /// Implements <see cref="ILogger"/> on top of System.Diagnostics.Debug.
+    /// Implements <see cref="ILogger"/> on top of <see cref="System.Diagnostics"/>.
     /// </summary>
-    /// <remarks>Useful for tests.</remarks>
     public class DebugDiagnosticsLogger : ILogger
     {
-        public void Error(Type callingType, string message, Exception exception)
+        /// <inheritdoc/>
+        public void Error(Type reporting, string message, Exception exception = null)
         {
-            System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, callingType.ToString());
+            System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
         }
 
-        public void Warn(Type callingType, string message, params Func<object>[] formatItems)
+        /// <inheritdoc/>
+        public void Warn(Type reporting, string format)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(message, formatItems.Select(x => x()).ToArray()), callingType.ToString());
+            System.Diagnostics.Debug.WriteLine(format, reporting.FullName);
         }
 
-        public void WarnWithException(Type callingType, string message, Exception e, params Func<object>[] formatItems)
+        /// <inheritdoc/>
+        public void Warn(Type reporting, Func<string> messageBuilder)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(message + Environment.NewLine + e, formatItems.Select(x => x()).ToArray()), callingType.ToString());
+            System.Diagnostics.Debug.WriteLine(messageBuilder(), reporting.FullName);
         }
 
-        public void Info(Type callingType, Func<string> generateMessage)
+        /// <inheritdoc/>
+        public void Warn(Type reporting, string format, params object[] args)
         {
-            System.Diagnostics.Debug.WriteLine(generateMessage(), callingType.ToString());
+            System.Diagnostics.Debug.WriteLine(string.Format(format, args), reporting.FullName);
         }
 
-        public void Info(Type type, string generateMessageFormat, params Func<object>[] formatItems)
+        /// <inheritdoc/>
+        public void Warn(Type reporting, string format, params Func<object>[] args)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(generateMessageFormat, formatItems.Select(x => x()).ToArray()), type.ToString());
+            System.Diagnostics.Debug.WriteLine(string.Format(format, args.Select(x => x()).ToArray()), reporting.FullName);
         }
 
-        public void Debug(Type callingType, Func<string> generateMessage)
+        /// <inheritdoc/>
+        public void Warn(Type reporting, Exception exception, string message)
         {
-            System.Diagnostics.Debug.WriteLine(generateMessage(), callingType.ToString());
+            System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
         }
 
-        public void Debug(Type type, string generateMessageFormat, params Func<object>[] formatItems)
+        /// <inheritdoc/>
+        public void Warn(Type reporting, Exception exception, Func<string> messageBuilder)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(generateMessageFormat, formatItems.Select(x => x()).ToArray()), type.ToString());
+            System.Diagnostics.Debug.WriteLine(messageBuilder() + Environment.NewLine + exception, reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Warn(Type reporting, Exception exception, string format, params object[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Format(format + Environment.NewLine + exception, args), reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Warn(Type reporting, Exception exception, string format, params Func<object>[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Format(format + Environment.NewLine + exception, args.Select(x => x()).ToArray()), reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Info(Type reporting, string message)
+        {
+            System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Info(Type reporting, Func<string> messageBuilder)
+        {
+            System.Diagnostics.Debug.WriteLine(messageBuilder(), reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Info(Type reporting, string format, params object[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Format(format, args), reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Info(Type reporting, string format, params Func<object>[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Format(format, args.Select(x => x()).ToArray()), reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Debug(Type reporting, string message)
+        {
+            System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Debug(Type reporting, Func<string> messageBuilder)
+        {
+            System.Diagnostics.Debug.WriteLine(messageBuilder(), reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Debug(Type reporting, string format, params object[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Format(format, args), reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Debug(Type reporting, string format, params Func<object>[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Format(format, args.Select(x => x()).ToArray()), reporting.FullName);
         }
     }
 }

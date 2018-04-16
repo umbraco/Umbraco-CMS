@@ -11,6 +11,7 @@
         <key alias="changeDocType">Change Document Type</key>
         <key alias="copy">Copy</key>
         <key alias="create">Create</key>
+        <key alias="export">Export</key>
         <key alias="createPackage">Create Package</key>
         <key alias="createGroup">Create group</key>
         <key alias="delete">Delete</key>
@@ -126,8 +127,9 @@
         <key alias="relations">Edit relations</key>
         <key alias="returnToList">Return to list</key>
         <key alias="save">Save</key>
-        <key alias="saveAndPublish">Save and publish</key>
-    <key alias="saveAndSchedule">Save and schedule</key>
+        <key alias="saveAndPublish">Publish</key>
+        <key alias="saveAndPublishMany">Publish…</key>
+        <key alias="saveAndSchedule">Save and schedule</key>
         <key alias="saveToPublish">Save and send for approval</key>
         <key alias="saveListView">Save list view</key>
         <key alias="showPage">Preview</key>
@@ -187,10 +189,10 @@
         <key alias="membergroup">Member Group</key>
         <key alias="memberrole">Role</key>
         <key alias="membertype">Member Type</key>
-    <key alias="noChanges">No changes have been made</key>
+        <key alias="noChanges">No changes have been made</key>
         <key alias="noDate">No date chosen</key>
         <key alias="nodeName">Page title</key>
-    <key alias="noMediaLink">This media item has no link</key>
+        <key alias="noMediaLink">This media item has no link</key>
         <key alias="otherElements">Properties</key>
         <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
         <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
@@ -227,6 +229,8 @@
         <key alias="addTextBox">Add another text box</key>
         <key alias="removeTextBox">Remove this text box</key>
         <key alias="contentRoot">Content root</key>
+        <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
+        <key alias="isSensitiveValue_short">This value is hidden.</key>
     </area>
     <area alias="blueprints">
         <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
@@ -316,7 +320,6 @@
         <key alias="nodeNameLinkPicker">Link title</key>
         <key alias="urlLinkPicker">Link</key>
         <key alias="anchorInsert">Name</key>
-        <key alias="assignDomain">Manage hostnames</key>
         <key alias="closeThisWindow">Close this window</key>
         <key alias="confirmdelete">Are you sure you want to delete</key>
         <key alias="confirmdisable">Are you sure you want to disable</key>
@@ -401,6 +404,7 @@
         <key alias="account">account</key>
         <key alias="selectEditor">Select editor</key>
         <key alias="selectSnippet">Select snippet</key>
+        <key alias="variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.</key>
     </area>
     <area alias="dictionaryItem">
         <key alias="description">
@@ -516,6 +520,7 @@
         <key alias="missingPropertyEditorErrorMessage">There is a configuration error with the data type used for this property, please check the data type</key>
     </area>
     <area alias="general">
+        <key alias="options">Options</key>
         <key alias="about">About</key>
         <key alias="action">Action</key>
         <key alias="actions">Actions</key>
@@ -556,15 +561,15 @@
         <key alias="error">Error</key>
         <key alias="findDocument">Find</key>
         <key alias="first">First</key>
-    <key alias="general">General</key>
+        <key alias="general">General</key>
         <key alias="groups">Groups</key>
         <key alias="height">Height</key>
         <key alias="help">Help</key>
         <key alias="hide">Hide</key>
-    <key alias="history">History</key>
+        <key alias="history">History</key>
         <key alias="icon">Icon</key>
         <key alias="import">Import</key>
-    <key alias="info">Info</key>
+        <key alias="info">Info</key>
         <key alias="innerMargin">Inner margin</key>
         <key alias="insert">Insert</key>
         <key alias="install">Install</key>
@@ -574,7 +579,7 @@
         <key alias="language">Language</key>
         <key alias="last">Last</key>
         <key alias="layout">Layout</key>
-    <key alias="links">Links</key>
+        <key alias="links">Links</key>
         <key alias="loading">Loading</key>
         <key alias="locked">Locked</key>
         <key alias="login">Login</key>
@@ -613,11 +618,12 @@
         <key alias="retrieve">Retrieve</key>
         <key alias="retry">Retry</key>
         <key alias="rights">Permissions</key>
-    <key alias="scheduledPublishing">Scheduled Publishing</key>
+        <key alias="scheduledPublishing">Scheduled Publishing</key>
         <key alias="search">Search</key>
         <key alias="searchNoResult">Sorry, we can not find what you are looking for</key>
         <key alias="noItemsInList">No items have been added</key>
         <key alias="server">Server</key>
+        <key alias="settings">Settings</key>
         <key alias="show">Show</key>
         <key alias="showPageOnSend">Show page on Send</key>
         <key alias="size">Size</key>
@@ -649,7 +655,7 @@
         <key alias="saving">Saving...</key>
         <key alias="current">current</key>
         <key alias="embed">Embed</key>
-    <key alias="retrieve">Retrieve</key>
+        <key alias="retrieve">Retrieve</key>
         <key alias="selected">selected</key>
     </area>
     <area alias="colors">
@@ -658,7 +664,20 @@
         <key alias="yellow">Yellow</key>
         <key alias="orange">Orange</key>
         <key alias="blue">Blue</key>
+        <key alias="bluegrey">Blue Grey</key>
+        <key alias="grey">Grey</key>
+        <key alias="brown">Brown</key>
+        <key alias="lightblue">Light Blue</key>
+        <key alias="cyan">Cyan</key>
+        <key alias="lightgreen">Light Green</key>
+        <key alias="lime">Lime</key>
+        <key alias="amber">Amber</key>
+        <key alias="deeporange">Deep Orange</key>
         <key alias="red">Red</key>
+        <key alias="pink">Pink</key>
+        <key alias="purple">Purple</key>
+        <key alias="deeppurple">Deep Purple</key>
+        <key alias="indigo">Indigo</key>
     </area>
     <area alias="shortcuts">
         <key alias="addTab">Add tab</key>
@@ -1398,6 +1417,10 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="unlockUsersError">An error occurred while unlocking the users</key>
         <key alias="unlockUserSuccess">%0% is now unlocked</key>
         <key alias="unlockUserError">An error occurred while unlocking the user</key>
+        <key alias="memberExportedSuccess">Member was exported to file</key>
+        <key alias="memberExportedError">An error occurred while exporting the member</key>
+        <key alias="contentReqLangValidationError">Validation failed for mandatory language '%0%'</key>
+        <key alias="contentLangValidationError">Validation failed for language '%0%'</key>
     </area>
     <area alias="stylesheet">
         <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>
@@ -1512,12 +1535,12 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="template">Template</key>
     </area>
     <area alias="grid">
-		<key alias="rte">Rich Text Editor</key>
-		<key alias="media">Image</key>
-		<key alias="macro">Macro</key>
-		<key alias="embed">Embed</key>
-		<key alias="headline">Headline</key>
-		<key alias="quote">Quote</key>	
+        <key alias="rte">Rich Text Editor</key>
+        <key alias="media">Image</key>
+        <key alias="macro">Macro</key>
+        <key alias="embed">Embed</key>
+        <key alias="headline">Headline</key>
+        <key alias="quote">Quote</key>
         <key alias="insertControl">Choose type of content</key>
         <key alias="chooseLayout">Choose a layout</key>
         <key alias="addRows">Add a row</key>
@@ -1619,8 +1642,22 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="thisEditorUpdateSettings">using this editor will get updated with the new settings</key>
 
         <key alias="memberCanEdit">Member can edit</key>
+        <key alias="memberCanEditDescription">Allow this property value to be edited by the member on their profile page</key>
+        <key alias="isSensitiveData">Is sensitive data</key>
+        <key alias="isSensitiveDataDescription">Hide this property value from content editors that don't have access to view sensitive information</key>
         <key alias="showOnMemberProfile">Show on member profile</key>
+        <key alias="showOnMemberProfileDescription">Allow this property value to be displayed on the member profile page</key>
+        
         <key alias="tabHasNoSortOrder">tab has no sort order</key>
+    </area>
+
+    <area alias="languages">
+        <key alias="addLanguage">Add language</key>
+        <key alias="mandatoryLanguage">Mandatory</key>
+        <key alias="mandatoryLanguageHelp">Properties on this language has to be filled out before the node can be published.</key>
+        <key alias="defaultLanguage">Default language</key>
+        <key alias="defaultLanguageHelp">An Umbraco site can only have one default langugae set.</key>
+        <key alias="changingDefaultLanguageWarning">Switching default language may result in default content missing.</key>
     </area>
 
     <area alias="modelsBuilder">
@@ -1912,7 +1949,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 															Hi %0%,
 														</h1>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															You have been invited by <a href="mailto:%1%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> to the Umbraco Back Office.
+															You have been invited by <a href="mailto:%4%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> to the Umbraco Back Office.
 														</p>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															Message from <a href="mailto:%1%" style="text-decoration: none; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a>:

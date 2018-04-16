@@ -1,4 +1,4 @@
-namespace Umbraco.Web.Scheduling
+﻿namespace Umbraco.Web.Scheduling
 {
     /// <summary>
     /// Provides options to the <see cref="BackgroundTaskRunner{T}"/> class.

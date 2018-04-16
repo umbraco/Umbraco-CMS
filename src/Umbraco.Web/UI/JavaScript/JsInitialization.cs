@@ -1,17 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Text.RegularExpressions;
 using System.Web;
 using ClientDependency.Core;
-using ClientDependency.Core.Config;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 using System.Linq;
+using System.Text;
 
 namespace Umbraco.Web.UI.JavaScript
 {
@@ -20,7 +16,7 @@ namespace Umbraco.Web.UI.JavaScript
     /// main Umbraco initialization output.
     /// </summary>
     internal class JsInitialization : AssetInitialization
-    {        
+    {
         private readonly ManifestParser _parser;
 
         public JsInitialization(ManifestParser parser)
@@ -28,65 +24,65 @@ namespace Umbraco.Web.UI.JavaScript
             _parser = parser;
         }
 
-        //used to strip comments
-        internal static readonly Regex Comments = new Regex("(/\\*.*\\*/)", RegexOptions.Compiled);
-        //used for dealing with js functions inside of json (which is not a supported json syntax)
+        // deal with javascript functions inside of json (not a supported json syntax)
         private const string PrefixJavaScriptObject = "@@@@";
-        private static readonly Regex JsFunctionParser = new Regex(string.Format("(\"{0}(.*?)\")+", PrefixJavaScriptObject),
-                                                                    RegexOptions.Multiline
-                                                                    | RegexOptions.CultureInvariant
-                                                                    | RegexOptions.Compiled);
-        //used to replace the tokens in the js main
+        private static readonly Regex JsFunctionParser = new Regex($"(\"{PrefixJavaScriptObject}(.*?)\")+",
+            RegexOptions.Multiline | RegexOptions.CultureInvariant | RegexOptions.Compiled);
+
+        // replace tokens in the js main
         private static readonly Regex Token = new Regex("(\"##\\w+?##\")", RegexOptions.Compiled);
 
         /// <summary>
         /// Processes all found manifest files and outputs the main.js file containing all plugin manifests
         /// </summary>
-        public string GetJavascriptInitialization(HttpContextBase httpContext, JArray umbracoInit, JArray additionalJsFiles = null)
+        public string GetJavascriptInitialization(HttpContextBase httpContext, IEnumerable<string> umbracoInit, IEnumerable<string> additionalJsFiles = null)
         {
-            var result = GetJavascriptInitializationArray(httpContext, umbracoInit, additionalJsFiles);
-                
-            return ParseMain(
-                result.ToString(),
-                IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+            var files = GetScriptFiles(httpContext, umbracoInit, additionalJsFiles);
+
+            var jarray = new StringBuilder();
+            jarray.AppendLine("[");
+            var first = true;
+            foreach (var file in files)
+            {
+                if (first) first = false;
+                else jarray.AppendLine(",");
+                jarray.Append("\"");
+                jarray.Append(file);
+                jarray.Append("\"");
+
+            }
+            jarray.Append("]");
+
+            return WriteScript(jarray.ToString(), IOHelper.ResolveUrl(SystemDirectories.Umbraco));
         }
 
-        public JArray GetJavascriptInitializationArray(HttpContextBase httpContext, JArray umbracoInit, JArray additionalJsFiles = null)
+        public IEnumerable<string> GetScriptFiles(HttpContextBase httpContext, IEnumerable<string> umbracoInit, IEnumerable<string> additionalJsFiles = null)
         {
-            foreach (var m in _parser.GetManifests())
-            {
-                ManifestParser.MergeJArrays(umbracoInit, m.JavaScriptInitialize);
-            }
-
-            //merge in the additional ones specified if there are any
+            var scripts = new HashSet<string>();
+            foreach (var script in umbracoInit)
+                scripts.Add(script);
+            foreach (var script in _parser.Manifest.Scripts)
+                scripts.Add(script);
             if (additionalJsFiles != null)
-            {
-                ManifestParser.MergeJArrays(umbracoInit, additionalJsFiles);
-            }
+                foreach (var script in additionalJsFiles)
+                    scripts.Add(script);
 
-            //now we can optimize if in release mode
-            umbracoInit = OptimizeAssetCollection(umbracoInit, ClientDependencyType.Javascript, httpContext);
+            scripts = new HashSet<string>(OptimizeAssetCollection(scripts, ClientDependencyType.Javascript, httpContext));
 
-            //now we need to merge in any found cdf declarations on property editors
-            ManifestParser.MergeJArrays(umbracoInit, ScanPropertyEditors(ClientDependencyType.Javascript, httpContext));
+            foreach (var script in ScanPropertyEditors(ClientDependencyType.Javascript, httpContext))
+                scripts.Add(script);
 
-            return umbracoInit;
+            return scripts.ToArray();
         }
 
         /// <summary>
         /// Returns the default config as a JArray
         /// </summary>
         /// <returns></returns>
-        internal static JArray GetDefaultInitialization()
+        internal static IEnumerable<string> GetDefaultInitialization()
         {
-            var init = Resources.JsInitialize;
-            var deserialized = JsonConvert.DeserializeObject<JArray>(init);
-            var result = new JArray();
-            foreach (var j in deserialized.Where(j => j.Type == JTokenType.String))
-            {
-                result.Add(j);
-            }
-            return result;
+            var resources = JsonConvert.DeserializeObject<JArray>(Resources.JsInitialize);
+            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());
         }
 
         /// <summary>
@@ -94,22 +90,18 @@ namespace Umbraco.Web.UI.JavaScript
         /// </summary>
         /// <param name="replacements"></param>
         /// <returns></returns>
-        internal static string ParseMain(params string[] replacements)
+        internal static string WriteScript(params string[] replacements)
         {
             var count = 0;
 
+            // replace, catering for the special syntax when we have
+            // js function() objects contained in the json
+
             return Token.Replace(Resources.Main, match =>
             {
-                var replaced = replacements[count];
-
-                //we need to cater for the special syntax when we have js function() objects contained in the json
-                var jsFunctionParsed = JsFunctionParser.Replace(replaced, "$2");
-
-                count++;
-
-                return jsFunctionParsed;
+                var replacement = replacements[count++];
+                return JsFunctionParser.Replace(replacement, "$2");
             });
         }
-
     }
 }

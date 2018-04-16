@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core.Models.EntityBase;
+﻿using System.Collections.Generic;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -16,9 +15,14 @@ namespace Umbraco.Core.Models
         int ContentTypeId { get; }
 
         /// <summary>
-        /// Gets the Guid Id of the Content's Version
+        /// Gets the identifier of the writer.
         /// </summary>
-        Guid Version { get; }
+        int WriterId { get; set; }
+
+        /// <summary>
+        /// Gets the version identifier.
+        /// </summary>
+        int VersionId { get; }
 
         /// <summary>
         /// List of properties, which make up all the data available for this Content object
@@ -39,45 +43,40 @@ namespace Umbraco.Core.Models
         IEnumerable<PropertyType> PropertyTypes { get; }
 
         /// <summary>
-        /// Indicates whether the content object has a property with the supplied alias
+        /// Gets a value indicating whether the content entity has a property with the supplied alias.
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <returns>True if Property with given alias exists, otherwise False</returns>
+        /// <remarks>Indicates that the content entity has a property with the supplied alias, but
+        /// not necessarily that the content has a value for that property. Could be missing.</remarks>
         bool HasProperty(string propertyTypeAlias);
 
         /// <summary>
         /// Gets the value of a Property
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <returns><see cref="Property"/> Value as an <see cref="object"/></returns>
-        object GetValue(string propertyTypeAlias);
+        object GetValue(string propertyTypeAlias, int? languageId = null, string segment = null, bool published = false);
 
         /// <summary>
-        /// Gets the value of a Property
+        /// Gets the typed value of a Property
         /// </summary>
-        /// <typeparam name="TPassType">Type of the value to return</typeparam>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <returns><see cref="Property"/> Value as a <see cref="TPassType"/></returns>
-        TPassType GetValue<TPassType>(string propertyTypeAlias);
+        TValue GetValue<TValue>(string propertyTypeAlias, int? languageId = null, string segment = null, bool published = false);
 
         /// <summary>
-        /// Sets the <see cref="System.Object"/> value of a Property
+        /// Sets the (edited) value of a Property
         /// </summary>
-        /// <param name="propertyTypeAlias">Alias of the PropertyType</param>
-        /// <param name="value">Value to set for the Property</param>
-        void SetValue(string propertyTypeAlias, object value);
+        void SetValue(string propertyTypeAlias, object value, int? languageId = null, string segment = null);
 
         /// <summary>
-        /// Boolean indicating whether the content and its properties are valid
+        /// Gets a value indicating whether the content and all its properties values are valid.
         /// </summary>
-        /// <returns>True if content is valid otherwise false</returns>
-        bool IsValid();
+        Property[] ValidateAll();
 
         /// <summary>
-        /// Changes the Trashed state of the content object
+        /// Gets a value indicating whether the content and its properties values are valid.
         /// </summary>
-        /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>
-        /// <param name="parentId"> </param>
-        void ChangeTrashedState(bool isTrashed, int parentId = -20);
+        Property[] Validate(int? languageId = null, string segment = null);
+
+        /// <summary>
+        /// Gets a value indicating whether the content and its culture/any properties values are valid.
+        /// </summary>
+        Property[] ValidateCulture(int? languageId = null);
     }
 }

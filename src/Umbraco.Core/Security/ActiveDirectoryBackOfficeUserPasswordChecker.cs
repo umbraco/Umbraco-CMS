@@ -21,7 +21,7 @@ namespace Umbraco.Core.Security
             bool isValid;
             using (var pc = new PrincipalContext(ContextType.Domain, ActiveDirectoryDomain))
             {
-                isValid = pc.ValidateCredentials(user.UserName, password);                
+                isValid = pc.ValidateCredentials(user.UserName, password);
             }
 
             if (isValid && user.HasIdentity == false)

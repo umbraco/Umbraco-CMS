@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using umbraco.interfaces;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Sync
 {

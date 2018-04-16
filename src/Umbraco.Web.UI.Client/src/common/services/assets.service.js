@@ -129,14 +129,12 @@ angular.module('umbraco.services')
                 asset.state = "loading";
                 LazyLoad.css(appendRnd(path), function () {
                     if (!scope) {
-                        asset.state = "loaded";
-                        asset.deferred.resolve(true);
-                    } else {
-                        asset.state = "loaded";
-                        angularHelper.safeApply(scope, function () {
-                            asset.deferred.resolve(true);
-                        });
+                        scope = $rootScope;
                     }
+                    asset.state = "loaded";
+                    angularHelper.safeApply(scope, function () {
+                        asset.deferred.resolve(true);
+                    });
                 });
             } else if (asset.state === "loaded") {
                 asset.deferred.resolve(true);
@@ -171,14 +169,12 @@ angular.module('umbraco.services')
 
                 LazyLoad.js(appendRnd(path), function () {
                     if (!scope) {
-                        asset.state = "loaded";
-                        asset.deferred.resolve(true);
-                    } else {
-                        asset.state = "loaded";
-                        angularHelper.safeApply(scope, function () {
-                            asset.deferred.resolve(true);
-                        });
+                        scope = $rootScope;
                     }
+                    asset.state = "loaded";
+                    angularHelper.safeApply(scope, function () {
+                        asset.deferred.resolve(true);
+                    });
                 });
 
             } else if (asset.state === "loaded") {
@@ -234,8 +230,7 @@ angular.module('umbraco.services')
                         assets.push(asset);
                     }
 
-                    //we need to always push to the promises collection to monitor correct
-                    //execution
+                    //we need to always push to the promises collection to monitor correct execution
                     promises.push(asset.deferred.promise);
                 }
             });
@@ -256,8 +251,7 @@ angular.module('umbraco.services')
             function assetLoaded(asset) {
                 asset.state = "loaded";
                 if (!scope) {
-                    asset.deferred.resolve(true);
-                    return;
+                    scope = $rootScope;
                 }
                 angularHelper.safeApply(scope,
                     function () {

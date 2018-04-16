@@ -18,12 +18,12 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         }
         [Test]
         public void DefaultRenderingEngine()
-        {        
+        {
             Assert.IsTrue(SettingsSection.Templates.DefaultRenderingEngine == RenderingEngine.Mvc);
         }
         [Test]
         public void EnableTemplateFolders()
-        {            
+        {
             Assert.IsTrue(SettingsSection.Templates.EnableTemplateFolders == false);
         }
     }

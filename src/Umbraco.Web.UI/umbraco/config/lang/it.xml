@@ -30,6 +30,7 @@
     <key alias="sendtopublish">Invia per la pubblicazione</key>
     <key alias="sendToTranslate">Invia per la traduzione</key>
     <key alias="sort">Ordina</key>
+    <key alias="toPublish">Invia la pubblicazione</key>
     <key alias="translate">Traduci</key>
     <key alias="unpublish">Annulla pubblicazione</key>
     <key alias="update">Aggiorna</key>
@@ -572,7 +573,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
   <area alias="publicAccess">
     <key alias="paAdvanced"><![CDATA[Protezione basata su ruoli]]></key>
     <key alias="paAdvancedHelp"><![CDATA[Se vuoi controllare gli accessi alla pagina tramite l'autenticazione basata sui ruoli,<br /> usando i gruppi di membri di Umbraco.]]></key>
-    <key alias="paAdvancedNoGroups">Devi creare un gruppo di membri prima di utilizzare l'autenticazione basata sui ruoli</key>
+    <key alias="paAdvancedNoGroups"><![CDATA[Devi creare un gruppo di membri prima di utilizzare <br />l'autenticazione basata sui ruoli.]]></key>
     <key alias="paErrorPage"><![CDATA[Pagina di Errore]]></key>
     <key alias="paErrorPageHelp"><![CDATA[Usato quando qualcuno è connesso, ma non ha accesso]]></key>
     <key alias="paHowWould"><![CDATA[Vuoi restringere l'accesso a questa pagina?]]></key>
@@ -795,6 +796,8 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="postContent"><![CDATA[Inserisci dopo il campo]]></key>
     <key alias="preContent"><![CDATA[Inserisci prima il campo]]></key>
     <key alias="recursive">Ricorsivo</key>
+    <key alias="removeParagraph"><![CDATA[Rimuovi i tag paragrafo]]></key>
+    <key alias="removeParagraphHelp"><![CDATA[Rimuoverà &lt;P&gt; all'inizio e alla fine del testo]]></key>
     <key alias="standardFields">Campi Standard</key>
     <key alias="uppercase">Maiuscolo</key>
     <key alias="urlEncode"><![CDATA[Codifica URL]]></key>
@@ -880,6 +883,9 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="stylesheets">Fogli di stile</key>
     <key alias="templates">Templates</key>
     <key alias="xslt">Files XSLT</key>
+    <key alias="userPermissions">Permessi Utente</key>
+    <key alias="userTypes">Tipi di Utente</key>
+    <key alias="users">Utenti</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable"><![CDATA[Nuovo aggiornamento pronto]]></key>
@@ -921,6 +927,8 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="startnode"><![CDATA[Nodo di inizio della sezione Contenuto]]></key>
     <key alias="username">Username</key>
     <key alias="userPermissions"><![CDATA[Permessi Utente]]></key>
+    <key alias="usertype"><![CDATA[Tipo di utente]]></key>
+    <key alias="userTypes"><![CDATA[Tipi Utente]]></key>
     <key alias="writer">Writer</key>
   </area>
 </language>

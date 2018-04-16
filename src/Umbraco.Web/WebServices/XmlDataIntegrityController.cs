@@ -1,8 +1,7 @@
-using System;
+﻿using System;
 using System.Web.Http;
-using Umbraco.Core;
-using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
@@ -11,75 +10,52 @@ namespace Umbraco.Web.WebServices
     [ValidateAngularAntiForgeryToken]
     public class XmlDataIntegrityController : UmbracoAuthorizedApiController
     {
+        private readonly PublishedSnapshotService _publishedSnapshotService;
+
+        public XmlDataIntegrityController(IPublishedSnapshotService publishedSnapshotService)
+        {
+            if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
+            _publishedSnapshotService = publishedSnapshotService as PublishedSnapshotService;
+            if (_publishedSnapshotService == null) throw new NotSupportedException("Unsupported IPublishedSnapshotService, only the Xml one is supported.");
+        }
+
         [HttpPost]
         public bool FixContentXmlTable()
         {
-            Services.ContentService.RebuildXmlStructures();
-            return CheckContentXmlTable();
+            _publishedSnapshotService.RebuildContentAndPreviewXml();
+            return _publishedSnapshotService.VerifyContentAndPreviewXml();
         }
 
         [HttpPost]
         public bool FixMediaXmlTable()
         {
-            Services.MediaService.RebuildXmlStructures();
-            return CheckMediaXmlTable();
+            _publishedSnapshotService.RebuildMediaXml();
+            return _publishedSnapshotService.VerifyMediaXml();
         }
 
         [HttpPost]
         public bool FixMembersXmlTable()
         {
-            Services.MemberService.RebuildXmlStructures();
-            return CheckMembersXmlTable();
+            _publishedSnapshotService.RebuildMemberXml();
+            return _publishedSnapshotService.VerifyMemberXml();
         }
 
         [HttpGet]
         public bool CheckContentXmlTable()
         {
-            var totalPublished = Services.ContentService.CountPublished();
-            
-            var subQuery = new Sql()
-                .Select("DISTINCT cmsContentXml.nodeId")
-                .From<ContentXmlDto>()
-                .InnerJoin<DocumentDto>()
-                .On<DocumentDto, ContentXmlDto>(left => left.NodeId, right => right.NodeId);
-
-            var totalXml = ApplicationContext.DatabaseContext.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM (" + subQuery.SQL + ") as tmp");
-
-            return totalXml == totalPublished;
+            return _publishedSnapshotService.VerifyContentAndPreviewXml();
         }
-        
+
         [HttpGet]
         public bool CheckMediaXmlTable()
         {
-            var total = Services.MediaService.CountNotTrashed();
-            var mediaObjectType = Guid.Parse(Constants.ObjectTypes.Media);
-            var subQuery = new Sql()
-                .Select("Count(*)")
-                .From<ContentXmlDto>()
-                .InnerJoin<NodeDto>()
-                .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
-            var totalXml = ApplicationContext.DatabaseContext.Database.ExecuteScalar<int>(subQuery);
-
-            return totalXml == total;
+            return _publishedSnapshotService.VerifyMediaXml();
         }
 
         [HttpGet]
         public bool CheckMembersXmlTable()
         {
-            var total = Services.MemberService.Count();
-            var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
-            var subQuery = new Sql()
-                .Select("Count(*)")
-                .From<ContentXmlDto>()
-                .InnerJoin<NodeDto>()
-                .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
-            var totalXml = ApplicationContext.DatabaseContext.Database.ExecuteScalar<int>(subQuery);
-
-            return totalXml == total;
+            return _publishedSnapshotService.VerifyMemberXml();
         }
-
-        
     }
 }

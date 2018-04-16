@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Linq;
 using System.Web.Mvc;
-using System.Web.Security;
-using System.Xml;
-using umbraco.cms.businesslogic.member;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Security;
@@ -17,7 +13,7 @@ namespace Umbraco.Web.Controllers
         [HttpPost]
         public ActionResult HandleUpdateProfile([Bind(Prefix = "profileModel")] ProfileModel model)
         {
-            var provider = global::Umbraco.Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+            var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
             if (provider.IsUmbracoMembershipProvider() == false)
             {
                 throw new NotSupportedException("Profile editing with the " + typeof(UmbProfileController) + " is not supported when not using the default Umbraco membership provider");
@@ -44,7 +40,7 @@ namespace Umbraco.Web.Controllers
                 return Redirect(model.RedirectUrl);
             }
 
-            //redirect to current page by default                  
+            //redirect to current page by default
             return RedirectToCurrentUmbracoPage();
         }
     }

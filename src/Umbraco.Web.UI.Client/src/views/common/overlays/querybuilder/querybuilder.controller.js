@@ -82,7 +82,9 @@
 
         function chooseSource(query) {
             vm.contentPickerOverlay = {
-                view: "contentpicker",
+                view: "treepicker",
+                section: "content",
+                treeAlias: "content",
                 show: true,
                 submit: function(model) {
 

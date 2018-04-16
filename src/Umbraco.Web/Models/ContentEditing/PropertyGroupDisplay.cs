@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 namespace Umbraco.Web.Models.ContentEditing
 {
     [DataContract(Name = "propertyGroup", Namespace = "")]
-    public class PropertyGroupDisplay<TPropertyTypeDisplay> : PropertyGroupBasic<TPropertyTypeDisplay> 
+    public class PropertyGroupDisplay<TPropertyTypeDisplay> : PropertyGroupBasic<TPropertyTypeDisplay>
         where TPropertyTypeDisplay : PropertyTypeDisplay
     {
         public PropertyGroupDisplay()

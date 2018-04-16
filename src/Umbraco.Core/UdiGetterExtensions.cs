@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core
 {
@@ -86,7 +86,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="entity">The entity.</param>
         /// <returns>The entity identifier of the entity.</returns>
-        public static GuidUdi GetUdi(this IDataTypeDefinition entity)
+        public static GuidUdi GetUdi(this IDataType entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
             return new GuidUdi(Constants.UdiEntityType.DataType, entity.Key).EnsureClosed();
@@ -102,11 +102,11 @@ namespace Umbraco.Core
             if (entity == null) throw new ArgumentNullException("entity");
 
             string entityType;
-            if (entity.ContainedObjectType == Constants.ObjectTypes.DataTypeGuid)
+            if (entity.ContainedObjectType == Constants.ObjectTypes.DataType)
                 entityType = Constants.UdiEntityType.DataTypeContainer;
-            else if (entity.ContainedObjectType == Constants.ObjectTypes.DocumentTypeGuid)
+            else if (entity.ContainedObjectType == Constants.ObjectTypes.DocumentType)
                 entityType = Constants.UdiEntityType.DocumentTypeContainer;
-            else if (entity.ContainedObjectType == Constants.ObjectTypes.MediaTypeGuid)
+            else if (entity.ContainedObjectType == Constants.ObjectTypes.MediaType)
                 entityType = Constants.UdiEntityType.MediaTypeContainer;
             else
                 throw new NotSupportedException(string.Format("Contained object type {0} is not supported.", entity.ContainedObjectType));
@@ -132,7 +132,7 @@ namespace Umbraco.Core
         public static GuidUdi GetUdi(this IContent entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new GuidUdi(entity.IsBlueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, entity.Key).EnsureClosed();
+            return new GuidUdi(entity.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, entity.Key).EnsureClosed();
         }
 
         /// <summary>
@@ -188,17 +188,6 @@ namespace Umbraco.Core
         {
             if (entity == null) throw new ArgumentNullException("entity");
             return new GuidUdi(Constants.UdiEntityType.Macro, entity.Key).EnsureClosed();
-        }
-
-        /// <summary>
-        /// Gets the entity identifier of the entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        /// <returns>The entity identifier of the entity.</returns>
-        public static StringUdi GetUdi(this IUserControl entity)
-        {
-            if (entity == null) throw new ArgumentNullException("entity");
-            return new StringUdi(Constants.UdiEntityType.UserControl, entity.Path.TrimStart('/')).EnsureClosed();
         }
 
         /// <summary>
@@ -298,7 +287,7 @@ namespace Umbraco.Core
             var contentTypeComposition = entity as IContentTypeComposition;
             if (contentTypeComposition != null) return contentTypeComposition.GetUdi();
 
-            var dataTypeComposition = entity as IDataTypeDefinition;
+            var dataTypeComposition = entity as IDataType;
             if (dataTypeComposition != null) return dataTypeComposition.GetUdi();
 
             var container = entity as EntityContainer;

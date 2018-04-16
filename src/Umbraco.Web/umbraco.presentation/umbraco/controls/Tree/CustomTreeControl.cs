@@ -5,6 +5,7 @@ using System.Web.UI.HtmlControls;
 using ClientDependency.Core;
 using umbraco.controls.Tree;
 using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 
 namespace umbraco.controls.Tree
 {
@@ -16,9 +17,6 @@ namespace umbraco.controls.Tree
     /// Since we're inheriting from a UserControl and all of the ClientDependency registrations are done inline, we need
     /// to re-register the ClientDependencies.
     /// </remarks>
-    [ClientDependency(10, ClientDependencyType.Css, "Tree/treeIcons.css", "UmbracoClient")]
-    [ClientDependency(11, ClientDependencyType.Css, "Tree/menuIcons.css", "UmbracoClient")]
-    [ClientDependency(12, ClientDependencyType.Css, "Tree/Themes/umbraco/style.css", "UmbracoClient")]
     [ClientDependency(0, ClientDependencyType.Javascript, "Application/NamespaceManager.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "Application/UmbracoClientManager.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "Application/UmbracoApplicationActions.js", "UmbracoClient")]
@@ -33,8 +31,6 @@ namespace umbraco.controls.Tree
     [ClientDependency(13, ClientDependencyType.Javascript, "Tree/UmbracoTree.js", "UmbracoClient")]
     public class CustomTreeControl : TreeControl
     {
-        private static readonly object m_Locker = new object();
-
         /// <summary>
         /// Ensure child controls are created on  init
         /// </summary>
@@ -87,7 +83,7 @@ namespace umbraco.controls.Tree
             writer.Write(@"
 <script type=""text/javascript"">
 jQuery(document).ready(function() {
-    var ctxMenu = " + GetJSONContextMenu() + @";	
+    var ctxMenu = " + GetJSONContextMenu() + @";
     var app = """ + App + @""";
     var showContext = " + ShowContextMenu.ToString().ToLower() + @";
     var isDialog = " + IsDialog.ToString().ToLower() + @";
@@ -95,13 +91,13 @@ jQuery(document).ready(function() {
     var treeType = """ + TreeType + @""";
     var functionToCall = """ + FunctionToCall + @""";
     var nodeKey = """ + NodeKey + @""";
-	
+
     //create the javascript tree
     jQuery(""#" + ClientID + @""").UmbracoTree({
         doNotInit: " + ManualInitialization.ToString().ToLower() + @",
         jsonFullMenu: ctxMenu,
         appActions: UmbClientMgr.appActions(),
-        deletingText: '" + umbraco.ui.GetText("deleting") + @"',
+        deletingText: '" + Services.TextService.Localize("deleting") + @"',
         app: app,
         showContext: showContext,
         isDialog: isDialog,
@@ -112,17 +108,17 @@ jQuery(document).ready(function() {
         treeMode: """ + Mode.ToString().ToLower() + @""",
         dataUrl: """ + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + @"/webservices/TreeDataService.ashx"",
         serviceUrl: """ + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + @"/controls/Tree/CustomTreeService.asmx/GetInitAppTreeData""});
-        
+
      //add event handler for ajax errors, this will refresh the whole application
     var mainTree = UmbClientMgr.mainTree();
     if (mainTree != null) {
         mainTree.addEventHandler(""ajaxError"", function(e) {
             if (e.msg == ""rebuildTree"") {
-	            UmbClientMgr.mainWindow(""umbraco.aspx"");
+                UmbClientMgr.mainWindow(""umbraco.aspx"");
             }
         });
     }
-});	
+});
 
 </script>");
 

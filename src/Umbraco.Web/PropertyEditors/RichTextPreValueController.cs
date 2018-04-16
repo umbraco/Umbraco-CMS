@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Xml;
 using Umbraco.Core.IO;
 using Umbraco.Web.Editors;
@@ -18,15 +13,14 @@ namespace Umbraco.Web.PropertyEditors
     [PluginController("UmbracoApi")]
     public class RichTextPreValueController : UmbracoAuthorizedJsonController
     {
-        private static volatile bool _init = false;
+        private static volatile bool _init;
         private static readonly object Locker = new object();
         private static readonly Dictionary<string, RichTextEditorCommand> Commands = new Dictionary<string,RichTextEditorCommand>();
         private static readonly Dictionary<string, RichTextEditorPlugin> Plugins = new Dictionary<string, RichTextEditorPlugin>();
         private static readonly Dictionary<string, string> ConfigOptions = new Dictionary<string, string>();
-       
+
         private static string _invalidElements = "";
         private static string _validElements = "";
-
 
         public RichTextEditorConfiguration GetConfiguration()
         {
@@ -131,7 +125,7 @@ namespace Umbraco.Web.PropertyEditors
                     }
                 }
             }
-            
+
         }
 
     }

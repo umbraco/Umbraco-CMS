@@ -20,13 +20,13 @@ namespace Umbraco.Web
             UmbracoModule.EndRequest += UmbracoModule_EndRequest;
         }
 
-        internal BatchedWebServiceServerMessenger(string login, string password) 
+        internal BatchedWebServiceServerMessenger(string login, string password)
             : base(login, password)
         {
             UmbracoModule.EndRequest += UmbracoModule_EndRequest;
         }
 
-        internal BatchedWebServiceServerMessenger(string login, string password, bool useDistributedCalls) 
+        internal BatchedWebServiceServerMessenger(string login, string password, bool useDistributedCalls)
             : base(login, password, useDistributedCalls)
         {
             UmbracoModule.EndRequest += UmbracoModule_EndRequest;
@@ -45,7 +45,7 @@ namespace Umbraco.Web
             // can get the http context from it
             var httpContext = (UmbracoContext.Current == null ? null : UmbracoContext.Current.HttpContext)
                 //if this is null, it could be that an async thread is calling this method that we weren't aware of and the UmbracoContext
-                // wasn't ensured at the beginning of the thread. We can try to see if the HttpContext.Current is available which might be 
+                // wasn't ensured at the beginning of the thread. We can try to see if the HttpContext.Current is available which might be
                 // the case if the asp.net synchronization context has kicked in
                 ?? (HttpContext.Current == null ? null : new HttpContextWrapper(HttpContext.Current));
 
@@ -65,7 +65,7 @@ namespace Umbraco.Web
             return batch;
         }
 
-        void UmbracoModule_EndRequest(object sender, UmbracoRequestEventArgs e)
+        private void UmbracoModule_EndRequest(object sender, UmbracoRequestEventArgs e)
         {
             FlushBatch();
         }

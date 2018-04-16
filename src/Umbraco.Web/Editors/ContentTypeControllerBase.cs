@@ -4,21 +4,17 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Web.Http;
 using AutoMapper;
-using Newtonsoft.Json;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -27,26 +23,10 @@ namespace Umbraco.Web.Editors
     /// </summary>
     [PluginController("UmbracoApi")]
     [PrefixlessBodyModelValidator]
-    public abstract class ContentTypeControllerBase : UmbracoAuthorizedJsonController
+    public abstract class ContentTypeControllerBase<TContentType> : UmbracoAuthorizedJsonController
+        where TContentType : class, IContentTypeComposition
     {
         private ICultureDictionary _cultureDictionary;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        protected ContentTypeControllerBase()
-            : this(UmbracoContext.Current)
-        {
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        protected ContentTypeControllerBase(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-        }
 
         /// <summary>
         /// Returns the available composite content types for a given content type
@@ -79,19 +59,19 @@ namespace Umbraco.Web.Editors
                 case UmbracoObjectTypes.DocumentType:
                     if (contentTypeId > 0)
                     {
-                        source = Services.ContentTypeService.GetContentType(contentTypeId);
+                        source = Services.ContentTypeService.Get(contentTypeId);
                         if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
                     }
-                    allContentTypes = Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
+                    allContentTypes = Services.ContentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
                     break;
 
                 case UmbracoObjectTypes.MediaType:
                     if (contentTypeId > 0)
                     {
-                        source = Services.ContentTypeService.GetMediaType(contentTypeId);
+                        source = Services.MediaTypeService.Get(contentTypeId);
                         if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
                     }
-                    allContentTypes = Services.ContentTypeService.GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray();
+                    allContentTypes = Services.MediaTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
                     break;
 
                 case UmbracoObjectTypes.MemberType:
@@ -148,12 +128,11 @@ namespace Umbraco.Web.Editors
             return CultureDictionary[text].IfNullOrWhiteSpace(text);
         }
 
-        protected TContentType PerformPostSave<TContentType, TContentTypeDisplay, TContentTypeSave, TPropertyType>(
+        protected TContentType PerformPostSave<TContentTypeDisplay, TContentTypeSave, TPropertyType>(
             TContentTypeSave contentTypeSave,
             Func<int, TContentType> getContentType,
             Action<TContentType> saveContentType,
             Action<TContentTypeSave> beforeCreateNew = null)
-            where TContentType : class, IContentTypeComposition
             where TContentTypeDisplay : ContentTypeCompositionDisplay
             where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
@@ -173,8 +152,8 @@ namespace Umbraco.Web.Editors
                 ModelState.AddModelError("Alias", "A content type, media type or member type with this alias already exists");
             }
 
-            //now let the external validators execute
-            ValidationHelper.ValidateEditorModelWithResolver(ModelState, contentTypeSave);
+            // execute the externam validators
+            EditorValidator.Validate(ModelState, contentTypeSave);
 
             if (ModelState.IsValid == false)
             {
@@ -271,7 +250,7 @@ namespace Umbraco.Web.Editors
         protected HttpResponseMessage PerformMove<TContentType>(
             MoveOrCopy move,
             Func<int, TContentType> getContentType,
-            Func<TContentType, int, Attempt<OperationStatus<MoveOperationStatusType>>> doMove)
+            Func<TContentType, int, Attempt<OperationResult<MoveOperationStatusType>>> doMove)
             where TContentType : IContentTypeComposition
         {
             var toMove = getContentType(move.Id);
@@ -288,7 +267,7 @@ namespace Umbraco.Web.Editors
                 return response;
             }
 
-            switch (result.Result.StatusType)
+            switch (result.Result.Result)
             {
                 case MoveOperationStatusType.FailedParentNotFound:
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -312,11 +291,10 @@ namespace Umbraco.Web.Editors
         /// <param name="getContentType"></param>
         /// <param name="doCopy"></param>
         /// <returns></returns>
-        protected HttpResponseMessage PerformCopy<TContentType>(
+        protected HttpResponseMessage PerformCopy(
             MoveOrCopy move,
             Func<int, TContentType> getContentType,
-            Func<TContentType, int, Attempt<OperationStatus<TContentType, MoveOperationStatusType>>> doCopy)
-            where TContentType : IContentTypeComposition
+            Func<TContentType, int, Attempt<OperationResult<MoveOperationStatusType, TContentType>>> doCopy)
         {
             var toMove = getContentType(move.Id);
             if (toMove == null)
@@ -333,7 +311,7 @@ namespace Umbraco.Web.Editors
                 return response;
             }
 
-            switch (result.Result.StatusType)
+            switch (result.Result.Result)
             {
                 case MoveOperationStatusType.FailedParentNotFound:
                     return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -356,12 +334,13 @@ namespace Umbraco.Web.Editors
         /// <param name="contentTypeSave"></param>
         /// <param name="composition"></param>
         /// <returns></returns>
-        private HttpResponseException CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(TContentTypeSave contentTypeSave, IContentTypeComposition composition)
+        private HttpResponseException CreateCompositionValidationExceptionIfInvalid<TContentTypeSave, TPropertyType, TContentTypeDisplay>(TContentTypeSave contentTypeSave, TContentType composition)
             where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
             where TContentTypeDisplay : ContentTypeCompositionDisplay
         {
-            var validateAttempt = Services.ContentTypeService.ValidateComposition(composition);
+            var service = Services.GetContentTypeService<TContentType>();
+            var validateAttempt = service.ValidateComposition(composition);
             if (validateAttempt == false)
             {
                 //if it's not successful then we need to return some model state for the property aliases that
@@ -468,15 +447,6 @@ namespace Umbraco.Web.Editors
         }
 
         private ICultureDictionary CultureDictionary
-        {
-            get
-            {
-                return
-                    _cultureDictionary ??
-                    (_cultureDictionary = CultureDictionaryFactoryResolver.Current.Factory.CreateDictionary());
-            }
-        }
-
-
+            => _cultureDictionary ?? (_cultureDictionary = Current.CultureDictionaryFactory.CreateDictionary());
     }
 }

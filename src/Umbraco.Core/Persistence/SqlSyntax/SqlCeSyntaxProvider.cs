@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
@@ -10,17 +11,12 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Ce
     /// </summary>
-    [SqlSyntaxProviderAttribute(Constants.DatabaseProviders.SqlCe)]
+    [SqlSyntaxProvider(Constants.DbProviderNames.SqlCe)]
     public class SqlCeSyntaxProvider : MicrosoftSqlSyntaxProviderBase<SqlCeSyntaxProvider>
     {
-        public SqlCeSyntaxProvider()
+        public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top)
         {
-            
-        }
-
-        public override Sql SelectTop(Sql sql, int top)
-        {
-            return new Sql(sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
+            return new Sql<ISqlContext>(sql.SqlContext, sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
         }
 
         public override bool SupportsClustered()
@@ -65,10 +61,13 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                     return string.Format("{0} LIKE '{1}'", column, value);
                 default:
                     throw new ArgumentOutOfRangeException("columnType");
-            }   
+            }
         }
 
-        
+        public override string GetConcat(params string[] args)
+        {
+            return "(" + string.Join("+", args) + ")";
+        }
 
         public override string FormatColumnRename(string tableName, string oldName, string newName)
         {
@@ -107,13 +106,13 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                                  columns);
         }
 
-        public override IEnumerable<string> GetTablesInSchema(Database db)
+        public override IEnumerable<string> GetTablesInSchema(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES");
             return items.Select(x => x.TABLE_NAME).Cast<string>().ToList();
         }
 
-        public override IEnumerable<ColumnInfo> GetColumnsInSchema(Database db)
+        public override IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS");
             return
@@ -123,7 +122,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                                    item.IS_NULLABLE, item.DATA_TYPE)).ToList();
         }
 
-        public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db)
+        public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS");
             var indexItems = db.Fetch<dynamic>("SELECT TABLE_NAME, INDEX_NAME FROM INFORMATION_SCHEMA.INDEXES");
@@ -135,7 +134,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                      .ToList();
         }
 
-        public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db)
+        public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(IDatabase db)
         {
             var items =
                 db.Fetch<dynamic>(
@@ -151,11 +150,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                                                                indexItem.INDEX_NAME))).ToList();
         }
 
-        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db)
+        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db)
         {
             var items =
                 db.Fetch<dynamic>(
-                    @"SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME, [UNIQUE] FROM INFORMATION_SCHEMA.INDEXES 
+                    @"SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME, [UNIQUE] FROM INFORMATION_SCHEMA.INDEXES
 WHERE INDEX_NAME NOT LIKE 'PK_%'
 ORDER BY TABLE_NAME, INDEX_NAME");
             return
@@ -163,7 +162,7 @@ ORDER BY TABLE_NAME, INDEX_NAME");
                     item => new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME, item.UNIQUE));
         }
 
-        public override bool DoesTableExist(Database db, string tableName)
+        public override bool DoesTableExist(IDatabase db, string tableName)
         {
             var result =
                 db.ExecuteScalar<long>("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = @TableName",
@@ -190,7 +189,7 @@ ORDER BY TABLE_NAME, INDEX_NAME");
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return "NEWID()";                
+                    return "NEWID()";
                 case SystemMethods.CurrentDateTime:
                     return "GETDATE()";
                 //case SystemMethods.NewSequentialId:
@@ -210,9 +209,9 @@ ORDER BY TABLE_NAME, INDEX_NAME");
             }
         }
 
-        
+
 
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
-        
+
     }
 }

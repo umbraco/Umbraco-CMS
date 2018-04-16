@@ -1,12 +1,19 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
 using System.Web;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
+using Umbraco.Core.Services;
 using Umbraco.Core.Models;
-using umbraco.BusinessLogic.Actions;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web;
+using Umbraco.Web.Composing;
+using Umbraco.Web.Macros;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.presentation.templateControls
 {
@@ -15,12 +22,12 @@ namespace umbraco.presentation.templateControls
     /// </summary>
     [DefaultProperty("Field")]
     [ToolboxData("<{0}:Item runat=\"server\"></{0}:Item>")]
-	[Designer("umbraco.presentation.templateControls.ItemDesigner, umbraco")]
+    [Designer("umbraco.presentation.templateControls.ItemDesigner, Umbraco.Web")]
     public class Item : CompositeControl
     {
-        
+
         #region Private Fields
-        
+
         /// <summary>The item's unique ID on the page.</summary>
         private readonly int m_ItemId;
         public AttributeCollectionAdapter LegacyAttributes;
@@ -33,7 +40,7 @@ namespace umbraco.presentation.templateControls
         internal IPublishedContent ContentItem { get; private set; }
 
         #region Public Control Properties
-        
+
         /// <summary>
         /// Gets or sets the field name.
         /// </summary>
@@ -126,7 +133,7 @@ namespace umbraco.presentation.templateControls
         #endregion
 
         #region Public Readonly Properties
-        
+
         /// <summary>
         /// Gets the item's unique ID on the page.
         /// </summary>
@@ -135,7 +142,7 @@ namespace umbraco.presentation.templateControls
         {
             get { return m_ItemId; }
         }
-        
+
         /// <summary>
         /// Gets the Umbraco page elements.
         /// </summary>
@@ -151,12 +158,12 @@ namespace umbraco.presentation.templateControls
         #endregion
 
         #region Public Constructors
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Item"/> class.
         /// </summary>
         public Item()
-        {            
+        {
             Renderer = ItemRenderer.Instance;
         }
 
@@ -173,7 +180,7 @@ namespace umbraco.presentation.templateControls
         #endregion
 
         #region Overriden Control Methods
-        
+
         /// <summary>
         /// Raises the <see cref="E:System.Web.UI.Control.Init"/> event.
         /// </summary>
@@ -185,7 +192,7 @@ namespace umbraco.presentation.templateControls
             Renderer.Init(this);
 
             base.OnInit(e);
-        }  
+        }
 
         /// <summary>
         /// Raises the <see cref="E:System.Web.UI.Control.Load"/> event.
@@ -214,7 +221,7 @@ namespace umbraco.presentation.templateControls
         #endregion
 
         #region Helper Functions
-        
+
         /// <summary>
         /// Gets the parsed node id. As a nodeid on a item element can be null, an integer or even a squarebracket syntax, this helper method
         /// is handy for getting the exact parsed nodeid back.
@@ -224,7 +231,7 @@ namespace umbraco.presentation.templateControls
         {
             if (!String.IsNullOrEmpty(NodeId))
             {
-                string tempNodeId = helper.parseAttribute(PageElements, NodeId);
+                string tempNodeId = MacroRenderer.ParseAttribute(PageElements, NodeId);
                 int nodeIdInt = 0;
                 if (int.TryParse(tempNodeId, out nodeIdInt))
                 {
@@ -267,7 +274,7 @@ namespace umbraco.presentation.templateControls
         #endregion
 
         #region Field Information Functions
-        
+
         /// <summary>
         /// Determines whether the field is a dictionary item.
         /// </summary>
@@ -304,9 +311,12 @@ namespace umbraco.presentation.templateControls
         /// <value><c>true</c> if the current item is editable by the current user; otherwise, <c>false</c>.</value>
         protected virtual bool FieldEditableWithUserPermissions()
         {
-            BusinessLogic.User u = helper.GetCurrentUmbracoUser();
-            return u != null && u.GetPermissions(PageElements["path"].ToString()).Contains(ActionUpdate.Instance.Letter.ToString(CultureInfo.InvariantCulture));
-        } 
+            var u = UmbracoContext.Current.Security.CurrentUser;
+            if (u == null) return false;
+            var permission = Current.Services.UserService.GetPermissions(u, PageElements["path"].ToString());
+
+            return permission.AssignedPermissions.Contains(ActionUpdate.Instance.Letter.ToString(CultureInfo.InvariantCulture), StringComparer.Ordinal);
+        }
 
         #endregion
     }
@@ -331,7 +341,7 @@ namespace umbraco.presentation.templateControls
             if (this.Component != null) {
                 m_control = this.Component as Item;
             }
-            
+
             if (m_control != null && !String.IsNullOrEmpty(m_control.Field))
             {
                 return returnMarkup(String.Format("Getting '{0}'", m_control.Field));

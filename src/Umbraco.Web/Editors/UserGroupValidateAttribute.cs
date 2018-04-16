@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -22,22 +23,19 @@ namespace Umbraco.Web.Editors
 
         public UserGroupValidateAttribute(IUserService userService)
         {
-            if (_userService == null) throw new ArgumentNullException("userService");
+            if (_userService == null) throw new ArgumentNullException(nameof(userService));
             _userService = userService;
         }
 
-        private IUserService UserService
-        {
-            get { return _userService ?? ApplicationContext.Current.Services.UserService; }
-        }
+        private IUserService UserService => _userService ?? Current.Services.UserService; // fixme inject
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            var userGroupSave = (UserGroupSave)actionContext.ActionArguments["userGroupSave"];
+            var userGroupSave = (UserGroupSave) actionContext.ActionArguments["userGroupSave"];
 
             userGroupSave.Name = userGroupSave.Name.CleanForXss('[', ']', '(', ')', ':');
             userGroupSave.Alias = userGroupSave.Alias.CleanForXss('[', ']', '(', ')', ':');
-            
+
             //Validate the usergroup exists or create one if required
             IUserGroup persisted;
             switch (userGroupSave.Action)
@@ -46,7 +44,7 @@ namespace Umbraco.Web.Editors
                     persisted = UserService.GetUserGroupById(Convert.ToInt32(userGroupSave.Id));
                     if (persisted == null)
                     {
-                        var message = string.Format("User group with id: {0} was not found", userGroupSave.Id);
+                        var message = $"User group with id: {userGroupSave.Id} was not found";
                         actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
                         return;
                     }
@@ -78,10 +76,7 @@ namespace Umbraco.Web.Editors
             {
                 //if it is not valid, do not continue and return the model state
                 actionContext.Response = actionContext.Request.CreateValidationErrorResponse(actionContext.ModelState);
-                return;
             }
-
         }
-
     }
 }

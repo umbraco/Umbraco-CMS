@@ -12,18 +12,18 @@ namespace Umbraco.Core.Sync
     /// Provides server registrations to the distributed cache by reading the legacy Xml configuration
     /// in umbracoSettings to get the list of (manually) configured server nodes.
     /// </summary>
-    internal class ConfigServerRegistrar : IServerRegistrar2
+    internal class ConfigServerRegistrar : IServerRegistrar
     {
         private readonly List<IServerAddress> _addresses;
         private readonly ServerRole _serverRole;
         private readonly string _umbracoApplicationUrl;
 
-        public ConfigServerRegistrar()
-            : this(UmbracoConfig.For.UmbracoSettings().DistributedCall)
+        public ConfigServerRegistrar(IUmbracoSettingsSection settings, ILogger logger, IGlobalSettings globalSettings)
+            : this(settings.DistributedCall, logger, globalSettings)
         { }
 
         // for tests
-        internal ConfigServerRegistrar(IDistributedCallSection settings)
+        internal ConfigServerRegistrar(IDistributedCallSection settings, ILogger logger, IGlobalSettings globalSettings)
         {
             if (settings.Enabled == false)
             {
@@ -36,14 +36,14 @@ namespace Umbraco.Core.Sync
             var serversA = settings.Servers.ToArray();
 
             _addresses = serversA
-                .Select(x => new ConfigServerAddress(x))
+                .Select(x => new ConfigServerAddress(x, globalSettings))
                 .Cast<IServerAddress>()
                 .ToList();
 
             if (serversA.Length == 0)
-            {               
+            {
                 _serverRole = ServerRole.Unknown; // config error, actually
-                LogHelper.Debug<ConfigServerRegistrar>(string.Format("Server Role Unknown: DistributedCalls are enabled but no servers are listed"));
+                logger.Debug<ConfigServerRegistrar>("Server Role Unknown: DistributedCalls are enabled but no servers are listed.");
             }
             else
             {
@@ -54,18 +54,21 @@ namespace Umbraco.Core.Sync
                 if (appId.IsNullOrWhiteSpace() && serverName.IsNullOrWhiteSpace())
                 {
                     _serverRole = ServerRole.Unknown; // config error, actually
-                    LogHelper.Debug<ConfigServerRegistrar>(string.Format("Server Role Unknown: Server Name or AppId missing from Server configuration in DistributedCalls settings"));
+                    logger.Debug<ConfigServerRegistrar>("Server Role Unknown: Server Name or AppId missing from Server configuration in DistributedCalls settings.");
                 }
                 else
+                {
                     _serverRole = IsCurrentServer(appId, serverName)
                         ? ServerRole.Master
                         : ServerRole.Slave;
+                }
             }
 
             var currentServer = serversA.FirstOrDefault(x => IsCurrentServer(x.AppId, x.ServerName));
             if (currentServer != null)
             {
                 // match, use the configured url
+                // ReSharper disable once UseStringInterpolation
                 _umbracoApplicationUrl = string.Format("{0}://{1}:{2}/{3}",
                     currentServer.ForceProtocol.IsNullOrWhiteSpace() ? "http" : currentServer.ForceProtocol,
                     currentServer.ServerAddress,
@@ -81,19 +84,10 @@ namespace Umbraco.Core.Sync
                 || (serverName.IsNullOrWhiteSpace() == false && serverName.Trim().InvariantEquals(NetworkHelper.MachineName));
         }
 
-        public IEnumerable<IServerAddress> Registrations
-        {
-            get { return _addresses; }
-        }
+        public IEnumerable<IServerAddress> Registrations => _addresses;
 
-        public ServerRole GetCurrentServerRole()
-        {
-            return _serverRole;
-        }
+        public ServerRole GetCurrentServerRole() => _serverRole;
 
-        public string GetCurrentServerUmbracoApplicationUrl()
-        {
-            return _umbracoApplicationUrl;
-        }
+        public string GetCurrentServerUmbracoApplicationUrl() => _umbracoApplicationUrl;
     }
 }

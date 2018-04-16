@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -15,11 +16,12 @@ namespace Umbraco.Core.Models
         private IContentType _contentType;
         private ITemplate _template;
         private bool _published;
-        private string _language;
+        private PublishedState _publishedState;
         private DateTime? _releaseDate;
         private DateTime? _expireDate;
-        private int _writer;
         private string _nodeName;//NOTE Once localization is introduced this will be the non-localized Node Name.
+
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -28,9 +30,8 @@ namespace Umbraco.Core.Models
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         public Content(string name, IContent parent, IContentType contentType)
-			: this(name, parent, contentType, new PropertyCollection())
-		{
-		}
+            : this(name, parent, contentType, new PropertyCollection())
+        { }
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -39,13 +40,13 @@ namespace Umbraco.Core.Models
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
-		public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties)
-			: base(name, parent, contentType, properties)
-		{
-			Mandate.ParameterNotNull(contentType, "contentType");
-
-			_contentType = contentType;
-		}
+        public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties)
+            : base(name, parent, contentType, properties)
+        {
+            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            _publishedState = PublishedState.Unpublished;
+            PublishedVersionId = 0;
+        }
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -55,8 +56,7 @@ namespace Umbraco.Core.Models
         /// <param name="contentType">ContentType for the current Content object</param>
         public Content(string name, int parentId, IContentType contentType)
             : this(name, parentId, contentType, new PropertyCollection())
-        {
-        }
+        { }
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -66,23 +66,20 @@ namespace Umbraco.Core.Models
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
         public Content(string name, int parentId, IContentType contentType, PropertyCollection properties)
-			: base(name, parentId, contentType, properties)
+            : base(name, parentId, contentType, properties)
         {
-            Mandate.ParameterNotNull(contentType, "contentType");
-
-            _contentType = contentType;
+            _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
+            _publishedState = PublishedState.Unpublished;
+            PublishedVersionId = 0;
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
-
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
             public readonly PropertyInfo TemplateSelector = ExpressionHelper.GetPropertyInfo<Content, ITemplate>(x => x.Template);
             public readonly PropertyInfo PublishedSelector = ExpressionHelper.GetPropertyInfo<Content, bool>(x => x.Published);
-            public readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Language);
             public readonly PropertyInfo ReleaseDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ReleaseDate);
             public readonly PropertyInfo ExpireDateSelector = ExpressionHelper.GetPropertyInfo<Content, DateTime?>(x => x.ExpireDate);
-            public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, int>(x => x.WriterId);
             public readonly PropertyInfo NodeNameSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.NodeName);
         }
 
@@ -97,8 +94,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual ITemplate Template
         {
-            get { return _template; }
-            set { SetPropertyValueAndDetectChanges(value, ref _template, Ps.Value.TemplateSelector); }
+            get => _template ?? _contentType.DefaultTemplate;
+            set => SetPropertyValueAndDetectChanges(value, ref _template, Ps.Value.TemplateSelector);
         }
 
         /// <summary>
@@ -126,29 +123,44 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Boolean indicating whether this Content is Published or not
+        /// Gets or sets a value indicating whether this content item is published or not.
         /// </summary>
-        /// <remarks>
-        /// Setting Published to true/false should be private or internal and should ONLY be used for wiring up the value
-        /// from the db or modifying it based on changing the published state.
-        /// </remarks>
         [DataMember]
         public bool Published
         {
-            get { return _published; }
-            internal set { SetPropertyValueAndDetectChanges(value, ref _published, Ps.Value.PublishedSelector); }
+            get => _published;
+
+            // the setter is internal and should only be invoked from
+            // - the ContentFactory when creating a content entity from a dto
+            // - the ContentRepository when updating a content entity
+            internal set
+            {
+                SetPropertyValueAndDetectChanges(value, ref _published, Ps.Value.PublishedSelector);
+                _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
+            }
         }
 
         /// <summary>
-        /// Language of the data contained within this Content object.
+        /// Gets the published state of the content item.
         /// </summary>
-        [Obsolete("This is not used and will be removed from the codebase in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public string Language
+        /// <remarks>The state should be Published or Unpublished, depending on whether Published
+        /// is true or false, but can also temporarily be Publishing or Unpublishing when the
+        /// content item is about to be saved.</remarks>
+        [DataMember]
+        public PublishedState PublishedState
         {
-            get { return _language; }
-            set { SetPropertyValueAndDetectChanges(value, ref _language, Ps.Value.LanguageSelector); }
+            get => _publishedState;
+            set
+            {
+                if (value != PublishedState.Publishing && value != PublishedState.Unpublishing)
+                    throw new ArgumentException("Invalid state, only Publishing and Unpublishing are accepted.");
+                _publishedState = value;
+            }
         }
+
+        [IgnoreDataMember]
+        public bool Edited { get; internal set; }
+
 
         /// <summary>
         /// The date this Content should be released and thus be published
@@ -156,8 +168,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public DateTime? ReleaseDate
         {
-            get { return _releaseDate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _releaseDate, Ps.Value.ReleaseDateSelector); }
+            get => _releaseDate;
+            set => SetPropertyValueAndDetectChanges(value, ref _releaseDate, Ps.Value.ReleaseDateSelector);
         }
 
         /// <summary>
@@ -166,18 +178,8 @@ namespace Umbraco.Core.Models
         [DataMember]
         public DateTime? ExpireDate
         {
-            get { return _expireDate; }
-            set { SetPropertyValueAndDetectChanges(value, ref _expireDate, Ps.Value.ExpireDateSelector); }
-        }
-
-        /// <summary>
-        /// Id of the user who wrote/updated this Content
-        /// </summary>
-        [DataMember]
-        public virtual int WriterId
-        {
-            get { return _writer; }
-            set { SetPropertyValueAndDetectChanges(value, ref _writer, Ps.Value.WriterSelector); }
+            get => _expireDate;
+            set => SetPropertyValueAndDetectChanges(value, ref _expireDate, Ps.Value.ExpireDateSelector);
         }
 
         /// <summary>
@@ -189,18 +191,199 @@ namespace Umbraco.Core.Models
         [DataMember]
         internal string NodeName
         {
-            get { return _nodeName; }
-            set { SetPropertyValueAndDetectChanges(value, ref _nodeName, Ps.Value.NodeNameSelector); }
+            get => _nodeName;
+            set => SetPropertyValueAndDetectChanges(value, ref _nodeName, Ps.Value.NodeNameSelector);
         }
-
 
         /// <summary>
         /// Gets the ContentType used by this content object
         /// </summary>
         [IgnoreDataMember]
-        public IContentType ContentType
+        public IContentType ContentType => _contentType;
+
+        [IgnoreDataMember]
+        public DateTime? PublishDate { get; internal set; }
+
+        [IgnoreDataMember]
+        public int? PublisherId { get; internal set; }
+
+        [IgnoreDataMember]
+        public ITemplate PublishTemplate { get; internal set; }
+
+        [IgnoreDataMember]
+        public string PublishName { get; internal set; }
+
+        [IgnoreDataMember]
+        public int PublishedVersionId { get; internal set; }
+
+        [DataMember]
+        public bool Blueprint { get; internal set; }
+
+        /// <inheritdoc />
+        public virtual bool PublishAllValues()
         {
-            get { return _contentType; }
+            if (ValidateAll().Any())
+                return false;
+
+            foreach (var property in Properties)
+                property.PublishAllValues();
+            _publishedState = PublishedState.Publishing;
+            return true;
+        }
+
+        /// <inheritdoc />
+        public virtual bool PublishValues(int? languageId = null, string segment = null)
+        {
+            if (Validate(languageId, segment).Any())
+                return false;
+
+            foreach (var property in Properties)
+                property.PublishValue(languageId, segment);
+            _publishedState = PublishedState.Publishing;
+            return true;
+        }
+
+        /// <inheritdoc />
+        public virtual bool PublishCultureValues(int? languageId = null)
+        {
+            if (ValidateCulture(languageId).Any())
+                return false;
+
+            foreach (var property in Properties)
+                property.PublishCultureValues(languageId);
+            _publishedState = PublishedState.Publishing;
+            return true;
+        }
+
+        /// <inheritdoc />
+        public virtual void ClearAllPublishedValues()
+        {
+            foreach (var property in Properties)
+                property.ClearPublishedAllValues();
+            _publishedState = PublishedState.Publishing;
+        }
+
+        /// <inheritdoc />
+        public virtual void ClearPublishedValues(int? languageId = null, string segment = null)
+        {
+            foreach (var property in Properties)
+                property.ClearPublishedValue(languageId, segment);
+            _publishedState = PublishedState.Publishing;
+        }
+
+        /// <inheritdoc />
+        public virtual void ClearCulturePublishedValues(int? languageId = null)
+        {
+            foreach (var property in Properties)
+                property.ClearPublishedCultureValues(languageId);
+            _publishedState = PublishedState.Publishing;
+        }
+
+        private bool CopyingFromSelf(IContent other)
+        {
+            // copying from the same Id and VersionPk
+            return Id == other.Id && VersionId == other.VersionId;
+        }
+
+        /// <inheritdoc />
+        public virtual void CopyAllValues(IContent other)
+        {
+            if (other.ContentTypeId != ContentTypeId)
+                throw new InvalidOperationException("Cannot copy values from a different content type.");
+
+            // we could copy from another document entirely,
+            // or from another version of the same document,
+            // in which case there is a special case.
+            var published = CopyingFromSelf(other);
+
+            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
+
+            // clear all existing properties
+            foreach (var property in Properties)
+            foreach (var pvalue in property.Values)
+                if (property.PropertyType.ValidateVariation(pvalue.LanguageId, pvalue.Segment, false))
+                    property.SetValue(null, pvalue.LanguageId, pvalue.Segment);
+
+            // copy other properties
+            var otherProperties = other.Properties;
+            foreach (var otherProperty in otherProperties)
+            {
+                var alias = otherProperty.PropertyType.Alias;
+                foreach (var pvalue in otherProperty.Values)
+                {
+                    if (!otherProperty.PropertyType.ValidateVariation(pvalue.LanguageId, pvalue.Segment, false))
+                        continue;
+                    var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
+                    SetValue(alias, value, pvalue.LanguageId, pvalue.Segment);
+                }
+            }
+        }
+
+        /// <inheritdoc />
+        public virtual void CopyValues(IContent other, int? languageId = null, string segment = null)
+        {
+            if (other.ContentTypeId != ContentTypeId)
+                throw new InvalidOperationException("Cannot copy values from a different content type.");
+
+            var published = CopyingFromSelf(other);
+
+            // segment is invariant in comparisons
+            segment = segment?.ToLowerInvariant();
+
+            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
+
+            // clear all existing properties
+            foreach (var property in Properties)
+            {
+                if (!property.PropertyType.ValidateVariation(languageId, segment, false))
+                    continue;
+
+                foreach (var pvalue in property.Values)
+                    if (pvalue.LanguageId == languageId && pvalue.Segment == segment)
+                        property.SetValue(null, pvalue.LanguageId, pvalue.Segment);
+            }
+
+            // copy other properties
+            var otherProperties = other.Properties;
+            foreach (var otherProperty in otherProperties)
+            {
+                if (!otherProperty.PropertyType.ValidateVariation(languageId, segment, false))
+                    continue;
+
+                var alias = otherProperty.PropertyType.Alias;
+                SetValue(alias, otherProperty.GetValue(languageId, segment, published), languageId, segment);
+            }
+        }
+
+        /// <inheritdoc />
+        public virtual void CopyCultureValues(IContent other, int? languageId = null)
+        {
+            if (other.ContentTypeId != ContentTypeId)
+                throw new InvalidOperationException("Cannot copy values from a different content type.");
+
+            var published = CopyingFromSelf(other);
+
+            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
+
+            // clear all existing properties
+            foreach (var property in Properties)
+            foreach (var pvalue in property.Values)
+                if (pvalue.LanguageId == languageId && property.PropertyType.ValidateVariation(pvalue.LanguageId, pvalue.Segment, false))
+                    property.SetValue(null, pvalue.LanguageId, pvalue.Segment);
+
+            // copy other properties
+            var otherProperties = other.Properties;
+            foreach (var otherProperty in otherProperties)
+            {
+                var alias = otherProperty.PropertyType.Alias;
+                foreach (var pvalue in otherProperty.Values)
+                {
+                    if (pvalue.LanguageId != languageId || !otherProperty.PropertyType.ValidateVariation(pvalue.LanguageId, pvalue.Segment, false))
+                        continue;
+                    var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
+                    SetValue(alias, value, pvalue.LanguageId, pvalue.Segment);
+                }
+            }
         }
 
         /// <summary>
@@ -238,70 +421,12 @@ namespace Umbraco.Core.Models
             ChangeContentType(contentType);
         }
 
-        /// <summary>
-        /// Changes the Published state of the content object
-        /// </summary>
-        public void ChangePublishedState(PublishedState state)
+        public override void ResetDirtyProperties(bool rememberDirty)
         {
-            Published = state == PublishedState.Published;
-            PublishedState = state;
-        }
+            base.ResetDirtyProperties(rememberDirty);
 
-        [DataMember]
-        internal PublishedState PublishedState { get; set; }
-
-        /// <summary>
-        /// Gets or sets the unique identifier of the published version, if any.
-        /// </summary>
-        [IgnoreDataMember]
-        public Guid PublishedVersionGuid { get; internal set; }
-
-        /// <summary>
-        /// Gets a value indicating whether the content has a published version.
-        /// </summary>
-        public bool HasPublishedVersion { get { return PublishedVersionGuid != default(Guid); } }
-
-        [IgnoreDataMember]
-        internal DateTime PublishedDate { get; set; }
-
-        [DataMember]
-        public bool IsBlueprint { get; internal set; }
-
-        /// <summary>
-        /// Changes the Trashed state of the content object
-        /// </summary>
-        /// <param name="isTrashed">Boolean indicating whether content is trashed (true) or not trashed (false)</param>
-        /// <param name="parentId"> </param>
-        public override void ChangeTrashedState(bool isTrashed, int parentId = -20)
-        {
-            Trashed = isTrashed;
-            ParentId = parentId;
-
-            //If the content is trashed and is published it should be marked as unpublished
-            if (isTrashed && Published)
-            {
-                ChangePublishedState(PublishedState.Unpublished);
-            }
-        }
-
-        /// <summary>
-        /// Method to call when Entity is being updated
-        /// </summary>
-        /// <remarks>Modified Date is set and a new Version guid is set</remarks>
-        internal override void UpdatingEntity()
-        {
-            base.UpdatingEntity();
-            Version = Guid.NewGuid();
-        }
-
-        /// <summary>
-        /// Creates a deep clone of the current entity with its identity and it's property identities reset
-        /// </summary>
-        /// <returns></returns>
-        [Obsolete("Use DeepCloneWithResetIdentities instead")]
-        public IContent Clone()
-        {
-            return DeepCloneWithResetIdentities();
+            // take care of the published state
+            _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
         }
 
         /// <summary>
@@ -312,21 +437,18 @@ namespace Umbraco.Core.Models
         {
             var clone = (Content)DeepClone();
             clone.Key = Guid.Empty;
-            clone.Version = Guid.NewGuid();
+            clone.VersionId = clone.PublishedVersionId = 0;
             clone.ResetIdentity();
 
             foreach (var property in clone.Properties)
-            {
                 property.ResetIdentity();
-                property.Version = clone.Version;
-            }
 
             return clone;
         }
 
         public override object DeepClone()
         {
-            var clone = (Content)base.DeepClone();
+            var clone = (Content) base.DeepClone();
             //turn off change tracking
             clone.DisableChangeTracking();
             //need to manually clone this since it's not settable

@@ -1,5 +1,4 @@
-<%@ Register Namespace="umbraco" TagPrefix="umb" Assembly="umbraco" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
 <%@ Page Language="c#" MasterPageFile="../masterpages/umbracoPage.Master" ValidateRequest="false"
     CodeBehind="EditDictionaryItem.aspx.cs" AutoEventWireup="True" Inherits="umbraco.settings.EditDictionaryItem" %>

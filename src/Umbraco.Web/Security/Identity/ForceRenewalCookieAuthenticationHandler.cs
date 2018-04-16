@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Core;
 using System.Threading.Tasks;
 using Umbraco.Core.Security;
@@ -54,7 +54,7 @@ namespace Umbraco.Web.Security.Identity
         /// <returns></returns>
         protected override Task ApplyResponseGrantAsync()
         {
-            if (_umbracoContextAccessor.Value == null || Context.Request.Uri.IsClientSideRequest())
+            if (_umbracoContextAccessor.UmbracoContext == null || Context.Request.Uri.IsClientSideRequest())
             {
                 return Task.FromResult(0);
             }
@@ -63,7 +63,7 @@ namespace Umbraco.Web.Security.Identity
             // which means that it is not a normal URL that is authenticated.
 
             var normalAuthUrl = ((BackOfficeCookieManager) Options.CookieManager)
-                .ShouldAuthenticateRequest(Context, _umbracoContextAccessor.Value.OriginalRequestUrl,
+                .ShouldAuthenticateRequest(Context, _umbracoContextAccessor.UmbracoContext.OriginalRequestUrl,
                     //Pass in false, we want to know if this is a normal auth'd page
                     checkForceAuthTokens: false);
             //This is auth'd normally, so OWIN will naturally take care of the cookie renewal
@@ -72,7 +72,7 @@ namespace Umbraco.Web.Security.Identity
             var httpCtx = Context.TryGetHttpContext();
             //check for the special flag in either the owin or http context
             var shouldRenew = Context.Get<bool?>(Constants.Security.ForceReAuthFlag) != null || (httpCtx.Success && httpCtx.Result.Items[Constants.Security.ForceReAuthFlag] != null);
-            
+
             if (shouldRenew)
             {
                 var signin = Helper.LookupSignIn(Options.AuthenticationType);
@@ -107,16 +107,16 @@ namespace Umbraco.Web.Security.Identity
                                 //now save back all the required cookie details
                                 var cookieValue = Options.TicketDataFormat.Protect(ticket);
 
-                                var cookieOptions = ((UmbracoBackOfficeCookieAuthOptions)Options).CreateRequestCookieOptions(Context, ticket);                                
+                                var cookieOptions = ((UmbracoBackOfficeCookieAuthOptions)Options).CreateRequestCookieOptions(Context, ticket);
 
                                 Options.CookieManager.AppendResponseCookie(
                                     Context,
                                     Options.CookieName,
                                     cookieValue,
                                     cookieOptions);
-                            }                            
+                            }
 
-                            
+
                         }
                     }
                 }

@@ -1,23 +1,17 @@
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Web.Script.Services;
 using System.Web.Services;
-using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 using Umbraco.Web.WebServices;
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
-using umbraco.BusinessLogic.Actions;
-using umbraco.cms.businesslogic.web;
+using Umbraco.Web._Legacy.Actions;
 
 namespace umbraco.presentation.webservices
 {
@@ -33,7 +27,7 @@ namespace umbraco.presentation.webservices
         [WebMethod]
         public SortNode GetNodes(string ParentId, string App)
         {
-            if (BasePage.ValidateUserContextID(BasePage.umbracoUserContextID))
+            if (AuthorizeRequest())
             {
                 var nodes = new List<SortNode>();
 
@@ -61,7 +55,7 @@ namespace umbraco.presentation.webservices
 
                     var parent = new SortNode { Id = asInt };
 
-                    var entityService = base.ApplicationContext.Services.EntityService;
+                    var entityService = Services.EntityService;
 
                     // Root nodes?
                     if (asInt == -1)
@@ -104,12 +98,12 @@ namespace umbraco.presentation.webservices
             if (AuthorizeRequest() == false) return;
             if (SortOrder.Trim().Length <= 0) return;
 
-            var isContent = helper.Request("app") == "content" | helper.Request("app") == "";
-            var isMedia = helper.Request("app") == "media";
+            var isContent = Context.Request.GetItemAsString("app") == "content" | Context.Request.GetItemAsString("app") == "";
+            var isMedia = Context.Request.GetItemAsString("app") == "media";
 
             //ensure user is authorized for the app requested
-            if (isContent && AuthorizeRequest(DefaultApps.content.ToString()) == false) return;
-            if (isMedia && AuthorizeRequest(DefaultApps.media.ToString()) == false) return;
+            if (isContent && AuthorizeRequest(Constants.Applications.Content.ToString()) == false) return;
+            if (isMedia && AuthorizeRequest(Constants.Applications.Media.ToString()) == false) return;
 
             var ids = SortOrder.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
             if (isContent)
@@ -128,7 +122,7 @@ namespace umbraco.presentation.webservices
 
         private void SortMedia(string[] ids)
         {
-            var mediaService = base.ApplicationContext.Services.MediaService;
+            var mediaService = Services.MediaService;
             var sortedMedia = new List<IMedia>();
             try
             {
@@ -144,7 +138,7 @@ namespace umbraco.presentation.webservices
             }
             catch (Exception ex)
             {
-                LogHelper.Error<nodeSorter>("Could not update media sort order", ex);
+                Current.Logger.Error<nodeSorter>("Could not update media sort order", ex);
             }
         }
 
@@ -173,7 +167,7 @@ namespace umbraco.presentation.webservices
 
         private void SortContent(string[] ids, int parentId)
         {
-            var contentService = ApplicationContext.Services.ContentService;
+            var contentService = Services.ContentService;
             try
             {
                 // Save content with new sort order and update db+cache accordingly
@@ -193,13 +187,13 @@ namespace umbraco.presentation.webservices
                 //send notifications! TODO: This should be put somewhere centralized instead of hard coded directly here
                 if (parentId > 0)
                 {
-                    ApplicationContext.Services.NotificationService.SendNotification(contentService.GetById(parentId), ActionSort.Instance, UmbracoContext, ApplicationContext);
+                    Services.NotificationService.SendNotification(contentService.GetById(parentId), ActionSort.Instance, UmbracoContext, Services.TextService, GlobalSettings);
                 }
 
             }
             catch (Exception ex)
             {
-                LogHelper.Error<nodeSorter>("Could not update content sort order", ex);
+                Current.Logger.Error<nodeSorter>("Could not update content sort order", ex);
             }
         }
 

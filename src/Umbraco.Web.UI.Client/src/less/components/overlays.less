@@ -75,19 +75,33 @@
 /* ---------- OVERLAY CENTER ---------- */
 .umb-overlay.umb-overlay-center {
     position: absolute;
-    width: 600px;
-    height: 500px;
-    top: 10px;
+    width: 500px;
+    height: auto;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, 0);
+    transform: translate(-50%, -50%);
+    border-radius: @baseBorderRadius;
 }
 
 .umb-overlay.umb-overlay-center .umb-overlay-header {
-    text-align: center;
+    border: none;
+    background: transparent;
+    padding: 20px 20px 0 20px;
+}
+
+.umb-overlay.umb-overlay-center .umb-overlay__form {
+    max-height: 80vh;
 }
 
 .umb-overlay.umb-overlay-center .umb-overlay-container {
     padding: 20px;
+}
+
+.umb-overlay.umb-overlay-center .umb-overlay-drawer {
+    border: none;
+    background: transparent;
+    padding: 0 20px 20px 20px;
 }
 
 /* ---------- OVERLAY TARGET ---------- */

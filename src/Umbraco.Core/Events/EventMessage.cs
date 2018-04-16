@@ -1,10 +1,10 @@
-namespace Umbraco.Core.Events
+﻿namespace Umbraco.Core.Events
 {
     /// <summary>
     /// An event message
     /// </summary>
     public sealed class EventMessage
-    {        
+    {
         /// <summary>
         /// Initializes a new instance of the <see cref="EventMessage"/> class.
         /// </summary>

@@ -55,7 +55,7 @@ namespace Umbraco.Core.Cache
 
         IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith);
         IEnumerable<object> GetCacheItemsByKeyExpression(string regexString);
-        
+
         /// <summary>
         /// Returns an item with a given key
         /// </summary>

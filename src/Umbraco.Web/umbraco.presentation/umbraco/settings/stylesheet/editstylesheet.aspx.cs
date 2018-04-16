@@ -1,16 +1,11 @@
-﻿using System;
+﻿using Umbraco.Core.Services;
+using System;
 using System.IO;
-using System.Linq;
 using System.Web.UI;
-using Umbraco.Core.IO;
-using Umbraco.Web;
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.web;
-using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
-using umbraco.uicontrols;
+using Umbraco.Web._Legacy.Controls;
 using Umbraco.Core;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.cms.presentation.settings.stylesheet
 {
@@ -26,7 +21,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
         public editstylesheet()
         {
-            CurrentApp = DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
         }
 
         protected override void OnInit(EventArgs e)
@@ -35,24 +30,24 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             filename = Request.QueryString["id"].Replace('\\', '/').TrimStart('/');
 
-            var editor = Panel1.NewTabPage(ui.Text("stylesheet"));
+            var editor = Panel1.NewTabPage(Services.TextService.Localize("stylesheet"));
             editor.Controls.Add(Pane7);
 
-            var props = Panel1.NewTabPage(ui.Text("properties"));
+            var props = Panel1.NewTabPage(Services.TextService.Localize("properties"));
             props.Controls.Add(Pane8);
 
             SaveButton = Panel1.Menu.NewButton();
-            SaveButton.Text = ui.Text("save");
+            SaveButton.Text = Services.TextService.Localize("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
             SaveButton.CssClass = "client-side";
         }
 
         protected void Page_Load(object sender, EventArgs e)
-        {           
-            Panel1.Text = ui.Text("stylesheet", "editstylesheet", UmbracoUser);
-            pp_name.Text = ui.Text("name", UmbracoUser);
-            pp_path.Text = ui.Text("path", UmbracoUser);
+        {
+            Panel1.Text = Services.TextService.Localize("stylesheet/editstylesheet");
+            pp_name.Text = Services.TextService.Localize("name");
+            pp_path.Text = Services.TextService.Localize("path");
 
             var stylesheet = Services.FileService.GetStylesheetByName(filename);
             if (stylesheet == null) // not found
@@ -60,7 +55,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             lttPath.Text = "<a id=\"" + lttPath.ClientID + "\" target=\"_blank\" href=\"" + stylesheet.VirtualPath + "\">" + stylesheet.VirtualPath + "</a>";
             editorSource.Text = stylesheet.Content;
-            TreeSyncPath = DeepLink.GetTreePathFromFilePath(filename).TrimEnd(".css");
+            TreeSyncPath = BaseTree.GetTreePathFromFilePath(filename);
 
             // name derives from path, without the .css extension, clean for xss
             NameTxt.Text = stylesheet.Path.TrimEnd(".css").CleanForXss('\\', '/');
@@ -87,7 +82,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.TabView Panel1;
+        protected global::Umbraco.Web._Legacy.Controls.TabView Panel1;
 
         /// <summary>
         /// Pane7 control.
@@ -96,8 +91,8 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane7;
-        protected global::umbraco.uicontrols.Pane Pane8;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane7;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane8;
 
         /// <summary>
         /// pp_name control.
@@ -106,7 +101,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_name;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_name;
 
         /// <summary>
         /// NameTxt control.
@@ -124,7 +119,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_path;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_path;
 
         /// <summary>
         /// lttPath control.
@@ -142,7 +137,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_source;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_source;
 
         /// <summary>
         /// editorSource control.
@@ -151,7 +146,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.CodeArea editorSource;
+        protected global::Umbraco.Web._Legacy.Controls.CodeArea editorSource;
 
     }
 }

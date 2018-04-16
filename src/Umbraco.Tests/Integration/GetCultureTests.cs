@@ -1,29 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Moq;
+using System.Threading;
 using NUnit.Framework;
-using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Tests.Testing;
 using Umbraco.Web.Routing;
-using Language = umbraco.cms.businesslogic.language.Language;
 
 namespace Umbraco.Tests.Integration
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
-    [TestFixture, RequiresSTA]
-    public class GetCultureTests : BaseServiceTest
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class GetCultureTests : TestWithSomeContentBase
     {
-        protected override void FreezeResolution()
+        protected override void Compose()
         {
-            SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
-
-            base.FreezeResolution();
+            base.Compose();
+            Container.Register<ISiteDomainHelper, SiteDomainHelper>();
         }
 
         [Test]
@@ -34,10 +30,10 @@ namespace Umbraco.Tests.Integration
             contentTypeService.Save(contentType);
             var contentService = ServiceContext.ContentService;
 
-            var c1 = contentService.CreateContentWithIdentity("content", -1, "umbBlah");
-            var c2 = contentService.CreateContentWithIdentity("content", c1, "umbBlah");
-            var c3 = contentService.CreateContentWithIdentity("content", c1, "umbBlah");
-            var c4 = contentService.CreateContentWithIdentity("content", c3, "umbBlah");
+            var c1 = contentService.CreateAndSave("content", -1, "umbBlah");
+            var c2 = contentService.CreateAndSave("content", c1, "umbBlah");
+            var c3 = contentService.CreateAndSave("content", c1, "umbBlah");
+            var c4 = contentService.CreateAndSave("content", c3, "umbBlah");
 
             foreach (var l in ServiceContext.LocalizationService.GetAllLanguages().Where(x => x.CultureName != "en-US").ToArray())
                 ServiceContext.LocalizationService.Delete(l);
@@ -63,13 +59,13 @@ namespace Umbraco.Tests.Integration
 
             content = c2;
             culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(null,
-                ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService, 
+                ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService,
                 content.Id, content.Path, new Uri("http://domain1.fr/"));
             Assert.AreEqual("fr-FR", culture.Name);
 
             content = c4;
             culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(null,
-                ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService, 
+                ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService,
                 content.Id, content.Path, new Uri("http://domain1.fr/"));
             Assert.AreEqual("de-DE", culture.Name);
         }
@@ -82,10 +78,10 @@ namespace Umbraco.Tests.Integration
             contentTypeService.Save(contentType);
             var contentService = ServiceContext.ContentService;
 
-            var c1 = contentService.CreateContentWithIdentity("content", -1, "umbBlah");
-            var c2 = contentService.CreateContentWithIdentity("content", c1, "umbBlah");
-            var c3 = contentService.CreateContentWithIdentity("content", c1, "umbBlah");
-            var c4 = contentService.CreateContentWithIdentity("content", c3, "umbBlah");
+            var c1 = contentService.CreateAndSave("content", -1, "umbBlah");
+            var c2 = contentService.CreateAndSave("content", c1, "umbBlah");
+            var c3 = contentService.CreateAndSave("content", c1, "umbBlah");
+            var c4 = contentService.CreateAndSave("content", c3, "umbBlah");
 
             foreach (var l in ServiceContext.LocalizationService.GetAllLanguages().Where(x => x.CultureName != "en-US").ToArray())
                 ServiceContext.LocalizationService.Delete(l);

@@ -1,48 +1,50 @@
-using System;
+﻿using System;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
-    public class TaskTypeRepositoryTest : BaseDatabaseFactoryTest
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class TaskTypeRepositoryTest : TestWithDatabaseBase
     {
         [Test]
         public void Can_Delete()
         {
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var unitOfWork = provider.GetUnitOfWork();
-            var taskType = new TaskType("asdfasdf");
-            using (var repo = new TaskRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
-            using (var taskTypeRepo = new TaskTypeRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = ScopeProvider.CreateScope())
             {
+                var taskType = new TaskType("asdfasdf");
+                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var taskTypeRepo = new TaskTypeRepository((IScopeAccessor) provider, CacheHelper, Logger);
+
                 var created = DateTime.Now;
                 var task = new Task(taskType)
                 {
-                    AssigneeUserId = 0,
+                    AssigneeUserId = Constants.Security.SuperId,
                     Closed = false,
                     Comment = "hello world",
                     EntityId = -1,
-                    OwnerUserId = 0
+                    OwnerUserId = Constants.Security.SuperId
                 };
-                repo.AddOrUpdate(task);
-                unitOfWork.Commit();
-
-                var alltasktypes = taskTypeRepo.GetAll();
+                repo.Save(task);
+                
+                var alltasktypes = taskTypeRepo.GetMany();
 
                 taskTypeRepo.Delete(taskType);
-                unitOfWork.Commit();
 
-                Assert.AreEqual(alltasktypes.Count() - 1, taskTypeRepo.GetAll().Count());
-                Assert.AreEqual(0, repo.GetAll().Count());
+                Assert.AreEqual(alltasktypes.Count() - 1, taskTypeRepo.GetMany().Count());
+                Assert.AreEqual(0, repo.GetMany().Count());
             }
 
-            
+
         }
     }
 }

@@ -11,7 +11,7 @@
 @using Umbraco.Web
 @using Umbraco.Web.Editors
 @using umbraco
-@inherits System.Web.Mvc.WebViewPage
+@inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
 @{
     Layout = null;
 
@@ -25,7 +25,7 @@
 
 <html lang="en">
 <head>
-    <base href="@GlobalSettings.Path.EnsureEndsWith('/')" />
+    <base href="@Model.Path.EnsureEndsWith('/')" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -54,12 +54,12 @@
     @{
         var externalLoginUrl = Url.Action("ExternalLogin", "BackOffice", new
         {
-            area = ViewBag.UmbracoPath, 
+            area = ViewBag.UmbracoPath,
             //Custom redirect URL since we don't want to just redirect to the back office since this is for authing upgrades
             redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
         });
     }
-    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl)
+    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl, Model.Features)
 
     <script type="text/javascript">
     document.angularReady = function (app) {

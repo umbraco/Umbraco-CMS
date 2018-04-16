@@ -1,26 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
-    [PropertyValueType(typeof(IEnumerable<string>))]
-    [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class DropdownListMultipleValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            if (UmbracoConfig.For.UmbracoSettings().Content.EnablePropertyValueConverters)
-            {
-                return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.DropDownListMultipleAlias);
-            }
-            return false;
-        }
+            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.DropDownListMultiple);
 
-        public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
+        public override Type GetPropertyValueType(PublishedPropertyType propertyType)
+            => typeof (IEnumerable<string>);
+
+        public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
+            => PropertyCacheLevel.Element;
+
+        public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel cacheLevel, object source, bool preview)
         {
             var sourceString = (source ?? "").ToString();
 
@@ -32,6 +29,5 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
             return values;
         }
-        
     }
 }

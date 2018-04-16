@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Editors
 {
@@ -42,7 +43,7 @@ namespace Umbraco.Web.Editors
         {
             var umbCtx = GetUmbracoContext();
             var currentUser = umbCtx.Security.CurrentUser;
-            
+
             var queryString = actionContext.Request.GetQueryNameValuePairs();
 
             var ids = queryString.Where(x => x.Key == _paramName).ToArray();
@@ -51,11 +52,11 @@ namespace Umbraco.Web.Editors
 
             var intIds = ids.Select(x => x.Value.TryConvertTo<int>()).Where(x => x.Success).Select(x => x.Result).ToArray();
             var authHelper = new UserGroupEditorAuthorizationHelper(
-                umbCtx.Application.Services.UserService,
-                umbCtx.Application.Services.ContentService,
-                umbCtx.Application.Services.MediaService,
-                umbCtx.Application.Services.EntityService);
-            return authHelper.AuthorizeGroupAccess(currentUser, intIds);         
+                Current.Services.UserService,
+                Current.Services.ContentService,
+                Current.Services.MediaService,
+                Current.Services.EntityService);
+            return authHelper.AuthorizeGroupAccess(currentUser, intIds);
         }
     }
 }

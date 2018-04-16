@@ -11,11 +11,11 @@ using System.Net;
 using System.Net.Http;
 using Umbraco.Web.WebApi;
 using Umbraco.Core.Services;
-using Umbraco.Core.Models.EntityBase;
 using System;
 using System.ComponentModel;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Editors
 {
@@ -30,7 +30,7 @@ namespace Umbraco.Web.Editors
     [UmbracoTreeAuthorize(Constants.Trees.MediaTypes)]
     [EnableOverrideAuthorization]
     [MediaTypeControllerControllerConfiguration]
-    public class MediaTypeController : ContentTypeControllerBase
+    public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {
         /// <summary>
         /// Configures this controller with a custom action selector
@@ -44,33 +44,15 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public MediaTypeController()
-            : this(UmbracoContext.Current)
-        {
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        public MediaTypeController(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-
-        }
-
         public int GetCount()
         {
-            return Services.ContentTypeService.CountContentTypes();
+            return Services.ContentTypeService.Count();
         }
 
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
         public MediaTypeDisplay GetById(int id)
         {
-            var ct = Services.ContentTypeService.GetMediaType(id);
+            var ct = Services.MediaTypeService.Get(id);
             if (ct == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -89,13 +71,13 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage DeleteById(int id)
         {
-            var foundType = Services.ContentTypeService.GetMediaType(id);
+            var foundType = Services.MediaTypeService.Get(id);
             if (foundType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            Services.ContentTypeService.Delete(foundType, Security.CurrentUser.Id);
+            Services.MediaTypeService.Delete(foundType, Security.CurrentUser.Id);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
@@ -143,7 +125,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentTypeBasic> GetAll()
         {
 
-            return Services.ContentTypeService.GetAllMediaTypes()
+            return Services.MediaTypeService.GetAll()
                                .Select(Mapper.Map<IMediaType, ContentTypeBasic>);
         }
 
@@ -156,14 +138,14 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage DeleteContainer(int id)
         {
-            Services.ContentTypeService.DeleteMediaTypeContainer(id, Security.CurrentUser.Id);
+            Services.MediaTypeService.DeleteContainer(id, Security.CurrentUser.Id);
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         public HttpResponseMessage PostCreateContainer(int parentId, string name)
         {
-            var result = Services.ContentTypeService.CreateMediaTypeContainer(parentId, name, Security.CurrentUser.Id);
+            var result = Services.MediaTypeService.CreateContainer(parentId, name, Security.CurrentUser.Id);
 
             return result
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
@@ -172,8 +154,8 @@ namespace Umbraco.Web.Editors
 
         public HttpResponseMessage PostRenameContainer(int id, string name)
         {
-            
-            var result = Services.ContentTypeService.RenameMediaTypeContainer(id, name, Security.CurrentUser.Id);
+
+            var result = Services.MediaTypeService.RenameContainer(id, name, Security.CurrentUser.Id);
 
             return result
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
@@ -182,10 +164,10 @@ namespace Umbraco.Web.Editors
 
         public MediaTypeDisplay PostSave(MediaTypeSave contentTypeSave)
         {
-            var savedCt = PerformPostSave<IMediaType, MediaTypeDisplay, MediaTypeSave, PropertyTypeBasic>(
+            var savedCt = PerformPostSave<MediaTypeDisplay, MediaTypeSave, PropertyTypeBasic>(
                 contentTypeSave:        contentTypeSave,
-                getContentType:         i => Services.ContentTypeService.GetMediaType(i),
-                saveContentType:        type => Services.ContentTypeService.Save(type));
+                getContentType:         i => Services.MediaTypeService.Get(i),
+                saveContentType:        type => Services.MediaTypeService.Save(type));
 
             var display = Mapper.Map<MediaTypeDisplay>(savedCt);
 
@@ -211,7 +193,7 @@ namespace Umbraco.Web.Editors
             IEnumerable<IMediaType> types;
             if (contentId == Constants.System.Root)
             {
-                types = Services.ContentTypeService.GetAllMediaTypes().ToList();
+                types = Services.MediaTypeService.GetAll().ToList();
 
                 //if no allowed root types are set, just return everything
                 if (types.Any(x => x.AllowedAsRoot))
@@ -229,7 +211,7 @@ namespace Umbraco.Web.Editors
 
                 if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 
-                types = Services.ContentTypeService.GetAllMediaTypes(ids).ToList();
+                types = Services.MediaTypeService.GetAll(ids).ToList();
             }
 
             var basics = types.Select(Mapper.Map<IMediaType, ContentTypeBasic>).ToList();
@@ -250,7 +232,7 @@ namespace Umbraco.Web.Editors
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(Guid contentId)
         {
-            var entity = ApplicationContext.Services.EntityService.GetByKey(contentId);
+            var entity = Current.Services.EntityService.Get(contentId);
             if (entity != null)
             {
                 return GetAllowedChildren(entity.Id);
@@ -269,7 +251,7 @@ namespace Umbraco.Web.Editors
             var guidUdi = contentId as GuidUdi;
             if (guidUdi != null)
             {
-                var entity = ApplicationContext.Services.EntityService.GetByKey(guidUdi.Guid);
+                var entity = Current.Services.EntityService.Get(guidUdi.Guid);
                 if (entity != null)
                 {
                     return GetAllowedChildren(entity.Id);
@@ -295,7 +277,7 @@ namespace Umbraco.Web.Editors
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
-        } 
+        }
         #endregion
 
         /// <summary>
@@ -307,8 +289,8 @@ namespace Umbraco.Web.Editors
         {
             return PerformMove(
                 move,
-                getContentType: i => Services.ContentTypeService.GetMediaType(i),
-                doMove: (type, i) => Services.ContentTypeService.MoveMediaType(type, i));
+                getContentType: i => Services.MediaTypeService.Get(i),
+                doMove: (type, i) => Services.MediaTypeService.Move(type, i));
         }
 
         /// <summary>
@@ -320,8 +302,8 @@ namespace Umbraco.Web.Editors
         {
             return PerformCopy(
                 copy,
-                getContentType: i => Services.ContentTypeService.GetMediaType(i),
-                doCopy: (type, i) => Services.ContentTypeService.CopyMediaType(type, i));
+                getContentType: i => Services.MediaTypeService.Get(i),
+                doCopy: (type, i) => Services.MediaTypeService.Copy(type, i));
         }
     }
 }

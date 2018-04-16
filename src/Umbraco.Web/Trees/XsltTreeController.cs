@@ -1,19 +1,21 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.IO;
+using System;
 using System.Net.Http.Formatting;
-using umbraco;
-using umbraco.BusinessLogic.Actions;
+using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Xslt)]
-    [Tree(Constants.Applications.Developer, Constants.Trees.Xslt, null, sortOrder: 5)]
-    [LegacyBaseTree(typeof(loadXslt))]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Xslt, "XSLT Files", "icon-folder", "icon-folder", sortOrder: 2)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
     public class XsltTreeController : FileSystemTreeController
@@ -30,10 +32,8 @@ namespace Umbraco.Web.Trees
             treeNode.AssignLegacyJsCallback("javascript:void(0);");
         }
 
-        protected override MenuItemCollection GetMenuForFile(string path, FormDataCollection queryStrings)
+        protected override void GetMenuForFile(MenuItemCollection menu, string path, string id, FormDataCollection queryStrings)
         {
-            var menu = new MenuItemCollection();
-
             //TODO: This is all hacky ... don't have time to convert the tree, views and dialogs over properly so we'll keep using the legacy dialogs
             var menuItem = menu.Items.Add(ActionDelete.Instance, Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
             var legacyConfirmView = LegacyTreeDataConverter.GetLegacyConfirmView(ActionDelete.Instance);
@@ -42,14 +42,10 @@ namespace Umbraco.Web.Trees
             menuItem.LaunchDialogView(
                 legacyConfirmView.Result,
                 Services.TextService.Localize("general/delete"));
-
-            return menu;
         }
 
-        protected override MenuItemCollection GetMenuForRootNode(FormDataCollection queryStrings)
+        protected override void GetMenuForRootNode(MenuItemCollection menu, FormDataCollection queryStrings)
         {
-            var menu = new MenuItemCollection();
-
             //set the default to create
             menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
@@ -57,24 +53,17 @@ namespace Umbraco.Web.Trees
             menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)))
                 .ConvertLegacyMenuItem(null, Constants.Trees.Xslt, queryStrings.GetValue<string>("application"));
 
-            menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
-            return menu;
+            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
         }
 
-        protected override IFileSystem2 FileSystem
-        {
-            get { return FileSystemProviderManager.Current.XsltFileSystem; }
-        }
+        protected override IFileSystem FileSystem => Current.FileSystems.XsltFileSystem; // fixme inject
 
         private static readonly string[] ExtensionsStatic = { "xslt" };
 
-        protected override string[] Extensions
-        {
-            get { return ExtensionsStatic; }
-        }
-        protected override string FileIcon
-        {
-            get { return "icon-code"; }
-        }
+        protected override string[] Extensions => ExtensionsStatic;
+
+        protected override string FileIcon => "icon-code";
+
+        protected override bool EnableCreateOnFolder => true;
     }
 }

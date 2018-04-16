@@ -1,15 +1,17 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Newtonsoft.Json;
-using umbraco.interfaces;
 using Umbraco.Core;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Logging;
-using Umbraco.Web.Scheduling;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Web
 {
@@ -21,33 +23,15 @@ namespace Umbraco.Web
     /// </remarks>
     public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     {
-        public BatchedDatabaseServerMessenger(ApplicationContext appContext, bool enableDistCalls, DatabaseServerMessengerOptions options)
-            : base(appContext, enableDistCalls, options)
+        private readonly IUmbracoDatabaseFactory _databaseFactory;
+
+        public BatchedDatabaseServerMessenger(
+            IRuntimeState runtime, IUmbracoDatabaseFactory databaseFactory, IScopeProvider scopeProvider, ISqlContext sqlContext, ProfilingLogger proflog, IGlobalSettings globalSettings,
+            bool enableDistCalls, DatabaseServerMessengerOptions options)
+            : base(runtime, scopeProvider, sqlContext, proflog, globalSettings, enableDistCalls, options)
         {
-            Scheduler.Initializing += Scheduler_Initializing;
+            _databaseFactory = databaseFactory;
         }
-
-        /// <summary>
-        /// Occurs when the scheduler initializes all scheduling activity when the app is ready
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Scheduler_Initializing(object sender, List<IBackgroundTask> e)
-        {
-            //if the current resolver is 'this' then we will start the scheduling
-            var isMessenger = ServerMessengerResolver.HasCurrent && ReferenceEquals(ServerMessengerResolver.Current.Messenger, this);
-
-            if (isMessenger)
-            {
-                //start the background task runner for processing instructions
-                const int delayMilliseconds = 60000;
-                var instructionProcessingRunner = new BackgroundTaskRunner<IBackgroundTask>("InstructionProcessing", ApplicationContext.ProfilingLogger.Logger);
-                var instructionProcessingTask = new InstructionProcessing(instructionProcessingRunner, this, delayMilliseconds, Options.ThrottleSeconds * 1000);
-                instructionProcessingRunner.TryAdd(instructionProcessingTask);
-                e.Add(instructionProcessingTask);
-            }
-        }
-
 
         // invoked by BatchedDatabaseServerMessengerStartup which is an ApplicationEventHandler
         // with default "ShouldExecute", so that method will run if app IsConfigured and database
@@ -56,42 +40,14 @@ namespace Umbraco.Web
         {
             UmbracoModule.EndRequest += UmbracoModule_EndRequest;
 
-            if (ApplicationContext.DatabaseContext.CanConnect == false)
+            if (_databaseFactory.CanConnect == false)
             {
-                ApplicationContext.ProfilingLogger.Logger.Warn<BatchedDatabaseServerMessenger>(
+                Logger.Warn<BatchedDatabaseServerMessenger>(
                     "Cannot connect to the database, distributed calls will not be enabled for this server.");
             }
             else
             {
                 Boot();
-            }
-        }
-
-        /// <summary>
-        /// This will process cache instructions on a background thread and will run every 5 seconds (or whatever is defined in the <see cref="DatabaseServerMessengerOptions.ThrottleSeconds"/>)
-        /// </summary>
-        private class InstructionProcessing : RecurringTaskBase
-        {
-            private readonly DatabaseServerMessenger _messenger;
-
-            public InstructionProcessing(IBackgroundTaskRunner<RecurringTaskBase> runner,
-                DatabaseServerMessenger messenger,
-                int delayMilliseconds, int periodMilliseconds)
-                : base(runner, delayMilliseconds, periodMilliseconds)
-            {
-                _messenger = messenger;
-            }
-
-            public override bool PerformRun()
-            {
-                _messenger.Sync();
-                //return true to repeat
-                return true;
-            }
-
-            public override bool IsAsync
-            {
-                get { return false; }
             }
         }
 
@@ -103,11 +59,11 @@ namespace Umbraco.Web
 
         protected override void DeliverRemote(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
         {
-            var idsA = ids == null ? null : ids.ToArray();
+            var idsA = ids?.ToArray();
 
             Type arrayType;
             if (GetArrayType(idsA, out arrayType) == false)
-                throw new ArgumentException("All items must be of the same type, either int or Guid.", "ids");
+                throw new ArgumentException("All items must be of the same type, either int or Guid.", nameof(ids));
 
             BatchMessage(servers, refresher, messageType, idsA, arrayType, json);
         }
@@ -125,7 +81,7 @@ namespace Umbraco.Web
             {
                 WriteInstructions(instructionsBatch);
             }
-            
+
         }
 
         private void WriteInstructions(IEnumerable<RefreshInstruction> instructions)
@@ -138,7 +94,11 @@ namespace Umbraco.Web
                 InstructionCount = instructions.Sum(x => x.JsonIdCount)
             };
 
-            ApplicationContext.DatabaseContext.Database.Insert(dto);
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                scope.Database.Insert(dto);
+                scope.Complete();
+            }
         }
 
         protected ICollection<RefreshInstructionEnvelope> GetBatch(bool create)
@@ -148,7 +108,7 @@ namespace Umbraco.Web
             // can get the http context from it
             var httpContext = (UmbracoContext.Current == null ? null : UmbracoContext.Current.HttpContext)
                 // if this is null, it could be that an async thread is calling this method that we weren't aware of and the UmbracoContext
-                // wasn't ensured at the beginning of the thread. We can try to see if the HttpContext.Current is available which might be 
+                // wasn't ensured at the beginning of the thread. We can try to see if the HttpContext.Current is available which might be
                 // the case if the asp.net synchronization context has kicked in
                 ?? (HttpContext.Current == null ? null : new HttpContextWrapper(HttpContext.Current));
 
@@ -188,7 +148,7 @@ namespace Umbraco.Web
             {
                 batch.Add(new RefreshInstructionEnvelope(servers, refresher, instructions));
             }
-                
-        }        
+
+        }
     }
 }

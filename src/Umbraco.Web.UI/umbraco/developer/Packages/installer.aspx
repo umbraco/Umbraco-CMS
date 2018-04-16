@@ -2,7 +2,8 @@
     AutoEventWireup="True" Inherits="umbraco.presentation.developer.packages.Installer"
     Trace="false" ValidateRequest="false" %>
 <%@ Import Namespace="umbraco" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Import Namespace="Umbraco.Core.Configuration" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 
@@ -67,7 +68,7 @@
                     <br />
 
                     <small>
-                        <%= umbraco.ui.Text("packager", "chooseLocalPackageText") %>
+                        <%= Services.TextService.Localize("packager/chooseLocalPackageText") %>
                     </small>
                 </p>
             </cc1:PropertyPanel>
@@ -297,7 +298,7 @@
         <cc1:Pane ID="pane_uninstalled" runat="server" Text="Package has been uninstalled" Visible="false">
             <cc1:PropertyPanel runat="server">
                
-                <p><%= umbraco.ui.Text("packager", "packageUninstalledText") %></p>
+                <p><%= Services.TextService.Localize("packager/packageUninstalledText") %></p>
 
             </cc1:PropertyPanel>
         </cc1:Pane>

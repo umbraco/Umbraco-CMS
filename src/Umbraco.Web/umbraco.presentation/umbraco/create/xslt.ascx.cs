@@ -1,31 +1,28 @@
-﻿using System;
-using System.Data;
-using System.Drawing;
+﻿using Umbraco.Core.Services;
 using System.Web;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
 using System.IO;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Web.UI;
 using Umbraco.Core.IO;
-using umbraco.cms.helpers;
-using umbraco.BasePages;
+using Umbraco.Web;
+using Umbraco.Web.UI.Controls;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco.presentation.create
 {
 
 
     /// <summary>
-    ///		Summary description for xslt.
+    ///        Summary description for xslt.
     /// </summary>
-    public partial class xslt : System.Web.UI.UserControl
+    public partial class xslt : UmbracoUserControl
     {
         protected System.Web.UI.WebControls.ListBox nodeType;
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-            sbmt.Text = ui.Text("create");
+            sbmt.Text = Services.TextService.Localize("create");
             foreach (string fileName in Directory.GetFiles(IOHelper.MapPath(SystemDirectories.Umbraco + GetXsltTemplatePath()), "*.xslt"))
             {
                 FileInfo fi = new FileInfo(fileName);
@@ -40,14 +37,7 @@ namespace umbraco.presentation.create
 
         private static string GetXsltTemplatePath()
         {
-            if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
-            {
-                return "/xslt/templates";
-            }
-            else
-            {
-                return "/xslt/templates/schema2";
-            }
+            return "/xslt/templates/schema2";
         }
 
         protected void sbmt_Click(object sender, System.EventArgs e)
@@ -58,17 +48,17 @@ namespace umbraco.presentation.create
                 if (createMacro.Checked)
                     createMacroVal = 1;
 
-                var xsltName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? xsltTemplate.SelectedValue :
-                    Path.Combine("schema2", xsltTemplate.SelectedValue);
+                var xsltName = Path.Combine("schema2", xsltTemplate.SelectedValue);
+
 
                 var returnUrl = LegacyDialogHandler.Create(
                     new HttpContextWrapper(Context),
-                    BasePage.Current.getUser(),
-                    helper.Request("nodeType"),
+                    Security.CurrentUser,
+                    Request.GetItemAsString("nodeType"),
                     createMacroVal,
                     xsltName + "|||" + rename.Text);
 
-                BasePage.Current.ClientTools
+                ClientTools
                     .ChangeContentFrameUrl(returnUrl)
                     .ChildNodeCreated()
                     .CloseModalWindow();

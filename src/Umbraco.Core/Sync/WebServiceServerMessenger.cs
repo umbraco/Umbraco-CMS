@@ -7,7 +7,8 @@ using System.Threading;
 using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
-using umbraco.interfaces;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Sync
 {
@@ -18,7 +19,7 @@ namespace Umbraco.Core.Sync
     /// this messenger sends ALL instructions to ALL servers, including the local server.
     /// the CacheRefresher web service will run ALL instructions, so there may be duplicated,
     /// except for "bulk" refresh, where it excludes those coming from the local server
-    /// </remarks>        
+    /// </remarks>
     //
     // TODO see Message() method: stop sending to local server!
     // just need to figure out WebServerUtility permissions issues, if any
@@ -48,7 +49,7 @@ namespace Umbraco.Core.Sync
         /// <remarks>Distribution will be enabled based on the umbraco config setting.</remarks>
         internal WebServiceServerMessenger(string login, string password)
             : this(login, password, UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
-        {            
+        {
         }
 
         /// <summary>
@@ -103,12 +104,12 @@ namespace Umbraco.Core.Sync
                     {
                         Login = result.Item1;
                         Password = result.Item2;
-                        DistributedEnabled = UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled;    
+                        DistributedEnabled = UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled;
                     }
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.Error<WebServiceServerMessenger>("Could not resolve username/password delegate, server distribution will be disabled", ex);
+                    Current.Logger.Error<WebServiceServerMessenger>("Could not resolve username/password delegate, server distribution will be disabled", ex);
                     Login = null;
                     Password = null;
                     DistributedEnabled = false;
@@ -154,18 +155,13 @@ namespace Umbraco.Core.Sync
         protected virtual void Message(
             IEnumerable<IServerAddress> servers,
             ICacheRefresher refresher,
-            MessageType messageType, 
+            MessageType messageType,
             IEnumerable<object> ids = null,
             Type idArrayType = null,
             string jsonPayload = null)
         {
-            LogHelper.Debug<WebServiceServerMessenger>(
-                "Performing distributed call for {0}/{1} on servers ({2}), ids: {3}, json: {4}",
-                refresher.GetType,
-                () => messageType,
-                () => string.Join(";", servers.Select(x => x.ToString())),
-                () => ids == null ? "" : string.Join(";", ids.Select(x => x.ToString())),
-                () => jsonPayload ?? "");
+            Current.Logger.Debug<WebServiceServerMessenger>(() =>
+                $"Performing distributed call for {refresher.GetType()}/{messageType} on servers ({string.Join(";", servers.Select(x => x.ToString()))}), ids: {(ids == null ? "" : string.Join(";", ids.Select(x => x.ToString())))}, json: {(jsonPayload ?? "")}");
 
             try
             {
@@ -193,11 +189,11 @@ namespace Umbraco.Core.Sync
                         switch (messageType)
                         {
                             case MessageType.RefreshByJson:
-                                asyncResults.Add(client.BeginRefreshByJson(refresher.UniqueIdentifier, jsonPayload, Login, Password, null, null));
+                                asyncResults.Add(client.BeginRefreshByJson(refresher.RefresherUniqueId, jsonPayload, Login, Password, null, null));
                                 break;
 
                             case MessageType.RefreshAll:
-                                asyncResults.Add(client.BeginRefreshAll(refresher.UniqueIdentifier, Login, Password, null, null));
+                                asyncResults.Add(client.BeginRefreshAll(refresher.RefresherUniqueId, Login, Password, null, null));
                                 break;
 
                             case MessageType.RefreshById:
@@ -208,14 +204,14 @@ namespace Umbraco.Core.Sync
                                 {
                                     // bulk of ints is supported
                                     var json = JsonConvert.SerializeObject(ids.Cast<int>().ToArray());
-                                    var result = client.BeginRefreshByIds(refresher.UniqueIdentifier, json, Login, Password, null, null);
+                                    var result = client.BeginRefreshByIds(refresher.RefresherUniqueId, json, Login, Password, null, null);
                                     asyncResults.Add(result);
                                 }
                                 else // must be guids
                                 {
                                     // bulk of guids is not supported, iterate
-                                    asyncResults.AddRange(ids.Select(i => 
-                                        client.BeginRefreshByGuid(refresher.UniqueIdentifier, (Guid)i, Login, Password, null, null)));
+                                    asyncResults.AddRange(ids.Select(i =>
+                                        client.BeginRefreshByGuid(refresher.RefresherUniqueId, (Guid)i, Login, Password, null, null)));
                                 }
 
                                 break;
@@ -224,8 +220,8 @@ namespace Umbraco.Core.Sync
                                     throw new InvalidOperationException("Cannot remove by id if the idArrayType is null.");
 
                                 // must be ints
-                                asyncResults.AddRange(ids.Select(i => 
-                                    client.BeginRemoveById(refresher.UniqueIdentifier, (int)i, Login, Password, null, null)));
+                                asyncResults.AddRange(ids.Select(i =>
+                                    client.BeginRemoveById(refresher.RefresherUniqueId, (int)i, Login, Password, null, null)));
                                 break;
                         }
                     }
@@ -358,28 +354,28 @@ namespace Umbraco.Core.Sync
 
         private static void LogDispatchBatchError(Exception ee)
         {
-            LogHelper.Error<WebServiceServerMessenger>("Error refreshing distributed list", ee);
+            Current.Logger.Error<WebServiceServerMessenger>("Error refreshing distributed list", ee);
         }
 
         private static void LogDispatchBatchResult(int errorCount)
         {
-            LogHelper.Debug<WebServiceServerMessenger>(string.Format("Distributed server push completed with {0} nodes reporting an error", errorCount == 0 ? "no" : errorCount.ToString(CultureInfo.InvariantCulture)));
+            Current.Logger.Debug<WebServiceServerMessenger>(string.Format("Distributed server push completed with {0} nodes reporting an error", errorCount == 0 ? "no" : errorCount.ToString(CultureInfo.InvariantCulture)));
         }
 
         private static void LogDispatchNodeError(Exception ex)
         {
-            LogHelper.Error<WebServiceServerMessenger>("Error refreshing a node in the distributed list", ex);
+            Current.Logger.Error<WebServiceServerMessenger>("Error refreshing a node in the distributed list", ex);
         }
 
         private static void LogDispatchNodeError(WebException ex)
         {
             string url = (ex.Response != null) ? ex.Response.ResponseUri.ToString() : "invalid url (responseUri null)";
-            LogHelper.Error<WebServiceServerMessenger>("Error refreshing a node in the distributed list, URI attempted: " + url, ex);
+            Current.Logger.Error<WebServiceServerMessenger>("Error refreshing a node in the distributed list, URI attempted: " + url, ex);
         }
-        
+
         private static void LogStartDispatch()
         {
-            LogHelper.Info<WebServiceServerMessenger>("Submitting calls to distributed servers");
+            Current.Logger.Info<WebServiceServerMessenger>("Submitting calls to distributed servers");
         }
 
         #endregion

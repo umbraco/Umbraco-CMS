@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Models
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Relation : Entity, IAggregateRoot, IRelation
+    public class Relation : EntityBase, IRelation
     {
         //NOTE: The datetime column from umbracoRelation is set on CreateDate on the Entity
         private int _parentId;

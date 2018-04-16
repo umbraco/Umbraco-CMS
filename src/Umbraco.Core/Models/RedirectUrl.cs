@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class RedirectUrl : Entity, IRedirectUrl
+    public class RedirectUrl : EntityBase, IRedirectUrl
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RedirectUrl"/> class.

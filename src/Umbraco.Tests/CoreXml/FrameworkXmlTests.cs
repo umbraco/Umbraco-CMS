@@ -38,7 +38,7 @@ namespace Umbraco.Tests.CoreXml
         [Test]
         public void ImportNodeClonesImportedNode()
         {
-            var doc1 = new XmlDocument();            
+            var doc1 = new XmlDocument();
             doc1.LoadXml(Xml1);
 
             var node1 = doc1.SelectSingleNode("//item2");

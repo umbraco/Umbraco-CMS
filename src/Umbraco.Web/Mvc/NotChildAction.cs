@@ -1,9 +1,9 @@
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
-    /// Used to ensure that actions with duplicate names that are not child actions don't get executed when 
+    /// Used to ensure that actions with duplicate names that are not child actions don't get executed when
     /// we are Posting and not redirecting.
     /// </summary>
     /// <remarks>

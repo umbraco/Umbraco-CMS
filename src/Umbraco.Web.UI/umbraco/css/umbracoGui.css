@@ -1,0 +1,455 @@
+html, body
+{
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+    margin: 0px;
+    border: none;
+    overflow: hidden;
+}
+
+body
+{
+    outline: none;
+    padding: 0px;
+    margin: 0px;
+    background: #fff url(../../umbraco_client/images/progressbar.gif) center 300px no-repeat;
+    overflow: auto;
+    font-size: 11px;
+}
+
+#appLoading
+{
+    background: #fff url(../../umbraco_client/images/progressbar.gif) center center no-repeat;
+    overflow: auto;
+    width: 300px;
+    height: 100px;
+}
+
+/*TOP*/
+.topBar
+{
+    padding: 10px 0px 10px 10px;
+    margin-bottom: 3px;
+    height: 22px;
+    background: url(../images/topGradient.gif) repeat-x top;
+}
+
+.topBarButtons
+{
+    float: right;
+    padding-right: 10px;
+}
+.topBarButtons button, button.topBarButton
+{
+    height: 26px;
+    margin-top: -1px;
+    padding: 3px;
+    margin-left: 10px;
+    vertical-align: middle;
+    font-size: 9px;
+}
+.topBarButtons button span, button.topBarButton span
+{
+    font-size: 9px;
+    vertical-align: middle;
+}
+.topBarButtons button img, button.topBarButton img
+{
+    margin-right: 5px;
+    vertical-align: middle;
+}
+#buttonCreate
+{
+    margin-left: 0px;
+}
+
+/* MAIN UI AREA */
+#treeWindow_content
+{
+    padding-top: 5px;
+    padding-right: 0px;
+}
+#PlaceHolderAppIcons_content
+{
+    overflow: auto;
+}
+
+#control_overlay
+{
+    background-color: #000;
+}
+#treeToggle
+{
+    display: none;
+    position: absolute;
+    top: 45px;
+    left: 2px;
+    width: 7px;
+    height: 120px;
+    background: url(../images/toggleTreeOff.png) no-repeat center center;
+    outline: none;
+    text-decoration: none;
+    overflow: hidden;
+}
+#treeToggle:hover
+{
+    background-color: #F4F5F4;
+}
+#treeToggle.on
+{
+    background-image: url(../images/toggleTreeOn.png) !important;
+}
+
+#leftDIV
+{
+    width: 20%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+#rightDIV
+{
+    width: 70%;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+}
+#uiArea
+{
+    position: relative;
+    margin: 0px 10px 0px 10px;
+    display: none;
+}
+
+#defaultSpeechbubble
+{
+    z-index: 10;
+    display: none;
+    width: 231px;
+    position: absolute;
+    right: 30px;
+    bottom: 20px;
+    margin: 0px;
+    padding: 0;
+}
+.speechClose
+{
+    float: right;
+    width: 18px;
+    height: 18px;
+    margin-right: 18px;
+    display: none;
+}
+.speechBubbleTop
+{
+    background: url('../images/speechbubble/speechbubble_top.png') no-repeat;
+    width: 235px;
+    height: 6px;
+    margin: 0px 0px 0px 3px;
+    padding: 0;
+}
+.speechBubbleContent
+{
+    background: url('../images/speechbubble/speechbubble_body.png') no-repeat;
+    width: 235px;
+    margin: 0;
+    padding: 5px 20px 5px 10px;
+}
+.speechBubbleBottom
+{
+    background: url('../images/speechbubble/speechbubble_bottom.png') no-repeat;
+    width: 235px;
+    height: 30px;
+    margin: 0px 0px 0px 1px;
+    padding: 0;
+}
+.speechBubbleContent h3
+{
+    font-size: 14px;
+    font-weight: bold;
+    font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+    margin: 0;
+    padding: 0;
+    display: block;
+    width: 220px;
+}
+.speechBubbleContent p
+{
+    font-size: 11px;
+    font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+    margin: 0;
+    width: 180px;
+}
+#tray
+{
+    margin: 0px;
+    padding: 7px 0;
+}
+
+#tray li
+{
+    list-style-type: none;
+    font-size: 37px;
+    width: 49px;
+    height: 36px;
+    display: block;
+    float: left;
+    padding: 0;
+    margin: 0;
+    padding-bottom: 7px;
+}
+
+#tray li a
+{
+    background-image: url('../images/tray/traySprites.png');
+    background-repeat: no-repeat;
+    text-decoration: none;
+    padding: 0;
+    margin: 0;
+    color: #fff;
+    font-size: 1px;
+    width: 49px;
+    height: 36px;
+    display: block;
+}
+
+.trayHolder, .trayIcon
+{
+    border: 0px;
+    width: 49px;
+    height: 36px;
+}
+/* tray sprites */
+.traycontent
+{
+    background-position: -18px -18px;
+}
+.traymedia
+{
+    background-position: -18px -90px;
+}
+.trayusers
+{
+    background-position: -18px -162px;
+}
+.traysettings
+{
+    background-position: -18px -234px;
+}
+.traydeveloper
+{
+    background-position: -18px -306px;
+}
+.traymember
+{
+    background-position: -18px -378px;
+}
+.traystats
+{
+    background-position: -18px -450px;
+}
+.traytranslation
+{
+    background-position: -18px -522px;
+}
+/* end tray sprites */
+
+
+a
+{
+    color: Black;
+}
+
+a:hover
+{
+    text-decoration: underline;
+}
+
+img
+{
+    border: none;
+}
+
+/* AUTOCOMPLETE */
+
+.umbracoSearchHolder #umbSearchField
+{
+    width: 250px;
+    color: #999;
+    padding: 2px;
+}
+.ac_results
+{
+    padding: 3px;
+    border: 1px solid #979797;
+    background-color: #f0f0f0;
+    border-top: none;
+    overflow: hidden;
+    z-index: 99999;
+}
+
+.ac_results ul
+{
+    width: 100%;
+    list-style-position: outside;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ac_results li
+{
+    display: block;
+    padding: 2px;
+    padding-left: 5px; /*  	it is very important, if line-height not setted or setted  	in relative units scroll will be broken in firefox 	*/
+    line-height: 20px;
+    overflow: hidden;
+    font-family: Arial,Lucida Grande;
+    font-size: 11px;
+    height: 20px;
+    color: #1a1818;
+    cursor: pointer;
+}
+
+.ac_results .ac_odd
+{
+}
+
+.ac_results .ac_over
+{
+    background-color: #D5EFFC;
+    border: 1px solid #a8d8eb;
+    padding: 1px !important;
+    padding-left: 4px !important;
+}
+
+.ac_results span.nodeId
+{
+    font-size: smaller;
+}
+
+.ac_loading
+{
+    background-image: url('../images/throbber.gif');
+    background-position: right;
+    background-repeat: no-repeat;
+}
+
+.error, .notice, .success
+{
+    padding: .8em;
+    padding-top: 0em;
+    padding-bottom: 0em;
+    margin-bottom: .5em;
+    border: 2px solid #ddd;
+}
+.error
+{
+    background: #FBE3E4;
+    color: #8a1f11;
+    border-color: #FBC2C4;
+}
+.notice
+{
+    background: #FFF6BF;
+    color: #514721;
+    border-color: #FFD324;
+}
+.success
+{
+    background: #E6EFC2;
+    color: #264409;
+    border-color: #C6D880;
+}
+.error a
+{
+    color: #8a1f11;
+}
+.notice a
+{
+    color: #514721;
+}
+.success a
+{
+    color: #264409;
+}
+.errormessage
+{
+    color: #8a1f11;
+}
+
+p 
+{
+  	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+  	font-size: 11px;
+}
+h3 
+{
+  	font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+  	font-size: 14px;
+}
+
+/* Renew session modal */
+
+#fullmodal-overlay
+{
+    background:#000;
+}
+#logout-refresh
+{
+    background:#fff url(../images/umbracosplash.png) no-repeat 50% 0%;
+    background-color: #fff;
+    border: 5px solid #a3a3a3;
+    padding:65px 10px 10px 10px;
+    width:230px;
+    height:135px;
+}
+
+#logout-refresh p
+{
+    margin:0 0 10px 0;
+    text-align:center;
+    font-size:2em;
+    font-weight:bold;
+    color:#666;
+}
+
+#sessionrefreshpassword label
+{
+    position:absolute;
+    color:#ccc;
+    font-family: Trebuchet MS, Lucida Grande, verdana, arial;
+    font-size:13px;
+    padding:5px;
+}
+
+
+#sessionrefreshpassword input
+{
+    width:220px;
+    padding:5px;
+    font-size:13px;
+    background:none;
+    border:1px solid #999;
+}
+
+#sessionrefreshbuttons
+{
+    margin-top:10px;
+    text-align:center;  
+    font-size: 11px;
+    font-family: Trebuchet MS, Lucida Grande, verdana, arial; 
+}
+
+#sessionrefreshbuttons a
+{
+    color:blue;
+}
+
+#sessionrefreshbuttons button
+{
+    font-size: 13px;
+    color:#333;
+    font-family: Trebuchet MS, Lucida Grande, verdana, arial; 
+}

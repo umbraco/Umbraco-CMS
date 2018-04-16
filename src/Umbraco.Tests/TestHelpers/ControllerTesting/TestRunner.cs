@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -50,14 +50,14 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 var response = await server.HttpClient.SendAsync(request);
                 Console.WriteLine(response);
 
-                string json = "";
+                var json = "";
                 if (response.IsSuccessStatusCode == false)
                 {
                     WriteResponseError(response);
                 }
                 else
                 {
-                    json = (await ((StreamContent)response.Content).ReadAsStringAsync()).TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+                    json = (await ((StreamContent) response.Content).ReadAsStringAsync()).TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
                     var deserialized = JsonConvert.DeserializeObject(json);
                     Console.Write(JsonConvert.SerializeObject(deserialized, Formatting.Indented));
                 }
@@ -71,8 +71,8 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
         {
             var result = response.Content.ReadAsStringAsync().Result;
             Console.Out.WriteLine("Http operation unsuccessfull");
-            Console.Out.WriteLine(string.Format("Status: '{0}'", response.StatusCode));
-            Console.Out.WriteLine(string.Format("Reason: '{0}'", response.ReasonPhrase));
+            Console.Out.WriteLine($"Status: '{response.StatusCode}'");
+            Console.Out.WriteLine($"Reason: '{response.ReasonPhrase}'");
             Console.Out.WriteLine(result);
         }
     }

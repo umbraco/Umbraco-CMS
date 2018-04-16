@@ -7,11 +7,12 @@ using System.Threading;
 namespace Umbraco.Core
 {
     /// <summary>
-    /// Provides a convenience methodology for implementing locked access to resources. 
+    /// Provides a convenience methodology for implementing locked access to resources.
     /// </summary>
     /// <remarks>
     /// Intended as an infrastructure class.
     /// </remarks>
+    [Obsolete("stop using, allocates")]
     public class WriteLock : IDisposable
     {
         private readonly ReaderWriterLockSlim _rwLock;

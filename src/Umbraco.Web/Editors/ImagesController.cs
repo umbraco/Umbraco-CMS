@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
-using Umbraco.Core.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -21,6 +15,13 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class ImagesController : UmbracoAuthorizedApiController
     {
+        private readonly MediaFileSystem _mediaFileSystem;
+
+        public ImagesController(MediaFileSystem mediaFileSystem)
+        {
+            _mediaFileSystem = mediaFileSystem;
+        }
+
         /// <summary>
         /// Gets the big thumbnail image for the media id
         /// </summary>
@@ -34,12 +35,13 @@ namespace Umbraco.Web.Editors
             var media = Services.MediaService.GetById(mediaId);
             if (media == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
-            
+
             var imageProp = media.Properties[Constants.Conventions.Media.File];
             if (imageProp == null)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
-            var imagePath = imageProp.Value.ToString();
+            //fixme doesn't take into account variants
+            var imagePath = imageProp.GetValue().ToString();
             return GetBigThumbnail(imagePath);
         }
 
@@ -53,8 +55,8 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         public HttpResponseMessage GetBigThumbnail(string originalImagePath)
         {
-            return string.IsNullOrWhiteSpace(originalImagePath) 
-                ? Request.CreateResponse(HttpStatusCode.OK) 
+            return string.IsNullOrWhiteSpace(originalImagePath)
+                ? Request.CreateResponse(HttpStatusCode.OK)
                 : GetResized(originalImagePath, 500, "big-thumb");
         }
 
@@ -72,12 +74,13 @@ namespace Umbraco.Web.Editors
             var media = Services.MediaService.GetById(mediaId);
             if (media == null)
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
-            
+
             var imageProp = media.Properties[Constants.Conventions.Media.File];
             if (imageProp == null)
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
 
-            var imagePath = imageProp.Value.ToString();
+            //fixme doesn't take into account variants
+            var imagePath = imageProp.GetValue().ToString();
             return GetResized(imagePath, width);
         }
 
@@ -104,17 +107,16 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private HttpResponseMessage GetResized(string imagePath, int width, string sizeName)
         {
-            var fs = FileSystemProviderManager.Current.MediaFileSystem;
             var ext = Path.GetExtension(imagePath);
 
             // we need to check if it is an image by extension
-            if (fs.IsImageFile(ext) == false)
+            if (_mediaFileSystem.IsImageFile(ext) == false)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
             //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
             var response = Request.CreateResponse(HttpStatusCode.Found);
-            var imageLastModified = fs.GetLastModified(imagePath);
-            response.Headers.Location = new Uri( string.Format( "{0}?rnd={1}&width={2}", imagePath, string.Format( "{0:yyyyMMddHHmmss}", imageLastModified ), width ), UriKind.Relative );
+            var imageLastModified = _mediaFileSystem.GetLastModified(imagePath);
+            response.Headers.Location = new Uri($"{imagePath}?rnd={imageLastModified:yyyyMMddHHmmss}&width={width}", UriKind.Relative );
             return response;
         }
     }

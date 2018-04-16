@@ -1,52 +1,43 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
-using ClientDependency.Core.Config;
 using Microsoft.Owin.Security;
 using Newtonsoft.Json;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Editors;
+using Umbraco.Web.Features;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web
 {
-    using Umbraco.Core.Configuration;
+    using Core.Configuration;
 
     /// <summary>
     /// HtmlHelper extensions for the back office
     /// </summary>
     public static class HtmlHelperBackOfficeExtensions
     {
-        [Obsolete("Use the overload with all required parameters instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl)
-        {
-            return html.BareMinimumServerVariablesScript(uri, ApplicationContext.Current, externalLoginsUrl);
-        }
-
         /// <summary>
         /// Outputs a script tag containing the bare minimum (non secure) server vars for use with the angular app
         /// </summary>
         /// <param name="html"></param>
         /// <param name="uri"></param>
-        /// <param name="appCtx"></param>
         /// <param name="externalLoginsUrl">
         /// The post url used to sign in with external logins - this can change depending on for what service the external login is service.
         /// Example: normal back office login or authenticating upgrade login
         /// </param>
+        /// <param name="features"></param>
+        /// <param name="globalSettings"></param>
         /// <returns></returns>
         /// <remarks>
         /// These are the bare minimal server variables that are required for the application to start without being authenticated,
         /// we will load the rest of the server vars after the user is authenticated.
         /// </remarks>
-        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, ApplicationContext appCtx, string externalLoginsUrl)
+        public static IHtmlString BareMinimumServerVariablesScript(this HtmlHelper html, UrlHelper uri, string externalLoginsUrl, UmbracoFeatures features, IGlobalSettings globalSettings)
         {
-            var serverVars = new BackOfficeServerVariables(uri, appCtx, UmbracoConfig.For.UmbracoSettings());
+            var serverVars = new BackOfficeServerVariables(uri, Current.RuntimeState, features, globalSettings);
             var minVars = serverVars.BareMinimumServerVariables();
 
             var str = @"<script type=""text/javascript"">
@@ -56,7 +47,7 @@ namespace Umbraco.Web
             </script>";
 
             return html.Raw(str);
-        }      
+        }
 
         /// <summary>
         /// Used to render the script that will pass in the angular "externalLoginInfo" service/value on page load
@@ -122,7 +113,7 @@ namespace Umbraco.Web
 
 
             sb.AppendLine(@"app.value(""resetPasswordCodeInfo"", {");
-            sb.AppendLine(@"errors: errors,");            
+            sb.AppendLine(@"errors: errors,");
             sb.Append(@"resetCodeModel: ");
             sb.AppendLine(JsonConvert.SerializeObject(resetCodeModel));
             sb.AppendLine(@"});");

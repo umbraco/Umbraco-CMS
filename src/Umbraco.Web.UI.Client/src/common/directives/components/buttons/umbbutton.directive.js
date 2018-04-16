@@ -125,6 +125,12 @@ Use this directive to render an umbraco button. The directive can be used to gen
 
          });
 
+         scope.clickButton = function(event) {
+            if(scope.action) {
+                scope.action({$event: event});
+            }
+         };
+
          scope.$on('$destroy', function() {
             unbindStateWatcher();
          });

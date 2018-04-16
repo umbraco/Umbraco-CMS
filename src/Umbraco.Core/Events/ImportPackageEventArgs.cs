@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Umbraco.Core.Packaging.Models;
+using Umbraco.Core.Models.Packaging;
 
 namespace Umbraco.Core.Events
 {
@@ -33,8 +33,8 @@ namespace Umbraco.Core.Events
         {
             get { return _packageMetaData; }
         }
-		
-		public IEnumerable<TEntity> InstallationSummary
+
+        public IEnumerable<TEntity> InstallationSummary
         {
             get { return EventObject; }
         }

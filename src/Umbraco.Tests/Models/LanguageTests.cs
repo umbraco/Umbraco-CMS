@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Models
                 Id = 11,
                 IsoCode = "en",
                 Key = Guid.NewGuid(),
-                UpdateDate = DateTime.Now               
+                UpdateDate = DateTime.Now
             };
 
             var clone = (Language) item.DeepClone();

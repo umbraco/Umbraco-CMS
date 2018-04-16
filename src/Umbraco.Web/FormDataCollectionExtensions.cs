@@ -7,7 +7,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web
 {
-    
+
     public static class FormDataCollectionExtensions
     {
         /// <summary>
@@ -77,8 +77,8 @@ namespace Umbraco.Web
             if (string.IsNullOrEmpty(val)) return default(T);
 
             var converted = val.TryConvertTo<T>();
-            return converted.Success 
-                ? converted.Result 
+            return converted.Success
+                ? converted.Result
                 : default(T);
         }
     }

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class DictionaryItemFactory 
+    internal class DictionaryItemFactory
     {
         #region Implementation of IEntityFactory<DictionaryItem,DictionaryDto>
 
@@ -18,8 +18,8 @@ namespace Umbraco.Core.Persistence.Factories
 
                 item.Id = dto.PrimaryKey;
                 item.Key = dto.UniqueId;
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
+
+                // reset dirty initial properties (U4-1946)
                 item.ResetDirtyProperties(false);
                 return item;
             }

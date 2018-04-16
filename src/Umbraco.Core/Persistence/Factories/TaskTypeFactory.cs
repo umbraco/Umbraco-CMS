@@ -1,5 +1,5 @@
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Rdbms;
+﻿using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
@@ -8,8 +8,7 @@ namespace Umbraco.Core.Persistence.Factories
         public TaskType BuildEntity(TaskTypeDto dto)
         {
             var entity = new TaskType(dto.Alias) {Id = dto.Id};
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
+            // reset dirty initial properties (U4-1946)
             entity.ResetDirtyProperties(false);
             return entity;
         }

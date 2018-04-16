@@ -15,7 +15,7 @@
 
         public Section()
         {
-            
+
         }
 
         public string Name { get; set; }

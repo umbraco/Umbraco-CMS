@@ -5,17 +5,19 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
-using UmbracoExamine;
+using Umbraco.Examine;
 using System.Xml;
 using Examine;
 using Examine.LuceneEngine.SearchCriteria;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Xml;
 
 
 namespace umbraco.presentation.dialogs
 {
-    public partial class search : BasePages.UmbracoEnsuredPage
+    //fixme - is this even used anymore?
+    public partial class search : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
 
         protected override void OnInit(EventArgs e)
@@ -43,7 +45,7 @@ namespace umbraco.presentation.dialogs
 
         protected void search_Click(object sender, EventArgs e)
         {
-            DoSearch();            
+            DoSearch();
         }
 
         private void DoSearch()
@@ -58,11 +60,11 @@ namespace umbraco.presentation.dialogs
 
             //if it doesn't start with "*", then search only nodeName and nodeId
             var internalSearcher = (CurrentApp == Constants.Applications.Members)
-                ? UmbracoContext.Current.InternalMemberSearchProvider
-                : UmbracoContext.Current.InternalSearchProvider;
+                ? ExamineManager.Instance.GetSearcher(Constants.Examine.InternalMemberIndexer)
+                : ExamineManager.Instance.GetSearcher(Constants.Examine.InternalIndexer);
 
             //create some search criteria, make everything combined to be 'And' and only search the current app
-            var criteria = internalSearcher.CreateSearchCriteria(CurrentApp, Examine.SearchCriteria.BooleanOperation.And);
+            var criteria = internalSearcher.CreateCriteria(CurrentApp, Examine.SearchCriteria.BooleanOperation.And);
 
             IEnumerable<SearchResult> results;
             if (txt.StartsWith("*"))
@@ -79,11 +81,12 @@ namespace umbraco.presentation.dialogs
                     operation = operation.And().GroupedOr(new[] { "__nodeName" }, new[] { word });
 
                 // ensure the user can only find nodes they are allowed to see
-                if (UmbracoContext.Current.UmbracoUser.StartNodeId > 0)
+                // fixme BORKED because we don't deal with all start nodes
+                if (Security.CurrentUser.StartContentIds.FirstOrDefault() > 0)
                 {
                     //TODO: This is not correct! This will not filter out seearches 'from' this node, this
                     // query is meant to search 'for' a specific node.
-                    operation = operation.And().Id(UmbracoContext.Current.UmbracoUser.StartNodeId);
+                    operation = operation.And().Id(Security.CurrentUser.StartContentIds.FirstOrDefault());
                 }
 
                 results = internalSearcher.Search(operation.Compile());
@@ -98,7 +101,7 @@ namespace umbraco.presentation.dialogs
         {
             var result = new XmlDocument();
             result.LoadXml("<results/>");
-            
+
             foreach (var r in results)
             {
                 var x = XmlHelper.AddTextNode(result, "result", "");
@@ -106,7 +109,7 @@ namespace umbraco.presentation.dialogs
                 x.Attributes.Append(XmlHelper.AddAttribute(result, "title", r.Fields["nodeName"]));
                 x.Attributes.Append(XmlHelper.AddAttribute(result, "author", r.Fields["writerName"]));
                 x.Attributes.Append(XmlHelper.AddAttribute(result, "changeDate", r.Fields["updateDate"]));
-                x.Attributes.Append(xmlHelper.addAttribute(result, "type", r.Fields["nodeTypeAlias"]));
+                x.Attributes.Append(XmlHelper.AddAttribute(result, "type", r.Fields["nodeTypeAlias"]));
                 result.DocumentElement.AppendChild(x);
             }
 

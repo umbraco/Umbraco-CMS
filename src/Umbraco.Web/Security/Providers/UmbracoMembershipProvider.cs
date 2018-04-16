@@ -13,6 +13,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Web.Security.Providers
@@ -54,10 +55,10 @@ namespace Umbraco.Web.Security.Providers
         /// <param name="name">The friendly name of the provider.</param>
         /// <param name="config">A collection of the name/value pairs representing the provider-specific attributes specified in the configuration for this provider.</param>
         /// <exception cref="T:System.ArgumentNullException">The name of the provider is null.</exception>
-        /// <exception cref="T:System.InvalidOperationException">An attempt is made to call 
-        /// <see cref="M:System.Configuration.Provider.ProviderBase.Initialize(System.String,System.Collections.Specialized.NameValueCollection)"></see> on a provider after the provider 
+        /// <exception cref="T:System.InvalidOperationException">An attempt is made to call
+        /// <see cref="M:System.Configuration.Provider.ProviderBase.Initialize(System.String,System.Collections.Specialized.NameValueCollection)"></see> on a provider after the provider
         /// has already been initialized.</exception>
-        /// <exception cref="T:System.ArgumentException">The name of the provider has a length of zero.</exception>       
+        /// <exception cref="T:System.ArgumentException">The name of the provider has a length of zero.</exception>
         public override void Initialize(string name, NameValueCollection config)
         {
             if (config == null) { throw new ArgumentNullException("config"); }
@@ -81,7 +82,7 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         protected override bool PerformChangePassword(string username, string oldPassword, string newPassword)
         {
-            //NOTE: due to backwards compatibilty reasons (and UX reasons), this provider doesn't care about the old password and 
+            //NOTE: due to backwards compatibilty reasons (and UX reasons), this provider doesn't care about the old password and
             // allows simply setting the password manually so we don't really care about the old password.
             // This is allowed based on the overridden AllowManuallyChangingPassword option.
 
@@ -148,7 +149,7 @@ namespace Umbraco.Web.Security.Providers
             if (MemberService.Exists(username))
             {
                 status = MembershipCreateStatus.DuplicateUserName;
-                LogHelper.Warn<UmbracoMembershipProvider<T, TEntity>>("Cannot create member as username already exists: " + username);
+                Current.Logger.Warn<UmbracoMembershipProvider<T, TEntity>>("Cannot create member as username already exists: " + username);
                 return null;
             }
 
@@ -156,7 +157,7 @@ namespace Umbraco.Web.Security.Providers
             if (MemberService.GetByEmail(email) != null && RequiresUniqueEmail)
             {
                 status = MembershipCreateStatus.DuplicateEmail;
-                LogHelper.Warn<UmbracoMembershipProvider<T, TEntity>>(
+                Current.Logger.Warn<UmbracoMembershipProvider<T, TEntity>>(
                     "Cannot create member as a member with the same email address exists: " + email);
                 return null;
             }
@@ -213,7 +214,9 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            var byEmail = MemberService.FindByEmail(emailToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
+            long totalRecords2;
+            var byEmail = MemberService.FindByEmail(emailToMatch, pageIndex, pageSize, out totalRecords2, StringPropertyMatchType.Wildcard).ToArray();
+            totalRecords = Convert.ToInt32(totalRecords2);
 
             var collection = new MembershipUserCollection();
             foreach (var m in byEmail)
@@ -235,7 +238,9 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            var byEmail = MemberService.FindByUsername(usernameToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
+            long totalRecords2;
+            var byEmail = MemberService.FindByUsername(usernameToMatch, pageIndex, pageSize, out totalRecords2, StringPropertyMatchType.Wildcard).ToArray();
+            totalRecords = Convert.ToInt32(totalRecords2);
 
             var collection = new MembershipUserCollection();
             foreach (var m in byEmail)
@@ -258,7 +263,9 @@ namespace Umbraco.Web.Security.Providers
         {
             var membersList = new MembershipUserCollection();
 
-            var pagedMembers = MemberService.GetAll(pageIndex, pageSize, out totalRecords);
+            long totalRecords2;
+            var pagedMembers = MemberService.GetAll(pageIndex, pageSize, out totalRecords2);
+            totalRecords = Convert.ToInt32(totalRecords2);
 
             foreach (var m in pagedMembers)
             {
@@ -271,7 +278,7 @@ namespace Umbraco.Web.Security.Providers
         /// Gets the number of users currently accessing the application.
         /// </summary>
         /// <returns>
-        /// The number of users currently accessing the application.       
+        /// The number of users currently accessing the application.
         /// </returns>
         /// <remarks>
         /// The way this is done is the same way that it is done in the MS SqlMembershipProvider - We query for any members
@@ -450,14 +457,14 @@ namespace Umbraco.Web.Security.Providers
                 throw new ProviderException(string.Format("No member with the username '{0}' found", username));
             }
 
-            // Non need to update		
+            // Non need to update
             if (member.IsLockedOut == false) return true;
 
             member.IsLockedOut = false;
             member.FailedPasswordAttempts = 0;
 
             MemberService.Save(member);
-            
+
             return true;
         }
 
@@ -478,7 +485,7 @@ namespace Umbraco.Web.Security.Providers
         /// <summary>
         /// Updates e-mail  approved status, lock status and comment on a user.
         /// </summary>
-        /// <param name="user">A <see cref="T:System.Web.Security.MembershipUser"></see> object that represents the user to update and the updated information for the user.</param>      
+        /// <param name="user">A <see cref="T:System.Web.Security.MembershipUser"></see> object that represents the user to update and the updated information for the user.</param>
         public override void UpdateUser(MembershipUser user)
         {
             var m = MemberService.GetByUsername(user.UserName);
@@ -490,7 +497,7 @@ namespace Umbraco.Web.Security.Providers
 
             if (RequiresUniqueEmail && user.Email.Trim().IsNullOrWhiteSpace() == false)
             {
-                int totalRecs;
+                long totalRecs;
                 var byEmail = MemberService.FindByEmail(user.Email.Trim(), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.Exact);
                 if (byEmail.Count(x => x.Id != m.Id) > 0)
                 {
@@ -518,7 +525,7 @@ namespace Umbraco.Web.Security.Providers
 
             if (member == null)
             {
-                LogHelper.Info<UmbracoMembershipProviderBase>(
+                Current.Logger.Info<UmbracoMembershipProviderBase>(
                     string.Format(
                         "Login attempt failed for username {0} from IP address {1}, the user does not exist",
                         username,
@@ -532,7 +539,7 @@ namespace Umbraco.Web.Security.Providers
 
             if (member.IsApproved == false)
             {
-                LogHelper.Info<UmbracoMembershipProviderBase>(
+                Current.Logger.Info<UmbracoMembershipProviderBase>(
                     string.Format(
                         "Login attempt failed for username {0} from IP address {1}, the user is not approved",
                         username,
@@ -546,7 +553,7 @@ namespace Umbraco.Web.Security.Providers
             }
             if (member.IsLockedOut)
             {
-                LogHelper.Info<UmbracoMembershipProviderBase>(
+                Current.Logger.Info<UmbracoMembershipProviderBase>(
                     string.Format(
                         "Login attempt failed for username {0} from IP address {1}, the user is locked",
                         username,
@@ -574,15 +581,15 @@ namespace Umbraco.Web.Security.Providers
                     member.IsLockedOut = true;
                     member.LastLockoutDate = DateTime.Now;
 
-                    LogHelper.Info<UmbracoMembershipProviderBase>(
+                    Current.Logger.Info<UmbracoMembershipProviderBase>(
                         string.Format(
                             "Login attempt failed for username {0} from IP address {1}, the user is now locked out, max invalid password attempts exceeded",
                             username,
-                            GetCurrentRequestIpAddress()));                    
+                            GetCurrentRequestIpAddress()));
                 }
                 else
                 {
-                    LogHelper.Info<UmbracoMembershipProviderBase>(
+                    Current.Logger.Info<UmbracoMembershipProviderBase>(
                         string.Format(
                             "Login attempt failed for username {0} from IP address {1}",
                             username,
@@ -599,11 +606,11 @@ namespace Umbraco.Web.Security.Providers
 
                 member.LastLoginDate = DateTime.Now;
 
-                LogHelper.Info<UmbracoMembershipProviderBase>(
+                Current.Logger.Info<UmbracoMembershipProviderBase>(
                         string.Format(
                             "Login attempt succeeded for username {0} from IP address {1}",
                             username,
-                            GetCurrentRequestIpAddress()));                
+                            GetCurrentRequestIpAddress()));
             }
 
             //don't raise events for this! It just sets the member dates, if we do raise events this will

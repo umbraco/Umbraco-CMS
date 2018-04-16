@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Models
 {
@@ -32,12 +33,12 @@ namespace Umbraco.Web.Models
             MacroParameters = macroParams;
         }
 
-	    [EditorBrowsable(EditorBrowsableState.Never)]
-	    [Obsolete("Use the Content property instead")]
-	    public IPublishedContent CurrentPage
-	    {
-	        get { return Content; }
-	    }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the Content property instead")]
+        public IPublishedContent CurrentPage
+        {
+            get { return Content; }
+        }
 
         public IPublishedContent Content { get; private set; }
         public string MacroName { get; private set; }

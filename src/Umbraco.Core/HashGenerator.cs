@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
@@ -10,8 +10,8 @@ namespace Umbraco.Core
     /// Used to generate a string hash using crypto libraries over multiple objects
     /// </summary>
     /// <remarks>
-    /// This should be used to generate a reliable hash that survives AppDomain restarts. 
-    /// This will use the crypto libs to generate the hash and will try to ensure that 
+    /// This should be used to generate a reliable hash that survives AppDomain restarts.
+    /// This will use the crypto libs to generate the hash and will try to ensure that
     /// strings, etc... are not re-allocated so it's not consuming much memory.
     /// </remarks>
     internal class HashGenerator : DisposableObjectSlim
@@ -60,7 +60,7 @@ namespace Umbraco.Core
             //we could go a step further and s.Normalize() but we're not really dealing with crazy unicode with this class so far.
 
             if (s != null)
-                _writer.Write(s.ToUpperInvariant());            
+                _writer.Write(s.ToUpperInvariant());
         }
 
         internal void AddFileSystemItem(FileSystemInfo f)
@@ -73,7 +73,7 @@ namespace Umbraco.Core
             AddDateTime(f.CreationTimeUtc);
             AddDateTime(f.LastWriteTimeUtc);
 
-            //check if it is a file or folder 
+            //check if it is a file or folder
             var fileInfo = f as FileInfo;
             if (fileInfo != null)
             {

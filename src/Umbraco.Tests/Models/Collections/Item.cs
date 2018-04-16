@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Tests.Models.Collections
 {
@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Models.Collections
         /// <summary>
         /// Guid based Id
         /// </summary>
-        /// <remarks>The key is currectly used to store the Unique Id from the 
+        /// <remarks>The key is currectly used to store the Unique Id from the
         /// umbracoNode table, which many of the entities are based on.</remarks>
         [DataMember]
         public Guid Key
@@ -67,6 +67,12 @@ namespace Umbraco.Tests.Models.Collections
         /// </summary>
         [DataMember]
         public DateTime UpdateDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Deleted Date
+        /// </summary>
+        [DataMember]
+        public DateTime? DeleteDate { get; set; }
 
         /// <summary>
         /// Gets or sets the WasCancelled flag, which is used to track
@@ -135,6 +141,11 @@ namespace Umbraco.Tests.Models.Collections
             return _propertyChangedInfo.Any(x => x.Key == propertyName);
         }
 
+        public virtual IEnumerable<string> GetDirtyProperties()
+        {
+            return _propertyChangedInfo.Keys;
+        }
+
         /// <summary>
         /// Indicates whether the current entity is dirty.
         /// </summary>
@@ -180,8 +191,6 @@ namespace Umbraco.Tests.Models.Collections
                 return false;*/
 
             return ReferenceEquals(left, right);
-
-            return left.Equals(right);
         }
 
         public static bool operator !=(Item left, Item right)
@@ -244,7 +253,7 @@ namespace Umbraco.Tests.Models.Collections
                 _hash = !HasIdentity ? new int?(base.GetHashCode()) : new int?(Id.GetHashCode() * 397 ^ GetType().GetHashCode());
             return _hash.Value;
         }*/
-        
+
         public object DeepClone()
         {
             return this.MemberwiseClone();

@@ -40,9 +40,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             if (!args.content) {
                 throw "args.content is not defined";
             }
-            if (!args.statusMessage) {
-                throw "args.statusMessage is not defined";
-            }
             if (!args.saveMethod) {
                 throw "args.saveMethod is not defined";
             }
@@ -54,13 +51,11 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             //we will use the default one for content if not specified
             var rebindCallback = args.rebindCallback === undefined ? self.reBindChangedProperties : args.rebindCallback;
 
-            var deferred = $q.defer();
-
-            if (!args.scope.busy && formHelper.submitForm({ scope: args.scope, statusMessage: args.statusMessage, action: args.action })) {
+            if (!args.scope.busy && formHelper.submitForm({ scope: args.scope, action: args.action })) {
 
                 args.scope.busy = true;
 
-                args.saveMethod(args.content, $routeParams.create, fileManager.getFiles())
+                return args.saveMethod(args.content, $routeParams.create, fileManager.getFiles())
                     .then(function (data) {
 
                         formHelper.resetForm({ scope: args.scope, notifications: data.notifications });
@@ -74,7 +69,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         });
 
                         args.scope.busy = false;
-                        deferred.resolve(data);
+                        return $q.when(data);
 
                     }, function (err) {
                         self.handleSaveError({
@@ -91,14 +86,13 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             }
                         }
                         args.scope.busy = false;
-                        deferred.reject(err);
+                        return $q.reject(err);
                     });
             }
             else {
-                deferred.reject();
+                return $q.reject();
             }
-
-            return deferred.promise;
+            
         },
         
         /** Used by the content editor and media editor to add an info tab to the tabs array (normally known as the properties tab) */
@@ -159,7 +153,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         //publish action
                         return {
                             letter: ch,
-                            labelKey: "buttons_saveAndPublish",
+                            labelKey: args.content.variants && args.content.variants.length > 1 ? "buttons_saveAndPublishMany" : "buttons_saveAndPublish",
                             handler: args.methods.saveAndPublish,
                             hotKey: "ctrl+p",
                             hotKeyWhenHidden: true,
@@ -440,7 +434,25 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
             //a method to ignore built-in prop changes
             var shouldIgnore = function(propName) {
-                return _.some(["tabs", "notifications", "ModelState", "tabs", "properties"], function(i) {
+                return _.some([
+                    "tabs",
+                    "notifications",
+                    "ModelState",
+                    "tabs",
+                    "properties",
+                    "apps",
+                    "createDateFormatted",
+                    "releaseDateYear",
+                    "releaseDateMonth",
+                    "releaseDateDayNumber",
+                    "releaseDateDay",
+                    "releaseDateTime",
+                    "removeDateYear",
+                    "removeDateMonth",
+                    "removeDateDayNumber",
+                    "removeDateDay",
+                    "removeDateTime",
+                ], function (i) {
                     return i === propName;
                 });
             };
@@ -489,6 +501,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          *
          * @description
          * A function to handle what happens when we have validation issues from the server side
+         *
          */
         handleSaveError: function (args) {
 

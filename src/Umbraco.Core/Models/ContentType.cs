@@ -13,6 +13,9 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class ContentType : ContentTypeCompositionBase, IContentType
     {
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+        public const bool IsPublishingConst = true;
+
         private int _defaultTemplate;
         private IEnumerable<ITemplate> _allowedTemplates;
 
@@ -48,8 +51,10 @@ namespace Umbraco.Core.Models
             _allowedTemplates = new List<ITemplate>();
         }
 
-        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+        /// <inheritdoc />
+        public override bool IsPublishing => IsPublishingConst;
 
+        // ReSharper disable once ClassNeverInstantiated.Local
         private class PropertySelectors
         {
             public readonly PropertyInfo DefaultTemplateSelector = ExpressionHelper.GetPropertyInfo<ContentType, int>(x => x.DefaultTemplateId);
@@ -64,7 +69,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the alias of the default Template.
         /// TODO: This should be ignored from cloning!!!!!!!!!!!!!!
-        ///  - but to do that we have to implement callback hacks, this needs to be fixed in v8, 
+        ///  - but to do that we have to implement callback hacks, this needs to be fixed in v8,
         ///     we should not store direct entity
         /// </summary>
         [IgnoreDataMember]
@@ -86,13 +91,13 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or Sets a list of Templates which are allowed for the ContentType
         /// TODO: This should be ignored from cloning!!!!!!!!!!!!!!
-        ///  - but to do that we have to implement callback hacks, this needs to be fixed in v8, 
+        ///  - but to do that we have to implement callback hacks, this needs to be fixed in v8,
         ///     we should not store direct entity
         /// </summary>
         [DataMember]
         public IEnumerable<ITemplate> AllowedTemplates
         {
-            get { return _allowedTemplates; }
+            get => _allowedTemplates;
             set
             {
                 SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, Ps.Value.AllowedTemplatesSelector, Ps.Value.TemplateComparer);
@@ -150,31 +155,5 @@ namespace Umbraco.Core.Models
         {
             return DeepCloneWithResetIdentities(alias);
         }
-
-        /// <summary>
-        /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset
-        /// </summary>
-        /// <returns></returns>
-        public IContentType DeepCloneWithResetIdentities(string alias)
-        {
-            var clone = (ContentType)DeepClone();
-            clone.Alias = alias;
-            clone.Key = Guid.Empty;
-            foreach (var propertyGroup in clone.PropertyGroups)
-            {
-                propertyGroup.ResetIdentity();
-                propertyGroup.ResetDirtyProperties(false);
-            }
-            foreach (var propertyType in clone.PropertyTypes)
-            {
-                propertyType.ResetIdentity();
-                propertyType.ResetDirtyProperties(false);
-            }
-
-            clone.ResetIdentity();
-            clone.ResetDirtyProperties(false);
-            return clone;
-        }
-
     }
 }

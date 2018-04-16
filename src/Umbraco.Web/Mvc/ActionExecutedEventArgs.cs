@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web.Mvc;
 
 namespace Umbraco.Web.Mvc
@@ -11,7 +11,7 @@ namespace Umbraco.Web.Mvc
         public ActionExecutedEventArgs(Controller controller, object model)
         {
             Controller = controller;
-            Model = model;            
+            Model = model;
         }
     }
 }

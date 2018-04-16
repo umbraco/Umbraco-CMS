@@ -1,5 +1,5 @@
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Models.Rdbms;
+﻿using Umbraco.Core.Models.Identity;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
@@ -9,8 +9,7 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, dto.UserId, dto.CreateDate);
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
+            // reset dirty initial properties (U4-1946)
             entity.ResetDirtyProperties(false);
             return entity;
         }
@@ -23,7 +22,7 @@ namespace Umbraco.Core.Persistence.Factories
                 CreateDate = entity.CreateDate,
                 LoginProvider = entity.LoginProvider,
                 ProviderKey = entity.ProviderKey,
-                UserId = entity.UserId               
+                UserId = entity.UserId
             };
 
             return dto;

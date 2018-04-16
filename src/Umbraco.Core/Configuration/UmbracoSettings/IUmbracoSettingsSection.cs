@@ -17,7 +17,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IDeveloperSection Developer { get; }
 
-        IViewStateMoverModuleSection ViewStateMoverModule { get; }
 
         ILoggingSection Logging { get; }
 
@@ -29,12 +28,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IProvidersSection Providers { get; }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This is no longer used and will be removed in future versions")]
-        IHelpSection Help { get; }
-
         IWebRoutingSection WebRouting { get; }
 
-        IScriptingSection Scripting { get; }
     }
 }

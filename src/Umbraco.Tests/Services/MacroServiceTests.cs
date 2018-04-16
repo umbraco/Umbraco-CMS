@@ -1,39 +1,37 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Scoping;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
-    [TestFixture, RequiresSTA]
-    public class MacroServiceTests : BaseServiceTest
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    public class MacroServiceTests : TestWithSomeContentBase
     {
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-        }
-
         public override void CreateTestData()
         {
             base.CreateTestData();
 
-            var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            using (var unitOfWork = provider.GetUnitOfWork())
-            using (var repository = new MacroRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax))
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
             {
-                repository.AddOrUpdate(new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml"));
-                repository.AddOrUpdate(new Macro("test2", "Test2", "~/usercontrol/test2.ascx", "MyAssembly2", "test2.xslt", "~/views/macropartials/test2.cshtml"));
-                repository.AddOrUpdate(new Macro("test3", "Tet3", "~/usercontrol/test3.ascx", "MyAssembly3", "test3.xslt", "~/views/macropartials/test3.cshtml"));
-                unitOfWork.Commit();
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+
+                repository.Save(new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml"));
+                repository.Save(new Macro("test2", "Test2", "~/usercontrol/test2.ascx", "MyAssembly2", "test2.xslt", "~/views/macropartials/test2.cshtml"));
+                repository.Save(new Macro("test3", "Tet3", "~/usercontrol/test3.ascx", "MyAssembly3", "test3.xslt", "~/views/macropartials/test3.cshtml"));
+                scope.Complete();
             }
         }
 
@@ -137,6 +135,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("New name", macro.Name);
             Assert.AreEqual("NewAlias", macro.Alias);
             Assert.AreEqual(currKey, macro.Key);
+
         }
 
         [Test]
@@ -168,7 +167,6 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(1, macro.Properties[0].SortOrder);
             Assert.AreEqual("new", macro.Properties[0].EditorAlias);
             Assert.AreEqual(currPropKey, macro.Properties[0].Key);
-
         }
 
         [Test]
@@ -189,8 +187,6 @@ namespace Umbraco.Tests.Services
                 Assert.AreNotEqual(lastKey, macro.Properties[i].Key);
                 lastKey = macro.Properties[i].Key;
             }
-
-
 
             // Act
             macro.Properties["blah1"].Alias = "newAlias";
@@ -215,6 +211,7 @@ namespace Umbraco.Tests.Services
             {
                 Assert.AreEqual(propKey.Key, macro.Properties[propKey.Alias].Key);
             }
+
         }
 
         [Test]
@@ -257,7 +254,7 @@ namespace Umbraco.Tests.Services
             // Arrange
             var macroService = ServiceContext.MacroService;
             var macro = new Macro("test", string.Empty, scriptPath: "~/Views/MacroPartials/Test.cshtml", cacheDuration: 1234);
-            
+
             // Act & Assert
             Assert.Throws<ArgumentException>(() => macroService.Save(macro));
         }

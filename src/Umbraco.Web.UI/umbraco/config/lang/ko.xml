@@ -30,6 +30,7 @@
     <key alias="sendtopublish">발행 항목으로 전달</key>
     <key alias="sendToTranslate">번역 항목으로 전달</key>
     <key alias="sort">정렬</key>
+    <key alias="toPublish">발행 항목으로 전달</key>
     <key alias="translate">번역</key>
     <key alias="update">업데이트</key>
   </area>
@@ -789,6 +790,8 @@
     <key alias="postContent">필드뒤에 삽입</key>
     <key alias="preContent">필드앞에 삽입</key>
     <key alias="recursive">Recursive</key>
+    <key alias="removeParagraph">단락 태그삭제</key>
+    <key alias="removeParagraphHelp">문서 시작과 끝의 &amp;amp;lt;P&amp;amp;gt; 를 삭제하시겠습니까</key>
     <key alias="uppercase">대문자</key>
     <key alias="urlEncode">URL 인코딩</key>
     <key alias="urlEncodeHelp">URL의 특수문자를 포맷하겠습니까</key>
@@ -873,6 +876,9 @@
     <key alias="stylesheets">스타일시트</key>
     <key alias="templates">템플릿</key>
     <key alias="xslt">XSLT 파일</key>
+    <key alias="userPermissions">사용자권한</key>
+    <key alias="userTypes">사용자 유형</key>
+    <key alias="users">사용자</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">새 업데이트가 준비되었습니다.</key>
@@ -910,6 +916,8 @@
     <key alias="startnode">컨텐츠의 시작노드</key>
     <key alias="username">사용자명</key>
     <key alias="userPermissions">사용자권한</key>
+    <key alias="usertype">사용자 타입</key>
+    <key alias="userTypes">사용자 타입</key>
     <key alias="writer">작성자</key>
   </area>
 </language>

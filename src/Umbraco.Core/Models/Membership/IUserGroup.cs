@@ -1,9 +1,9 @@
-using System.Collections.Generic;
-using Umbraco.Core.Models.EntityBase;
+﻿using System.Collections.Generic;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models.Membership
 {
-    public interface IUserGroup : IAggregateRoot
+    public interface IUserGroup : IEntity, IRememberBeingDirty
     {
         string Alias { get; set; }
 
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models.Membership
         /// The icon
         /// </summary>
         string Icon { get; set; }
-        
+
         /// <summary>
         /// The name
         /// </summary>

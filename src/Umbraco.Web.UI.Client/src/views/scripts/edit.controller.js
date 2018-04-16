@@ -5,7 +5,6 @@
 
         var vm = this;
         var currentPosition = null;
-        var localizeSaving = localizationService.localize("general_saving");
 
         vm.page = {};
         vm.page.loading = true;
@@ -38,7 +37,6 @@
             vm.script.content = vm.editor.getValue();
 
             contentEditingHelper.contentEditorPerformSave({
-                statusMessage: localizeSaving,
                 saveMethod: codefileResource.save,
                 scope: $scope,
                 content: vm.script,
@@ -92,7 +90,7 @@
         function init() {
 
             //we need to load this somewhere, for now its here.
-            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css");
+            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css", $scope);
 
             if ($routeParams.create) {
                 codefileResource.getScaffold("scripts", $routeParams.id).then(function (script) {

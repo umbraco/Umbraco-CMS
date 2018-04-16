@@ -221,6 +221,11 @@
                                         <localize key="contentTypeEditor_memberCanEdit"></localize>
                                     </div>
 
+                                    <div class="umb-group-builder__property-tag -white" ng-if="property.isSensitiveData">
+                                        <i class="icon-lock umb-group-builder__property-tag-icon"></i>
+                                        <localize key="contentTypeEditor_isSensitiveData"></localize>
+                                    </div>
+
                                 </div>
 
                                 <div class="umb-group-builder__property-tags -right">
@@ -251,7 +256,7 @@
                             <!-- row tools -->
                             <div class="umb-group-builder__property-actions" ng-if="!sortingMode">
 
-                                <div ng-if="!property.inherited && !property.locked">
+                                <div ng-if="!property.inherited">
 
                                     <!-- settings for property -->
                                     <div class="umb-group-builder__property-action" ng-click="editPropertyTypeSettings(property, tab)">
@@ -259,7 +264,7 @@
                                     </div>
 
                                     <!-- delete property -->
-                                    <div class="umb-group-builder__property-action">
+                                    <div ng-if="!property.locked" class="umb-group-builder__property-action">
                                         <i class="icon-trash" ng-click="togglePrompt(property)"></i>
                                         <umb-confirm-action
                                             ng-if="property.deletePrompt"

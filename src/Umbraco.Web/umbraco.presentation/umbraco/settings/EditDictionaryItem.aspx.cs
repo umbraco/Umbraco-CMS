@@ -1,10 +1,15 @@
-using System;
+﻿using System;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
+using Umbraco.Web;
+using Umbraco.Web.Composing;
+using Umbraco.Web.UI;
 
 namespace umbraco.settings
 {
@@ -12,41 +17,38 @@ namespace umbraco.settings
     /// Summary description for EditDictionaryItem.
     /// </summary>
     [WebformsPageTreeAuthorize(Constants.Trees.Dictionary)]
-    public partial class EditDictionaryItem : BasePages.UmbracoEnsuredPage
+    public partial class EditDictionaryItem : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
-
         protected LiteralControl keyTxt = new LiteralControl();
-        protected uicontrols.TabView tbv = new uicontrols.TabView();
+        protected Umbraco.Web._Legacy.Controls.TabView tbv = new Umbraco.Web._Legacy.Controls.TabView();
         private System.Collections.ArrayList languageFields = new System.Collections.ArrayList();
-        private cms.businesslogic.Dictionary.DictionaryItem currentItem;
+        private IDictionaryItem currentItem;
         protected TextBox boxChangeKey;
         protected Label labelChangeKey;
         protected Literal txt;
-        protected User currentUser;
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-            currentItem = new cms.businesslogic.Dictionary.DictionaryItem(int.Parse(Request.QueryString["id"]));
-            currentUser = getUser();
+            currentItem = Services.LocalizationService.GetDictionaryItemById(int.Parse(Request.QueryString["id"]));
 
             // Put user code to initialize the page here
             Panel1.hasMenu = true;
-            Panel1.Text = ui.Text("editdictionary") + ": " + currentItem.key;
+            Panel1.Text = Services.TextService.Localize("editdictionary") + ": " + currentItem.ItemKey;
 
             var save = Panel1.Menu.NewButton();
-            save.Text = ui.Text("save");
+            save.Text = Services.TextService.Localize("save");
             save.Click += save_Click;
-            save.ToolTip = ui.Text("save");
+            save.ToolTip = Services.TextService.Localize("save");
             save.ID = "save";
-            save.ButtonType = uicontrols.MenuButtonType.Primary;
+            save.ButtonType = Umbraco.Web._Legacy.Controls.MenuButtonType.Primary;
 
-            uicontrols.Pane p = new uicontrols.Pane();
+            var p = new Umbraco.Web._Legacy.Controls.Pane();
 
             boxChangeKey = new TextBox
             {
-                ID = "changeKey-" + currentItem.id,
+                ID = "changeKey-" + currentItem.Id,
                 CssClass = "umbEditorTextField",
-                Text = currentItem.key
+                Text = currentItem.ItemKey
             };
 
             labelChangeKey = new Label
@@ -57,29 +59,31 @@ namespace umbraco.settings
 
             p.addProperty(new Literal
             {
-                Text = "<p>" + ui.Text("dictionaryItem", "changeKey", currentUser) + "</p>"
+                Text = "<p>" + Services.TextService.Localize("dictionaryItem/changeKey") + "</p>"
             });
             p.addProperty(boxChangeKey);
             p.addProperty(labelChangeKey);
 
 
             txt = new Literal();
-            txt.Text = "<br/><p>" + ui.Text("dictionaryItem", "description", currentItem.key, currentUser) + "</p><br/>";
+            txt.Text = "<p>" + Services.TextService.Localize("dictionaryItem/description", new[] { currentItem.ItemKey }) + "</p><br/>";
             p.addProperty(txt);
 
-            foreach (cms.businesslogic.language.Language l in cms.businesslogic.language.Language.getAll)
+            foreach (var l in Current.Services.LocalizationService.GetAllLanguages())
             {
 
                 TextBox languageBox = new TextBox();
                 languageBox.TextMode = TextBoxMode.MultiLine;
-                languageBox.ID = l.id.ToString();
+                languageBox.ID = l.Id.ToString();
                 languageBox.CssClass = "umbEditorTextFieldMultiple";
 
                 if (!IsPostBack)
-                    languageBox.Text = currentItem.Value(l.id);
+                {
+                    languageBox.Text = currentItem.GetTranslatedValue(l.Id);
+                }
 
                 languageFields.Add(languageBox);
-                p.addProperty(l.FriendlyName, languageBox);
+                p.addProperty(l.CultureName, languageBox);
 
             }
 
@@ -88,56 +92,67 @@ namespace umbraco.settings
             {
                 var path = BuildPath(currentItem);
                 ClientTools
-                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadDictionary>().Tree.Alias)
+                    .SetActiveTreeType(Constants.Trees.Dictionary)
                     .SyncTree(path, false);
             }
 
             Panel1.Controls.Add(p);
         }
 
-        private string BuildPath(cms.businesslogic.Dictionary.DictionaryItem current)
+        private string BuildPath(IDictionaryItem current)
         {
-            var parentPath = current.IsTopMostItem() ? "" : BuildPath(current.Parent) + ",";
-            return parentPath + current.id;
+            var parentPath = current.ParentId.HasValue == false ? "" : BuildPath(current) + ",";
+            return parentPath + current.Id;
         }
 
         void save_Click(object sender, EventArgs e)
         {
-            foreach (TextBox t in languageFields)
-            {
-                //check for null but allow empty string!
-                // http://issues.umbraco.org/issue/U4-1931
-                if (t.Text != null)
-                {
-                    currentItem.setValue(int.Parse(t.ID), t.Text);
-                }
-            }
-
-            labelChangeKey.Text = ""; // reset error text 
+            labelChangeKey.Text = ""; // reset error text
             var newKey = boxChangeKey.Text;
-            if (string.IsNullOrWhiteSpace(newKey) == false && newKey != currentItem.key)
+            var save = true;
+            if (string.IsNullOrWhiteSpace(newKey) == false && newKey != currentItem.ItemKey)
             {
-                // key already exists, save but inform
-                if (Dictionary.DictionaryItem.hasKey(newKey) == true)
+                if (Services.LocalizationService.DictionaryItemExists(newKey))
                 {
-                    labelChangeKey.Text = ui.Text("dictionaryItem", "changeKeyError", newKey, currentUser);
-                    boxChangeKey.Text = currentItem.key; // reset key                    
+                    // reject
+                    labelChangeKey.Text = Services.TextService.Localize("dictionaryItem/changeKeyError", newKey);
+                    boxChangeKey.Text = currentItem.ItemKey; // reset key
+                    save = false;
                 }
                 else
                 {
-                    // set the new key
-                    currentItem.setKey(newKey);
+                    // update key
+                    currentItem.ItemKey = newKey;
 
-                    // update the title with the new key
-                    Panel1.title.InnerHtml = ui.Text("editdictionary") + ": " + newKey;
+                    // update title
+                    Panel1.title.InnerHtml = Services.TextService.Localize("editdictionary") + ": " + newKey;
 
                     // sync the content tree
                     var path = BuildPath(currentItem);
                     ClientTools.SyncTree(path, true);
                 }
             }
-            txt.Text = "<br/><p>" + ui.Text("dictionaryItem", "description", currentItem.key, currentUser) + "</p><br/>";
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "dictionaryItemSaved"), "");
+
+            if (save)
+            {
+                foreach (TextBox t in languageFields)
+                {
+                    //check for null but allow empty string!
+                    // http://issues.umbraco.org/issue/U4-1931
+                    if (t.Text != null)
+                    {
+                        Services.LocalizationService.AddOrUpdateDictionaryValue(
+                            currentItem,
+                            Services.LocalizationService.GetLanguageById(int.Parse(t.ID)),
+                            t.Text);
+                    }
+                }
+
+                Services.LocalizationService.Save(currentItem);
+                ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/dictionaryItemSaved"), "");
+            }
+
+            txt.Text = "<br/><p>" + Services.TextService.Localize("dictionaryItem/description", currentItem.ItemKey) + "</p><br/>";
         }
 
         #region Web Form Designer generated code
@@ -157,28 +172,5 @@ namespace umbraco.settings
         }
 
         #endregion
-
-
-        private class languageTextbox : TextBox
-        {
-
-            private int _languageid;
-
-            public int languageid
-            {
-                set { _languageid = value; }
-                get { return _languageid; }
-            }
-
-            public languageTextbox(int languageId) : base()
-            {
-                this.TextMode = TextBoxMode.MultiLine;
-                this.Rows = 10;
-                this.Columns = 40;
-                this.Attributes.Add("style", "margin: 3px; width: 98%;");
-
-                this.languageid = languageId;
-            }
-        }
     }
 }

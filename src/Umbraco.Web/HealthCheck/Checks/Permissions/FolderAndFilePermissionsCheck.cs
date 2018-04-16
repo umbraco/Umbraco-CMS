@@ -28,9 +28,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
     {
         private readonly ILocalizedTextService _textService;
 
-        public FolderAndFilePermissionsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
+        public FolderAndFilePermissionsCheck(ILocalizedTextService textService)
         {
-            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+            _textService = textService;
         }
 
         /// <summary>
@@ -84,16 +84,16 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
             };
 
             // Run checks for required and optional paths for modify permission
-            List<string> requiredFailedPaths;
-            List<string> optionalFailedPaths;
-            var requiredPathCheckResult = FilePermissionHelper.TestDirectories(GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Required), out requiredFailedPaths);
-            var optionalPathCheckResult = FilePermissionHelper.TestDirectories(GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Optional), out optionalFailedPaths);
+            var requiredPathCheckResult = FilePermissionHelper.EnsureDirectories(
+                GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Required), out var requiredFailedPaths);
+            var optionalPathCheckResult = FilePermissionHelper.EnsureDirectories(
+                GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Optional), out var optionalFailedPaths);
 
             //now check the special folders
-            List<string> requiredFailedPaths2;
-            List<string> optionalFailedPaths2;
-            var requiredPathCheckResult2 = FilePermissionHelper.TestDirectories(GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Required), out requiredFailedPaths2, writeCausesRestart:true);
-            var optionalPathCheckResult2 = FilePermissionHelper.TestDirectories(GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Optional), out optionalFailedPaths2, writeCausesRestart: true);
+            var requiredPathCheckResult2 = FilePermissionHelper.EnsureDirectories(
+                GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Required), out var requiredFailedPaths2, writeCausesRestart:true);
+            var optionalPathCheckResult2 = FilePermissionHelper.EnsureDirectories(
+                GetPathsToCheck(pathsToCheckWithRestarts, PermissionCheckRequirement.Optional), out var optionalFailedPaths2, writeCausesRestart: true);
 
             requiredPathCheckResult = requiredPathCheckResult && requiredPathCheckResult2;
             optionalPathCheckResult = optionalPathCheckResult && optionalPathCheckResult2;
@@ -115,10 +115,10 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
             };
 
             // Run checks for required and optional paths for modify permission
-            List<string> requiredFailedPaths;
-            List<string> optionalFailedPaths;
-            var requiredPathCheckResult = FilePermissionHelper.TestFiles(GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Required), out requiredFailedPaths);
-            var optionalPathCheckResult = FilePermissionHelper.TestFiles(GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Optional), out optionalFailedPaths);
+            IEnumerable<string> requiredFailedPaths;
+            IEnumerable<string> optionalFailedPaths;
+            var requiredPathCheckResult = FilePermissionHelper.EnsureFiles(GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Required), out requiredFailedPaths);
+            var optionalPathCheckResult = FilePermissionHelper.EnsureFiles(GetPathsToCheck(pathsToCheck, PermissionCheckRequirement.Optional), out optionalFailedPaths);
 
             return GetStatus(requiredPathCheckResult, requiredFailedPaths, optionalPathCheckResult, optionalFailedPaths, PermissionCheckFor.File);
         }
@@ -133,7 +133,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
                 .ToArray();
         }
 
-        private HealthCheckStatus GetStatus(bool requiredPathCheckResult, List<string> requiredFailedPaths,
+        private HealthCheckStatus GetStatus(bool requiredPathCheckResult, IEnumerable<string> requiredFailedPaths,
             bool optionalPathCheckResult, IEnumerable<string> optionalFailedPaths,
             PermissionCheckFor checkingFor)
         {

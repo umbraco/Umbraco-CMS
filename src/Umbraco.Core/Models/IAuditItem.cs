@@ -1,9 +1,9 @@
 ﻿using System;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
-    public interface IAuditItem : IAggregateRoot
+    public interface IAuditItem : IEntity
     {
         string Comment { get; }
         AuditType AuditType { get; }

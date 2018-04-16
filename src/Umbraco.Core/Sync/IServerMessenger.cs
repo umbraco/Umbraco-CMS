@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using umbraco.interfaces;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Sync
 {
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Sync
         /// <param name="servers">The servers that compose the load balanced environment.</param>
         /// <param name="refresher">The ICacheRefresher.</param>
         /// <param name="payload">The notification content.</param>
-        void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, object payload);
+        void PerformRefresh<TPayload>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, TPayload[] payload);
 
         /// <summary>
         /// Notifies the distributed cache, for a specified <see cref="ICacheRefresher"/>.

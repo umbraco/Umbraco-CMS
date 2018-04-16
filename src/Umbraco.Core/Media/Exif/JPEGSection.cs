@@ -13,7 +13,7 @@
         public JPEGMarker Marker { get; private set; }
         /// <summary>
         /// Section header as a byte array. This is different from the header
-        /// definition in JPEG specification in that it does not include the 
+        /// definition in JPEG specification in that it does not include the
         /// two byte section length.
         /// </summary>
         public byte[] Header { get; set; }

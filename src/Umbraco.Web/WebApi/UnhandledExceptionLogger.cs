@@ -1,5 +1,6 @@
 ﻿using System.Web.Http.ExceptionHandling;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.WebApi
@@ -12,7 +13,7 @@ namespace Umbraco.Web.WebApi
         private readonly ILogger _logger;
 
         public UnhandledExceptionLogger()
-            : this(ApplicationContext.Current.ProfilingLogger.Logger)
+            : this(Current.Logger)
         {
         }
 
@@ -29,8 +30,8 @@ namespace Umbraco.Web.WebApi
                 && context.Exception != null)
             {
                 _logger.Error(context.ExceptionContext.ActionContext.ControllerContext.Controller.GetType(), "Unhandled controller exception occurred", context.Exception);
-            }            
+            }
         }
-        
+
     }
 }

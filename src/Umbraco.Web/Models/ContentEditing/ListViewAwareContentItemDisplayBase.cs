@@ -1,4 +1,4 @@
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -22,7 +22,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// Property for the entity's individual tree node URL
         /// </summary>
         /// <remarks>
-        /// This is required if the item is a child of a list view since the tree won't actually be loaded, 
+        /// This is required if the item is a child of a list view since the tree won't actually be loaded,
         /// so the app will need to go fetch the individual tree node in order to be able to load it's action list (menu)
         /// </remarks>
         [DataMember(Name = "treeNodeUrl")]

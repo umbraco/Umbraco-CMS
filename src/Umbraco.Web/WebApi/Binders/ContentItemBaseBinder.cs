@@ -18,8 +18,13 @@ using Newtonsoft.Json.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
+using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
 using IModelBinder = System.Web.Http.ModelBinding.IModelBinder;
@@ -38,16 +43,7 @@ namespace Umbraco.Web.WebApi.Binders
         where TPersisted : class, IContentBase
         where TModelSave : ContentBaseItemSave<TPersisted>
     {
-        protected ApplicationContext ApplicationContext { get; private set; }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="applicationContext"></param>
-        internal ContentItemBaseBinder(ApplicationContext applicationContext)
-        {
-            ApplicationContext = applicationContext;
-        }
+        protected ServiceContext Services => Current.Services; // fixme - inject
 
         public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
         {
@@ -96,14 +92,23 @@ namespace Umbraco.Web.WebApi.Binders
         /// <returns></returns>
         private async Task<TModelSave> GetModelAsync(HttpActionContext actionContext, ModelBindingContext bindingContext, MultipartFormDataStreamProvider provider)
         {
-            var request = actionContext.Request;
+            // note
+            //
+            // for some reason, due to the way we do async, HttpContext.Current is null
+            // which means that the 'current' UmbracoContext is null too since we are using HttpContextUmbracoContextAccessor
+            // trying to 'EnsureContext' fails because that accessor cannot access the HttpContext either to register the current UmbracoContext
+            //
+            // so either we go with an HybridUmbracoContextAccessor that relies on a ThreadStatic variable when HttpContext.Current is null
+            // and I don't like it
+            // or
+            // we try to force-set the current http context, because, hey... it's there.
+            // and then there is no need to event 'Ensure' anything
+            // read http://stackoverflow.com/questions/1992141/how-do-i-get-an-httpcontext-object-from-httpcontextbase-in-asp-net-mvc-1
 
-            //IMPORTANT!!! We need to ensure the umbraco context here because this is running in an async thread
+            // what's below works but I cannot say I am proud of it
+            var request = actionContext.Request;
             var httpContext = (HttpContextBase) request.Properties["MS_HttpContext"];
-            UmbracoContext.EnsureContext(
-                httpContext, 
-                ApplicationContext.Current,
-                new WebSecurity(httpContext, ApplicationContext.Current));
+            HttpContext.Current = httpContext.ApplicationInstance.Context;
 
             var content = request.Content;
 
@@ -121,7 +126,7 @@ namespace Umbraco.Web.WebApi.Binders
 
             //deserialize into our model
             var model = JsonConvert.DeserializeObject<TModelSave>(contentItem);
-            
+
             //get the default body validator and validate the object
             var bodyValidator = actionContext.ControllerContext.Configuration.Services.GetBodyModelValidator();
             var metadataProvider = actionContext.ControllerContext.Configuration.Services.GetModelMetadataProvider();
@@ -131,7 +136,7 @@ namespace Umbraco.Web.WebApi.Binders
             //get the files
             foreach (var file in result.FileData)
             {
-                //The name that has been assigned in JS has 2 parts and the second part indicates the property id 
+                //The name that has been assigned in JS has 2 parts and the second part indicates the property id
                 // for which the file belongs.
                 var parts = file.Headers.ContentDisposition.Name.Trim(new char[] { '\"' }).Split('_');
                 if (parts.Length != 2)
@@ -141,10 +146,10 @@ namespace Umbraco.Web.WebApi.Binders
                     throw new HttpResponseException(response);
                 }
                 var propAlias = parts[1];
-             
+
                 var fileName = file.Headers.ContentDisposition.FileName.Trim(new char[] {'\"'});
 
-                model.UploadedFiles.Add(new ContentItemFile
+                model.UploadedFiles.Add(new ContentPropertyFile
                     {
                         TempFilePath = file.LocalFileName,
                         PropertyAlias = propAlias,
@@ -154,24 +159,24 @@ namespace Umbraco.Web.WebApi.Binders
 
             if (ContentControllerBase.IsCreatingAction(model.Action))
             {
-                //we are creating new content                          
+                //we are creating new content
                 model.PersistedContent = CreateNew(model);
             }
             else
             {
                 //finally, let's lookup the real content item and create the DTO item
-                model.PersistedContent = GetExisting(model);                
+                model.PersistedContent = GetExisting(model);
             }
-            
+
             //create the dto from the persisted model
             if (model.PersistedContent != null)
             {
-                model.ContentDto = MapFromPersisted(model);  
+                model.ContentDto = MapFromPersisted(model);
             }
             if (model.ContentDto != null)
             {
                 //now map all of the saved values to the dto
-                MapPropertyValuesFromSaved(model, model.ContentDto);    
+                MapPropertyValuesFromSaved(model, model.ContentDto);
             }
 
             model.Name = model.Name.Trim();
@@ -192,7 +197,7 @@ namespace Umbraco.Web.WebApi.Binders
                 foreach (var propertyDto in dto.Properties)
                 {
                     if (propertyDto.Alias != p.Alias) continue;
-                    propertyDto.Value = p.Value;                        
+                    propertyDto.Value = p.Value;
                     break;
                 }
             }

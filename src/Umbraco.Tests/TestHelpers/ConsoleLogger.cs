@@ -6,41 +6,100 @@ namespace Umbraco.Tests.TestHelpers
 {
     public class ConsoleLogger : ILogger
     {
-        public void Error(Type callingType, string message, Exception exception)
+        public void Error(Type reporting, string message, Exception exception)
         {
-            Console.WriteLine("INFO {0} - {1}", callingType.Name, message);
+            Console.WriteLine("INFO {0} - {1}", reporting.Name, message);
             Console.WriteLine(exception);
         }
 
-        public void Warn(Type callingType, string message, params Func<object>[] formatItems)
+        public void Warn(Type reporting, string message)
         {
-            Console.WriteLine("WARN {0} - {1}", callingType.Name, string.Format(message, formatItems.Select(x => x()).ToArray()));
+            Console.WriteLine("WARN {0} - {1}", reporting.Name, message);
         }
 
-        public void WarnWithException(Type callingType, string message, Exception e, params Func<object>[] formatItems)
+        public void Warn(Type reporting, Func<string> messageBuilder)
         {
-            Console.WriteLine("WARN {0} - {1}", callingType.Name, string.Format(message, formatItems.Select(x => x()).ToArray()));
+            Console.WriteLine("WARN {0} - {1}", reporting.Name, messageBuilder());
+        }
+
+        public void Warn(Type reporting, string format, params object[] args)
+        {
+            Console.WriteLine("WARN {0} - {1}", reporting.Name, string.Format(format, args));
+        }
+
+        public void Warn(Type reporting, string format, params Func<object>[] args)
+        {
+            Console.WriteLine("WARN {0} - {1}", reporting.Name, string.Format(format, args.Select(x => x()).ToArray()));
+        }
+
+        public void Warn(Type reporting, Exception exception, string message)
+        {
+            Console.WriteLine("WARN {0} - {1}", reporting.Name, message);
+            Console.WriteLine(exception);
+        }
+
+        public void Warn(Type reporting, Exception exception, Func<string> messageBuilder)
+        {
+            Console.WriteLine("WARN {0} - {1}", reporting.Name, messageBuilder());
+            Console.WriteLine(exception);
+        }
+
+        public void Warn(Type reporting, Exception exception, string format, params object[] args)
+        {
+            Console.WriteLine("WARN {0} - {1}", reporting.Name, string.Format(format, args));
+            Console.WriteLine(exception);
+        }
+
+        public void Warn(Type reporting, Exception exception, string format, params Func<object>[] args)
+        {
+            Console.WriteLine("WARN {0} - {1}", reporting.Name, string.Format(format, args.Select(x => x()).ToArray()));
+            Console.WriteLine(exception);
+        }
+
+        public void WarnWithException(Type reporting, string format, Exception e, params Func<object>[] args)
+        {
+            Console.WriteLine("WARN {0} - {1}", reporting.Name, string.Format(format, args.Select(x => x()).ToArray()));
             Console.WriteLine(e);
         }
 
-        public void Info(Type callingType, Func<string> generateMessage)
+        public void Info(Type reporting, Func<string> generateMessage)
         {
-            Console.WriteLine("INFO {0} - {1}", callingType.Name, generateMessage());
+            Console.WriteLine("INFO {0} - {1}", reporting.Name, generateMessage());
         }
 
-        public void Info(Type type, string generateMessageFormat, params Func<object>[] formatItems)
+        public void Info(Type reporting, string format, params object[] args)
         {
-            Console.WriteLine("INFO {0} - {1}", type.Name, string.Format(generateMessageFormat, formatItems.Select(x => x()).ToArray()));
+            Console.WriteLine("INFO {0} - {1}", reporting.Name, string.Format(format, args));
         }
 
-        public void Debug(Type callingType, Func<string> generateMessage)
+        public void Info(Type reporting, string format, params Func<object>[] args)
         {
-            Console.WriteLine("DEBUG {0} - {1}", callingType.Name, generateMessage());
+            Console.WriteLine("INFO {0} - {1}", reporting.Name, string.Format(format, args.Select(x => x()).ToArray()));
         }
 
-        public void Debug(Type type, string generateMessageFormat, params Func<object>[] formatItems)
+        public void Info(Type reporting, string message)
         {
-            Console.WriteLine("DEBUG {0} - {1}", type.Name, string.Format(generateMessageFormat, formatItems.Select(x => x()).ToArray()));
+            Console.WriteLine("INFO {0} - {1}", reporting.Name, message);
+        }
+
+        public void Debug(Type reporting, string message)
+        {
+            Console.WriteLine("DEBUG {0} - {1}", reporting.Name, message);
+        }
+
+        public void Debug(Type reporting, Func<string> messageBuilder)
+        {
+            Console.WriteLine("DEBUG {0} - {1}", reporting.Name, messageBuilder());
+        }
+
+        public void Debug(Type reporting, string format, params object[] args)
+        {
+            Console.WriteLine("DEBUG {0} - {1}", reporting.Name, string.Format(format, args));
+        }
+
+        public void Debug(Type reporting, string format, params Func<object>[] args)
+        {
+            Console.WriteLine("DEBUG {0} - {1}", reporting.Name, string.Format(format, args.Select(x => x()).ToArray()));
         }
     }
 }

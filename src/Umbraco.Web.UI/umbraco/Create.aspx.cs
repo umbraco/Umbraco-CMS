@@ -6,6 +6,7 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Web._Legacy.UI;
 
 namespace Umbraco.Web.UI.Umbraco
 {
@@ -31,7 +32,7 @@ namespace Umbraco.Web.UI.Umbraco
         {
             return LegacyDialogHandler.UserHasCreateAccess(
                 new HttpContextWrapper(Context),
-                getUser(),
+                Security.CurrentUser,
                 nodeTypeAlias);
         }
 

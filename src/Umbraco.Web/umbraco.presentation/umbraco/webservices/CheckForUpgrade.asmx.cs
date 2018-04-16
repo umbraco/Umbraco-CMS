@@ -6,6 +6,9 @@ using System.Web.Script.Services;
 using Umbraco.Core;
 using Umbraco.Web.WebServices;
 using Umbraco.Core.Configuration;
+using Umbraco.Web;
+using Umbraco.Web.Composing;
+using Umbraco.Web.Install;
 
 
 namespace umbraco.presentation.webservices
@@ -40,12 +43,12 @@ namespace umbraco.presentation.webservices
         {
             bool isUpgrade = false;
             // if it's an upgrade, you'll need to be logged in before we allow this call
-            if (!String.IsNullOrEmpty(global::Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus))
+            if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) == false)
             {
                 isUpgrade = true;
                 try
                 {
-                    legacyAjaxCalls.Authorize();
+                    AuthorizeRequest(true);
                 }
                 catch (Exception)
                 {
@@ -56,10 +59,10 @@ namespace umbraco.presentation.webservices
 
             // Check for current install Id
             Guid installId = Guid.NewGuid();
-            var installCookie = new BusinessLogic.StateHelper.Cookies.Cookie("umb_installId", 1);
-            if (string.IsNullOrEmpty(installCookie.GetValue()) == false)
+            var installCookie = Context.Request.GetCookieValue(Constants.Web.InstallerCookieName);
+            if (string.IsNullOrEmpty(installCookie) == false)
             {
-                if (Guid.TryParse(installCookie.GetValue(), out installId))
+                if (Guid.TryParse(installCookie, out installId))
                 {
                     // check that it's a valid Guid
                     if (installId == Guid.Empty)
@@ -67,11 +70,11 @@ namespace umbraco.presentation.webservices
 
                 }
             }
-            installCookie.SetValue(installId.ToString());
+            Context.Response.Cookies.Set(new HttpCookie(Constants.Web.InstallerCookieName, installId.ToString()));
 
             string dbProvider = string.Empty;
-            if (string.IsNullOrEmpty(global::Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus) == false)
-            dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
+            if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) == false)
+            dbProvider = InstallHelper.GetDbProviderString(Current.SqlContext);
 
             var check = new global::Umbraco.Web.org.umbraco.update.CheckForUpgrade();
             check.Install(installId,

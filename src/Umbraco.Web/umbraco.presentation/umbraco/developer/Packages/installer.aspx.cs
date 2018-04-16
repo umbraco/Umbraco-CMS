@@ -1,25 +1,16 @@
 ﻿using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Globalization;
 using System.Threading;
-using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using System.Xml;
-using System.Xml.XPath;
 using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
-using BizLogicAction = umbraco.BusinessLogic.Actions.Action;
+using Umbraco.Web.Composing;
+using Umbraco.Web.UI.Pages;
+using BizLogicAction = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.presentation.developer.packages
 {
@@ -31,8 +22,8 @@ namespace umbraco.presentation.developer.packages
     {
         public Installer()
         {
-            CurrentApp = DefaultApps.developer.ToString();
-            _installer = new cms.businesslogic.packager.Installer(UmbracoUser.Id);
+            CurrentApp = Constants.Applications.Developer.ToString();
+            _installer = new cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
         }
 
         private Control _configControl;
@@ -48,8 +39,8 @@ namespace umbraco.presentation.developer.packages
             if (!cms.businesslogic.packager.Settings.HasFileAccess(ref ex))
             {
                 fb.Style.Add("margin-top", "7px");
-                fb.type = uicontrols.Feedback.feedbacktype.error;
-                fb.Text = "<strong>" + ui.Text("errors", "filePermissionsError") + ":</strong><br/>" + ex.Message;
+                fb.type = Umbraco.Web._Legacy.Controls.Feedback.feedbacktype.error;
+                fb.Text = "<strong>" + Services.TextService.Localize("errors/filePermissionsError") + ":</strong><br/>" + ex.Message;
             }
 
             if (!IsPostBack)
@@ -58,10 +49,10 @@ namespace umbraco.presentation.developer.packages
                 ButtonLoadPackage.Attributes.Add("onClick", "jQuery(this).hide(); jQuery('#loadingbar').show();; return true;");
             }
 
-            //if we are actually in the middle of installing something... meaning we keep redirecting back to this page with 
-            // custom query strings 
+            //if we are actually in the middle of installing something... meaning we keep redirecting back to this page with
+            // custom query strings
             // TODO: SD: This process needs to be fixed/changed/etc... to use the InstallPackageController
-            //	http://issues.umbraco.org/issue/U4-1047
+            //    http://issues.umbraco.org/issue/U4-1047
             if (!string.IsNullOrEmpty(Request.GetItemAsString("installing")))
             {
                 HideAllPanes();
@@ -84,7 +75,7 @@ namespace umbraco.presentation.developer.packages
                     if (!pack.Protected)
                     {
                         //if it isn't then go straigt to the accept licens screen
-                        tempFile.Value = _installer.Import(_repo.fetch(Request.GetItemAsString("guid"), UmbracoUser.Id));
+                        tempFile.Value = _installer.Import(_repo.fetch(Request.GetItemAsString("guid"), Security.CurrentUser.Id));
                         UpdateSettings();
 
                     }
@@ -100,7 +91,7 @@ namespace umbraco.presentation.developer.packages
                 else
                 {
                     fb.Style.Add("margin-top", "7px");
-                    fb.type = uicontrols.Feedback.feedbacktype.error;
+                    fb.type = Umbraco.Web._Legacy.Controls.Feedback.feedbacktype.error;
                     fb.Text = "<strong>No connection to repository.</strong> Runway could not be installed as there was no connection to: '" + _repo.RepositoryUrl + "'";
                     pane_upload.Visible = false;
                 }
@@ -125,7 +116,7 @@ namespace umbraco.presentation.developer.packages
             }
             catch (Exception ex)
             {
-                fb.type = global::umbraco.uicontrols.Feedback.feedbacktype.error;
+                fb.type = global::Umbraco.Web._Legacy.Controls.Feedback.feedbacktype.error;
                 fb.Text = "<strong>Could not upload file</strong><br/>" + ex.ToString();
             }
         }
@@ -139,7 +130,7 @@ namespace umbraco.presentation.developer.packages
             //if we auth correctly and get a valid key back, we will fetch the file from the repo webservice.
             if (string.IsNullOrEmpty(memberGuid) == false)
             {
-                tempFile.Value = _installer.Import(_repo.fetch(helper.Request("guid"), memberGuid));
+                tempFile.Value = _installer.Import(_repo.fetch(Request.GetItemAsString("guid"), memberGuid));
                 UpdateSettings();
             }
         }
@@ -163,10 +154,6 @@ namespace umbraco.presentation.developer.packages
                 }
             }
 
-            if (_installer.ContainsLegacyPropertyEditors)
-            {
-                LegacyPropertyEditorPanel.Visible = true;
-            }
 
             if (_installer.ContainsBinaryFileErrors)
             {
@@ -232,7 +219,9 @@ namespace umbraco.presentation.developer.packages
 
 
                     //making sure that publishing actions performed from the cms layer gets pushed to the presentation
-                    library.RefreshContent();
+                    // library.RefreshContent is obsolete, would need to RefreshAll...,
+                    // but it should be managed automatically by services and caches!
+                    //DistributedCache.Instance.RefreshAll...();
 
                     if (string.IsNullOrEmpty(_installer.Control) == false)
                     {
@@ -299,7 +288,7 @@ namespace umbraco.presentation.developer.packages
             bt_viewInstalledPackage.OnClientClick = "document.location = '" + packageViewUrl + "'; return false;";
 
             if (!string.IsNullOrEmpty(url))
-                lit_authorUrl.Text = " <em>" + ui.Text("or") + "</em> <a href='" + url + "' target=\"_blank\">" + ui.Text("viewPackageWebsite") + "</a>";
+                lit_authorUrl.Text = " <em>" + Services.TextService.Localize("or") + "</em> <a href='" + url + "' target=\"_blank\">" + Services.TextService.Localize("viewPackageWebsite") + "</a>";
 
 
             pane_success.Visible = true;
@@ -350,30 +339,21 @@ namespace umbraco.presentation.developer.packages
         }
 
         /// <summary>
-        /// Runs Post refresh actions such reloading the correct tree nodes, etc...
-        /// </summary>
-        private void PerformPostRefreshAction()
-        {
-            BasePage.Current.ClientTools.ReloadActionNode(true, true);
-        }
-
-        /// <summary>
         /// Runs Post install actions such as clearning any necessary cache, reloading the correct tree nodes, etc...
         /// </summary>
         /// <param name="packageId"></param>
         /// <param name="dir"></param>
         private void PerformPostInstallCleanup(int packageId, string dir)
-        {   
+        {
             _installer.InstallCleanUp(packageId, dir);
 
             // Update ClientDependency version
-            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(LoggerResolver.Current.Logger);
+            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(Current.Logger);
             var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
-            
+
             //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.
             ClientTools.ClearClientTreeCache().RefreshTree("packager");
             TreeDefinitionCollection.Instance.ReRegisterTrees();
-            BizLogicAction.ReRegisterActionsAndHandlers();
         }
 
         //this accepts the package, creates the manifest and then installs the files.
@@ -384,14 +364,14 @@ namespace umbraco.presentation.developer.packages
 
             _installer.LoadConfig(tempFile.Value);
 
-            int pId = _installer.CreateManifest(tempFile.Value, helper.Request("guid"), helper.Request("repoGuid"));
+            int pId = _installer.CreateManifest(tempFile.Value, Request.GetItemAsString("guid"), Request.GetItemAsString("repoGuid"));
 
             //and then copy over the files. This will take some time if it contains .dlls that will reboot the system..
             _installer.InstallFiles(pId, tempFile.Value);
 
-            //TODO: This is a total hack, we need to refactor the installer to be just like the package installer during the 
+            //TODO: This is a total hack, we need to refactor the installer to be just like the package installer during the
             // install process and use AJAX to ensure that app pool restarts and restarts PROPERLY before installing the business
-            // logic. Until then, we are going to put a thread sleep here for 2 seconds in hopes that we always fluke out and the app 
+            // logic. Until then, we are going to put a thread sleep here for 2 seconds in hopes that we always fluke out and the app
             // pool will be restarted after redirect.
             Thread.Sleep(2000);
 
@@ -416,7 +396,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.UmbracoPanel Panel1;
+        protected global::Umbraco.Web._Legacy.Controls.UmbracoPanel Panel1;
 
         /// <summary>
         /// fb control.
@@ -425,7 +405,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Feedback fb;
+        protected global::Umbraco.Web._Legacy.Controls.Feedback fb;
 
         /// <summary>
         /// pane_upload control.
@@ -434,7 +414,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_upload;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_upload;
 
         /// <summary>
         /// PropertyPanel9 control.
@@ -443,7 +423,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel9;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel9;
 
         /// <summary>
         /// file1 control.
@@ -470,7 +450,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.ProgressBar progbar1;
+        protected global::Umbraco.Web._Legacy.Controls.ProgressBar progbar1;
 
         /// <summary>
         /// pane_authenticate control.
@@ -479,7 +459,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_authenticate;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_authenticate;
 
         /// <summary>
         /// tb_email control.
@@ -497,7 +477,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel1;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel1;
 
         /// <summary>
         /// tb_password control.
@@ -515,7 +495,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel2;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel2;
 
         /// <summary>
         /// Button1 control.
@@ -542,7 +522,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_acceptLicenseInner;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_acceptLicenseInner;
 
         /// <summary>
         /// PropertyPanel3 control.
@@ -551,7 +531,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel3;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel3;
 
         /// <summary>
         /// LabelName control.
@@ -569,7 +549,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel5;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel5;
 
         /// <summary>
         /// LabelAuthor control.
@@ -587,7 +567,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel4;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel4;
 
         /// <summary>
         /// LabelMore control.
@@ -605,7 +585,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel6;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel6;
 
         /// <summary>
         /// LabelLicense control.
@@ -623,7 +603,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel7;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel7;
 
         /// <summary>
         /// acceptCheckbox control.
@@ -641,7 +621,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel8;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel PropertyPanel8;
 
         /// <summary>
         /// readme control.
@@ -659,7 +639,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_unsecureFiles;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_unsecureFiles;
 
         /// <summary>
         /// lt_files control.
@@ -677,7 +657,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_macroConflicts;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_macroConflicts;
 
         /// <summary>
         /// ltrMacroAlias control.
@@ -695,10 +675,10 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_templateConflicts;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_templateConflicts;
 
-        protected global::umbraco.uicontrols.PropertyPanel BinaryFileErrorsPanel;
-        protected global::umbraco.uicontrols.PropertyPanel LegacyPropertyEditorPanel;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel BinaryFileErrorsPanel;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel LegacyPropertyEditorPanel;
         protected global::System.Web.UI.WebControls.Literal BinaryFileErrorReport;
 
         /// <summary>
@@ -717,7 +697,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.PropertyPanel pp_stylesheetConflicts;
+        protected global::Umbraco.Web._Legacy.Controls.PropertyPanel pp_stylesheetConflicts;
 
         /// <summary>
         /// ltrStylesheetNames control.
@@ -735,7 +715,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.ProgressBar _progbar1;
+        protected global::Umbraco.Web._Legacy.Controls.ProgressBar _progbar1;
 
         /// <summary>
         /// ButtonInstall control.
@@ -753,9 +733,9 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_installing;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_installing;
 
-        protected global::umbraco.uicontrols.Pane pane_uninstalled;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_uninstalled;
 
 
         /// <summary>
@@ -765,7 +745,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.ProgressBar progBar2;
+        protected global::Umbraco.Web._Legacy.Controls.ProgressBar progBar2;
 
         /// <summary>
         /// lit_installStatus control.
@@ -783,7 +763,7 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_optional;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_optional;
 
         /// <summary>
         /// pane_success control.
@@ -792,9 +772,9 @@ namespace umbraco.presentation.developer.packages
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_success;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_success;
 
-        protected global::umbraco.uicontrols.Pane pane_refresh;
+        protected global::Umbraco.Web._Legacy.Controls.Pane pane_refresh;
 
         /// <summary>
         /// bt_viewInstalledPackage control.

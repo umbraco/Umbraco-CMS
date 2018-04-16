@@ -49,7 +49,7 @@ namespace Umbraco.Web.Editors
             var template = Services.FileService.GetTemplate(id);
             if (template == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            
+
             return Mapper.Map<ITemplate, TemplateDisplay>(template);
         }
 
@@ -87,7 +87,7 @@ namespace Umbraco.Web.Editors
 
             var content = ViewHelper.GetDefaultFileContent( layoutPageAlias: dt.MasterTemplateAlias );
             var scaffold = Mapper.Map<ITemplate, TemplateDisplay>(dt);
-           
+
             scaffold.Content =  content + "\r\n\r\n@* the fun starts here *@\r\n\r\n";
             return scaffold;
         }
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState));
             }
-            
+
             if (display.Id > 0)
             {
                 // update
@@ -138,7 +138,7 @@ namespace Umbraco.Web.Editors
                             {
                                 //template ID to find
                                 var templateIdInPath = "," + display.Id + ",";
-                                
+
                                 if (string.IsNullOrEmpty(childTemplate.Path))
                                 {
                                     continue;

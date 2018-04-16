@@ -1,8 +1,7 @@
 <%@ Page Language="c#" MasterPageFile="../../../masterpages/umbracoPage.Master" CodeBehind="EditStyleSheetProperty.aspx.cs"
   AutoEventWireup="True" Inherits="Umbraco.Web.UI.Umbraco.Settings.Stylesheet.Property.EditStyleSheetProperty"
   ValidateRequest="False" %>
-
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
   <cc1:UmbracoPanel ID="Panel1" runat="server" Text="Edit stylesheet property" Width="432px" Height="176px" hasMenu="true">
@@ -10,26 +9,26 @@
       <table cellspacing="0" cellpadding="4" border="0">
         <tr>
           <th width="30%">
-            <%=umbraco.ui.Text("name", UmbracoUser)%>:
+              <%=Services.TextService.Localize("name")%>
           </th>
           <td class="propertyContent">
             <asp:HiddenField runat="server" ID="OriginalName"/>
             <asp:TextBox ID="NameTxt" Width="350px" runat="server" /><br />
-            <small><%=umbraco.ui.Text("stylesheet", "nameHelp", UmbracoUser)%></small>
+            <small><%=Services.TextService.Localize("stylesheet/nameHelp")%></small>
           </td>
         </tr>
         <tr>
           <th width="30%">
-            <%=umbraco.ui.Text("alias", UmbracoUser)%>:
+            <%=Services.TextService.Localize("alias")%>:
           </th>
           <td class="propertyContent">
             <asp:TextBox ID="AliasTxt" Width="350px" runat="server" /><br />
-            <small><%=umbraco.ui.Text("stylesheet", "aliasHelp", UmbracoUser)%></small>
+            <small><%=Services.TextService.Localize("stylesheet/aliasHelp")%></small>
           </td>
         </tr>
         <tr>
           <th width="30%">
-            <%=umbraco.ui.Text("styles", UmbracoUser)%>:
+              <%=Services.TextService.Localize("styles")%>
           </th>
           <td class="propertyContent">
             <asp:TextBox ID="Content" Style="width: 350px" TextMode="MultiLine" runat="server" />
@@ -39,7 +38,7 @@
         </tr>
         <tr>
           <th width="30%">
-            <%=umbraco.ui.Text("preview", UmbracoUser)%>:
+              <%=Services.TextService.Localize("preview")%>
           </th>
           <td class="propertyContent">
             <div id="preview" style="padding: 10px; border: 1px solid #ccc; width: 330px;">

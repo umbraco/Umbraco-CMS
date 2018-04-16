@@ -1,308 +1,250 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using log4net;
+using LightInject;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Core.ObjectResolution;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core
 {
-
     /// <summary>
-    /// The abstract class for the Umbraco HttpApplication
+    /// Provides an abstract base class for the Umbraco HttpApplication.
     /// </summary>
-    /// <remarks>
-    /// This is exposed in the core so that we can have the IApplicationEventHandler in the core project so that
-    /// IApplicationEventHandler's can fire/execute outside of the web contenxt (i.e. in console applications)
-    /// </remarks>
-    public abstract class UmbracoApplicationBase : System.Web.HttpApplication
+    public abstract class UmbracoApplicationBase : HttpApplication
     {
-
-        public static event EventHandler ApplicationStarting;
-        public static event EventHandler ApplicationStarted;
+        private IRuntime _runtime;
 
         /// <summary>
-        /// Called when the HttpApplication.Init() is fired, allows developers to subscribe to the HttpApplication events
+        /// Gets a runtime.
         /// </summary>
+        protected abstract IRuntime GetRuntime();
+
+        /// <summary>
+        /// Gets a logger.
+        /// </summary>
+        protected virtual ILogger GetLogger()
+        {
+            return Logger.CreateWithDefaultLog4NetConfiguration();
+        }
+
+        // events - in the order they trigger
+
+        // were part of the BootManager architecture, would trigger only for the initial
+        // application, so they need not be static, and they would let ppl hook into the
+        // boot process... but I believe this can be achieved with components as well and
+        // we don't need these events.
+        //public event EventHandler ApplicationStarting;
+        //public event EventHandler ApplicationStarted;
+
+        // this event can only be static since there will be several instances of this class
+        // triggers for each application instance, ie many times per lifetime of the application
         public static event EventHandler ApplicationInit;
 
-        /// <summary>
-        /// Boots up the Umbraco application
-        /// </summary>
-        internal void StartApplication(object sender, EventArgs e)
+        // this event can only be static since there will be several instances of this class
+        // triggers once per error
+        public static event EventHandler ApplicationError;
+
+        // this event can only be static since there will be several instances of this class
+        // triggers once per lifetime of the application, before it is unloaded
+        public static event EventHandler ApplicationEnd;
+
+        #region Start
+
+        // internal for tests
+        internal void HandleApplicationStart(object sender, EventArgs evargs)
+        {
+            // ******** THIS IS WHERE EVERYTHING BEGINS ********
+
+            // create the container for the application, and configure.
+            // the boot manager is responsible for registrations
+            var container = new ServiceContainer();
+            container.ConfigureUmbracoCore(); // also sets Current.Container
+
+            // register the essential stuff,
+            // ie the global application logger
+            // (profiler etc depend on boot manager)
+            var logger = GetLogger();
+            container.RegisterInstance(logger);
+            // now it is ok to use Current.Logger
+
+            ConfigureUnhandledException(logger);
+            ConfigureAssemblyResolve(logger);
+
+            // get runtime & boot
+            _runtime = GetRuntime();
+            _runtime.Boot(container);
+        }
+
+        protected virtual void ConfigureUnhandledException(ILogger logger)
         {
             //take care of unhandled exceptions - there is nothing we can do to
             // prevent the entire w3wp process to go down but at least we can try
             // and log the exception
             AppDomain.CurrentDomain.UnhandledException += (_, args) =>
             {
-                var exception = (Exception) args.ExceptionObject;
+                var exception = (Exception)args.ExceptionObject;
                 var isTerminating = args.IsTerminating; // always true?
 
                 var msg = "Unhandled exception in AppDomain";
                 if (isTerminating) msg += " (terminating)";
-                LogHelper.Error<UmbracoApplicationBase>(msg, exception);
+                msg += ".";
+                logger.Error<UmbracoApplicationBase>(msg, exception);
             };
-
-            //boot up the application
-            GetBootManager()
-                .Initialize()
-                .Startup(appContext => OnApplicationStarting(sender, e))
-                .Complete(appContext => OnApplicationStarted(sender, e));
-
-            //And now we can dispose of our startup handlers - save some memory
-            ApplicationEventsResolver.Current.Dispose();
-
-            // after Umbraco has started there is a scope in "context" and that context is
-            // going to stay there and never get destroyed nor reused, so we have to ensure that
-            // the scope is disposed (along with database etc) - reset it all entirely
-            var scopeProvider = ApplicationContext.Current.ScopeProvider as ScopeProvider;
-            if (scopeProvider != null) // can be mocked...
-                scopeProvider.Reset();
         }
-        
-        /// <summary>
-        /// Initializes the Umbraco application
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected void Application_Start(object sender, EventArgs e)
+
+        protected virtual void ConfigureAssemblyResolve(ILogger logger)
+        {
+            // When an assembly can't be resolved. In here we can do magic with the assembly name and try loading another.
+            // This is used for loading a signed assembly of AutoMapper (v. 3.1+) without having to recompile old code.
+            AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
+            {
+                // ensure the assembly is indeed AutoMapper and that the PublicKeyToken is null before trying to Load again
+                // do NOT just replace this with 'return Assembly', as it will cause an infinite loop -> stackoverflow
+                if (args.Name.StartsWith("AutoMapper") && args.Name.EndsWith("PublicKeyToken=null"))
+                    return Assembly.Load(args.Name.Replace(", PublicKeyToken=null", ", PublicKeyToken=be96cd2c38ef1005"));
+                return null;
+            };
+        }
+
+        // called by ASP.NET (auto event wireup) once per app domain
+        // do NOT set instance data here - only static (see docs)
+        // sender is System.Web.HttpApplicationFactory, evargs is EventArgs.Empty
+        protected void Application_Start(object sender, EventArgs evargs)
         {
             Thread.CurrentThread.SanitizeThreadCulture();
-            StartApplication(sender, e);
+            HandleApplicationStart(sender, evargs);
         }
 
-        /// <summary>
-        /// Override init and raise the event
-        /// </summary>
-        /// <remarks>
-        /// DID YOU KNOW? The Global.asax Init call is the thing that initializes all of the httpmodules, ties up a bunch of stuff with IIS, etc...
-        /// Therefore, since OWIN is an HttpModule when running in IIS/ASP.Net the OWIN startup is not executed until this method fires and by that
-        /// time, Umbraco has performed it's bootup sequence.
-        /// </remarks>
+        #endregion
+
+        #region Init
+
+        private void OnApplicationInit(object sender, EventArgs evargs)
+        {
+            TryInvoke(ApplicationInit, "ApplicationInit", sender, evargs);
+        }
+
+        // called by ASP.NET for every HttpApplication instance after all modules have been created
+        // which means that this will be called *many* times for different apps when Umbraco runs
         public override void Init()
         {
+            // note: base.Init() is what initializes all of the httpmodules, ties up a bunch of stuff with IIS, etc...
+            // therefore, since OWIN is an HttpModule when running in IIS/ASP.Net the OWIN startup is not executed
+            // until this method fires and by that time - Umbraco has booted already
+
             base.Init();
             OnApplicationInit(this, new EventArgs());
         }
 
-        /// <summary>
-        /// Developers can override this method to modify objects on startup
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected virtual void OnApplicationStarting(object sender, EventArgs e)
-        {
-            if (ApplicationStarting != null)
-            {
-                try
-                {
-                    ApplicationStarting(sender, e);
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<UmbracoApplicationBase>("An error occurred in an ApplicationStarting event handler", ex);
-                    throw;
-                }
-            }
 
+        #endregion
+
+        #region End
+
+        protected virtual void OnApplicationEnd(object sender, EventArgs evargs)
+        {
+            ApplicationEnd?.Invoke(this, EventArgs.Empty);
         }
 
-        /// <summary>
-        /// Developers can override this method to do anything they need to do once the application startup routine is completed.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected virtual void OnApplicationStarted(object sender, EventArgs e)
+        // internal for tests
+        internal void HandleApplicationEnd()
         {
-            if (ApplicationStarted != null)
+            if (_runtime != null)
             {
-                try
-                {
-                    ApplicationStarted(sender, e);
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<UmbracoApplicationBase>("An error occurred in an ApplicationStarted event handler", ex);
-                    throw;
-                }
-            }
-        }
+                _runtime.Terminate();
+                _runtime.DisposeIfDisposable();
 
-        /// <summary>
-        /// Called to raise the ApplicationInit event
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnApplicationInit(object sender, EventArgs e)
-        {
-            if (ApplicationInit != null)
+                _runtime = null;
+            }
+
+            Current.Reset(); // dispose the container and everything
+
+            if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted) return;
+
+            // try to log the detailed shutdown message (typical asp.net hack: http://weblogs.asp.net/scottgu/433194)
+            try
             {
-                try
-                {
-                    ApplicationInit(sender, e);
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<UmbracoApplicationBase>("An error occurred in an ApplicationInit event handler", ex);
-                    throw;
-                }
+                var runtime = (HttpRuntime) typeof(HttpRuntime).InvokeMember("_theRuntime",
+                    BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.GetField,
+                    null, null, null);
+                if (runtime == null)
+                    return;
+
+                var shutDownMessage = (string)runtime.GetType().InvokeMember("_shutDownMessage",
+                    BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField,
+                    null, runtime, null);
+
+                var shutDownStack = (string)runtime.GetType().InvokeMember("_shutDownStack",
+                    BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField,
+                    null, runtime, null);
+
+                var shutdownMsg = $"Application shutdown. Details: {HostingEnvironment.ShutdownReason}\r\n\r\n_shutDownMessage={shutDownMessage}\r\n\r\n_shutDownStack={shutDownStack}";
+
+                Current.Logger.Info<UmbracoApplicationBase>(shutdownMsg);
+            }
+            catch (Exception)
+            {
+                //if for some reason that fails, then log the normal output
+                Current.Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
             }
         }
 
-        /// <summary>
-        /// A method that can be overridden to invoke code when the application has an error.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected virtual void OnApplicationError(object sender, EventArgs e)
+        // called by ASP.NET (auto event wireup) once per app domain
+        // sender is System.Web.HttpApplicationFactory, evargs is EventArgs.Empty
+        protected void Application_End(object sender, EventArgs evargs)
         {
-
-        }
-
-        protected void Application_Error(object sender, EventArgs e)
-        {
-            // Code that runs when an unhandled error occurs
-
-            // Get the exception object.
-            var exc = Server.GetLastError();
-
-            // Ignore HTTP errors
-            if (exc.GetType() == typeof(HttpException))
-            {
-                return;
-            }
-
-            Logger.Error<UmbracoApplicationBase>("An unhandled exception occurred", exc);
-
-            OnApplicationError(sender, e);
-        }
-
-        /// <summary>
-        /// A method that can be overridden to invoke code when the application shuts down.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected virtual void OnApplicationEnd(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void Application_End(object sender, EventArgs e)
-        {
-            if (SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
-            {
-                //Try to log the detailed shutdown message (typical asp.net hack: http://weblogs.asp.net/scottgu/433194)
-                try
-                {
-                    var runtime = (HttpRuntime)typeof(HttpRuntime).InvokeMember("_theRuntime",
-                                BindingFlags.NonPublic
-                                | BindingFlags.Static
-                                | BindingFlags.GetField,
-                                null,
-                                null,
-                                null);
-                    if (runtime == null)
-                        return;
-
-                    var shutDownMessage = (string)runtime.GetType().InvokeMember("_shutDownMessage",
-                        BindingFlags.NonPublic
-                        | BindingFlags.Instance
-                        | BindingFlags.GetField,
-                        null,
-                        runtime,
-                        null);
-
-                    var shutDownStack = (string)runtime.GetType().InvokeMember("_shutDownStack",
-                        BindingFlags.NonPublic
-                        | BindingFlags.Instance
-                        | BindingFlags.GetField,
-                        null,
-                        runtime,
-                        null);
-
-                    var shutdownMsg = string.Format("{0}\r\n\r\n_shutDownMessage={1}\r\n\r\n_shutDownStack={2}",
-                        HostingEnvironment.ShutdownReason,
-                        shutDownMessage,
-                        shutDownStack);
-
-                    Logger.Info<UmbracoApplicationBase>("Application shutdown. Details: " + shutdownMsg);
-                }
-                catch (Exception)
-                {
-                    //if for some reason that fails, then log the normal output
-                    Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
-                }
-            }
-            OnApplicationEnd(sender, e);
-
-            //Last thing to do is shutdown log4net
+            HandleApplicationEnd();
+            OnApplicationEnd(sender, evargs);
             LogManager.Shutdown();
         }
 
-        protected abstract IBootManager GetBootManager();
+        #endregion
 
-        protected ILogger Logger
+        #region Error
+
+        protected virtual void OnApplicationError(object sender, EventArgs evargs)
         {
-            get
+            ApplicationError?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void HandleApplicationError()
+        {
+            var exception = Server.GetLastError();
+
+            // ignore HTTP errors
+            if (exception.GetType() == typeof(HttpException)) return;
+
+            Current.Logger.Error<UmbracoApplicationBase>("An unhandled exception occurred.", exception);
+        }
+
+        // called by ASP.NET (auto event wireup) at any phase in the application life cycle
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            // when unhandled errors occur
+            HandleApplicationError();
+            OnApplicationError(sender, e);
+        }
+
+        #endregion
+
+        #region Utilities
+
+        private static void TryInvoke(EventHandler handler, string name, object sender, EventArgs evargs)
+        {
+            try
             {
-                // LoggerResolver can resolve before resolution is frozen
-                if (LoggerResolver.HasCurrent && LoggerResolver.Current.HasValue)
-                {
-                    return LoggerResolver.Current.Logger;
-                }
-                return new HttpTraceLogger();
+                handler?.Invoke(sender, evargs);
+            }
+            catch (Exception ex)
+            {
+                Current.Logger.Error<UmbracoApplicationBase>($"Error in {name} handler.", ex);
+                throw;
             }
         }
 
-        private class HttpTraceLogger : ILogger
-        {
-            public void Error(Type callingType, string message, Exception exception)
-            {
-                if (HttpContext.Current == null) return;
-                HttpContext.Current.Trace.Warn(callingType.ToString(), message + Environment.NewLine + exception);
-            }
-
-            public void Warn(Type callingType, string message, params Func<object>[] formatItems)
-            {
-                if (HttpContext.Current == null) return;
-                HttpContext.Current.Trace.Warn(callingType.ToString(), string.Format(message, formatItems.Select(x => x())));
-            }
-
-            public void WarnWithException(Type callingType, string message, Exception e, params Func<object>[] formatItems)
-            {
-                if (HttpContext.Current == null) return;
-                HttpContext.Current.Trace.Warn(callingType.ToString(), string.Format(message + Environment.NewLine + e, formatItems.Select(x => x())));
-            }
-
-            public void Info(Type callingType, Func<string> generateMessage)
-            {
-                if (HttpContext.Current == null) return;
-                HttpContext.Current.Trace.Write(callingType.ToString(), generateMessage());
-            }
-
-            public void Info(Type type, string generateMessageFormat, params Func<object>[] formatItems)
-            {
-                if (HttpContext.Current == null) return;
-                HttpContext.Current.Trace.Write(type.ToString(), string.Format(generateMessageFormat, formatItems.Select(x => x())));
-            }
-
-            public void Debug(Type callingType, Func<string> generateMessage)
-            {
-                if (HttpContext.Current == null) return;
-                HttpContext.Current.Trace.Write(callingType.ToString(), generateMessage());
-            }
-
-            public void Debug(Type type, string generateMessageFormat, params Func<object>[] formatItems)
-            {
-                if (HttpContext.Current == null) return;
-                HttpContext.Current.Trace.Write(type.ToString(), string.Format(generateMessageFormat, formatItems.Select(x => x())));
-            }
-        }
+        #endregion
     }
 }

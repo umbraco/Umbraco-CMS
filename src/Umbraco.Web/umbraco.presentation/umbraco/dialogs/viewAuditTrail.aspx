@@ -1,7 +1,7 @@
 <%@ Page Language="c#" MasterPageFile="../masterpages/umbracoPage.Master"Codebehind="viewAuditTrail.aspx.cs" AutoEventWireup="True"
   Inherits="umbraco.presentation.umbraco.dialogs.viewAuditTrail" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="head" runat="server">
 <style type="text/css">
@@ -10,8 +10,6 @@
 html, body {overflow: initial;}
 </style>
 
-<umb:CssInclude ID="CssInclude2" runat="server" FilePath="Tree/treeIcons.css" PathNameAlias="UmbracoClient" />
-<umb:CssInclude ID="CssInclude3" runat="server" FilePath="Tree/menuIcons.css" PathNameAlias="UmbracoClient" Priority="11" />
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
@@ -23,7 +21,7 @@ html, body {overflow: initial;}
                 <asp:TemplateColumn>
                   <HeaderTemplate>
                     <b>
-                      <%=umbraco.ui.Text("action")%>&nbsp;&nbsp;
+                      <%=Services.TextService.Localize("action")%>&nbsp;&nbsp;
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>
@@ -33,17 +31,18 @@ html, body {overflow: initial;}
                 <asp:TemplateColumn>
                   <HeaderTemplate>
                     <b>
-                      <%=umbraco.ui.Text("user")%>
+                      <%=Services.TextService.Localize("user")%>
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>
-                    <%# umbraco.BusinessLogic.User.GetUser(int.Parse(DataBinder.Eval(Container.DataItem, "UserId", "{0}"))).Name%>
+                     <%--TODO: N+1 !!!! and no null checks--%>
+                    <%# Services.UserService.GetUserById(int.Parse(DataBinder.Eval(Container.DataItem, "UserId", "{0}"))).Name%>
                   </ItemTemplate>
                 </asp:TemplateColumn>
                 <asp:TemplateColumn>
                   <HeaderTemplate>
                     <b>
-                      <%=umbraco.ui.Text("date")%>
+                      <%=Services.TextService.Localize("date")%>
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>
@@ -53,7 +52,7 @@ html, body {overflow: initial;}
                 <asp:TemplateColumn>
                   <HeaderTemplate>
                     <b>
-                      <%=umbraco.ui.Text("comment")%>
+                      <%=Services.TextService.Localize("comment")%>
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>
@@ -68,6 +67,6 @@ html, body {overflow: initial;}
 </asp:Content>
 
 
-           
-            
-            
+
+
+

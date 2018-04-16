@@ -2,18 +2,21 @@
 using System.Linq;
 using System.Web;
 using System.Web.UI.WebControls;
+using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
+using Umbraco.Web.UI;
+using Umbraco.Core.Services;
 
 namespace umbraco.cms.presentation.settings.stylesheet
 {
     /// <summary>
     /// Summary description for EditStyleSheetProperty.
     /// </summary>
-    public partial class EditStyleSheetProperty : BasePages.UmbracoEnsuredPage
+    public partial class EditStyleSheetProperty : Umbraco.Web.UI.Pages.UmbracoEnsuredPage
     {
         public EditStyleSheetProperty()
         {
-            CurrentApp = BusinessLogic.DefaultApps.settings.ToString();
+            CurrentApp = Constants.Applications.Settings.ToString();
 
         }
 
@@ -37,13 +40,13 @@ namespace umbraco.cms.presentation.settings.stylesheet
             _stylesheetproperty = _sheet.Properties.FirstOrDefault(x => x.Name.InvariantEquals(propName));
             if (_stylesheetproperty == null) throw new InvalidOperationException("No stylesheet property found with name: " + property);
 
-            Panel1.Text = ui.Text("stylesheet", "editstylesheetproperty", UmbracoUser);
+            Panel1.Text = Services.TextService.Localize("stylesheet/editstylesheetproperty");
 
             var bt = Panel1.Menu.NewButton();
             bt.Click += SaveClick;
-            bt.Text = ui.Text("save");
-            bt.ToolTip = ui.Text("save");
-            bt.ButtonType = uicontrols.MenuButtonType.Primary;
+            bt.Text = Services.TextService.Localize("save");
+            bt.ToolTip = Services.TextService.Localize("save");
+            bt.ButtonType = Umbraco.Web._Legacy.Controls.MenuButtonType.Primary;
             bt.ID = "save";
         }
 
@@ -57,9 +60,9 @@ namespace umbraco.cms.presentation.settings.stylesheet
 
             prStyles.Attributes["style"] = _stylesheetproperty.Value;
 
-            var nodePath = string.Format("-1,init,{0},{0}_{1}", _sheet.Path
-                        //needs a double escape to work with JS
-                        .Replace("\\", "\\\\").TrimEnd(".css"), HttpUtility.UrlEncode(_stylesheetproperty.Name));
+            var path = _sheet.Path.Replace('\\', '/');
+            var nodePath = string.Format(BaseTree.GetTreePathFromFilePath(path) +
+                        ",{0}_{1}", path, HttpUtility.UrlEncode(_stylesheetproperty.Name));
 
             ClientTools
                     .SetActiveTreeType(Constants.Trees.Stylesheets)
@@ -80,13 +83,13 @@ namespace umbraco.cms.presentation.settings.stylesheet
                 //to change the name we actually have to remove the property and re-add it as a different one
                 _sheet.AddProperty(new Umbraco.Core.Models.StylesheetProperty(NameTxt.Text, _stylesheetproperty.Alias, _stylesheetproperty.Value));
                 _sheet.RemoveProperty(_stylesheetproperty.Name);
-                //reset our variable 
+                //reset our variable
                 _stylesheetproperty = _sheet.Properties.Single(x => x.Name == NameTxt.Text);
             }
 
             Services.FileService.SaveStylesheet(_sheet);
 
-            ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editStylesheetPropertySaved", UmbracoUser), "");
+            ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, Services.TextService.Localize("speechBubbles/editStylesheetPropertySaved"), "");
         }
 
 
@@ -106,7 +109,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.UmbracoPanel Panel1;
+        protected global::Umbraco.Web._Legacy.Controls.UmbracoPanel Panel1;
 
         /// <summary>
         /// Pane7 control.
@@ -115,7 +118,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.Pane Pane7;
+        protected global::Umbraco.Web._Legacy.Controls.Pane Pane7;
 
         protected global::System.Web.UI.WebControls.HiddenField OriginalName;
 

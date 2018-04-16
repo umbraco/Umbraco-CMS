@@ -1,8 +1,10 @@
-using System;
+﻿using System;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Web.Security.Identity
 {
@@ -21,10 +23,10 @@ namespace Umbraco.Web.Security.Identity
         public static void SetSignInChallengeResultCallback(
             this AuthenticationOptions authOptions,
             Func<IOwinContext, AuthenticationProperties> authProperties)
-        {   
+        {
             authOptions.Description.Properties["ChallengeResultCallback"] = authProperties;
         }
-        
+
         public static AuthenticationProperties GetSignInChallengeResult(this AuthenticationDescription authenticationDescription, IOwinContext ctx)
         {
             if (authenticationDescription.Properties.ContainsKey("ChallengeResultCallback") == false) return null;
@@ -68,18 +70,18 @@ namespace Umbraco.Web.Security.Identity
         /// This is important if the identity provider is to be able to authenticate when upgrading Umbraco. We will try to extract this from
         /// any options passed in via reflection since none of the default OWIN providers inherit from a base class but so far all of them have a consistent
         /// name for the 'CallbackPath' property which is of type PathString. So we'll try to extract it if it's not found or supplied.
-        /// 
+        ///
         /// If a value is extracted or supplied, this will be added to an internal list which the UmbracoModule will use to allow the request to pass
         /// through without redirecting to the installer.
         /// </param>
         public static void ForUmbracoBackOffice(this AuthenticationOptions options, string style, string icon, string callbackPath = null)
         {
-            Mandate.ParameterNotNullOrEmpty(options.AuthenticationType, "options.AuthenticationType");
+            if (string.IsNullOrEmpty(options.AuthenticationType)) throw new ArgumentNullOrEmptyException("options.AuthenticationType");
 
             //Ensure the prefix is set
             if (options.AuthenticationType.StartsWith(Constants.Security.BackOfficeExternalAuthenticationTypePrefix) == false)
             {
-                options.AuthenticationType = Constants.Security.BackOfficeExternalAuthenticationTypePrefix + options.AuthenticationType;    
+                options.AuthenticationType = Constants.Security.BackOfficeExternalAuthenticationTypePrefix + options.AuthenticationType;
             }
 
             options.Description.Properties["SocialStyle"] = style;
@@ -106,7 +108,7 @@ namespace Umbraco.Web.Security.Identity
                 }
                 catch (System.Exception ex)
                 {
-                    LogHelper.Error(typeof (AuthenticationOptionsExtensions), "Could not read AuthenticationOptions properties", ex);
+                    Current.Logger.Error(typeof (AuthenticationOptionsExtensions), "Could not read AuthenticationOptions properties", ex);
                 }
             }
             else

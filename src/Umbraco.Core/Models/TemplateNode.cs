@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models
         /// The current template
         /// </summary>
         public ITemplate Template { get; set; }
-        
+
         /// <summary>
         /// The children of the current template
         /// </summary>

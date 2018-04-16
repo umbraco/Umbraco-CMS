@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using umbraco.interfaces;
-using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Deploy
 {

@@ -33,8 +33,10 @@
     <key alias="sendtopublish">公開に送る</key>
     <key alias="sendToTranslate">翻訳に送る</key>
     <key alias="sort">並べ替え</key>
+    <key alias="toPublish">公開する</key>
     <key alias="translate">翻訳</key>
     <key alias="update">更新</key>
+    <key alias="defaultValue">初期値</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">アクセスが拒否されました</key>
@@ -1103,6 +1105,8 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="postContent">フィールド値の後ろ追加</key>
     <key alias="preContent">フィールド値の前に追加</key>
     <key alias="recursive">再帰的</key>
+    <key alias="removeParagraph">段落タグの消去</key>
+    <key alias="removeParagraphHelp">段落タグ &amp;lt;P&amp;gt; を消去します</key>
     <key alias="standardFields">標準フィールド</key>
     <key alias="uppercase">大文字変換</key>
     <key alias="urlEncode">URLエンコード</key>
@@ -1175,7 +1179,7 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="memberRoles">役割</key>
     <key alias="memberTypes">メンバーの種類</key>
     <key alias="documentTypes">ドキュメントタイプ</key>
-	<key alias="relationTypes">関連タイプ</key>
+	  <key alias="relationTypes">関連タイプ</key>
     <key alias="packager">パッケージ</key>
     <key alias="packages">パッケージ</key>
     <key alias="python">Python ファイル</key>
@@ -1188,6 +1192,9 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="templates">テンプレート</key>
     <key alias="xslt">XSLT ファイル</key>
     <key alias="analytics">アナリティクス</key>
+    <key alias="userPermissions">ユーザーの権限</key>
+    <key alias="userTypes">ユーザータイプ</key>
+    <key alias="users">ユーザー</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">新しい更新があります</key>
@@ -1230,6 +1237,8 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="startnode">コンテンツの開始ノード</key>
     <key alias="username">ユーザー名</key>
     <key alias="userPermissions">ユーザーの権限</key>
+    <key alias="usertype">ユーザーの種類</key>
+    <key alias="userTypes">ユーザーの種類</key>
     <key alias="writer">投稿者</key>
     <key alias="translator">翻訳者</key>
 	<key alias="change">変更</key>

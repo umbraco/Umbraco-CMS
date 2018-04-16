@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using umbraco.interfaces;
 
 namespace Umbraco.Core.Sync
 {
@@ -56,29 +56,29 @@ namespace Umbraco.Core.Sync
 
         #region IServerMessenger
 
-        public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, object payload)
+        public void PerformRefresh<TPayload>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, TPayload[] payload)
         {
-            if (servers == null) throw new ArgumentNullException("servers");
-            if (refresher == null) throw new ArgumentNullException("refresher");
-            if (payload == null) throw new ArgumentNullException("payload");
+            if (servers == null) throw new ArgumentNullException(nameof(servers));
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
+            if (payload == null) throw new ArgumentNullException(nameof(payload));
 
             Deliver(servers, refresher, payload);
         }
 
         public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, string jsonPayload)
         {
-            if (servers == null) throw new ArgumentNullException("servers");
-            if (refresher == null) throw new ArgumentNullException("refresher");
-            if (jsonPayload == null) throw new ArgumentNullException("jsonPayload");
+            if (servers == null) throw new ArgumentNullException(nameof(servers));
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
+            if (jsonPayload == null) throw new ArgumentNullException(nameof(jsonPayload));
 
             Deliver(servers, refresher, MessageType.RefreshByJson, json: jsonPayload);
         }
 
         public void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
         {
-            if (servers == null) throw new ArgumentNullException("servers");
-            if (refresher == null) throw new ArgumentNullException("refresher");
-            if (getNumericId == null) throw new ArgumentNullException("getNumericId");
+            if (servers == null) throw new ArgumentNullException(nameof(servers));
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
+            if (getNumericId == null) throw new ArgumentNullException(nameof(getNumericId));
             if (instances == null || instances.Length == 0) return;
 
             Func<T, object> getId = x => getNumericId(x);
@@ -87,9 +87,9 @@ namespace Umbraco.Core.Sync
 
         public void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
         {
-            if (servers == null) throw new ArgumentNullException("servers");
-            if (refresher == null) throw new ArgumentNullException("refresher");
-            if (getGuidId == null) throw new ArgumentNullException("getGuidId");
+            if (servers == null) throw new ArgumentNullException(nameof(servers));
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
+            if (getGuidId == null) throw new ArgumentNullException(nameof(getGuidId));
             if (instances == null || instances.Length == 0) return;
 
             Func<T, object> getId = x => getGuidId(x);
@@ -98,9 +98,9 @@ namespace Umbraco.Core.Sync
 
         public void PerformRemove<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
         {
-            if (servers == null) throw new ArgumentNullException("servers");
-            if (refresher == null) throw new ArgumentNullException("refresher");
-            if (getNumericId == null) throw new ArgumentNullException("getNumericId");
+            if (servers == null) throw new ArgumentNullException(nameof(servers));
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
+            if (getNumericId == null) throw new ArgumentNullException(nameof(getNumericId));
             if (instances == null || instances.Length == 0) return;
 
             Func<T, object> getId = x => getNumericId(x);
@@ -109,8 +109,8 @@ namespace Umbraco.Core.Sync
 
         public void PerformRemove(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params int[] numericIds)
         {
-            if (servers == null) throw new ArgumentNullException("servers");
-            if (refresher == null) throw new ArgumentNullException("refresher");
+            if (servers == null) throw new ArgumentNullException(nameof(servers));
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
             if (numericIds == null || numericIds.Length == 0) return;
 
             Deliver(servers, refresher, MessageType.RemoveById, numericIds.Cast<object>());
@@ -118,8 +118,8 @@ namespace Umbraco.Core.Sync
 
         public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params int[] numericIds)
         {
-            if (servers == null) throw new ArgumentNullException("servers");
-            if (refresher == null) throw new ArgumentNullException("refresher");
+            if (servers == null) throw new ArgumentNullException(nameof(servers));
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
             if (numericIds == null || numericIds.Length == 0) return;
 
             Deliver(servers, refresher, MessageType.RefreshById, numericIds.Cast<object>());
@@ -127,8 +127,8 @@ namespace Umbraco.Core.Sync
 
         public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params Guid[] guidIds)
         {
-            if (servers == null) throw new ArgumentNullException("servers");
-            if (refresher == null) throw new ArgumentNullException("refresher");
+            if (servers == null) throw new ArgumentNullException(nameof(servers));
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
             if (guidIds == null || guidIds.Length == 0) return;
 
             Deliver(servers, refresher, MessageType.RefreshById, guidIds.Cast<object>());
@@ -136,8 +136,8 @@ namespace Umbraco.Core.Sync
 
         public void PerformRefreshAll(IEnumerable<IServerAddress> servers, ICacheRefresher refresher)
         {
-            if (servers == null) throw new ArgumentNullException("servers");
-            if (refresher == null) throw new ArgumentNullException("refresher");
+            if (servers == null) throw new ArgumentNullException(nameof(servers));
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
             Deliver(servers, refresher, MessageType.RefreshAll);
         }
@@ -154,16 +154,15 @@ namespace Umbraco.Core.Sync
 
         #region Deliver
 
-        protected void DeliverLocal(ICacheRefresher refresher, object payload)
+        protected void DeliverLocal<TPayload>(ICacheRefresher refresher, TPayload[] payload)
         {
-            if (refresher == null) throw new ArgumentNullException("refresher");
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
-            LogHelper.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type RefreshByPayload",
-                refresher.GetType);
+            Current.Logger.Debug<ServerMessengerBase>(() => $"Invoking refresher {refresher.GetType()} on local server for message type RefreshByPayload");
 
-            var payloadRefresher = refresher as IPayloadCacheRefresher;
+            var payloadRefresher = refresher as IPayloadCacheRefresher<TPayload>;
             if (payloadRefresher == null)
-                throw new InvalidOperationException("The cache refresher " + refresher.GetType() + " is not of type " + typeof(IPayloadCacheRefresher));
+                throw new InvalidOperationException("The cache refresher " + refresher.GetType() + " is not of type " + typeof(IPayloadCacheRefresher<TPayload>));
             payloadRefresher.Refresh(payload);
         }
 
@@ -179,11 +178,9 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         protected void DeliverLocal(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
         {
-            if (refresher == null) throw new ArgumentNullException("refresher");
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
-            LogHelper.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type {1}",
-                refresher.GetType,
-                () => messageType);
+            Current.Logger.Debug<ServerMessengerBase>(() => $"Invoking refresher {refresher.GetType()} on local server for message type {messageType}");
 
             switch (messageType)
             {
@@ -228,7 +225,7 @@ namespace Umbraco.Core.Sync
                     throw new NotSupportedException("Invalid message type " + messageType);
             }
         }
-        
+
         /// <summary>
         /// Executes the strongly typed <see cref="ICacheRefresher{T}"/> on the local/current server
         /// </summary>
@@ -242,11 +239,9 @@ namespace Umbraco.Core.Sync
         /// </remarks>
         protected void DeliverLocal<T>(ICacheRefresher refresher, MessageType messageType, Func<T, object> getId, IEnumerable<T> instances)
         {
-            if (refresher == null) throw new ArgumentNullException("refresher");
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
-            LogHelper.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type {1}",
-                refresher.GetType,
-                () => messageType);
+            Current.Logger.Debug<ServerMessengerBase>(() => $"Invoking refresher {refresher.GetType()} on local server for message type {messageType}");
 
             var typedRefresher = refresher as ICacheRefresher<T>;
 
@@ -282,7 +277,7 @@ namespace Umbraco.Core.Sync
         //{
         //    if (refresher == null) throw new ArgumentNullException("refresher");
 
-        //    LogHelper.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type Notify",
+        //    Current.Logger.Debug<ServerMessengerBase>("Invoking refresher {0} on local server for message type Notify",
         //        () => refresher.GetType());
 
         //    refresher.Notify(payload);
@@ -292,10 +287,10 @@ namespace Umbraco.Core.Sync
 
         //protected abstract void DeliverRemote(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, object payload);
 
-        protected virtual void Deliver(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, object payload)
+        protected virtual void Deliver<TPayload>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, TPayload[] payload)
         {
-            if (servers == null) throw new ArgumentNullException("servers");
-            if (refresher == null) throw new ArgumentNullException("refresher");
+            if (servers == null) throw new ArgumentNullException(nameof(servers));
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
             var serversA = servers.ToArray();
 
@@ -313,11 +308,11 @@ namespace Umbraco.Core.Sync
 
         protected virtual void Deliver(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
         {
-            if (servers == null) throw new ArgumentNullException("servers");
-            if (refresher == null) throw new ArgumentNullException("refresher");
+            if (servers == null) throw new ArgumentNullException(nameof(servers));
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
             var serversA = servers.ToArray();
-            var idsA = ids == null ? null : ids.ToArray();
+            var idsA = ids?.ToArray();
 
             // deliver local
             DeliverLocal(refresher, messageType, idsA, json);
@@ -332,8 +327,8 @@ namespace Umbraco.Core.Sync
 
         protected virtual void Deliver<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, MessageType messageType, Func<T, object> getId, IEnumerable<T> instances)
         {
-            if (servers == null) throw new ArgumentNullException("servers");
-            if (refresher == null) throw new ArgumentNullException("refresher");
+            if (servers == null) throw new ArgumentNullException(nameof(servers));
+            if (refresher == null) throw new ArgumentNullException(nameof(refresher));
 
             var serversA = servers.ToArray();
             var instancesA = instances.ToArray();

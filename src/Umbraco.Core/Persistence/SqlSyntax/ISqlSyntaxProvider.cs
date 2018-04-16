@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models.Rdbms;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
@@ -17,6 +17,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string GetWildcardPlaceholder();
         string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType);
         string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);
+        string GetConcat(params string[] args);
 
         [Obsolete("Use the overload with the parameter index instead")]
         string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType);
@@ -32,7 +33,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string GetQuotedTableName(string tableName);
         string GetQuotedColumnName(string columnName);
         string GetQuotedName(string name);
-        bool DoesTableExist(Database db, string tableName);
+        bool DoesTableExist(IDatabase db, string tableName);
         string GetIndexType(IndexTypes indexTypes);
         string GetSpecialDbType(SpecialDbTypes dbTypes);
         string CreateTable { get; }
@@ -63,24 +64,26 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string FormatPrimaryKey(TableDefinition table);
         string GetQuotedValue(string value);
         string Format(ColumnDefinition column);
+        string Format(ColumnDefinition column, string tableName, out IEnumerable<string> sqls);
         string Format(IndexDefinition index);
         string Format(ForeignKeyDefinition foreignKey);
         string FormatColumnRename(string tableName, string oldName, string newName);
         string FormatTableRename(string oldName, string newName);
-        Sql SelectTop(Sql sql, int top);
+
+        Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top);
+
         bool SupportsClustered();
         bool SupportsIdentityInsert();
-        bool? SupportsCaseInsensitiveQueries(Database db);
-        
+        bool? SupportsCaseInsensitiveQueries(IDatabase db);
+
         string ConvertIntegerToOrderableString { get; }
         string ConvertDateToOrderableString { get; }
         string ConvertDecimalToOrderableString { get; }
 
-        IEnumerable<string> GetTablesInSchema(Database db);
-        IEnumerable<ColumnInfo> GetColumnsInSchema(Database db);
-        IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db);
-        IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db);
-
-        IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db);
+        IEnumerable<string> GetTablesInSchema(IDatabase db);
+        IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db);
+        IEnumerable<Tuple<string, string>> GetConstraintsPerTable(IDatabase db);
+        IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(IDatabase db);
+        IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db);
     }
 }

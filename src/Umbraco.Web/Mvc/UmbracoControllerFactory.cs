@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
 using Umbraco.Core;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {
@@ -14,7 +15,7 @@ namespace Umbraco.Web.Mvc
         private readonly OverridenDefaultControllerFactory _innerFactory = new OverridenDefaultControllerFactory();
 
         public abstract bool CanHandle(RequestContext request);
-        
+
         public virtual Type GetControllerType(RequestContext requestContext, string controllerName)
         {
             return _innerFactory.GetControllerType(requestContext, controllerName);
@@ -30,10 +31,9 @@ namespace Umbraco.Web.Mvc
         public virtual IController CreateController(RequestContext requestContext, string controllerName)
         {
             var controllerType = GetControllerType(requestContext, controllerName) ??
-                                 _innerFactory.GetControllerType(
-                                     requestContext,
-                                     ControllerExtensions.GetControllerName(
-                                         DefaultRenderMvcControllerResolver.Current.GetDefaultControllerType()));
+                _innerFactory.GetControllerType(
+                    requestContext,
+                    ControllerExtensions.GetControllerName(Current.DefaultRenderMvcControllerType));
 
             return _innerFactory.GetControllerInstance(requestContext, controllerType);
         }

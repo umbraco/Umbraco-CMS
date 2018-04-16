@@ -10,6 +10,10 @@ namespace Umbraco.Core.Cache
     /// </summary>
     public class NullCacheProvider : IRuntimeCacheProvider
     {
+        private NullCacheProvider() { }
+
+        public static NullCacheProvider Instance { get; } = new NullCacheProvider();
+
         public virtual void ClearAllCache()
         { }
 

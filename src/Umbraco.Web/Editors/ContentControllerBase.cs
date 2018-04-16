@@ -1,15 +1,15 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -23,37 +23,20 @@ namespace Umbraco.Web.Editors
     [OutgoingDateTimeFormat]
     public abstract class ContentControllerBase : BackOfficeNotificationsController
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        protected ContentControllerBase()
-            : this(UmbracoContext.Current)
-        {            
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="umbracoContext"></param>
-        protected ContentControllerBase(UmbracoContext umbracoContext)
-            : base(umbracoContext)
-        {
-        }
-
         protected HttpResponseMessage HandleContentNotFound(object id, bool throwException = true)
         {
-            ModelState.AddModelError("id", string.Format("content with id: {0} was not found", id));
+            ModelState.AddModelError("id", $"content with id: {id} was not found");
             var errorResponse = Request.CreateErrorResponse(
                 HttpStatusCode.NotFound,
                 ModelState);
             if (throwException)
             {
-                throw new HttpResponseException(errorResponse);    
+                throw new HttpResponseException(errorResponse);
             }
             return errorResponse;
         }
 
-        protected void UpdateName<TPersisted>(ContentBaseItemSave<TPersisted> contentItem) 
+        protected void UpdateName<TPersisted>(ContentBaseItemSave<TPersisted> contentItem)
             where TPersisted : IContentBase
         {
             //Don't update the name if it is empty
@@ -83,62 +66,67 @@ namespace Umbraco.Web.Editors
         /// Maps the dto property values to the persisted model
         /// </summary>
         /// <typeparam name="TPersisted"></typeparam>
+        /// <typeparam name="TSaved"></typeparam>
         /// <param name="contentItem"></param>
-        protected virtual void MapPropertyValues<TPersisted>(ContentBaseItemSave<TPersisted> contentItem)
+        /// <param name="getPropertyValue"></param>
+        /// <param name="savePropertyValue"></param>
+        protected void MapPropertyValues<TPersisted, TSaved>(
+            TSaved contentItem,
+            Func<TSaved, Property, object> getPropertyValue,
+            Action<TSaved, Property, object> savePropertyValue)
             where TPersisted : IContentBase
+            where TSaved : ContentBaseItemSave<TPersisted>
         {
-            //Map the property values
-            foreach (var property in contentItem.ContentDto.Properties)
+            // map the property values
+            foreach (var propertyDto in contentItem.ContentDto.Properties)
             {
-                //get the dbo property
-                var dboProperty = contentItem.PersistedContent.Properties[property.Alias];
-
-                //create the property data to send to the property editor
-                var dictionary = new Dictionary<string, object>();
-                //add the files if any
-                var files = contentItem.UploadedFiles.Where(x => x.PropertyAlias == property.Alias).ToArray();
-                if (files.Length > 0)
+                // get the property editor
+                if (propertyDto.PropertyEditor == null)
                 {
-                    dictionary.Add("files", files);                    
+                    Logger.Warn<ContentController>("No property editor found for property " + propertyDto.Alias);
+                    continue;
                 }
+
+                // get the value editor
+                // nothing to save/map if it is readonly
+                var valueEditor = propertyDto.PropertyEditor.GetValueEditor();
+                if (valueEditor.IsReadOnly) continue;
+
+                // get the property
+                var property = contentItem.PersistedContent.Properties[propertyDto.Alias];
+
+                // prepare files, if any
+                var files = contentItem.UploadedFiles.Where(x => x.PropertyAlias == propertyDto.Alias).ToArray();
                 foreach (var file in files)
                     file.FileName = file.FileName.ToSafeFileName();
 
-                // add extra things needed to figure out where to put the files
-                dictionary.Add("cuid", contentItem.PersistedContent.Key);
-                dictionary.Add("puid", dboProperty.PropertyType.Key);
-
-                var data = new ContentPropertyData(property.Value, property.PreValues, dictionary);
-
-                //get the deserialized value from the property editor
-                if (property.PropertyEditor == null)
+                // create the property data for the property editor
+                var data = new ContentPropertyData(propertyDto.Value, propertyDto.DataType.Configuration)
                 {
-                    LogHelper.Warn<ContentController>("No property editor found for property " + property.Alias);
+                    ContentKey = contentItem.PersistedContent.Key,
+                    PropertyTypeKey = property.PropertyType.Key,
+                    Files =  files
+                };
+
+                // let the editor convert the value that was received, deal with files, etc
+                var value = valueEditor.FromEditor(data, getPropertyValue(contentItem, property));
+
+                // set the value - tags are special
+                var tagAttribute = propertyDto.PropertyEditor.GetTagAttribute();
+                if (tagAttribute != null)
+                {
+                    var tagConfiguration = ConfigurationEditor.ConfigurationAs<TagConfiguration>(propertyDto.DataType.Configuration);
+                    if (tagConfiguration.Delimiter == default) tagConfiguration.Delimiter = tagAttribute.Delimiter;
+                    //fixme how is this supposed to work with variants?
+                    property.SetTagsValue(value, tagConfiguration);
                 }
                 else
-                {
-                    var valueEditor = property.PropertyEditor.ValueEditor;
-                    //don't persist any bound value if the editor is readonly
-                    if (valueEditor.IsReadOnly == false)
-                    {                        
-                        var propVal = property.PropertyEditor.ValueEditor.ConvertEditorToDb(data, dboProperty.Value);
-                        var supportTagsAttribute = TagExtractor.GetAttribute(property.PropertyEditor);
-                        if (supportTagsAttribute != null)
-                        {
-                            TagExtractor.SetPropertyTags(dboProperty, data, propVal, supportTagsAttribute);
-                        }
-                        else
-                        {
-                            dboProperty.Value = propVal;
-                        }
-                    }    
-                    
-                }
+                    savePropertyValue(contentItem, property, value);
             }
         }
 
-        protected void HandleInvalidModelState<T, TPersisted>(ContentItemDisplayBase<T, TPersisted> display) 
-            where TPersisted : IContentBase 
+        protected void HandleInvalidModelState<T, TPersisted>(ContentItemDisplayBase<T, TPersisted> display)
+            where TPersisted : IContentBase
             where T : ContentPropertyBasic
         {
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
@@ -167,7 +155,7 @@ namespace Umbraco.Web.Editors
             return Request.Properties.ContainsKey(typeof(TPersisted).ToString()) && Request.Properties[typeof(TPersisted).ToString()] != null
                 ? (TPersisted) Request.Properties[typeof (TPersisted).ToString()]
                 : getFromService();
-        } 
+        }
 
         /// <summary>
         /// Returns true if the action passed in means we need to create something new
@@ -179,14 +167,15 @@ namespace Umbraco.Web.Editors
             return (action.ToString().EndsWith("New"));
         }
 
-        protected void AddCancelMessage(INotificationModel display, 
-            string header = "speechBubbles/operationCancelledHeader",             
+        protected void AddCancelMessage(INotificationModel display,
+            string header = "speechBubbles/operationCancelledHeader",
             string message = "speechBubbles/operationCancelledText",
             bool localizeHeader = true,
             bool localizeMessage = true)
         {
             //if there's already a default event message, don't add our default one
-            var msgs = UmbracoContext.GetCurrentEventMessages();
+            //fixme inject
+            var msgs = Current.EventMessages;
             if (msgs != null && msgs.GetAll().Any(x => x.IsDefaultEventMessage)) return;
 
             display.AddWarningNotification(

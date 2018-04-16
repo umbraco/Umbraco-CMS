@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Data;
 using System.Configuration;
 using System.Web;
@@ -7,15 +7,14 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
-using umbraco.BusinessLogic;
-using umbraco.interfaces;
+using Umbraco.Core.Models;
 
 namespace umbraco.cms.presentation.Trees
 {
 
     /// <summary>
-    /// Defines the entire structure of an application tree including it's Type, a reference to it's ApplicationTree object, and a reference 
-    /// to it's Application object. Tree Definitions are based on defining a database in the umbracoAppTree database. Any tree defined in this table 
+    /// Defines the entire structure of an application tree including it's Type, a reference to it's ApplicationTree object, and a reference
+    /// to it's Application object. Tree Definitions are based on defining a database in the umbracoAppTree database. Any tree defined in this table
     /// that is of an ITree type, it will be found and can be instantiated by this class. Any ITree that is not defined in the database will
     /// need to be instantiated with it's own tree constructor.
     /// </summary>
@@ -27,7 +26,7 @@ namespace umbraco.cms.presentation.Trees
         /// <param name="type">The type.</param>
         /// <param name="tree">The tree.</param>
         /// <param name="app">The app.</param>
-        public TreeDefinition(Type type, ApplicationTree tree, Application app)
+        public TreeDefinition(Type type, ApplicationTree tree, Section app)
         {
             m_treeType = type;
             m_tree = tree;
@@ -36,20 +35,20 @@ namespace umbraco.cms.presentation.Trees
 
         private Type m_treeType;
         private ApplicationTree m_tree;
-        private Application m_app;
+        private Section m_app;
 
         /// <summary>
         /// Returns a new instance of a BaseTree based on this Tree Definition
         /// </summary>
         public BaseTree CreateInstance()
-        {       
+        {
             //create the tree instance
-            ITree typeInstance = CreateTreeInstance(m_treeType, m_app.alias);
+            var typeInstance = CreateTreeInstance(m_treeType, m_app.Alias);
 
             if (typeInstance != null)
             {
                 //convert to BaseTree
-                return (BaseTree.IsBaseTree(typeInstance) ? typeInstance as BaseTree : BaseTree.FromITree(typeInstance, m_tree.Alias, m_app.alias, m_tree.IconClosed, m_tree.IconOpened, m_tree.Action));                    
+                return typeInstance;
             }
             return null;
         }
@@ -78,7 +77,7 @@ namespace umbraco.cms.presentation.Trees
         /// Gets or sets the application.
         /// </summary>
         /// <value>The app.</value>
-        public Application App
+        public Section App
         {
             get { return m_app; }
             set { m_app = value; }
@@ -90,20 +89,20 @@ namespace umbraco.cms.presentation.Trees
         /// <param name="tree">The tree.</param>
         /// <param name="appAlias">The app alias.</param>
         /// <returns></returns>
-        public static ITree CreateTreeInstance(Type tree, string appAlias)
+        public static BaseTree CreateTreeInstance(Type tree, string appAlias)
         {
-            ITree typeInstance;
+            BaseTree typeInstance;
             //call the correct constructor
             if (typeof(BaseTree).IsAssignableFrom(tree))
-                typeInstance = Activator.CreateInstance(tree, new object[] { appAlias }) as ITree; //the BaseTree constructor
+                typeInstance = Activator.CreateInstance(tree, new object[] { appAlias }) as BaseTree; //the BaseTree constructor
             else
                 typeInstance = CreateTreeInstance(tree);
             return typeInstance;
         }
 
-        private static ITree CreateTreeInstance(Type tree)
+        private static BaseTree CreateTreeInstance(Type tree)
         {
-            ITree typeInstance = Activator.CreateInstance(tree) as ITree; //an empty constructor (ITree)
+            BaseTree typeInstance = Activator.CreateInstance(tree) as BaseTree; //an empty constructor (ITree)
             return typeInstance;
         }
 

@@ -1,4 +1,6 @@
 ﻿using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -10,53 +12,29 @@ namespace Umbraco.Tests.Persistence.Mappers
         [Test]
         public void Can_Map_Id_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
-            // Act
-            string column = new MediaMapper().Map("Id");
-
-            // Assert
-            Assert.That(column, Is.EqualTo("[umbracoNode].[id]"));
+            var column = new MediaMapper().Map(new SqlCeSyntaxProvider(), nameof(Media.Id));
+            Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.Node}].[id]"));
         }
 
         [Test]
         public void Can_Map_Trashed_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
-            // Act
-            string column = new MediaMapper().Map("Trashed");
-
-            // Assert
-            Assert.That(column, Is.EqualTo("[umbracoNode].[trashed]"));
+            var column = new MediaMapper().Map(new SqlCeSyntaxProvider(), nameof(Media.Trashed));
+            Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.Node}].[trashed]"));
         }
 
         [Test]
         public void Can_Map_UpdateDate_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
-            // Act
-            string column = new MediaMapper().Map("UpdateDate");
-
-            // Assert
-            Assert.That(column, Is.EqualTo("[cmsContentVersion].[VersionDate]"));
+            var column = new MediaMapper().Map(new SqlCeSyntaxProvider(), nameof(Media.UpdateDate));
+            Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.ContentVersion}].[versionDate]"));
         }
 
         [Test]
         public void Can_Map_Version_Property()
         {
-            // Arrange
-            SqlSyntaxContext.SqlSyntaxProvider = new SqlCeSyntaxProvider();
-
-            // Act
-            string column = new MediaMapper().Map("Version");
-
-            // Assert
-            Assert.That(column, Is.EqualTo("[cmsContentVersion].[VersionId]"));
+            var column = new MediaMapper().Map(new SqlCeSyntaxProvider(), nameof(Media.VersionId));
+            Assert.That(column, Is.EqualTo($"[{Constants.DatabaseSchema.Tables.ContentVersion}].[id]"));
         }
     }
 }

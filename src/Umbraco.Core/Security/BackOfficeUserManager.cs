@@ -9,6 +9,7 @@ using System.Web;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security.DataProtection;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -30,16 +31,6 @@ namespace Umbraco.Core.Security
         {
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the constructor specifying all dependencies instead")]
-        public BackOfficeUserManager(
-            IUserStore<BackOfficeIdentityUser, int> store,
-            IdentityFactoryOptions<BackOfficeUserManager> options,
-            MembershipProviderBase membershipProvider)
-            : this(store, options, membershipProvider, UmbracoConfig.For.UmbracoSettings().Content)
-        {
-        }
-
         public BackOfficeUserManager(
             IUserStore<BackOfficeIdentityUser, int> store,
             IdentityFactoryOptions<BackOfficeUserManager> options,
@@ -53,56 +44,36 @@ namespace Umbraco.Core.Security
 
         #region Static Create methods
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the overload specifying all dependencies instead")]
-        public static BackOfficeUserManager Create(
-            IdentityFactoryOptions<BackOfficeUserManager> options,
-            IUserService userService,         
-            IExternalLoginService externalLoginService,
-            MembershipProviderBase membershipProvider)
-        {
-            return Create(options, userService,
-                ApplicationContext.Current.Services.EntityService,
-                externalLoginService, membershipProvider,
-                UmbracoConfig.For.UmbracoSettings().Content);
-        }
-
         /// <summary>
-        /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager 
+        /// Creates a BackOfficeUserManager instance with all default options and the default BackOfficeUserManager
         /// </summary>
         /// <param name="options"></param>
         /// <param name="userService"></param>
+        /// <param name="memberTypeService"></param>
         /// <param name="entityService"></param>
         /// <param name="externalLoginService"></param>
         /// <param name="membershipProvider"></param>
         /// <param name="contentSectionConfig"></param>
+        /// <param name="globalSettings"></param>
         /// <returns></returns>
         public static BackOfficeUserManager Create(
             IdentityFactoryOptions<BackOfficeUserManager> options,
             IUserService userService,
+            IMemberTypeService memberTypeService,
             IEntityService entityService,
             IExternalLoginService externalLoginService,
             MembershipProviderBase membershipProvider,
-            IContentSection contentSectionConfig)
+            IContentSection contentSectionConfig,
+            IGlobalSettings globalSettings)
         {
             if (options == null) throw new ArgumentNullException("options");
             if (userService == null) throw new ArgumentNullException("userService");
+            if (memberTypeService == null) throw new ArgumentNullException("memberTypeService");
             if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
 
             var manager = new BackOfficeUserManager(
-                new BackOfficeUserStore(userService, entityService, externalLoginService, membershipProvider));
+                new BackOfficeUserStore(userService, memberTypeService, entityService, externalLoginService, globalSettings, membershipProvider));
             manager.InitUserManager(manager, membershipProvider, contentSectionConfig, options);
-            return manager;
-        }
-        
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the overload specifying all dependencies instead")]
-        public static BackOfficeUserManager Create(
-           IdentityFactoryOptions<BackOfficeUserManager> options,
-           BackOfficeUserStore customUserStore,
-           MembershipProviderBase membershipProvider)
-        {
-            var manager = new BackOfficeUserManager(customUserStore, options, membershipProvider);
             return manager;
         }
 
@@ -124,16 +95,6 @@ namespace Umbraco.Core.Security
             return manager;
         }
         #endregion
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the overload specifying all dependencies instead")]
-        protected void InitUserManager(
-            BackOfficeUserManager manager,
-            MembershipProviderBase membershipProvider,         
-            IdentityFactoryOptions<BackOfficeUserManager> options)
-        {
-            InitUserManager(manager, membershipProvider, UmbracoConfig.For.UmbracoSettings().Content, options);
-        }
 
         /// <summary>
         /// Initializes the user manager with the correct options
@@ -165,7 +126,6 @@ namespace Umbraco.Core.Security
         {
         }
 
-
         #region What we support do not currently
 
         //TODO: We could support this - but a user claims will mostly just be what is in the auth cookie
@@ -194,17 +154,7 @@ namespace Umbraco.Core.Security
             get { return false; }
         }
         #endregion
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the overload specifying all dependencies instead")]
-        protected void InitUserManager(
-            BackOfficeUserManager<T> manager,
-            MembershipProviderBase membershipProvider,
-            IDataProtectionProvider dataProtectionProvider)
-        {
-            InitUserManager(manager, membershipProvider, dataProtectionProvider, UmbracoConfig.For.UmbracoSettings().Content);
-        }
-
+        
         /// <summary>
         /// Initializes the user manager with the correct options
         /// </summary>
@@ -216,8 +166,8 @@ namespace Umbraco.Core.Security
         /// <param name="contentSectionConfig"></param>
         /// <returns></returns>
         protected void InitUserManager(
-            BackOfficeUserManager<T> manager, 
-            MembershipProviderBase membershipProvider, 
+            BackOfficeUserManager<T> manager,
+            MembershipProviderBase membershipProvider,
             IDataProtectionProvider dataProtectionProvider,
             IContentSection contentSectionConfig)
         {
@@ -233,7 +183,7 @@ namespace Umbraco.Core.Security
 
             //use a custom hasher based on our membership provider
             manager.PasswordHasher = GetDefaultPasswordHasher(membershipProvider);
-            
+
             if (dataProtectionProvider != null)
             {
                 manager.UserTokenProvider = new DataProtectorTokenProvider<T, int>(dataProtectionProvider.Create("ASP.NET Identity"));
@@ -267,7 +217,7 @@ namespace Umbraco.Core.Security
             //    BodyFormat = "Your security code is: {0}"
             //});
 
-            //manager.SmsService = new SmsService();            
+            //manager.SmsService = new SmsService();
         }
 
         /// <summary>
@@ -373,7 +323,7 @@ namespace Umbraco.Core.Security
         }
 
         #region Overrides for password logic
-        
+
         /// <summary>
         /// Logic used to validate a username and password
         /// </summary>
@@ -385,12 +335,12 @@ namespace Umbraco.Core.Security
         /// * Get password store
         /// * Call VerifyPasswordAsync with the password store + user + password
         /// * Uses the PasswordHasher.VerifyHashedPassword to compare the stored password
-        /// 
+        ///
         /// In some cases people want simple custom control over the username/password check, for simplicity
         /// sake, developers would like the users to simply validate against an LDAP directory but the user
-        /// data remains stored inside of Umbraco. 
+        /// data remains stored inside of Umbraco.
         /// See: http://issues.umbraco.org/issue/U4-7032 for the use cases.
-        /// 
+        ///
         /// We've allowed this check to be overridden with a simple callback so that developers don't actually
         /// have to implement/override this class.
         /// </remarks>
@@ -418,6 +368,33 @@ namespace Umbraco.Core.Security
 
             //use the default behavior
             return await base.CheckPasswordAsync(user, password);
+        }
+
+        public override Task<IdentityResult> ResetPasswordAsync(int userId, string token, string newPassword)
+        {
+            var result = base.ResetPasswordAsync(userId, token, newPassword);
+            if (result.Result.Succeeded)
+                RaisePasswordResetEvent(userId);
+            return result;
+        }
+
+        /// <summary>
+        /// This is a special method that will reset the password but will raise the Password Changed event instead of the reset event
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="token"></param>
+        /// <param name="newPassword"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// We use this because in the back office the only way an admin can change another user's password without first knowing their password
+        /// is to generate a token and reset it, however, when we do this we want to track a password change, not a password reset
+        /// </remarks>
+        public Task<IdentityResult> ChangePasswordWithResetAsync(int userId, string token, string newPassword)
+        {
+            var result = base.ResetPasswordAsync(userId, token, newPassword);
+            if (result.Result.Succeeded)
+                RaisePasswordChangedEvent(userId);
+            return result;
         }
 
         public override Task<IdentityResult> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
@@ -469,7 +446,7 @@ namespace Umbraco.Core.Security
             await UpdateSecurityStampInternal(user);
             return IdentityResult.Success;
 
-            
+
         }
 
         /// <summary>
@@ -537,9 +514,9 @@ namespace Umbraco.Core.Security
             RaiseResetAccessFailedCountEvent(userId);
             return await UpdateAsync(user);
         }
-        
 
-      
+
+
 
         public override Task<IdentityResult> AccessFailedAsync(int userId)
         {
@@ -554,27 +531,27 @@ namespace Umbraco.Core.Security
 
         internal void RaiseAccountLockedEvent(int userId)
         {
-            OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked, GetCurrentRequestIpAddress(), userId));
+            OnAccountLocked(new IdentityAuditEventArgs(AuditEvent.AccountLocked, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseAccountUnlockedEvent(int userId)
         {
-            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked, GetCurrentRequestIpAddress(), userId));
+            OnAccountUnlocked(new IdentityAuditEventArgs(AuditEvent.AccountUnlocked, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseForgotPasswordRequestedEvent(int userId)
         {
-            OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested, GetCurrentRequestIpAddress(), userId));
+            OnForgotPasswordRequested(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordRequested, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseForgotPasswordChangedSuccessEvent(int userId)
         {
-            OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess, GetCurrentRequestIpAddress(), userId));
+            OnForgotPasswordChangedSuccess(new IdentityAuditEventArgs(AuditEvent.ForgotPasswordChangedSuccess, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseLoginFailedEvent(int userId)
         {
-            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, GetCurrentRequestIpAddress(), userId));
+            OnLoginFailed(new IdentityAuditEventArgs(AuditEvent.LoginFailed, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseInvalidLoginAttemptEvent(string username)
@@ -584,31 +561,33 @@ namespace Umbraco.Core.Security
 
         internal void RaiseLoginRequiresVerificationEvent(int userId)
         {
-            OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification, GetCurrentRequestIpAddress(), userId));
+            OnLoginRequiresVerification(new IdentityAuditEventArgs(AuditEvent.LoginRequiresVerification, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseLoginSuccessEvent(int userId)
         {
-            OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces, GetCurrentRequestIpAddress(), userId));
+            OnLoginSuccess(new IdentityAuditEventArgs(AuditEvent.LoginSucces, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaiseLogoutSuccessEvent(int userId)
         {
-            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess, GetCurrentRequestIpAddress(), userId));
+            OnLogoutSuccess(new IdentityAuditEventArgs(AuditEvent.LogoutSuccess, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         internal void RaisePasswordChangedEvent(int userId)
         {
-            OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged, GetCurrentRequestIpAddress(), userId));
+            OnPasswordChanged(new IdentityAuditEventArgs(AuditEvent.PasswordChanged, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
+        //TODO: I don't think this is required anymore since from 7.7 we no longer display the reset password checkbox since that didn't make sense.
         internal void RaisePasswordResetEvent(int userId)
         {
-            OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset, GetCurrentRequestIpAddress(), userId));
+            OnPasswordReset(new IdentityAuditEventArgs(AuditEvent.PasswordReset, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
+
         internal void RaiseResetAccessFailedCountEvent(int userId)
         {
-            OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount, GetCurrentRequestIpAddress(), userId));
+            OnResetAccessFailedCount(new IdentityAuditEventArgs(AuditEvent.ResetAccessFailedCount, GetCurrentRequestIpAddress(), affectedUser: userId));
         }
 
         public static event EventHandler AccountLocked;

@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Tests.IO
 {
-    [TestFixture, RequiresSTA]
-    public abstract class AbstractFileSystemTests 
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
+    public abstract class AbstractFileSystemTests
     {
         protected IFileSystem _fileSystem;
 
@@ -49,13 +51,15 @@ namespace Umbraco.Tests.IO
         }
 
         [Test]
-        [ExpectedException(typeof(InvalidOperationException))]
         public void Cant_Overwrite_File()
         {
-            _fileSystem.AddFile("test.txt", CreateStream());
-            _fileSystem.AddFile("test.txt", CreateStream(), false);
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                _fileSystem.AddFile("test.txt", CreateStream());
+                _fileSystem.AddFile("test.txt", CreateStream(), false);
 
-            _fileSystem.DeleteFile("test.txt");
+                _fileSystem.DeleteFile("test.txt");
+            });
         }
 
         [Test]

@@ -1,14 +1,14 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Text;
 using System.Linq;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web;
-using Umbraco.Web.Routing;
+using Umbraco.Web.Composing;
 using Umbraco.Web.WebServices;
+using Umbraco.Web._Legacy.Actions;
 
 
 namespace umbraco.dialogs
@@ -32,16 +32,16 @@ namespace umbraco.dialogs
 
             if (node == null)
             {
-                feedback.Text = ui.Text("assignDomain", "invalidNode");
+                feedback.Text = Services.TextService.Localize("assignDomain/invalidNode");
                 pane_language.Visible = false;
                 pane_domains.Visible = false;
                 p_buttons.Visible = false;
                 return;
-            }            
+            }
 
-            pane_language.Title = ui.Text("assignDomain", "setLanguage");
-            pane_domains.Title = ui.Text("assignDomain", "setDomains");
-            prop_language.Text = ui.Text("assignDomain", "language");
+            pane_language.Title = Services.TextService.Localize("assignDomain/setLanguage");
+            pane_domains.Title = Services.TextService.Localize("assignDomain/setDomains");
+            prop_language.Text = Services.TextService.Localize("assignDomain/language");
 
             var nodeDomains = Services.DomainService.GetAssignedDomains(nodeId, true).ToArray();
             var wildcard = nodeDomains.FirstOrDefault(d => d.IsWildcard);
@@ -49,7 +49,7 @@ namespace umbraco.dialogs
             var sb = new StringBuilder();
             sb.Append("languages: [");
             var i = 0;
-            foreach (var language in ApplicationContext.Current.Services.LocalizationService.GetAllLanguages())
+            foreach (var language in Current.Services.LocalizationService.GetAllLanguages())
                 sb.AppendFormat("{0}{{ \"Id\": {1}, \"Code\": \"{2}\" }}", (i++ == 0 ? "" : ","), language.Id, language.IsoCode);
             sb.Append("]\r\n");
 

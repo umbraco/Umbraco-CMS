@@ -313,17 +313,18 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *    });
           * </pre> 
           * 
-          * @param {Int} id id of content item to return        
+          * @param {Int} id id of content item to return
+          * @param {Int} languageId optional ID of the language to retrieve the item in 
           * @returns {Promise} resourcePromise object containing the content item.
           *
           */
-        getById: function (id) {
+        getById: function (id, languageId) {
             return umbRequestHelper.resourcePromise(
                   $http.get(
                         umbRequestHelper.getApiUrl(
                               "contentApiBaseUrl",
                               "GetById",
-                              [{ id: id }])),
+                            { id: id, languageId: languageId })),
                   'Failed to retrieve data for content id ' + id);
         },
 

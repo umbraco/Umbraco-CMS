@@ -1,7 +1,7 @@
 ﻿<%@ Page Language="C#" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="true"
     CodeBehind="search.aspx.cs" Inherits="umbraco.presentation.dialogs.search" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <asp:Content ID="header1" ContentPlaceHolderID="head" runat="server">
 <script type="text/javascript">
     function openItem(id) {
@@ -33,7 +33,7 @@
     <cc1:Pane ID="Wizard" runat="server">
         <h3>Search</h3>
         <p>
-        <asp:TextBox ID="keyword" runat="server" Width="500" CssClass="bigInput"></asp:TextBox> 
+        <asp:TextBox ID="keyword" runat="server" Width="500" CssClass="bigInput"></asp:TextBox>
             <asp:Button ID="searchButton" runat="server" Text="Search" onclick="search_Click" /><br />
         </p>
         <asp:Panel ID="nothingFound" runat="server" Visible="false">

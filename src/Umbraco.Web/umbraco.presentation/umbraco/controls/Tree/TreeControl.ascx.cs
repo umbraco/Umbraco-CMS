@@ -1,24 +1,19 @@
 ﻿using System;
+using Umbraco.Core.Security;
 using System.Collections.Generic;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.Script.Serialization;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.Controls;
-using umbraco.interfaces;
-using System.Text.RegularExpressions;
-using umbraco.BusinessLogic.Actions;
-using umbraco.businesslogic.Utils;
 using System.Text;
 using umbraco.cms.presentation.Trees;
-using umbraco.BasePages;
-using System.Web.Services;
 using System.Drawing;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 
 namespace umbraco.controls.Tree
 {
@@ -226,10 +221,10 @@ namespace umbraco.controls.Tree
             m_TreeService.App = GetCurrentApp();
 
             // Validate permissions
-            if (!BasePages.BasePage.ValidateUserContextID(BasePages.BasePage.umbracoUserContextID))
+            if (ValidateCurrentUser() == false)
                 return;
-            UmbracoEnsuredPage page = new UmbracoEnsuredPage();
-            if (!page.ValidateUserApp(GetCurrentApp()))
+
+            if (!Security.ValidateUserApp(GetCurrentApp()))
                 throw new ArgumentException("The current user doesn't have access to this application. Please contact the system administrator.");
 
             //find all tree definitions that have the current application alias that are ACTIVE.
@@ -237,7 +232,7 @@ namespace umbraco.controls.Tree
             //m_ActiveTreeDefs = TreeDefinitionCollection.Instance.FindActiveTrees(GetCurrentApp());
 
             m_ActiveTreeDefs = Services.ApplicationTreeService.GetApplicationTrees(GetCurrentApp(), true).ToList();
-            
+
             if (!string.IsNullOrEmpty(this.TreeType))
             {
                 m_ActiveTreeDefs = m_ActiveTreeDefs
@@ -264,6 +259,28 @@ namespace umbraco.controls.Tree
 
             m_IsInit = true;
         }
+
+        /// <summary>
+        /// Validates the currently logged in user and ensures they are not timed out
+        /// </summary>
+        /// <returns></returns>
+        private bool ValidateCurrentUser()
+        {
+            var identity = Context.GetCurrentIdentity(
+                //DO NOT AUTO-AUTH UNLESS THE CURRENT HANDLER IS WEBFORMS!
+                // Without this check, anything that is using this legacy API, like ui.Text will
+                // automatically log the back office user in even if it is a front-end request (if there is
+                // a back office user logged in. This can cause problems becaues the identity is changing mid
+                // request. For example: http://issues.umbraco.org/issue/U4-4010
+                HttpContext.Current.CurrentHandler is Page);
+
+            if (identity != null)
+            {
+                return true;
+            }
+            return false;
+        }
+
 
         /// <summary>
         /// This calls the databind method to bind the data binding syntax on the front-end.
@@ -387,13 +404,13 @@ namespace umbraco.controls.Tree
             else
             {
 
-                //If there is more than 1 tree for the application than render out a 
+                //If there is more than 1 tree for the application than render out a
                 //container node labelled with the current application.
                 XmlTree xTree = new XmlTree();
                 XmlTreeNode xNode = XmlTreeNode.CreateRoot(new NullTree(GetCurrentApp()));
-                xNode.Text = ui.Text("sections", GetCurrentApp(), UmbracoEnsuredPage.CurrentUser);
+                xNode.Text = Services.TextService.Localize("sections", GetCurrentApp());
                 xNode.Source = m_TreeService.GetServiceUrl();
-                xNode.Action = "javascript:" + ClientTools.Scripts.OpenDashboard(GetCurrentApp());
+                xNode.Action = "javascript:" + global::Umbraco.Web.UI.Pages.ClientTools.Scripts.OpenDashboard(GetCurrentApp());
                 xNode.NodeType = m_TreeService.App.ToLower();
                 xNode.NodeID = "-1";
                 xNode.Icon = ".sprTreeFolder";
@@ -420,7 +437,7 @@ namespace umbraco.controls.Tree
             {
                 TreeDefinition treeDef = TreeDefinitionCollection.Instance.FindTree(m_TreeService.TreeType);
                 if (treeDef != null)
-                    return treeDef.App.alias;
+                    return treeDef.App.Alias;
             }
             else if (!string.IsNullOrEmpty(m_TreeService.App))
                 return m_TreeService.App;

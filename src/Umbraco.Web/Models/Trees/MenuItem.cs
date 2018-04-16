@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.Trees;
-using umbraco;
-using umbraco.interfaces;
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
+using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Models.Trees
 {
@@ -37,14 +38,14 @@ namespace Umbraco.Web.Models.Trees
             SeperatorBefore = false;
             Icon = legacyMenu.Icon;
             Action = legacyMenu;
-        } 
+        }
         #endregion
 
         #region Properties
         internal IAction Action { get; set; }
 
         /// <summary>
-        /// A dictionary to support any additional meta data that should be rendered for the node which is 
+        /// A dictionary to support any additional meta data that should be rendered for the node which is
         /// useful for custom action commands such as 'create', 'copy', etc...
         /// </summary>
         /// <remarks>
@@ -69,7 +70,7 @@ namespace Umbraco.Web.Models.Trees
         public bool SeperatorBefore { get; set; }
 
         [DataMember(Name = "cssclass")]
-        public string Icon { get; set; } 
+        public string Icon { get; set; }
         #endregion
 
         #region Constants
@@ -85,8 +86,8 @@ namespace Umbraco.Web.Models.Trees
         internal const string ActionUrlKey = "actionUrl";
 
         //TODO: some action's want to launch a new window like live editing, we support this in the menu item's metadata with
-        // a key called: "actionUrlMethod" which can be set to either: Dialog, BlankWindow. Normally this is always set to Dialog 
-        // if a URL is specified in the "actionUrl" metadata. For now I'm not going to implement launching in a blank window, 
+        // a key called: "actionUrlMethod" which can be set to either: Dialog, BlankWindow. Normally this is always set to Dialog
+        // if a URL is specified in the "actionUrl" metadata. For now I'm not going to implement launching in a blank window,
         // though would be v-easy, just not sure we want to ever support that?
         internal const string ActionUrlMethodKey = "actionUrlMethod";
 
@@ -96,14 +97,14 @@ namespace Umbraco.Web.Models.Trees
         internal const string ActionViewKey = "actionView";
 
         /// <summary>
-        /// Used to specify the js method to execute for the menu item 
+        /// Used to specify the js method to execute for the menu item
         /// </summary>
         internal const string JsActionKey = "jsAction";
 
         /// <summary>
         /// Used to specify an angular route to go to for the menu item
         /// </summary>
-        internal const string ActionRouteKey = "actionRoute"; 
+        internal const string ActionRouteKey = "actionRoute";
 
         #endregion
 
@@ -177,21 +178,55 @@ namespace Umbraco.Web.Models.Trees
 
         internal void ConvertLegacyMenuItem(IUmbracoEntity item, string nodeType, string currentSection)
         {
-            //First try to get a URL/title from the legacy action,
-            // if that doesn't work, try to get the legacy confirm view
+            // try to get a URL/title from the legacy action,
+            // in some edge cases, item can be null so we'll just convert those to "-1" and "" for id and name since these edge cases don't need that.
+            var attempt = LegacyTreeDataConverter.GetUrlAndTitleFromLegacyAction(Action,
+                item == null ? "-1" : item.Id.ToInvariantString(),
+                nodeType,
+                item == null ? "" : item.Name, currentSection);
+            if (attempt)
+            {
+                var action = attempt.Result;
+                LaunchDialogUrl(action.Url, action.DialogTitle);
+            }
+            else
+            {
+                // if that doesn't work, try to get the legacy confirm view
+                var attempt2 = LegacyTreeDataConverter.GetLegacyConfirmView(Action);
+                if (attempt2)
+                {
+                    var view = attempt2.Result;
+                    var textService = Current.Services.TextService;
+                    LaunchDialogView(view, textService.Localize("defaultdialogs/confirmdelete") + " '" + (item == null ? "" : item.Name) + "' ?");
+                }
+            }
+        }
 
-            //in some edge cases, item can be null so we'll just convert those to "-1" and "" for id and name since these edge cases don't need that.
-            Attempt
-                .Try(LegacyTreeDataConverter.GetUrlAndTitleFromLegacyAction(Action,
-                                                                            item == null ? "-1" : item.Id.ToInvariantString(),
-                                                                            nodeType,
-                                                                            item == null ? "" : item.Name, currentSection),
-                     action => LaunchDialogUrl(action.Url, action.DialogTitle))
-                .OnFailure(() => LegacyTreeDataConverter.GetLegacyConfirmView(Action),
-                           view => LaunchDialogView(
-                               view,
-                               ui.GetText("defaultdialogs", "confirmdelete") + " '" + (item == null ? "" : item.Name) + "' ?"));
-        } 
+        internal void ConvertLegacyFileSystemMenuItem(string path, string nodeType, string currentSection)
+        {
+            // try to get a URL/title from the legacy action,
+            // in some edge cases, item can be null so we'll just convert those to "-1" and "" for id and name since these edge cases don't need that.
+            var attempt = LegacyTreeDataConverter.GetUrlAndTitleFromLegacyAction(Action,
+                path,
+                nodeType,
+                path, currentSection);
+            if (attempt)
+            {
+                var action = attempt.Result;
+                LaunchDialogUrl(action.Url, action.DialogTitle);
+            }
+            else
+            {
+                // if that doesn't work, try to get the legacy confirm view
+                var attempt2 = LegacyTreeDataConverter.GetLegacyConfirmView(Action);
+                if (attempt2)
+                {
+                    var view = attempt2.Result;
+                    var textService = Current.Services.TextService;
+                    LaunchDialogView(view, textService.Localize("defaultdialogs/confirmdelete") + " '" + path + "' ?");
+                }
+            }
+        }
         #endregion
 
     }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -9,7 +9,7 @@ using System.Web.SessionState;
 using AutoMapper;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using umbraco;
+using Umbraco.Web.Macros;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 
@@ -93,15 +93,13 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            //need to get a legacy macro object - eventually we'll have a new format but nto yet
-            var macro = new macro(macroAlias);
-            if (macro == null)
-            {
+            var m = Services.MacroService.GetByAlias(macroAlias);
+            if (m == null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+            var macro = new MacroModel(m);
 
             //if it isn't supposed to be rendered in the editor then return an empty string
-            if (macro.DontRenderInEditor)
+            if (macro.RenderInEditor == false)
             {
                 var response = Request.CreateResponse();
                 //need to create a specific content result formatted as html since this controller has been configured

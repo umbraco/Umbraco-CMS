@@ -3,11 +3,13 @@ using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Strings.Css;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Strings
 {
     [TestFixture]
-    public class StylesheetHelperTests
+    public class StylesheetHelperTests : UmbracoTestBase
     {
         [Test]
         public void Replace_Rule()
@@ -65,18 +67,18 @@ p {
         [TestCase("Test", "p", @"font-size: 1em;
 color:red; font-weight:bold;
 
-text-align:left;", @"/** umb_name: Test */ p { font-size: 1em; 
+text-align:left;", @"/** umb_name: Test */ p { font-size: 1em;
 color:red; font-weight:bold;
 
-text-align:left; 
+text-align:left;
 
 }")]
         // All on one line with no spaces
         [TestCase("Test", "p", "font-size: 1em;", @"/**UMB_NAME:Test*/p{font-size: 1em;}")]
         // Has a name with spaces
-        [TestCase("Hello world", "p", "font-size: 1em;", @"/**UMB_NAME:Hello world */p{font-size: 1em;}")]        
+        [TestCase("Hello world", "p", "font-size: 1em;", @"/**UMB_NAME:Hello world */p{font-size: 1em;}")]
         // Every part on a new line
-        [TestCase("Test", "p", "font-size: 1em;", @"/** 
+        [TestCase("Test", "p", "font-size: 1em;", @"/**
 umb_name:
 Test
 */
@@ -86,7 +88,7 @@ font-size: 1em;
 }")]
         public void ParseRules_Parses(string name, string selector, string styles, string css)
         {
-            
+
             // Act
             var results = StylesheetHelper.ParseRules(css);
 
@@ -117,17 +119,17 @@ p, h2
         //Only a single asterisk
         [TestCase("/* umb_name: Test */ p { font-size: 1em; }")]
         // Has a name with spaces over multiple lines
-        [TestCase(@"/**UMB_NAME:Hello 
+        [TestCase(@"/**UMB_NAME:Hello
 
 world */p{font-size: 1em;}")]
         public void ParseRules_DoesntParse(string css)
         {
-         
+
             // Act
             var results = StylesheetHelper.ParseRules(css);
 
             // Assert
-            Assert.IsTrue(results.Count() == 0);
+            Assert.IsTrue(results.Any() == false);
         }
     }
 }

@@ -1,45 +1,39 @@
-using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using umbraco.cms.businesslogic.web;
+﻿using System;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Services;
+using Umbraco.Web;
+using Umbraco.Web.Composing;
+using Umbraco.Web.UI.Pages;
 
 namespace umbraco.presentation.actions
 {
-    public partial class delete : BasePages.UmbracoEnsuredPage
+    public partial class delete : UmbracoEnsuredPage
     {
-        private Document d;
+        private IContent c;
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            d = new Document(int.Parse(helper.Request("id")));
+            c = Current.Services.ContentService.GetById(int.Parse(Request.GetItemAsString("id")));
 
-            if (!base.ValidateUserApp(Constants.Applications.Content))
+            if (Security.ValidateUserApp(Constants.Applications.Content) == false)
                 throw new ArgumentException("The current user doesn't have access to this application. Please contact the system administrator.");
-            if (!base.ValidateUserNodeTreePermissions(d.Path, "D"))
-                throw new ArgumentException("The current user doesn't have permissions to delete this document. Please contact the system administrator.");
-            
-            pane_delete.Text = ui.Text("delete") + " '" + d.Text + "'";
-            Panel2.Text = ui.Text("delete");
-            warning.Text = ui.Text("confirmdelete") + " '" + d.Text + "'";
-            deleteButton.Text = ui.Text("delete");
+            CheckPathAndPermissions(c.Id, UmbracoObjectTypes.Document, Umbraco.Web._Legacy.Actions.ActionDelete.Instance);
+
+            pane_delete.Text = Services.TextService.Localize("delete") + " '" + c.Name + "'";
+            Panel2.Text = Services.TextService.Localize("delete");
+            warning.Text = Services.TextService.Localize("confirmdelete") + " '" + c.Name + "'";
+            deleteButton.Text = Services.TextService.Localize("delete");
         }
 
         protected void deleteButton_Click(object sender, EventArgs e)
         {
-            deleteMessage.Text = ui.Text("deleted");
-            deleted.Text =  "'" + d.Text + "' " + ui.Text("deleted");
+            deleteMessage.Text = Services.TextService.Localize("deleted");
+            deleted.Text =  "'" + c.Name + "' " + Services.TextService.Localize("deleted");
             deleteMessage.Visible = true;
             confirm.Visible = false;
-            
-            d.delete();
+
+            Current.Services.ContentService.Delete(c);
         }
     }
 }

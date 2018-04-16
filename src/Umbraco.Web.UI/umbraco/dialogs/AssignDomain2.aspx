@@ -1,7 +1,7 @@
 <%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" Codebehind="AssignDomain2.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.AssignDomain2" %>
 <%@ Import Namespace="Umbraco.Web" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
-<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 <umb:JsInclude runat="server" FilePath="Dialogs/AssignDomain2.js" PathNameAlias="UmbracoClient" />
@@ -14,8 +14,8 @@
             var dialog = new Umbraco.Dialogs.AssignDomain2({
                 nodeId: <%=GetNodeId()%>,
                 restServiceLocation: '<%=GetRestServicePath() %>',
-                invalidDomain: '<%=umbraco.ui.Text("assignDomain", "invalidDomain") %>',
-                duplicateDomain: '<%=umbraco.ui.Text("assignDomain", "duplicateDomain") %>',
+                invalidDomain: '<%=Services.TextService.Localize("assignDomain/invalidDomain") %>',
+                duplicateDomain: '<%=Services.TextService.Localize("assignDomain/duplicateDomain") %>',
                 <asp:Literal runat="server" ID="data" />
             });
         dialog.init();
@@ -25,28 +25,28 @@
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
-    
+
     <div class="umb-dialog-body">
 
-    <cc1:Feedback ID="feedback" runat="server" />    
+    <cc1:Feedback ID="feedback" runat="server" />
     <div id="komask"></div>
-    
+
          <cc1:Pane runat="server" ID="pane_language">
             <cc1:PropertyPanel runat="server" ID="prop_language">
-                <select class="umb-editor umb-dropdown" name="language" data-bind="options: languages, optionsText: 'Code', optionsValue: 'Id', value: language, optionsCaption: '<%=umbraco.ui.Text("assignDomain", "inherit") %>    '"></select>
-             <!--   <small class="help-inline"><%=umbraco.ui.Text("assignDomain", "setLanguageHelp") %></small>-->
+                <select class="umb-editor umb-dropdown" name="language" data-bind="options: languages, optionsText: 'Code', optionsValue: 'Id', value: language, optionsCaption: '<%=Services.TextService.Localize("assignDomain/inherit") %>    '"></select>
+             <!--   <small class="help-inline"><%=Services.TextService.Localize("assignDomain/setLanguageHelp") %></small>-->
             </cc1:PropertyPanel>
         </cc1:Pane>
-    
+
 
         <cc1:Pane runat="server" ID="pane_domains">
-            <small class="help-inline"><%=umbraco.ui.Text("assignDomain", "domainHelp") %></small>
+            <small class="help-inline"><%=Services.TextService.Localize("assignDomain/domainHelp") %></small>
             <cc1:PropertyPanel runat="server">
                 <table class="table domains" data-bind="visible: domains().length > 0">
                     <thead>
                         <tr>
-                            <th><%=umbraco.ui.Text("assignDomain", "domain") %></th>
-                            <th><%=umbraco.ui.Text("assignDomain", "language") %></th>
+                            <th><%=Services.TextService.Localize("assignDomain/domain") %></th>
+                            <th><%=Services.TextService.Localize("assignDomain/language") %></th>
                             <th />
                         </tr>
                     </thead>
@@ -59,12 +59,12 @@
                     </tbody>
                 </table>
             </cc1:PropertyPanel>
-            
+
             <cc1:PropertyPanel runat="server">
-                <button class="btn" data-bind="click: addDomain"><%=umbraco.ui.Text("assignDomain", "addNew") %></button>        
+                <button class="btn" data-bind="click: addDomain"><%=Services.TextService.Localize("assignDomain/addNew") %></button>
             </cc1:PropertyPanel>
 
-               
+
         </cc1:Pane>
 
         </div>
@@ -72,8 +72,8 @@
 
 
         <div runat="server" ID="p_buttons" class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-             <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel")%></a>  
-             <button class="btn btn-primary" id="btnSave"><%=umbraco.ui.Text("buttons", "save") %></button>
+             <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=Services.TextService.Localize("general/cancel")%></a>
+             <button class="btn btn-primary" id="btnSave"><%=Services.TextService.Localize("buttons/save") %></button>
         </div>
 
 </asp:Content>

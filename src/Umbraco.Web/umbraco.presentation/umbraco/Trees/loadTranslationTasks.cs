@@ -1,30 +1,12 @@
-﻿using System;
-using System.Collections;
+﻿using Umbraco.Core.Services;
+using System;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
 using System.Text;
-using System.Web;
-using System.Xml;
-using System.Configuration;
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.contentitem;
-using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic.member;
-using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.translation;
-using umbraco.cms.businesslogic.task;
-
-using umbraco.interfaces;
-using umbraco.DataLayer;
-using umbraco.BusinessLogic.Actions;
-using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Web;
+using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web._Legacy.BusinessLogic;
 
 namespace umbraco {
     public class loadOpenTasks : BaseTree {
@@ -32,8 +14,8 @@ namespace umbraco {
         public loadOpenTasks(string application) : base(application) { }
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode) {
-            rootNode.Action = "javascript:openTranslationOverview(" + currentUser().Id + ",'open');";
-            rootNode.Text = ui.Text("translation", "assignedTasks");
+            rootNode.Action = "javascript:openTranslationOverview(" + CurrentUser().Id + ",'open');";
+            rootNode.Text = Services.TextService.Localize("translation/assignedTasks");
         }
 
         protected override void CreateRootNodeActions(ref List<IAction> actions) {
@@ -44,26 +26,28 @@ namespace umbraco {
         public override void RenderJS(ref StringBuilder Javascript) {
            Javascript.Append(@"
                     function openTranslationTask(id) {
-	                    UmbClientMgr.contentFrame('translation/details.aspx?id=' + id);
+                        UmbClientMgr.contentFrame('translation/details.aspx?id=' + id);
                     }
                     function openTranslationOverview(id, mode) {
-	                    UmbClientMgr.contentFrame('translation/default.aspx?id=' + id + '&mode=' + mode);
+                        UmbClientMgr.contentFrame('translation/default.aspx?id=' + id + '&mode=' + mode);
                     }
-                    ");     
+                    ");
         }
 
-        private User currentUser() {
-            return User.GetCurrent();
+        private IUser CurrentUser()
+        {
+            return UmbracoContext.Current.Security.CurrentUser;
         }
+
         public override void Render(ref XmlTree tree) {
-            foreach (Task t in Task.GetTasks(currentUser(), false)) {
-                
+            foreach (Task t in Task.GetTasks(CurrentUser(), false)) {
+
                 if (t.Type.Alias == "toTranslate") {
                     XmlTreeNode xNode = XmlTreeNode.Create(this);
                     xNode.Menu.Clear();
 
                     xNode.NodeID = t.Id.ToString();
-                    xNode.Text = t.Node.Text;
+                    xNode.Text = t.TaskEntityEntity.Name;
                     xNode.Action = "javascript:openTranslationTask(" + t.Id.ToString() + ")";
                     xNode.Icon = ".sprTreeSettingLanguage";
                     xNode.OpenIcon = ".sprTreeSettingLanguage";
@@ -74,11 +58,11 @@ namespace umbraco {
                         tree.Add(xNode);
                         OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
                     }
-                    
+
                 }
 
             }
-        }        
+        }
     }
 
     public class loadYourTasks : BaseTree {
@@ -86,8 +70,8 @@ namespace umbraco {
         public loadYourTasks(string application) : base(application) { }
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode) {
-            rootNode.Action = "javascript:openTranslationOverview(" + currentUser().Id + ", 'owned');";
-            rootNode.Text = ui.Text("translation", "ownedTasks");
+            rootNode.Action = "javascript:openTranslationOverview(" + CurrentUser().Id + ", 'owned');";
+            rootNode.Text = Services.TextService.Localize("translation/ownedTasks");
         }
 
         protected override void CreateRootNodeActions(ref List<IAction> actions) {
@@ -98,23 +82,23 @@ namespace umbraco {
         public override void RenderJS(ref StringBuilder Javascript) {
             Javascript.Append(@"
                     function openTranslationTask(id) {
-	                    UmbClientMgr.contentFrame('translation/details.aspx?id=' + id);
+                        UmbClientMgr.contentFrame('translation/details.aspx?id=' + id);
                     }");
         }
 
-        private User currentUser()
+        private IUser CurrentUser()
         {
-            return User.GetCurrent();
+            return UmbracoContext.Current.Security.CurrentUser;
         }
 
         public override void Render(ref XmlTree tree) {
-            foreach (Task t in Task.GetOwnedTasks(currentUser(), false)) {
+            foreach (Task t in Task.GetOwnedTasks(CurrentUser(), false)) {
 
                 if (t.Type.Alias == "toTranslate") {
                     XmlTreeNode xNode = XmlTreeNode.Create(this);
                     xNode.Menu.Clear();
                     xNode.NodeID = t.Id.ToString();
-                    xNode.Text = t.Node.Text;
+                    xNode.Text = t.TaskEntityEntity.Name;
                     xNode.Action = "javascript:openTranslationTask(" + t.Id.ToString() + ")";
                     xNode.Icon = ".sprTreeSettingLanguage";
                     xNode.OpenIcon = ".sprTreeSettingLanguage";
@@ -125,12 +109,12 @@ namespace umbraco {
                         tree.Add(xNode);
                         OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
                     }
-                    
+
                 }
 
             }
         }
     }
-    
+
 
 }

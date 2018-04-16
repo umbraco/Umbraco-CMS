@@ -5,8 +5,8 @@ using System.Linq;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.EntityBase;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public TemplateFactory()
         {
-            
+
         }
 
         public TemplateFactory(Guid nodeObjectTypeId)
@@ -51,8 +51,7 @@ namespace Umbraco.Core.Persistence.Factories
                 if (dto.NodeDto.ParentId > 0)
                     template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);
 
-                //on initial construction we don't want to have dirty properties tracked
-                // http://issues.umbraco.org/issue/U4-1946
+                // reset dirty initial properties (U4-1946)
                 template.ResetDirtyProperties(false);
                 return template;
             }

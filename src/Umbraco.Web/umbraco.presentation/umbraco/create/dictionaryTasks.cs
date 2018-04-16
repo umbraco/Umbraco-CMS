@@ -1,13 +1,10 @@
-using System;
-using System.Data;
-using System.Web.Security;
+﻿using System;
 using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
-using umbraco.BusinessLogic;
-using umbraco.DataLayer;
-using umbraco.BasePages;
-using Umbraco.Core.IO;
-using umbraco.cms.businesslogic.member;
+using Umbraco.Core;
+using Umbraco.Web;
+using Umbraco.Web.Composing;
+using Umbraco.Web._Legacy.UI;
 
 namespace umbraco
 {
@@ -16,27 +13,32 @@ namespace umbraco
         public override bool PerformSave()
         {
             //check to see if key is already there
-            if (cms.businesslogic.Dictionary.DictionaryItem.hasKey(Alias))
+            if (Current.Services.LocalizationService.DictionaryItemExists(Alias))
                 return false;
 
             // Create new dictionary item if name no already exist
             if (ParentID > 0)
             {
-                var id = cms.businesslogic.Dictionary.DictionaryItem.addKey(Alias, "", new cms.businesslogic.Dictionary.DictionaryItem(ParentID).key);
-                _returnUrl = string.Format("settings/editDictionaryItem.aspx?id={0}", id);
+                var di = Current.Services.LocalizationService.GetDictionaryItemById(ParentID);
+                if (di == null) throw new NullReferenceException("No dictionary item found by id " + ParentID);
+                var item = Current.Services.LocalizationService.CreateDictionaryItemWithIdentity(Alias, di.Key);
+                _returnUrl = string.Format("settings/editDictionaryItem.aspx?id={0}", item.Id);
             }
             else
             {
-                var id = cms.businesslogic.Dictionary.DictionaryItem.addKey(Alias, "");
-                _returnUrl = string.Format("settings/editDictionaryItem.aspx?id={0}", id);
+                var item = Current.Services.LocalizationService.CreateDictionaryItemWithIdentity(Alias, null);
+                _returnUrl = string.Format("settings/editDictionaryItem.aspx?id={0}", item.Id);
             }
             return true;
         }
 
         public override bool PerformDelete()
         {
-			LogHelper.Debug<dictionaryTasks>(TypeID.ToString() + " " + ParentID.ToString() + " deleting " + Alias);
-            new cms.businesslogic.Dictionary.DictionaryItem(ParentID).delete();
+            Current.Logger.Debug<dictionaryTasks>(TypeID + " " + ParentID + " deleting " + Alias);
+            var di = Current.Services.LocalizationService.GetDictionaryItemById(ParentID);
+            if (di == null) return true;
+
+            Current.Services.LocalizationService.Delete(di);
             return true;
         }
 
@@ -49,7 +51,7 @@ namespace umbraco
 
         public override string AssignedApp
         {
-            get { return DefaultApps.settings.ToString(); }
+            get { return Constants.Applications.Settings.ToString(); }
         }
     }
 }

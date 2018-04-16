@@ -1,78 +1,89 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Collections.ObjectModel;
 using System.Web.Routing;
+using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.ObjectResolution;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
-using Umbraco.Tests.TestHelpers;
-using umbraco.BusinessLogic;
-using Umbraco.Web.PublishedCache.XmlPublishedCache;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Umbraco.Core.Composing;
+using Current = Umbraco.Core.Composing.Current;
+using LightInject;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.PublishedContent
 {
     [TestFixture]
+    [UmbracoTest(PluginManager = UmbracoTestOptions.PluginManager.PerFixture)]
     public class PublishedContentMoreTests : PublishedContentTestBase
     {
-
         // read http://stackoverflow.com/questions/7713326/extension-method-that-works-on-ienumerablet-and-iqueryablet
         // and http://msmvps.com/blogs/jon_skeet/archive/2010/10/28/overloading-and-generic-constraints.aspx
         // and http://blogs.msdn.com/b/ericlippert/archive/2009/12/10/constraints-are-not-part-of-the-signature.aspx
 
-        private PluginManager _pluginManager;
-
-        public override void Initialize()
+        public override void SetUp()
         {
-            base.Initialize();
+            base.SetUp();
+
+            var umbracoContext = GetUmbracoContext();
+            Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
+        }
+
+        protected override void Compose()
+        {
+            base.Compose();
+
+            Container.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
+        }
+
+        protected override TypeLoader CreatePluginManager(IServiceFactory f)
+        {
+            var pluginManager = base.CreatePluginManager(f);
 
             // this is so the model factory looks into the test assembly
-            _pluginManager = PluginManager.Current;
-            PluginManager.Current = new PluginManager(new ActivatorServiceProvider(), new NullCacheProvider(), ProfilingLogger, false)
-                {
-                    AssembliesToScan = _pluginManager.AssembliesToScan
-                        .Union(new[] { typeof (PublishedContentMoreTests).Assembly})
-                };
+            pluginManager.AssembliesToScan = pluginManager.AssembliesToScan
+                .Union(new[] { typeof (PublishedContentMoreTests).Assembly })
+                .ToList();
 
-            InitializeUmbracoContext();
+            return pluginManager;
         }
 
-        protected override void FreezeResolution()
-        {
-            PropertyValueConvertersResolver.Current =
-                new PropertyValueConvertersResolver(new ActivatorServiceProvider(), Logger);
-            var types = PluginManager.Current.ResolveTypes<PublishedContentModel>();
-            PublishedContentModelFactoryResolver.Current =
-                new PublishedContentModelFactoryResolver(new PublishedContentModelFactory(types));
-
-            base.FreezeResolution();
-        }
-
-        private void InitializeUmbracoContext()
+        private UmbracoContext GetUmbracoContext()
         {
             RouteData routeData = null;
 
-            var caches = CreatePublishedContent();
+            var publishedSnapshot = CreatePublishedSnapshot();
+
+            var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
+            publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot);
+
+            var globalSettings = TestObjects.GetGlobalSettings();
 
             var httpContext = GetHttpContextFactory("http://umbraco.local/", routeData).HttpContext;
-            var ctx = new UmbracoContext(
+            var umbracoContext = new UmbracoContext(
                 httpContext,
-                ApplicationContext,
-                caches,
-                new WebSecurity(httpContext, ApplicationContext));
+                publishedSnapshotService.Object,
+                new WebSecurity(httpContext, Current.Services.UserService, globalSettings),
+                TestObjects.GetUmbracoSettings(),
+                Enumerable.Empty<IUrlProvider>(),
+                globalSettings);
 
-            UmbracoContext.Current = ctx;
+            return umbracoContext;
         }
-        
+
         public override void TearDown()
         {
-            PluginManager.Current = _pluginManager;
-            ApplicationContext.Current.DisposeIfDisposable();
-            ApplicationContext.Current = null;
+            base.TearDown();
+
+            Current.Reset();
         }
 
         [Test]
@@ -83,74 +94,38 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        public void DefaultContentSetIsSiblings()
-        {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First();
-            Assert.AreEqual(0, content.Index());
-            Assert.IsTrue(content.IsFirst());
-        }
-
-        [Test]
-        public void RunOnLatestContentSet()
-        {
-            // get first content
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First();
-            var id = content.Id;
-            Assert.IsTrue(content.IsFirst());
-
-            // reverse => should be last, but set has not changed => still first
-            content = UmbracoContext.Current.ContentCache.GetAtRoot().Reverse().First(x => x.Id == id);
-            Assert.IsTrue(content.IsFirst());
-            Assert.IsFalse(content.IsLast());
-
-            // reverse + new set => now it's last
-            content = UmbracoContext.Current.ContentCache.GetAtRoot().Reverse().ToContentSet().First(x => x.Id == id);
-            Assert.IsFalse(content.IsFirst());
-            Assert.IsTrue(content.IsLast());
-
-            // reverse that set => should be first, but no new set => still last
-            content = UmbracoContext.Current.ContentCache.GetAtRoot().Reverse().ToContentSet().Reverse().First(x => x.Id == id);
-            Assert.IsFalse(content.IsFirst());
-            Assert.IsTrue(content.IsLast());
-        }
-
-        [Test]
         public void Distinct()
         {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
+            var items = UmbracoContext.Current.ContentCache.GetAtRoot()
                 .Distinct()
                 .Distinct()
-                .ToContentSet()
-                .First();
+                .ToIndexedArray();
 
-            Assert.AreEqual("Content 1", content.Name);
-            Assert.IsTrue(content.IsFirst());
-            Assert.IsFalse(content.IsLast());
+            var item = items[0];
+            Assert.AreEqual("Content 1", item.Content.Name);
+            Assert.IsTrue(item.IsFirst());
+            Assert.IsFalse(item.IsLast());
 
-            content = content.Next();
-            Assert.AreEqual("Content 2", content.Name);
-            Assert.IsFalse(content.IsFirst());
-            Assert.IsFalse(content.IsLast());
+            item = items[1];
+            Assert.AreEqual("Content 2", item.Content.Name);
+            Assert.IsFalse(item.IsFirst());
+            Assert.IsFalse(item.IsLast());
 
-            content = content.Next();
-            Assert.AreEqual("Content 2Sub", content.Name);
-            Assert.IsFalse(content.IsFirst());
-            Assert.IsTrue(content.IsLast());
+            item = items[2];
+            Assert.AreEqual("Content 2Sub", item.Content.Name);
+            Assert.IsFalse(item.IsFirst());
+            Assert.IsTrue(item.IsLast());
         }
 
         [Test]
         public void OfType1()
         {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
+            var items = UmbracoContext.Current.ContentCache.GetAtRoot()
                 .OfType<ContentType2>()
                 .Distinct()
-                .ToArray();
-            Assert.AreEqual(2, content.Count());
-            Assert.IsInstanceOf<ContentType2>(content.First());
-            var set = content.ToContentSet();
-            Assert.IsInstanceOf<ContentType2>(set.First());
-            Assert.AreSame(set, set.First().ContentSet);
-            Assert.IsInstanceOf<ContentType2Sub>(set.First().Next());
+                .ToIndexedArray();
+            Assert.AreEqual(2, items.Length);
+            Assert.IsInstanceOf<ContentType2>(items.First().Content);
         }
 
         [Test]
@@ -159,11 +134,9 @@ namespace Umbraco.Tests.PublishedContent
             var content = UmbracoContext.Current.ContentCache.GetAtRoot()
                 .OfType<ContentType2Sub>()
                 .Distinct()
-                .ToArray();
-            Assert.AreEqual(1, content.Count());
-            Assert.IsInstanceOf<ContentType2Sub>(content.First());
-            var set = content.ToContentSet();
-            Assert.IsInstanceOf<ContentType2Sub>(set.First());
+                .ToIndexedArray();
+            Assert.AreEqual(1, content.Length);
+            Assert.IsInstanceOf<ContentType2Sub>(content.First().Content);
         }
 
         [Test]
@@ -179,17 +152,16 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Position()
         {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot()
-                .Where(x => x.GetPropertyValue<int>("prop1") == 1234)
-                .ToContentSet()
-                .ToArray();
+            var items = UmbracoContext.Current.ContentCache.GetAtRoot()
+                .Where(x => x.Value<int>("prop1") == 1234)
+                .ToIndexedArray();
 
-            Assert.IsTrue(content.First().IsFirst());
-            Assert.IsFalse(content.First().IsLast());
-            Assert.IsFalse(content.First().Next().IsFirst());
-            Assert.IsFalse(content.First().Next().IsLast());
-            Assert.IsFalse(content.First().Next().Next().IsFirst());
-            Assert.IsTrue(content.First().Next().Next().IsLast());
+            Assert.IsTrue(items.First().IsFirst());
+            Assert.IsFalse(items.First().IsLast());
+            Assert.IsFalse(items.Skip(1).First().IsFirst());
+            Assert.IsFalse(items.Skip(1).First().IsLast());
+            Assert.IsFalse(items.Skip(2).First().IsFirst());
+            Assert.IsTrue(items.Skip(2).First().IsLast());
         }
 
         [Test]
@@ -218,25 +190,29 @@ namespace Umbraco.Tests.PublishedContent
         public void PublishedContentQueryTypedContentList()
         {
             var query = new PublishedContentQuery(UmbracoContext.Current.ContentCache, UmbracoContext.Current.MediaCache);
-            var result = query.TypedContent(new[] { 1, 2, 4 }).ToArray();
+            var result = query.Content(new[] { 1, 2, 4 }).ToArray();
             Assert.AreEqual(2, result.Length);
             Assert.AreEqual(1, result[0].Id);
             Assert.AreEqual(2, result[1].Id);
         }
 
-        static SolidPublishedCaches CreatePublishedContent()
+        private static SolidPublishedShapshot CreatePublishedSnapshot()
         {
-            var caches = new SolidPublishedCaches();
-            var cache = caches.ContentCache;
+            var dataTypeService = new TestObjects.TestDataTypeService(
+                new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
+
+            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
+            var caches = new SolidPublishedShapshot();
+            var cache = caches.InnerContentCache;
 
             var props = new[]
-                    {
-                        new PublishedPropertyType("prop1", 1, "?"), 
-                    };
+            {
+                factory.CreatePropertyType("prop1", 1),
+            };
 
-            var contentType1 = new PublishedContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
-            var contentType2 = new PublishedContentType(2, "ContentType2", Enumerable.Empty<string>(), props);
-            var contentType2s = new PublishedContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), props);
+            var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
+            var contentType2 = factory.CreateContentType(2, "ContentType2", Enumerable.Empty<string>(), props);
+            var contentType2Sub = factory.CreateContentType(3, "ContentType2Sub", Enumerable.Empty<string>(), props);
 
             cache.Add(new SolidPublishedContent(contentType1)
                 {
@@ -250,15 +226,15 @@ namespace Umbraco.Tests.PublishedContent
                     ParentId = -1,
                     ChildIds = new int[] {},
                     Properties = new Collection<IPublishedProperty>
+                    {
+                        new SolidPublishedProperty
                         {
-                            new SolidPublishedProperty
-                                {
-                                    PropertyTypeAlias = "prop1",
-                                    HasValue = true,
-                                    Value = 1234,
-                                    DataValue = "1234"
-                                }
+                            Alias = "prop1",
+                            SolidHasValue = true,
+                            SolidValue = 1234,
+                            SolidSourceValue = "1234"
                         }
+                    }
                 });
 
             cache.Add(new SolidPublishedContent(contentType2)
@@ -273,18 +249,18 @@ namespace Umbraco.Tests.PublishedContent
                     ParentId = -1,
                     ChildIds = new int[] { },
                     Properties = new Collection<IPublishedProperty>
-                            {
-                                new SolidPublishedProperty
-                                    {
-                                        PropertyTypeAlias = "prop1",
-                                        HasValue = true,
-                                        Value = 1234,
-                                        DataValue = "1234"
-                                    }
-                            }
+                    {
+                        new SolidPublishedProperty
+                        {
+                            Alias = "prop1",
+                            SolidHasValue = true,
+                            SolidValue = 1234,
+                            SolidSourceValue = "1234"
+                        }
+                    }
                 });
 
-            cache.Add(new SolidPublishedContent(contentType2s)
+            cache.Add(new SolidPublishedContent(contentType2Sub)
             {
                 Id = 3,
                 SortOrder = 2,
@@ -296,15 +272,15 @@ namespace Umbraco.Tests.PublishedContent
                 ParentId = -1,
                 ChildIds = new int[] { },
                 Properties = new Collection<IPublishedProperty>
-                            {
-                                new SolidPublishedProperty
-                                    {
-                                        PropertyTypeAlias = "prop1",
-                                        HasValue = true,
-                                        Value = 1234,
-                                        DataValue = "1234"
-                                    }
-                            }
+                {
+                    new SolidPublishedProperty
+                    {
+                        Alias = "prop1",
+                        SolidHasValue = true,
+                        SolidValue = 1234,
+                        SolidSourceValue = "1234"
+                    }
+                }
             });
 
             return caches;

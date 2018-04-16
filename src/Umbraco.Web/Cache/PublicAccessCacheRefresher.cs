@@ -1,8 +1,4 @@
-using System;
-using System.Xml;
-using Newtonsoft.Json;
-using umbraco.cms.businesslogic.web;
-using Umbraco.Core;
+﻿using System;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 
@@ -10,20 +6,23 @@ namespace Umbraco.Web.Cache
 {
     public sealed class PublicAccessCacheRefresher : CacheRefresherBase<PublicAccessCacheRefresher>
     {
-        protected override PublicAccessCacheRefresher Instance
-        {
-            get { return this; }
-        }
+        public PublicAccessCacheRefresher(CacheHelper cacheHelper)
+            : base(cacheHelper)
+        { }
 
-        public override Guid UniqueIdentifier
-        {
-            get { return new Guid(DistributedCache.PublicAccessCacheRefresherId); }
-        }
+        #region Define
 
-        public override string Name
-        {
-            get { return "Public access cache refresher"; }
-        }
+        protected override PublicAccessCacheRefresher This => this;
+
+        public static readonly Guid UniqueId = Guid.Parse("1DB08769-B104-4F8B-850E-169CAC1DF2EC");
+
+        public override Guid RefresherUniqueId => UniqueId;
+
+        public override string Name => "Public Access Cache Refresher";
+
+        #endregion
+
+        #region Refresher
 
         public override void Refresh(Guid id)
         {
@@ -48,5 +47,7 @@ namespace Umbraco.Web.Cache
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             base.Remove(id);
         }
+
+        #endregion
     }
 }

@@ -1,25 +1,20 @@
 ﻿using System;
-using System.Linq;
-using System.Web;
-using System.Web.Security;
+using System.Security;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Web.Security;
-using umbraco;
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
-using umbraco.businesslogic.Exceptions;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.WebServices
 {
     public abstract class UmbracoAuthorizedHttpHandler : UmbracoHttpHandler
     {
         protected UmbracoAuthorizedHttpHandler()
-            : base()
-        {
-        }
+        { }
 
-        protected UmbracoAuthorizedHttpHandler(UmbracoContext umbracoContext)
-            : base(umbracoContext)
+        protected UmbracoAuthorizedHttpHandler(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
+            : base(umbracoContext, services, appCache)
         {
         }
 
@@ -62,9 +57,9 @@ namespace Umbraco.Web.WebServices
             {
                 return true;
             }
-            var hasAccess = UserHasAppAccess(app, UmbracoUser);
+            var hasAccess = UserHasAppAccess(app, Security.CurrentUser);
             if (!hasAccess && throwExceptions)
-                throw new UserAuthorizationException("The user does not have access to the required application");
+                throw new SecurityException("The user does not have access to the required application");
             return hasAccess;
         }
 
@@ -74,7 +69,7 @@ namespace Umbraco.Web.WebServices
         /// <param name="app"></param>
         /// <param name="user"></param>
         /// <returns></returns>
-        protected bool UserHasAppAccess(string app, User user)
+        protected bool UserHasAppAccess(string app, IUser user)
         {
             return Security.UserHasSectionAccess(app, user);
         }
@@ -101,22 +96,6 @@ namespace Umbraco.Web.WebServices
             return result == ValidateRequestAttempt.Success;
         }
 
-        /// <summary>
-        /// Returns the current user
-        /// </summary>
-        [Obsolete("This should no longer be used since it returns the legacy user object, use The Security.CurrentUser instead to return the proper user object")]
-        protected User UmbracoUser
-        {
-            get
-            {
-                if (!_hasValidated)
-                {
-                    Security.ValidateCurrentUser();
-                    _hasValidated = true;
-                }
-                return new User(Security.CurrentUser);
-            }
-        }
 
     }
 }

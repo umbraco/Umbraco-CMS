@@ -4,10 +4,13 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.UI;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
-using umbraco.DataLayer;
+using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Web.UI.Controls
 {
@@ -16,119 +19,89 @@ namespace Umbraco.Web.UI.Controls
     /// </summary>
     public abstract class UmbracoUserControl : UserControl
     {
+        private ClientTools _clientTools;
+        private UrlHelper _url;
+
         /// <summary>
         /// Default constructor
         /// </summary>
         /// <param name="umbracoContext"></param>
-        protected UmbracoUserControl(UmbracoContext umbracoContext)
+        /// <param name="services"></param>
+        /// <param name="appCache"></param>
+        protected UmbracoUserControl(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
         {
-            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
             UmbracoContext = umbracoContext;
-            InstanceId = Guid.NewGuid();
-            Umbraco = new UmbracoHelper(umbracoContext);
-            _membershipHelper = new MembershipHelper(umbracoContext);
+            Umbraco = new UmbracoHelper(umbracoContext, services, appCache);
+            Members = new MembershipHelper(umbracoContext);
+
+            // fixme inject somehow
+            Logger = Current.Logger;
+            ProfilingLogger = Current.ProfilingLogger;
+            Services = Current.Services;
         }
 
         /// <summary>
         /// Empty constructor, uses Singleton to resolve the UmbracoContext
         /// </summary>
         protected UmbracoUserControl()
-            : this(UmbracoContext.Current)
+            : this(Current.UmbracoContext, Current.Services, Current.ApplicationCache)
+        { }
+
+        // for debugging purposes
+        internal Guid InstanceId { get; } = Guid.NewGuid();
+
+        /// <summary>
+        /// Gets the Umbraco helper.
+        /// </summary>
+        public UmbracoHelper Umbraco { get; }
+
+        /// <summary>
+        /// Gets the membership helper;
+        /// </summary>
+        public MembershipHelper Members { get; }
+
+        /// <summary>
+        /// Gets the web security helper.
+        /// </summary>
+        public WebSecurity Security => UmbracoContext.Security;
+
+        /// <summary>
+        /// Gets the logger.
+        /// </summary>
+        public ILogger Logger { get; }
+
+        /// <summary>
+        /// Gets the ProfilingLogger.
+        /// </summary>
+        public ProfilingLogger ProfilingLogger { get; }
+
+        /// <summary>
+        /// Gets the Umbraco context.
+        /// </summary>
+        public UmbracoContext UmbracoContext { get; }
+
+        /// <summary>
+        /// Gets the services context.
+        /// </summary>
+        public ServiceContext Services { get; }
+
+        /// <summary>
+        /// Gets an instance of ClientTools for access to the pages client API.
+        /// </summary>
+        public ClientTools ClientTools
         {
-        }
-
-        private readonly MembershipHelper _membershipHelper;
-
-        /// <summary>
-        /// Useful for debugging
-        /// </summary>
-        internal Guid InstanceId { get; private set; }
-
-        /// <summary>
-        /// Returns an UmbracoHelper object
-        /// </summary>
-        public UmbracoHelper Umbraco { get; private set; }
-
-        /// <summary>
-        /// Returns the MemberHelper instance
-        /// </summary>
-        public MembershipHelper Members
-        {
-            get { return _membershipHelper; }
-        }
-
-        /// <summary>
-        /// Returns the current WebSecurity instance
-        /// </summary>
-        public WebSecurity Security
-        {
-            get { return UmbracoContext.Security; }
-        }
-
-        /// <summary>
-        /// Returns an ILogger
-        /// </summary>
-        public ILogger Logger
-        {
-            get { return ProfilingLogger.Logger; }
-        }
-
-        /// <summary>
-        /// Returns a ProfilingLogger
-        /// </summary>
-        public ProfilingLogger ProfilingLogger
-        {
-            get { return UmbracoContext.Application.ProfilingLogger; }
-        }
-
-        /// <summary>
-        /// Returns the current UmbracoContext
-        /// </summary>
-        public UmbracoContext UmbracoContext { get; private set; }
-
-        /// <summary>
-        /// Returns the current ApplicationContext
-        /// </summary>
-        public ApplicationContext ApplicationContext
-        {
-            get { return UmbracoContext.Application; }
+            get
+            {
+                var page = Page as BasePage;
+                return _clientTools ?? (_clientTools = page != null ? page.ClientTools : new ClientTools(Page));
+            }
         }
 
         /// <summary>
-        /// Returns a ServiceContext
+        /// Gets a Url helper.
         /// </summary>
-        public ServiceContext Services
-        {
-            get { return ApplicationContext.Services; }
-        }
-
-        /// <summary>
-        /// Returns a DatabaseContext
-        /// </summary>
-        public DatabaseContext DatabaseContext
-        {
-            get { return ApplicationContext.DatabaseContext; }
-        }
-
-        private UrlHelper _url;
-        /// <summary>
-        /// Returns a UrlHelper
-        /// </summary>
-        /// <remarks>
-        /// This URL helper is created without any route data and an empty request context
-        /// </remarks>
-        public UrlHelper Url
-        {
-            get { return _url ?? (_url = new UrlHelper(Context.Request.RequestContext)); }
-        }
-
-        /// <summary>
-        /// Unused, please do not use
-        /// </summary>
-        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
-        protected ISqlHelper SqlHelper
-        {
-            get { return global::umbraco.BusinessLogic.Application.SqlHelper; }
-        }
+        /// <remarks>This URL helper is created without any route data and an empty request context.</remarks>
+        public UrlHelper Url => _url ?? (_url = new UrlHelper(Context.Request.RequestContext));
     }
 }

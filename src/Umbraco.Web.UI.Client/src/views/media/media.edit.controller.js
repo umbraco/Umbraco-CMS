@@ -142,7 +142,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
 
         $scope.content.apps = [];
 
-        if($scope.content.contentType.alias === "Folder") {
+        if($scope.content.contentTypeAlias === "Folder") {
           // add list view app
           $scope.content.apps.push(listview);
             
@@ -171,7 +171,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
     
     $scope.save = function () {
 
-        if (!$scope.busy && formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+        if (!$scope.busy && formHelper.submitForm({ scope: $scope })) {
 
             $scope.busy = true;
             $scope.page.saveButtonState = "busy";

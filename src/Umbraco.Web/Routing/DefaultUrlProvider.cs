@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-
-using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
-using Umbraco.Web.PublishedCache;
-using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Web.Routing
 {
@@ -18,16 +13,14 @@ namespace Umbraco.Web.Routing
     public class DefaultUrlProvider : IUrlProvider
     {
         private readonly IRequestHandlerSection _requestSettings;
+        private readonly ILogger _logger;
+        private readonly IGlobalSettings _globalSettings;
 
-        [Obsolete("Use the ctor that specifies the IRequestHandlerSection")]
-        public DefaultUrlProvider()
-            : this(UmbracoConfig.For.UmbracoSettings().RequestHandler)
-        {            
-        }
-
-        public DefaultUrlProvider(IRequestHandlerSection requestSettings)
+        public DefaultUrlProvider(IRequestHandlerSection requestSettings, ILogger logger, IGlobalSettings globalSettings)
         {
             _requestSettings = requestSettings;
+            _logger = logger;
+            _globalSettings = globalSettings;
         }
 
         #region GetUrl
@@ -59,13 +52,12 @@ namespace Umbraco.Web.Routing
         {
             if (string.IsNullOrWhiteSpace(route))
             {
-                LogHelper.Debug<DefaultUrlProvider>(
-                    "Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
-                    () => id);
+                _logger.Debug<DefaultUrlProvider>(() =>
+                    $"Couldn't find any page with nodeId={id}. This is most likely caused by the page not being published.");
                 return null;
             }
 
-            var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
+            var domainHelper = new DomainHelper(umbracoContext.PublishedShapshot.Domains);
 
             // extract domainUri and path
             // route is /<path> or <domainRootId>/<path>
@@ -101,13 +93,12 @@ namespace Umbraco.Web.Routing
 
             if (string.IsNullOrWhiteSpace(route))
             {
-                LogHelper.Debug<DefaultUrlProvider>(
-                    "Couldn't find any page with nodeId={0}. This is most likely caused by the page not being published.",
-                    () => id);
+                _logger.Debug<DefaultUrlProvider>(() =>
+                    $"Couldn't find any page with nodeId={id}. This is most likely caused by the page not being published.");
                 return null;
             }
 
-            var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
+            var domainHelper = new DomainHelper(umbracoContext.PublishedShapshot.Domains);
 
             // extract domainUri and path
             // route is /<path> or <domainRootId>/<path>
@@ -179,7 +170,7 @@ namespace Umbraco.Web.Routing
 
             // UriFromUmbraco will handle vdir
             // meaning it will add vdir into domain urls too!
-            return UriUtility.UriFromUmbraco(uri);
+            return UriUtility.UriFromUmbraco(uri, _globalSettings, _requestSettings);
         }
 
         string CombinePaths(string path1, string path2)
@@ -201,7 +192,7 @@ namespace Umbraco.Web.Routing
 
             // UriFromUmbraco will handle vdir
             // meaning it will add vdir into domain urls too!
-            return uris.Select(UriUtility.UriFromUmbraco);
+            return uris.Select(x => UriUtility.UriFromUmbraco(x, _globalSettings, _requestSettings));
         }
 
         #endregion

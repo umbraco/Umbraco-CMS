@@ -1,22 +1,17 @@
-using Umbraco.Core;
+﻿using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.ColorPickerAlias, "Color Picker", "colorpicker", Icon="icon-colorpicker", Group="Pickers")]
-    public class ColorPickerPropertyEditor : PropertyEditor
+    [DataEditor(Constants.PropertyEditors.Aliases.ColorPicker, "Color Picker", "colorpicker", Icon="icon-colorpicker", Group="Pickers")]
+    public class ColorPickerPropertyEditor : DataEditor
     {
-        /// <summary>
-        /// Return a custom pre-value editor
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// ColorListPreValueEditor uses the ValueListPreValueEditor with a custom view and controller.
-        /// </remarks>
-        protected override PreValueEditor CreatePreValueEditor()
-        {
-            return new ColorListPreValueEditor();
-        }
+        public ColorPickerPropertyEditor(ILogger logger)
+            : base(logger)
+        { }
 
+        /// <inheritdoc />
+        protected override IConfigurationEditor CreateConfigurationEditor() => new ColorPickerConfigurationEditor();
     }
 }

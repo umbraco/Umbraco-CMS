@@ -1,11 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Mappers
 {
     /// <summary>
-    /// Represents a <see cref="UserGroup"/> to DTO mapper used to translate the properties of the public api 
+    /// Represents a <see cref="UserGroup"/> to DTO mapper used to translate the properties of the public api
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
     [MapperFor(typeof(IUserGroup))]
@@ -23,12 +23,9 @@ namespace Umbraco.Core.Persistence.Mappers
 
         #region Overrides of BaseMapper
 
-        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache
-        {
-            get { return PropertyInfoCacheInstance; }
-        }
+        internal override ConcurrentDictionary<string, DtoMapModel> PropertyInfoCache => PropertyInfoCacheInstance;
 
-        internal override void BuildMap()
+        protected override void BuildMap()
         {
             CacheMap<UserGroup, UserGroupDto>(src => src.Id, dto => dto.Id);
             CacheMap<UserGroup, UserGroupDto>(src => src.Alias, dto => dto.Alias);

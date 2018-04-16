@@ -1,10 +1,12 @@
-using System;
+﻿using System;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -19,75 +21,72 @@ namespace Umbraco.Web.PropertyEditors
     {
         private readonly bool _publishIds;
 
-        internal PublishValuesMultipleValueEditor(bool publishIds, IDataTypeService dataTypeService, PropertyValueEditor wrapped)
-            : base(dataTypeService, wrapped)
+        internal PublishValuesMultipleValueEditor(bool publishIds, ILogger logger, DataEditorAttribute attribute)
+            : base(attribute, logger)
         {
             _publishIds = publishIds;
         }
 
-        public PublishValuesMultipleValueEditor(bool publishIds, PropertyValueEditor wrapped)
-            : this(publishIds, ApplicationContext.Current.Services.DataTypeService, wrapped)
-        {
-        }
+        public PublishValuesMultipleValueEditor(bool publishIds, DataEditorAttribute attribute)
+            : this(publishIds, Current.Logger, attribute)
+        { }
 
         /// <summary>
         /// If publishing ids, we don't need to do anything, otherwise we need to look up the pre-values and get the string values
         /// </summary>
-        /// <param name="property"></param>
         /// <param name="propertyType"></param>
+        /// <param name="propertyValue"></param>
         /// <param name="dataTypeService"></param>
         /// <returns></returns>
-        public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        public override string ConvertDbToString(PropertyType propertyType, object propertyValue, IDataTypeService dataTypeService)
         {
-            if (property.Value == null)
+            if (propertyValue == null)
                 return null;
 
             //publishing ids, so just need to return the value as-is
             if (_publishIds)
             {
-                return property.Value.ToString();
+                return propertyValue.ToString();
             }
 
-            //get the multiple ids
-            var selectedIds = property.Value.ToString().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+            // get the multiple ids
+            // if none, fallback to base
+            var selectedIds = propertyValue.ToString().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
             if (selectedIds.Any() == false)
-            {
-                //nothing there
-                return base.ConvertDbToString(property, propertyType, dataTypeService);
-            }
+                return base.ConvertDbToString(propertyType, propertyValue, dataTypeService);
 
-            var preValues = GetPreValues(property);
-            if (preValues != null)
-            {
-                //get all pre-values matching our Ids
-                return string.Join(",", 
-                                   preValues.Where(x => selectedIds.Contains(x.Value.Id.ToInvariantString())).Select(x => x.Value.Value));
-            }
+            // get the configuration items
+            // if none, fallback to base
+            var configuration = dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ValueListConfiguration>();
+            if (configuration == null)
+                return base.ConvertDbToString(propertyType, propertyValue, dataTypeService);
 
-            return base.ConvertDbToString(property, propertyType, dataTypeService);
+            var items = configuration.Items.Where(x => selectedIds.Contains(x.Id.ToInvariantString())).Select(x => x.Value);
+            return string.Join(",", items);
         }
 
         /// <summary>
         /// Override so that we can return a json array to the editor for multi-select values
         /// </summary>
         /// <param name="property"></param>
-        /// <param name="propertyType"></param>
         /// <param name="dataTypeService"></param>
+        /// <param name="languageId"></param>
+        /// <param name="segment"></param>
         /// <returns></returns>
-        public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
+        public override object ToEditor(Property property, IDataTypeService dataTypeService, int? languageId = null, string segment = null)
         {
-            var delimited = base.ConvertDbToEditor(property, propertyType, dataTypeService).ToString();
+            var delimited = base.ToEditor(property, dataTypeService, languageId, segment).ToString();
             return delimited.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
         /// <summary>
-        /// When multiple values are selected a json array will be posted back so we need to format for storage in 
+        /// When multiple values are selected a json array will be posted back so we need to format for storage in
         /// the database which is a comma separated ID value
         /// </summary>
         /// <param name="editorValue"></param>
         /// <param name="currentValue"></param>
         /// <returns></returns>
-        public override object ConvertEditorToDb(Core.Models.Editors.ContentPropertyData editorValue, object currentValue)
+        public override object FromEditor(Core.Models.Editors.ContentPropertyData editorValue, object currentValue)
         {
             var json = editorValue.Value as JArray;
             if (json == null)

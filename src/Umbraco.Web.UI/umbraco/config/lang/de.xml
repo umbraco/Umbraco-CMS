@@ -33,8 +33,10 @@
     <key alias="sendtopublish">Zur Veröffentlichung einreichen</key>
     <key alias="sendToTranslate">Zur Übersetzung senden</key>
     <key alias="sort">Sortieren</key>
+    <key alias="toPublish">Zur Veröffentlichung einreichen</key>
     <key alias="translate">Übersetzen</key>
     <key alias="update">Aktualisieren</key>
+    <key alias="defaultValue">Standardwert</key>
   </area>
   <area alias="assignDomain">
     <key alias="permissionDenied">Erlaubnis verweigert.</key>
@@ -83,6 +85,7 @@
     <key alias="returnToList">Zurück zur Liste</key>
     <key alias="save">Speichern</key>
     <key alias="saveAndPublish">Speichern und veröffentlichen</key>
+    <key alias="saveAndSchedule">Speichern und planen</key>
     <key alias="saveToPublish">Speichern und zur Abnahme übergeben</key>
     <key alias="showPage">Vorschau</key>
     <key alias="showPageDisabled">Die Vorschaufunktion ist deaktiviert, da keine Vorlage zugewiesen ist</key>
@@ -858,7 +861,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="quote">Quote</key>  
     <key alias="insertControl">Element hinzufügen</key>
     <key alias="addRows">Zeilenlayout auswählen</key>
-    <key alias="addElement">Element mit &lt;i class="icon icon-add blue"&gt;&lt;/i&gt; hinzufügen</key>
+    <key alias="addElement">Einfach auf &lt;i class="icon icon-add blue"&gt;&lt;/i&gt; klicken, um das erste Element anzulegen</key>
     <key alias="dropElement">Drop content</key>
     <key alias="clickToEmbed">Klicken, um Inhalt einzubetten</key>
     <key alias="clickToInsertImage">Klicken, um Abbildung einzufügen</key>
@@ -902,6 +905,8 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="postContent">An den Feldinhalt anhängen</key>
     <key alias="preContent">Dem Feldinhalt voranstellen</key>
     <key alias="recursive">Rekursiv</key>
+    <key alias="removeParagraph">Textabsatz entfernen</key>
+    <key alias="removeParagraphHelp">Alle &lt;p&gt; am Anfang und am Ende des Feldinhalts werden entfernt</key>
     <key alias="standardFields">Standardfelder</key>
     <key alias="uppercase">Großbuchstaben</key>
     <key alias="urlEncode">URL kodieren</key>
@@ -979,6 +984,9 @@ Ihr freundlicher Umbraco-Robot
     <key alias="templates">Vorlagen</key>
     <key alias="xslt">XSLT-Dateien</key>
     <key alias="analytics">Auswertungen</key>
+    <key alias="userPermissions">Berechtigungen</key>
+    <key alias="userTypes">Benutzertypen</key>
+    <key alias="users">Benutzer</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Neues Update verfügbar</key>
@@ -1021,6 +1029,8 @@ Ihr freundlicher Umbraco-Robot
     <key alias="startnode">Startelement in den Inhalten</key>
     <key alias="username">Benutzername</key>
     <key alias="userPermissions">Berechtigungen</key>
+    <key alias="usertype">Rolle</key>
+    <key alias="userTypes">Rollen</key>
     <key alias="writer">Autor</key>
     <key alias="translator">Übersetzer</key>
     <key alias="yourProfile" version="7.0">Ihr Profil</key>

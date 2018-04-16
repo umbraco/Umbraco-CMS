@@ -1,8 +1,9 @@
-using System;
+﻿using System;
 using System.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Core.Publishing
 {
@@ -12,10 +13,12 @@ namespace Umbraco.Core.Publishing
     internal class ScheduledPublisher
     {
         private readonly IContentService _contentService;
+        private readonly ILogger _logger;
 
-        public ScheduledPublisher(IContentService contentService)
+        public ScheduledPublisher(IContentService contentService, ILogger logger)
         {
             _contentService = contentService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -26,27 +29,22 @@ namespace Umbraco.Core.Publishing
         /// </returns>
         public int CheckPendingAndProcess()
         {
+            // fixme isn't this done in ContentService already?
             var counter = 0;
             var contentForRelease = _contentService.GetContentForRelease().ToArray();
             if (contentForRelease.Length > 0)
-                LogHelper.Debug<ScheduledPublisher>(string.Format("There's {0} item(s) of content to be published", contentForRelease.Length));
+                _logger.Debug<ScheduledPublisher>($"There's {contentForRelease.Length} item(s) of content to be published");
             foreach (var d in contentForRelease)
             {
                 try
                 {
                     d.ReleaseDate = null;
-                    var result = _contentService.SaveAndPublishWithStatus(d, (int)d.GetWriterProfile().Id);
-                    LogHelper.Debug<ContentService>(string.Format("Result of publish attempt: {0}", result.Result.StatusType));
+                    d.PublishValues(); // fixme variants?
+                    var result = _contentService.SaveAndPublish(d, d.GetWriterProfile().Id);
+                    _logger.Debug<ContentService>($"Result of publish attempt: {result.Result}");
                     if (result.Success == false)
                     {
-                        if (result.Exception != null)
-                        {
-                            LogHelper.Error<ScheduledPublisher>("Could not published the document (" + d.Id + ") based on it's scheduled release, status result: " + result.Result.StatusType, result.Exception);
-                        }
-                        else
-                        {
-                            LogHelper.Warn<ScheduledPublisher>("Could not published the document (" + d.Id + ") based on it's scheduled release. Status result: " + result.Result.StatusType);
-                        }
+                        _logger.Error<ScheduledPublisher>($"Error publishing node {d.Id}");
                     }
                     else
                     {
@@ -55,28 +53,28 @@ namespace Umbraco.Core.Publishing
                 }
                 catch (Exception ee)
                 {
-                    LogHelper.Error<ScheduledPublisher>(string.Format("Error publishing node {0}", d.Id), ee);
+                    _logger.Error<ScheduledPublisher>($"Error publishing node {d.Id}", ee);
                     throw;
                 }
             }
 
             var contentForExpiration = _contentService.GetContentForExpiration().ToArray();
             if (contentForExpiration.Length > 0)
-                LogHelper.Debug<ScheduledPublisher>(string.Format("There's {0} item(s) of content to be unpublished", contentForExpiration.Length));
+                _logger.Debug<ScheduledPublisher>($"There's {contentForExpiration.Length} item(s) of content to be unpublished");
             foreach (var d in contentForExpiration)
             {
                 try
                 {
                     d.ExpireDate = null;
-                    var result = _contentService.UnPublish(d, (int)d.GetWriterProfile().Id);
-                    if (result)
+                    var result = _contentService.Unpublish(d, d.GetWriterProfile().Id);
+                    if (result.Success)
                     {
                         counter++;
                     }
                 }
                 catch (Exception ee)
                 {
-                    LogHelper.Error<ScheduledPublisher>(string.Format("Error unpublishing node {0}", d.Id), ee);
+                    _logger.Error<ScheduledPublisher>($"Error unpublishing node {d.Id}", ee);
                     throw;
                 }
             }

@@ -20,7 +20,7 @@ namespace Umbraco.Core.Packaging
             if (macroService != null) _macroService = macroService;
             else throw new ArgumentNullException("macroService");
         }
-        
+
         public IEnumerable<IFile> FindConflictingStylesheets(XElement stylesheetNotes)
         {
             if (string.Equals(Constants.Packaging.StylesheetsNodeName, stylesheetNotes.Name.LocalName) == false)
@@ -73,7 +73,7 @@ namespace Umbraco.Core.Packaging
                 throw new ArgumentException("Node must be a \"" + Constants.Packaging.MacrosNodeName + "\" node",
                     "macroNodes");
             }
-            
+
             return macroNodes.Elements(Constants.Packaging.MacroNodeName)
                 .Select(n =>
                 {

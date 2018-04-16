@@ -14,26 +14,16 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi.Filters;
 using System.Linq;
+using System.Net.Http;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Web;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.WebApi.Binders
 {
     internal class MemberBinder : ContentItemBaseBinder<IMember, MemberSave>
     {
-        public MemberBinder(ApplicationContext applicationContext)
-            : base(applicationContext)
-        {
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        public MemberBinder()
-            : this(ApplicationContext.Current)
-        {
-        }
-
         protected override ContentItemValidationHelper<IMember, MemberSave> GetValidationHelper()
         {
             return new MemberValidationHelper();
@@ -46,7 +36,7 @@ namespace Umbraco.Web.WebApi.Binders
         /// <returns></returns>
         protected override IMember GetExisting(MemberSave model)
         {
-            var scenario = ApplicationContext.Services.MemberService.GetMembershipScenario();
+            var scenario = Services.MemberService.GetMembershipScenario();
             var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
             switch (scenario)
             {
@@ -71,12 +61,12 @@ namespace Umbraco.Web.WebApi.Binders
                     //    {
                     //        var existing = GetExisting(model.Key);
                     //        FilterContentTypeProperties(existing.ContentType, existing.ContentType.PropertyTypes.Select(x => x.Alias).ToArray());
-                    //    }    
+                    //    }
                     //}
 
                     //generate a member for a generic membership provider
                     //NOTE: We don't care about the password here, so just generate something
-                    //var member = MemberService.CreateGenericMembershipProviderMember(model.Name, model.Email, model.Username, Guid.NewGuid().ToString("N"));                    
+                    //var member = MemberService.CreateGenericMembershipProviderMember(model.Name, model.Email, model.Username, Guid.NewGuid().ToString("N"));
 
                     //var convertResult = membershipUser.ProviderUserKey.TryConvertTo<Guid>();
                     //if (convertResult.Success == false)
@@ -93,7 +83,7 @@ namespace Umbraco.Web.WebApi.Binders
 
         private IMember GetExisting(Guid key)
         {
-            var member = ApplicationContext.Services.MemberService.GetByKey(key);
+            var member = Services.MemberService.GetByKey(key);
             if (member == null)
             {
                 throw new InvalidOperationException("Could not find member with key " + key);
@@ -116,7 +106,7 @@ namespace Umbraco.Web.WebApi.Binders
 
             if (provider.IsUmbracoMembershipProvider())
             {
-                var contentType = ApplicationContext.Services.MemberTypeService.Get(model.ContentTypeAlias);
+                var contentType = Services.MemberTypeService.Get(model.ContentTypeAlias);
                 if (contentType == null)
                 {
                     throw new InvalidOperationException("No member type found wth alias " + model.ContentTypeAlias);
@@ -137,7 +127,7 @@ namespace Umbraco.Web.WebApi.Binders
 
                 //If the default Member type exists, we'll use that to create the IMember - that way we can associate the custom membership
                 // provider to our data - eventually we can support editing custom properties with a custom provider.
-                var memberType = ApplicationContext.Services.MemberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
+                var memberType = Services.MemberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
                 if (memberType != null)
                 {
                     FilterContentTypeProperties(memberType, memberType.PropertyTypes.Select(x => x.Alias).ToArray());
@@ -193,48 +183,57 @@ namespace Umbraco.Web.WebApi.Binders
             /// We need to manually validate a few things here like email and login to make sure they are valid and aren't duplicates
             /// </summary>
             /// <param name="postedItem"></param>
-            /// <param name="actionContext"></param>
-            /// <returns></returns>           
-            protected override bool ValidatePropertyData(ContentItemBasic<ContentPropertyBasic, IMember> postedItem, HttpActionContext actionContext)
+            /// <param name="dto"></param>
+            /// <param name="modelState"></param>
+            /// <returns></returns>
+            public override bool ValidatePropertyData(ContentItemBasic<ContentPropertyBasic, IMember> postedItem, ContentItemDto<IMember> dto, ModelStateDictionary modelState)
             {
                 var memberSave = (MemberSave)postedItem;
 
                 if (memberSave.Username.IsNullOrWhiteSpace())
                 {
-                    actionContext.ModelState.AddPropertyError(
+                    modelState.AddPropertyError(
                             new ValidationResult("Invalid user name", new[] { "value" }),
-                            string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));    
+                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
                 }
 
                 if (memberSave.Email.IsNullOrWhiteSpace() || new EmailAddressAttribute().IsValid(memberSave.Email) == false)
                 {
-                    actionContext.ModelState.AddPropertyError(
+                    modelState.AddPropertyError(
                             new ValidationResult("Invalid email", new[] { "value" }),
-                            string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));    
+                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
                 }
 
                 //default provider!
                 var membershipProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
-                var validEmail = ValidateUniqueEmail(memberSave, membershipProvider, actionContext);
+                var validEmail = ValidateUniqueEmail(memberSave, membershipProvider);
                 if (validEmail == false)
                 {
-                    actionContext.ModelState.AddPropertyError(
+                    modelState.AddPropertyError(
                         new ValidationResult("Email address is already in use", new[] { "value" }),
-                        string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email");
                 }
 
-                var validLogin = ValidateUniqueLogin(memberSave, membershipProvider, actionContext);
+                var validLogin = ValidateUniqueLogin(memberSave, membershipProvider);
                 if (validLogin == false)
                 {
-                    actionContext.ModelState.AddPropertyError(
+                    modelState.AddPropertyError(
                         new ValidationResult("Username is already in use", new[] { "value" }),
-                        string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
                 }
 
-                return base.ValidatePropertyData(postedItem, actionContext);
+                return base.ValidatePropertyData(postedItem, dto, modelState);
             }
 
+            /// <summary>
+            /// This ensures that the internal membership property types are removed from validation before processing the validation
+            /// since those properties are actually mapped to real properties of the IMember.
+            /// This also validates any posted data for fields that are sensitive.
+            /// </summary>
+            /// <param name="postedItem"></param>
+            /// <param name="actionContext"></param>
+            /// <returns></returns>
             protected override bool ValidateProperties(ContentItemBasic<ContentPropertyBasic, IMember> postedItem, HttpActionContext actionContext)
             {
                 var propertiesToValidate = postedItem.Properties.ToList();
@@ -245,13 +244,40 @@ namespace Umbraco.Web.WebApi.Binders
                     propertiesToValidate.RemoveAll(property => property.Alias == remove);
                 }
 
-                return ValidateProperties(propertiesToValidate.ToArray(), postedItem.PersistedContent.Properties.ToArray(), actionContext);
-            }
 
-            internal bool ValidateUniqueLogin(MemberSave contentItem, MembershipProvider membershipProvider, HttpActionContext actionContext)
+                var umbCtx = Current.UmbracoContext; // fixme inject?
+
+                //if the user doesn't have access to sensitive values, then we need to validate the incoming properties to check
+                //if a sensitive value is being submitted.
+                if (umbCtx.Security.CurrentUser.HasAccessToSensitiveData() == false)
+                {
+                    var sensitiveProperties = postedItem.PersistedContent.ContentType
+                        .PropertyTypes.Where(x => postedItem.PersistedContent.ContentType.IsSensitiveProperty(x.Alias))
+                        .ToList();
+
+                    foreach (var sensitiveProperty in sensitiveProperties)
+                    {
+                        var prop = propertiesToValidate.FirstOrDefault(x => x.Alias == sensitiveProperty.Alias);
+
+                        if (prop != null)
+                        {
+                            //this should not happen, this means that there was data posted for a sensitive property that
+                            //the user doesn't have access to, which means that someone is trying to hack the values.
+
+                            var message = $"property with alias: {prop.Alias} cannot be posted";
+                            actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, new InvalidOperationException(message));
+                            return false;
+                        }
+                    }
+                }
+
+                return ValidateProperties(propertiesToValidate, postedItem.PersistedContent.Properties.ToList(), actionContext);
+            }
+            
+            internal bool ValidateUniqueLogin(MemberSave contentItem, MembershipProvider membershipProvider)
             {
-                if (contentItem == null) throw new ArgumentNullException("contentItem");
-                if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
+                if (contentItem == null) throw new ArgumentNullException(nameof(contentItem));
+                if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
 
                 int totalRecs;
                 var existingByName = membershipProvider.FindUsersByName(contentItem.Username.Trim(), 0, int.MaxValue, out totalRecs);
@@ -282,16 +308,16 @@ namespace Umbraco.Web.WebApi.Binders
                         break;
                     default:
                         //we don't support this for members
-                        throw new HttpResponseException(HttpStatusCode.NotFound);
+                        throw new ArgumentOutOfRangeException();
                 }
 
                 return true;
             }
 
-            internal bool ValidateUniqueEmail(MemberSave contentItem, MembershipProvider membershipProvider, HttpActionContext actionContext)
+            internal bool ValidateUniqueEmail(MemberSave contentItem, MembershipProvider membershipProvider)
             {
-                if (contentItem == null) throw new ArgumentNullException("contentItem");
-                if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
+                if (contentItem == null) throw new ArgumentNullException(nameof(contentItem));
+                if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
 
                 if (membershipProvider.RequiresUniqueEmail == false)
                 {
@@ -326,7 +352,7 @@ namespace Umbraco.Web.WebApi.Binders
                         break;
                     default:
                         //we don't support this for members
-                        throw new HttpResponseException(HttpStatusCode.NotFound);
+                        throw new ArgumentOutOfRangeException();
                 }
 
                 return true;

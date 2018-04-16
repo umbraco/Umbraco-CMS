@@ -1,11 +1,15 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using BenchmarkDotNet.Attributes;
+using Moq;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Tests.Benchmarks.Config;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
@@ -137,40 +141,40 @@ namespace Umbraco.Tests.Benchmarks
         [Benchmark(OperationsPerInvoke = 10)]
         public void Enhanced_10_Children()
         {
-            XmlPublishedContent.InitializeNode(_xml10.DocumentElement, false, false,
+            XmlPublishedContent.InitializeNode(null, _xml10.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out version, out createDate, out updateDate, out level, out isDraft, out publishedContentType,
+                out createDate, out updateDate, out level, out isDraft, out publishedContentType,
                 out properties, GetPublishedContentType);
         }
 
         [Benchmark(OperationsPerInvoke = 10)]
         public void Enhanced_100_Children()
         {
-            XmlPublishedContent.InitializeNode(_xml100.DocumentElement, false, false,
+            XmlPublishedContent.InitializeNode(null, _xml100.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out version, out createDate, out updateDate, out level, out isDraft, out publishedContentType,
+                out createDate, out updateDate, out level, out isDraft, out publishedContentType,
                 out properties, GetPublishedContentType);
         }
 
         [Benchmark(OperationsPerInvoke = 10)]
         public void Enhanced_1000_Children()
         {
-            XmlPublishedContent.InitializeNode(_xml1000.DocumentElement, false, false,
+            XmlPublishedContent.InitializeNode(null, _xml1000.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out version, out createDate, out updateDate, out level, out isDraft, out publishedContentType,
+                out createDate, out updateDate, out level, out isDraft, out publishedContentType,
                 out properties, GetPublishedContentType);
         }
 
         [Benchmark(OperationsPerInvoke = 10)]
         public void Enhanced_10000_Children()
         {
-            XmlPublishedContent.InitializeNode(_xml10000.DocumentElement, false, false,
+            XmlPublishedContent.InitializeNode(null, _xml10000.DocumentElement, false,
                 out id, out key, out template, out sortOrder, out name, out writerName, out urlName,
                 out creatorName, out creatorId, out writerId, out docTypeAlias, out nodeType, out path,
-                out version, out createDate, out updateDate, out level, out isDraft, out publishedContentType,
+                out createDate, out updateDate, out level, out isDraft, out publishedContentType,
                 out properties, GetPublishedContentType);
         }
 
@@ -276,20 +280,30 @@ namespace Umbraco.Tests.Benchmarks
             properties = contentType.PropertyTypes.Select(p =>
             {
                 XmlNode n;
-                return propertyNodes.TryGetValue(p.PropertyTypeAlias.ToLowerInvariant(), out n)
-                    ? new XmlPublishedProperty(p, isPreviewing, n)
-                    : new XmlPublishedProperty(p, isPreviewing);
+                return propertyNodes.TryGetValue(p.Alias.ToLowerInvariant(), out n)
+                    ? new XmlPublishedProperty(p, null, isPreviewing, n)
+                    : new XmlPublishedProperty(p, null, isPreviewing);
             }).Cast<IPublishedProperty>().ToDictionary(
-                x => x.PropertyTypeAlias,
+                x => x.Alias,
                 x => x,
                 StringComparer.OrdinalIgnoreCase);
         }
 
         private static PublishedContentType GetPublishedContentType(PublishedItemType type, string alias)
         {
-            return new PublishedContentType(alias, new string[] { },
-                new List<PublishedPropertyType>(Enumerable.Range(0, 10).Select(x => new PublishedPropertyType("prop" + x, 0, "test", initConverters: false))));
+            var dataType = new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 };
 
+            var dataTypeService = Mock.Of<IDataTypeService>();
+            Mock.Get(dataTypeService)
+                .Setup(x => x.GetDataType(It.IsAny<int>()))
+                .Returns<int>(id => id == 1 ? dataType : null);
+            Mock.Get(dataTypeService)
+                .Setup(x => x.GetAll())
+                .Returns(new[] { dataType });
+
+            var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
+            return factory.CreateContentType(0, alias, new string[] {},
+                new List<PublishedPropertyType>(Enumerable.Range(0, 10).Select(x => factory.CreatePropertyType("prop" + x, 1))));
         }
     }
 }

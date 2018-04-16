@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Umbraco.Core.Models.EntityBase;
+﻿using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
 {
@@ -7,18 +6,21 @@ namespace Umbraco.Core.Models
     {
 
         /// <summary>
-        /// Returns true if this entity has just been created and persisted to the data store
+        /// Determines whether the entity was just created and persisted.
         /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This is useful when handling events to determine if an entity is a brand new entity or was
-        /// already existing.
-        /// </remarks>
-        public static bool IsNewEntity(this IEntity entity)
+        public static bool IsNewEntity(this IRememberBeingDirty entity)
         {
-            var dirty = (IRememberBeingDirty)entity;
-            return dirty.WasPropertyDirty("Id");
+            return entity.WasPropertyDirty("Id");
+        }
+
+        /// <summary>
+        /// Gets additional data.
+        /// </summary>
+        public static object GetAdditionalDataValueIgnoreCase(this IHaveAdditionalData entity, string key, object defaultValue)
+        {
+            if (!entity.HasAdditionalData) return defaultValue;
+            if (entity.AdditionalData.ContainsKeyIgnoreCase(key) == false) return defaultValue;
+            return entity.AdditionalData.GetValueIgnoreCase(key, defaultValue);
         }
     }
 }

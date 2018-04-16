@@ -55,6 +55,10 @@ The best solution is to unblock the Zip file before un-zipping: right-click the 
 
 Git might have issues dealing with long file paths during build. You may want/need to enable `core.longpaths` support (see [this page](https://github.com/msysgit/msysgit/wiki/Git-cannot-create-a-file-or-directory-with-a-long-path) for details).
 
+If PowerShell does not execute the script due to a security error, you may have to run the following command from an administrator prompt: 
+
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
+
 # Build
 
 The Umbraco Build solution relies on a PowerShell module. The module needs to be imported into PowerShell. From within Umbraco's repository root:

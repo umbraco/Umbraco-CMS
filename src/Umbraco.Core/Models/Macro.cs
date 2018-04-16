@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models
@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Macro : Entity, IMacro
+    public class Macro : EntityBase, IMacro
     {
         public Macro()
         {
@@ -173,15 +173,15 @@ namespace Umbraco.Core.Models
         {
             OnPropertyChanged(Ps.Value.PropertiesSelector);
         }
-        
-        public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+
+        public override void ResetDirtyProperties(bool rememberDirty)
         {
             _addedProperties.Clear();
             _removedProperties.Clear();
-            base.ResetDirtyProperties(rememberPreviouslyChangedProperties);
+            base.ResetDirtyProperties(rememberDirty);
             foreach (var prop in Properties)
             {
-                ((TracksChangesEntityBase)prop).ResetDirtyProperties(rememberPreviouslyChangedProperties);
+                ((BeingDirtyBase)prop).ResetDirtyProperties(rememberDirty);
             }
         }
 
@@ -320,7 +320,7 @@ namespace Umbraco.Core.Models
         [DataMember]
         public MacroPropertyCollection Properties
         {
-            get { return _properties; }            
+            get { return _properties; }
         }
 
         public override object DeepClone()

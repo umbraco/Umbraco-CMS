@@ -1,0 +1,48 @@
+<div ng-controller="Umbraco.Editors.MemberGroups.EditController as vm">
+
+    <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
+
+    <form name="contentForm"
+          ng-submit="save()"
+          novalidate
+          val-form-manager>
+
+        <umb-editor-view ng-if="!page.loading">
+
+            <umb-editor-header menu="page.menu"
+                               name="content.name"
+                               name-locked="page.nameLocked"
+                               hide-icon="true"
+                               hide-description="true"
+                               hide-alias="true">
+            </umb-editor-header>
+
+            <umb-editor-container class="form-horizontal">
+
+                <p><localize key="member_memberGroupNoProperties">Member groups have no additional properties for editing.</localize></p>
+
+            </umb-editor-container>
+            
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button type="submit"
+                                button-style="success"
+                                state="page.saveButtonState"
+                                shortcut="ctrl+s"
+                                label="Save"
+                                label-key="buttons_save">
+                    </umb-button>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+
+
+        </umb-editor-view>
+
+    </form>
+
+</div>

@@ -17,6 +17,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     $scope.page.nameLocked = false;
     $scope.page.listViewPath = null;
     $scope.page.saveButtonState = "init";
+    $scope.page.exportButton = "init";
     $scope.busy = false;
 
     $scope.page.listViewPath = ($routeParams.page && $routeParams.listName)
@@ -125,7 +126,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
 
     $scope.save = function() {
 
-        if (!$scope.busy && formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+        if (!$scope.busy && formHelper.submitForm({ scope: $scope })) {
 
             $scope.busy = true;
             $scope.page.saveButtonState = "busy";
@@ -170,6 +171,11 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
         }
 
     };
+
+    $scope.export = function() {
+        var memberKey = $scope.content.key;
+        memberResource.exportMemberData(memberKey);
+    }
 
 }
 
