@@ -161,94 +161,93 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 if (!args.path) {
                     throw "args.path cannot be null";
                 }
-                if (!args.tree) {
-                    throw "args.tree cannot be null";
+                                
+                var treeNode = loadActiveTree(args.tree);
+
+                if (angular.isString(args.path)) {
+                    args.path = args.path.replace('"', '').split(',');
                 }
 
-                //this should normally be set unless it is being called from legacy
-                // code, so set the active tree type before proceeding.
-                if (args.tree) {
-                    var treeNode = getTreeRootNode(args.tree);
+                //Filter the path for root node ids (we don't want to pass in -1 or 'init')
 
-                    if (angular.isString(args.path)) {
-                        args.path = args.path.replace('"', '').split(',');
+                args.path = _.filter(args.path, function (item) { return (item !== "init" && item !== "-1"); });
+
+                //Once those are filtered we need to check if the current user has a special start node id,
+                // if they do, then we're going to trim the start of the array for anything found from that start node
+                // and previous so that the tree syncs properly. The tree syncs from the top down and if there are parts
+                // of the tree's path in there that don't actually exist in the dom/model then syncing will not work.
+
+                return userService.getCurrentUser().then(function (userData) {
+
+                    var startNodes = [];
+                    for (var i = 0; i < userData.startContentIds; i++) {
+                        startNodes.push(userData.startContentIds[i]);
+                    }
+                    for (var j = 0; j < userData.startMediaIds; j++) {
+                        startNodes.push(userData.startMediaIds[j]);
                     }
 
-                    //Filter the path for root node ids (we don't want to pass in -1 or 'init')
-
-                    args.path = _.filter(args.path, function (item) { return (item !== "init" && item !== "-1"); });
-
-                    //Once those are filtered we need to check if the current user has a special start node id,
-                    // if they do, then we're going to trim the start of the array for anything found from that start node
-                    // and previous so that the tree syncs properly. The tree syncs from the top down and if there are parts
-                    // of the tree's path in there that don't actually exist in the dom/model then syncing will not work.
-
-                    return userService.getCurrentUser().then(function (userData) {
-
-                        var startNodes = [];
-                        for (var i = 0; i < userData.startContentIds; i++) {
-                            startNodes.push(userData.startContentIds[i]);
-                        }
-                        for (var j = 0; j < userData.startMediaIds; j++) {
-                            startNodes.push(userData.startMediaIds[j]);
-                        }
-
-                        _.each(startNodes, function (i) {
-                            var found = _.find(args.path, function (p) {
-                                return String(p) === String(i);
-                            });
-                            if (found) {
-                                args.path = args.path.splice(_.indexOf(args.path, found));
-                            }
+                    _.each(startNodes, function (i) {
+                        var found = _.find(args.path, function (p) {
+                            return String(p) === String(i);
                         });
-
-                        deleteAnimations = false;
-
-                        return treeService.syncTree({
-                            node: treeNode,
-                            path: args.path,
-                            forceReload: args.forceReload
-                        }).then(function (data) {
-
-                            if (args.activate === undefined || args.activate === true) {
-                                $scope.currentNode = data;
-                            }
-
-                            emitEvent("treeSynced", { node: data, activate: args.activate });
-
-                            enableDeleteAnimations();
-
-                            return $q.when({ node: data, activate: args.activate });
-                        });
+                        if (found) {
+                            args.path = args.path.splice(_.indexOf(args.path, found));
+                        }
                     });
-                }
+
+                    deleteAnimations = false;
+
+                    return treeService.syncTree({
+                        node: treeNode,
+                        path: args.path,
+                        forceReload: args.forceReload
+                    }).then(function (data) {
+
+                        if (args.activate === undefined || args.activate === true) {
+                            $scope.currentNode = data;
+                        }
+
+                        emitEvent("treeSynced", { node: data, activate: args.activate });
+
+                        enableDeleteAnimations();
+
+                        return $q.when({ node: data, activate: args.activate });
+                    });
+                });
                 
             }
 
-            //given a tree alias, this will search the current section tree for the specified tree alias return it's root node
-            function getTreeRootNode(treeAlias) {
-                if (!treeAlias) {
-                    throw "Err in umbtree.directive.loadActiveTree, treeAlias is null";
-                }
+            //given a tree alias, this will search the current section tree for the specified tree alias and set the current active tree to it's root node
+            function loadActiveTree(treeAlias) {
+                
                 if (!$scope.tree) {
                     throw "Err in umbtree.directive.loadActiveTree, $scope.tree is null";
                 }
 
+                //if its not specified, it should have been specified before
+                if (!treeAlias) {
+                    if (!$scope.activeTree) {
+                        throw "Err in umbtree.directive.loadActiveTree, $scope.activeTree is null";
+                    }
+                    return $scope.activeTree;
+                }
+
                 var childrenAndSelf = [$scope.tree.root].concat($scope.tree.root.children);
-                var found = _.find(childrenAndSelf, function (node) {
+                $scope.activeTree = _.find(childrenAndSelf, function (node) {
                     if (node && node.metaData && node.metaData.treeAlias) {
                         return node.metaData.treeAlias.toUpperCase() === treeAlias.toUpperCase();
                     }
                     return false;
                 });
 
-                if (!found) {
+                if (!$scope.activeTree) {
                     throw "Could not find the tree " + treeAlias;
                 }
 
-                emitEvent("activeTreeLoaded", { tree: found });
+                emitEvent("activeTreeLoaded", { tree: $scope.activeTree });
 
-                return found;
+                return $scope.activeTree;
             }
 
             /** Method to load in the tree data */
@@ -276,6 +275,9 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                             enableDeleteAnimations();
 
                             $scope.loading = false;
+
+                            //set the root as the current active tree
+                            $scope.activeTree = $scope.tree.root;
 
                             emitEvent("treeLoaded", { tree: $scope.tree });
                             emitEvent("treeNodeExpanded", { tree: $scope.tree, node: $scope.tree.root, children: $scope.tree.root.children });
