@@ -610,7 +610,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   
   <Target Name="BeforeBuild">
-	<Message Text="-BeforeBuild-?" Importance="high" />
+	<Message Text="-BeforeBuild-" Importance="high" />
     <Message Text="MSBuildExtensionsPath: $(MSBuildExtensionsPath)" Importance="high" />
     <Message Text="WebPublishingTasks:    $(WebPublishingTasks)" Importance="high" />
     <Message Text="NuGetPackageFolders:   $(NuGetPackageFolders)" Importance="high" />
