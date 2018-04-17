@@ -216,19 +216,23 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 mainTreeApi.syncTree({ path: path, forceReload: forceReload });
             }
         },
-
-        //TODO: This should return a promise
+        
         reloadNode: function(node) {
             if (mainTreeApi) {
-                mainTreeApi.reloadNode(node);
+                return mainTreeApi.reloadNode(node);
+            }
+            else {
+                return $q.reject();
             }
         },
-
-        //TODO: This should return a promise
+        
         reloadSection: function(sectionAlias) {
             if (mainTreeApi) {
                 mainTreeApi.clearCache({ section: sectionAlias });
-                mainTreeApi.load(sectionAlias);
+                return mainTreeApi.load(sectionAlias);
+            }
+            else {
+                return $q.reject();
             }
         },
 
