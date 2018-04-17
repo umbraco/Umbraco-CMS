@@ -236,13 +236,12 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         languageResource.getAll().then(function(languages) {
             $scope.languages = languages;
 
-            // select the default language
-            $scope.languages.forEach(function(language) {
-                if(language.isDefault) {
-                    $scope.selectLanguage(language);
+            // make the default language selected
+            $scope.languages.forEach(function (language) {
+                if (language.isDefault) {
+                    $scope.selectedLanguage = language;
                 }
             });
-
         });
 
     }));
@@ -274,7 +273,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         }
     }
 
-    $scope.selectLanguage = function(language, languages) {
+    $scope.selectLanguage = function(language) {
         $scope.selectedLanguage = language;
         // close the language selector
         $scope.page.languageSelectorIsOpen = false;
@@ -293,7 +292,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 //starting with syncing to the currently selected node if there is one
                 if (currNode) {
                     var path = treeService.getPath(currNode);
-                    promises.push($scope.treeApi.syncTree({ path: path, activate: true }));
+                    promises.push($scope.treeApi.syncTree({ path: path, activate: true, forceReload: true }));
                 }
                 //for (var i = 0; i < expandedPaths.length; i++) {
                 //    promises.push($scope.treeApi.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));

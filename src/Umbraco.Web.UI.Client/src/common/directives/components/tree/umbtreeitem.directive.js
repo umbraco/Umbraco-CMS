@@ -249,9 +249,6 @@ angular.module("umbraco.directives")
             $compile(newElement)(scope);
             element.append(newElement);
 
-        },
-        controller: function ($scope) {
-
         }
     };
 });
