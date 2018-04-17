@@ -66,6 +66,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
         function initDialogTree() {
             vm.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
+            //TODO: Also deal with unexpanding!!
             vm.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
             vm.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
         }
@@ -202,7 +203,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     //create the list of promises
                     var promises = [];
                     for (var i = 0; i < expandedPaths.length; i++) {
-                        promises.push(vm.dialogTreeApi.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));
+                        promises.push(vm.dialogTreeApi.syncTree({ path: expandedPaths[i], activate: false }));
                     }
                     //execute them sequentially
                     angularHelper.executeSequentialPromises(promises);

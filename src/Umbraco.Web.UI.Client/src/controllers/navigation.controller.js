@@ -292,8 +292,9 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 //starting with syncing to the currently selected node if there is one
                 if (currNode) {
                     var path = treeService.getPath(currNode);
-                    promises.push($scope.treeApi.syncTree({ path: path, activate: true, forceReload: true }));
+                    promises.push($scope.treeApi.syncTree({ path: path, activate: true }));
                 }
+                //TODO: If we want to keep all paths expanded ... but we need more testing since we need to deal with unexpanding
                 //for (var i = 0; i < expandedPaths.length; i++) {
                 //    promises.push($scope.treeApi.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));
                 //}
