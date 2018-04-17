@@ -18,8 +18,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             _textService = textService;
         }
-
-        public new ContentPropertyDisplay Convert(ResolutionContext context)
+        public override ContentPropertyDisplay Convert(ResolutionContext context)
         {
             var display = base.Convert(context);
 

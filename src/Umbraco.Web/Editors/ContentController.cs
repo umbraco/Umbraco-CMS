@@ -389,7 +389,25 @@ namespace Umbraco.Web.Editors
                 Direction orderDirection = Direction.Ascending,
                 bool orderBySystemField = true,
                 string filter = "")
-        {            
+        {
+            return GetChildren(id, null, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+        }
+
+        /// <summary>
+        /// Gets the children for the content id passed in
+        /// </summary>
+        /// <returns></returns>
+        [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IContent>>), "Items")]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
+                int id,
+                string includeProperties,
+                int pageNumber = 0,  //TODO: This should be '1' as it's not the index
+                int pageSize = 0,
+                string orderBy = "SortOrder",
+                Direction orderDirection = Direction.Ascending,
+                bool orderBySystemField = true,
+                string filter = "")
+        {
             long totalChildren;
             IContent[] children;
             if (pageNumber > 0 && pageSize > 0)
@@ -409,13 +427,17 @@ namespace Umbraco.Web.Editors
                 return new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(0, 0, 0);
             }
 
-            // Note that we're excluding mapping of complex properties here to ensure that getting a larger amount of
-            // children for listviews and other similar cases, will not make everything halt when it tries to deserialize a
-            // complex property such as Nested Content.
             var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(totalChildren, pageNumber, pageSize);
             pagedResult.Items = children.Select(content =>
                 Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>(content,
-                    opts => { opts.Items["ExcludeComplexProperties"] = true; }));
+                    opts =>
+                    {
+                        // if there's a list of property aliases to map - we will make sure to store this in the mapping context.
+                        if (String.IsNullOrWhiteSpace(includeProperties) == false)
+                        {
+                            opts.Items["IncludeProperties"] = includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries);
+                        }
+                    }));
 
             return pagedResult;
         }

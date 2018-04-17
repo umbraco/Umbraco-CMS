@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -30,7 +31,7 @@ namespace Umbraco.Web.Models.Mapping
         /// Assigns the PropertyEditor, Id, Alias and Value to the property
         /// </summary>
         /// <returns></returns>
-        public T Convert(ResolutionContext context)
+        public virtual T Convert(ResolutionContext context)
         {
             var property = context.SourceValue as Property;
             if (property == null)
@@ -55,19 +56,19 @@ namespace Umbraco.Web.Models.Mapping
                 Editor = editor.Alias
             };
 
-            // Complex properties such as Nested Content do not need to be mapped for simpler things like list views,
-            // where they will not make sense to use anyways. To avoid having to do unnecessary mapping on large
-            // collections of items in list views - we allow excluding mapping of certain properties.
-            var excludeComplexProperties = false;
-            if (context.Options.Items.ContainsKey("ExcludeComplexProperties"))
+            // if there's a set of property aliases specified, we will check if the current property's value should be mapped.
+            // if it isn't one of the ones specified in 'includeProperties', we will just return the result without mapping the Value.
+            if (context.Options.Items.ContainsKey("IncludeProperties"))
             {
-                excludeComplexProperties = System.Convert.ToBoolean(context.Options.Items["ExcludeComplexProperties"]);
+                var includeProperties = context.Options.Items["IncludeProperties"] as IEnumerable<string>;
+                if (includeProperties != null && includeProperties.Contains(property.Alias) == false)
+                {
+                    return result;
+                }
             }
-            if (excludeComplexProperties == false || ComplexPropertyTypeAliases.Contains(property.PropertyType.PropertyEditorAlias) == false)
-            {
-                result.Value = editor.ValueEditor.ConvertDbToEditor(property, property.PropertyType, DataTypeService);
-            }
-            
+
+            // if no 'IncludeProperties' were specified or this property is set to be included - we will map the value and return.
+            result.Value = editor.ValueEditor.ConvertDbToEditor(property, property.PropertyType, DataTypeService);
             return result;
         }
     }
