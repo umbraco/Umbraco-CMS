@@ -286,10 +286,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             //reload the tree with it's updated querystring args
             $scope.treeApi.load($scope.currentSection).then(function () {
 
-                //this is sequential promise chaining, it's not pretty but we need to do it this way. $q.all doesn't execute promises in
-                //sequence but that's what we need to do here
-
-
                 //re-sync to currently edited node
                 var currNode = appState.getTreeState("selectedNode");
                 //create the list of promises
@@ -299,26 +295,11 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                     var path = treeService.getPath(currNode);
                     promises.push($scope.treeApi.syncTree({ path: path, activate: true }));
                 }
-                for (var i = 0; i < expandedPaths.length; i++) {
-                    promises.push($scope.treeApi.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));
-                }
-
-                //now execute them in sequence... sorry there's no other good way to do it with angular promises
-                var j = 0;
-                function pExec(promise) {
-                    j++;
-                    promise.then(function (data) {
-                        if (j === promises.length) {
-                            return $q.when(data); //exit
-                        }
-                        else {
-                            return pExec(promises[j]); //recurse
-                        }
-                    });
-                }
-                if (promises.length > 0) {
-                    pExec(promises[0]); //start the promise chain
-                }
+                //for (var i = 0; i < expandedPaths.length; i++) {
+                //    promises.push($scope.treeApi.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));
+                //}
+                //execute them sequentially
+                angularHelper.executeSequentialPromises(promises);
             });
         });
         

@@ -1,36 +1,38 @@
 app.config(function ($routeProvider) {
-
-    /** This checks if the user is authenticated for a route and what the isRequired is set to.
-        Depending on whether isRequired = true, it first check if the user is authenticated and will resolve successfully
+    
+    /**
+     * This determines if the route can continue depending on authentication and initialization requirements
+     * @param {boolean} authRequired If true, it first checks if the user is authenticated and will resolve successfully
         otherwise the route will fail and the $routeChangeError event will execute, in that handler we will redirect to the rejected
-        path that is resolved from this method and prevent default (prevent the route from executing) */
-    var canRoute = function(isRequired) {
+        path that is resolved from this method and prevent default (prevent the route from executing)
+     * @param {boolean} navRequired if true, the route can only continue once the main navigation is ready
+     * @returns {promise} 
+     */
+    var canRoute = function(authRequired) {
 
         return {
             /** Checks that the user is authenticated, then ensures that are requires assets are loaded */
             isAuthenticatedAndReady: function ($q, userService, $route, assetsService, appState) {
-                var deferred = $q.defer();
-
+                
                 //don't need to check if we've redirected to login and we've already checked auth
                 if (!$route.current.params.section
                     && ($route.current.params.check === false || $route.current.params.check === "false")) {
-                    deferred.resolve(true);
-                    return deferred.promise;
+                    return $q.when(true);
                 }
 
-                userService.isAuthenticated()
+                return userService.isAuthenticated()
                     .then(function () {
 
-                        assetsService._loadInitAssets().then(function() {
+                        return assetsService._loadInitAssets().then(function () {
 
                             //This could be the first time has loaded after the user has logged in, in this case
                             // we need to broadcast the authenticated event - this will be handled by the startup (init)
                             // handler to set/broadcast the ready state
                             var broadcast = appState.getGlobalState("isReady") !== true;
 
-                            userService.getCurrentUser({ broadcastEvent: broadcast }).then(function (user) {
+                            return userService.getCurrentUser({ broadcastEvent: broadcast }).then(function (user) {
                                 //is auth, check if we allow or reject
-                                if (isRequired) {
+                                if (authRequired) {
 
                                     //This checks the current section and will force a redirect to 'content' as the default
                                     if ($route.current.params.section.toLowerCase() === "default" || $route.current.params.section.toLowerCase() === "umbraco" || $route.current.params.section === "") {
@@ -42,13 +44,13 @@ app.config(function ($routeProvider) {
                                     // To do this we need to grab the current user's allowed sections, then reject the promise with the correct path.
                                     if (user.allowedSections.indexOf($route.current.params.section) > -1) {
                                         //this will resolve successfully so the route will continue
-                                        deferred.resolve(true);
+                                        return $q.when(true);
                                     } else {
-                                        deferred.reject({ path: "/" + user.allowedSections[0] });
+                                        return $q.reject({ path: "/" + user.allowedSections[0] });
                                     }
                                 }
                                 else {
-                                    deferred.reject({ path: "/" });
+                                    return $q.reject({ path: "/" });
                                 }
                             });
 
@@ -56,17 +58,17 @@ app.config(function ($routeProvider) {
 
                     }, function () {
                         //not auth, check if we allow or reject
-                        if (isRequired) {
+                        if (authRequired) {
                             //the check=false is checked above so that we don't have to make another http call to check
                             //if they are logged in since we already know they are not.
-                            deferred.reject({ path: "/login/false" });
+                            return $q.reject({ path: "/login/false" });
                         }
                         else {
                             //this will resolve successfully so the route will continue
-                            deferred.resolve(true);
+                            return $q.when(true);
                         }
                     });
-                return deferred.promise;
+
             }
         };
     };
@@ -75,15 +77,13 @@ app.config(function ($routeProvider) {
     var doLogout = function() {
         return {
             isLoggedOut: function ($q, userService) {
-                var deferred = $q.defer();
-                userService.logout().then(function () {
+                return userService.logout().then(function () {
                     //success so continue
-                    deferred.resolve(true);
+                    return $q.when(true);
                 }, function() {
                     //logout failed somehow ? we'll reject with the login page i suppose
-                    deferred.reject({ path: "/login/false" });
+                    return $q.reject({ path: "/login/false" });
                 });
-                return deferred.promise;
             }
         }
     }

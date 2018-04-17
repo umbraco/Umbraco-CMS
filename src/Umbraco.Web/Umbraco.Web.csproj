@@ -123,6 +123,7 @@
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Editors\BackOfficeAssetsController.cs" />
+    <Compile Include="Editors\BackOfficeModel.cs" />
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\DashboardHelper.cs" />

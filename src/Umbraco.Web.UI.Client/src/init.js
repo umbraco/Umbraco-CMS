@@ -16,28 +16,29 @@ app.run(['userService', '$q', '$log', '$rootScope', '$location', 'queryStrings',
 
         /** Listens for authentication and checks if our required assets are loaded, if/once they are we'll broadcast a ready event */
         eventsService.on("app.authenticated", function (evt, data) {
-            
-            $q.all([
-                assetsService._loadInitAssets(),
-                userService.loadMomentLocaleForCurrentUser(),
-                tourService.registerAllTours()
-            ]).then(function () {
 
-                //Register all of the tours on the server
-                tourService.registerAllTours().then(function () {
-                    appReady(data);
+            assetsService._loadInitAssets().then(function() {
+                $q.all([
+                    userService.loadMomentLocaleForCurrentUser(),
+                    tourService.registerAllTours()
+                ]).then(function () {
 
-                    // Auto start intro tour
-                    tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
-                        // start intro tour if it hasn't been completed or disabled
-                        if (introTour && introTour.disabled !== true && introTour.completed !== true) {
-                            tourService.startTour(introTour);
-                        }
+                    //Register all of the tours on the server
+                    tourService.registerAllTours().then(function () {
+                        appReady(data);
+
+                        // Auto start intro tour
+                        tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
+                            // start intro tour if it hasn't been completed or disabled
+                            if (introTour && introTour.disabled !== true && introTour.completed !== true) {
+                                tourService.startTour(introTour);
+                            }
+                        });
+
+                    }, function () {
+                        appAuthenticated = true;
+                        appReady(data);
                     });
-
-                }, function () {
-                    appAuthenticated = true;
-                    appReady(data);
                 });
             });
 

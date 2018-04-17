@@ -16,7 +16,7 @@
             </div>
 
             <!-- the tree -->
-            <div id="tree" ng-if="authenticated">
+            <div id="tree" ng-show="authenticated">
                 <umb-tree
                     cachekey="{{treeCacheKey}}"
                     api="treeApi"

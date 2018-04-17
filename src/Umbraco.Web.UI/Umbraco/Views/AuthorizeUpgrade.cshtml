@@ -11,6 +11,7 @@
 @using Umbraco.Web
 @using Umbraco.Web.Editors
 @using umbraco
+@using Umbraco.Core.Configuration
 @inherits System.Web.Mvc.WebViewPage<Umbraco.Web.Editors.BackOfficeModel>
 @{
     Layout = null;
@@ -25,7 +26,7 @@
 
 <html lang="en">
 <head>
-    <base href="@Model.Path.EnsureEndsWith('/')" />
+    <base href="@Model.GlobalSettings.Path.EnsureEndsWith('/')" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -59,7 +60,7 @@
             redirectUrl = Url.Action("AuthorizeUpgrade", "BackOffice")
         });
     }
-    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl, Model.Features)
+    @Html.BareMinimumServerVariablesScript(Url, externalLoginUrl, Model.Features, Model.GlobalSettings)
 
     <script type="text/javascript">
     document.angularReady = function (app) {
