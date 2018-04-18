@@ -58,7 +58,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     $scope.renderModel = [];
 	    
-    $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;
+    $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;    
 
     //the default pre-values
     var defaultConfig = {
@@ -93,7 +93,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.model.config.showOpenButton = ($scope.model.config.showOpenButton === "1" ? true : false);
     $scope.model.config.showEditButton = ($scope.model.config.showEditButton === "1" ? true : false);
     $scope.model.config.showPathOnHover = ($scope.model.config.showPathOnHover === "1" ? true : false);
- 
+    
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
         : $scope.model.config.startNode.type === "media"
