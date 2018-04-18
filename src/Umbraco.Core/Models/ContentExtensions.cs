@@ -160,6 +160,32 @@ namespace Umbraco.Core.Models
         }
         #endregion
 
+        #region Variants
+
+        /// <summary>
+        /// Returns true if the content has any property type that allows language variants
+        /// </summary>
+        public static bool HasPropertyTypeVaryingByCulture(this IContent content)
+        {
+            // fixme - what about CultureSegment? what about content.ContentType.Variations?
+            return content.PropertyTypes.Any(x => x.Variations == ContentVariation.CultureNeutral);
+        }
+
+        /// <summary>
+        /// Returns true if the content has a variation for the language/segment combination
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="langId"></param>
+        /// <param name="segment"></param>
+        /// <returns></returns>
+        public static bool HasVariation(this IContent content, int langId, string segment = null)
+        {
+            // fixme - wire - but: purpose? are we looking for a 'published' variation? what is this?
+            return false;
+        }
+
+        #endregion
+
         /// <summary>
         /// Removes characters that are not valide XML characters from all entity properties
         /// of type string. See: http://stackoverflow.com/a/961504/5018

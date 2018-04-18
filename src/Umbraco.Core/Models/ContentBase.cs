@@ -24,7 +24,7 @@ namespace Umbraco.Core.Models
         protected IContentTypeComposition ContentTypeBase;
         private int _writerId;
         private PropertyCollection _properties;
-        private Dictionary<string, string> _names;
+        private Dictionary<int, string> _names;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
@@ -66,8 +66,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
             public readonly PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
             public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.WriterId);
-            // fixme how can that work / comparison?
-            public readonly PropertyInfo NamesSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyDictionary<string, string>>(x => x.Names);
+            public readonly PropertyInfo NamesSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyDictionary<int, string>>(x => x.Names);
         }
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -123,7 +122,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public virtual IReadOnlyDictionary<string, string> Names
+        public virtual IReadOnlyDictionary<int, string> Names
         {
             get => _names;
             set
@@ -134,7 +133,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public virtual void SetName(string languageId, string name)
+        public virtual void SetName(int? languageId, string name)
         {
             if (languageId == null)
             {
@@ -145,21 +144,25 @@ namespace Umbraco.Core.Models
             if ((ContentTypeBase.Variations & (ContentVariation.CultureNeutral | ContentVariation.CultureSegment)) == 0)
                 throw new NotSupportedException("Content type does not support varying name by culture.");
 
-            // fixme validate language?
-
             if (_names == null)
-                _names = new Dictionary<string, string>();
+                _names = new Dictionary<int, string>();
 
-            _names[languageId] = name;
+            _names[languageId.Value] = name;
+            OnPropertyChanged(Ps.Value.NamesSelector);
+        }
+
+        protected virtual void ClearNames()
+        {
+            _names = null;
             OnPropertyChanged(Ps.Value.NamesSelector);
         }
 
         /// <inheritdoc />
-        public virtual string GetName(string languageId)
+        public virtual string GetName(int? languageId)
         {
             if (languageId == null) return Name;
             if (_names == null) return null;
-            return _names.TryGetValue(languageId, out var name) ? name : null;
+            return _names.TryGetValue(languageId.Value, out var name) ? name : null;
         }
 
         /// <summary>

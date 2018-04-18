@@ -23,8 +23,7 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("languageId")]
         [ForeignKey(typeof(LanguageDto))]
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_LanguageId")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public int? LanguageId { get; set; }
+        public int LanguageId { get; set; }
 
         [Column("name")]
         [NullSetting(NullSetting = NullSettings.Null)]
@@ -36,7 +35,7 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("availableDate")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public DateTime? AvailableDate { get; set; }
-        
+
         [Column("availableUserId")]
         // [ForeignKey(typeof(UserDto))] -- there is no foreign key so we can delete users without deleting associated content
         //[NullSetting(NullSetting = NullSettings.Null)]

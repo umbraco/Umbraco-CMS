@@ -202,6 +202,35 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Validates that a variation is valid for the content type.
+        /// </summary>
+        public bool ValidateVariation(int? languageId, string segment, bool throwIfInvalid)
+        {
+            ContentVariation variation;
+            if (languageId.HasValue)
+            {
+                variation = segment != null
+                    ? ContentVariation.CultureSegment
+                    : ContentVariation.CultureNeutral;
+            }
+            else if (segment != null)
+            {
+                variation = ContentVariation.InvariantSegment;
+            }
+            else
+            {
+                variation = ContentVariation.InvariantNeutral;
+            }
+            if ((Variations & variation) == 0)
+            {
+                if (throwIfInvalid)
+                    throw new NotSupportedException($"Variation {variation} is invalid for content type \"{Alias}\".");
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
         /// List of PropertyGroups available on this ContentType
         /// </summary>
         /// <remarks>

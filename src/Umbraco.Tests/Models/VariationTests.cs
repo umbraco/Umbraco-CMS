@@ -159,7 +159,10 @@ namespace Umbraco.Tests.Models
             var contentType = new ContentType(-1) { Alias = "contentType" };
             var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
 
-            Assert.Throws<NotSupportedException>(() => content.SetName("fr-FR", "name-fr"));
+            const int langFr = 1;
+            const int langUk = 2;
+
+            Assert.Throws<NotSupportedException>(() => content.SetName(langFr, "name-fr"));
 
             contentType.Variations = ContentVariation.CultureNeutral;
 
@@ -169,17 +172,17 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual("name2", content.Name);
             Assert.AreEqual("name2", content.GetName(null));
 
-            content.SetName("fr-FR", "name-fr");
-            content.SetName("en-UK", "name-uk");
+            content.SetName(langFr, "name-fr");
+            content.SetName(langUk, "name-uk");
 
-            Assert.AreEqual("name-fr", content.GetName("fr-FR"));
-            Assert.AreEqual("name-uk", content.GetName("en-UK"));
+            Assert.AreEqual("name-fr", content.GetName(langFr));
+            Assert.AreEqual("name-uk", content.GetName(langUk));
 
             Assert.AreEqual(2, content.Names.Count);
-            Assert.IsTrue(content.Names.ContainsKey("fr-FR"));
-            Assert.AreEqual("name-fr", content.Names["fr-FR"]);
-            Assert.IsTrue(content.Names.ContainsKey("en-UK"));
-            Assert.AreEqual("name-uk", content.Names["en-UK"]);
+            Assert.IsTrue(content.Names.ContainsKey(langFr));
+            Assert.AreEqual("name-fr", content.Names[langFr]);
+            Assert.IsTrue(content.Names.ContainsKey(langUk));
+            Assert.AreEqual("name-uk", content.Names[langUk]);
         }
 
         [Test]

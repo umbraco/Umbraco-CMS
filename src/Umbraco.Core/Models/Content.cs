@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Models
 {
@@ -20,10 +19,9 @@ namespace Umbraco.Core.Models
         private PublishedState _publishedState;
         private DateTime? _releaseDate;
         private DateTime? _expireDate;
-        private HashSet<string> _cultures;
-        private Dictionary<string, string> _publishNames;
+        private Dictionary<int, string> _publishNames;
 
-        private static readonly Dictionary<string, string> NoPublishNames = new Dictionary<string, string>();
+        private static readonly Dictionary<int, string> NoPublishNames = new Dictionary<int, string>();
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         /// <summary>
@@ -203,19 +201,19 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc/>
         [IgnoreDataMember]
-        public IReadOnlyDictionary<string, string> PublishNames => _publishNames ?? NoPublishNames;
+        public IReadOnlyDictionary<int, string> PublishNames => _publishNames ?? NoPublishNames;
 
         /// <inheritdoc/>
-        public string GetPublishName(string languageId)
+        public string GetPublishName(int? languageId)
         {
             if (languageId == null) return PublishName;
             if (_publishNames == null) return null;
-            return _publishNames.TryGetValue(languageId, out var name) ? name : null;
+            return _publishNames.TryGetValue(languageId.Value, out var name) ? name : null;
         }
 
         // sets a publish name
         // internal for repositories
-        internal void SetPublishName(string languageId, string name)
+        internal void SetPublishName(int? languageId, string name)
         {
             if (languageId == null)
             {
@@ -226,13 +224,13 @@ namespace Umbraco.Core.Models
             // private method, assume that culture is valid
 
             if (_publishNames == null)
-                _publishNames = new Dictionary<string, string>();
+                _publishNames = new Dictionary<int, string>();
 
-            _publishNames[languageId] = name;
+            _publishNames[languageId.Value] = name;
         }
 
         // clears a publish name
-        private void ClearPublishName(string languageId)
+        private void ClearPublishName(int? languageId)
         {
             if (languageId == null)
             {
@@ -240,36 +238,21 @@ namespace Umbraco.Core.Models
                 return;
             }
 
-            _publishNames.Remove(languageId);
+            _publishNames.Remove(languageId.Value);
             if (_publishNames.Count == 0)
                 _publishNames = null;
         }
 
-        /// <inheritdoc />
-        public bool IsCultureAvailable(string languageId)
+        // clears all publish names
+        private void ClearPublishNames()
         {
-            return _cultures != null && _cultures.Contains(languageId);
+            _publishNames = null;
         }
 
-        // fixme but what's setting it?
-        // fixme a culture is available when published = when setting the publish name (merge?)
-        // internal for repositories
-        internal void SetCultureAvailability(string languageId, bool available)
+        /// <inheritdoc />
+        public bool IsCulturePublished(int? languageId)
         {
-            if (available)
-            {
-                if (_cultures == null) _cultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-                // private method, assume that culture is valid
-                _cultures.Add(languageId);
-            }
-            else
-            {
-                if (_cultures == null) return;
-
-                _cultures.Remove(languageId);
-                if (_cultures.Count == 0) _cultures = null;
-            }
+            return !string.IsNullOrWhiteSpace(GetPublishName(languageId));
         }
 
         [IgnoreDataMember]
@@ -281,11 +264,19 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public virtual bool PublishAllValues()
         {
+            // the values we want to publish should be valid
             if (ValidateAll().Any())
                 return false;
 
+            // property.PublishAllValues only deals with supported variations (if any)
             foreach (var property in Properties)
                 property.PublishAllValues();
+
+            // Name and PublishName are managed by the repository, but Names and PublishNames
+            // must be managed here as they depend on the existing / supported variations.
+            foreach (var (languageId, name) in Names)
+                SetPublishName(languageId, name);
+
             _publishedState = PublishedState.Publishing;
             return true;
         }
@@ -293,22 +284,20 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public virtual bool PublishValues(int? languageId = null, string segment = null)
         {
-            // fixme MUST refactor it all here!
             // the variation should be supported by the content type
+            ContentType.ValidateVariation(languageId, segment, throwIfInvalid: true);
 
-            //ContentType.ValidateVariation(languageId, segment, throwIfInvalid: true);
+            // the values we want to publish should be valid
+            if (Validate(languageId, segment).Any())
+                return false;
 
-            //if (Validate(languageId, segment).Any())
-            //    return false;
-
+            // property.PublishValue throws on invalid variation, so filter them out
             foreach (var property in Properties.Where(x => x.PropertyType.ValidateVariation(languageId, segment, throwIfInvalid: false)))
                 property.PublishValue(languageId, segment);
 
-            // Name and PublishName are managed in the repository
-            // but Names and PublishNames must be managed here,
-            // as they depend on the variation
-            var languageIsoCode = Current.Services.LocalizationService.GetLanguageById(languageId.Value).IsoCode;
-            SetPublishName(languageIsoCode, GetName(languageIsoCode));
+            // Name and PublishName are managed by the repository, but Names and PublishNames
+            // must be managed here as they depend on the existing / supported variations.
+            SetPublishName(languageId, GetName(languageId));
 
             _publishedState = PublishedState.Publishing;
             return true;
@@ -317,11 +306,18 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public virtual bool PublishCultureValues(int? languageId = null)
         {
+            // the values we want to publish should be valid
             if (ValidateCulture(languageId).Any())
                 return false;
 
+            // property.PublishCultureValues only deals with supported variations (if any)
             foreach (var property in Properties)
                 property.PublishCultureValues(languageId);
+
+            // Name and PublishName are managed by the repository, but Names and PublishNames
+            // must be managed here as they depend on the existing / supported variations.
+            SetPublishName(languageId, GetName(languageId));
+
             _publishedState = PublishedState.Publishing;
             return true;
         }
@@ -329,22 +325,30 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public virtual void ClearAllPublishedValues()
         {
+            // property.ClearPublishedAllValues only deals with supported variations (if any)
             foreach (var property in Properties)
                 property.ClearPublishedAllValues();
+
+            // Name and PublishName are managed by the repository, but Names and PublishNames
+            // must be managed here as they depend on the existing / supported variations.
+            ClearPublishNames();
+
             _publishedState = PublishedState.Publishing;
         }
 
         /// <inheritdoc />
         public virtual void ClearPublishedValues(int? languageId = null, string segment = null)
         {
+            // the variation should be supported by the content type
+            ContentType.ValidateVariation(languageId, segment, throwIfInvalid: true);
+
+            // property.ClearPublishedValue throws on invalid variation, so filter them out
             foreach (var property in Properties.Where(x => x.PropertyType.ValidateVariation(languageId, segment, throwIfInvalid: false)))
                 property.ClearPublishedValue(languageId, segment);
 
-            // Name and PublishName are managed in the repository
-            // but Names and PublishNames must be managed here,
-            // as they depend on the variation
-            var languageIsoCode = Current.Services.LocalizationService.GetLanguageById(languageId.Value).IsoCode;
-            ClearPublishName(languageIsoCode);
+            // Name and PublishName are managed by the repository, but Names and PublishNames
+            // must be managed here as they depend on the existing / supported variations.
+            ClearPublishName(languageId);
 
             _publishedState = PublishedState.Publishing;
         }
@@ -352,8 +356,14 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public virtual void ClearCulturePublishedValues(int? languageId = null)
         {
+            // property.ClearPublishedCultureValues only deals with supported variations (if any)
             foreach (var property in Properties)
                 property.ClearPublishedCultureValues(languageId);
+
+            // Name and PublishName are managed by the repository, but Names and PublishNames
+            // must be managed here as they depend on the existing / supported variations.
+            ClearPublishName(languageId);
+
             _publishedState = PublishedState.Publishing;
         }
 
@@ -395,6 +405,11 @@ namespace Umbraco.Core.Models
                     SetValue(alias, value, pvalue.LanguageId, pvalue.Segment);
                 }
             }
+
+            // copy names
+            ClearNames();
+            foreach (var (languageId, name) in other.Names)
+                SetName(languageId, name);
         }
 
         /// <inheritdoc />
@@ -431,6 +446,9 @@ namespace Umbraco.Core.Models
                 var alias = otherProperty.PropertyType.Alias;
                 SetValue(alias, otherProperty.GetValue(languageId, segment, published), languageId, segment);
             }
+
+            // copy name
+            SetName(languageId, other.GetName(languageId));
         }
 
         /// <inheritdoc />
@@ -462,6 +480,9 @@ namespace Umbraco.Core.Models
                     SetValue(alias, value, pvalue.LanguageId, pvalue.Segment);
                 }
             }
+
+            // copy name
+            SetName(languageId, other.GetName(languageId));
         }
 
         /// <summary>

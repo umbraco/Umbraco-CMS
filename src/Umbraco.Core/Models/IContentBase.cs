@@ -34,7 +34,7 @@ namespace Umbraco.Core.Models
         /// <para>When <paramref name="languageId"/> is <c>null</c>, sets the invariant
         /// language, which sets the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        void SetName(string languageId, string value);
+        void SetName(int? languageId, string value);
 
         /// <summary>
         /// Gets the name of the content item for a specified language.
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Models
         /// <para>When <paramref name="languageId"/> is <c>null</c>, gets the invariant
         /// language, which is the value of the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        string GetName(string languageId);
+        string GetName(int? languageId);
 
         /// <summary>
         /// Gets or sets the names of the content item.
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Models
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot get nor set the invariant
         /// name, which must be get or set via the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        IReadOnlyDictionary<string, string> Names { get; set; }
+        IReadOnlyDictionary<int, string> Names { get; set; }
 
         /// <summary>
         /// List of properties, which make up all the data available for this Content object

@@ -445,7 +445,7 @@ namespace Umbraco.Web.Editors
         {
             var permissions = Services.UserService
                     .GetPermissions(Security.CurrentUser, nodeIds);
-            
+
             var permissionsDictionary = new Dictionary<int, string[]>();
             foreach (var nodeId in nodeIds)
             {
@@ -557,7 +557,7 @@ namespace Umbraco.Web.Editors
             }
             return contentItemDisplay;
         }
-        
+
         private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod)
         {
             //If we've reached here it means:
@@ -618,7 +618,7 @@ namespace Umbraco.Web.Editors
             {
                 //publish the item and check if it worked, if not we will show a diff msg below
                 contentItem.PersistedContent.PublishValues(contentItem.LanguageId); //we are not checking for a return value here because we've alraedy pre-validated the property values
-                
+
                 //check if we are publishing other variants and validate them
                 var allLangs = Services.LocalizationService.GetAllLanguages().ToList();
                 var variantsToValidate = contentItem.PublishVariations.Where(x => x.LanguageId != contentItem.LanguageId).ToList();
@@ -651,7 +651,7 @@ namespace Umbraco.Web.Editors
 
             //get the updated model
             var display = MapToDisplay(contentItem.PersistedContent, contentItem.LanguageId);
-            
+
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
 
@@ -1150,7 +1150,7 @@ namespace Umbraco.Web.Editors
             //a languageId must exist in the mapping context if this content item has any property type that can be varied by language
             //otherwise the property validation will fail since it's expecting to be get/set with a language ID. If a languageId is not explicitly
             //sent up, then it means that the user is editing the default variant language.
-            if (!languageId.HasValue && content.HasLanguageVariantPropertyType())
+            if (!languageId.HasValue && content.HasPropertyTypeVaryingByCulture())
             {
                 languageId = Services.LocalizationService.GetDefaultVariantLanguage().Id;
             }
@@ -1160,6 +1160,6 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
-        
+
     }
 }

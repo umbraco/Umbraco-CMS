@@ -910,7 +910,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 foreach (var v in variation)
                 {
                     content.SetPublishName(v.LanguageId, v.Name);
-                    content.SetCultureAvailability(v.LanguageId, v.Available);
                 }
         }
 
@@ -926,7 +925,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
             if (versions.Count == 0) return new Dictionary<int, List<CultureVariation>>();
 
-            // fixme split content (name) vs document (availability) ?
             var dtos = Database.FetchByGroups<ContentVersionCultureVariationDto, int>(versions, 2000, batch
                 => Sql()
                     .Select<ContentVersionCultureVariationDto>()
@@ -942,7 +940,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 variation.Add(new CultureVariation
                 {
-                    LanguageId = dto.LanguageId.HasValue ? _languageRepository.GetIsoCodeById(dto.LanguageId.Value) : null,
+                    LanguageId = dto.LanguageId,
                     Name = dto.Name,
                     Available = dto.Available
                 });
@@ -953,13 +951,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private IEnumerable<ContentVersionCultureVariationDto> GetVariationDtos(IContent content, bool publishing)
         {
-            // fixme what about availability?
-
             foreach (var (culture, name) in content.Names)
                 yield return new ContentVersionCultureVariationDto
                 {
                     VersionId = content.VersionId,
-                    LanguageId = _languageRepository.GetIdByIsoCode(culture),
+                    LanguageId = culture,
                     Name = name
                 };
 
@@ -969,14 +965,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 yield return new ContentVersionCultureVariationDto
                 {
                     VersionId = content.PublishedVersionId,
-                    LanguageId = _languageRepository.GetIdByIsoCode(culture),
+                    LanguageId = culture,
                     Name = name
                 };
         }
 
         private class CultureVariation
         {
-            public string LanguageId { get; set; }
+            public int LanguageId { get; set; }
             public string Name { get; set; }
             public bool Available { get; set; }
         }
