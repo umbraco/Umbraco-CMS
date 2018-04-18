@@ -31,6 +31,7 @@ using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Services;
 using Umbraco.Examine;
+using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Composing.CompositionRoots;
 using Umbraco.Web._Legacy.Actions;
 using Current = Umbraco.Core.Composing.Current;

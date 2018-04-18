@@ -123,6 +123,8 @@ namespace Umbraco.Web
 
         #region Value
 
+        // fixme missing variations, but recurse/variations/fallback = ?
+
         /// <summary>
         /// Recursively gets the value of a content's property identified by its alias.
         /// </summary>
@@ -148,6 +150,8 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="alias">The property alias.</param>
+        /// <param name="culture">The variation language.</param>
+        /// <param name="segment">The variation segment.</param>
         /// <param name="recurse">A value indicating whether to recurse.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
@@ -158,10 +162,11 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(this IPublishedContent content, string alias, bool recurse, object defaultValue)
+        public static object Value(this IPublishedContent content, string alias,  string culture = ".", string segment = ".",  object defaultValue = default, bool recurse = false)
         {
+            // fixme - variations+recurse not implemented here
             var property = content.GetProperty(alias, recurse);
-            return property == null || property.HasValue() == false ? defaultValue : property.GetValue();
+            return property == null || property.HasValue(culture, segment) == false ? defaultValue : property.GetValue();
         }
 
         #endregion
@@ -174,6 +179,9 @@ namespace Umbraco.Web
         /// <typeparam name="T">The target property type.</typeparam>
         /// <param name="content">The content.</param>
         /// <param name="alias">The property alias.</param>
+        /// <param name="culture">The variation language.</param>
+        /// <param name="segment">The variation segment.</param>
+        /// <param name="defaultValue">The default value.</param>
         /// <param name="recurse">A value indicating whether to recurse.</param>
         /// <returns>The value of the content's property identified by the alias, converted to the specified type.</returns>
         /// <remarks>
@@ -183,38 +191,13 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T Value<T>(this IPublishedContent content, string alias, bool recurse)
+        public static T Value<T>(this IPublishedContent content, string alias, string culture = ".", string segment = ".", T defaultValue = default, bool recurse = false)
         {
-            return content.Value(alias, recurse, false, default(T));
-        }
-
-        /// <summary>
-        /// Recursively gets the value of a content's property identified by its alias, converted to a specified type, if it exists, otherwise a default value.
-        /// </summary>
-        /// <typeparam name="T">The target property type.</typeparam>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <param name="recurse">A value indicating whether to recurse.</param>
-        /// <param name="defaultValue">The default value.</param>
-        /// <returns>The value of the content's property identified by the alias, converted to the specified type, if it exists, otherwise a default value.</returns>
-        /// <remarks>
-        /// <para>Recursively means: walking up the tree from <paramref name="content"/>, get the first value that can be found.</para>
-        /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
-        /// <para>If no property with the specified alias exists, or if the property has no value, or if it could not be converted, returns <paramref name="defaultValue"/>.</para>
-        /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        public static T Value<T>(this IPublishedContent content, string alias, bool recurse, T defaultValue)
-        {
-            return content.Value(alias, recurse, true, defaultValue);
-        }
-
-        internal static T Value<T>(this IPublishedContent content, string alias, bool recurse, bool withDefaultValue, T defaultValue)
-        {
+            // fixme - variations+recurse not implemented here
             var property = content.GetProperty(alias, recurse);
             if (property == null) return defaultValue;
 
-            return property.Value(withDefaultValue, defaultValue);
+            return property.Value(culture, segment, defaultValue);
         }
 
         #endregion

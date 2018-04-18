@@ -18,7 +18,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     // fixme - use SqlTemplate for these queries else it's going to be horribly slow!
 
     // provides efficient database access for NuCache
-    internal class Database
+    internal class DatabaseDataSource : IDataSource
     {
         // we want arrays, we want them all loaded, not an enumerable
 
@@ -186,7 +186,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             {
                 if (Debugger.IsAttached)
                     throw new Exception("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
-                Current.Logger.Warn<Database>("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
+                Current.Logger.Warn<DatabaseDataSource>("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
             }
             else
             {
@@ -211,7 +211,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 {
                     if (Debugger.IsAttached)
                         throw new Exception("Missing cmsContentNu published content for node " + dto.Id + ", consider rebuilding.");
-                    Current.Logger.Warn<Database>("Missing cmsContentNu published content for node " + dto.Id + ", consider rebuilding.");
+                    Current.Logger.Warn<DatabaseDataSource>("Missing cmsContentNu published content for node " + dto.Id + ", consider rebuilding.");
                 }
                 else
                 {

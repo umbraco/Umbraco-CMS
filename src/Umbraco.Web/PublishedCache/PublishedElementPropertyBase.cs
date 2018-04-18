@@ -36,7 +36,7 @@ namespace Umbraco.Web.PublishedCache
             IsMember = propertyType.ContentType.ItemType == PublishedItemType.Member;
         }
 
-        public override bool HasValue(string culture = null, string segment = null)
+        public override bool HasValue(string culture = ".", string segment = ".")
             => _sourceValue != null && (!(_sourceValue is string s) || !string.IsNullOrWhiteSpace(s));
 
         // used to cache the CacheValues of this property
@@ -136,9 +136,9 @@ namespace Umbraco.Web.PublishedCache
             return _interValue;
         }
 
-        public override object GetSourceValue(string culture = null, string segment = null) => _sourceValue;
+        public override object GetSourceValue(string culture = ".", string segment = ".") => _sourceValue;
 
-        public override object GetValue(string culture = null, string segment = null)
+        public override object GetValue(string culture = ".", string segment = ".")
         {
             GetCacheLevels(out var cacheLevel, out var referenceCacheLevel);
 
@@ -152,7 +152,7 @@ namespace Umbraco.Web.PublishedCache
             }
         }
 
-        public override object GetXPathValue(string culture = null, string segment = null)
+        public override object GetXPathValue(string culture = ".", string segment = ".")
         {
             GetCacheLevels(out var cacheLevel, out var referenceCacheLevel);
 

@@ -350,6 +350,7 @@
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfPropertyDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentNestedData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\CultureVariation.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IDataSource.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\PropertyData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\SerializerBase.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheComponent.cs" />
@@ -371,7 +372,7 @@
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentSourceDto.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\Database.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\DatabaseDataSource.cs" />
     <Compile Include="PublishedCache\NuCache\DomainCache.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotService.cs" />
     <Compile Include="PublishedCache\NuCache\MediaCache.cs" />

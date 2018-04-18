@@ -129,6 +129,7 @@
     <Compile Include="Models\PathValidationTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
+    <Compile Include="PublishedContent\PublishedContentOtherTests.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
     <Compile Include="Published\NestedContentTests.cs" />
@@ -176,9 +177,10 @@
     <Compile Include="TestHelpers\ControllerTesting\TestStartup.cs" />
     <Compile Include="TestHelpers\ControllerTesting\TraceExceptionLogger.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
-    <Compile Include="TestHelpers\NoHttpContextAccessor.cs" />
+    <Compile Include="Testing\Objects\Accessors\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
     <Compile Include="TestHelpers\Stubs\TestPublishedContent.cs" />
+    <Compile Include="Testing\Objects\Accessors\TestPublishedVariationContextAccessor.cs" />
     <Compile Include="Testing\ContentBaseExtensions.cs" />
     <Compile Include="Testing\Objects\AccessorsAndProviders\TestSystemDefaultCultureProvider.cs" />
     <Compile Include="Testing\TestDatabase.cs" />
@@ -195,10 +197,10 @@
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="Testing\UmbracoTestOptions.cs" />
     <Compile Include="CoreThings\TryConvertToTests.cs" />
-    <Compile Include="TestHelpers\Stubs\TestPublishedSnapshotAccessor.cs" />
+    <Compile Include="Testing\Objects\Accessors\TestPublishedSnapshotAccessor.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
-    <Compile Include="TestHelpers\Stubs\TestUmbracoContextAccessor.cs" />
+    <Compile Include="Testing\Objects\Accessors\TestUmbracoContextAccessor.cs" />
     <Compile Include="CoreThings\UdiTests.cs" />
     <Compile Include="UmbracoExamine\RandomIdRamDirectory.cs" />
     <Compile Include="Web\AngularIntegration\AngularAntiForgeryTests.cs" />

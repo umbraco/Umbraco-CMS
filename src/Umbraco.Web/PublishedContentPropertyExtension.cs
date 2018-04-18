@@ -10,21 +10,16 @@ namespace Umbraco.Web
     {
         #region Value<T>
 
-        public static T Value<T>(this IPublishedProperty property, string culture = null, string segment = null)
+        public static T Value<T>(this IPublishedProperty property, string culture = ".", string segment = ".", T defaultValue = default)
         {
-            return property.Value(false, default(T), culture, segment);
-        }
+            // for Value<T> when defaultValue is not specified, and HasValue() is false, we still want to convert the result (see below)
+            // but we have no way to tell whether default value is specified or not - we could do it with overloads, but then defaultValue
+            // comes right after property and conflicts with culture when T is string - so we're just not doing it - if defaultValue is
+            // default, whether specified or not, we give a chance to the converter
+            //
+            //if (!property.HasValue(culture, segment) && 'defaultValue is explicitely specified') return defaultValue;
 
-        public static T Value<T>(this IPublishedProperty property, T defaultValue, string culture = null, string segment = null)
-        {
-            return property.Value(true, defaultValue, culture, segment);
-        }
-
-        internal static T Value<T>(this IPublishedProperty property, bool withDefaultValue, T defaultValue, string culture = null, string segment = null)
-        {
-            if (property.HasValue(culture, segment) == false && withDefaultValue) return defaultValue;
-
-            // else we use .Value so we give the converter a chance to handle the default value differently
+            // give the converter a chance to handle the default value differently
             // eg for IEnumerable<T> it may return Enumerable<T>.Empty instead of null
 
             var value = property.GetValue(culture, segment);
@@ -34,7 +29,7 @@ namespace Umbraco.Web
             // failed attempt. So, no need to care for value being null here.
 
             // if already the requested type, return
-            if (value is T) return (T)value;
+            if (value is T variable) return variable;
 
             // if can convert to requested type, return
             var convert = value.TryConvertTo<T>();

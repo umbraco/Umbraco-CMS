@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
+using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;

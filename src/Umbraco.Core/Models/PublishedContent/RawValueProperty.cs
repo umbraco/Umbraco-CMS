@@ -20,19 +20,19 @@ namespace Umbraco.Core.Models.PublishedContent
         private readonly Lazy<object> _objectValue;
         private readonly Lazy<object> _xpathValue;
 
-        public override object GetSourceValue(string culture = null, string segment = null)
+        public override object GetSourceValue(string culture = ".", string segment = ".")
             => culture == null & segment == null ? _sourceValue : null;
 
-        public override bool HasValue(string culture = null, string segment = null)
+        public override bool HasValue(string culture = ".", string segment = ".")
         {
             var sourceValue = GetSourceValue(culture, segment);
             return sourceValue is string s ? !string.IsNullOrWhiteSpace(s) : sourceValue != null;
         }
 
-        public override object GetValue(string culture = null, string segment = null)
+        public override object GetValue(string culture = ".", string segment = ".")
             => culture == null & segment == null ? _objectValue.Value : null;
 
-        public override object GetXPathValue(string culture = null, string segment = null)
+        public override object GetXPathValue(string culture = ".", string segment = ".")
             => culture == null & segment == null ? _xpathValue.Value : null;
 
         public RawValueProperty(PublishedPropertyType propertyType, IPublishedElement content, object sourceValue, bool isPreviewing = false)

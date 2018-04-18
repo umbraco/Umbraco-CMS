@@ -33,6 +33,7 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.Testing.Objects.AccessorsAndProviders;
+using Umbraco.Tests.Testing.Objects.Accessors;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -264,11 +265,12 @@ namespace Umbraco.Tests.TestHelpers
             // testing=true so XmlStore will not use the file nor the database
 
             var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
+            var variationContextAccessor = new TestPublishedVariationContextAccessor();
             var service = new PublishedSnapshotService(
                 ServiceContext,
                 Container.GetInstance<IPublishedContentTypeFactory>(),
                 ScopeProvider,
-                cache, publishedSnapshotAccessor,
+                cache, publishedSnapshotAccessor, variationContextAccessor,
                 Container.GetInstance<IDocumentRepository>(), Container.GetInstance<IMediaRepository>(), Container.GetInstance<IMemberRepository>(),
                 SystemDefaultCultureProvider,
                 Logger,

@@ -25,6 +25,7 @@ using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
+using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
@@ -88,9 +89,11 @@ namespace Umbraco.Tests.Scoping
                 contentTypeFactory,
                 null,
                 publishedSnapshotAccessor,
+                Mock.Of<IPublishedVariationContextAccessor>(),
                 Logger,
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
+                new DatabaseDataSource(),
                 SystemDefaultCultureProvider,
                 Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper());
         }

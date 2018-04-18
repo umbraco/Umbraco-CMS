@@ -28,7 +28,6 @@ using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
-using Database = Umbraco.Web.PublishedCache.NuCache.DataSource.Database;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -37,7 +36,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ServiceContext _serviceContext;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly IScopeProvider _scopeProvider;
-        private readonly Database _dataSource;
+        private readonly IDataSource _dataSource;
         private readonly ILogger _logger;
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
@@ -82,18 +81,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public PublishedSnapshotService(Options options, MainDom mainDom, IRuntimeState runtime,
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, IScopeProvider scopeProvider,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor, IPublishedVariationContextAccessor variationContextAccessor,
+            ILogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             ISystemDefaultCultureProvider systemDefaultCultureProvider,
-            IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper)
-            : base(publishedSnapshotAccessor)
+            IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper)
+            : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
             //    throw new Exception("Singleton must be instancianted only once!");
 
             _serviceContext = serviceContext;
             _publishedContentTypeFactory = publishedContentTypeFactory;
-            _dataSource = new Database();
+            _dataSource = dataSource;
             _logger = logger;
             _scopeProvider = scopeProvider;
             _documentRepository = documentRepository;
@@ -145,13 +145,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // stores are created with a db so they can write to it, but they do not read from it,
                 // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
                 // figure out whether it can read the dbs or it should populate them from sql
-                _contentStore = new ContentStore(publishedSnapshotAccessor, logger, _localContentDb);
-                _mediaStore = new ContentStore(publishedSnapshotAccessor, logger, _localMediaDb);
+                _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localContentDb);
+                _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localMediaDb);
             }
             else
             {
-                _contentStore = new ContentStore(publishedSnapshotAccessor, logger);
-                _mediaStore = new ContentStore(publishedSnapshotAccessor, logger);
+                _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
+                _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
             }
 
             _domainStore = new SnapDictionary<int, Domain>();
@@ -1025,7 +1025,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainHelper, _globalSettings, _serviceContext.LocalizationService),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, snapshotCache, elementsCache),
-                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, _serviceContext.DataTypeService, _serviceContext.LocalizationService, memberTypeCache, PublishedSnapshotAccessor),
+                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, _serviceContext.DataTypeService, _serviceContext.LocalizationService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor),
                 DomainCache = domainCache,
                 SnapshotCache = snapshotCache,
                 ElementsCache = elementsCache

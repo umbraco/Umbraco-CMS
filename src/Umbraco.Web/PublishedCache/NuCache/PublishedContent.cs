@@ -23,11 +23,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Constructors
 
-        public PublishedContent(ContentNode contentNode, ContentData contentData, IPublishedSnapshotAccessor publishedSnapshotAccessor)
+        public PublishedContent(ContentNode contentNode, ContentData contentData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IPublishedVariationContextAccessor variationContextAccessor)
         {
             _contentNode = contentNode;
             _contentData = contentData;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
+            VariationContextAccessor = variationContextAccessor;
 
             _urlName = _contentData.Name.ToUrlSegment();
             IsPreviewing = _contentData.Published == false;
@@ -70,6 +71,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             _contentNode = contentNode;
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
+            VariationContextAccessor = origin.VariationContextAccessor;
             _contentData = origin._contentData;
 
             _urlName = origin._urlName;
@@ -85,6 +87,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private PublishedContent(PublishedContent origin)
         {
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
+            VariationContextAccessor = origin.VariationContextAccessor;
             _contentNode = origin._contentNode;
             _contentData = origin._contentData;
 
@@ -307,6 +310,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #endregion
 
         #region Internal
+
+        internal IPublishedVariationContextAccessor VariationContextAccessor { get; }
 
         // used by navigable content
         internal IPublishedProperty[] PropertiesArray { get; }

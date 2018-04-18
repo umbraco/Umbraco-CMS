@@ -369,6 +369,11 @@
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
     <Compile Include="Models\PublishedContent\PublishedCultureName.cs" />
+    <Compile Include="Models\PublishedContent\IPublishedVariationContextAccessor.cs" />
+    <Compile Include="Models\PublishedContent\IPublishedValueFallback.cs" />
+    <Compile Include="Models\PublishedContent\PublishedVariationContext.cs" />
+    <Compile Include="Models\PublishedContent\ThreadCulturePublishedVariationContextAccessor.cs" />
+    <Compile Include="Models\PublishedContent\ThreadStaticPublishedVariationContextAccessor.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
     <Compile Include="Persistence\Dtos\ContentVersionCultureVariationDto.cs" />

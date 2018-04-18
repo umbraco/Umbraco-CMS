@@ -15,6 +15,7 @@ using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
+using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
