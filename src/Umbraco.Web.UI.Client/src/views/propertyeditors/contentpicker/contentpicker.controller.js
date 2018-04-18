@@ -58,14 +58,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     $scope.renderModel = [];
 	    
-    $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;
-
-    // very dirty check if it's a parameter editor
-    var isParamEditor = false;
-
-    if ($scope.model.config.multiPicker && $scope.model.config.multiPicker === "1" && !$scope.model.config.maxNumber) {
-        isParamEditor = true;
-    }
+    $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;    
 
     //the default pre-values
     var defaultConfig = {
@@ -100,12 +93,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.model.config.showOpenButton = ($scope.model.config.showOpenButton === "1" ? true : false);
     $scope.model.config.showEditButton = ($scope.model.config.showEditButton === "1" ? true : false);
     $scope.model.config.showPathOnHover = ($scope.model.config.showPathOnHover === "1" ? true : false);
-
-    // if it's a multipicker the maxnumber can't be 1, otherwise it does not work as macro parameter editor
-    if ($scope.model.config.multiPicker && $scope.model.config.maxNumber === 1 && isParamEditor) {
-        $scope.model.config.maxNumber = 0;
-    }
- 
+    
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
         : $scope.model.config.startNode.type === "media"
