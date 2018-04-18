@@ -136,6 +136,12 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public virtual void SetName(int? languageId, string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                ClearName(languageId);
+                return;
+            }
+
             if (languageId == null)
             {
                 Name = name;
@@ -150,6 +156,20 @@ namespace Umbraco.Core.Models
 
             _names[languageId.Value] = name;
             OnPropertyChanged(Ps.Value.NamesSelector);
+        }
+
+        private void ClearName(int? languageId)
+        {
+            if (languageId == null)
+            {
+                Name = null;
+                return;
+            }
+
+            if (_names == null) return;
+            _names.Remove(languageId.Value);
+            if (_names.Count == 0)
+                _names = null;
         }
 
         protected virtual void ClearNames()

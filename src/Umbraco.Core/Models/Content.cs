@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Models
 {
@@ -214,6 +215,9 @@ namespace Umbraco.Core.Models
         // internal for repositories
         internal void SetPublishName(int? languageId, string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentNullOrEmptyException(nameof(name));
+
             if (languageId == null)
             {
                 PublishName = name;
@@ -414,6 +418,7 @@ namespace Umbraco.Core.Models
             ClearNames();
             foreach (var (languageId, name) in other.Names)
                 SetName(languageId, name);
+            Name = other.Name;
         }
 
         /// <inheritdoc />
