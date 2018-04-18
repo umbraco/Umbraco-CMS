@@ -127,15 +127,16 @@ a.umb-editor-header__close-split-view:hover {
 .umb-variant-switcher__toggle {
 	display: flex;
 	align-items: center;
-	padding: 0 10px;
+	padding: 0 10px; 
+    margin: 1px 1px;
+    position: absolute;
+    right: 0;
+    height: 30px;
 	text-decoration: none !important;
 	font-size: 13px;
 	color: @gray-4;
 	background-color: @white;
-	border: 1px solid @gray-8;
-	border-left: none;
 	transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-	margin-left: -1px;
 	&:hover {
 		background-color: @gray-10;
 	}
