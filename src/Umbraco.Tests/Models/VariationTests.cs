@@ -223,6 +223,7 @@ namespace Umbraco.Tests.Models
             Assert.IsNull(content.GetValue("prop", published: true));
 
             // change
+            contentType.Variations |= ContentVariation.CultureNeutral;
             propertyType.Variations |= ContentVariation.CultureNeutral;
 
             // can set value

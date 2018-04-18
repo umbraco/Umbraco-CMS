@@ -2569,7 +2569,7 @@ namespace Umbraco.Tests.Services
             contentService.SaveAndPublish(content);
 
             // content has been published,
-            // it has -- THIS IS WHERE IT BECOMES WEIRD -- FIXME
+            // the french culture is gone
 
             content2 = contentService.GetById(content.Id);
 
@@ -2577,7 +2577,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("name-fr2", content2.GetName(langFr.Id));
             Assert.AreEqual("name-uk2", content2.GetName(langUk.Id));
 
-            Assert.AreEqual("Home US2", content2.PublishName); // fixme why?
+            Assert.AreEqual("Home US2", content2.PublishName); // fixme why? -- and what about properties?
             Assert.IsNull(content2.GetPublishName(langFr.Id));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
 
@@ -2589,35 +2589,42 @@ namespace Umbraco.Tests.Services
             contentService.Unpublish(content);
 
             // content has been unpublished,
-            // ...
+            // but properties, names, etc. retain their 'published' values so the content
+            // can be re-published in its exact original state (before being unpublished)
+            //
+            // fixme should PublishName, GetPublishName and IsCulturePublished check content.Published?
 
             content2 = contentService.GetById(content.Id);
+
+            Assert.IsFalse(content2.Published);
 
             Assert.AreEqual("Home US2", content2.Name);
             Assert.AreEqual("name-fr2", content2.GetName(langFr.Id));
             Assert.AreEqual("name-uk2", content2.GetName(langUk.Id));
 
-            Assert.IsNotNull(content2.PublishName); // fixme not null?! why?
+            Assert.AreEqual("Home US2", content2.PublishName); // not null, see note above
             Assert.IsNull(content2.GetPublishName(langFr.Id));
-            Assert.IsNotNull(content2.GetPublishName(langUk.Id)); // fixme not null?! why? because the 'published' values are not going away!
+            Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id)); // not null, see note above
 
             Assert.IsFalse(content.IsCulturePublished(langFr.Id));
-            Assert.IsTrue(content.IsCulturePublished(langUk.Id)); // fixme ??
+            Assert.IsTrue(content.IsCulturePublished(langUk.Id)); // still true, see note above
 
             // act
 
             contentService.SaveAndPublish(content);
 
             // content has been re-published,
-            // ...
+            // everything is back to what it was before being unpublished
 
             content2 = contentService.GetById(content.Id);
+
+            Assert.IsTrue(content2.Published);
 
             Assert.AreEqual("Home US2", content2.Name);
             Assert.AreEqual("name-fr2", content2.GetName(langFr.Id));
             Assert.AreEqual("name-uk2", content2.GetName(langUk.Id));
 
-            Assert.AreEqual("Home US2", content2.PublishName); // fixme US2? see above
+            Assert.AreEqual("Home US2", content2.PublishName);
             Assert.IsNull(content2.GetPublishName(langFr.Id));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
 

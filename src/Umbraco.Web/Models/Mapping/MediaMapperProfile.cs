@@ -37,6 +37,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
                 .ForMember(dest => dest.Errors, opt => opt.Ignore())
                 .ForMember(dest => dest.Published, opt => opt.Ignore())
+                .ForMember(dest => dest.Edited, opt => opt.Ignore())
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .ForMember(dest => dest.IsContainer, opt => opt.Ignore())
@@ -58,6 +59,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Trashed, opt => opt.MapFrom(src => src.Trashed))
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
                 .ForMember(dest => dest.Published, opt => opt.Ignore())
+                .ForMember(dest => dest.Edited, opt => opt.Ignore())
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
@@ -67,6 +69,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(Constants.UdiEntityType.Media, src.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => mediaOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Published, opt => opt.Ignore())
+                .ForMember(dest => dest.Edited, opt => opt.Ignore())
                 .ForMember(dest => dest.Updater, opt => opt.Ignore())
                 .ForMember(dest => dest.Icon, opt => opt.Ignore())
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
