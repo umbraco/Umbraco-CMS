@@ -18,6 +18,7 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentTypeBase.Alias}")]
     public abstract class ContentBase : TreeEntityBase, IContentBase
     {
+        protected static readonly Dictionary<int, string> NoNames = new Dictionary<int, string>();
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         private int _contentTypeId;
@@ -124,7 +125,7 @@ namespace Umbraco.Core.Models
         [DataMember]
         public virtual IReadOnlyDictionary<int, string> Names
         {
-            get => _names;
+            get => _names ?? NoNames;
             set
             {
                 foreach (var (languageId, name) in value)

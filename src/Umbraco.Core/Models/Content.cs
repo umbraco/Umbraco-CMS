@@ -21,7 +21,6 @@ namespace Umbraco.Core.Models
         private DateTime? _expireDate;
         private Dictionary<int, string> _publishNames;
 
-        private static readonly Dictionary<int, string> NoPublishNames = new Dictionary<int, string>();
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         /// <summary>
@@ -201,7 +200,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc/>
         [IgnoreDataMember]
-        public IReadOnlyDictionary<int, string> PublishNames => _publishNames ?? NoPublishNames;
+        public IReadOnlyDictionary<int, string> PublishNames => _publishNames ?? NoNames;
 
         /// <inheritdoc/>
         public string GetPublishName(int? languageId)
@@ -238,6 +237,7 @@ namespace Umbraco.Core.Models
                 return;
             }
 
+            if (_publishNames == null) return;
             _publishNames.Remove(languageId.Value);
             if (_publishNames.Count == 0)
                 _publishNames = null;
