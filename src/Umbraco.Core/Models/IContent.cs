@@ -84,8 +84,18 @@ namespace Umbraco.Core.Models
         /// Gets a value indicating whether a given culture is available.
         /// </summary>
         /// <remarks>
-        /// <para>A culture becomes available whenever values for this culture are published,
-        /// and it becomes unavailable whenever values for this culture are unpublished.</para>
+        /// <para>A culture becomes available whenever the content name for this culture is
+        /// non-null, and it becomes unavailable whenever the content name is null.</para>
+        /// </remarks>
+        bool IsCultureAvailable(int? languageId);
+
+        /// <summary>
+        /// Gets a value indicating whether a given culture is published.
+        /// </summary>
+        /// <remarks>
+        /// <para>A culture becomes published whenever values for this culture are published,
+        /// and the content published name for this culture is non-null. It becomes non-published
+        /// whenever values for this culture are unpublished.</para>
         /// </remarks>
         bool IsCulturePublished(int? languageId);
 

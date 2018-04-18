@@ -344,7 +344,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (content.PublishedState == PublishedState.Publishing)
             {
                 content.Published = true;
-                content.PublishName = content.Name;
                 content.PublishTemplate = content.Template;
                 content.PublisherId = content.WriterId;
                 content.PublishDate = content.UpdateDate;
@@ -354,7 +353,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             else if (content.PublishedState == PublishedState.Unpublishing)
             {
                 content.Published = false;
-                content.PublishName = null;
                 content.PublishTemplate = null;
                 content.PublisherId = null;
                 content.PublishDate = null;
@@ -497,7 +495,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (content.PublishedState == PublishedState.Publishing)
             {
                 content.Published = true;
-                content.PublishName = content.Name;
                 content.PublishTemplate = content.Template;
                 content.PublisherId = content.WriterId;
                 content.PublishDate = content.UpdateDate;
@@ -507,7 +504,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             else if (content.PublishedState == PublishedState.Unpublishing)
             {
                 content.Published = false;
-                content.PublishName = null;
                 content.PublishTemplate = null;
                 content.PublisherId = null;
                 content.PublishDate = null;

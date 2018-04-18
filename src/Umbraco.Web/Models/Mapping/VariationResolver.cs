@@ -30,7 +30,7 @@ namespace Umbraco.Web.Models.Mapping
                 Language = x,
                 Mandatory = x.Mandatory,
                 Name = source.GetName(x.Id),
-                Exists = source.HasVariation(x.Id), // fixme - what's the purpose? "exists" or "published"? exists is a new thing?
+                Exists = source.IsCultureAvailable(x.Id), // segments ??
                 PublishedState = source.PublishedState.ToString(),
                 //Segment = ?? We'll need to populate this one day when we support segments
             }).ToList();

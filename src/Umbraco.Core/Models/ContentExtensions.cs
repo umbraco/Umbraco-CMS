@@ -171,19 +171,6 @@ namespace Umbraco.Core.Models
             return content.PropertyTypes.Any(x => x.Variations == ContentVariation.CultureNeutral);
         }
 
-        /// <summary>
-        /// Returns true if the content has a variation for the language/segment combination
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="langId"></param>
-        /// <param name="segment"></param>
-        /// <returns></returns>
-        public static bool HasVariation(this IContent content, int langId, string segment = null)
-        {
-            // fixme - wire - but: purpose? are we looking for a 'published' variation? what is this?
-            return false;
-        }
-
         #endregion
 
         /// <summary>

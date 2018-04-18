@@ -2481,13 +2481,16 @@ namespace Umbraco.Tests.Services
 
             var langFr = new Language("fr-FR");
             var langUk = new Language("en-UK");
+            var langDe = new Language("de-DE");
             languageService.Save(langFr);
             languageService.Save(langUk);
+            languageService.Save(langDe);
 
             var contentTypeService = ServiceContext.ContentTypeService;
 
             var contentType = contentTypeService.Get("umbTextpage");
             contentType.Variations = ContentVariation.CultureNeutral;
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.CultureNeutral });
             contentTypeService.Save(contentType);
 
             var contentService = ServiceContext.ContentService;
@@ -2496,6 +2499,8 @@ namespace Umbraco.Tests.Services
             // act
 
             content.SetValue("author", "Barack Obama");
+            content.SetValue("prop", "value-fr1", langFr.Id);
+            content.SetValue("prop", "value-uk1", langUk.Id);
             content.SetName(langFr.Id, "name-fr");
             content.SetName(langUk.Id, "name-uk");
             contentService.Save(content);
@@ -2509,9 +2514,18 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("name-fr", content2.GetName(langFr.Id));
             Assert.AreEqual("name-uk", content2.GetName(langUk.Id));
 
+            Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.Id));
+            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id));
+            Assert.IsNull(content2.GetValue("prop", langFr.Id, published: true));
+            Assert.IsNull(content2.GetValue("prop", langUk.Id, published: true));
+
             Assert.IsNull(content2.PublishName);
             Assert.IsNull(content2.GetPublishName(langFr.Id));
             Assert.IsNull(content2.GetPublishName(langUk.Id));
+
+            Assert.IsTrue(content.IsCultureAvailable(langFr.Id));
+            Assert.IsTrue(content.IsCultureAvailable(langUk.Id));
+            Assert.IsFalse(content.IsCultureAvailable(langDe.Id));
 
             Assert.IsFalse(content.IsCulturePublished(langFr.Id));
             Assert.IsFalse(content.IsCulturePublished(langUk.Id));
@@ -2536,6 +2550,11 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("name-fr", content2.GetPublishName(langFr.Id));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
 
+            Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.Id));
+            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id));
+            Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.Id, published: true));
+            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id, published: true));
+
             Assert.IsTrue(content.IsCulturePublished(langFr.Id));
             Assert.IsTrue(content.IsCulturePublished(langUk.Id));
 
@@ -2544,6 +2563,9 @@ namespace Umbraco.Tests.Services
             content.SetName(null, "Home US2");
             content.SetName(langFr.Id, "name-fr2");
             content.SetName(langUk.Id, "name-uk2");
+            content.SetValue("author", "Barack Obama2");
+            content.SetValue("prop", "value-fr2", langFr.Id);
+            content.SetValue("prop", "value-uk2", langUk.Id);
             contentService.Save(content);
 
             // content has been saved,
@@ -2558,6 +2580,14 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("Home US", content2.PublishName);
             Assert.AreEqual("name-fr", content2.GetPublishName(langFr.Id));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
+
+            Assert.AreEqual("Barack Obama2", content2.GetValue("author"));
+            Assert.IsNull(content2.GetValue("author", published: true)); // because, we never published the InvariantNeutral variation
+
+            Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.Id));
+            Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.Id));
+            Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.Id, published: true));
+            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id, published: true));
 
             Assert.IsTrue(content.IsCulturePublished(langFr.Id));
             Assert.IsTrue(content.IsCulturePublished(langUk.Id));
@@ -2577,9 +2607,14 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("name-fr2", content2.GetName(langFr.Id));
             Assert.AreEqual("name-uk2", content2.GetName(langUk.Id));
 
-            Assert.AreEqual("Home US2", content2.PublishName); // fixme why? -- and what about properties?
+            Assert.AreEqual("Home US2", content2.PublishName); // fixme why? -- and what about properties? -- we haven't published invariants?!
             Assert.IsNull(content2.GetPublishName(langFr.Id));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
+
+            Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.Id));
+            Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.Id));
+            Assert.IsNull(content2.GetValue("prop", langFr.Id, published: true));
+            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id, published: true));
 
             Assert.IsFalse(content.IsCulturePublished(langFr.Id));
             Assert.IsTrue(content.IsCulturePublished(langUk.Id));
@@ -2592,7 +2627,14 @@ namespace Umbraco.Tests.Services
             // but properties, names, etc. retain their 'published' values so the content
             // can be re-published in its exact original state (before being unpublished)
             //
-            // fixme should PublishName, GetPublishName and IsCulturePublished check content.Published?
+            // BEWARE!
+            // in order for a content to be unpublished as a whole, and then republished in
+            // its exact previous state, properties and names etc. retain their published
+            // values even though the content is not published - hence many things being
+            // non-null or true below - always check against content.Published to be sure
+
+            // FIXME
+            // still, we have some inconsistencies, publishName should go NULL when unpublishing it whole, see repository?
 
             content2 = contentService.GetById(content.Id);
 
@@ -2605,6 +2647,11 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("Home US2", content2.PublishName); // not null, see note above
             Assert.IsNull(content2.GetPublishName(langFr.Id));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id)); // not null, see note above
+
+            Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.Id));
+            Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.Id));
+            Assert.IsNull(content2.GetValue("prop", langFr.Id, published: true));
+            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id, published: true));  // has value, see note above
 
             Assert.IsFalse(content.IsCulturePublished(langFr.Id));
             Assert.IsTrue(content.IsCulturePublished(langUk.Id)); // still true, see note above
@@ -2627,6 +2674,11 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("Home US2", content2.PublishName);
             Assert.IsNull(content2.GetPublishName(langFr.Id));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
+
+            Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.Id));
+            Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.Id));
+            Assert.IsNull(content2.GetValue("prop", langFr.Id, published: true));
+            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id, published: true));
 
             Assert.IsFalse(content.IsCulturePublished(langFr.Id));
             Assert.IsTrue(content.IsCulturePublished(langUk.Id));

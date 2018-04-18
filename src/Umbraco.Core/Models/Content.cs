@@ -246,14 +246,17 @@ namespace Umbraco.Core.Models
         // clears all publish names
         private void ClearPublishNames()
         {
+            PublishName = null;
             _publishNames = null;
         }
 
         /// <inheritdoc />
+        public bool IsCultureAvailable(int? languageId)
+            => !string.IsNullOrWhiteSpace(GetName(languageId));
+
+        /// <inheritdoc />
         public bool IsCulturePublished(int? languageId)
-        {
-            return !string.IsNullOrWhiteSpace(GetPublishName(languageId));
-        }
+            => !string.IsNullOrWhiteSpace(GetPublishName(languageId));
 
         [IgnoreDataMember]
         public int PublishedVersionId { get; internal set; }
@@ -274,6 +277,7 @@ namespace Umbraco.Core.Models
 
             // Name and PublishName are managed by the repository, but Names and PublishNames
             // must be managed here as they depend on the existing / supported variations.
+            PublishName = Name;
             foreach (var (languageId, name) in Names)
                 SetPublishName(languageId, name);
 
