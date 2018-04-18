@@ -210,32 +210,40 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public ILanguage GetByIsoCode(string isoCode)
         {
             TypedCachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
-            var id = GetIdByIsoCode(isoCode);
-            return Get(id);
+            var id = GetIdByIsoCode(isoCode, throwOnNotFound: false);
+            return id > 0 ? Get(id) : null;
         }
 
         // fast way of getting an id for an isoCode - avoiding cloning
         // _codeIdMap is rebuilt whenever PerformGetAll runs
-        public int GetIdByIsoCode(string isoCode)
+        public int GetIdByIsoCode(string isoCode) => GetIdByIsoCode(isoCode, throwOnNotFound: true);
+
+        private int GetIdByIsoCode(string isoCode, bool throwOnNotFound)
         {
             TypedCachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
             lock (_codeIdMap)
             {
                 if (_codeIdMap.TryGetValue(isoCode, out var id)) return id;
             }
-            throw new ArgumentException($"Code {isoCode} does not correspond to an existing language.", nameof(isoCode));
+            if (throwOnNotFound)
+                throw new ArgumentException($"Code {isoCode} does not correspond to an existing language.", nameof(isoCode));
+            return 0;
         }
 
         // fast way of getting an isoCode for an id - avoiding cloning
         // _idCodeMap is rebuilt whenever PerformGetAll runs
-        public string GetIsoCodeById(int id)
+        public string GetIsoCodeById(int id) => GetIsoCodeById(id, throwOnNotFound: true);
+
+        private string GetIsoCodeById(int id, bool throwOnNotFound)
         {
             TypedCachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
             lock (_codeIdMap) // yes, we want to lock _codeIdMap
             {
                 if (_idCodeMap.TryGetValue(id, out var isoCode)) return isoCode;
             }
-            throw new ArgumentException($"Id {id} does not correspond to an existing language.", nameof(id));
+            if (throwOnNotFound)
+                throw new ArgumentException($"Id {id} does not correspond to an existing language.", nameof(id));
+            return null;
         }
     }
 }
