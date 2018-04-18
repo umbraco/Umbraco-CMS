@@ -60,6 +60,13 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 	    
     $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;
 
+    // very dirty check if it's a parameter editor
+    var isParamEditor = false;
+
+    if ($scope.model.config.multiPicker && $scope.model.config.multiPicker === "1" && !$scope.model.config.maxNumber) {
+        isParamEditor = true;
+    }
+
     //the default pre-values
     var defaultConfig = {
         multiPicker: false,
@@ -95,7 +102,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.model.config.showPathOnHover = ($scope.model.config.showPathOnHover === "1" ? true : false);
 
     // if it's a multipicker the maxnumber can't be 1, otherwise it does not work as macro parameter editor
-    if ($scope.model.config.multiPicker && $scope.model.config.maxNumber === 1) {
+    if ($scope.model.config.multiPicker && $scope.model.config.maxNumber === 1 && isParamEditor) {
         $scope.model.config.maxNumber = 0;
     }
  
