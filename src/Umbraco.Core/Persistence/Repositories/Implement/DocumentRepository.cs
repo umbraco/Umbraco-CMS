@@ -290,6 +290,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var contentVersionDto = dto.DocumentVersionDto.ContentVersionDto;
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = !publishing;
+            contentVersionDto.Text = publishing ? content.PublishName : content.Name;
             Database.Insert(contentVersionDto);
             content.VersionId = contentVersionDto.Id;
 
@@ -306,6 +307,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 content.PublishedVersionId = content.VersionId;
                 contentVersionDto.Id = 0;
                 contentVersionDto.Current = true;
+                contentVersionDto.Text = content.Name;
                 Database.Insert(contentVersionDto);
                 content.VersionId = contentVersionDto.Id;
 
@@ -434,6 +436,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 documentVersionDto.Published = true; // now published
                 contentVersionDto.Current = false; // no more current
+                contentVersionDto.Text = content.PublishName;
             }
             Database.Update(contentVersionDto);
             Database.Update(documentVersionDto);
@@ -445,6 +448,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 contentVersionDto.Id = 0; // want a new id
                 contentVersionDto.Current = true; // current version
+                contentVersionDto.Text = content.Name;
                 Database.Insert(contentVersionDto);
                 content.VersionId = documentVersionDto.Id = contentVersionDto.Id; // get the new id
 

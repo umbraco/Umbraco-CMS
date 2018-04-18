@@ -2488,8 +2488,18 @@ namespace Umbraco.Tests.Services
 
             var contentTypeService = ServiceContext.ContentTypeService;
 
+            // fixme
+            // contentType.Variations is InvariantNeutral | CultureNeutral
+            // propertyType.Variations can only be a subset of contentType.Variations - ie cannot *add* anything
+            //  (at least, we should validate this)
+            // but then,
+            // if the contentType supports InvariantNeutral | CultureNeutral,
+            //    the propertyType should support InvariantNeutral, or both, but not solely CultureNeutral?
+            //  but does this mean that CultureNeutral implies InvariantNeutral?
+            //  can a contentType *not* support InvariantNeutral?
+
             var contentType = contentTypeService.Get("umbTextpage");
-            contentType.Variations = ContentVariation.CultureNeutral;
+            contentType.Variations = ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral;
             contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.CultureNeutral });
             contentTypeService.Save(contentType);
 
@@ -2546,7 +2556,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("name-fr", content2.GetName(langFr.Id));
             Assert.AreEqual("name-uk", content2.GetName(langUk.Id));
 
-            Assert.AreEqual("Home US", content2.PublishName);
+            Assert.IsNull(content2.PublishName); // we haven't published InvariantNeutral
             Assert.AreEqual("name-fr", content2.GetPublishName(langFr.Id));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
 
@@ -2557,6 +2567,17 @@ namespace Umbraco.Tests.Services
 
             Assert.IsTrue(content.IsCulturePublished(langFr.Id));
             Assert.IsTrue(content.IsCulturePublished(langUk.Id));
+
+            // act
+
+            content.PublishValues();
+            contentService.SaveAndPublish(content);
+
+            // now it has publish name for invariant neutral
+
+            content2 = contentService.GetById(content.Id);
+
+            Assert.AreEqual("Home US", content2.PublishName);
 
             // act
 
@@ -2582,7 +2603,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
 
             Assert.AreEqual("Barack Obama2", content2.GetValue("author"));
-            Assert.IsNull(content2.GetValue("author", published: true)); // because, we never published the InvariantNeutral variation
+            Assert.AreEqual("Barack Obama", content2.GetValue("author", published: true));
 
             Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.Id));
             Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.Id));
@@ -2607,7 +2628,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("name-fr2", content2.GetName(langFr.Id));
             Assert.AreEqual("name-uk2", content2.GetName(langUk.Id));
 
-            Assert.AreEqual("Home US2", content2.PublishName); // fixme why? -- and what about properties? -- we haven't published invariants?!
+            Assert.AreEqual("Home US", content2.PublishName);
             Assert.IsNull(content2.GetPublishName(langFr.Id));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
 
@@ -2633,9 +2654,6 @@ namespace Umbraco.Tests.Services
             // values even though the content is not published - hence many things being
             // non-null or true below - always check against content.Published to be sure
 
-            // FIXME
-            // still, we have some inconsistencies, publishName should go NULL when unpublishing it whole, see repository?
-
             content2 = contentService.GetById(content.Id);
 
             Assert.IsFalse(content2.Published);
@@ -2644,7 +2662,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("name-fr2", content2.GetName(langFr.Id));
             Assert.AreEqual("name-uk2", content2.GetName(langUk.Id));
 
-            Assert.AreEqual("Home US2", content2.PublishName); // not null, see note above
+            Assert.AreEqual("Home US", content2.PublishName); // not null, see note above
             Assert.IsNull(content2.GetPublishName(langFr.Id));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id)); // not null, see note above
 
@@ -2671,7 +2689,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("name-fr2", content2.GetName(langFr.Id));
             Assert.AreEqual("name-uk2", content2.GetName(langUk.Id));
 
-            Assert.AreEqual("Home US2", content2.PublishName);
+            Assert.AreEqual("Home US", content2.PublishName);
             Assert.IsNull(content2.GetPublishName(langFr.Id));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
 
