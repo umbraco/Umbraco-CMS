@@ -38,17 +38,6 @@ using JArray = Newtonsoft.Json.Linq.JArray;
 
 namespace Umbraco.Web.Editors
 {
-    public class BackOfficeModel
-    {
-        public BackOfficeModel(string path, UmbracoFeatures features)
-        {
-            Path = path;
-            Features = features;
-        }
-
-        public string Path { get; }
-        public UmbracoFeatures Features { get; }
-    }
 
     /// <summary>
     /// Represents a controller user to render out the default back office view and JS results.
@@ -85,8 +74,8 @@ namespace Umbraco.Web.Editors
         public async Task<ActionResult> Default()
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(GlobalSettings.Path, _features)),
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(GlobalSettings.Path, _features)));
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings)),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", new BackOfficeModel(_features, GlobalSettings)));
         }
 
         [HttpGet]
@@ -159,7 +148,7 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(GlobalSettings.Path, _features)),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings)),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
         }

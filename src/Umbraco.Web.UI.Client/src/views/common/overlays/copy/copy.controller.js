@@ -22,7 +22,7 @@
       });
 
       $scope.model.relateToOriginal = true;
-      $scope.dialogTreeEventHandler = $({});
+      $scope.dialogTreeApi = {};
 
       vm.searchInfo = {
           searchFromId: null,
@@ -35,7 +35,7 @@
       // get entity type based on the section
       $scope.entityType = entityHelper.getEntityTypeFromSection(dialogOptions.section);
 
-      function nodeSelectHandler(ev, args) {
+      function nodeSelectHandler(args) {
           if(args && args.event) {
             args.event.preventDefault();
             args.event.stopPropagation();
@@ -52,7 +52,7 @@
           $scope.model.target.selected = true;
       }
 
-      function nodeExpandedHandler(ev, args) {
+      function nodeExpandedHandler(args) {
           // open mini list view for list views
           if (args.node.metaData.isContainer) {
               openMiniListView(args.node);
@@ -78,13 +78,11 @@
           vm.searchInfo.showSearch = true;
       }
 
-      $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
-      $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
+        $scope.onTreeInit = function () {
+            $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
+            $scope.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
+        }
 
-      $scope.$on('$destroy', function () {
-          $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-          $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
-      });
 
       // Mini list view
       $scope.selectListViewNode = function (node) {

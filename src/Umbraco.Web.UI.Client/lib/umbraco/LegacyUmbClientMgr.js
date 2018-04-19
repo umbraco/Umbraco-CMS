@@ -90,11 +90,6 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
 
                 //mimic the API of the legacy tree
                 var tree = {
-                    setActiveTreeType: function (treeType) {
-                        angularHelper.safeApply($rootScope, function() {
-                            navService._setActiveTreeType(treeType);
-                        });
-                    },
                     syncTree: function (path, forceReload) {
                         angularHelper.safeApply($rootScope, function() {
                             navService._syncPath(path, forceReload);
@@ -118,9 +113,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                         });
                     },
                     refreshTree: function (treeAlias) {
-                        angularHelper.safeApply($rootScope, function() {
-                            navService._setActiveTreeType(treeAlias, true);
-                        });                        
+                        //no-op, just needs to be here for legacy reasons
                     },
                     moveNode: function (id, path) {
                         angularHelper.safeApply($rootScope, function() {

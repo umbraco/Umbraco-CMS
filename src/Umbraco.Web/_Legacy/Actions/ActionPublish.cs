@@ -43,7 +43,7 @@ namespace Umbraco.Web._Legacy.Actions
         {
             get
             {
-                return string.Format("{0}.actionPublish()", ClientTools.Scripts.GetAppActions);
+                return string.Empty;
             }
         }
 
@@ -67,7 +67,7 @@ namespace Umbraco.Web._Legacy.Actions
         {
             get
             {
-                return "globe";
+                return string.Empty;
             }
         }
 

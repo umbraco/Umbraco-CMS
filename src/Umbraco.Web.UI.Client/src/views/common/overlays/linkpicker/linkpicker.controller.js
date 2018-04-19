@@ -12,7 +12,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 		    $scope.model.title = localizationService.localize("defaultdialogs_selectLink");
 		}
 
-	    $scope.dialogTreeEventHandler = $({});
+	    $scope.dialogTreeApi = {};
 	    $scope.model.target = {};
 	    $scope.searchInfo = {
 	        searchFromId: null,
@@ -38,7 +38,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
                     entityResource.getPath(id, "Document").then(function (path) {
 	                    $scope.model.target.path = path;
 	                    //now sync the tree to this path
-	                    $scope.dialogTreeEventHandler.syncTree({ path: $scope.model.target.path, tree: "content" });
+	                    $scope.dialogTreeApi.syncTree({ path: $scope.model.target.path, tree: "content" });
 	                });
 	            }
 
@@ -48,7 +48,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 	        }
 	    }
 
-	    function nodeSelectHandler(ev, args) {
+	    function nodeSelectHandler(args) {
 
 			if(args && args.event) {
 				args.event.preventDefault();
@@ -82,7 +82,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 			}
 	    }
 
-	    function nodeExpandedHandler(ev, args) {
+	    function nodeExpandedHandler(args) {
 			// open mini list view for list views
 			if (args.node.metaData.isContainer) {
 				openMiniListView(args.node);
@@ -131,14 +131,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
             $scope.searchInfo.showSearch = true;
 	    };
 
-	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
-	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
-
-	    $scope.$on('$destroy', function () {
-	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-	        $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
-	    });
-
+        $scope.onTreeInit = function () {
+            $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
+            $scope.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
+        }
+        
 		// Mini list view
 		$scope.selectListViewNode = function (node) {
 			node.selected = node.selected === true ? false : true;

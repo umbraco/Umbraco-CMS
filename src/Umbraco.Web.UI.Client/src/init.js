@@ -1,31 +1,32 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService', 'tourService', 'dashboardResource',
-  function (userService, $log, $rootScope, $location, queryStrings, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService, tourService, dashboardResource) {
-      
+app.run(['userService', '$q', '$log', '$rootScope', '$location', 'queryStrings', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService', 'tourService', 'dashboardResource',
+    function (userService, $q, $log, $rootScope, $location, queryStrings, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService, tourService, dashboardResource) {
+        
         //This sets the default jquery ajax headers to include our csrf token, we
         // need to user the beforeSend method because our token changes per user/login so
         // it cannot be static
         $.ajaxSetup({
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("X-UMB-XSRF-TOKEN", $cookies["UMB-XSRF-TOKEN"]);
-              if (queryStrings.getParams().umbDebug === "true" || queryStrings.getParams().umbdebug === "true") {
-                xhr.setRequestHeader("X-UMB-DEBUG", "true");
-              }
+                if (queryStrings.getParams().umbDebug === "true" || queryStrings.getParams().umbdebug === "true") {
+                    xhr.setRequestHeader("X-UMB-DEBUG", "true");
+                }
             }
         });
 
         /** Listens for authentication and checks if our required assets are loaded, if/once they are we'll broadcast a ready event */
-        eventsService.on("app.authenticated", function(evt, data) {
-            
-            assetsService._loadInitAssets().then(function() {
+        eventsService.on("app.authenticated", function (evt, data) {
 
-                // Loads the user's locale settings for Moment.
-                userService.loadMomentLocaleForCurrentUser().then(function() {
+            assetsService._loadInitAssets().then(function() {
+                $q.all([
+                    userService.loadMomentLocaleForCurrentUser(),
+                    tourService.registerAllTours()
+                ]).then(function () {
 
                     //Register all of the tours on the server
                     tourService.registerAllTours().then(function () {
                         appReady(data);
-                        
+
                         // Auto start intro tour
                         tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
                             // start intro tour if it hasn't been completed or disabled
@@ -34,7 +35,8 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                             }
                         });
 
-                    }, function(){
+                    }, function () {
+                        appAuthenticated = true;
                         appReady(data);
                     });
                 });
@@ -50,7 +52,7 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
         }
 
         /** execute code on each successful route */
-        $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
+        $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
 
             var deployConfig = Umbraco.Sys.ServerVariables.deploy;
             var deployEnv, deployEnvTitle;
@@ -59,7 +61,7 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                 deployEnvTitle = "(" + deployEnv + ") ";
             }
 
-            if(current.params.section) {
+            if (current.params.section) {
 
                 //Uppercase the current section, content, media, settings, developer, forms
                 var currentSection = current.params.section.charAt(0).toUpperCase() + current.params.section.slice(1);
@@ -67,18 +69,18 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
                 var baseTitle = currentSection + " - " + $location.$$host;
 
                 //Check deploy for Global Umbraco.Sys obj workspace
-                if(deployEnv){
+                if (deployEnv) {
                     $rootScope.locationTitle = deployEnvTitle + baseTitle;
                 }
                 else {
                     $rootScope.locationTitle = baseTitle;
                 }
-                
+
             }
             else {
 
-                if(deployEnv) {
-                     $rootScope.locationTitle = deployEnvTitle + "Umbraco - " + $location.$$host;
+                if (deployEnv) {
+                    $rootScope.locationTitle = deployEnvTitle + "Umbraco - " + $location.$$host;
                 }
 
                 $rootScope.locationTitle = "Umbraco - " + $location.$$host;
@@ -95,7 +97,7 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
 
         /** When the route change is rejected - based on checkAuth - we'll prevent the rejected route from executing including
             wiring up it's controller, etc... and then redirect to the rejected URL.   */
-        $rootScope.$on('$routeChangeError', function(event, current, previous, rejection) {
+        $rootScope.$on('$routeChangeError', function (event, current, previous, rejection) {
             event.preventDefault();
 
             var returnPath = null;
@@ -111,13 +113,12 @@ app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navi
 
         });
 
-
         /* this will initialize the navigation service once the application has started */
         navigationService.init();
 
         //check for touch device, add to global appState
         //var touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints === 5 || window.DocumentTouch && document instanceof DocumentTouch);
-        var touchDevice =  /android|webos|iphone|ipad|ipod|blackberry|iemobile|touch/i.test(navigator.userAgent.toLowerCase());
+        var touchDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|touch/i.test(navigator.userAgent.toLowerCase());
         appState.setGlobalState("touchDevice", touchDevice);
 
     }]);

@@ -8,7 +8,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	        searchText = value + "...";
 	    });
 
-	    $scope.dialogTreeEventHandler = $({});
+        $scope.dialogTreeApi = {};
 	    $scope.target = {};
 	    $scope.searchInfo = {
 	        searchFromId: null,
@@ -30,7 +30,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	                entityResource.getPath(id, "Document").then(function (path) {
 	                    $scope.target.path = path;
 	                    //now sync the tree to this path
-	                    $scope.dialogTreeEventHandler.syncTree({ path: $scope.target.path, tree: "content" });
+                        $scope.dialogTreeApi.syncTree({ path: $scope.target.path, tree: "content" });
 	                });
 	            }
 
@@ -40,7 +40,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	        }
 	    }
 
-	    function nodeSelectHandler(ev, args) {
+	    function nodeSelectHandler(args) {
 	        args.event.preventDefault();
 	        args.event.stopPropagation();
 
@@ -80,7 +80,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	        }	        
 	    }
 
-	    function nodeExpandedHandler(ev, args) {
+	    function nodeExpandedHandler(args) {
 	        if (angular.isArray(args.children)) {
 
 	            //iterate children
@@ -139,11 +139,9 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
             $scope.searchInfo.showSearch = true;
 	    };
 
-	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
-	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
-
-	    $scope.$on('$destroy', function () {
-	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-	        $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
-	    });
+        $scope.onTreeInit = function () {
+            $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
+            $scope.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
+        }	    
+        
 	});

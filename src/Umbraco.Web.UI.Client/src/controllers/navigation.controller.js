@@ -9,18 +9,113 @@
  *
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $rootScope, $location, $log, $routeParams, $timeout, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource) {
+function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource) {
 
-    //TODO: Need to think about this and an nicer way to acheive what this is doing.
-    //the tree event handler i used to subscribe to the main tree click events
-    $scope.treeEventHandler = $({});
-    navigationService.setupTreeEvents($scope.treeEventHandler);
+    $scope.treeApi = {};
 
-    //Put the navigation service on this scope so we can use it's methods/properties in the view.
+    //Bind to the main tree events
+    $scope.onTreeInit = function () {
+
+        $scope.treeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
+
+        //when a tree is loaded into a section, we need to put it into appState
+        $scope.treeApi.callbacks.treeLoaded(function (args) {
+            appState.setTreeState("currentRootNode", args.tree);
+        });
+
+        //when a tree node is synced this event will fire, this allows us to set the currentNode
+        $scope.treeApi.callbacks.treeSynced(function (args) {
+
+            if (args.activate === undefined || args.activate === true) {
+                //set the current selected node
+                appState.setTreeState("selectedNode", args.node);
+                //when a node is activated, this is the same as clicking it and we need to set the
+                //current menu item to be this node as well.
+                appState.setMenuState("currentNode", args.node);
+            }
+        });
+
+        //this reacts to the options item in the tree
+        $scope.treeApi.callbacks.treeOptionsClick(function (args) {
+            args.event.stopPropagation();
+            args.event.preventDefault();
+
+            //Set the current action node (this is not the same as the current selected node!)
+            appState.setMenuState("currentNode", args.node);
+
+            if (args.event && args.event.altKey) {
+                args.skipDefault = true;
+            }
+
+            navigationService.showMenu(args);
+        });
+
+        $scope.treeApi.callbacks.treeNodeAltSelect(function (args) {
+            args.event.stopPropagation();
+            args.event.preventDefault();
+
+            args.skipDefault = true;
+            navigationService.showMenu(args);
+        });
+
+        //this reacts to tree items themselves being clicked
+        //the tree directive should not contain any handling, simply just bubble events
+        $scope.treeApi.callbacks.treeNodeSelect(function (args) {
+            var n = args.node;
+            args.event.stopPropagation();
+            args.event.preventDefault();
+
+            if (n.metaData && n.metaData["jsClickCallback"] && angular.isString(n.metaData["jsClickCallback"]) && n.metaData["jsClickCallback"] !== "") {
+                //this is a legacy tree node!
+                var jsPrefix = "javascript:";
+                var js;
+                if (n.metaData["jsClickCallback"].startsWith(jsPrefix)) {
+                    js = n.metaData["jsClickCallback"].substr(jsPrefix.length);
+                }
+                else {
+                    js = n.metaData["jsClickCallback"];
+                }
+                try {
+                    var func = eval(js);
+                    //this is normally not necessary since the eval above should execute the method and will return nothing.
+                    if (func != null && (typeof func === "function")) {
+                        func.call();
+                    }
+                }
+                catch (ex) {
+                    $log.error("Error evaluating js callback from legacy tree node: " + ex);
+                }
+            }
+            else if (n.routePath) {
+                //add action to the history service
+                historyService.add({ name: n.name, link: n.routePath, icon: n.icon });
+
+                //put this node into the tree state
+                appState.setTreeState("selectedNode", args.node);
+                //when a node is clicked we also need to set the active menu node to this node
+                appState.setMenuState("currentNode", args.node);
+
+                //not legacy, lets just set the route value and clear the query string if there is one.
+                $location.path(n.routePath).search("");
+            }
+            else if (n.section) {
+                $location.path(n.section).search("");
+            }
+
+            navigationService.hideNavigation();
+        });
+
+        //once this is wired up, the nav is ready
+        eventsService.emit("app.navigationReady", { treeApi: $scope.treeApi});
+    }
+
+    //TODO: Remove this, this is not healthy
+    // Put the navigation service on this scope so we can use it's methods/properties in the view.
     // IMPORTANT: all properties assigned to this scope are generally available on the scope object on dialogs since
     //   when we create a dialog we pass in this scope to be used for the dialog's scope instead of creating a new one.
     $scope.nav = navigationService;
-    // TODO: Lets fix this, it is less than ideal to be passing in the navigationController scope to something else to be used as it's scope,
+    // TODO: Remove this, this is not healthy
+    // it is less than ideal to be passing in the navigationController scope to something else to be used as it's scope,
     // this is going to lead to problems/confusion. I really don't think passing scope's around is very good practice.
     $rootScope.nav = navigationService;
 
@@ -37,7 +132,11 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     $scope.page.languageSelectorIsOpen = false;
 
     $scope.currentSection = appState.getSectionState("currentSection");
+    $scope.customTreeParams = null;
+    $scope.treeCacheKey = "_";
     $scope.showNavigation = appState.getGlobalState("showNavigation");
+    // tracks all expanded paths so when the language is switched we can resync it with the already loaded paths
+    var expandedPaths = [];
 
     //trigger search with a hotkey:
     keyboardService.bind("ctrl+shift+s", function () {
@@ -137,32 +236,86 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
         languageResource.getAll().then(function(languages) {
             $scope.languages = languages;
 
-            // select the default language
-            $scope.languages.forEach(function(language) {
-                if(language.isDefault) {
-                    $scope.selectLanguage(language);
+            // make the default language selected
+            $scope.languages.forEach(function (language) {
+                if (language.isDefault) {
+                    $scope.selectedLanguage = language;
                 }
             });
-
         });
 
     }));
 
-    $scope.selectLanguage = function(language, languages) {
+    /**
+    * Updates the tree's query parameters
+    */
+    function initTree() {
+        //create the custom query string param for this tree
+        var queryParams = {};
+        if ($scope.selectedLanguage && $scope.selectedLanguage.id) {
+            queryParams["languageId"] = $scope.selectedLanguage.id;
+        }
+        var queryString = $.param(queryParams); //create the query string from the params object
+
+        if (queryString) {
+            $scope.customTreeParams = queryString;
+            $scope.treeCacheKey = queryString; // this tree uses caching but we need to change it's cache key per lang
+        }
+        else {
+            $scope.treeCacheKey = "_"; // this tree uses caching, there's no lang selected so use the default
+        }
+    }
+
+    function nodeExpandedHandler(args) {
+        //store the reference to the expanded node path
+        if (args.node) {
+            treeService._trackExpandedPaths(args.node, expandedPaths);
+        }
+    }
+
+    $scope.selectLanguage = function(language) {
         $scope.selectedLanguage = language;
         // close the language selector
         $scope.page.languageSelectorIsOpen = false;
+
+        initTree(); //this will reset the tree params and the tree directive will pick up the changes in a $watch
+
+        //execute after next digest because the internal watch on the customtreeparams needs to be bound now that we've changed it
+        $timeout(function () {
+            //reload the tree with it's updated querystring args
+            $scope.treeApi.load($scope.currentSection).then(function () {
+
+                //re-sync to currently edited node
+                var currNode = appState.getTreeState("selectedNode");
+                //create the list of promises
+                var promises = [];
+                //starting with syncing to the currently selected node if there is one
+                if (currNode) {
+                    var path = treeService.getPath(currNode);
+                    promises.push($scope.treeApi.syncTree({ path: path, activate: true }));
+                }
+                //TODO: If we want to keep all paths expanded ... but we need more testing since we need to deal with unexpanding
+                //for (var i = 0; i < expandedPaths.length; i++) {
+                //    promises.push($scope.treeApi.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));
+                //}
+                //execute them sequentially
+                angularHelper.executeSequentialPromises(promises);
+            });
+        });
+        
     };
 
     //this reacts to the options item in the tree
-    //todo, migrate to nav service
+    //TODO: migrate to nav service
+    //TODO: is this used? 
     $scope.searchShowMenu = function (ev, args) {
         //always skip default
         args.skipDefault = true;
-        navigationService.showMenu(ev, args);
+        navigationService.showMenu(args);
     };
 
-    //todo, migrate to nav service
+    //TODO: migrate to nav service
+    //TODO: is this used?
     $scope.searchHide = function () {
         navigationService.hideSearch();
     };

@@ -149,7 +149,8 @@ namespace Umbraco.Web.Trees
 
             // get child entities - if id is root, but user's start nodes do not contain the
             // root node, this returns the start nodes instead of root's children
-            var entities = GetChildEntities(id).ToList();
+            var langId = queryStrings["languageId"].TryConvertTo<int?>();
+            var entities = GetChildEntities(id, langId.Success ? langId.Result : null).ToList();
             nodes.AddRange(entities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings)).Where(x => x != null));
 
             // if the user does not have access to the root node, what we have is the start nodes,
@@ -181,7 +182,7 @@ namespace Umbraco.Web.Trees
 
         protected abstract UmbracoObjectTypes UmbracoObjectType { get; }
 
-        protected IEnumerable<IEntitySlim> GetChildEntities(string id)
+        protected IEnumerable<IEntitySlim> GetChildEntities(string id, int? langId)
         {
             // try to parse id as an integer else use GetEntityFromId
             // which will grok Guids, Udis, etc and let use obtain the id
@@ -194,16 +195,41 @@ namespace Umbraco.Web.Trees
                 entityId = entity.Id;
             }
 
+            IEntitySlim[] result;
+
             // if a request is made for the root node but user has no access to
             // root node, return start nodes instead
             if (entityId == Constants.System.Root && UserStartNodes.Contains(Constants.System.Root) == false)
             {
-                return UserStartNodes.Length > 0
-                    ? Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes)
-                    : Enumerable.Empty<IEntitySlim>();
+                result = UserStartNodes.Length > 0
+                    ? Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes).ToArray()
+                    : Array.Empty<IEntitySlim>();
+            }
+            else
+            {
+                result = Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToArray();
             }
 
-            return Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToArray();
+            if (langId.HasValue)
+            {
+                //need to update all node names
+                //TODO: This is not currently stored, we need to wait until U4-11128 is complete for this to work, in the meantime
+                // we'll mock using this and it will just be some mock data
+                foreach(var e in result)
+                {
+                    if (e.AdditionalData.TryGetValue("VariantNames", out var variantNames))
+                    {
+                        var casted = (IDictionary<int, string>)variantNames;
+                        e.Name = casted[langId.Value];
+                    }
+                    else
+                    {
+                        e.Name = e.Name + " (lang: " + langId.Value + ")";
+                    }
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -362,8 +388,9 @@ namespace Umbraco.Web.Trees
         /// <param name="allowedUserOptions">A list of MenuItems that the user has permissions to execute on the current document</param>
         /// <remarks>By default the user must have Browse permissions to see the node in the Content tree</remarks>
         /// <returns></returns>
-        internal bool CanUserAccessNode(IUmbracoEntity doc, IEnumerable<MenuItem> allowedUserOptions)
+        internal bool CanUserAccessNode(IUmbracoEntity doc, IEnumerable<MenuItem> allowedUserOptions, int? langId)
         {
+            //TODO: At some stage when we implement permissions on languages we'll need to take care of langId
             return allowedUserOptions.Select(x => x.Action).OfType<ActionBrowse>().Any();
         }
 
