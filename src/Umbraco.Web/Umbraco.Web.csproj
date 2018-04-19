@@ -140,6 +140,8 @@
     <Compile Include="Editors\PreviewController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\TourController.cs" />
+    <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\UserGroupAuthorizationAttribute.cs" />
     <Compile Include="Editors\UserGroupEditorAuthorizationHelper.cs" />
@@ -186,6 +188,8 @@
     <Compile Include="HealthCheck\Checks\Config\TraceCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\ValueComparisonType.cs" />
     <Compile Include="HealthCheck\Checks\Config\CompilationDebugCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Security\BaseHttpHeaderCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Security\NoSniffCheck.cs" />
     <Compile Include="HealthCheck\Checks\Services\SmtpCheck.cs" />
     <Compile Include="HealthCheck\Checks\Permissions\FolderAndFilePermissionsCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\ExcessiveHeadersCheck.cs" />

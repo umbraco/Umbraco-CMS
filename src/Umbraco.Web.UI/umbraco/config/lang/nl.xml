@@ -1368,7 +1368,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
 
     <key alias="httpsCheckValidCertificate">Het cerficaat van de website is ongeldig.</key>
     <key alias="httpsCheckInvalidCertificate">Cerficaat validatie foutmelding: '%0%'</key>
-    <key alias="httpsCheckInvalidUrl">Fout bij pingen van URL %0% - '%1%'</key>
+    <key alias="healthCheckInvalidUrl">Fout bij pingen van URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">De site wordt momenteel %0% bekeken via HTTPS.</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">De appSetting 'umbracoUseSSL' in web.config staat op 'false'. Indien HTTPS gebruikt wordt moet deze op 'true' staan.</key>
     <key alias="httpsCheckConfigurationCheckResult">De appSetting 'umbracoUseSSL' in web.config is ingesteld op '%0%'. Cookies zijn %1% ingesteld als secure.</key>
@@ -1408,10 +1408,10 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
 
     <key alias="clickJackingCheckHeaderFound"><![CDATA[De <strong>X-Frame-Options</strong> header of meta-tag om IFRAMEing door andere websites te voorkomen is aanwezig!]]></key>
     <key alias="clickJackingCheckHeaderNotFound"><![CDATA[De <strong>X-Frame-Options</strong> header of meta-tag om IFRAMEing door andere websites te voorkomen is NIET aanwezig.]]></key>
-    <key alias="clickJackingSetHeaderInConfig">Voorkom IFRAMEing via web.config</key>
+    <key alias="setHeaderInConfig">Voorkom IFRAMEing via web.config</key>
     <key alias="clickJackingSetHeaderInConfigDescription">Voegt de instelling toe aan de httpProtocol/customHeaders section in web.config om IFRAMEing door andere websites te voorkomen.</key>
     <key alias="clickJackingSetHeaderInConfigSuccess">De instelling om IFRAMEing door andere websites te voorkomen is toegevoegd aan de web.config!</key>
-    <key alias="clickJackingSetHeaderInConfigError">Web.config kon niet aangepast worden door error: %0%</key>
+    <key alias="setHeaderInConfigError">Web.config kon niet aangepast worden door error: %0%</key>
 
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found

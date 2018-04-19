@@ -30,21 +30,7 @@
       <delete assembly="Umbraco.Web" type="macroTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="xslt">
-    <header>Macro</header>
-    <usercontrol>/create/xslt.ascx</usercontrol>
-    <tasks>
-      <delete assembly="Umbraco.Web" type="XsltTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="xsltFolder">
-    <header>Xslt</header>
-    <usercontrol>/create/xslt.ascx</usercontrol>
-    <tasks>
-      <create assembly="Umbraco.Web" type="XsltTasks" />
-      <delete assembly="Umbraco.Web" type="XsltTasks" />
-    </tasks>
-  </nodeType>
+  
   <nodeType alias="users">
     <header>User</header>
     <usercontrol>/create/user.ascx</usercontrol>

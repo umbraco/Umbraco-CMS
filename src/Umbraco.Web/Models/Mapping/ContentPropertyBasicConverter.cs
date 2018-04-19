@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -55,12 +57,24 @@ namespace Umbraco.Web.Models.Mapping
             var result = new TDestination
                 {
                     Id = property.Id,
-                    Value = editor.GetValueEditor().ToEditor(property, DataTypeService, languageId),
                     Alias = property.Alias,
                     PropertyEditor = editor,
                     Editor = editor.Alias
                 };
 
+            // if there's a set of property aliases specified, we will check if the current property's value should be mapped.
+            // if it isn't one of the ones specified in 'includeProperties', we will just return the result without mapping the Value.
+            if (context.Options.Items.ContainsKey("IncludeProperties"))
+            {
+                var includeProperties = context.Options.Items["IncludeProperties"] as IEnumerable<string>;
+                if (includeProperties != null && includeProperties.Contains(property.Alias) == false)
+                {
+                    return result;
+                }
+            }
+
+            // if no 'IncludeProperties' were specified or this property is set to be included - we will map the value and return.
+            result.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, languageId);
             return result;
         }
     }
