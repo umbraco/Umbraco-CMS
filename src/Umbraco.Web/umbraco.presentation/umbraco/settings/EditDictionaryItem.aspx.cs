@@ -92,7 +92,6 @@ namespace umbraco.settings
             {
                 var path = BuildPath(currentItem);
                 ClientTools
-                    .SetActiveTreeType(Constants.Trees.Dictionary)
                     .SyncTree(path, false);
             }
 

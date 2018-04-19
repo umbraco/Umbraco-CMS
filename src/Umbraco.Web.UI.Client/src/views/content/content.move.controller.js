@@ -7,7 +7,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 	        searchText = value + "...";
 	    });
 
-	    $scope.dialogTreeEventHandler = $({});
+	    $scope.dialogTreeApi = {};
 	    $scope.busy = false;
 	    $scope.searchInfo = {
 	        searchFromId: null,
@@ -25,7 +25,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 
 	    var node = dialogOptions.currentNode;
 
-	    function nodeSelectHandler(ev, args) {
+	    function nodeSelectHandler(args) {
 
 			if(args && args.event) {
 				args.event.preventDefault();
@@ -44,7 +44,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 
 	    }
 
-	    function nodeExpandedHandler(ev, args) {
+	    function nodeExpandedHandler(args) {
 			// open mini list view for list views
           	if (args.node.metaData.isContainer) {
 				openMiniListView(args.node);
@@ -111,14 +111,11 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
                 });
 	    };
 
-	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
-	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
-
-	    $scope.$on('$destroy', function () {
-	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-	        $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
-	    });
-
+        $scope.onTreeInit = function () {
+            $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
+            $scope.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
+        }	    
+        
 		// Mini list view
 		$scope.selectListViewNode = function (node) {
 			node.selected = node.selected === true ? false : true;

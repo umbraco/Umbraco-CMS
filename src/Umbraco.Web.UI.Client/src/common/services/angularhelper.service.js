@@ -8,7 +8,42 @@
  */
 function angularHelper($log, $q) {
     return {
-        
+
+        /**
+         * Execute a list of promises sequentially. Unlike $q.all which executes all promises at once, this will execute them in sequence.
+         * @param {} promises 
+         * @returns {} 
+         */
+        executeSequentialPromises: function (promises) {
+
+            //this is sequential promise chaining, it's not pretty but we need to do it this way.
+            //$q.all doesn't execute promises in sequence but that's what we want to do here.
+
+            if (!angular.isArray(promises)) {
+                throw "promises must be an array";
+            }
+
+            //now execute them in sequence... sorry there's no other good way to do it with angular promises
+            var j = 0;
+            function pExec(promise) {
+                j++;
+                return promise.then(function (data) {
+                    if (j === promises.length) {
+                        return $q.when(data); //exit
+                    }
+                    else {
+                        return pExec(promises[j]); //recurse
+                    }
+                });
+            }
+            if (promises.length > 0) {
+                return pExec(promises[0]); //start the promise chain
+            }
+            else {
+                return $q.when(true); // just exit, no promises to execute
+            }
+        },
+
         /**
          * @ngdoc function
          * @name safeApply

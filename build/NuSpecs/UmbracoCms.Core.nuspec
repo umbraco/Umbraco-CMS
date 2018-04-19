@@ -15,34 +15,57 @@
     <language>en-US</language>
     <tags>umbraco</tags>
     <dependencies>
-      <dependency id="Microsoft.AspNet.Mvc" version="[5.2.4,6.0.0)" />
-      <dependency id="Microsoft.AspNet.WebApi" version="[5.2.4,6.0.0)" />
-      <dependency id="Microsoft.AspNet.Identity.Owin" version="[2.2.1, 3.0.0)" />
-      <dependency id="Microsoft.Owin.Security.Cookies" version="[4.0.0, 5.0.0)" />
-      <dependency id="Microsoft.Owin.Security.OAuth" version="[4.0.0, 5.0.0)" />
-      <dependency id="Microsoft.Owin.Host.SystemWeb" version="[4.0.0, 5.0.0)" />
-      <dependency id="MiniProfiler" version="[3.2.0.157, 3.9.999)" />
-      <dependency id="HtmlAgilityPack" version="[1.7.2, 2.0.0)" />
-      <dependency id="Lucene.Net" version="[3.0.3, 4.0.0.0)" />
-      <dependency id="MySql.Data" version="[6.10.6, 7.0.0)" />
-      <dependency id="ClientDependency" version="[1.9.6, 2.0.0)" />
-      <dependency id="ClientDependency-Mvc5" version="[1.8.0.0, 2.0.0)" />
-      <dependency id="AutoMapper" version="[6.2.2, 7.0.0)" />
-      <dependency id="LightInject" version="[5.1.2, 6.0.0)" />
-      <dependency id="LightInject.Mvc" version="[2.0.0, 3.0.0)" />
-      <dependency id="LightInject.Web" version="[2.0.0, 3.0.0)" />
-      <dependency id="LightInject.WebApi" version="[2.0.0, 3.0.0)" />
-      <dependency id="Newtonsoft.Json" version="[11.0.2, 12.0.0)" />
-      <dependency id="Examine" version="[1.0.0-beta025, 1.666.666)" />
-      <dependency id="ImageProcessor" version="[2.6.0, 3.0.0)" />
-      <dependency id="ImageProcessor.Web" version="[4.8.7, 5.0.0)" />
-      <dependency id="semver" version="[2.0.4, 3.0.0)" />
-      <dependency id="Markdown" version="[2.2.1, 3.0.0)" />
-      <dependency id="log4net" version="[2.0.8, 3.0.0)" />
-      <dependency id="System.Threading.Tasks.Dataflow" version="[4.8.0, 5.0.0)" />
-      <dependency id="System.ValueTuple" version="[4.4.0, 5.0.0)" />
-      <dependency id="NPoco" version="3.9.0" />
-      <dependency id="NuGet.Core" version="2.14.0" />
+        <dependency id="AutoMapper" version="[6.2.2,6.666666)" />
+        <dependency id="ClientDependency" version="[1.9.6,1.666666)" />
+        <dependency id="ClientDependency-Mvc5" version="[1.8.0.0,1.666666)" />
+        <dependency id="CSharpTest.Net.Collections" version="[14.906.1403.1082,14.666666)" />
+        <dependency id="Examine" version="[1.0.0-beta025,1.666666)" />
+        <dependency id="HtmlAgilityPack" version="[1.7.2,1.666666)" />
+        <dependency id="ImageProcessor.Web" version="[4.9.1.2,4.666666)" />
+        <dependency id="ImageProcessor.Web.Config" version="[2.4.0,2.666666)" />
+        <dependency id="LightInject" version="[5.1.2,5.666666)" />
+        <dependency id="LightInject.Annotation" version="[1.1.0,1.666666)" />
+        <dependency id="LightInject.Mvc" version="[2.0.0,2.666666)" />
+        <dependency id="LightInject.WebApi" version="[2.0.0,2.666666)" />
+        <dependency id="log4net" version="[2.0.8,2.666666)" />
+        <dependency id="Log4Net.Async" version="[2.0.4,2.666666)" />
+        <dependency id="Lucene.Net.Contrib" version="[3.0.3,3.666666)" />
+        <dependency id="Markdown" version="[2.2.1,2.666666)" />
+        <dependency id="Microsoft.AspNet.Identity.Owin" version="[2.2.1,2.666666)" />
+        <dependency id="Microsoft.AspNet.Mvc" version="[5.2.4,5.666666)" />
+        <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.2.3,2.666666)" />
+        <dependency id="Microsoft.AspNet.WebApi" version="[5.2.4,5.666666)" />
+        <dependency id="Microsoft.CodeAnalysis.CSharp" version="[2.7.0,2.666666)" />
+        <dependency id="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" version="[1.0.8,1.666666)" />
+        <dependency id="Microsoft.Net.Compilers" version="[2.7.0,2.666666)" />
+        <dependency id="Microsoft.Owin.Host.SystemWeb" version="[4.0.0,4.666666)" />
+        <dependency id="Microsoft.Owin.Security.Cookies" version="[4.0.0,4.666666)" />
+        <dependency id="Microsoft.Owin.Security.OAuth" version="[4.0.0,4.666666)" />
+        <dependency id="Microsoft.Web.Xdt" version="[2.1.2,2.666666)" />
+        <dependency id="MiniProfiler" version="[3.2.0.157,3.666666)" />
+        <dependency id="MySql.Data" version="[6.10.6,6.666666)" />
+        <dependency id="Newtonsoft.Json" version="[11.0.2,11.666666)" />
+        <dependency id="NPoco" version="[3.9.3,3.666666)" />
+        <dependency id="NuGet.Core" version="[2.14.0,2.666666)" />
+        <dependency id="Semver" version="[2.0.4,2.666666)" />
+        <dependency id="System.Reflection.Metadata" version="[1.5.0,1.666666)" />
+        <dependency id="System.Reflection.Primitives" version="[4.3.0,4.666666)" />
+        <dependency id="System.Runtime.Handles" version="[4.3.0,4.666666)" />
+        <dependency id="System.Security.Cryptography.Algorithms" version="[4.3.1,4.666666)" />
+        <dependency id="System.Security.Cryptography.X509Certificates" version="[4.3.2,4.666666)" />
+        <dependency id="System.Text.Encoding.CodePages" version="[4.4.0,4.666666)" />
+        <dependency id="System.Threading.Tasks.Dataflow" version="[4.8.0,4.666666)" />
+        <dependency id="System.ValueTuple" version="[4.4.0,4.666666)" />
+        <dependency id="System.Xml.ReaderWriter" version="[4.3.1,4.666666)" />
+        <dependency id="Umbraco.ModelsBuilder" version="[8.0.0-alpha.17,8.666666)" />
+        <!--
+          although these are package references in csproj files, they cannot or
+          should not be part of nuspecs, either because we directly distribute the
+          DLLs (SqlServerCE) of ... well ... I don't know
+        -->
+        <!--<dependency id="xmlrpcnet" version="[3.0.0.266,3.666666)" />-->
+        <!--<dependency id="dotless" version="[1.5.2,1.666666)" />-->
+        <!--<dependency id="SqlServerCE" version="[4.0.0.1,4.666666)" />-->
     </dependencies>
   </metadata>
   <files>

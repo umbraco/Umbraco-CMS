@@ -23,10 +23,13 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
         // Search and listviews is only working for content, media and member section
         var searchableSections = ["content", "media", "member"];
+        // tracks all expanded paths so when the language is switched we can resync it with the already loaded paths
+        var expandedPaths = [];
 
         var vm = this;
         vm.treeReady = false;
-        vm.dialogTreeEventHandler = $({});
+        vm.dialogTreeApi = {};
+        vm.initDialogTree = initDialogTree;
         vm.section = $scope.model.section;
         vm.treeAlias = $scope.model.treeAlias;
         vm.multiPicker = $scope.model.multiPicker;
@@ -61,11 +64,18 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         vm.closeMiniListView = closeMiniListView;
         vm.selectListViewNode = selectListViewNode;
 
+        function initDialogTree() {
+            vm.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
+            //TODO: Also deal with unexpanding!!
+            vm.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
+            vm.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
+        }
+
         /**
          * Performs the initialization of this component
          */
         function onInit () {
-            
+
             // load languages
             languageResource.getAll().then(function (languages) {
                 vm.languages = languages;
@@ -98,13 +108,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                 }
             }
 
-            //var searchText = "Search...";
-            //localizationService.localize("general_search").then(function (value) {
-            //    searchText = value + "...";
-            //});
-
-            //min / max values
-            //TODO: Where are these used?
+            //TODO: Seems odd this logic is here, i don't think it needs to be and should just exist on the property editor using this
             if ($scope.model.minNumber) {
                 $scope.model.minNumber = parseInt($scope.model.minNumber, 10);
             }
@@ -188,14 +192,35 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             vm.selectedLanguage = language;
             // close the language selector
             vm.languageSelectorIsOpen = false;
-            initTree();
+
+            initTree(); //this will reset the tree params and the tree directive will pick up the changes in a $watch
+
+            //execute after next digest because the internal watch on the customtreeparams needs to be bound now that we've changed it
+            $timeout(function () {
+                //reload the tree with it's updated querystring args
+                vm.dialogTreeApi.load(vm.section).then(function () {
+                    
+                    //create the list of promises
+                    var promises = [];
+                    for (var i = 0; i < expandedPaths.length; i++) {
+                        promises.push(vm.dialogTreeApi.syncTree({ path: expandedPaths[i], activate: false }));
+                    }
+                    //execute them sequentially
+                    angularHelper.executeSequentialPromises(promises);
+                });
+            });
         };
 
         function toggleLanguageSelector() {
             vm.languageSelectorIsOpen = !vm.languageSelectorIsOpen;
         };
+        
+        function nodeExpandedHandler(args) {
 
-        function nodeExpandedHandler(ev, args) {
+            //store the reference to the expanded node path
+            if (args.node) {
+                treeService._trackExpandedPaths(args.node, expandedPaths);
+            }
 
             // open mini list view for list views
             if (args.node.metaData.isContainer) {
@@ -225,7 +250,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         }
 
         //gets the tree object when it loads
-        function treeLoadedHandler(ev, args) {
+        function treeLoadedHandler(args) {
             //args.tree contains children (args.tree.root.children)
             vm.hasItems = args.tree.root.children.length > 0;
 
@@ -233,7 +258,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         }
 
         //wires up selection
-        function nodeSelectHandler(ev, args) {
+        function nodeSelectHandler(args) {
             args.event.preventDefault();
             args.event.stopPropagation();
 
@@ -578,17 +603,6 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         function closeMiniListView() {
             vm.miniListView = undefined;
         }
-
-        vm.dialogTreeEventHandler.bind("treeLoaded", treeLoadedHandler);
-        vm.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
-        vm.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
-
-        $scope.$on('$destroy',
-            function () {
-                vm.dialogTreeEventHandler.unbind("treeLoaded", treeLoadedHandler);
-                vm.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
-                vm.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-            });
         
         //initialize
         onInit();

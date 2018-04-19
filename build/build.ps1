@@ -235,7 +235,6 @@
       /t:Build `
       /tv:"$($this.BuildEnv.VisualStudio.ToolsVersion)" `
       /p:UmbracoBuild=True `
-      /p:NugetPackages="$($this.SolutionRoot)\src\packages" `
       > $log
 
     if (-not $?) { throw "Failed to compile tests." }

@@ -2,9 +2,9 @@ angular.module("umbraco")
 .controller("Umbraco.Editors.MediaTypes.CopyController",
     function ($scope, mediaTypeResource, treeService, navigationService, notificationsService, appState, eventsService) {
         var dialogOptions = $scope.dialogOptions;
-        $scope.dialogTreeEventHandler = $({});
+        $scope.dialogTreeApi = {};
 
-        function nodeSelectHandler(ev, args) {
+        function nodeSelectHandler(args) {
             args.event.preventDefault();
             args.event.stopPropagation();
 
@@ -55,9 +55,8 @@ angular.module("umbraco")
                 });
         };
 
-        $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
-
-        $scope.$on('$destroy', function () {
-            $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-        });
+        $scope.onTreeInit = function () {
+            $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
+        }
+        
     });
