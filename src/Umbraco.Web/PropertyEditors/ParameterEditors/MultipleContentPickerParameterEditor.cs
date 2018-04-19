@@ -1,16 +1,20 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
-    [ParameterEditor(Constants.PropertyEditors.MultiNodeTreePickerAlias, "Multiple Content Picker", "contentpicker")]
-    public class MultipleContentPickerParameterEditor : ParameterEditor
+    [DataEditor("multiNodeTreePicker", EditorType.MacroParameter, "Multiple Content Picker", "contentpicker")]
+    public class MultipleContentPickerParameterEditor : DataEditor
     {
-        public MultipleContentPickerParameterEditor()
+
+        public MultipleContentPickerParameterEditor(ILogger logger, EditorType type = EditorType.PropertyValue)
+            : base(logger, type)
         {
-            Configuration.Add("multiPicker", "1");
-            Configuration.Add("minNumber",0 );
-            Configuration.Add("maxNumber", 0);
+            // configure
+            DefaultConfiguration.Add("multiPicker", "1");
+            DefaultConfiguration.Add("minNumber",0 );
+            DefaultConfiguration.Add("maxNumber", 0);
         }
     }
 }
