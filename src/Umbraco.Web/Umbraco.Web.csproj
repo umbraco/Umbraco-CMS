@@ -315,6 +315,7 @@
     <Compile Include="PropertyEditors\NestedContentConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\NestedContentController.cs" />
     <Compile Include="PropertyEditors\NestedContentPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\MultipleContentPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorsComponent.cs" />
     <Compile Include="PropertyEditors\RelatedLinksPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RelatedLinksConfiguration.cs" />
