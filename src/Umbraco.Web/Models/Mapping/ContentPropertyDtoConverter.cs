@@ -16,7 +16,7 @@ namespace Umbraco.Web.Models.Mapping
         {
         }
 
-        public new ContentPropertyDto Convert(ResolutionContext context)
+        public override ContentPropertyDto Convert(ResolutionContext context)
         {
             var propertyDto = base.Convert(context);
 
