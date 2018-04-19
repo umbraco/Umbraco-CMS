@@ -10,7 +10,7 @@ namespace Umbraco.Web.Models.Mapping
     {
         public string[] Resolve(IContent source, ContentItemDisplay destination, string[] destMember, ResolutionContext context)
         {
-            var umbracoContext = context.GetUmbracoContext();
+            var umbracoContext = context.GetUmbracoContext(throwIfMissing: false);
 
             var urls = umbracoContext == null
                 ? new[] {"Cannot generate urls without a current Umbraco Context"}

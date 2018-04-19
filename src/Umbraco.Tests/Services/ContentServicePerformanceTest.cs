@@ -164,7 +164,8 @@ namespace Umbraco.Tests.Services
                 var tRepository = new TemplateRepository((IScopeAccessor) provider, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
                 var tagRepo = new TagRepository((IScopeAccessor) provider, DisabledCache, Logger);
                 var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, DisabledCache, Logger, tRepository);
-                var repository = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
+                var languageRepository = new LanguageRepository((IScopeAccessor) provider, DisabledCache, Logger);
+                var repository = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, ctRepository, tRepository, tagRepo, languageRepository, Mock.Of<IContentSection>());
 
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
@@ -196,7 +197,8 @@ namespace Umbraco.Tests.Services
                 var tRepository = new TemplateRepository((IScopeAccessor) provider, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
                 var tagRepo = new TagRepository((IScopeAccessor) provider, DisabledCache, Logger);
                 var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, DisabledCache, Logger, tRepository);
-                var repository = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
+                var languageRepository = new LanguageRepository((IScopeAccessor) provider, DisabledCache, Logger);
+                var repository = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, ctRepository, tRepository, tagRepo, languageRepository, Mock.Of<IContentSection>());
 
                 // Act
                 Stopwatch watch = Stopwatch.StartNew();
@@ -226,7 +228,8 @@ namespace Umbraco.Tests.Services
                 var tRepository = new TemplateRepository((IScopeAccessor) provider, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
                 var tagRepo = new TagRepository((IScopeAccessor) provider, DisabledCache, Logger);
                 var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, DisabledCache, Logger, tRepository);
-                var repository = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
+                var languageRepository = new LanguageRepository((IScopeAccessor) provider, DisabledCache, Logger);
+                var repository = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, ctRepository, tRepository, tagRepo, languageRepository, Mock.Of<IContentSection>());
 
                 // Act
                 var contents = repository.GetMany();
@@ -259,7 +262,8 @@ namespace Umbraco.Tests.Services
                 var tRepository = new TemplateRepository((IScopeAccessor) provider, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
                 var tagRepo = new TagRepository((IScopeAccessor) provider, DisabledCache, Logger);
                 var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, DisabledCache, Logger, tRepository);
-                var repository = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, ctRepository, tRepository, tagRepo, Mock.Of<IContentSection>());
+                var languageRepository = new LanguageRepository((IScopeAccessor) provider, DisabledCache, Logger);
+                var repository = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, ctRepository, tRepository, tagRepo, languageRepository, Mock.Of<IContentSection>());
 
                 // Act
                 var contents = repository.GetMany();

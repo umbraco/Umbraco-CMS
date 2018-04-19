@@ -42,7 +42,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             templateRepository = new TemplateRepository(accessor, CacheHelper, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
             var tagRepository = new TagRepository(accessor, CacheHelper, Logger);
             contentTypeRepository = new ContentTypeRepository(accessor, CacheHelper, Logger, templateRepository);
-            var repository = new DocumentRepository(accessor, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            var languageRepository = new LanguageRepository(accessor, CacheHelper, Logger);
+            var repository = new DocumentRepository(accessor, CacheHelper, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
             return repository;
         }
 

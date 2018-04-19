@@ -161,9 +161,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 if (!args.path) {
                     throw "args.path cannot be null";
                 }
-                                
-                var treeNode = loadActiveTree(args.tree);
-
+                
                 if (angular.isString(args.path)) {
                     args.path = args.path.replace('"', '').split(',');
                 }
@@ -197,6 +195,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     });
 
                     deleteAnimations = false;
+
+                    var treeNode = loadActiveTree(args.tree);
 
                     return treeService.syncTree({
                         node: treeNode,
@@ -269,6 +269,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
                     return treeService.getTree(args)
                         .then(function (data) {
+
                             //set the data once we have it
                             $scope.tree = data;
 
@@ -421,11 +422,10 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     lastSection = newVal;
                 }
             });
-
-            //call the callback, this allows for hosting controllers to bind to events and use the exposed API
-            $scope.onInit();
             
             loadTree();
+
+            $scope.onInit();
         }
     };
 }

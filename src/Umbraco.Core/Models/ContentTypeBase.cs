@@ -19,9 +19,6 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, Alias: {Alias}")]
     public abstract class ContentTypeBase : TreeEntityBase, IContentTypeBase
     {
-        //fixme this should be invariant by default but for demo purposes and until the UI is updated to support changing a property type we'll make this neutral by default
-        private const ContentVariation DefaultVaryBy = ContentVariation.CultureNeutral;
-
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         private string _alias;
@@ -49,7 +46,7 @@ namespace Umbraco.Core.Models
             _propertyTypes = new PropertyTypeCollection(IsPublishing);
             _propertyTypes.CollectionChanged += PropertyTypesChanged;
 
-            _variations = DefaultVaryBy;
+            _variations = ContentVariation.InvariantNeutral;
         }
 
         protected ContentTypeBase(IContentTypeBase parent)
@@ -70,7 +67,7 @@ namespace Umbraco.Core.Models
             _propertyTypes = new PropertyTypeCollection(IsPublishing);
             _propertyTypes.CollectionChanged += PropertyTypesChanged;
 
-            _variations = DefaultVaryBy;
+            _variations = ContentVariation.InvariantNeutral;
         }
 
         /// <summary>
@@ -202,6 +199,35 @@ namespace Umbraco.Core.Models
         {
             get => _variations;
             set => SetPropertyValueAndDetectChanges(value, ref _variations, Ps.Value.VaryBy);
+        }
+
+        /// <summary>
+        /// Validates that a variation is valid for the content type.
+        /// </summary>
+        public bool ValidateVariation(int? languageId, string segment, bool throwIfInvalid)
+        {
+            ContentVariation variation;
+            if (languageId.HasValue)
+            {
+                variation = segment != null
+                    ? ContentVariation.CultureSegment
+                    : ContentVariation.CultureNeutral;
+            }
+            else if (segment != null)
+            {
+                variation = ContentVariation.InvariantSegment;
+            }
+            else
+            {
+                variation = ContentVariation.InvariantNeutral;
+            }
+            if ((Variations & variation) == 0)
+            {
+                if (throwIfInvalid)
+                    throw new NotSupportedException($"Variation {variation} is invalid for content type \"{Alias}\".");
+                return false;
+            }
+            return true;
         }
 
         /// <summary>

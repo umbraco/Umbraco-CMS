@@ -118,6 +118,11 @@ namespace Umbraco.Core.Services
         ILanguage GetLanguageByIsoCode(string isoCode);
 
         /// <summary>
+        /// Gets a language identifier by its iso code.
+        /// </summary>
+        int GetLanguageIdByIsoCode(string isoCode);
+
+        /// <summary>
         /// Gets all available languages
         /// </summary>
         /// <returns>An enumerable list of <see cref="ILanguage"/> objects</returns>

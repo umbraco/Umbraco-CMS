@@ -116,9 +116,10 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<SuperZero>("{9DF05B77-11D1-475C-A00A-B656AF7E0908}");
             Chain<PropertyEditorsMigration>("{6FE3EF34-44A0-4992-B379-B40BC4EF1C4D}");
             Chain<LanguageColumns>("{7F59355A-0EC9-4438-8157-EB517E6D2727}");
+            Chain<AddContentVariationTable>("{66B6821A-0DE3-4DF8-A6A4-65ABD211EDDE}");
 
             // must chain to v8 final state (see at end of file)
-            Chain("{79591E91-01EA-43F7-AC58-7BD286DB1E77}");
+            Chain("{941B2ABA-2D06-4E04-81F5-74224F1DB037}");
 
 
             // UPGRADE FROM 7, MORE RECENT
@@ -199,10 +200,13 @@ namespace Umbraco.Core.Migrations.Upgrade
             // mergin from 7.10.0
             Chain<RenamePreviewFolder>("{79591E91-01EA-43F7-AC58-7BD286DB1E77}");
 
+            // 8.0.0
+            Chain<AddContentVariationTable>("{941B2ABA-2D06-4E04-81F5-74224F1DB037}");
+
             // FINAL STATE - MUST MATCH LAST ONE ABOVE !
             // whenever this changes, update all references in this file!
 
-            Add(string.Empty, "{79591E91-01EA-43F7-AC58-7BD286DB1E77}");
+            Add(string.Empty, "{941B2ABA-2D06-4E04-81F5-74224F1DB037}");
         }
     }
 }

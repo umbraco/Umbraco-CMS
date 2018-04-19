@@ -18,6 +18,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class LanguageRepository : NPocoRepositoryBase<int, ILanguage>, ILanguageRepository
     {
+        private readonly Dictionary<string, int> _codeIdMap = new Dictionary<string, int>();
+        private readonly Dictionary<int, string> _idCodeMap = new Dictionary<int, string>();
+
         public LanguageRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
@@ -27,12 +30,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return new FullDataSetRepositoryCachePolicy<ILanguage, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
         }
 
+        private FullDataSetRepositoryCachePolicy<ILanguage, int> TypedCachePolicy => (FullDataSetRepositoryCachePolicy<ILanguage, int>) CachePolicy;
+
         #region Overrides of RepositoryBase<int,Language>
 
         protected override ILanguage PerformGet(int id)
         {
-            //use the underlying GetAll which will force cache all domains
-            return GetMany().FirstOrDefault(x => x.Id == id);
+            throw new NotSupportedException(); // not required since policy is full dataset
         }
 
         protected override IEnumerable<ILanguage> PerformGetAll(params int[] ids)
@@ -47,8 +51,22 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //even though legacy didn't sort, it should be by id
             sql.OrderBy<LanguageDto>(dto => dto.Id);
 
+            // get languages
+            var languages = Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto).ToList();
 
-            return Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto);
+            // initialize the code-id map
+            lock (_codeIdMap)
+            {
+                _codeIdMap.Clear();
+                _idCodeMap.Clear();
+                foreach (var language in languages)
+                {
+                    _codeIdMap[language.IsoCode] = language.Id;
+                    _idCodeMap[language.Id] = language.IsoCode;
+                }
+            }
+
+            return languages;
         }
 
         protected override IEnumerable<ILanguage> PerformGetByQuery(IQuery<ILanguage> query)
@@ -184,14 +202,48 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public ILanguage GetByCultureName(string cultureName)
         {
-            //use the underlying GetAll which will force cache all languages
+            // use the underlying GetMany which will force cache all languages
+            // TODO we are cloning ALL in GetMany just to retrieve ONE, this is surely not optimized
             return GetMany().FirstOrDefault(x => x.CultureName.InvariantEquals(cultureName));
         }
 
         public ILanguage GetByIsoCode(string isoCode)
         {
-            //use the underlying GetAll which will force cache all languages
-            return GetMany().FirstOrDefault(x => x.IsoCode.InvariantEquals(isoCode));
+            TypedCachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
+            var id = GetIdByIsoCode(isoCode, throwOnNotFound: false);
+            return id > 0 ? Get(id) : null;
+        }
+
+        // fast way of getting an id for an isoCode - avoiding cloning
+        // _codeIdMap is rebuilt whenever PerformGetAll runs
+        public int GetIdByIsoCode(string isoCode) => GetIdByIsoCode(isoCode, throwOnNotFound: true);
+
+        private int GetIdByIsoCode(string isoCode, bool throwOnNotFound)
+        {
+            TypedCachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
+            lock (_codeIdMap)
+            {
+                if (_codeIdMap.TryGetValue(isoCode, out var id)) return id;
+            }
+            if (throwOnNotFound)
+                throw new ArgumentException($"Code {isoCode} does not correspond to an existing language.", nameof(isoCode));
+            return 0;
+        }
+
+        // fast way of getting an isoCode for an id - avoiding cloning
+        // _idCodeMap is rebuilt whenever PerformGetAll runs
+        public string GetIsoCodeById(int id) => GetIsoCodeById(id, throwOnNotFound: true);
+
+        private string GetIsoCodeById(int id, bool throwOnNotFound)
+        {
+            TypedCachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
+            lock (_codeIdMap) // yes, we want to lock _codeIdMap
+            {
+                if (_idCodeMap.TryGetValue(id, out var isoCode)) return isoCode;
+            }
+            if (throwOnNotFound)
+                throw new ArgumentException($"Id {id} does not correspond to an existing language.", nameof(id));
+            return null;
         }
     }
 }

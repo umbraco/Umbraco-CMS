@@ -406,7 +406,8 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var tagRepository = new TagRepository((IScopeAccessor) provider, DisabledCache, Logger);
                 var contentTypeRepository = new ContentTypeRepository((IScopeAccessor) provider, DisabledCache, Logger, templateRepository);
-                var contentRepo = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+                var languageRepository = new LanguageRepository((IScopeAccessor) provider, DisabledCache, Logger);
+                var contentRepo = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!
