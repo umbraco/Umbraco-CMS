@@ -10,11 +10,11 @@ using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class VariationResolver : IValueResolver<IContent, ContentItemDisplay, IEnumerable<ContentVariation>>
+    internal class ContentItemDisplayVariationResolver : IValueResolver<IContent, ContentItemDisplay, IEnumerable<ContentVariation>>
     {
         private readonly ILocalizationService _localizationService;
 
-        public VariationResolver(ILocalizationService localizationService)
+        public ContentItemDisplayVariationResolver(ILocalizationService localizationService)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         }

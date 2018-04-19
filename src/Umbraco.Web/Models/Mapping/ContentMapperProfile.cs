@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models.Mapping
             var contentTreeNodeUrlResolver = new ContentTreeNodeUrlResolver<IContent, ContentTreeController>();
             var defaultTemplateResolver = new DefaultTemplateResolver();
             var contentUrlResolver = new ContentUrlResolver();
-            var variantResolver = new VariationResolver(localizationService);
+            var variantResolver = new ContentItemDisplayVariationResolver(localizationService);
 
             //FROM IContent TO ContentItemDisplay
             CreateMap<IContent, ContentItemDisplay>()
