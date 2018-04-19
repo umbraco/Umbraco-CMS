@@ -267,11 +267,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         }
 
         var notSupported = [
-          "Umbraco.CheckBoxList",
-          "Umbraco.DropDownMultiple",
-          "Umbraco.MacroContainer",
-          "Umbraco.RadioButtonList",
-          "Umbraco.MultipleTextstring",
           "Umbraco.Tags",
           "Umbraco.UploadField",
           "Umbraco.ImageCropper"
