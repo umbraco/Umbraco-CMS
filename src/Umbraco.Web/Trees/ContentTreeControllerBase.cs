@@ -96,6 +96,12 @@ namespace Umbraco.Web.Trees
                 return null;
 
             var treeNode = GetSingleTreeNode(e, parentId, queryStrings);
+            if (treeNode == null)
+            {
+                //this means that the user has NO access to this node via permissions! They at least need to have browse permissions to see
+                //the node so we need to return null;
+                return null;
+            }
             if (hasPathAccess == false)
             {
                 treeNode.AdditionalData["noAccess"] = true;
