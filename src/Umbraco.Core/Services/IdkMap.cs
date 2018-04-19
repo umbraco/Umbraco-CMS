@@ -76,8 +76,9 @@ namespace Umbraco.Core.Services
                 _locker.EnterWriteLock();
                 foreach (var pair in pairs)
                 {
-                    _id2Key.Add(pair.id, new TypedId<Guid>(pair.key, umbracoObjectType));
-                    _key2Id.Add(pair.key, new TypedId<int>(pair.id, umbracoObjectType));
+
+                    _id2Key[pair.id] = new TypedId<Guid>(pair.key, umbracoObjectType);
+                    _key2Id[pair.key] = new TypedId<int>(pair.id, umbracoObjectType);
                 }
             }
             finally
