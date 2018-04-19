@@ -156,7 +156,7 @@ namespace Umbraco.Core.Cache
         }
 
         // does NOT clone anything, so be nice with the returned values
-        private IEnumerable<TEntity> GetAllCached(Func<TId[], IEnumerable<TEntity>> performGetAll)
+        internal IEnumerable<TEntity> GetAllCached(Func<TId[], IEnumerable<TEntity>> performGetAll)
         {
             // try the cache first
             var all = Cache.GetCacheItem<DeepCloneableList<TEntity>>(GetEntityTypeCacheKey());

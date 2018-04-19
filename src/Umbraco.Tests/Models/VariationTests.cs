@@ -154,6 +154,38 @@ namespace Umbraco.Tests.Models
         }
 
         [Test]
+        public void ContentNames()
+        {
+            var contentType = new ContentType(-1) { Alias = "contentType" };
+            var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
+
+            const int langFr = 1;
+            const int langUk = 2;
+
+            Assert.Throws<NotSupportedException>(() => content.SetName(langFr, "name-fr"));
+
+            contentType.Variations = ContentVariation.CultureNeutral;
+
+            content.Name = "name";
+            Assert.AreEqual("name", content.GetName(null));
+            content.SetName(null, "name2");
+            Assert.AreEqual("name2", content.Name);
+            Assert.AreEqual("name2", content.GetName(null));
+
+            content.SetName(langFr, "name-fr");
+            content.SetName(langUk, "name-uk");
+
+            Assert.AreEqual("name-fr", content.GetName(langFr));
+            Assert.AreEqual("name-uk", content.GetName(langUk));
+
+            Assert.AreEqual(2, content.Names.Count);
+            Assert.IsTrue(content.Names.ContainsKey(langFr));
+            Assert.AreEqual("name-fr", content.Names[langFr]);
+            Assert.IsTrue(content.Names.ContainsKey(langUk));
+            Assert.AreEqual("name-uk", content.Names[langUk]);
+        }
+
+        [Test]
         public void ContentTests()
         {
             var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop" };
@@ -191,6 +223,7 @@ namespace Umbraco.Tests.Models
             Assert.IsNull(content.GetValue("prop", published: true));
 
             // change
+            contentType.Variations |= ContentVariation.CultureNeutral;
             propertyType.Variations |= ContentVariation.CultureNeutral;
 
             // can set value

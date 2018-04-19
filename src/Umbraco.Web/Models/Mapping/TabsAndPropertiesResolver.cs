@@ -260,7 +260,7 @@ namespace Umbraco.Web.Models.Mapping
 
         public virtual IEnumerable<Tab<ContentPropertyDisplay>> Resolve(TSource source, TDestination destination, IEnumerable<Tab<ContentPropertyDisplay>> destMember, ResolutionContext context)
         {
-            var umbracoContext = context.GetUmbracoContext();
+            var umbracoContext = context.GetUmbracoContext(throwIfMissing: false); // fixme
             var tabs = new List<Tab<ContentPropertyDisplay>>();
 
             // add the tabs, for properties that belong to a tab

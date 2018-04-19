@@ -2474,6 +2474,234 @@ namespace Umbraco.Tests.Services
             */
         }
 
+        [Test]
+        public void Can_SaveAndRead_Names()
+        {
+            var languageService = ServiceContext.LocalizationService;
+
+            var langFr = new Language("fr-FR");
+            var langUk = new Language("en-UK");
+            var langDe = new Language("de-DE");
+            languageService.Save(langFr);
+            languageService.Save(langUk);
+            languageService.Save(langDe);
+
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            // fixme
+            // contentType.Variations is InvariantNeutral | CultureNeutral
+            // propertyType.Variations can only be a subset of contentType.Variations - ie cannot *add* anything
+            //  (at least, we should validate this)
+            // but then,
+            // if the contentType supports InvariantNeutral | CultureNeutral,
+            //    the propertyType should support InvariantNeutral, or both, but not solely CultureNeutral?
+            //  but does this mean that CultureNeutral implies InvariantNeutral?
+            //  can a contentType *not* support InvariantNeutral?
+
+            var contentType = contentTypeService.Get("umbTextpage");
+            contentType.Variations = ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral;
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.CultureNeutral });
+            contentTypeService.Save(contentType);
+
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.Create("Home US", - 1, "umbTextpage");
+
+            // act
+
+            content.SetValue("author", "Barack Obama");
+            content.SetValue("prop", "value-fr1", langFr.Id);
+            content.SetValue("prop", "value-uk1", langUk.Id);
+            content.SetName(langFr.Id, "name-fr");
+            content.SetName(langUk.Id, "name-uk");
+            contentService.Save(content);
+
+            // content has been saved,
+            // it has names, but no publishNames, and no published cultures
+
+            var content2 = contentService.GetById(content.Id);
+
+            Assert.AreEqual("Home US", content2.Name);
+            Assert.AreEqual("name-fr", content2.GetName(langFr.Id));
+            Assert.AreEqual("name-uk", content2.GetName(langUk.Id));
+
+            Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.Id));
+            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id));
+            Assert.IsNull(content2.GetValue("prop", langFr.Id, published: true));
+            Assert.IsNull(content2.GetValue("prop", langUk.Id, published: true));
+
+            Assert.IsNull(content2.PublishName);
+            Assert.IsNull(content2.GetPublishName(langFr.Id));
+            Assert.IsNull(content2.GetPublishName(langUk.Id));
+
+            Assert.IsTrue(content.IsCultureAvailable(langFr.Id));
+            Assert.IsTrue(content.IsCultureAvailable(langUk.Id));
+            Assert.IsFalse(content.IsCultureAvailable(langDe.Id));
+
+            Assert.IsFalse(content.IsCulturePublished(langFr.Id));
+            Assert.IsFalse(content.IsCulturePublished(langUk.Id));
+
+            // act
+
+            content.PublishValues(langFr.Id);
+            content.PublishValues(langUk.Id);
+            contentService.SaveAndPublish(content);
+
+            // both FR and UK have been published,
+            // and content has been published,
+            // it has names, publishNames, and published cultures
+
+            content2 = contentService.GetById(content.Id);
+
+            Assert.AreEqual("Home US", content2.Name);
+            Assert.AreEqual("name-fr", content2.GetName(langFr.Id));
+            Assert.AreEqual("name-uk", content2.GetName(langUk.Id));
+
+            Assert.IsNull(content2.PublishName); // we haven't published InvariantNeutral
+            Assert.AreEqual("name-fr", content2.GetPublishName(langFr.Id));
+            Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
+
+            Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.Id));
+            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id));
+            Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.Id, published: true));
+            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id, published: true));
+
+            Assert.IsTrue(content.IsCulturePublished(langFr.Id));
+            Assert.IsTrue(content.IsCulturePublished(langUk.Id));
+
+            // act
+
+            content.PublishValues();
+            contentService.SaveAndPublish(content);
+
+            // now it has publish name for invariant neutral
+
+            content2 = contentService.GetById(content.Id);
+
+            Assert.AreEqual("Home US", content2.PublishName);
+
+            // act
+
+            content.SetName(null, "Home US2");
+            content.SetName(langFr.Id, "name-fr2");
+            content.SetName(langUk.Id, "name-uk2");
+            content.SetValue("author", "Barack Obama2");
+            content.SetValue("prop", "value-fr2", langFr.Id);
+            content.SetValue("prop", "value-uk2", langUk.Id);
+            contentService.Save(content);
+
+            // content has been saved,
+            // it has updated names, unchanged publishNames, and published cultures
+
+            content2 = contentService.GetById(content.Id);
+
+            Assert.AreEqual("Home US2", content2.Name);
+            Assert.AreEqual("name-fr2", content2.GetName(langFr.Id));
+            Assert.AreEqual("name-uk2", content2.GetName(langUk.Id));
+
+            Assert.AreEqual("Home US", content2.PublishName);
+            Assert.AreEqual("name-fr", content2.GetPublishName(langFr.Id));
+            Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
+
+            Assert.AreEqual("Barack Obama2", content2.GetValue("author"));
+            Assert.AreEqual("Barack Obama", content2.GetValue("author", published: true));
+
+            Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.Id));
+            Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.Id));
+            Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.Id, published: true));
+            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id, published: true));
+
+            Assert.IsTrue(content.IsCulturePublished(langFr.Id));
+            Assert.IsTrue(content.IsCulturePublished(langUk.Id));
+
+            // act
+            // cannot just 'save' since we are changing what's published!
+
+            content.ClearPublishedValues(langFr.Id);
+            contentService.SaveAndPublish(content);
+
+            // content has been published,
+            // the french culture is gone
+
+            content2 = contentService.GetById(content.Id);
+
+            Assert.AreEqual("Home US2", content2.Name);
+            Assert.AreEqual("name-fr2", content2.GetName(langFr.Id));
+            Assert.AreEqual("name-uk2", content2.GetName(langUk.Id));
+
+            Assert.AreEqual("Home US", content2.PublishName);
+            Assert.IsNull(content2.GetPublishName(langFr.Id));
+            Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
+
+            Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.Id));
+            Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.Id));
+            Assert.IsNull(content2.GetValue("prop", langFr.Id, published: true));
+            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id, published: true));
+
+            Assert.IsFalse(content.IsCulturePublished(langFr.Id));
+            Assert.IsTrue(content.IsCulturePublished(langUk.Id));
+
+            // act
+
+            contentService.Unpublish(content);
+
+            // content has been unpublished,
+            // but properties, names, etc. retain their 'published' values so the content
+            // can be re-published in its exact original state (before being unpublished)
+            //
+            // BEWARE!
+            // in order for a content to be unpublished as a whole, and then republished in
+            // its exact previous state, properties and names etc. retain their published
+            // values even though the content is not published - hence many things being
+            // non-null or true below - always check against content.Published to be sure
+
+            content2 = contentService.GetById(content.Id);
+
+            Assert.IsFalse(content2.Published);
+
+            Assert.AreEqual("Home US2", content2.Name);
+            Assert.AreEqual("name-fr2", content2.GetName(langFr.Id));
+            Assert.AreEqual("name-uk2", content2.GetName(langUk.Id));
+
+            Assert.AreEqual("Home US", content2.PublishName); // not null, see note above
+            Assert.IsNull(content2.GetPublishName(langFr.Id));
+            Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id)); // not null, see note above
+
+            Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.Id));
+            Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.Id));
+            Assert.IsNull(content2.GetValue("prop", langFr.Id, published: true));
+            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id, published: true));  // has value, see note above
+
+            Assert.IsFalse(content.IsCulturePublished(langFr.Id));
+            Assert.IsTrue(content.IsCulturePublished(langUk.Id)); // still true, see note above
+
+            // act
+
+            contentService.SaveAndPublish(content);
+
+            // content has been re-published,
+            // everything is back to what it was before being unpublished
+
+            content2 = contentService.GetById(content.Id);
+
+            Assert.IsTrue(content2.Published);
+
+            Assert.AreEqual("Home US2", content2.Name);
+            Assert.AreEqual("name-fr2", content2.GetName(langFr.Id));
+            Assert.AreEqual("name-uk2", content2.GetName(langUk.Id));
+
+            Assert.AreEqual("Home US", content2.PublishName);
+            Assert.IsNull(content2.GetPublishName(langFr.Id));
+            Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
+
+            Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.Id));
+            Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.Id));
+            Assert.IsNull(content2.GetValue("prop", langFr.Id, published: true));
+            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id, published: true));
+
+            Assert.IsFalse(content.IsCulturePublished(langFr.Id));
+            Assert.IsTrue(content.IsCulturePublished(langUk.Id));
+        }
+
         private IEnumerable<IContent> CreateContentHierarchy()
         {
             var contentType = ServiceContext.ContentTypeService.Get("umbTextpage");
@@ -2513,7 +2741,8 @@ namespace Umbraco.Tests.Services
             var templateRepository = new TemplateRepository(accessor, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
             var tagRepository = new TagRepository(accessor, DisabledCache, Logger);
             contentTypeRepository = new ContentTypeRepository(accessor, DisabledCache, Logger, templateRepository);
-            var repository = new DocumentRepository(accessor, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, Mock.Of<IContentSection>());
+            var languageRepository = new LanguageRepository(accessor, DisabledCache, Logger);
+            var repository = new DocumentRepository(accessor, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
             return repository;
         }
     }
