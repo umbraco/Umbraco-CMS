@@ -4,12 +4,17 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
-    [DataEditor("multiNodeTreePicker", EditorType.MacroParameter, "Multiple Content Picker", "contentpicker")]
+    /// <summary>
+    /// Represents a parameter editor of some sort.
+    /// </summary>
+    [DataEditor(Constants.PropertyEditors.Aliases.MultiNodeTreePicker, EditorType.MacroParameter, "Multiple Content Picker", "contentpicker")]
     public class MultipleContentPickerParameterEditor : DataEditor
     {
-
-        public MultipleContentPickerParameterEditor(ILogger logger, EditorType type = EditorType.PropertyValue)
-            : base(logger, type)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MultipleContentPickerParameterEditor"/> class.
+        /// </summary>
+        public MultipleContentPickerParameterEditor(ILogger logger)
+            : base(logger)
         {
             // configure
             DefaultConfiguration.Add("multiPicker", "1");
