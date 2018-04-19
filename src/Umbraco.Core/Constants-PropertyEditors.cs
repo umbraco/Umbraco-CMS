@@ -68,12 +68,7 @@ namespace Umbraco.Core
                 /// DropDown List.
                 /// </summary>
                 public const string DropDownListFlexible = "Umbraco.DropDown.Flexible";
-
-                /// <summary>
-                /// Folder Browser.
-                /// </summary>
-                public const string FolderBrowser = "Umbraco.FolderBrowser";
-
+                
                 /// <summary>
                 /// Grid.
                 /// </summary>
@@ -193,17 +188,7 @@ namespace Umbraco.Core
                 /// Upload Field.
                 /// </summary>
                 public const string UploadField = "Umbraco.UploadField";
-
-                /// <summary>
-                /// XPatch Checkbox List.
-                /// </summary>
-                public const string XPathCheckBoxList = "Umbraco.XPathCheckBoxList";
-
-                /// <summary>
-                /// XPath DropDown List.
-                /// </summary>
-                public const string XPathDropDownList = "Umbraco.XPathDropDownList";
-
+                
                 /// <summary>
                 /// Email Address.
                 /// </summary>
