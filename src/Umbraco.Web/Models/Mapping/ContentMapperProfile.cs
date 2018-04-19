@@ -32,6 +32,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(src.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, src.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Updater, opt => opt.ResolveUsing(src => creatorResolver.Resolve(src)))
+                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<ContentItemDisplayNameResolver>())
                 .ForMember(dest => dest.Variants, opt => opt.ResolveUsing(variantResolver))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentType.Icon))
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))

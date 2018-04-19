@@ -10,6 +10,9 @@ using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.Models.Mapping
 {
+    /// <summary>
+    /// Used to map the <see cref="ContentItemDisplay"/> variations collection from an <see cref="IContent"/> instance
+    /// </summary>
     internal class ContentItemDisplayVariationResolver : IValueResolver<IContent, ContentItemDisplay, IEnumerable<ContentVariation>>
     {
         private readonly ILocalizationService _localizationService;
