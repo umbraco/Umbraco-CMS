@@ -63,7 +63,6 @@ namespace umbraco.cms.presentation.settings.stylesheet
             if (IsPostBack == false)
             {
                 ClientTools
-                    .SetActiveTreeType(Constants.Trees.Stylesheets)
                     .SyncTree(TreeSyncPath, false);
             }
         }

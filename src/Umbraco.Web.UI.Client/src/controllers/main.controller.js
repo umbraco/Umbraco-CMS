@@ -14,6 +14,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
     $scope.authenticated = null;
     $scope.touchDevice = appState.getGlobalState("touchDevice");
     $scope.overlay = {};
+    $scope.navReady = false;
 
 
     $scope.removeNotification = function (index) {
@@ -60,6 +61,10 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         });
     }));
 
+    evts.push(eventsService.on('app.navigationReady', function () {
+        $scope.navReady = true;
+    }));
+    
     //when the app is ready/user is logged in, setup the data
     evts.push(eventsService.on("app.ready", function (evt, data) {
 

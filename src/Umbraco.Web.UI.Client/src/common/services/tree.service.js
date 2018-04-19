@@ -36,6 +36,41 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             return treeCache;
         },
 
+        /** Internal method to track expanded paths on a tree */
+        _trackExpandedPaths: function (node, expandedPaths) {
+            if (!node.children || !angular.isArray(node.children) || node.children.length == 0) {
+                return;
+            }
+
+            //take the last child
+            var childPath = this.getPath(node.children[node.children.length - 1]).join(",");
+            //check if this already exists, if so exit
+            if (expandedPaths.indexOf(childPath) !== -1) {
+                return;
+            }
+
+            if (expandedPaths.length === 0) {
+                expandedPaths.push(childPath); //track it
+                return;
+            }
+
+            var clonedPaths = expandedPaths.slice(0); //make a copy to iterate over so we can modify the original in the iteration
+
+            _.each(clonedPaths, function (p) {
+                if (childPath.startsWith(p + ",")) {
+                    //this means that the node's path supercedes this path stored so we can remove the current 'p' and replace it with node.path
+                    expandedPaths.splice(expandedPaths.indexOf(p), 1); //remove it
+                    expandedPaths.push(childPath); //replace it
+                }
+                else if (p.startsWith(childPath + ",")) {
+                    //this means we've already tracked a deeper node so we shouldn't track this one
+                }
+                else {
+                    expandedPaths.push(childPath); //track it
+                }
+            });
+        },
+        
         /** Internal method that ensures there's a routePath, parent and level property on each tree node and adds some icon specific properties so that the nodes display properly */
         _formatNodeDataForUseInUI: function (parentNode, treeNodes, section, level) {
             //if no level is set, then we make it 1   
@@ -264,7 +299,13 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                         args.node.expanded = true;
                         args.node.hasChildren = true;
                     }
-                    return data;
+
+                    //Since we've removed the children &  reloaded them, we need to refresh the UI now because the tree node UI doesn't operate on normal angular $watch since that will be pretty slow
+                    if (angular.isFunction(args.node.updateNodeData)) {
+                        args.node.updateNodeData(args.node);
+                    }
+
+                    return $q.when(data);
 
                 }, function(reason) {
 
@@ -277,7 +318,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     //tell notications about the error
                     notificationsService.error(reason);
 
-                    return reason;
+                    return $q.reject(reason);
                 });
 
         },
@@ -475,8 +516,6 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
          */
         getTree: function (args) {
 
-            var deferred = $q.defer();
-
             //set defaults
             if (!args) {
                 args = { section: 'content', cacheKey: null };
@@ -489,12 +528,11 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             
             //return the cache if it exists
             if (cacheKey && treeCache[cacheKey] !== undefined) {
-                deferred.resolve(treeCache[cacheKey]);
-                return deferred.promise;
+                return $q.when(treeCache[cacheKey]);
             }
 
             var self = this;
-            treeResource.loadApplication(args)
+            return treeResource.loadApplication(args)
                 .then(function(data) {
                     //this will be called once the tree app data has loaded
                     var result = {
@@ -507,16 +545,14 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
 
                     //cache this result if a cache key is specified - generally a cache key should ONLY
                     // be specified for application trees, dialog trees should not be cached.
-                    if (cacheKey) {                        
+                    if (cacheKey) {
                         treeCache[cacheKey] = result;
-                        deferred.resolve(treeCache[cacheKey]);
+                        return $q.when(treeCache[cacheKey]);
                     }
 
                     //return un-cached
-                    deferred.resolve(result);
+                    return $q.when(result);
                 });
-            
-            return deferred.promise;
         },
 
         /**
@@ -579,7 +615,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 .then(function (data) {
                     //now that we have the data, we need to add the level property to each item and the view
                     self._formatNodeDataForUseInUI(treeItem, data, section, treeItem.level + 1);
-                    return data;
+                    return $q.when(data);
                 });
         },
         
@@ -604,12 +640,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 throw "cannot reload a single node without an assigned node.section";
             }
             
-            var deferred = $q.defer();
-            
             //set the node to loading
             node.loading = true;
 
-            this.getChildren({ node: node.parent(), section: node.section }).then(function(data) {
+            return this.getChildren({ node: node.parent(), section: node.section }).then(function(data) {
 
                 //ok, now that we have the children, find the node we're reloading
                 var found = _.find(data, function(item) {
@@ -633,16 +667,14 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     //set the node loading
                     node.parent().children[index].loading = false;
                     //return
-                    deferred.resolve(node.parent().children[index]);
+                    return $q.when(node.parent().children[index]);
                 }
                 else {
-                    deferred.reject();
+                    return $q.reject();
                 }
             }, function() {
-                deferred.reject();
+                return $q.reject();
             });
-            
-            return deferred.promise;
         },
 
         /**
@@ -696,8 +728,6 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 args.path.push("-1");
             }
 
-            var deferred = $q.defer();
-
             //get the rootNode for the current node, we'll sync based on that
             var root = this.getTreeRoot(args.node);
             if (!root) {
@@ -711,8 +741,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
             if (String(args.path[currPathIndex]).toLowerCase() === String(args.node.id).toLowerCase()) {
                 if (args.path.length === 1) {
                     //return the root
-                    deferred.resolve(root);
-                    return deferred.promise;
+                    return $q.when(root);
                 }
                 else {
                     //move to the next path part and continue
@@ -732,16 +761,12 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                     if (args.path.length === (currPathIndex + 1)) {
                         //woot! synced the node
                         if (!args.forceReload) {
-                            deferred.resolve(child);
+                            return $q.when(child);
                         }
                         else {
                             //even though we've found the node if forceReload is specified
                             //we want to go update this single node from the server
-                            self.reloadNode(child).then(function (reloaded) {
-                                deferred.resolve(reloaded);
-                            }, function () {
-                                deferred.reject();
-                            });
+                            return self.reloadNode(child);
                         }
                     }
                     else {
@@ -749,42 +774,40 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                         currPathIndex++;
                         node = child;
                         //recurse
-                        doSync();
+                        return doSync();
                     }
                 }
                 else {
                     //couldn't find it in the 
-                    self.loadNodeChildren({ node: node, section: node.section }).then(function () {
+                    return self.loadNodeChildren({ node: node, section: node.section }).then(function () {
                         //ok, got the children, let's find it
                         var found = self.getChildNode(node, args.path[currPathIndex]);
                         if (found) {
                             if (args.path.length === (currPathIndex + 1)) {
                                 //woot! synced the node
-                                deferred.resolve(found);
+                                return $q.when(found);
                             }
                             else {
                                 //now we need to recurse with the updated node/currPathIndex
                                 currPathIndex++;
                                 node = found;
                                 //recurse
-                                doSync();
+                                return doSync();
                             }
                         }
                         else {
                             //fail!
-                            deferred.reject();
+                            return $q.reject();
                         }
                     }, function () {
                         //fail!
-                        deferred.reject();
+                        return $q.reject();
                     });
                 }
             };
 
             //start
-            doSync();
-            
-            return deferred.promise;
+            return doSync();
 
         }
         

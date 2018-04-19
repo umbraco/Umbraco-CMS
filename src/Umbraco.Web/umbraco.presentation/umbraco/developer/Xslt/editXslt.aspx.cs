@@ -30,7 +30,6 @@ namespace umbraco.cms.presentation.developer
                 string file = Request.QueryString["file"];
                 string path = BaseTree.GetTreePathFromFilePath(file, false, true);
                 ClientTools
-                    .SetActiveTreeType(Constants.Trees.Xslt)
                     .SyncTree(path, false);
             }
         }

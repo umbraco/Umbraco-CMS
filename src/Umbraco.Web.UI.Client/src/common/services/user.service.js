@@ -247,10 +247,9 @@ angular.module('umbraco.services')
 
             /** Returns the current user object in a promise  */
             getCurrentUser: function (args) {
-                var deferred = $q.defer();
-
+                
                 if (!currentUser) {
-                    authResource.getCurrentUser()
+                    return authResource.getCurrentUser()
                         .then(function (data) {
 
                             var result = { user: data, authenticated: true, lastUserId: lastUserId, loginType: "implicit" };
@@ -262,18 +261,16 @@ angular.module('umbraco.services')
 
                             setCurrentUser(data);
 
-                            deferred.resolve(currentUser);
+                            return $q.when(currentUser);
                         }, function () {
                             //it failed, so they are not logged in
-                            deferred.reject();
+                            return $q.reject(currentUser);
                         });
 
                 }
                 else {
-                    deferred.resolve(currentUser);
+                    return $q.when(currentUser);
                 }
-
-                return deferred.promise;
             },
 
             /** Loads the Moment.js Locale for the current user. */
@@ -295,11 +292,7 @@ angular.module('umbraco.services')
                         return assetsService.load(localeUrls, $rootScope);
                     }
                     else {
-                        //return a noop promise
-                        var deferred = $q.defer();
-                        var promise = deferred.promise;
-                        deferred.resolve(true);
-                        return promise;
+                        $q.when(true);
                     }
                 }
 

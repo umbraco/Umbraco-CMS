@@ -6,7 +6,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.MemberGroupPickerControll
             $scope.model.title = localizationService.localize("defaultdialogs_selectMemberGroup");
         }
 
-        $scope.dialogTreeEventHandler = $({});
+        $scope.dialogTreeApi = {};
         $scope.multiPicker = $scope.model.multiPicker;
 
         function activate() {
@@ -39,7 +39,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.MemberGroupPickerControll
             }
         }
 
-        function nodeSelectHandler(ev, args) {
+        function nodeSelectHandler(args) {
             args.event.preventDefault();
             args.event.stopPropagation();
 
@@ -53,12 +53,10 @@ angular.module("umbraco").controller("Umbraco.Overlays.MemberGroupPickerControll
             args.node.selected = args.node.selected === true ? false : true;
         }
 
-        $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
-
-        $scope.$on('$destroy', function () {
-            $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-        });
-
+        $scope.onTreeInit = function () {
+            $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
+        };
+        
         activate();
 
     });

@@ -16,11 +16,13 @@
             </div>
 
             <!-- the tree -->
-            <div id="tree" ng-if="authenticated">
+            <div id="tree" ng-show="authenticated">
                 <umb-tree
-                    cachekey="_"
-                    eventhandler="treeEventHandler"
-                    section="{{currentSection}}">
+                    cachekey="{{treeCacheKey}}"
+                    api="treeApi"
+                    on-init="onTreeInit()"
+                    section="{{currentSection}}"
+                    customtreeparams="{{customTreeParams}}">
                 </umb-tree>
             </div>
         </div>

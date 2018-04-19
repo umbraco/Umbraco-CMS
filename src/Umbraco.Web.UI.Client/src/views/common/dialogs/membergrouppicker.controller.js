@@ -2,7 +2,7 @@
 angular.module("umbraco").controller("Umbraco.Dialogs.MemberGroupPickerController",
     function($scope, eventsService, entityResource, searchService, $log) {
         var dialogOptions = $scope.dialogOptions;
-        $scope.dialogTreeEventHandler = $({});
+        $scope.dialogTreeApi = {};
         $scope.multiPicker = dialogOptions.multiPicker;
 
         /** Method used for selecting a node */
@@ -16,7 +16,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberGroupPickerControlle
             }
         }
         
-        function nodeSelectHandler(ev, args) {
+        function nodeSelectHandler(args) {
             args.event.preventDefault();
             args.event.stopPropagation();
             
@@ -30,9 +30,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberGroupPickerControlle
             args.node.selected = args.node.selected === true ? false : true;
         }
 
-        $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
+        function onTreeInit() {
+            $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
+        }
 
-        $scope.$on('$destroy', function () {
-            $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-        });
     });
