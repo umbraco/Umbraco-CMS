@@ -10,7 +10,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
-            Create.Table<ContentVersionCultureVariationDto>();
+            Create.Table<ContentVersionCultureVariationDto>().Do();
 
             // fixme - data migration?
         }

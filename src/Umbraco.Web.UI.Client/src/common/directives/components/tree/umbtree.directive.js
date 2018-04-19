@@ -55,6 +55,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
             var vm = this;
 
+            var isInitialized = false;
+
             var registeredCallbacks = {
                 treeNodeExpanded: [],
                 treeNodeSelect: [],
@@ -269,8 +271,16 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
                     return treeService.getTree(args)
                         .then(function (data) {
+
                             //set the data once we have it
                             $scope.tree = data;
+
+                            //call the callback, this allows for hosting controllers to bind to events and use the exposed API
+                            if (!isInitialized) {
+                                isInitialized = true;
+                                $scope.onInit();
+                            }
+                            
 
                             enableDeleteAnimations();
 
@@ -421,9 +431,6 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     lastSection = newVal;
                 }
             });
-
-            //call the callback, this allows for hosting controllers to bind to events and use the exposed API
-            $scope.onInit();
             
             loadTree();
         }
