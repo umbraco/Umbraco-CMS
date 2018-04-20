@@ -899,7 +899,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     variantInfo[info.LanguageId] = info.Name;
                 }
-                entity.AdditionalData["VariantInfo"] = variantInfo;
+                entity.AdditionalData["CultureNames"] = variantInfo;
             }
             return entity;
         }

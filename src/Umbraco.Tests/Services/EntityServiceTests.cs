@@ -466,7 +466,7 @@ namespace Umbraco.Tests.Services
                 if (i % 2 == 0)
                 {
                     Assert.AreEqual(1, entities[i].AdditionalData.Count);
-                    Assert.AreEqual("VariantInfo", entities[i].AdditionalData.Keys.First());
+                    Assert.AreEqual("CultureNames", entities[i].AdditionalData.Keys.First());
                     var variantInfo = entities[i].AdditionalData.First().Value as IDictionary<int, string>;
                     Assert.IsNotNull(variantInfo);
                     var keys = variantInfo.Keys.ToList();
