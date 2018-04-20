@@ -281,8 +281,6 @@
     <Compile Include="Configuration\UmbracoSettings\INotDynamicXmlDocument.cs" />
     <Compile Include="Configuration\UmbracoSettings\IProvidersSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IRazorStaticMapping.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IRepositoriesSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IRepository.cs" />
     <Compile Include="Configuration\UmbracoSettings\IRequestHandlerSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IScheduledTask.cs" />
     <Compile Include="Configuration\UmbracoSettings\IScheduledTasksSection.cs" />
@@ -308,10 +306,6 @@
     <Compile Include="Configuration\UmbracoSettings\RazorElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RazorStaticMappingCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\RazorStaticMappingElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoriesCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoriesElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoryConfigExtensions.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoryElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RequestHandlerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ScheduledTaskElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ScheduledTasksCollection.cs" />
@@ -1604,6 +1598,9 @@
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     <Compile Include="Constants-Packaging.cs">
+      <DependentUpon>Constants.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Constants-PackageRepository.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     <Compile Include="Constants-ObjectTypes.cs">

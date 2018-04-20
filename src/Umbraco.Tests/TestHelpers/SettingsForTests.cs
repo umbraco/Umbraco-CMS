@@ -38,7 +38,6 @@ namespace Umbraco.Tests.TestHelpers
             var logging = new Mock<ILoggingSection>();
             var tasks = new Mock<IScheduledTasksSection>();
             var distCall = new Mock<IDistributedCallSection>();
-            var repos = new Mock<IRepositoriesSection>();
             var providers = new Mock<IProvidersSection>();
             
             var routing = new Mock<IWebRoutingSection>();
@@ -53,7 +52,6 @@ namespace Umbraco.Tests.TestHelpers
             settings.Setup(x => x.Logging).Returns(logging.Object);
             settings.Setup(x => x.ScheduledTasks).Returns(tasks.Object);
             settings.Setup(x => x.DistributedCall).Returns(distCall.Object);
-            settings.Setup(x => x.PackageRepositories).Returns(repos.Object);
             settings.Setup(x => x.Providers).Returns(providers.Object);
             
             settings.Setup(x => x.WebRouting).Returns(routing.Object);
