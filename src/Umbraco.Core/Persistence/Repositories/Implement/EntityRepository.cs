@@ -150,15 +150,29 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var isMedia = objectTypeId == Constants.ObjectTypes.Media;
 
             var sql = GetFullSqlForEntityType(isContent, isMedia, objectTypeId, key);
-            var dto = Database.FirstOrDefault<BaseDto>(sql);
-            if (dto == null) return null;
 
-            var entity = BuildEntity(isContent, isMedia, dto);
+            //isContent is going to return a 1:M result now with the variants so we need to do different things 
+            if (isContent)
+            {
+                 var dtos = Database.FetchOneToMany<ContentEntityDto>(
+                    dto => dto.VariationInfo,
+                    dto => dto.VersionId,
+                    sql);
+                if (dtos.Count == 0) return null;
+                return BuildDocumentEntity(dtos[0]);
+            }
+            else
+            {
+                var dto = Database.FirstOrDefault<BaseDto>(sql);
+                if (dto == null) return null;
 
-            if (isMedia)
-                BuildProperties(entity, dto);
+                var entity = BuildEntity(isContent, isMedia, dto);
 
-            return entity;
+                if (isMedia)
+                    BuildProperties(entity, dto);
+
+                return entity;
+            }
         }
 
         public virtual IEntitySlim Get(int id)
@@ -174,15 +188,30 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var isMedia = objectTypeId == Constants.ObjectTypes.Media;
 
             var sql = GetFullSqlForEntityType(isContent, isMedia, objectTypeId, id);
-            var dto = Database.FirstOrDefault<BaseDto>(sql);
-            if (dto == null) return null;
 
-            var entity = BuildEntity(isContent, isMedia, dto);
+            //isContent is going to return a 1:M result now with the variants so we need to do different things 
+            if (isContent)
+            {
+                var dtos = Database.FetchOneToMany<ContentEntityDto>(
+                    dto => dto.VariationInfo,
+                    dto => dto.VersionId,
+                    sql);
+                if (dtos.Count == 0) return null;
+                return BuildDocumentEntity(dtos[0]);
+            }
+            else
+            {
+                var dto = Database.FirstOrDefault<BaseDto>(sql);
+                if (dto == null) return null;
 
-            if (isMedia)
-                BuildProperties(entity, dto);
+                var entity = BuildEntity(isContent, isMedia, dto);
 
-            return entity;
+                if (isMedia)
+                    BuildProperties(entity, dto);
+
+                return entity;
+            }
+
         }
 
         public virtual IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids)
@@ -205,15 +234,30 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var isMedia = objectType == Constants.ObjectTypes.Media;
 
             var sql = GetFullSqlForEntityType(isContent, isMedia, objectType, filter);
-            var dtos = Database.Fetch<BaseDto>(sql);
-            if (dtos.Count == 0) return Enumerable.Empty<IEntitySlim>();
 
-            var entities = dtos.Select(x => BuildEntity(isContent, isMedia, x)).ToArray();
+            //isContent is going to return a 1:M result now with the variants so we need to do different things 
+            if (isContent)
+            {
+                var dtos = Database.FetchOneToMany<ContentEntityDto>(
+                    dto => dto.VariationInfo,
+                    dto => dto.VersionId,
+                    sql);
+                if (dtos.Count == 0) return Enumerable.Empty<IEntitySlim>();
+                var entities = dtos.Select(x => BuildDocumentEntity(x)).ToArray();
+                return entities;
+            }
+            else
+            {
+                var dtos = Database.Fetch<BaseDto>(sql);
+                if (dtos.Count == 0) return Enumerable.Empty<IEntitySlim>();
 
-            if (isMedia)
-                BuildProperties(entities, dtos);
+                var entities = dtos.Select(x => BuildEntity(isContent, isMedia, x)).ToArray();
 
-            return entities;
+                if (isMedia)
+                    BuildProperties(entities, dtos);
+
+                return entities;
+            }
         }
 
         public virtual IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params int[] ids)

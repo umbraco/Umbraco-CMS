@@ -215,7 +215,10 @@ namespace Umbraco.Web.Trees
 
             //Try to see if there is a variant name for the current language for the item and set the name accordingly.
             //If any of this fails, the tree node name will remain the default invariant culture name.
-            //fixme - what if there is no name found at all ? This could occur if the doc type is variant and the user fills in all language values, then creates a new lang, sets it as default and deletes all other pre-existing langs
+
+            //fixme - what if there is no name found at all ? This could occur if the doc type is variant and the user fills in all language values, then creates a new lang and sets it as the default
+            //fixme - what if the user changes this document type to not allow culture variants after it's already been created with culture variants, this means we'll be displaying the culture variant name when in fact we should be displaying the invariant name... but that would be null
+
             if (currLangId.HasValue)
             {
                 foreach (var e in result)
