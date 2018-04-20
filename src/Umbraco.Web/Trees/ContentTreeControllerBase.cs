@@ -217,7 +217,7 @@ namespace Umbraco.Web.Trees
                 // we'll mock using this and it will just be some mock data
                 foreach(var e in result)
                 {
-                    if (e.AdditionalData.TryGetValue("VariantNames", out var variantNames))
+                    if (e.AdditionalData.TryGetValue("VariantInfo", out var variantNames))
                     {
                         var casted = (IDictionary<int, string>)variantNames;
                         e.Name = casted[langId.Value];
