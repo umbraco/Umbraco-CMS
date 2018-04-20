@@ -27,7 +27,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IXsltFileRepository _xsltRepository;
         private readonly IAuditRepository _auditRepository;
 
-        private const string PartialViewHeader = "@inherits Umbraco.Web.Mvc.UmbracoTemplatePage";
+        private const string PartialViewHeader = "@inherits Umbraco.Web.Mvc.UmbracoViewPage";
         private const string PartialViewMacroHeader = "@inherits Umbraco.Web.Macros.PartialViewMacroPage";
 
         public FileService(IScopeProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
