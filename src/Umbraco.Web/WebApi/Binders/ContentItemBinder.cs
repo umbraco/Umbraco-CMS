@@ -34,7 +34,7 @@ namespace Umbraco.Web.WebApi.Binders
         {
             return ContextMapper.Map<IContent, ContentItemDto<IContent>>(content, new Dictionary<string, object>
             {
-                [ContextMapper.LanguageKey] = languageId
+                [ContextMapper.CultureKey] = languageId
             });
         }
     }

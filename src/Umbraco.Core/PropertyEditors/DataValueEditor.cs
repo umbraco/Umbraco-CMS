@@ -272,16 +272,16 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         /// <param name="property"></param>
         /// <param name="dataTypeService"></param>
-        /// <param name="languageId"></param>
+        /// <param name="culture"></param>
         /// <param name="segment"></param>
         /// <returns></returns>
         /// <remarks>
         /// The object returned will automatically be serialized into json notation. For most property editors
         /// the value returned is probably just a string but in some cases a json structure will be returned.
         /// </remarks>
-        public virtual object ToEditor(Property property, IDataTypeService dataTypeService, int? languageId = null, string segment = null)
+        public virtual object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
         {
-            var val = property.GetValue(languageId, segment);
+            var val = property.GetValue(culture, segment);
             if (val == null) return string.Empty;
 
             switch (ValueTypes.ToStorageType(ValueType))
@@ -343,12 +343,8 @@ namespace Umbraco.Core.PropertyEditors
                     continue;
 
                 var xElement = new XElement(nodeName);
-                if (pvalue.LanguageId.HasValue)
-                {
-                    var language = localizationService.GetLanguageById(pvalue.LanguageId.Value);
-                    if (language == null) continue; // uh?
-                    xElement.Add(new XAttribute("lang", language.IsoCode));
-                }
+                if (pvalue.Culture != null)
+                    xElement.Add(new XAttribute("lang", pvalue.Culture));
                 if (pvalue.Segment != null)
                     xElement.Add(new XAttribute("segment", pvalue.Segment));
 

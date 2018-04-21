@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
@@ -964,7 +965,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var accessor = (IScopeAccessor) provider;
             var tagRepository = new TagRepository(accessor, DisabledCache, Logger);
             mediaTypeRepository = new MediaTypeRepository(accessor, DisabledCache, Logger);
-            var repository = new MediaRepository(accessor, DisabledCache, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>());
+            var repository = new MediaRepository(accessor, DisabledCache, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), Mock.Of<ILanguageRepository>());
             return repository;
         }
     }

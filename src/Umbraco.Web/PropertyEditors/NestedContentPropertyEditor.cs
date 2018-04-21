@@ -139,9 +139,9 @@ namespace Umbraco.Web.PropertyEditors
 
             // note: there is NO variant support here
 
-            public override object ToEditor(Property property, IDataTypeService dataTypeService, int? languageId = null, string segment = null)
+            public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
             {
-                var val = property.GetValue(languageId, segment);
+                var val = property.GetValue(culture, segment);
                 if (val == null || string.IsNullOrWhiteSpace(val.ToString()))
                     return string.Empty;
 

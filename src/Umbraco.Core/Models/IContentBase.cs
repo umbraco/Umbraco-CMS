@@ -31,19 +31,19 @@ namespace Umbraco.Core.Models
         /// Sets the name of the content item for a specified language.
         /// </summary>
         /// <remarks>
-        /// <para>When <paramref name="languageId"/> is <c>null</c>, sets the invariant
+        /// <para>When <paramref name="culture"/> is <c>null</c>, sets the invariant
         /// language, which sets the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        void SetName(int? languageId, string value);
+        void SetName(string culture, string value);
 
         /// <summary>
         /// Gets the name of the content item for a specified language.
         /// </summary>
         /// <remarks>
-        /// <para>When <paramref name="languageId"/> is <c>null</c>, gets the invariant
+        /// <para>When <paramref name="culture"/> is <c>null</c>, gets the invariant
         /// language, which is the value of the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        string GetName(int? languageId);
+        string GetName(string culture);
 
         /// <summary>
         /// Gets or sets the names of the content item.
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Models
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot get nor set the invariant
         /// name, which must be get or set via the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        IReadOnlyDictionary<int, string> Names { get; set; }
+        IReadOnlyDictionary<string, string> Names { get; set; }
 
         /// <summary>
         /// List of properties, which make up all the data available for this Content object
@@ -82,17 +82,17 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the value of a Property
         /// </summary>
-        object GetValue(string propertyTypeAlias, int? languageId = null, string segment = null, bool published = false);
+        object GetValue(string propertyTypeAlias, string culture = null, string segment = null, bool published = false);
 
         /// <summary>
         /// Gets the typed value of a Property
         /// </summary>
-        TValue GetValue<TValue>(string propertyTypeAlias, int? languageId = null, string segment = null, bool published = false);
+        TValue GetValue<TValue>(string propertyTypeAlias, string culture = null, string segment = null, bool published = false);
 
         /// <summary>
         /// Sets the (edited) value of a Property
         /// </summary>
-        void SetValue(string propertyTypeAlias, object value, int? languageId = null, string segment = null);
+        void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null);
 
         /// <summary>
         /// Gets a value indicating whether the content and all its properties values are valid.
@@ -102,11 +102,11 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets a value indicating whether the content and its properties values are valid.
         /// </summary>
-        Property[] Validate(int? languageId = null, string segment = null);
+        Property[] Validate(string culture = null, string segment = null);
 
         /// <summary>
         /// Gets a value indicating whether the content and its culture/any properties values are valid.
         /// </summary>
-        Property[] ValidateCulture(int? languageId = null);
+        Property[] ValidateCulture(string culture = null);
     }
 }

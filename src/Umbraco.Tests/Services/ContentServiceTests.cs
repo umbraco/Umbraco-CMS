@@ -2506,200 +2506,200 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var content = contentService.Create("Home US", - 1, "umbTextpage");
 
-            // act
+        // act
 
-            content.SetValue("author", "Barack Obama");
-            content.SetValue("prop", "value-fr1", langFr.Id);
-            content.SetValue("prop", "value-uk1", langUk.Id);
-            content.SetName(langFr.Id, "name-fr");
-            content.SetName(langUk.Id, "name-uk");
-            contentService.Save(content);
+        content.SetValue("author", "Barack Obama");
+        content.SetValue("prop", "value-fr1", langFr.IsoCode);
+        content.SetValue("prop", "value-uk1", langUk.IsoCode);
+        content.SetName(langFr.IsoCode, "name-fr");
+        content.SetName(langUk.IsoCode, "name-uk");
+        contentService.Save(content);
 
-            // content has been saved,
-            // it has names, but no publishNames, and no published cultures
+        // content has been saved,
+        // it has names, but no publishNames, and no published cultures
 
-            var content2 = contentService.GetById(content.Id);
+        var content2 = contentService.GetById(content.Id);
 
-            Assert.AreEqual("Home US", content2.Name);
-            Assert.AreEqual("name-fr", content2.GetName(langFr.Id));
-            Assert.AreEqual("name-uk", content2.GetName(langUk.Id));
+        Assert.AreEqual("Home US", content2.Name);
+        Assert.AreEqual("name-fr", content2.GetName(langFr.IsoCode));
+        Assert.AreEqual("name-uk", content2.GetName(langUk.IsoCode));
 
-            Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.Id));
-            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id));
-            Assert.IsNull(content2.GetValue("prop", langFr.Id, published: true));
-            Assert.IsNull(content2.GetValue("prop", langUk.Id, published: true));
+        Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.IsoCode));
+        Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode));
+        Assert.IsNull(content2.GetValue("prop", langFr.IsoCode, published: true));
+        Assert.IsNull(content2.GetValue("prop", langUk.IsoCode, published: true));
 
-            Assert.IsNull(content2.PublishName);
-            Assert.IsNull(content2.GetPublishName(langFr.Id));
-            Assert.IsNull(content2.GetPublishName(langUk.Id));
+        Assert.IsNull(content2.PublishName);
+        Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
+        Assert.IsNull(content2.GetPublishName(langUk.IsoCode));
 
-            Assert.IsTrue(content.IsCultureAvailable(langFr.Id));
-            Assert.IsTrue(content.IsCultureAvailable(langUk.Id));
-            Assert.IsFalse(content.IsCultureAvailable(langDe.Id));
+        Assert.IsTrue(content.IsCultureAvailable(langFr.IsoCode));
+        Assert.IsTrue(content.IsCultureAvailable(langUk.IsoCode));
+        Assert.IsFalse(content.IsCultureAvailable(langDe.IsoCode));
 
-            Assert.IsFalse(content.IsCulturePublished(langFr.Id));
-            Assert.IsFalse(content.IsCulturePublished(langUk.Id));
+        Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
+        Assert.IsFalse(content.IsCulturePublished(langUk.IsoCode));
 
-            // act
+        // act
 
-            content.PublishValues(langFr.Id);
-            content.PublishValues(langUk.Id);
-            contentService.SaveAndPublish(content);
+        content.PublishValues(langFr.IsoCode);
+        content.PublishValues(langUk.IsoCode);
+        contentService.SaveAndPublish(content);
 
-            // both FR and UK have been published,
-            // and content has been published,
-            // it has names, publishNames, and published cultures
+        // both FR and UK have been published,
+        // and content has been published,
+        // it has names, publishNames, and published cultures
 
-            content2 = contentService.GetById(content.Id);
+        content2 = contentService.GetById(content.Id);
 
-            Assert.AreEqual("Home US", content2.Name);
-            Assert.AreEqual("name-fr", content2.GetName(langFr.Id));
-            Assert.AreEqual("name-uk", content2.GetName(langUk.Id));
+        Assert.AreEqual("Home US", content2.Name);
+        Assert.AreEqual("name-fr", content2.GetName(langFr.IsoCode));
+        Assert.AreEqual("name-uk", content2.GetName(langUk.IsoCode));
 
-            Assert.IsNull(content2.PublishName); // we haven't published InvariantNeutral
-            Assert.AreEqual("name-fr", content2.GetPublishName(langFr.Id));
-            Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
+        Assert.IsNull(content2.PublishName); // we haven't published InvariantNeutral
+        Assert.AreEqual("name-fr", content2.GetPublishName(langFr.IsoCode));
+        Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
 
-            Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.Id));
-            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id));
-            Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.Id, published: true));
-            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id, published: true));
+        Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.IsoCode));
+        Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode));
+        Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.IsoCode, published: true));
+        Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode, published: true));
 
-            Assert.IsTrue(content.IsCulturePublished(langFr.Id));
-            Assert.IsTrue(content.IsCulturePublished(langUk.Id));
+        Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
+        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
-            // act
+        // act
 
-            content.PublishValues();
-            contentService.SaveAndPublish(content);
+        content.PublishValues();
+        contentService.SaveAndPublish(content);
 
-            // now it has publish name for invariant neutral
+        // now it has publish name for invariant neutral
 
-            content2 = contentService.GetById(content.Id);
+        content2 = contentService.GetById(content.Id);
 
-            Assert.AreEqual("Home US", content2.PublishName);
+        Assert.AreEqual("Home US", content2.PublishName);
 
-            // act
+        // act
 
-            content.SetName(null, "Home US2");
-            content.SetName(langFr.Id, "name-fr2");
-            content.SetName(langUk.Id, "name-uk2");
-            content.SetValue("author", "Barack Obama2");
-            content.SetValue("prop", "value-fr2", langFr.Id);
-            content.SetValue("prop", "value-uk2", langUk.Id);
-            contentService.Save(content);
+        content.SetName(null, "Home US2");
+        content.SetName(langFr.IsoCode, "name-fr2");
+        content.SetName(langUk.IsoCode, "name-uk2");
+        content.SetValue("author", "Barack Obama2");
+        content.SetValue("prop", "value-fr2", langFr.IsoCode);
+        content.SetValue("prop", "value-uk2", langUk.IsoCode);
+        contentService.Save(content);
 
-            // content has been saved,
-            // it has updated names, unchanged publishNames, and published cultures
+        // content has been saved,
+        // it has updated names, unchanged publishNames, and published cultures
 
-            content2 = contentService.GetById(content.Id);
+        content2 = contentService.GetById(content.Id);
 
-            Assert.AreEqual("Home US2", content2.Name);
-            Assert.AreEqual("name-fr2", content2.GetName(langFr.Id));
-            Assert.AreEqual("name-uk2", content2.GetName(langUk.Id));
+        Assert.AreEqual("Home US2", content2.Name);
+        Assert.AreEqual("name-fr2", content2.GetName(langFr.IsoCode));
+        Assert.AreEqual("name-uk2", content2.GetName(langUk.IsoCode));
 
-            Assert.AreEqual("Home US", content2.PublishName);
-            Assert.AreEqual("name-fr", content2.GetPublishName(langFr.Id));
-            Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
+        Assert.AreEqual("Home US", content2.PublishName);
+        Assert.AreEqual("name-fr", content2.GetPublishName(langFr.IsoCode));
+        Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
 
-            Assert.AreEqual("Barack Obama2", content2.GetValue("author"));
-            Assert.AreEqual("Barack Obama", content2.GetValue("author", published: true));
+        Assert.AreEqual("Barack Obama2", content2.GetValue("author"));
+        Assert.AreEqual("Barack Obama", content2.GetValue("author", published: true));
 
-            Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.Id));
-            Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.Id));
-            Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.Id, published: true));
-            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id, published: true));
+        Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.IsoCode));
+        Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.IsoCode));
+        Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.IsoCode, published: true));
+        Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode, published: true));
 
-            Assert.IsTrue(content.IsCulturePublished(langFr.Id));
-            Assert.IsTrue(content.IsCulturePublished(langUk.Id));
+        Assert.IsTrue(content.IsCulturePublished(langFr.IsoCode));
+        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
-            // act
-            // cannot just 'save' since we are changing what's published!
+        // act
+        // cannot just 'save' since we are changing what's published!
 
-            content.ClearPublishedValues(langFr.Id);
-            contentService.SaveAndPublish(content);
+        content.ClearPublishedValues(langFr.IsoCode);
+        contentService.SaveAndPublish(content);
 
-            // content has been published,
-            // the french culture is gone
+        // content has been published,
+        // the french culture is gone
 
-            content2 = contentService.GetById(content.Id);
+        content2 = contentService.GetById(content.Id);
 
-            Assert.AreEqual("Home US2", content2.Name);
-            Assert.AreEqual("name-fr2", content2.GetName(langFr.Id));
-            Assert.AreEqual("name-uk2", content2.GetName(langUk.Id));
+        Assert.AreEqual("Home US2", content2.Name);
+        Assert.AreEqual("name-fr2", content2.GetName(langFr.IsoCode));
+        Assert.AreEqual("name-uk2", content2.GetName(langUk.IsoCode));
 
-            Assert.AreEqual("Home US", content2.PublishName);
-            Assert.IsNull(content2.GetPublishName(langFr.Id));
-            Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
+        Assert.AreEqual("Home US", content2.PublishName);
+        Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
+        Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
 
-            Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.Id));
-            Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.Id));
-            Assert.IsNull(content2.GetValue("prop", langFr.Id, published: true));
-            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id, published: true));
+        Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.IsoCode));
+        Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.IsoCode));
+        Assert.IsNull(content2.GetValue("prop", langFr.IsoCode, published: true));
+        Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode, published: true));
 
-            Assert.IsFalse(content.IsCulturePublished(langFr.Id));
-            Assert.IsTrue(content.IsCulturePublished(langUk.Id));
+        Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
+        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
 
-            // act
+        // act
 
-            contentService.Unpublish(content);
+        contentService.Unpublish(content);
 
-            // content has been unpublished,
-            // but properties, names, etc. retain their 'published' values so the content
-            // can be re-published in its exact original state (before being unpublished)
-            //
-            // BEWARE!
-            // in order for a content to be unpublished as a whole, and then republished in
-            // its exact previous state, properties and names etc. retain their published
-            // values even though the content is not published - hence many things being
-            // non-null or true below - always check against content.Published to be sure
+        // content has been unpublished,
+        // but properties, names, etc. retain their 'published' values so the content
+        // can be re-published in its exact original state (before being unpublished)
+        //
+        // BEWARE!
+        // in order for a content to be unpublished as a whole, and then republished in
+        // its exact previous state, properties and names etc. retain their published
+        // values even though the content is not published - hence many things being
+        // non-null or true below - always check against content.Published to be sure
 
-            content2 = contentService.GetById(content.Id);
+        content2 = contentService.GetById(content.Id);
 
-            Assert.IsFalse(content2.Published);
+        Assert.IsFalse(content2.Published);
 
-            Assert.AreEqual("Home US2", content2.Name);
-            Assert.AreEqual("name-fr2", content2.GetName(langFr.Id));
-            Assert.AreEqual("name-uk2", content2.GetName(langUk.Id));
+        Assert.AreEqual("Home US2", content2.Name);
+        Assert.AreEqual("name-fr2", content2.GetName(langFr.IsoCode));
+        Assert.AreEqual("name-uk2", content2.GetName(langUk.IsoCode));
 
-            Assert.AreEqual("Home US", content2.PublishName); // not null, see note above
-            Assert.IsNull(content2.GetPublishName(langFr.Id));
-            Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id)); // not null, see note above
+        Assert.AreEqual("Home US", content2.PublishName); // not null, see note above
+        Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
+        Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode)); // not null, see note above
 
-            Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.Id));
-            Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.Id));
-            Assert.IsNull(content2.GetValue("prop", langFr.Id, published: true));
-            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id, published: true));  // has value, see note above
+        Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.IsoCode));
+        Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.IsoCode));
+        Assert.IsNull(content2.GetValue("prop", langFr.IsoCode, published: true));
+        Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode, published: true));  // has value, see note above
 
-            Assert.IsFalse(content.IsCulturePublished(langFr.Id));
-            Assert.IsTrue(content.IsCulturePublished(langUk.Id)); // still true, see note above
+        Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
+        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode)); // still true, see note above
 
-            // act
+        // act
 
-            contentService.SaveAndPublish(content);
+        contentService.SaveAndPublish(content);
 
-            // content has been re-published,
-            // everything is back to what it was before being unpublished
+        // content has been re-published,
+        // everything is back to what it was before being unpublished
 
-            content2 = contentService.GetById(content.Id);
+        content2 = contentService.GetById(content.Id);
 
-            Assert.IsTrue(content2.Published);
+        Assert.IsTrue(content2.Published);
 
-            Assert.AreEqual("Home US2", content2.Name);
-            Assert.AreEqual("name-fr2", content2.GetName(langFr.Id));
-            Assert.AreEqual("name-uk2", content2.GetName(langUk.Id));
+        Assert.AreEqual("Home US2", content2.Name);
+        Assert.AreEqual("name-fr2", content2.GetName(langFr.IsoCode));
+        Assert.AreEqual("name-uk2", content2.GetName(langUk.IsoCode));
 
-            Assert.AreEqual("Home US", content2.PublishName);
-            Assert.IsNull(content2.GetPublishName(langFr.Id));
-            Assert.AreEqual("name-uk", content2.GetPublishName(langUk.Id));
+        Assert.AreEqual("Home US", content2.PublishName);
+        Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
+        Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
 
-            Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.Id));
-            Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.Id));
-            Assert.IsNull(content2.GetValue("prop", langFr.Id, published: true));
-            Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.Id, published: true));
+        Assert.AreEqual("value-fr2", content2.GetValue("prop", langFr.IsoCode));
+        Assert.AreEqual("value-uk2", content2.GetValue("prop", langUk.IsoCode));
+        Assert.IsNull(content2.GetValue("prop", langFr.IsoCode, published: true));
+        Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode, published: true));
 
-            Assert.IsFalse(content.IsCulturePublished(langFr.Id));
-            Assert.IsTrue(content.IsCulturePublished(langUk.Id));
+        Assert.IsFalse(content.IsCulturePublished(langFr.IsoCode));
+        Assert.IsTrue(content.IsCulturePublished(langUk.IsoCode));
         }
 
         private IEnumerable<IContent> CreateContentHierarchy()

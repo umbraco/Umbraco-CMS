@@ -266,7 +266,7 @@ namespace Umbraco.Web.Editors
                 return null;//irrelevant since the above throws
             }
 
-            var content = MapToDisplay(foundContent, languageId);
+            var content = MapToDisplay(foundContent, GetLanguageCulture(languageId));
             return content;
         }
 
@@ -606,7 +606,7 @@ namespace Umbraco.Web.Editors
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the modelstate to the outgoing object and throw a validation message
-                    var forDisplay = MapToDisplay(contentItem.PersistedContent, contentItem.LanguageId);
+                    var forDisplay = MapToDisplay(contentItem.PersistedContent, GetLanguageCulture(contentItem.LanguageId));
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
 
@@ -643,14 +643,14 @@ namespace Umbraco.Web.Editors
             else
             {
                 //publish the item and check if it worked, if not we will show a diff msg below
-                contentItem.PersistedContent.PublishValues(contentItem.LanguageId); //we are not checking for a return value here because we've alraedy pre-validated the property values
+                contentItem.PersistedContent.PublishValues(GetLanguageCulture(contentItem.LanguageId)); //we are not checking for a return value here because we've alraedy pre-validated the property values
 
                 //check if we are publishing other variants and validate them
                 var allLangs = Services.LocalizationService.GetAllLanguages().ToList();
                 var variantsToValidate = contentItem.PublishVariations.Where(x => x.LanguageId != contentItem.LanguageId).ToList();
                 foreach (var publishVariation in variantsToValidate)
                 {
-                    if (!contentItem.PersistedContent.PublishValues(publishVariation.LanguageId))
+                    if (!contentItem.PersistedContent.PublishValues(GetLanguageCulture(publishVariation.LanguageId)))
                     {
                         var errMsg = Services.TextService.Localize("speechBubbles/contentLangValidationError", new[]{allLangs.First(x => x.Id == publishVariation.LanguageId).CultureName});
                         ModelState.AddModelError("publish_variant_" + publishVariation.LanguageId + "_", errMsg);
@@ -664,7 +664,7 @@ namespace Umbraco.Web.Editors
                     .Where(x => x.Mandatory);
                 foreach (var lang in mandatoryLangs)
                 {
-                    if (contentItem.PersistedContent.Validate(lang.Id).Length > 0)
+                    if (contentItem.PersistedContent.Validate(GetLanguageCulture(lang.Id)).Length > 0)
                     {
                         var errMsg = Services.TextService.Localize("speechBubbles/contentReqLangValidationError", new[]{allLangs.First(x => x.Id == lang.Id).CultureName});
                         ModelState.AddModelError("publish_variant_" + lang.Id + "_", errMsg);
@@ -676,7 +676,7 @@ namespace Umbraco.Web.Editors
             }
 
             //get the updated model
-            var display = MapToDisplay(contentItem.PersistedContent, contentItem.LanguageId);
+            var display = MapToDisplay(contentItem.PersistedContent, GetLanguageCulture(contentItem.LanguageId));
 
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
@@ -977,8 +977,8 @@ namespace Umbraco.Web.Editors
 
             base.MapPropertyValues<IContent, ContentItemSave>(
                 contentItem,
-                (save, property) => property.GetValue(save.LanguageId),         //get prop val
-                (save, property, v) => property.SetValue(v, save.LanguageId));  //set prop val
+                (save, property) => property.GetValue(GetLanguageCulture(save.LanguageId)),         //get prop val
+                (save, property, v) => property.SetValue(v, GetLanguageCulture(save.LanguageId)));  //set prop val
         }
 
         /// <summary>
@@ -1169,23 +1169,28 @@ namespace Umbraco.Web.Editors
         /// Used to map an <see cref="IContent"/> instance to a <see cref="ContentItemDisplay"/> and ensuring a language is present if required
         /// </summary>
         /// <param name="content"></param>
-        /// <param name="languageId"></param>
+        /// <param name="culture"></param>
         /// <returns></returns>
-        private ContentItemDisplay MapToDisplay(IContent content, int? languageId = null)
+        private ContentItemDisplay MapToDisplay(IContent content, string culture = null)
         {
             //a languageId must exist in the mapping context if this content item has any property type that can be varied by language
             //otherwise the property validation will fail since it's expecting to be get/set with a language ID. If a languageId is not explicitly
             //sent up, then it means that the user is editing the default variant language.
-            if (!languageId.HasValue && content.HasPropertyTypeVaryingByCulture())
+            if (culture == null && content.HasPropertyTypeVaryingByCulture())
             {
-                languageId = Services.LocalizationService.GetDefaultVariantLanguage().Id;
+                culture = Services.LocalizationService.GetDefaultVariantLanguage().IsoCode;
             }
 
             var display = ContextMapper.Map<IContent, ContentItemDisplay>(content, UmbracoContext,
-                new Dictionary<string, object> { { ContextMapper.LanguageKey, languageId } });
+                new Dictionary<string, object> { { ContextMapper.CultureKey, culture } });
 
             return display;
         }
 
+        private string GetLanguageCulture(int? languageId)
+        {
+            if (languageId == null) return null;
+            return Core.Composing.Current.Services.LocalizationService.GetLanguageById(languageId.Value).IsoCode; // fixme optimize!
+        }
     }
 }

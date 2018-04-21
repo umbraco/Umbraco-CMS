@@ -93,11 +93,11 @@ namespace Umbraco.Web.PropertyEditors
                 //copy each of the property values (variants, segments) to the destination
                 foreach (var propertyValue in property.Values)
                 {
-                    var propVal = property.GetValue(propertyValue.LanguageId, propertyValue.Segment);
+                    var propVal = property.GetValue(propertyValue.Culture, propertyValue.Segment);
                     if (propVal == null || !(propVal is string str) || str.IsNullOrWhiteSpace()) continue;
                     var sourcePath = _mediaFileSystem.GetRelativePath(str);
                     var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
-                    args.Copy.SetValue(property.Alias, _mediaFileSystem.GetUrl(copyPath), propertyValue.LanguageId, propertyValue.Segment);
+                    args.Copy.SetValue(property.Alias, _mediaFileSystem.GetUrl(copyPath), propertyValue.Culture, propertyValue.Segment);
                     isUpdated = true;
                 }
             }
@@ -153,11 +153,11 @@ namespace Umbraco.Web.PropertyEditors
 
                 foreach (var pvalue in property.Values)
                 {
-                    var svalue = property.GetValue(pvalue.LanguageId, pvalue.Segment) as string;
+                    var svalue = property.GetValue(pvalue.Culture, pvalue.Segment) as string;
                     if (string.IsNullOrWhiteSpace(svalue))
-                        _mediaFileSystem.UploadAutoFillProperties.Reset(model, autoFillConfig, pvalue.LanguageId, pvalue.Segment);
+                        _mediaFileSystem.UploadAutoFillProperties.Reset(model, autoFillConfig, pvalue.Culture, pvalue.Segment);
                     else
-                        _mediaFileSystem.UploadAutoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(svalue), pvalue.LanguageId, pvalue.Segment);
+                        _mediaFileSystem.UploadAutoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(svalue), pvalue.Culture, pvalue.Segment);
                 }
             }
         }

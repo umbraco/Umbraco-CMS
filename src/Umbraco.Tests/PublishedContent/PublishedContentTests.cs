@@ -356,7 +356,7 @@ namespace Umbraco.Tests.PublishedContent
             var result = doc.Ancestors().OrderBy(x => x.Level)
                 .Single()
                 .Descendants()
-                .FirstOrDefault(x => x.Value<string>("selectedNodes", "").Split(',').Contains("1173"));
+                .FirstOrDefault(x => x.Value<string>("selectedNodes", defaultValue: "").Split(',').Contains("1173"));
 
             Assert.IsNotNull(result);
         }

@@ -27,13 +27,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <summary>
         /// Gets the raw value of the property.
         /// </summary>
-        public override object GetSourceValue(int? languageId = null, string segment = null) => _sourceValue;
+        public override object GetSourceValue(string culture = null, string segment = null) => _sourceValue;
 
         // in the Xml cache, everything is a string, and to have a value
         // you want to have a non-null, non-empty string.
-        public override bool HasValue(int? languageId = null, string segment = null) => _sourceValue.Trim().Length > 0;
+        public override bool HasValue(string culture = null, string segment = null) => _sourceValue.Trim().Length > 0;
 
-        public override object GetValue(int? languageId = null, string segment = null)
+        public override object GetValue(string culture = null, string segment = null)
         {
             // NOT caching the source (intermediate) value since we'll never need it
             // everything in Xml cache is per-request anyways
@@ -48,7 +48,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return _objectValue;
         }
 
-        public override object GetXPathValue(int? languageId = null, string segment = null) { throw new NotImplementedException(); }
+        public override object GetXPathValue(string culture = null, string segment = null) { throw new NotImplementedException(); }
 
         public XmlPublishedProperty(PublishedPropertyType propertyType, IPublishedContent content, bool isPreviewing, XmlNode propertyXmlData)
             : this(propertyType, content, isPreviewing)

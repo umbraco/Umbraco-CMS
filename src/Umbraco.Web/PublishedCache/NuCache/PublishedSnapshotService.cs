@@ -1183,7 +1183,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
                     if (value != null)
-                        pdatas.Add(new PropertyData { LanguageId = pvalue.LanguageId, Segment = pvalue.Segment, Value = value });
+                        pdatas.Add(new PropertyData { Culture = pvalue.Culture, Segment = pvalue.Segment, Value = value });
 
                     //Core.Composing.Current.Logger.Debug<PublishedSnapshotService>($"{content.Id} {prop.Alias} [{pvalue.LanguageId},{pvalue.Segment}] {value} {(published?"pub":"edit")}");
 

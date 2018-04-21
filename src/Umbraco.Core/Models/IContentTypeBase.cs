@@ -51,7 +51,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Validates that a variation is valid for the content type.
         /// </summary>
-        bool ValidateVariation(int? languageId, string segment, bool throwIfInvalid);
+        bool ValidateVariation(string culture, string segment, bool throwIfInvalid);
 
         /// <summary>
         /// Gets or Sets a list of integer Ids of the ContentTypes allowed under the ContentType

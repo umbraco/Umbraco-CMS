@@ -21,7 +21,7 @@
         /// <para>Other caches that get their raw value from the database would consider that a property has "no
         /// value" if it is missing, null, or an empty string (including whitespace-only).</para>
         /// </remarks>
-        bool HasValue(int? languageId = null, string segment = null);
+        bool HasValue(string culture = null, string segment = null);
 
         /// <summary>
         /// Gets the source value of the property.
@@ -35,7 +35,7 @@
         /// <para>If you're using that value, you're probably wrong, unless you're doing some internal
         /// Umbraco stuff.</para>
         /// </remarks>
-        object GetSourceValue(int? languageId = null, string segment = null);
+        object GetSourceValue(string culture = null, string segment = null);
 
         /// <summary>
         /// Gets the object value of the property.
@@ -45,7 +45,7 @@
         /// <para>It can be null, or any type of CLR object.</para>
         /// <para>It has been fully prepared and processed by the appropriate converter.</para>
         /// </remarks>
-        object GetValue(int? languageId = null, string segment = null);
+        object GetValue(string culture = null, string segment = null);
 
         /// <summary>
         /// Gets the XPath value of the property.
@@ -55,6 +55,6 @@
         /// <para>It must be either null, or a string, or an XPathNavigator.</para>
         /// <para>It has been fully prepared and processed by the appropriate converter.</para>
         /// </remarks>
-        object GetXPathValue(int? languageId = null, string segment = null);
+        object GetXPathValue(string culture = null, string segment = null);
     }
 }

@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Repositories
         ILanguage GetByCultureName(string cultureName);
         ILanguage GetByIsoCode(string isoCode);
 
-        int GetIdByIsoCode(string isoCode);
-        string GetIsoCodeById(int id);
+        int? GetIdByIsoCode(string isoCode);
+        string GetIsoCodeById(int? id);
     }
 }

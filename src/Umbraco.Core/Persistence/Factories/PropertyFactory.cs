@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Factories
 {
     internal static class PropertyFactory
     {
-        public static IEnumerable<Property> BuildEntities(PropertyType[] propertyTypes, IReadOnlyCollection<PropertyDataDto> dtos, int publishedVersionId)
+        public static IEnumerable<Property> BuildEntities(PropertyType[] propertyTypes, IReadOnlyCollection<PropertyDataDto> dtos, int publishedVersionId, ILanguageRepository languageRepository)
         {
             var properties = new List<Property>();
             var xdtos = dtos.GroupBy(x => x.PropertyTypeId).ToDictionary(x => x.Key, x => (IEnumerable<PropertyDataDto>) x);
@@ -26,7 +28,7 @@ namespace Umbraco.Core.Persistence.Factories
                     if (xdtos.TryGetValue(propertyType.Id, out var propDtos))
                     {
                         foreach (var propDto in propDtos)
-                            property.FactorySetValue(propDto.LanguageId, propDto.Segment, propDto.VersionId == publishedVersionId, propDto.Value);
+                            property.FactorySetValue(languageRepository.GetIsoCodeById(propDto.LanguageId), propDto.Segment, propDto.VersionId == publishedVersionId, propDto.Value);
                     }
 
                     property.ResetDirtyProperties(false);
@@ -41,12 +43,12 @@ namespace Umbraco.Core.Persistence.Factories
             return properties;
         }
 
-        private static PropertyDataDto BuildDto(int versionId, Property property, int? nLanguageId, string segment, object value)
+        private static PropertyDataDto BuildDto(int versionId, Property property, int? languageId, string segment, object value)
         {
             var dto = new PropertyDataDto { VersionId = versionId, PropertyTypeId = property.PropertyTypeId };
 
-            if (nLanguageId.HasValue)
-                dto.LanguageId = nLanguageId;
+            if (languageId.HasValue)
+                dto.LanguageId = languageId;
 
             if (segment != null)
                 dto.Segment = segment;
@@ -88,7 +90,7 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        public static IEnumerable<PropertyDataDto> BuildDtos(int currentVersionId, int publishedVersionId, IEnumerable<Property> properties, out bool edited)
+        public static IEnumerable<PropertyDataDto> BuildDtos(int currentVersionId, int publishedVersionId, IEnumerable<Property> properties, ILanguageRepository languageRepository, out bool edited)
         {
             var propertyDataDtos = new List<PropertyDataDto>();
             edited = false;
@@ -102,15 +104,15 @@ namespace Umbraco.Core.Persistence.Factories
                     {
                         // deal with published value
                         if (propertyValue.PublishedValue != null && publishedVersionId > 0)
-                            propertyDataDtos.Add(BuildDto(publishedVersionId, property, propertyValue.LanguageId, propertyValue.Segment, propertyValue.PublishedValue));
+                            propertyDataDtos.Add(BuildDto(publishedVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.PublishedValue));
 
                         // deal with edit value
                         if (propertyValue.EditedValue != null)
-                            propertyDataDtos.Add(BuildDto(currentVersionId, property, propertyValue.LanguageId, propertyValue.Segment, propertyValue.EditedValue));
+                            propertyDataDtos.Add(BuildDto(currentVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
 
                         // deal with missing edit value (fix inconsistencies)
                         else if (propertyValue.PublishedValue != null)
-                            propertyDataDtos.Add(BuildDto(currentVersionId, property, propertyValue.LanguageId, propertyValue.Segment, propertyValue.PublishedValue));
+                            propertyDataDtos.Add(BuildDto(currentVersionId, property,  languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.PublishedValue));
 
                         // use explicit equals here, else object comparison fails at comparing eg strings
                         var sameValues = propertyValue.PublishedValue == null ? propertyValue.EditedValue == null : propertyValue.PublishedValue.Equals(propertyValue.EditedValue);
@@ -123,7 +125,7 @@ namespace Umbraco.Core.Persistence.Factories
                     {
                         // not publishing = only deal with edit values
                         if (propertyValue.EditedValue != null)
-                            propertyDataDtos.Add(BuildDto(currentVersionId, property, propertyValue.LanguageId, propertyValue.Segment, propertyValue.EditedValue));
+                            propertyDataDtos.Add(BuildDto(currentVersionId, property,  languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
                     }
                     edited = true;
                 }

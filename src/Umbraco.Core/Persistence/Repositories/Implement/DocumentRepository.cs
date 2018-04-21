@@ -25,19 +25,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
         private readonly ITagRepository _tagRepository;
-        private readonly ILanguageRepository _languageRepository;
         private readonly CacheHelper _cacheHelper;
         private PermissionRepository<IContent> _permissionRepository;
         private readonly ContentByGuidReadRepository _contentByGuidReadRepository;
         private readonly IScopeAccessor _scopeAccessor;
 
         public DocumentRepository(IScopeAccessor scopeAccessor, CacheHelper cacheHelper, ILogger logger, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IContentSection settings)
-            : base(scopeAccessor, cacheHelper, logger)
+            : base(scopeAccessor, cacheHelper, languageRepository, logger)
         {
             _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
             _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
-            _languageRepository = languageRepository;
             _cacheHelper = cacheHelper;
             _scopeAccessor = scopeAccessor;
             _contentByGuidReadRepository = new ContentByGuidReadRepository(this, scopeAccessor, cacheHelper, logger);
@@ -317,7 +315,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(content.VersionId, content.PublishedVersionId, entity.Properties, out var edited);
+            var propertyDataDtos = PropertyFactory.BuildDtos(content.VersionId, content.PublishedVersionId, entity.Properties, LanguageRepository, out var edited);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -462,7 +460,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var deletePropertyDataSql = Sql().Delete<PropertyDataDto>().WhereIn<PropertyDataDto>(x => x.VersionId, versionToDelete);
             Database.Execute(deletePropertyDataSql);
 
-            var propertyDataDtos = PropertyFactory.BuildDtos(content.VersionId, publishing ? content.PublishedVersionId : 0, entity.Properties, out var edited);
+            var propertyDataDtos = PropertyFactory.BuildDtos(content.VersionId, publishing ? content.PublishedVersionId : 0, entity.Properties, LanguageRepository, out var edited);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -904,12 +902,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (variations.TryGetValue(content.VersionId, out var variation))
                 foreach (var v in variation)
                 {
-                    content.SetName(v.LanguageId, v.Name);
+                    content.SetName(v.Culture, v.Name);
                 }
             if (content.PublishedVersionId > 0 && variations.TryGetValue(content.PublishedVersionId, out variation))
                 foreach (var v in variation)
                 {
-                    content.SetPublishName(v.LanguageId, v.Name);
+                    content.SetPublishName(v.Culture, v.Name);
                 }
         }
 
@@ -940,7 +938,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 variation.Add(new CultureVariation
                 {
-                    LanguageId = dto.LanguageId,
+                    Culture = LanguageRepository.GetIsoCodeById(dto.LanguageId),
                     Name = dto.Name,
                     Available = dto.Available
                 });
@@ -955,7 +953,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 yield return new ContentVersionCultureVariationDto
                 {
                     VersionId = content.VersionId,
-                    LanguageId = culture,
+                    LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Name = name
                 };
 
@@ -965,14 +963,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 yield return new ContentVersionCultureVariationDto
                 {
                     VersionId = content.PublishedVersionId,
-                    LanguageId = culture,
+                    LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Name = name
                 };
         }
 
         private class CultureVariation
         {
-            public int LanguageId { get; set; }
+            public string Culture { get; set; }
             public string Name { get; set; }
             public bool Available { get; set; }
         }

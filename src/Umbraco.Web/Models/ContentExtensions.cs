@@ -96,6 +96,5 @@ namespace Umbraco.Web.Models
             var defaultLanguage = localizationService.GetAllLanguages().FirstOrDefault();
             return defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.IsoCode);
         }
-
     }
 }

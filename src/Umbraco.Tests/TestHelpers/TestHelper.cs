@@ -140,8 +140,8 @@ namespace Umbraco.Tests.TestHelpers
             {
                 // compare values
                 var actualProperty = (Property) actual;
-                var expectedPropertyValues = expectedProperty.Values.OrderBy(x => x.LanguageId).ThenBy(x => x.Segment).ToArray();
-                var actualPropertyValues = actualProperty.Values.OrderBy(x => x.LanguageId).ThenBy(x => x.Segment).ToArray();
+                var expectedPropertyValues = expectedProperty.Values.OrderBy(x => x.Culture).ThenBy(x => x.Segment).ToArray();
+                var actualPropertyValues = actualProperty.Values.OrderBy(x => x.Culture).ThenBy(x => x.Segment).ToArray();
                 if (expectedPropertyValues.Length != actualPropertyValues.Length)
                     Assert.Fail($"{property.DeclaringType.Name}.{property.Name}: Expected {expectedPropertyValues.Length} but got {actualPropertyValues.Length}.");
                 for (var i = 0; i < expectedPropertyValues.Length; i++)
