@@ -255,10 +255,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public bool IsCultureAvailable(string culture)
-            => !string.IsNullOrWhiteSpace(GetName(culture));
-
-        /// <inheritdoc />
         public bool IsCulturePublished(string culture)
             => !string.IsNullOrWhiteSpace(GetPublishName(culture));
 

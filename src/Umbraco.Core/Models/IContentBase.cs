@@ -55,6 +55,15 @@ namespace Umbraco.Core.Models
         IReadOnlyDictionary<string, string> Names { get; set; }
 
         /// <summary>
+        /// Gets a value indicating whether a given culture is available.
+        /// </summary>
+        /// <remarks>
+        /// <para>A culture becomes available whenever the content name for this culture is
+        /// non-null, and it becomes unavailable whenever the content name is null.</para>
+        /// </remarks>
+        bool IsCultureAvailable(string culture);
+
+        /// <summary>
         /// List of properties, which make up all the data available for this Content object
         /// </summary>
         /// <remarks>Properties are loaded as part of the Content object graph</remarks>

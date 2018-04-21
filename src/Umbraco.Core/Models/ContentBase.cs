@@ -121,6 +121,22 @@ namespace Umbraco.Core.Models
             }
         }
 
+        /// <summary>
+        /// Gets the enumeration of property groups for the entity.
+        /// fixme is a proxy, kill this
+        /// </summary>
+        [IgnoreDataMember]
+        public IEnumerable<PropertyGroup> PropertyGroups => ContentTypeBase.CompositionPropertyGroups;
+
+        /// <summary>
+        /// Gets the numeration of property types for the entity.
+        /// fixme is a proxy, kill this
+        /// </summary>
+        [IgnoreDataMember]
+        public IEnumerable<PropertyType> PropertyTypes => ContentTypeBase.CompositionPropertyTypes;
+
+        #region Cultures
+
         /// <inheritdoc />
         [DataMember]
         public virtual IReadOnlyDictionary<string, string> Names
@@ -158,6 +174,18 @@ namespace Umbraco.Core.Models
             OnPropertyChanged(Ps.Value.NamesSelector);
         }
 
+        /// <inheritdoc />
+        public virtual string GetName(string culture)
+        {
+            if (culture == null) return Name;
+            if (_names == null) return null;
+            return _names.TryGetValue(culture, out var name) ? name : null;
+        }
+
+        /// <inheritdoc />
+        public bool IsCultureAvailable(string culture)
+            => !string.IsNullOrWhiteSpace(GetName(culture));
+
         private void ClearName(string culture)
         {
             if (culture == null)
@@ -178,27 +206,7 @@ namespace Umbraco.Core.Models
             OnPropertyChanged(Ps.Value.NamesSelector);
         }
 
-        /// <inheritdoc />
-        public virtual string GetName(string culture)
-        {
-            if (culture == null) return Name;
-            if (_names == null) return null;
-            return _names.TryGetValue(culture, out var name) ? name : null;
-        }
-
-        /// <summary>
-        /// Gets the enumeration of property groups for the entity.
-        /// fixme is a proxy, kill this
-        /// </summary>
-        [IgnoreDataMember]
-        public IEnumerable<PropertyGroup> PropertyGroups => ContentTypeBase.CompositionPropertyGroups;
-
-        /// <summary>
-        /// Gets the numeration of property types for the entity.
-        /// fixme is a proxy, kill this
-        /// </summary>
-        [IgnoreDataMember]
-        public IEnumerable<PropertyType> PropertyTypes => ContentTypeBase.CompositionPropertyTypes;
+        #endregion
 
         #region Has, Get, Set, Publish Property Value
 

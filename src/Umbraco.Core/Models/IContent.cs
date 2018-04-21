@@ -81,15 +81,6 @@ namespace Umbraco.Core.Models
         ContentStatus Status { get; }
 
         /// <summary>
-        /// Gets a value indicating whether a given culture is available.
-        /// </summary>
-        /// <remarks>
-        /// <para>A culture becomes available whenever the content name for this culture is
-        /// non-null, and it becomes unavailable whenever the content name is null.</para>
-        /// </remarks>
-        bool IsCultureAvailable(string culture);
-
-        /// <summary>
         /// Gets a value indicating whether a given culture is published.
         /// </summary>
         /// <remarks>
