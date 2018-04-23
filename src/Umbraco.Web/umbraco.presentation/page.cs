@@ -201,7 +201,7 @@ namespace umbraco
         /// <param name="node"></param>
         void PopulateElementData(IPublishedContent node)
         {
-            foreach(var p in node.Properties)
+            foreach (var p in node.Properties)
             {
                 if (_elements.ContainsKey(p.Alias) == false)
                 {
@@ -408,6 +408,7 @@ namespace umbraco
             private readonly PublishedContentType _contentType;
             private readonly IPublishedProperty[] _properties;
             private readonly IPublishedContent _parent;
+            private IReadOnlyDictionary<string, PublishedCultureName> _cultureNames;
 
             private PagePublishedContent(int id)
             {
@@ -469,6 +470,31 @@ namespace umbraco
             public string Name
             {
                 get { return _inner.Name; }
+            }
+
+            public IReadOnlyDictionary<string, PublishedCultureName> CultureNames
+            {
+                get
+                {
+                    if (!_inner.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
+                        return null;
+
+                    if (_cultureNames == null)
+                    {
+                        var d = new Dictionary<string, PublishedCultureName>();
+                        //fixme this will not be necessary when the IContentBase.Names is a string based dictionary
+                        var langs = Current.Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.Id, x => x.IsoCode);
+                        foreach (var c in _inner.Names)
+                        {
+                            if (langs.TryGetValue(c.Key, out var lang))
+                            {
+                                d[lang] = new PublishedCultureName(c.Value, c.Value.ToUrlSegment());
+                            }
+                        }
+                        _cultureNames = d;
+                    }
+                    return _cultureNames;
+                }
             }
 
             public string UrlName

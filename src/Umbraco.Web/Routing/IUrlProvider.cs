@@ -21,7 +21,7 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
         /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
         /// </remarks>
-        string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode);
+        string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string language = null);
 
         /// <summary>
         /// Gets the other urls of a published content.

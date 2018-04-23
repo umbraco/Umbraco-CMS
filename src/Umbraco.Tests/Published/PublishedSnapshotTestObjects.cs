@@ -66,6 +66,7 @@ namespace Umbraco.Tests.Published
             public int TemplateId { get; set; }
             public int SortOrder { get; set; }
             public string Name { get; set; }
+            public IReadOnlyDictionary<string, PublishedCultureName> CultureNames => throw new NotSupportedException();
             public string UrlName { get; set; }
             public string DocumentTypeAlias => ContentType.Alias;
             public int DocumentTypeId { get; set; }

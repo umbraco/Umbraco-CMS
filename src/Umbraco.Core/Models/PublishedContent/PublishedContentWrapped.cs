@@ -56,6 +56,8 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public virtual string Name => _content.Name;
 
+        public virtual IReadOnlyDictionary<string, PublishedCultureName> CultureNames => _content.CultureNames;
+
         public virtual string UrlName => _content.UrlName;
 
         public virtual string DocumentTypeAlias => _content.DocumentTypeAlias;

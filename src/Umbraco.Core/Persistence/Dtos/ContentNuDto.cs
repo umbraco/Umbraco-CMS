@@ -16,6 +16,12 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("published")]
         public bool Published { get; set; }
 
+        /// <summary>
+        /// Stores serialized JSON representing the content item's property and culture name values
+        /// </summary>
+        /// <remarks>
+        /// Pretty much anything that would require a 1:M lookup is serialized here
+        /// </remarks>
         [Column("data")]
         [SpecialDbType(SpecialDbTypes.NTEXT)]
         public string Data { get; set; }

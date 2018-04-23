@@ -39,7 +39,7 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The route.</returns>
         /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
-        string GetRouteById(bool preview, int contentId);
+        string GetRouteById(bool preview, int contentId, string language = null);
 
         /// <summary>
         /// Gets the route for a content identified by its unique identifier.
@@ -47,6 +47,6 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The route.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-        string GetRouteById(int contentId);
+        string GetRouteById(int contentId, string language = null);
     }
 }

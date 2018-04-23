@@ -207,7 +207,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // plug
             ContentTypeService.UowRefreshedEntity += OnContentTypeRefreshedEntity;
-            MediaTypeService.UowRefreshedEntity+= OnMediaTypeRefreshedEntity;
+            MediaTypeService.UowRefreshedEntity += OnMediaTypeRefreshedEntity;
             MemberTypeService.UowRefreshedEntity += OnMemberTypeRefreshedEntity;
         }
 
@@ -721,7 +721,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void Notify<T>(ContentStore store, ContentTypeCacheRefresher.JsonPayload[] payloads, Action<IEnumerable<int>, IEnumerable<int>, IEnumerable<int>, IEnumerable<int>> action)
         {
-            var nameOfT = typeof (T).Name;
+            var nameOfT = typeof(T).Name;
 
             var removedIds = new List<int>();
             var refreshedIds = new List<int>();
@@ -793,7 +793,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
             }
 
-            ((PublishedShapshot) CurrentPublishedShapshot).Resync();
+            ((PublishedShapshot)CurrentPublishedShapshot).Resync();
         }
 
         public override void Notify(DomainCacheRefresher.JsonPayload[] payloads)
@@ -993,7 +993,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // a MaxValue to make sure this one runs last, and it should be ok
                     scopeContext.Enlist("Umbraco.Web.PublishedCache.NuCache.PublishedSnapshotService.Resync", () => this, (completed, svc) =>
                     {
-                        ((PublishedShapshot) svc.CurrentPublishedShapshot).Resync();
+                        ((PublishedShapshot)svc.CurrentPublishedShapshot).Resync();
                     }, int.MaxValue);
                 }
 
@@ -1015,7 +1015,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             return new PublishedShapshot.PublishedSnapshotElements
             {
-                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, new DomainHelper(domainCache), _globalSettings),
+                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, new DomainHelper(domainCache), _globalSettings, _serviceContext.LocalizationService),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, snapshotCache, elementsCache),
                 MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, _serviceContext.DataTypeService, _serviceContext.LocalizationService, memberTypeCache, PublishedSnapshotAccessor),
                 DomainCache = domainCache,
@@ -1079,7 +1079,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private static bool HasChangesImpactingAllVersions(IContent icontent)
         {
-            var content = (Content) icontent;
+            var content = (Content)icontent;
 
             // UpdateDate will be dirty
             // Published may be dirty if saving a Published entity
@@ -1093,7 +1093,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private void OnContentRefreshedEntity(DocumentRepository sender, DocumentRepository.ScopedEntityEventArgs args)
         {
             var db = args.Scope.Database;
-            var content = (Content) args.Entity;
+            var content = (Content)args.Entity;
 
             // always refresh the edited data
             OnRepositoryRefreshed(db, content, false);
@@ -1168,14 +1168,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 RebuildMemberDbCache(contentTypeIds: memberTypeIds);
         }
 
-        private static ContentNuDto GetDto(IContentBase content, bool published)
+        private ContentNuDto GetDto(IContentBase content, bool published)
         {
             // should inject these in ctor
             // BUT for the time being we decide not to support ConvertDbToXml/String
             //var propertyEditorResolver = PropertyEditorResolver.Current;
             //var dataTypeService = ApplicationContext.Current.Services.DataTypeService;
 
-            var data = new Dictionary<string, PropertyData[]>();
+            //the dictionary that will be serialized
+            var data = new ContentSerializedData();
+
+            var propertyData = new Dictionary<string, PropertyData[]>();
             foreach (var prop in content.Properties)
             {
                 var pdatas = new List<PropertyData>();
@@ -1206,8 +1209,27 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     //        value = e.ValueEditor.ConvertDbToString(prop, prop.PropertyType, dataTypeService);
                     //}
                 }
-                data[prop.Alias] = pdatas.ToArray();
+                propertyData[prop.Alias] = pdatas.ToArray();
             }
+
+            data.PropertyData = propertyData;
+
+            var cultureData = new Dictionary<string, CultureVariation>();
+            if (content.Names != null)
+            {
+                //fixme - when this stores a culture name reference we don't need this lookup anymore
+                var keys = content.Names.Keys;
+                var langs = _serviceContext.LocalizationService.GetAllLanguages().ToDictionary(x => x.Id, x => x.IsoCode);
+                foreach (var name in content.Names)
+                {
+                    if (langs.TryGetValue(name.Key, out var found))
+                    {
+                        cultureData[found] = new CultureVariation { Name = name.Value };
+                    }
+                }
+            }
+
+            data.CultureData = cultureData;
 
             var dto = new ContentNuDto
             {

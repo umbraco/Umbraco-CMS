@@ -68,12 +68,12 @@ namespace Umbraco.Tests.PublishedContent
             throw new NotImplementedException();
         }
 
-        public string GetRouteById(bool preview, int contentId)
+        public string GetRouteById(bool preview, int contentId, string language = null)
         {
             throw new NotImplementedException();
         }
 
-        public string GetRouteById(int contentId)
+        public string GetRouteById(int contentId, string language = null)
         {
             throw new NotImplementedException();
         }
@@ -177,6 +177,7 @@ namespace Umbraco.Tests.PublishedContent
         public int TemplateId { get; set; }
         public int SortOrder { get; set; }
         public string Name { get; set; }
+        public IReadOnlyDictionary<string, PublishedCultureName> CultureNames => throw new NotSupportedException();
         public string UrlName { get; set; }
         public string DocumentTypeAlias { get; private set; }
         public int DocumentTypeId { get; private set; }

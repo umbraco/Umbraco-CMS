@@ -18,7 +18,7 @@ namespace Umbraco.Web.Routing
         /// <param name="current"></param>
         /// <param name="mode"></param>
         /// <returns></returns>
-        public string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode)
+        public string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string language = null)
         {
             if (umbracoContext == null) return null;
             if (umbracoContext.PublishedRequest == null) return null;

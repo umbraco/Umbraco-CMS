@@ -112,7 +112,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return GetByRoute(PreviewDefault, route, hideTopLevelNode);
         }
 
-        public virtual string GetRouteById(bool preview, int contentId)
+        public virtual string GetRouteById(bool preview, int contentId, string language = null)
         {
             // try to get from cache if not previewing
             var route = preview || _routesCache == null ? null : _routesCache.GetRoute(contentId);
@@ -137,9 +137,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return route;
         }
 
-        public string GetRouteById(int contentId)
+        public string GetRouteById(int contentId, string language = null)
         {
-            return GetRouteById(PreviewDefault, contentId);
+            return GetRouteById(PreviewDefault, contentId, language);
         }
 
         IPublishedContent DetermineIdByRoute(bool preview, string route, bool hideTopLevelNode)

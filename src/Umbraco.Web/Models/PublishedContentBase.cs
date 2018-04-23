@@ -94,6 +94,8 @@ namespace Umbraco.Web.Models
         public abstract int TemplateId { get; }
         public abstract int SortOrder { get; }
         public abstract string Name { get; }
+        //TODO: On the base ContentData instance this dictionary contains a CultureVariation, should we expose that model here or a different model?
+        public abstract IReadOnlyDictionary<string, PublishedCultureName> CultureNames { get; }
         public abstract string UrlName { get; }
         public abstract string DocumentTypeAlias { get; }
         public abstract int DocumentTypeId { get; }

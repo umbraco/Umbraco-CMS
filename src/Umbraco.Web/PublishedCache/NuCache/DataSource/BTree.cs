@@ -83,6 +83,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         class ContentDataSerializer : ISerializer<ContentData>
         {
             private static readonly DictionaryOfPropertyDataSerializer PropertiesSerializer = new DictionaryOfPropertyDataSerializer();
+            private static readonly DictionaryOfCultureVariationSerializer CultureVariationsSerializer = new DictionaryOfCultureVariationSerializer();
 
             public ContentData ReadFrom(Stream stream)
             {
@@ -94,7 +95,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     VersionDate = PrimitiveSerializer.DateTime.ReadFrom(stream),
                     WriterId = PrimitiveSerializer.Int32.ReadFrom(stream),
                     TemplateId = PrimitiveSerializer.Int32.ReadFrom(stream),
-                    Properties = PropertiesSerializer.ReadFrom(stream)
+                    Properties = PropertiesSerializer.ReadFrom(stream),
+                    CultureInfos = CultureVariationsSerializer.ReadFrom(stream)
                 };
             }
 
@@ -107,6 +109,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 PrimitiveSerializer.Int32.WriteTo(value.WriterId, stream);
                 PrimitiveSerializer.Int32.WriteTo(value.TemplateId, stream);
                 PropertiesSerializer.WriteTo(value.Properties, stream);
+                CultureVariationsSerializer.WriteTo(value.CultureInfos, stream);
             }
         }
 
@@ -130,6 +133,69 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             }
         }
         */
+
+        private class DictionaryOfCultureVariationSerializer : ISerializer<IReadOnlyDictionary<string, CultureVariation>>
+        {
+            public IReadOnlyDictionary<string, CultureVariation> ReadFrom(Stream stream)
+            {
+                var dict = new Dictionary<string, CultureVariation>();
+
+                // read values count
+                var pcount = PrimitiveSerializer.Int32.ReadFrom(stream);
+
+                // read each property
+                for (var i = 0; i < pcount; i++)
+                {
+                    // read lang id
+                    // fixme: This will need to change to string when stephane is done his culture work
+                    var key = PrimitiveSerializer.String.ReadFrom(stream);
+
+                    var val = new CultureVariation();
+
+                    // read variation info
+                    //TODO: This is supporting multiple properties but we only have one currently
+                    var type = PrimitiveSerializer.Char.ReadFrom(stream);
+                    switch(type)
+                    {
+                        case 'N':
+                            val.Name = PrimitiveSerializer.String.ReadFrom(stream);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    
+                    dict[key] = val;
+                }
+                return dict;
+            }
+
+            private static readonly IReadOnlyDictionary<string, CultureVariation> Empty = new Dictionary<string, CultureVariation>();
+
+            public void WriteTo(IReadOnlyDictionary<string, CultureVariation> value, Stream stream)
+            {
+                var valToSerialize = value;
+                if (valToSerialize == null)
+                {
+                    valToSerialize = Empty;
+                }
+
+                // write values count
+                PrimitiveSerializer.Int32.WriteTo(valToSerialize.Count, stream);
+
+                // write each name
+                foreach (var kvp in valToSerialize)
+                {
+                    // write alias
+                    PrimitiveSerializer.String.WriteTo(kvp.Key, stream);
+
+                    // write name
+                    PrimitiveSerializer.Char.WriteTo('N', stream);
+                    PrimitiveSerializer.String.WriteTo(kvp.Value.Name, stream);
+                    //TODO: This is supporting multiple properties but we only have one currently
+                }
+            }
+            
+        }
 
         private class DictionaryOfPropertyDataSerializer : ISerializer<IDictionary<string, PropertyData[]>>
         {

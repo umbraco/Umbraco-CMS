@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
@@ -18,6 +19,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         internal readonly ContentData _contentData; // internal for ContentNode cloning
 
         private readonly string _urlName;
+        private IReadOnlyDictionary<string, PublishedCultureName> _cultureNames;
 
         #region Constructors
 
@@ -44,7 +46,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var cache = GetCurrentSnapshotCache();
             return cache == null
                 ? GetProfileNameByIdNoCache(id)
-                : (string) cache.GetCacheItem(CacheKeys.ProfileName(id), () => GetProfileNameByIdNoCache(id));
+                : (string)cache.GetCacheItem(CacheKeys.ProfileName(id), () => GetProfileNameByIdNoCache(id));
         }
 
         private static string GetProfileNameByIdNoCache(int id)
@@ -88,7 +90,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IsPreviewing = true;
 
             // clone properties so _isPreviewing is true
-            PropertiesArray = origin.PropertiesArray.Select(x => (IPublishedProperty) new Property((Property) x, this)).ToArray();
+            PropertiesArray = origin.PropertiesArray.Select(x => (IPublishedProperty)new Property((Property)x, this)).ToArray();
         }
 
         #endregion
@@ -157,6 +159,25 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override PublishedItemType ItemType => _contentNode.ContentType.ItemType;
 
         public override string Name => _contentData.Name;
+        public override IReadOnlyDictionary<string, PublishedCultureName> CultureNames
+        {
+            get
+            {
+                if (!ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
+                    return null;
+
+                if (_cultureNames == null)
+                {
+                    var d = new Dictionary<string, PublishedCultureName>();
+                    foreach(var c in _contentData.CultureInfos)
+                    {
+                        d[c.Key] = new PublishedCultureName(c.Value.Name, c.Value.Name.ToUrlSegment());
+                    }
+                    _cultureNames = d;
+                }
+                return _cultureNames;
+            }
+        }
         public override int Level => _contentNode.Level;
         public override string Path => _contentNode.Path;
         public override int SortOrder => _contentNode.SortOrder;
@@ -205,7 +226,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     return GetChildren();
 
                 // note: ToArray is important here, we want to cache the result, not the function!
-                return (IEnumerable<IPublishedContent>) cache.GetCacheItem(ChildrenCacheKey, () => GetChildren().ToArray());
+                return (IEnumerable<IPublishedContent>)cache.GetCacheItem(ChildrenCacheKey, () => GetChildren().ToArray());
             }
         }
 
@@ -250,8 +271,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (cache == null)
                 return base.GetProperty(alias, true);
 
-            var key = ((Property) property).RecurseCacheKey;
-            return (Property) cache.GetCacheItem(key, () => base.GetProperty(alias, true));
+            var key = ((Property)property).RecurseCacheKey;
+            return (Property)cache.GetCacheItem(key, () => base.GetProperty(alias, true));
         }
 
         public override PublishedContentType ContentType => _contentNode.ContentType;
@@ -263,7 +284,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // beware what you use that one for - you don't want to cache its result
         private ICacheProvider GetAppropriateCache()
         {
-            var publishedSnapshot = (PublishedShapshot) _publishedSnapshotAccessor.PublishedSnapshot;
+            var publishedSnapshot = (PublishedShapshot)_publishedSnapshotAccessor.PublishedSnapshot;
             var cache = publishedSnapshot == null
                 ? null
                 : ((IsPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && (ItemType != PublishedItemType.Member)
@@ -274,7 +295,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private ICacheProvider GetCurrentSnapshotCache()
         {
-            var publishedSnapshot = (PublishedShapshot) _publishedSnapshotAccessor.PublishedSnapshot;
+            var publishedSnapshot = (PublishedShapshot)_publishedSnapshotAccessor.PublishedSnapshot;
             return publishedSnapshot?.SnapshotCache;
         }
 
@@ -311,7 +332,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var cache = GetAppropriateCache();
             if (cache == null) return new PublishedContent(this).CreateModel();
-            return (IPublishedContent) cache.GetCacheItem(AsPreviewingCacheKey, () => new PublishedContent(this).CreateModel());
+            return (IPublishedContent)cache.GetCacheItem(AsPreviewingCacheKey, () => new PublishedContent(this).CreateModel());
         }
 
         // used by Navigable.Source,...

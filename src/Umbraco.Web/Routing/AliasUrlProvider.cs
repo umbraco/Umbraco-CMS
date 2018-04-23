@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 
@@ -16,11 +17,13 @@ namespace Umbraco.Web.Routing
     {
         private readonly IGlobalSettings _globalSettings;
         private readonly IRequestHandlerSection _requestConfig;
+        private readonly ILocalizationService _localizationService;
 
-        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig)
+        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ILocalizationService localizationService)
         {
             _globalSettings = globalSettings;
             _requestConfig = requestConfig;
+            _localizationService = localizationService;
         }
 
         // note - at the moment we seem to accept pretty much anything as an alias
@@ -42,7 +45,7 @@ namespace Umbraco.Web.Routing
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
         /// </remarks>
-        public string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode)
+        public string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string language = null)
         {
             return null; // we have nothing to say
         }
@@ -68,10 +71,10 @@ namespace Umbraco.Web.Routing
                 return Enumerable.Empty<string>(); // we have nothing to say
 
             var node = umbracoContext.ContentCache.GetById(id);
-            string umbracoUrlName = null;
-            if (node.HasProperty(Constants.Conventions.Content.UrlAlias))
-                umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias);
-            if (string.IsNullOrWhiteSpace(umbracoUrlName))
+            if (node == null)
+                return Enumerable.Empty<string>();
+
+            if (!node.HasProperty(Constants.Conventions.Content.UrlAlias))
                 return Enumerable.Empty<string>();
 
             var domainHelper = new DomainHelper(umbracoContext.PublishedShapshot.Domains);
@@ -85,17 +88,30 @@ namespace Umbraco.Web.Routing
                 domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current, false);
             }
 
-            var path = "/" + umbracoUrlName;
-
             if (domainUris == null)
             {
+                var path = "/" + node.Value<string>(Constants.Conventions.Content.UrlAlias);
                 var uri = new Uri(path, UriKind.Relative);
                 return new[] { UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString() };
             }
+            else
+            {
+                var result = new List<string>();
+                var languageIds = new List<int?>(domainUris.Select(x => _localizationService.GetLanguageByCultureCode(x.Culture.Name)?.Id).Where(x => x.HasValue));
+                foreach (var langId in languageIds)
+                {
+                    var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias, languageId: langId);
+                    if (!string.IsNullOrWhiteSpace(umbracoUrlName))
+                    {
+                        var path = "/" + umbracoUrlName;
 
-            return domainUris
-                .Select(domainUri => new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path)))
-                .Select(uri => UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
+                        result.AddRange(domainUris
+                            .Select(domainUri => new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path)))
+                            .Select(uri => UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString()));
+                    }
+                }
+                return result;
+            }
         }
 
         #endregion

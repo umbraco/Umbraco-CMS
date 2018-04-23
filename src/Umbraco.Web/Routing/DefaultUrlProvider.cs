@@ -37,13 +37,13 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
         /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
         /// </remarks>
-        public virtual string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode)
+        public virtual string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string language = null)
         {
             if (!current.IsAbsoluteUri)
                 throw new ArgumentException("Current url must be absolute.", "current");
 
             // will not use cache if previewing
-            var route = umbracoContext.ContentCache.GetRouteById(id);
+            var route = umbracoContext.ContentCache.GetRouteById(id, language);
 
             return GetUrlFromRoute(route, umbracoContext, id, current, mode);
         }

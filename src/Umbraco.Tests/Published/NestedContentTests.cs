@@ -273,6 +273,7 @@ namespace Umbraco.Tests.Published
             public override int TemplateId { get; }
             public override int SortOrder { get; }
             public override string Name { get; }
+            public override IReadOnlyDictionary<string, PublishedCultureName> CultureNames => throw new NotSupportedException();
             public override string UrlName { get; }
             public override string DocumentTypeAlias { get; }
             public override int DocumentTypeId { get; }

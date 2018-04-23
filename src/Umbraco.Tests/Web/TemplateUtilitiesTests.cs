@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Web
 
             //setup a mock url provider which we'll use fo rtesting
             var testUrlProvider = new Mock<IUrlProvider>();
-            testUrlProvider.Setup(x => x.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>()))
+            testUrlProvider.Setup(x => x.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>()))
                 .Returns((UmbracoContext umbCtx, int id, Uri url, UrlProviderMode mode) =>
                 {
                     return "/my-test-url";

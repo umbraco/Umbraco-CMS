@@ -25,10 +25,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ICacheProvider _elementsCache;
         private readonly DomainHelper _domainHelper;
         private readonly IGlobalSettings _globalSettings;
+        private readonly ILocalizationService _localizationService;
 
         #region Constructor
 
-        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider snapshotCache, ICacheProvider elementsCache, DomainHelper domainHelper, IGlobalSettings globalSettings)
+        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider snapshotCache, ICacheProvider elementsCache, DomainHelper domainHelper, IGlobalSettings globalSettings, ILocalizationService localizationService)
             : base(previewDefault)
         {
             _snapshot = snapshot;
@@ -36,6 +37,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _elementsCache = elementsCache;
             _domainHelper = domainHelper;
             _globalSettings = globalSettings;
+            _localizationService = localizationService;
         }
 
         private bool HideTopLevelNodeFromPath => _globalSettings.HideTopLevelNodeFromPath;
@@ -118,19 +120,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return content;
         }
 
-        public string GetRouteById(int contentId)
+        public string GetRouteById(int contentId, string language = null)
         {
-            return GetRouteById(PreviewDefault, contentId);
+            return GetRouteById(PreviewDefault, contentId, language);
         }
 
-        public string GetRouteById(bool preview, int contentId)
+        public string GetRouteById(bool preview, int contentId, string language = null)
         {
             var cache = (preview == false || PublishedSnapshotService.FullCacheWhenPreviewing) ? _elementsCache : _snapshotCache;
-            var key = CacheKeys.ContentCacheRouteByContent(contentId, preview);
-            return cache.GetCacheItem<string>(key, () => GetRouteByIdInternal(preview, contentId, null));
+            var key = CacheKeys.ContentCacheRouteByContent(contentId, preview, language);
+            return cache.GetCacheItem<string>(key, () => GetRouteByIdInternal(preview, contentId, null, language));
         }
 
-        private string GetRouteByIdInternal(bool preview, int contentId, bool? hideTopLevelNode)
+        private string GetRouteByIdInternal(bool preview, int contentId, bool? hideTopLevelNode, string language)
         {
             var node = GetById(preview, contentId);
             if (node == null)
@@ -146,7 +148,23 @@ namespace Umbraco.Web.PublishedCache.NuCache
             while (hasDomains == false && n != null) // n is null at root
             {
                 // get the url
-                var urlName = n.UrlName;
+                string urlName;
+                if (n.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
+                {
+                    var cultureCode = language != null
+                        ? language
+                        : _localizationService.GetDefaultVariantLanguage()?.IsoCode;
+
+                    if (n.CultureNames.TryGetValue(cultureCode, out var cultureName))
+                        urlName = cultureName.UrlName;
+                    else
+                        urlName = n.UrlName; //couldn't get the value, fallback to invariant ... not sure what else to do
+                }
+                else
+                {
+                    urlName = n.UrlName;
+                }
+
                 pathParts.Add(urlName);
 
                 // move to parent node
