@@ -457,8 +457,8 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(contentType);
 
             var c1 = MockedContent.CreateSimpleContent(contentType, "Test", -1);
-            c1.SetName(_langFr.Id, "Test - FR");
-            c1.SetName(_langEs.Id, "Test - ES");
+            c1.SetName(_langFr.IsoCode, "Test - FR");
+            c1.SetName(_langEs.IsoCode, "Test - ES");
             ServiceContext.ContentService.Save(c1);
 
             var result = service.Get(c1.Id, UmbracoObjectTypes.Document);
@@ -486,8 +486,8 @@ namespace Umbraco.Tests.Services
                 var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
                 if (i % 2 == 0)
                 {
-                    c1.SetName(_langFr.Id, "Test " + i + " - FR");
-                    c1.SetName(_langEs.Id, "Test " + i + " - ES");
+                    c1.SetName(_langFr.IsoCode, "Test " + i + " - FR");
+                    c1.SetName(_langEs.IsoCode, "Test " + i + " - ES");
                 }
                 ServiceContext.ContentService.Save(c1);
             }

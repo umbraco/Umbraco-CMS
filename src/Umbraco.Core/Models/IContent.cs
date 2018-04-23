@@ -90,6 +90,12 @@ namespace Umbraco.Core.Models
         /// </remarks>
         bool IsCulturePublished(string culture);
 
+        // fixme doc
+        DateTime GetDateCulturePublished(string culture);
+
+        // fixme doc
+        bool IsCultureEdited(string culture);
+
         /// <summary>
         /// Gets the name of the published version of the content for a given culture.
         /// </summary>

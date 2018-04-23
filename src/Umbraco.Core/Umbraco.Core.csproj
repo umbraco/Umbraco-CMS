@@ -320,6 +320,7 @@
     <Compile Include="Constants-Web.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DisposableObjectSlim.cs" />
+    <Compile Include="EnumExtensions.cs" />
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Events\UserGroupWithUsers.cs" />
@@ -336,7 +337,8 @@
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoAuditTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoConsentTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\CreateSensitiveDataUserGroup.cs" />
-    <Compile Include="Migrations\Upgrade\V_8_0_0\AddContentVariationTable.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\AddVariationTables1A.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\AddVariationTables2.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypeMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\LanguageColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigration.cs" />
@@ -369,6 +371,7 @@
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
     <Compile Include="Persistence\Dtos\ContentVersionCultureVariationDto.cs" />
+    <Compile Include="Persistence\Dtos\DocumentCultureVariationDto.cs" />
     <Compile Include="Persistence\Dtos\MediaDto.cs" />
     <Compile Include="Persistence\Dtos\MediaVersionDto.cs" />
     <Compile Include="Persistence\Dtos\UserLoginDto.cs" />

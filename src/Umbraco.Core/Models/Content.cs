@@ -20,7 +20,8 @@ namespace Umbraco.Core.Models
         private PublishedState _publishedState;
         private DateTime? _releaseDate;
         private DateTime? _expireDate;
-        private Dictionary<string, string> _publishNames;
+        private Dictionary<string, (string Name, DateTime Date)> _publishInfos;
+        private HashSet<string> _edited;
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
@@ -199,21 +200,10 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public string PublishName { get; internal set; }
 
-        /// <inheritdoc/>
-        [IgnoreDataMember]
-        public IReadOnlyDictionary<string, string> PublishNames => _publishNames ?? NoNames;
-
-        /// <inheritdoc/>
-        public string GetPublishName(string culture)
-        {
-            if (culture == null) return PublishName;
-            if (_publishNames == null) return null;
-            return _publishNames.TryGetValue(culture, out var name) ? name : null;
-        }
-
-        // sets a publish name
+        // sets publish infos
         // internal for repositories
-        internal void SetPublishName(string culture, string name)
+        // clear by clearing name
+        internal void SetPublishInfos(string culture, string name, DateTime date)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentNullOrEmptyException(nameof(name));
@@ -221,15 +211,29 @@ namespace Umbraco.Core.Models
             if (culture == null)
             {
                 PublishName = name;
+                PublishDate = date;
                 return;
             }
 
             // private method, assume that culture is valid
 
-            if (_publishNames == null)
-                _publishNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (_publishInfos == null)
+                _publishInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
 
-            _publishNames[culture] = name;
+            _publishInfos[culture] = (name, date);
+        }
+
+        /// <inheritdoc/>
+        [IgnoreDataMember]
+        //public IReadOnlyDictionary<string, string> PublishNames => _publishNames ?? NoNames;
+        public IReadOnlyDictionary<string, string> PublishNames => _publishInfos?.ToDictionary(x => x.Key, x => x.Value.Name) ?? NoNames;
+
+        /// <inheritdoc/>
+        public string GetPublishName(string culture)
+        {
+            if (culture == null) return PublishName;
+            if (_publishInfos == null) return null;
+            return _publishInfos.TryGetValue(culture, out var infos) ? infos.Name : null;
         }
 
         // clears a publish name
@@ -241,22 +245,50 @@ namespace Umbraco.Core.Models
                 return;
             }
 
-            if (_publishNames == null) return;
-            _publishNames.Remove(culture);
-            if (_publishNames.Count == 0)
-                _publishNames = null;
+            if (_publishInfos == null) return;
+            _publishInfos.Remove(culture);
+            if (_publishInfos.Count == 0)
+                _publishInfos = null;
         }
 
         // clears all publish names
         private void ClearPublishNames()
         {
             PublishName = null;
-            _publishNames = null;
+            _publishInfos = null;
         }
 
         /// <inheritdoc />
         public bool IsCulturePublished(string culture)
             => !string.IsNullOrWhiteSpace(GetPublishName(culture));
+
+        /// <inheritdoc />
+        public DateTime GetDateCulturePublished(string culture)
+        {
+            if (_publishInfos != null && _publishInfos.TryGetValue(culture, out var infos))
+                return infos.Date;
+            throw new InvalidOperationException($"Culture \"{culture}\" is not published.");
+        }
+
+        /// <inheritdoc />
+        public bool IsCultureEdited(string culture)
+        {
+            return string.IsNullOrWhiteSpace(GetPublishName(culture)) || (_edited != null && _edited.Contains(culture));
+        }
+
+        // sets a publish edited
+        internal void SetCultureEdited(string culture)
+        {
+            if (_edited == null)
+                _edited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            _edited.Add(culture);
+        }
+
+        // sets all publish edited
+        internal void SetCultureEdited(IEnumerable<string> cultures)
+        {
+            _edited = new HashSet<string>(cultures, StringComparer.OrdinalIgnoreCase);
+        }
 
         [IgnoreDataMember]
         public int PublishedVersionId { get; internal set; }
@@ -276,11 +308,12 @@ namespace Umbraco.Core.Models
             if (string.IsNullOrWhiteSpace(Name))
                 throw new InvalidOperationException($"Cannot publish invariant culture without a name.");
             PublishName = Name;
+            var now = DateTime.Now;
             foreach (var (culture, name) in Names)
             {
                 if (string.IsNullOrWhiteSpace(name))
                     throw new InvalidOperationException($"Cannot publish {culture ?? "invariant"} culture without a name.");
-                SetPublishName(culture, name);
+                SetPublishInfos(culture, name, now);
             }
 
             // property.PublishAllValues only deals with supported variations (if any)
@@ -308,7 +341,7 @@ namespace Umbraco.Core.Models
                 var name = GetName(culture);
                 if (string.IsNullOrWhiteSpace(name))
                     throw new InvalidOperationException($"Cannot publish {culture ?? "invariant"} culture without a name.");
-                SetPublishName(culture, name);
+                SetPublishInfos(culture, name, DateTime.Now);
             }
 
             // property.PublishValue throws on invalid variation, so filter them out
@@ -331,7 +364,7 @@ namespace Umbraco.Core.Models
             var name = GetName(culture);
             if (string.IsNullOrWhiteSpace(name))
                 throw new InvalidOperationException($"Cannot publish {culture ?? "invariant"} culture without a name.");
-            SetPublishName(culture, name);
+            SetPublishInfos(culture, name, DateTime.Now);
 
             // property.PublishCultureValues only deals with supported variations (if any)
             foreach (var property in Properties)

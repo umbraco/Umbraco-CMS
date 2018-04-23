@@ -164,7 +164,7 @@ namespace Umbraco.Core.Models
                 return;
             }
 
-            if ((ContentTypeBase.Variations & (ContentVariation.CultureNeutral | ContentVariation.CultureSegment)) == 0)
+            if (!ContentTypeBase.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment))
                 throw new NotSupportedException("Content type does not support varying name by culture.");
 
             if (_names == null)

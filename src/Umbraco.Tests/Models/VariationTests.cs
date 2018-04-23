@@ -164,22 +164,26 @@ namespace Umbraco.Tests.Models
             const string langFr = "fr-FR";
             const string langUk = "en-UK";
 
+            // throws if the content type does not support the variation
             Assert.Throws<NotSupportedException>(() => content.SetName(langFr, "name-fr"));
 
+            // now it will work
             contentType.Variations = ContentVariation.CultureNeutral;
 
+            // invariant name works
             content.Name = "name";
             Assert.AreEqual("name", content.GetName(null));
             content.SetName(null, "name2");
             Assert.AreEqual("name2", content.Name);
             Assert.AreEqual("name2", content.GetName(null));
 
+            // variant names work
             content.SetName(langFr, "name-fr");
             content.SetName(langUk, "name-uk");
-
             Assert.AreEqual("name-fr", content.GetName(langFr));
             Assert.AreEqual("name-uk", content.GetName(langUk));
 
+            // variant dictionary of names work
             Assert.AreEqual(2, content.Names.Count);
             Assert.IsTrue(content.Names.ContainsKey(langFr));
             Assert.AreEqual("name-fr", content.Names[langFr]);
@@ -188,7 +192,7 @@ namespace Umbraco.Tests.Models
         }
 
         [Test]
-        public void ContentTests()
+        public void ContentPublishValues()
         {
             const string langFr = "fr-FR";
 
@@ -294,6 +298,61 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual("b", content.GetValue("prop", published: true));
             Assert.AreEqual("c", content.GetValue("prop", langFr));
             Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
+        }
+
+        [Test]
+        public void ContentPublishVariations()
+        {
+            const string langFr = "fr-FR";
+            const string langUk = "en-UK";
+            const string langEs = "es-ES";
+
+            var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop" };
+            var contentType = new ContentType(-1) { Alias = "contentType" };
+            contentType.AddPropertyType(propertyType);
+
+            var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
+
+            contentType.Variations |= ContentVariation.CultureNeutral;
+            propertyType.Variations |= ContentVariation.CultureNeutral;
+
+            content.SetValue("prop", "a");
+            content.SetValue("prop", "a-fr", langFr);
+            content.SetValue("prop", "a-uk", langUk);
+            content.SetValue("prop", "a-es", langEs);
+
+            // cannot publish without a name
+            Assert.Throws<InvalidOperationException>(() => content.PublishValues(langFr));
+
+            // works with a name
+            // and then FR is available, and published
+            content.SetName(langFr, "name-fr");
+            content.PublishValues(langFr);
+
+            // now UK is available too
+            content.SetName(langUk, "name-uk");
+
+            // test available, published
+            Assert.IsTrue(content.IsCultureAvailable(langFr));
+            Assert.IsTrue(content.IsCulturePublished(langFr));
+            Assert.AreEqual("name-fr", content.GetPublishName(langFr));
+            Assert.AreNotEqual(DateTime.MinValue, content.GetDateCulturePublished(langFr));
+            Assert.IsFalse(content.IsCultureEdited(langFr)); // once published, edited is *wrong* until saved
+
+            Assert.IsTrue(content.IsCultureAvailable(langUk));
+            Assert.IsFalse(content.IsCulturePublished(langUk));
+            Assert.IsNull(content.GetPublishName(langUk));
+            Assert.Throws<InvalidOperationException>(() => content.GetDateCulturePublished(langUk)); // not published!
+            Assert.IsTrue(content.IsCultureEdited(langEs)); // not published, so... edited
+
+            Assert.IsFalse(content.IsCultureAvailable(langEs));
+            Assert.IsFalse(content.IsCulturePublished(langEs));
+            Assert.IsNull(content.GetPublishName(langEs));
+            Assert.Throws<InvalidOperationException>(() => content.GetDateCulturePublished(langEs)); // not published!
+            Assert.IsTrue(content.IsCultureEdited(langEs)); // not published, so... edited
+
+            // cannot test IsCultureEdited here - as that requires the content service and repository
+            // see: ContentServiceTests.Can_SaveRead_Variations
         }
 
         [Test]

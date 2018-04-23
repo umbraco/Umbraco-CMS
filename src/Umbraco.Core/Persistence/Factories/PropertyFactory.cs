@@ -4,7 +4,6 @@ using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Persistence.Factories
 {
@@ -90,15 +89,25 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        public static IEnumerable<PropertyDataDto> BuildDtos(int currentVersionId, int publishedVersionId, IEnumerable<Property> properties, ILanguageRepository languageRepository, out bool edited)
+        public static IEnumerable<PropertyDataDto> BuildDtos(int currentVersionId, int publishedVersionId, IEnumerable<Property> properties, ILanguageRepository languageRepository, out bool edited, out HashSet<string> editedCultures)
         {
             var propertyDataDtos = new List<PropertyDataDto>();
             edited = false;
+            editedCultures = null; // don't allocate unless necessary
 
             foreach (var property in properties)
             {
                 if (property.PropertyType.IsPublishing)
                 {
+                    // fixme
+                    // why only CultureNeutral?
+                    // then, the tree can only show when a CultureNeutral value has been modified, but not when
+                    // a CultureSegment has been modified, so if I edit some french/mobile thing, the tree will
+                    // NOT tell me that I have changes?
+
+                    var editingCultures = property.PropertyType.Variations.Has(ContentVariation.CultureNeutral);
+                    if (editingCultures && editedCultures == null) editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
                     // publishing = deal with edit and published values
                     foreach (var propertyValue in property.Values)
                     {
@@ -117,6 +126,13 @@ namespace Umbraco.Core.Persistence.Factories
                         // use explicit equals here, else object comparison fails at comparing eg strings
                         var sameValues = propertyValue.PublishedValue == null ? propertyValue.EditedValue == null : propertyValue.PublishedValue.Equals(propertyValue.EditedValue);
                         edited |= !sameValues;
+
+                        if (editingCultures && // cultures can be edited, ie CultureNeutral is supported
+                            propertyValue.Culture != null && propertyValue.Segment == null && // and value is CultureNeutral
+                            !sameValues) // and edited and published are different
+                        {
+                            editedCultures.Add(propertyValue.Culture); // report culture as edited
+                        }
                     }
                 }
                 else

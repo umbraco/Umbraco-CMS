@@ -956,7 +956,8 @@ namespace Umbraco.Web.Editors
                 //set the name according to the culture settings
                 if (contentItem.LanguageId.HasValue && contentItem.PersistedContent.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
                 {
-                    contentItem.PersistedContent.SetName(contentItem.LanguageId, contentItem.Name);
+                    var culture = Services.LocalizationService.GetLanguageById(contentItem.LanguageId.Value).IsoCode;
+                    contentItem.PersistedContent.SetName(culture, contentItem.Name);
                 }
                 else
                 {

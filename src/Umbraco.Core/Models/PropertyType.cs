@@ -243,7 +243,7 @@ namespace Umbraco.Core.Models
             {
                 variation = ContentVariation.InvariantNeutral;
             }
-            if ((Variations & variation) == 0)
+            if (!Variations.Has(variation))
             {
                 if (throwIfInvalid)
                     throw new NotSupportedException($"Variation {variation} is invalid for property type \"{Alias}\".");
