@@ -20,6 +20,9 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "defaultTemplate")]
         public EntityBasic DefaultTemplate { get; set; }
+        
+        [DataMember(Name = "allowCultureVariant")]
+        public bool AllowCultureVariant { get; set; }
 
     }
 }

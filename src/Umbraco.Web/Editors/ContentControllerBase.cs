@@ -36,32 +36,6 @@ namespace Umbraco.Web.Editors
             return errorResponse;
         }
 
-        protected void UpdateName<TPersisted>(ContentBaseItemSave<TPersisted> contentItem)
-            where TPersisted : IContentBase
-        {
-            //Don't update the name if it is empty
-            if (contentItem.Name.IsNullOrWhiteSpace() == false)
-            {
-                contentItem.PersistedContent.Name = contentItem.Name;
-            }
-        }
-
-        protected HttpResponseMessage PerformSort(ContentSortOrder sorted)
-        {
-            if (sorted == null)
-            {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
-
-            //if there's nothing to sort just return ok
-            if (sorted.IdSortOrder.Length == 0)
-            {
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-
-            return null;
-        }
-
         /// <summary>
         /// Maps the dto property values to the persisted model
         /// </summary>

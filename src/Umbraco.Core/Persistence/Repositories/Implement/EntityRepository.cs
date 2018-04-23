@@ -128,6 +128,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var dtos = page.Items;
             var entities = dtos.Select(x => BuildEntity(isContent, isMedia, x)).ToArray();
 
+            //TODO: For isContent will we need to build up the variation info? 
+
             if (isMedia)
                 BuildProperties(entities, dtos);
 
@@ -148,15 +150,29 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var isMedia = objectTypeId == Constants.ObjectTypes.Media;
 
             var sql = GetFullSqlForEntityType(isContent, isMedia, objectTypeId, key);
-            var dto = Database.FirstOrDefault<BaseDto>(sql);
-            if (dto == null) return null;
 
-            var entity = BuildEntity(isContent, isMedia, dto);
+            //isContent is going to return a 1:M result now with the variants so we need to do different things 
+            if (isContent)
+            {
+                 var dtos = Database.FetchOneToMany<ContentEntityDto>(
+                    dto => dto.VariationInfo,
+                    dto => dto.VersionId,
+                    sql);
+                if (dtos.Count == 0) return null;
+                return BuildDocumentEntity(dtos[0]);
+            }
+            else
+            {
+                var dto = Database.FirstOrDefault<BaseDto>(sql);
+                if (dto == null) return null;
 
-            if (isMedia)
-                BuildProperties(entity, dto);
+                var entity = BuildEntity(isContent, isMedia, dto);
 
-            return entity;
+                if (isMedia)
+                    BuildProperties(entity, dto);
+
+                return entity;
+            }
         }
 
         public virtual IEntitySlim Get(int id)
@@ -172,15 +188,30 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var isMedia = objectTypeId == Constants.ObjectTypes.Media;
 
             var sql = GetFullSqlForEntityType(isContent, isMedia, objectTypeId, id);
-            var dto = Database.FirstOrDefault<BaseDto>(sql);
-            if (dto == null) return null;
 
-            var entity = BuildEntity(isContent, isMedia, dto);
+            //isContent is going to return a 1:M result now with the variants so we need to do different things 
+            if (isContent)
+            {
+                var dtos = Database.FetchOneToMany<ContentEntityDto>(
+                    dto => dto.VariationInfo,
+                    dto => dto.VersionId,
+                    sql);
+                if (dtos.Count == 0) return null;
+                return BuildDocumentEntity(dtos[0]);
+            }
+            else
+            {
+                var dto = Database.FirstOrDefault<BaseDto>(sql);
+                if (dto == null) return null;
 
-            if (isMedia)
-                BuildProperties(entity, dto);
+                var entity = BuildEntity(isContent, isMedia, dto);
 
-            return entity;
+                if (isMedia)
+                    BuildProperties(entity, dto);
+
+                return entity;
+            }
+
         }
 
         public virtual IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids)
@@ -203,15 +234,30 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var isMedia = objectType == Constants.ObjectTypes.Media;
 
             var sql = GetFullSqlForEntityType(isContent, isMedia, objectType, filter);
-            var dtos = Database.Fetch<BaseDto>(sql);
-            if (dtos.Count == 0) return Enumerable.Empty<IEntitySlim>();
 
-            var entities = dtos.Select(x => BuildEntity(isContent, isMedia, x)).ToArray();
+            //isContent is going to return a 1:M result now with the variants so we need to do different things 
+            if (isContent)
+            {
+                var dtos = Database.FetchOneToMany<ContentEntityDto>(
+                    dto => dto.VariationInfo,
+                    dto => dto.VersionId,
+                    sql);
+                if (dtos.Count == 0) return Enumerable.Empty<IEntitySlim>();
+                var entities = dtos.Select(x => BuildDocumentEntity(x)).ToArray();
+                return entities;
+            }
+            else
+            {
+                var dtos = Database.Fetch<BaseDto>(sql);
+                if (dtos.Count == 0) return Enumerable.Empty<IEntitySlim>();
 
-            if (isMedia)
-                BuildProperties(entities, dtos);
+                var entities = dtos.Select(x => BuildEntity(isContent, isMedia, x)).ToArray();
 
-            return entities;
+                if (isMedia)
+                    BuildProperties(entities, dtos);
+
+                return entities;
+            }
         }
 
         public virtual IEnumerable<TreeEntityPath> GetAllPaths(Guid objectType, params int[] ids)
@@ -251,18 +297,35 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var isMedia = objectType == Constants.ObjectTypes.Media;
 
             var sql = GetBaseWhere(isContent, isMedia, false, null, objectType);
+
             var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
             sql = translator.Translate();
             sql = AddGroupBy(isContent, isMedia, sql);
-            var dtos = Database.Fetch<BaseDto>(sql);
-            if (dtos.Count == 0) return Enumerable.Empty<IEntitySlim>();
 
-            var entities = dtos.Select(x => BuildEntity(isContent, isMedia, x)).ToArray();
+            //isContent is going to return a 1:M result now with the variants so we need to do different things 
+            if (isContent)
+            {
+                var dtos = Database.FetchOneToMany<ContentEntityDto>(
+                    dto => dto.VariationInfo,
+                    dto => dto.VersionId,
+                    sql);
+                if (dtos.Count == 0) return Enumerable.Empty<IEntitySlim>();
+                var entities = dtos.Select(x => BuildDocumentEntity(x)).ToArray();
+                return entities;
+            }
+            else
+            {
+                var dtos = Database.Fetch<BaseDto>(sql);
 
-            if (isMedia)
-                BuildProperties(entities, dtos);
+                if (dtos.Count == 0) return Enumerable.Empty<IEntitySlim>();
 
-            return entities;
+                var entities = dtos.Select(x => BuildEntity(isContent, isMedia, x)).ToArray();
+
+                if (isMedia)
+                    BuildProperties(entities, dtos);
+
+                return entities;
+            }
         }
 
         public UmbracoObjectTypes GetObjectType(int id)
@@ -409,8 +472,33 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         //    return wrappedSql;
         //}
 
-        // the DTO corresponding to fields selected by GetBase
+
+        /// <summary>
+        /// The DTO used to fetch results for a content item with it's variation info
+        /// </summary>
+        private class ContentEntityDto : BaseDto
+        {
+            [ResultColumn, Reference(ReferenceType.Many)]
+            public List<ContentEntityVariationInfoDto> VariationInfo { get; set; }
+        }
+
+        /// <summary>
+        /// The DTO used in the 1:M result for content variation info
+        /// </summary>
+        private class ContentEntityVariationInfoDto
+        {
+            [Column("versionCultureId")]
+            public int VersionCultureId { get; set; }
+            [Column("versionCultureLangId")]
+            public int LanguageId { get; set; }
+            [Column("versionCultureName")]
+            public string Name { get; set; }
+        }
+
         // ReSharper disable once ClassNeverInstantiated.Local
+        /// <summary>
+        /// the DTO corresponding to fields selected by GetBase
+        /// </summary>
         private class BaseDto
         {
             // ReSharper disable UnusedAutoPropertyAccessor.Local
@@ -455,14 +543,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     .AndSelect<NodeDto>(x => x.SortOrder, x => x.UniqueId, x => x.Text, x => x.NodeObjectType, x => x.CreateDate)
                     .Append(", COUNT(child.id) AS children");
 
-                if (isContent)
-                    sql
-                        .AndSelect<DocumentDto>(x => x.Published, x => x.Edited);
-
                 if (isContent || isMedia)
                     sql
                         .AndSelect<ContentVersionDto>(x => NPocoSqlExtensions.Statics.Alias(x.Id, "versionId"))
                         .AndSelect<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.Thumbnail, x => x.IsContainer);
+
+                if (isContent)
+                {
+                    sql
+                        .AndSelect<DocumentDto>(x => x.Published, x => x.Edited)
+                        //This MUST come last in the select statements since we will end up with a 1:M query
+                        .AndSelect<ContentVersionCultureVariationDto>(
+                            x => NPocoSqlExtensions.Statics.Alias(x.Id, "versionCultureId"),
+                            x => NPocoSqlExtensions.Statics.Alias(x.LanguageId, "versionCultureLangId"),
+                            x => NPocoSqlExtensions.Statics.Alias(x.Name, "versionCultureName"));
+                }
             }
 
             sql
@@ -482,9 +577,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     .InnerJoin<DocumentDto>().On<NodeDto, DocumentDto>((left, right) => left.NodeId == right.NodeId);
             }
 
+            //Any LeftJoin statements need to come last
             if (isCount == false)
+            {
                 sql
                     .LeftJoin<NodeDto>("child").On<NodeDto, NodeDto>((left, right) => left.NodeId == right.ParentId, aliasRight: "child");
+
+                if (isContent)
+                    sql
+                        .LeftJoin<ContentVersionCultureVariationDto>().On<ContentVersionDto, ContentVersionCultureVariationDto>((left, right) => left.Id == right.VersionId);
+            }
+
 
             filter?.Invoke(sql);
 
@@ -542,8 +645,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .AndBy<NodeDto>(x => x.SortOrder, x => x.UniqueId, x => x.Text, x => x.NodeObjectType, x => x.CreateDate);
 
             if (isContent)
+            {
                 sql
-                    .AndBy<DocumentDto>(x => x.Published, x => x.Edited);
+                    .AndBy<DocumentDto>(x => x.Published, x => x.Edited)
+                    .AndBy<ContentVersionCultureVariationDto>(x => x.Id, x => x.LanguageId, x => x.Name);
+            }
+
 
             if (isContent || isMedia)
                 sql
@@ -816,6 +923,28 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // EntitySlim does not track changes
             var entity = new DocumentEntitySlim();
             BuildDocumentEntity(entity, dto);
+            return entity;
+        }
+
+        /// <summary>
+        /// Builds the <see cref="EntitySlim"/> from a <see cref="ContentEntityDto"/> and ensures the AdditionalData is populated with variant info
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        private static EntitySlim BuildDocumentEntity(ContentEntityDto dto)
+        {
+            // EntitySlim does not track changes
+            var entity = new DocumentEntitySlim();
+            BuildDocumentEntity(entity, dto);
+            var variantInfo = new Dictionary<int, string>();
+            if (dto.VariationInfo != null)
+            {
+                foreach (var info in dto.VariationInfo)
+                {
+                    variantInfo[info.LanguageId] = info.Name;
+                }
+                entity.AdditionalData["CultureNames"] = variantInfo;
+            }
             return entity;
         }
 

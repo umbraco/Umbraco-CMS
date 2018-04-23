@@ -225,18 +225,23 @@ Use this directive to construct a header inside the main editor window.
                 });
             }
 
+            //TODO: This doesn't really affect any UI currently, need some feedback from mads
             function setVariantStatusColor(variants) {
                 angular.forEach(variants, function (variant) {
-                    angular.forEach(variant.states, function(state){
-                        switch (state.name) {
-                            case "Published":
-                            case "Published +":
-                                state.stateColor = "success";
-                                break;
-                            default:
-                                state.stateColor = "gray";
-                        }
-                    });
+
+                    //TODO: What about variant.exists? If we are applying colors/styles, this should be one of them
+
+                    switch (variant.state) {
+                        case "Published":
+                            variant.stateColor = "success";
+                            break;
+                        case "Unpublished":
+                        //TODO: Not sure if these statuses will ever bubble up to the UI?
+                        case "Publishing":
+                        case "Unpublishing":
+                        default:
+                            variant.stateColor = "gray";
+                    }
                 });
             }
 

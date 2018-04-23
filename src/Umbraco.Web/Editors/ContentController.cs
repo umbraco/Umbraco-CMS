@@ -943,14 +943,26 @@ namespace Umbraco.Web.Editors
                 return content;
             }
         }
-
+        
         /// <summary>
         /// Maps the dto property values to the persisted model
         /// </summary>
         /// <param name="contentItem"></param>
         private void MapPropertyValues(ContentItemSave contentItem)
         {
-            UpdateName(contentItem);
+            //Don't update the name if it is empty
+            if (contentItem.Name.IsNullOrWhiteSpace() == false)
+            {
+                //set the name according to the culture settings
+                if (contentItem.LanguageId.HasValue && contentItem.PersistedContent.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
+                {
+                    contentItem.PersistedContent.SetName(contentItem.LanguageId, contentItem.Name);
+                }
+                else
+                {
+                    contentItem.PersistedContent.Name = contentItem.Name;
+                }
+            }
 
             //TODO: We need to support 'send to publish'
 

@@ -181,7 +181,7 @@ namespace Umbraco.Web.Models.Mapping
                 // ignore, composition is managed in AfterMapContentTypeSaveToEntity
                 .ForMember(dest => dest.ContentTypeComposition, opt => opt.Ignore())
 
-                .ForMember(dto => dto.Variations, opt => opt.Ignore()) // fixme - change when UI supports it!
+                .ForMember(dto => dto.Variations, opt => opt.ResolveUsing<ContentTypeVariationsResolver<TSource, TSourcePropertyType, TDestination>>())
 
                 .ForMember(
                     dest => dest.AllowedContentTypes,

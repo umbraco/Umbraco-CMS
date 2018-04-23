@@ -7,7 +7,7 @@
             <small><localize key="contentTypeEditor_allowAsRootDescription" /></small>
         </div>
         <div class="sub-view-column-right">
-            <label class="checkbox no-indent" >
+            <label class="checkbox no-indent">
                 <input type="checkbox" ng-model="model.allowAsRoot" hotkey="alt+shift+r" />
                 <localize key="contentTypeEditor_allowAsRootCheckbox" />
             </label>
@@ -23,23 +23,36 @@
         </div>
 
         <div class="sub-view-column-right">
-            <umb-child-selector
-                    selected-children="vm.selectedChildren"
-                    available-children="vm.contentTypes"
-                    parent-name="model.name"
-                    parent-icon="model.icon"
-                    parent-id="model.id"
-                    on-add="vm.addChild"
-                    on-remove="vm.removeChild">
+            <umb-child-selector selected-children="vm.selectedChildren"
+                                available-children="vm.contentTypes"
+                                parent-name="model.name"
+                                parent-icon="model.icon"
+                                parent-id="model.id"
+                                on-add="vm.addChild"
+                                on-remove="vm.removeChild">
             </umb-child-selector>
 
-            <umb-overlay
-               ng-if="vm.childNodeSelectorOverlay.show"
-               model="vm.childNodeSelectorOverlay"
-               position="target"
-               view="vm.childNodeSelectorOverlay.view">
+            <umb-overlay ng-if="vm.childNodeSelectorOverlay.show"
+                         model="vm.childNodeSelectorOverlay"
+                         position="target"
+                         view="vm.childNodeSelectorOverlay.view">
             </umb-overlay>
 
+        </div>
+
+    </div>
+
+    <div class="sub-view-columns">
+
+        <div class="sub-view-column-left">
+            <h5>Content Type Variation</h5>
+            <small>Define the rules for how this content type's properties can be varied</small>
+        </div>
+        <div class="sub-view-column-right">
+            <label class="checkbox no-indent">
+                <input type="checkbox" ng-model="model.allowCultureVariant" />
+                Allow varying by Culture
+            </label>
         </div>
 
     </div>

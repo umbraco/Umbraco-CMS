@@ -210,21 +210,26 @@ namespace Umbraco.Web.Trees
                 result = Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToArray();
             }
 
-            if (langId.HasValue)
+            //This should really never be null, but we'll error check anyways
+            int? currLangId = langId.HasValue ? langId.Value : Services.LocalizationService.GetDefaultVariantLanguage()?.Id;
+
+            //Try to see if there is a variant name for the current language for the item and set the name accordingly.
+            //If any of this fails, the tree node name will remain the default invariant culture name.
+
+            //fixme - what if there is no name found at all ? This could occur if the doc type is variant and the user fills in all language values, then creates a new lang and sets it as the default
+            //fixme - what if the user changes this document type to not allow culture variants after it's already been created with culture variants, this means we'll be displaying the culture variant name when in fact we should be displaying the invariant name... but that would be null
+
+            if (currLangId.HasValue)
             {
-                //need to update all node names
-                //TODO: This is not currently stored, we need to wait until U4-11128 is complete for this to work, in the meantime
-                // we'll mock using this and it will just be some mock data
-                foreach(var e in result)
+                foreach (var e in result)
                 {
-                    if (e.AdditionalData.TryGetValue("VariantNames", out var variantNames))
+                    if (e.AdditionalData.TryGetValue("CultureNames", out var cultureNames)
+                        && cultureNames is IDictionary<int, string> cnd)
                     {
-                        var casted = (IDictionary<int, string>)variantNames;
-                        e.Name = casted[langId.Value];
-                    }
-                    else
-                    {
-                        e.Name = e.Name + " (lang: " + langId.Value + ")";
+                        if (cnd.TryGetValue(currLangId.Value, out var name))
+                        {
+                            e.Name = name;
+                        }
                     }
                 }
             }
