@@ -37,7 +37,7 @@
                 var saveModel = _.pick(displayModel,
                     'compositeContentTypes', 'isContainer', 'allowAsRoot', 'allowedTemplates', 'allowedContentTypes',
                     'alias', 'description', 'thumbnail', 'name', 'id', 'icon', 'trashed',
-                    'key', 'parentId', 'alias', 'path');
+                    'key', 'parentId', 'alias', 'path', 'allowCultureVariant');
 
                 //TODO: Map these
                 saveModel.allowedTemplates = _.map(displayModel.allowedTemplates, function (t) { return t.alias; });

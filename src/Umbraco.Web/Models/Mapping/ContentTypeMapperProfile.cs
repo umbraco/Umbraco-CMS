@@ -6,6 +6,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Core.Services;
+using ContentVariation = Umbraco.Core.Models.ContentVariation;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -26,7 +27,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     dest.AllowedTemplates = source.AllowedTemplates
                         .Where(x => x != null)
-                        .Select(s => fileService.GetTemplate(s))
+                        .Select(fileService.GetTemplate)
                         .ToArray();
 
                     if (source.DefaultTemplate != null)
@@ -111,6 +112,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dto => dto.AllowedTemplates, opt => opt.Ignore())
                 .ForMember(dto => dto.DefaultTemplate, opt => opt.Ignore())
                 .ForMember(display => display.Notifications, opt => opt.Ignore())
+                .ForMember(display => display.AllowCultureVariant, opt => opt.MapFrom(type => type.Variations.HasFlag(ContentVariation.CultureNeutral)))
                 .AfterMap((source, dest) =>
                 {
                     //sync templates

@@ -242,6 +242,8 @@
     <Compile Include="Models\ContentEditing\Language.cs" />
     <Compile Include="Models\Mapping\ActionButtonsResolver.cs" />
     <Compile Include="Models\Mapping\AuditMapperProfile.cs" />
+    <Compile Include="Models\Mapping\ContentItemDisplayNameResolver.cs" />
+    <Compile Include="Models\Mapping\ContentTypeVariationsResolver.cs" />
     <Compile Include="Models\Mapping\ContextMapper.cs" />
     <Compile Include="Models\Mapping\ContentChildOfListViewResolver.cs" />
     <Compile Include="Models\Mapping\ContentUrlResolver.cs" />
@@ -263,7 +265,7 @@
     <Compile Include="Models\Mapping\RedirectUrlMapperProfile.cs" />
     <Compile Include="Models\Mapping\TemplateMapperProfile.cs" />
     <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
-    <Compile Include="Models\Mapping\VariationResolver.cs" />
+    <Compile Include="Models\Mapping\ContentItemDisplayVariationResolver.cs" />
     <Compile Include="Models\RelatedLink.cs" />
     <Compile Include="Models\RelatedLinkBase.cs" />
     <Compile Include="Models\RelatedLinks.cs" />

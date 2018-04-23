@@ -470,7 +470,12 @@ namespace Umbraco.Web.Editors
             // * we have a reference to the DTO object and the persisted object
             // * Permissions are valid
 
-            UpdateName(contentItem);
+            //Don't update the name if it is empty
+            if (contentItem.Name.IsNullOrWhiteSpace() == false)
+            {
+                contentItem.PersistedContent.Name = contentItem.Name;
+            }
+
             MapPropertyValues<IMedia, MediaItemSave>(
                 contentItem,
                 (save, property) => property.GetValue(),        //get prop val
