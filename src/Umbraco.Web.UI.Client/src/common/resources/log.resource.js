@@ -9,7 +9,73 @@ function logResource($q, $http, umbRequestHelper) {
 
     //the factory object returned
     return {
-        
+
+        getPagedEntityLog: function (options) {
+
+            var defaults = {
+                pageSize: 10,
+                pageNumber: 1,
+                orderDirection: "Descending"
+            };
+            if (options === undefined) {
+                options = {};
+            }
+            //overwrite the defaults if there are any specified
+            angular.extend(defaults, options);
+            //now copy back to the options we will use
+            options = defaults;
+            //change asc/desct
+            if (options.orderDirection === "asc") {
+                options.orderDirection = "Ascending";
+            }
+            else if (options.orderDirection === "desc") {
+                options.orderDirection = "Descending";
+            }
+
+            if (options.id === undefined || options.id === null) {
+                throw "options.id is required";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "logApiBaseUrl",
+                        "GetPagedEntityLog",
+                        options)),
+                'Failed to retrieve log data for id');
+        },
+
+        getPagedUserLog: function (options) {
+
+            var defaults = {
+                pageSize: 10,
+                pageNumber: 1,
+                orderDirection: "Descending"
+            };
+            if (options === undefined) {
+                options = {};
+            }
+            //overwrite the defaults if there are any specified
+            angular.extend(defaults, options);
+            //now copy back to the options we will use
+            options = defaults;
+            //change asc/desct
+            if (options.orderDirection === "asc") {
+                options.orderDirection = "Ascending";
+            }
+            else if (options.orderDirection === "desc") {
+                options.orderDirection = "Descending";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "logApiBaseUrl",
+                        "GetPagedEntityLog",
+                        options)),
+                'Failed to retrieve log data for id');
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.logResource#getEntityLog

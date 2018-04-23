@@ -10,12 +10,12 @@ function noDirtyCheck() {
         require: 'ngModel',
         link: function (scope, elm, attrs, ctrl) {
 
-            elm.focus(function () {
-                scope.$watch(function() {
-                    ctrl.$pristine = false;
-                });
-            });
-
+            var alwaysFalse = {
+                    get: function () { return false; },
+                    set: function () { }
+                };
+            Object.defineProperty(ctrl, '$pristine', alwaysFalse);
+            Object.defineProperty(ctrl, '$dirty', alwaysFalse);
 
         }
     };

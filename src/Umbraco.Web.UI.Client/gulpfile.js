@@ -73,7 +73,6 @@ var sources = {
     js: {
         preview: { files: ["src/canvasdesigner/**/*.js"], out: "umbraco.canvasdesigner.js" },
         installer: { files: ["src/installer/**/*.js"], out: "umbraco.installer.js" },
-        
         controllers: { files: ["src/{views,controllers}/**/*.controller.js"], out: "umbraco.controllers.js" },
         directives: { files: ["src/common/directives/**/*.js"], out: "umbraco.directives.js" },
         filters: { files: ["src/common/filters/**/*.js"], out: "umbraco.filters.js" },
@@ -85,8 +84,7 @@ var sources = {
     //selectors for copying all views into the build
     //processed in the views task
     views:{
-        umbraco: {files: ["src/views/**/*html"], folder: ""},
-        preview: { files: ["src/canvasdesigner/**/*.html"], folder: "../preview"},
+        umbraco: {files: ["src/views/**/*.html"], folder: ""},
         installer: {files: ["src/installer/steps/*.html"], folder: "install"}
     },
 

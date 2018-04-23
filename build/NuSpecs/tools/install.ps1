@@ -98,10 +98,51 @@ if ($project) {
 		$umbracoUIXMLDestination = Join-Path $projectPath "Umbraco\Config\Create\UI.xml"
 		Copy-Item $umbracoUIXMLSource $umbracoUIXMLDestination -Force
 	} else {
+		# This part only runs for upgrades
+	
 		$upgradeViewSource = Join-Path $umbracoFolderSource "Views\install\*"
 		$upgradeView = Join-Path $umbracoFolder "Views\install\"
 		Write-Host "Copying2 ${upgradeViewSource} to ${upgradeView}"
 		Copy-Item $upgradeViewSource $upgradeView -Force
+		
+		Try 
+		{
+			# Disable tours for upgrades, presumably Umbraco experience is already available
+			$umbracoSettingsConfigPath = Join-Path $configFolder "umbracoSettings.config"
+			$content = (Get-Content $umbracoSettingsConfigPath).Replace('<tours enable="true">','<tours enable="false">')
+			# Saves with UTF-8 encoding without BOM which makes sure Umbraco can still read it
+			# Reference: https://stackoverflow.com/a/32951824/5018
+			[IO.File]::WriteAllLines($umbracoSettingsConfigPath, $content)
+		} 
+		Catch 
+		{
+			# Not a big problem if this fails, let it go
+		}
+		
+		Try 
+		{
+			$uiXmlConfigPath = Join-Path $umbracoFolder -ChildPath "Config" | Join-Path -ChildPath "create" | Join-Path -ChildPath "UI.xml"
+			$uiXmlFile = Join-Path $umbracoFolder -ChildPath "Config" | Join-Path -ChildPath "create" | Join-Path -ChildPath "UI.xml"
+
+			$uiXml = New-Object System.Xml.XmlDocument
+			$uiXml.PreserveWhitespace = $true
+
+			$uiXml.Load($uiXmlFile)
+			$createExists = $uiXml.SelectNodes("//nodeType[@alias='macros']/tasks/create")
+
+			if($createExists.Count -eq 0) 
+			{    
+				$macrosTasksNode = $uiXml.SelectNodes("//nodeType[@alias='macros']/tasks")
+
+				#Creating: <create assembly="umbraco" type="macroTasks" />
+				$createNode = $uiXml.CreateElement("create")
+				$createNode.SetAttribute("assembly", "umbraco")
+				$createNode.SetAttribute("type", "macroTasks")
+				$macrosTasksNode.AppendChild($createNode)
+				$uiXml.Save($uiXmlFile)
+			}
+		} 
+		Catch { }
 	}
 	
 	$installFolder = Join-Path $projectPath "Install"

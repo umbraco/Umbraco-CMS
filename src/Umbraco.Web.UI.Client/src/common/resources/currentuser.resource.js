@@ -10,6 +10,30 @@ function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
     //the factory object returned
     return {
 
+        saveTourStatus: function (tourStatus) {
+
+            if (!tourStatus) {
+                return angularHelper.rejectedPromise({ errorMsg: 'tourStatus cannot be empty' });
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "currentUserApiBaseUrl",
+                        "PostSetUserTour"),
+                    tourStatus),
+                'Failed to save tour status');
+        },
+
+        getTours: function () {
+            
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "currentUserApiBaseUrl",
+                        "GetUserTours")), 'Failed to get tours');
+        },
+
         performSetInvitedUserPassword: function (newPassword) {
 
             if (!newPassword) {

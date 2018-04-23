@@ -17,6 +17,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.ControllerTesting;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Editors;
+using Umbraco.Web.Features;
 using Umbraco.Web.Models.ContentEditing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 
@@ -26,6 +27,11 @@ namespace Umbraco.Tests.Web.Controllers
     [TestFixture]
     public class UsersControllerTests : BaseDatabaseFactoryTest
     {
+        protected override void FreezeResolution()
+        {
+            FeaturesResolver.Current = new FeaturesResolver(new UmbracoFeatures());
+            base.FreezeResolution();
+        }
 
         [Test]
         public async void Save_User()

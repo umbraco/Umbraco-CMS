@@ -667,6 +667,12 @@
     <key alias="text">Текст</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="addElement">Добавить содержимое</key>
     <key alias="dropElement">Сбросить содержимое</key>
     <key alias="addGridLayout">Добавить шаблон сетки</key>
@@ -750,7 +756,7 @@
 
     <key alias="httpsCheckValidCertificate">Сертификат Вашего веб-сайта отмечен как проверенный.</key>
     <key alias="httpsCheckInvalidCertificate">Ошибка проверки сертификата: '%0%'</key>
-    <key alias="httpsCheckInvalidUrl">Ошибка проверки адреса URL %0% - '%1%'</key>
+    <key alias="healthCheckInvalidUrl">Ошибка проверки адреса URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Сейчас Вы %0% просматриваете сайт, используя протокол HTTPS.</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">Параметр 'umbracoUseSSL' в секции 'appSetting' установлен в 'false' в файле web.config. Если Вам необходим доступ к сайту по протоколу HTTPS, нужно установить данный параметр в 'true'.</key>
     <key alias="httpsCheckConfigurationCheckResult">Параметр 'umbracoUseSSL' в секции 'appSetting' в файле установлен в '%0%', значения cookies %1% маркированы как безопасные.</key>
@@ -790,10 +796,10 @@
 
     <key alias="clickJackingCheckHeaderFound"><![CDATA[Был обнаружен заголовок или мета-тэг <strong>X-Frame-Options</strong>, использующийся для управления возможностью помещать сайт в IFRAME на другом сайте.]]></key>
     <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Заголовок или мета-тэг <strong>X-Frame-Options</strong>, использующийся для управления возможностью помещать сайт в IFRAME на другом сайте, не обнаружен.]]></key>
-    <key alias="clickJackingSetHeaderInConfig">Установить заголовок в файле конфигурации</key>
+    <key alias="setHeaderInConfig">Установить заголовок в файле конфигурации</key>
     <key alias="clickJackingSetHeaderInConfigDescription">Добавляет значение в секцию 'httpProtocol/customHeaders' файла web.config, препятствующее возможному использованию этого сайта внутри IFRAME на другом сайте.</key>
     <key alias="clickJackingSetHeaderInConfigSuccess">Значение, добавляющее заголовок, препятствующий использованию этого сайта внутри IFRAME другого сайта, успешно добавлено в файл web.config.</key>
-    <key alias="clickJackingSetHeaderInConfigError">Невозможно обновить файл web.config. Ошибка: %0%</key>
+    <key alias="setHeaderInConfigError">Невозможно обновить файл web.config. Ошибка: %0%</key>
 
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found

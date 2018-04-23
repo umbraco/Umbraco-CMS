@@ -27,6 +27,7 @@ namespace Umbraco.Core.Models.Rdbms
         [ForeignKey(typeof(PropertyTypeGroupDto))]
         public int? PropertyTypeGroupId { get; set; }
 
+        [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyTypeAlias")]
         [Column("Alias")]
         public string Alias { get; set; }
 

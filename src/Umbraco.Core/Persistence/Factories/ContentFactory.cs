@@ -98,18 +98,18 @@ namespace Umbraco.Core.Persistence.Factories
         {
             //NOTE Currently doesn't add Alias (legacy that eventually will go away)
             var documentDto = new DocumentDto
-                                  {
-                                      Newest = true,
-                                      NodeId = entity.Id,
-                                      Published = entity.Published,
-                                      Text = entity.Name,
-                                      UpdateDate = entity.UpdateDate,
-                                      WriterUserId = entity.WriterId,
-                                      VersionId = entity.Version,
-                                      ExpiresDate = null,
-                                      ReleaseDate = null,
-                                      ContentVersionDto = BuildContentVersionDto(entity)
-                                  };
+            {
+                Newest = true,
+                NodeId = entity.Id,
+                Published = entity.Published,
+                Text = entity.Name,
+                UpdateDate = entity.UpdateDate,
+                WriterUserId = entity.WriterId,
+                VersionId = entity.Version,
+                ExpiresDate = null,
+                ReleaseDate = null,
+                ContentVersionDto = BuildContentVersionDto(entity)
+            };
 
             if (entity.Template != null && entity.Template.Id > 0)
                 documentDto.TemplateId = entity.Template.Id;

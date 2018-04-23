@@ -80,7 +80,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
         {
             var foundContent = Services.ContentService.GetByIds(ids);
-            return foundContent.Select(Mapper.Map<IContent, ContentItemDisplay>);
+            return foundContent.Select(content => AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(content, UmbracoContext));
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace Umbraco.Web.Editors
                 Path = "-1," + Constants.System.RecycleBinContent
             };
 
-            TabsAndPropertiesResolver.AddListView(display, "content", Services.DataTypeService, Services.TextService);
+            TabsAndPropertiesResolver<IContent>.AddListView(display, "content", Services.DataTypeService, Services.TextService);
 
             return display;
         }
@@ -232,7 +232,7 @@ namespace Umbraco.Web.Editors
                 HandleContentNotFound(id);
             }
 
-            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            var content = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
 
             SetupBlueprint(content, foundContent);
 
@@ -270,7 +270,7 @@ namespace Umbraco.Web.Editors
                 HandleContentNotFound(id);
             }
 
-            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            var content = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
             return content;
         }
 
@@ -283,7 +283,7 @@ namespace Umbraco.Web.Editors
                 HandleContentNotFound(id);
             }
 
-            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            var content = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
             return content;
         }
 
@@ -306,7 +306,7 @@ namespace Umbraco.Web.Editors
             }
 
             var emptyContent = Services.ContentService.CreateContent("", parentId, contentType.Alias, UmbracoUser.Id);
-            var mapped = Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
+            var mapped = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(emptyContent, UmbracoContext);
 
             //remove this tab if it exists: umbContainerView
             var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
@@ -379,7 +379,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Gets the children for the content id passed in
         /// </summary>
-        /// <returns></returns>        
+        /// <returns></returns>
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IContent>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
                 int id,
@@ -389,7 +389,25 @@ namespace Umbraco.Web.Editors
                 Direction orderDirection = Direction.Ascending,
                 bool orderBySystemField = true,
                 string filter = "")
-        {            
+        {
+            return GetChildren(id, null, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+        }
+
+        /// <summary>
+        /// Gets the children for the content id passed in
+        /// </summary>
+        /// <returns></returns>
+        [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IContent>>), "Items")]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
+                int id,
+                string includeProperties,
+                int pageNumber = 0,  //TODO: This should be '1' as it's not the index
+                int pageSize = 0,
+                string orderBy = "SortOrder",
+                Direction orderDirection = Direction.Ascending,
+                bool orderBySystemField = true,
+                string filter = "")
+        {
             long totalChildren;
             IContent[] children;
             if (pageNumber > 0 && pageSize > 0)
@@ -410,8 +428,16 @@ namespace Umbraco.Web.Editors
             }
 
             var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(totalChildren, pageNumber, pageSize);
-            pagedResult.Items = children
-                    .Select(Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>);
+            pagedResult.Items = children.Select(content =>
+                Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>(content,
+                    opts =>
+                    {
+                        // if there's a list of property aliases to map - we will make sure to store this in the mapping context.
+                        if (String.IsNullOrWhiteSpace(includeProperties) == false)
+                        {
+                            opts.Items["IncludeProperties"] = includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries);
+                        }
+                    }));
 
             return pagedResult;
         }
@@ -563,7 +589,7 @@ namespace Umbraco.Web.Editors
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the modelstate to the outgoing object and throw a validation message
-                    var forDisplay = Mapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent);
+                    var forDisplay = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(contentItem.PersistedContent, UmbracoContext);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
 
@@ -605,7 +631,7 @@ namespace Umbraco.Web.Editors
             }
 
             //return the updated model
-            var display = Mapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent);
+            var display = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(contentItem.PersistedContent, UmbracoContext);
 
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
@@ -858,7 +884,7 @@ namespace Umbraco.Web.Editors
 
             var unpublishResult = Services.ContentService.WithResult().UnPublish(foundContent, Security.CurrentUser.Id);
 
-            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            var content = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
 
             if (unpublishResult == false)
             {

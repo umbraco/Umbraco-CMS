@@ -146,7 +146,7 @@ namespace Umbraco.Core.Cache
         #region Insert
         #endregion
 
-        private class NoopLocker : DisposableObject
+        private class NoopLocker : DisposableObjectSlim
         {
             protected override void DisposeResources()
             { }

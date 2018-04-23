@@ -10,7 +10,7 @@
 
         <ul class="umb-actions umb-actions-child" ng-show="selectContentType">
 
-            <li ng-repeat="docType in allowedTypes | orderBy:'name':false">
+            <li data-element="action-create-{{docType.alias}}" ng-repeat="docType in allowedTypes | orderBy:'name':false">
                 <a ng-click="createOrSelectBlueprintIfAny(docType)">
                     <i class="large {{docType.icon}}"></i>
                     <span class="menu-label">

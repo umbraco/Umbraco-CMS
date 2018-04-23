@@ -44,7 +44,7 @@ function Build-UmbracoDocs
   # change baseUrl
   $baseUrl = "https://our.umbraco.org/apidocs/ui/"
   $indexPath = "$src/Umbraco.Web.UI.Client/docs/api/index.html"
-  (Get-Content $indexPath).Replace("location.href.replace(rUrl, indexFile)", "'$baseUrl'") `
+  (Get-Content $indexPath).Replace("origin + location.href.substr(origin.length).replace(rUrl, indexFile)", "'$baseUrl'") `
     | Set-Content $indexPath
     
   # restore
@@ -100,8 +100,9 @@ function Get-DocFx($uenv, $buildTemp)
   $docFx = "$buildTemp\docfx"
   if (-not (test-path $docFx))
   {
-    Write-Host "Download DocFx..."
     $source = "https://github.com/dotnet/docfx/releases/download/v2.19.2/docfx.zip"
+    Write-Host "Download DocFx from $source"
+    
     Invoke-WebRequest $source -OutFile "$buildTemp\docfx.zip"
     
     &$uenv.Zip x "$buildTemp\docfx.zip" -o"$buildTemp\docfx" -aos > $nul

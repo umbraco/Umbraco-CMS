@@ -11,6 +11,7 @@
         <key alias="changeDocType">Change Document Type</key>
         <key alias="copy">Copy</key>
         <key alias="create">Create</key>
+        <key alias="export">Export</key>
         <key alias="createPackage">Create Package</key>
         <key alias="createGroup">Create group</key>
         <key alias="delete">Delete</key>
@@ -127,6 +128,7 @@
         <key alias="returnToList">Return to list</key>
         <key alias="save">Save</key>
         <key alias="saveAndPublish">Save and publish</key>
+        <key alias="saveAndSchedule">Save and schedule</key>
         <key alias="saveToPublish">Save and send for approval</key>
         <key alias="saveListView">Save list view</key>
         <key alias="showPage">Preview</key>
@@ -186,18 +188,23 @@
         <key alias="membergroup">Member Group</key>
         <key alias="memberrole">Role</key>
         <key alias="membertype">Member Type</key>
+        <key alias="noChanges">No changes have been made</key>
         <key alias="noDate">No date chosen</key>
         <key alias="nodeName">Page title</key>
+        <key alias="noMediaLink">This media item has no link</key>
         <key alias="otherElements">Properties</key>
         <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
         <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
         <key alias="getUrlException">Could not get the url</key>
         <key alias="routeError">This document is published but its url would collide with content %0%</key>
         <key alias="publish">Publish</key>
+        <key alias="published">Published</key>
+        <key alias="publishedPendingChanges">Published (pending changes)</key>
         <key alias="publishStatus">Publication Status</key>
         <key alias="releaseDate">Publish at</key>
         <key alias="unpublishDate">Unpublish at</key>
         <key alias="removeDate">Clear Date</key>
+        <key alias="setDate">Set date</key>
         <key alias="sortDone">Sortorder is updated</key>
         <key alias="sortHelp">To sort the nodes, simply drag the nodes or click one of the column headers. You can select multiple nodes by holding the "shift" or "control" key while selecting</key>
         <key alias="statistics">Statistics</key>
@@ -205,6 +212,7 @@
         <key alias="altTextOptional">Alternative text (optional)</key>
         <key alias="type">Type</key>
         <key alias="unPublish">Unpublish</key>
+        <key alias="unpublished">Unpublished</key>
         <key alias="updateDate">Last edited</key>
         <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
         <key alias="uploadClear">Remove file(s)</key>
@@ -220,6 +228,8 @@
         <key alias="addTextBox">Add another text box</key>
         <key alias="removeTextBox">Remove this text box</key>
         <key alias="contentRoot">Content root</key>
+        <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
+        <key alias="isSensitiveValue_short">This value is hidden.</key>
     </area>
     <area alias="blueprints">
         <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
@@ -309,7 +319,6 @@
         <key alias="nodeNameLinkPicker">Link title</key>
         <key alias="urlLinkPicker">Link</key>
         <key alias="anchorInsert">Name</key>
-        <key alias="assignDomain">Manage hostnames</key>
         <key alias="closeThisWindow">Close this window</key>
         <key alias="confirmdelete">Are you sure you want to delete</key>
         <key alias="confirmdisable">Are you sure you want to disable</key>
@@ -509,6 +518,7 @@
         <key alias="missingPropertyEditorErrorMessage">There is a configuration error with the data type used for this property, please check the data type</key>
     </area>
     <area alias="general">
+        <key alias="options">Options</key>
         <key alias="about">About</key>
         <key alias="action">Action</key>
         <key alias="actions">Actions</key>
@@ -549,12 +559,15 @@
         <key alias="error">Error</key>
         <key alias="findDocument">Find</key>
         <key alias="first">First</key>
+        <key alias="general">General</key>
         <key alias="groups">Groups</key>
         <key alias="height">Height</key>
         <key alias="help">Help</key>
         <key alias="hide">Hide</key>
+        <key alias="history">History</key>
         <key alias="icon">Icon</key>
         <key alias="import">Import</key>
+        <key alias="info">Info</key>
         <key alias="innerMargin">Inner margin</key>
         <key alias="insert">Insert</key>
         <key alias="install">Install</key>
@@ -564,6 +577,7 @@
         <key alias="language">Language</key>
         <key alias="last">Last</key>
         <key alias="layout">Layout</key>
+        <key alias="links">Links</key>
         <key alias="loading">Loading</key>
         <key alias="locked">Locked</key>
         <key alias="login">Login</key>
@@ -602,9 +616,9 @@
         <key alias="retrieve">Retrieve</key>
         <key alias="retry">Retry</key>
         <key alias="rights">Permissions</key>
+        <key alias="scheduledPublishing">Scheduled Publishing</key>
         <key alias="search">Search</key>
         <key alias="searchNoResult">Sorry, we can not find what you are looking for</key>
-        <key alias="clearSearch">Clear search</key>
         <key alias="noItemsInList">No items have been added</key>
         <key alias="server">Server</key>
         <key alias="show">Show</key>
@@ -638,7 +652,7 @@
         <key alias="saving">Saving...</key>
         <key alias="current">current</key>
         <key alias="embed">Embed</key>
-    <key alias="retrieve">Retrieve</key>
+        <key alias="retrieve">Retrieve</key>
         <key alias="selected">selected</key>
     </area>
     <area alias="colors">
@@ -647,7 +661,20 @@
         <key alias="yellow">Yellow</key>
         <key alias="orange">Orange</key>
         <key alias="blue">Blue</key>
+        <key alias="bluegrey">Blue Grey</key>
+        <key alias="grey">Grey</key>
+        <key alias="brown">Brown</key>
+        <key alias="lightblue">Light Blue</key>
+        <key alias="cyan">Cyan</key>
+        <key alias="lightgreen">Light Green</key>
+        <key alias="lime">Lime</key>
+        <key alias="amber">Amber</key>
+        <key alias="deeporange">Deep Orange</key>
         <key alias="red">Red</key>
+        <key alias="pink">Pink</key>
+        <key alias="purple">Purple</key>
+        <key alias="deeppurple">Deep Purple</key>
+        <key alias="indigo">Indigo</key>
     </area>
     <area alias="shortcuts">
         <key alias="addTab">Add tab</key>
@@ -1387,6 +1414,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="unlockUsersError">An error occurred while unlocking the users</key>
         <key alias="unlockUserSuccess">%0% is now unlocked</key>
         <key alias="unlockUserError">An error occurred while unlocking the user</key>
+        <key alias="memberExportedSuccess">Member was exported to file</key>
+        <key alias="memberExportedError">An error occurred while exporting the member</key>
     </area>
     <area alias="stylesheet">
         <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>
@@ -1501,6 +1530,12 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="template">Template</key>
     </area>
     <area alias="grid">
+        <key alias="rte">Rich Text Editor</key>
+        <key alias="media">Image</key>
+        <key alias="macro">Macro</key>
+        <key alias="embed">Embed</key>
+        <key alias="headline">Headline</key>
+        <key alias="quote">Quote</key>
         <key alias="insertControl">Choose type of content</key>
         <key alias="chooseLayout">Choose a layout</key>
         <key alias="addRows">Add a row</key>
@@ -1602,7 +1637,12 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="thisEditorUpdateSettings">using this editor will get updated with the new settings</key>
 
         <key alias="memberCanEdit">Member can edit</key>
+        <key alias="memberCanEditDescription">Allow this property value to be edited by the member on their profile page</key>
+        <key alias="isSensitiveData">Is sensitive data</key>
+        <key alias="isSensitiveDataDescription">Hide this property value from content editors that don't have access to view sensitive information</key>
         <key alias="showOnMemberProfile">Show on member profile</key>
+        <key alias="showOnMemberProfileDescription">Allow this property value to be displayed on the member profile page</key>
+        
         <key alias="tabHasNoSortOrder">tab has no sort order</key>
     </area>
 
@@ -1895,7 +1935,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 															Hi %0%,
 														</h1>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															You have been invited by <a href="mailto:%1%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> to the Umbraco Back Office.
+															You have been invited by <a href="mailto:%4%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> to the Umbraco Back Office.
 														</p>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															Message from <a href="mailto:%1%" style="text-decoration: none; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a>:
@@ -2011,7 +2051,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
         <key alias="httpsCheckExpiredCertificate">Your website's SSL certificate has expired.</key>
         <key alias="httpsCheckExpiringCertificate">Your website's SSL certificate is expiring in %0% days.</key>
-        <key alias="httpsCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
+        <key alias="healthCheckInvalidUrl">Error pinging the URL %0% - '%1%'</key>
         <key alias="httpsCheckIsCurrentSchemeHttps">You are currently %0% viewing the site using the HTTPS scheme.</key>
         <key alias="httpsCheckConfigurationRectifyNotPossible">The appSetting 'umbracoUseSSL' is set to 'false' in your web.config file. Once you access this site using the HTTPS scheme, that should be set to 'true'.</key>
         <key alias="httpsCheckConfigurationCheckResult">The appSetting 'umbracoUseSSL' is set to '%0%' in your web.config file, your cookies are %1% marked as secure.</key>
@@ -2051,10 +2091,25 @@ To manage your website, simply open the Umbraco back office and start adding con
 
         <key alias="clickJackingCheckHeaderFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was found.]]></key>
         <key alias="clickJackingCheckHeaderNotFound"><![CDATA[The header or meta-tag <strong>X-Frame-Options</strong> used to control whether a site can be IFRAMEd by another was not found.]]></key>
-        <key alias="clickJackingSetHeaderInConfig">Set Header in Config</key>
+        <key alias="setHeaderInConfig">Set Header in Config</key>
         <key alias="clickJackingSetHeaderInConfigDescription">Adds a value to the httpProtocol/customHeaders section of web.config to prevent the site being IFRAMEd by other websites.</key>
         <key alias="clickJackingSetHeaderInConfigSuccess">A setting to create a header preventing IFRAMEing of the site by other websites has been added to your web.config file.</key>
-        <key alias="clickJackingSetHeaderInConfigError">Could not update web.config file. Error: %0%</key>
+        <key alias="setHeaderInConfigError">Could not update web.config file. Error: %0%</key>
+
+        <key alias="noSniffCheckHeaderFound"><![CDATA[The header or meta-tag <strong>X-Content-Type-Options</strong> used to protect against MIME sniffing vulnerabilities was found.]]></key>
+        <key alias="noSniffCheckHeaderNotFound"><![CDATA[The header or meta-tag <strong>X-Content-Type-Options</strong> used to protect against MIME sniffing vulnerabilities was not found.]]></key>
+        <key alias="noSniffSetHeaderInConfigDescription">Adds a value to the httpProtocol/customHeaders section of web.config to protect against MIME sniffing vulnerabilities.</key>
+        <key alias="noSniffSetHeaderInConfigSuccess">A setting to create a header protecting against MIME sniffing vulnerabilities has been added to your web.config file.</key>
+
+        <key alias="hSTSCheckHeaderFound"><![CDATA[The header <strong>Strict-Transport-Security</strong>, also known as the HSTS-header, was found.]]></key>
+        <key alias="hSTSCheckHeaderNotFound"><![CDATA[The header <strong>Strict-Transport-Security</strong> was not found.]]></key>
+        <key alias="hSTSSetHeaderInConfigDescription">Adds the header 'Strict-Transport-Security' with the value 'max-age=10886400; preload' to the httpProtocol/customHeaders section of web.config. Use this fix only if you will have your domains running with https for the next 18 weeks (minimum).</key>
+        <key alias="hSTSSetHeaderInConfigSuccess">The HSTS header has been added to your web.config file.</key>
+
+        <key alias="xssProtectionCheckHeaderFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was found.]]></key>
+        <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[The header <strong>X-XSS-Protection</strong> was not found.]]></key>
+        <key alias="xssProtectionSetHeaderInConfigDescription">Adds the header 'X-XSS-Protection' with the value '1; mode=block' to the httpProtocol/customHeaders section of web.config. </key>
+        <key alias="xssProtectionSetHeaderInConfigSuccess">The X-XSS-Protection header has been added to your web.config file.</key>
 
         <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found

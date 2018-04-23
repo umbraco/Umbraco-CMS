@@ -20,7 +20,7 @@ namespace Umbraco.Core.Security
         /// Use this constructor to create/assign new UserData to the ticket
         /// </summary>
         /// <param name="sessionId">
-        /// The security stamp for the user
+        /// The current sessionId for the user
         /// </param>
         public UserData(string sessionId)
         {
@@ -30,10 +30,16 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// This is the 'security stamp' for validation
+        /// This is the 'sessionId' for validation
         /// </summary>        
         [DataMember(Name = "sessionId")]
-        public string SessionId { get; set; } 
+        public string SessionId { get; set; }
+
+        /// <summary>
+        /// This is the 'security stamp' for validation
+        /// </summary>        
+        [DataMember(Name = "securityStamp")]
+        public string SecurityStamp { get; set; }
 
         [DataMember(Name = "id")]
         public object Id { get; set; }

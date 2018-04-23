@@ -14,7 +14,7 @@
                 if (!model) {
                     return null;
                 }
-                var trimmed = _.omit(model, ["confirm", "generatedPassword"])
+                var trimmed = _.omit(model, ["confirm", "generatedPassword"]);
 
                 //ensure that the pass value is null if all child properties are null
                 var allNull = true;
@@ -56,7 +56,7 @@
                     });
 
                     var saveProperties = _.map(realProperties, function (p) {
-                        var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile');
+                        var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile', 'isSensitiveData');
                         return saveProperty;
                     });
 
@@ -267,10 +267,10 @@
                             // by looking at the key
                             switch (foundAlias[0]) {
                                 case "umbracoMemberLockedOut":
-                                    saveModel.isLockedOut = prop.value.toString() === "1" ? true : false;
+                                    saveModel.isLockedOut = prop.value ? (prop.value.toString() === "1" ? true : false) : false;
                                     break;
                                 case "umbracoMemberApproved":
-                                    saveModel.isApproved = prop.value.toString() === "1" ? true : false;
+                                    saveModel.isApproved = prop.value ? (prop.value.toString() === "1" ? true : false) : true;
                                     break;
                                 case "umbracoMemberComments":
                                     saveModel.comments = prop.value;
@@ -304,14 +304,14 @@
                     _.each(tab.properties, function (prop) {
 
                         //don't include the custom generic tab properties
-                        if (!prop.alias.startsWith("_umb_")) {
+                        //don't include a property that is marked readonly
+                        if (!prop.alias.startsWith("_umb_") && !prop.readonly) {
                             saveModel.properties.push({
                                 id: prop.id,
                                 alias: prop.alias,
                                 value: prop.value
                             });
                         }
-
                     });
                 });
 
@@ -324,22 +324,13 @@
                 //this is basically the same as for media but we need to explicitly add some extra properties
                 var saveModel = this.formatMediaPostData(displayModel, action);
 
-                var genericTab = _.find(displayModel.tabs, function (item) {
-                    return item.id === 0;
-                });
-
-                var propExpireDate = _.find(genericTab.properties, function (item) {
-                    return item.alias === "_umb_expiredate";
-                });
-                var propReleaseDate = _.find(genericTab.properties, function (item) {
-                    return item.alias === "_umb_releasedate";
-                });
-                var propTemplate = _.find(genericTab.properties, function (item) {
-                    return item.alias === "_umb_template";
-                });
-                saveModel.expireDate = propExpireDate ? propExpireDate.value : null;
-                saveModel.releaseDate = propReleaseDate ? propReleaseDate.value : null;
-                saveModel.templateAlias = propTemplate ? propTemplate.value : null;
+                var propExpireDate = displayModel.removeDate;
+                var propReleaseDate = displayModel.releaseDate;
+                var propTemplate = displayModel.template;
+            
+                saveModel.expireDate = propExpireDate ? propExpireDate : null;
+                saveModel.releaseDate = propReleaseDate ? propReleaseDate : null;
+                saveModel.templateAlias = propTemplate ? propTemplate : null;
 
                 return saveModel;
             }

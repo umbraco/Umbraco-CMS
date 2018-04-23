@@ -84,12 +84,18 @@ Use this directive to render a date time picker
 
         function link(scope, element, attrs, ctrl) {
 
+            scope.hasTranscludedContent = false;
+
             function onInit() {
+                
+                // check for transcluded content so we can hide the defualt markup
+                scope.hasTranscludedContent = element.find('.js-datePicker__transcluded-content')[0].children.length > 0;
+
                 // load css file for the date picker
-                assetsService.loadCss('lib/datetimepicker/bootstrap-datetimepicker.min.css');
+                assetsService.loadCss('lib/datetimepicker/bootstrap-datetimepicker.min.css', scope);
                 
                 // load the js file for the date picker
-                assetsService.loadJs('lib/datetimepicker/bootstrap-datetimepicker.js').then(function () {
+                assetsService.loadJs('lib/datetimepicker/bootstrap-datetimepicker.js', scope).then(function () {
                     // init date picker
                     initDatePicker();
                 });
@@ -148,7 +154,7 @@ Use this directive to render a date time picker
                     .on("dp.show", onShow)
                     .on("dp.change", onChange)
                     .on("dp.error", onError)
-                    .on("dp.update", onUpdate);
+                    .on("dp.update", onUpdate);                
             }
 
             onInit();
@@ -158,6 +164,7 @@ Use this directive to render a date time picker
         var directive = {
             restrict: 'E',
             replace: true,
+            transclude: true,
             templateUrl: 'views/components/umb-date-time-picker.html',
             scope: {
                 options: "=",

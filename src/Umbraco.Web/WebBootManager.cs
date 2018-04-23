@@ -40,6 +40,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
+using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Profiling;
 using Umbraco.Web.Search;
@@ -376,6 +377,10 @@ namespace Umbraco.Web
         protected override void InitializeResolvers()
         {
             base.InitializeResolvers();
+
+            FeaturesResolver.Current = new FeaturesResolver(new UmbracoFeatures());
+
+            TourFilterResolver.Current = new TourFilterResolver(ServiceProvider, LoggerResolver.Current.Logger);
 
             SearchableTreeResolver.Current = new SearchableTreeResolver(ServiceProvider, LoggerResolver.Current.Logger, ApplicationContext.Services.ApplicationTreeService, () => PluginManager.ResolveSearchableTrees());
 

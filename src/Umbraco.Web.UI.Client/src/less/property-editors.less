@@ -40,6 +40,16 @@
   padding: 10px;
 }
 
+.umb-contentpicker__min-max-help {
+    font-size: 13px;
+    margin-top: 5px;
+    color: @gray-4;
+}
+
+.show-validation .umb-contentpicker__min-max-help {
+    display: none;
+}
+
 .umb-contentpicker small {
 
   &:not(:last-child) {
@@ -203,10 +213,22 @@ ul.color-picker li a  {
 
 
 
-.umb-thumbnails{
-  position: relative;
+.umb-thumbnails {
+    position: relative;
+    display: flex;
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    -ms-flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    justify-content: flex-start;
 }
 
+.umb-thumbnails > li.icon {
+    width: 14%;
+    text-align: center;
+}
 
 .umb-thumbnails i{margin: auto;}
 .umb-thumbnails a{
@@ -243,7 +265,7 @@ ul.color-picker li a  {
 
 .umb-mediapicker .umb-sortable-thumbnails li {
     flex-direction: column;
-    margin: 0 5px 0 0;
+    margin: 0 5px 5px 0;
     padding: 5px;
 }
 
@@ -282,8 +304,8 @@ ul.color-picker li a  {
 }
 
 .umb-sortable-thumbnails .umb-sortable-thumbnails__wrapper {
-    width: 120px;
-    height: 114px;
+    width: 124px;
+    height: 124px;
     overflow: hidden;
 }
 
@@ -297,6 +319,12 @@ ul.color-picker li a  {
     opacity: 0;
     visibility: hidden;
 }
+
+.umb-sortable-thumbnails.ui-sortable:not(.ui-sortable-disabled) {
+    > li:not(.unsortable) {
+        cursor: move;
+    }
+} 
 
 .umb-sortable-thumbnails li:hover .umb-sortable-thumbnails__actions  {
     opacity: 1;
