@@ -63,7 +63,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a document type wth a given ID
+        /// Deletes a media type with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -120,17 +120,16 @@ namespace Umbraco.Web.Editors
 
 
         /// <summary>
-        /// Returns all member types
+        /// Returns all media types
         /// </summary>
         public IEnumerable<ContentTypeBasic> GetAll()
         {
-
             return Services.MediaTypeService.GetAll()
                                .Select(Mapper.Map<IMediaType, ContentTypeBasic>);
         }
 
         /// <summary>
-        /// Deletes a document type container wth a given ID
+        /// Deletes a media type container wth a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

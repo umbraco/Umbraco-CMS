@@ -489,6 +489,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getChildren: function (parentId, options) {
 
             var defaults = {
+                includeProperties: [],
                 pageSize: 0,
                 pageNumber: 0,
                 filter: '',
@@ -532,6 +533,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         "GetChildren",
                         {
                             id: parentId,
+                            includeProperties: _.pluck(options.includeProperties, 'alias').join(","),
                             pageNumber: options.pageNumber,
                             pageSize: options.pageSize,
                             orderBy: options.orderBy,

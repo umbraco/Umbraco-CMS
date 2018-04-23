@@ -77,14 +77,18 @@ namespace Umbraco.Web
             batch.Clear();
 
             //Write the instructions but only create JSON blobs with a max instruction count equal to MaxProcessingInstructionCount
-            foreach (var instructionsBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
+            using (var scope = ScopeProvider.CreateScope())
             {
-                WriteInstructions(instructionsBatch);
+                foreach (var instructionsBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
+                {
+                    WriteInstructions(scope, instructionsBatch);
+                }
+                scope.Complete();
             }
 
         }
 
-        private void WriteInstructions(IEnumerable<RefreshInstruction> instructions)
+        private void WriteInstructions(IScope scope, IEnumerable<RefreshInstruction> instructions)
         {
             var dto = new CacheInstructionDto
             {
@@ -93,12 +97,7 @@ namespace Umbraco.Web
                 OriginIdentity = LocalIdentity,
                 InstructionCount = instructions.Sum(x => x.JsonIdCount)
             };
-
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                scope.Database.Insert(dto);
-                scope.Complete();
-            }
+            scope.Database.Insert(dto);
         }
 
         protected ICollection<RefreshInstructionEnvelope> GetBatch(bool create)
@@ -139,9 +138,13 @@ namespace Umbraco.Web
             if (batch == null)
             {
                 //only write the json blob with a maximum count of the MaxProcessingInstructionCount
-                foreach (var maxBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
+                using (var scope = ScopeProvider.CreateScope())
                 {
-                    WriteInstructions(maxBatch);
+                    foreach (var maxBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
+                    {
+                        WriteInstructions(scope, maxBatch);
+                    }
+                    scope.Complete();
                 }
             }
             else

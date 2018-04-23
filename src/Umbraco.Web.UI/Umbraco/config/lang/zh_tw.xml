@@ -1283,7 +1283,7 @@
     <key alias="xmlDataIntegrityCheckMedia">媒體 - 所有XML：%0%，總共發佈：%1%，不合格：%2%</key>
     <key alias="xmlDataIntegrityCheckContent">內容 - 所有XML：%0%，總共發佈：%1%，不合格：%2%</key>
     <key alias="httpsCheckInvalidCertificate">憑證驗證錯誤：%0%</key>
-    <key alias="httpsCheckInvalidUrl">網址探查錯誤：%0% - '%1%'</key>
+    <key alias="healthCheckInvalidUrl">網址探查錯誤：%0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">您目前使用HTTPS瀏覽本站：%0%</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">在您的web.config檔案中，appSetting的umbracoUseSSL是設為false。當您開始使用HTTPS時，應將其改為 true。</key>
     <key alias="httpsCheckConfigurationCheckResult">在您的web.config檔案中，appSetting的umbracoUseSSL是設為 %0%，您的cookies %0% 標成安全。</key>
@@ -1316,10 +1316,10 @@
     <key alias="optionalFilePermissionFailed"><![CDATA[以下檔案必須擁有寫入權限好讓系統可以正常運作，但無法連接：<strong>%0%</strong>。如果無須寫入，不需採取行動。]]></key>
     <key alias="clickJackingCheckHeaderFound"><![CDATA[標頭或meta-tag的 <strong>X-Frame-Options</strong> 設定能控制網站是否可以被其他人IFRAMEd已找到。]]></key>
     <key alias="clickJackingCheckHeaderNotFound"><![CDATA[標頭或meta-tag的 <strong>X-Frame-Options</strong> 設定能控制網站是否可以被其他人IFRAMEd沒有找到。]]></key>
-    <key alias="clickJackingSetHeaderInConfig">調整設定的標頭</key>
+    <key alias="setHeaderInConfig">調整設定的標頭</key>
     <key alias="clickJackingSetHeaderInConfigDescription">在 web.config 的 httpProtocol/customHeaders 區域增加設定來防止本站被別的網站IFRAMEd。</key>
     <key alias="clickJackingSetHeaderInConfigSuccess">在 web.config 的 httpProtocol/customHeaders 區域已經增加設定來防止本站被別的網站IFRAMEd。</key>
-    <key alias="clickJackingSetHeaderInConfigError">無法更新web.config檔案，錯誤：%0%</key>
+    <key alias="setHeaderInConfigError">無法更新web.config檔案，錯誤：%0%</key>
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
   	-->
