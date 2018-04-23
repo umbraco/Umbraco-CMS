@@ -9,11 +9,22 @@
 function mediaEditController($scope, $routeParams, appState, mediaResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper, editorState, umbRequestHelper, $http) {
     
     var nodeId = null;
+    var create = false;
 
+    // when opening the editor through infinite editing get the 
+    // node id from the model instead of the route param
     if($scope.model && $scope.model.node && $scope.model.node.id) {
         nodeId = $scope.model.node.id;
     } else {
         nodeId = $routeParams.id;
+    }
+    
+    // when opening the editor through infinite editing get the 
+    // create option from the model instead of the route param
+    if($scope.model && $scope.model.infiniteMode) {
+        create = $scope.model.create;
+    } else {
+        create = $routeParams.create;
     }
 
     //setup scope vars
@@ -52,7 +63,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
         }
     }
 
-    if ($routeParams.create) {
+    if (create) {
 
         $scope.page.loading = true;
 
@@ -176,7 +187,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
             $scope.busy = true;
             $scope.page.saveButtonState = "busy";
 
-            mediaResource.save($scope.content, $routeParams.create, fileManager.getFiles())
+            mediaResource.save($scope.content, create, fileManager.getFiles())
                 .then(function(data) {
 
                     formHelper.resetForm({ scope: $scope, notifications: data.notifications });
