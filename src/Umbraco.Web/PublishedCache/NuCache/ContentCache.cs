@@ -65,7 +65,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (route == null) throw new ArgumentNullException(nameof(route));
 
             var cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing ? _elementsCache : _snapshotCache;
-            var key = CacheKeys.ContentCacheContentByRoute(route, preview);
+            var key = CacheKeys.ContentCacheContentByRoute(route, preview, culture);
             return cache.GetCacheItem<IPublishedContent>(key, () => GetByRouteInternal(preview, route, hideTopLevelNode, culture));
         }
 
