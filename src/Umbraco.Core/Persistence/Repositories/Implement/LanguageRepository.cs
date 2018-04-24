@@ -199,14 +199,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var entity = factory.BuildEntity(dto);
             return entity;
         }
-
-        public ILanguage GetByCultureName(string cultureName)
-        {
-            // use the underlying GetMany which will force cache all languages
-            // TODO we are cloning ALL in GetMany just to retrieve ONE, this is surely not optimized
-            return GetMany().FirstOrDefault(x => x.CultureName.InvariantEquals(cultureName));
-        }
-
+        
         public ILanguage GetByIsoCode(string isoCode)
         {
             TypedCachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way

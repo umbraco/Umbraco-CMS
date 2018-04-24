@@ -100,7 +100,7 @@ namespace Umbraco.Web.Routing
             else
             {
                 var result = new List<string>();
-                var languageIds = new List<int?>(domainUris.Select(x => _localizationService.GetLanguageByCultureCode(x.Culture.Name)?.Id).Where(x => x.HasValue));
+                var languageIds = new List<int?>(domainUris.Select(x => _localizationService.GetLanguageByIsoCode(x.Culture.Name)?.Id).Where(x => x.HasValue));
                 foreach (var langId in languageIds)
                 {
                     var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias, languageId: langId);

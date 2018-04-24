@@ -291,19 +291,6 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
-        /// Gets a <see cref="Language"/> by its culture code
-        /// </summary>
-        /// <param name="cultureName">Culture Name - also refered to as the Friendly name</param>
-        /// <returns><see cref="Language"/></returns>
-        public ILanguage GetLanguageByCultureCode(string cultureName)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _languageRepository.GetByCultureName(cultureName);
-            }
-        }
-
-        /// <summary>
         /// Gets a <see cref="Language"/> by its iso code
         /// </summary>
         /// <param name="isoCode">Iso Code of the language (ie. en-US)</param>
