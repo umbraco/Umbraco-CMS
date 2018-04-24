@@ -36,7 +36,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
             foreach (var propertyType in _contentNode.ContentType.PropertyTypes)
             {
                 if (contentData.Properties.TryGetValue(propertyType.Alias, out var pdatas))
+                {
                     properties.Add(new Property(propertyType, this, pdatas, _publishedSnapshotAccessor));
+                }
+                else
+                {
+                    //it doesn't exist in our serialized json but we should add it as an empty property so they are in sync
+                    properties.Add(new Property(propertyType, this, null, _publishedSnapshotAccessor));
+                }
             }
             PropertiesArray = properties.ToArray();
         }
@@ -259,8 +266,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             var index = _contentNode.ContentType.GetPropertyIndex(alias);
             if (index < 0) return null;
-            //TODO: Should we log here? I think this can happen when property types are added/removed from the doc type and the json serialized properties
-            // no longer match the list of property types since that is how the PropertiesArray is populated.
+            //fixme: This should not happen since we align the PropertiesArray with the property types in the ctor, if this does happen maybe we should throw a descriptive exception
             if (index >= PropertiesArray.Length) return null; 
             var property = PropertiesArray[index];
             return property;
