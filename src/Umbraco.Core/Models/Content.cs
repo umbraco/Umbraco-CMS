@@ -271,6 +271,9 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
+        public IEnumerable<string> PublishedCultures => _publishInfos.Keys;
+
+        /// <inheritdoc />
         public bool IsCultureEdited(string culture)
         {
             return string.IsNullOrWhiteSpace(GetPublishName(culture)) || (_edited != null && _edited.Contains(culture));
@@ -289,6 +292,12 @@ namespace Umbraco.Core.Models
         {
             _edited = new HashSet<string>(cultures, StringComparer.OrdinalIgnoreCase);
         }
+
+        /// <inheritdoc />
+        public IEnumerable<string> EditedCultures => Names.Keys.Where(IsCultureEdited);
+
+        /// <inheritdoc />
+        public IEnumerable<string> AvailableCultures => Names.Keys;
 
         [IgnoreDataMember]
         public int PublishedVersionId { get; internal set; }

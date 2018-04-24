@@ -90,10 +90,18 @@ namespace Umbraco.Core.Models
         /// </remarks>
         bool IsCulturePublished(string culture);
 
-        // fixme doc
+        /// <summary>
+        /// Gets the date a culture was published.
+        /// </summary>
         DateTime GetDateCulturePublished(string culture);
 
-        // fixme doc
+        /// <summary>
+        /// Gets a value indicated whether a given culture is edited.
+        /// </summary>
+        /// <remarks>
+        /// <para>A culture is edited when it is not published, or when it is published but
+        /// it has changes.</para>
+        /// </remarks>
         bool IsCultureEdited(string culture);
 
         /// <summary>
@@ -114,6 +122,21 @@ namespace Umbraco.Core.Models
         /// name, which must be get via the <see cref="PublishName"/> property.</para>
         /// </remarks>
         IReadOnlyDictionary<string, string> PublishNames { get; }
+
+        /// <summary>
+        /// Gets the available cultures.
+        /// </summary>
+        IEnumerable<string> AvailableCultures { get; }
+
+        /// <summary>
+        /// Gets the published cultures.
+        /// </summary>
+        IEnumerable<string> PublishedCultures { get; }
+
+        /// <summary>
+        /// Gets the edited cultures.
+        /// </summary>
+        IEnumerable<string> EditedCultures { get; }
 
         // fixme - these two should move to some kind of service
 
