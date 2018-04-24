@@ -258,7 +258,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override IPublishedProperty GetProperty(string alias)
         {
             var index = _contentNode.ContentType.GetPropertyIndex(alias);
-            var property = index < 0 ? null : PropertiesArray[index];
+            if (index < 0) return null;
+            //TODO: Should we log here? I think this can happen when property types are added/removed from the doc type and the json serialized properties
+            // no longer match the list of property types since that is how the PropertiesArray is populated.
+            //TODO: Does the PropertiesArray get repopulated on content save?
+            if (index > PropertiesArray.Length) return null; 
+            var property = PropertiesArray[index];
             return property;
         }
 
