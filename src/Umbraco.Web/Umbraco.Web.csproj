@@ -394,6 +394,8 @@
     <Compile Include="PublishedElementExtensions.cs" />
     <Compile Include="PublishedModels\DummyClassSoThatPublishedModelsNamespaceExists.cs" />
     <Compile Include="RelatedLinksTypeConverter.cs" />
+    <Compile Include="Routing\ContentFinderByUrl.cs" />
+    <Compile Include="Routing\ContentFinderByUrlAndTemplate.cs" />
     <Compile Include="Routing\ContentFinderCollection.cs" />
     <Compile Include="Routing\ContentFinderCollectionBuilder.cs" />
     <Compile Include="Routing\Domain.cs" />
@@ -1231,8 +1233,6 @@
     <Compile Include="Media\ThumbnailProviders\FileExtensionIconThumbnailProvider.cs" />
     <Compile Include="Media\ThumbnailProviders\ImageThumbnailProvider.cs" />
     <Compile Include="Routing\ContentFinderByIdPath.cs" />
-    <Compile Include="Routing\ContentFinderByNiceUrl.cs" />
-    <Compile Include="Routing\ContentFinderByNiceUrlAndTemplate.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Routing\DomainHelper.cs" />
     <Compile Include="Routing\PublishedRequest.cs" />

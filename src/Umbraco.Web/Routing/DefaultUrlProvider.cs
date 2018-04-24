@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -15,12 +16,14 @@ namespace Umbraco.Web.Routing
         private readonly IRequestHandlerSection _requestSettings;
         private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
+        private readonly ISiteDomainHelper _siteDomainHelper;
 
-        public DefaultUrlProvider(IRequestHandlerSection requestSettings, ILogger logger, IGlobalSettings globalSettings)
+        public DefaultUrlProvider(IRequestHandlerSection requestSettings, ILogger logger, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper)
         {
             _requestSettings = requestSettings;
             _logger = logger;
             _globalSettings = globalSettings;
+            _siteDomainHelper = siteDomainHelper;
         }
 
         #region GetUrl
@@ -37,13 +40,13 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
         /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
         /// </remarks>
-        public virtual string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string language = null)
+        public virtual string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, CultureInfo culture = null)
         {
             if (!current.IsAbsoluteUri)
                 throw new ArgumentException("Current url must be absolute.", "current");
 
             // will not use cache if previewing
-            var route = umbracoContext.ContentCache.GetRouteById(id, language);
+            var route = umbracoContext.ContentCache.GetRouteById(id, culture);
 
             return GetUrlFromRoute(route, umbracoContext, id, current, mode);
         }
@@ -57,7 +60,7 @@ namespace Umbraco.Web.Routing
                 return null;
             }
 
-            var domainHelper = new DomainHelper(umbracoContext.PublishedShapshot.Domains);
+            var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
 
             // extract domainUri and path
             // route is /<path> or <domainRootId>/<path>
@@ -98,7 +101,7 @@ namespace Umbraco.Web.Routing
                 return null;
             }
 
-            var domainHelper = new DomainHelper(umbracoContext.PublishedShapshot.Domains);
+            var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
 
             // extract domainUri and path
             // route is /<path> or <domainRootId>/<path>

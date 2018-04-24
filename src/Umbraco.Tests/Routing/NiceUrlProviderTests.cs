@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("/test", 1111, urlProviders: new []
             {
-                new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object)
+                new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
             
             var requestHandlerMock = Mock.Get(_umbracoSettings.RequestHandler);
@@ -108,7 +108,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("/test", 1111, urlProviders: new[]
             {
-                new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object)
+                new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
 
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
@@ -138,7 +138,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("/test", 1111, urlProviders: new[]
             {
-                new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object)
+                new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
 
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
@@ -162,7 +162,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, umbracoSettings: _umbracoSettings, urlProviders: new[]
             {
-                new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object)
+                new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
 
             Assert.AreEqual("/home/sub1/custom-sub-1/", umbracoContext.UrlProvider.GetUrl(1177));
@@ -185,7 +185,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, urlProviders: new[]
             {
-                new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object)
+                new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
 
             //mock the Umbraco settings that we need

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -18,12 +19,14 @@ namespace Umbraco.Web.Routing
         private readonly IGlobalSettings _globalSettings;
         private readonly IRequestHandlerSection _requestConfig;
         private readonly ILocalizationService _localizationService;
+        private readonly ISiteDomainHelper _siteDomainHelper;
 
-        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ILocalizationService localizationService)
+        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ILocalizationService localizationService, ISiteDomainHelper siteDomainHelper)
         {
             _globalSettings = globalSettings;
             _requestConfig = requestConfig;
             _localizationService = localizationService;
+            _siteDomainHelper = siteDomainHelper;
         }
 
         // note - at the moment we seem to accept pretty much anything as an alias
@@ -45,7 +48,7 @@ namespace Umbraco.Web.Routing
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
         /// </remarks>
-        public string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string language = null)
+        public string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, CultureInfo culture = null)
         {
             return null; // we have nothing to say
         }
@@ -77,7 +80,7 @@ namespace Umbraco.Web.Routing
             if (!node.HasProperty(Constants.Conventions.Content.UrlAlias))
                 return Enumerable.Empty<string>();
 
-            var domainHelper = new DomainHelper(umbracoContext.PublishedShapshot.Domains);
+            var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
 
             var n = node;
             var domainUris = domainHelper.DomainsForNode(n.Id, current, false);

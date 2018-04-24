@@ -74,7 +74,8 @@ namespace Umbraco.Tests.PublishedContent
                 new WebSecurity(httpContext, Current.Services.UserService, globalSettings),
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
-                globalSettings);
+                globalSettings,
+                ServiceContext.EntityService);
 
             return umbracoContext;
         }

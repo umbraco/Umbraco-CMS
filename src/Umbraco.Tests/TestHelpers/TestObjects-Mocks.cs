@@ -119,7 +119,7 @@ namespace Umbraco.Tests.TestHelpers
             var urlProviders = Enumerable.Empty<IUrlProvider>();
 
             if (accessor == null) accessor = new TestUmbracoContextAccessor();
-            return UmbracoContext.EnsureContext(accessor, httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings, true);
+            return UmbracoContext.EnsureContext(accessor, httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings, Mock.Of<IEntityService>(), true);
         }
 
         public IUmbracoSettingsSection GetUmbracoSettings()

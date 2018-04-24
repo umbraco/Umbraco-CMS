@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -13,7 +14,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentMapperProfile : Profile
     {
-        public ContentMapperProfile(IUserService userService, ILocalizedTextService textService, IContentService contentService, IContentTypeService contentTypeService, IDataTypeService dataTypeService, ILocalizationService localizationService)
+        public ContentMapperProfile(IUserService userService, ILocalizedTextService textService, IContentService contentService, IContentTypeService contentTypeService, IDataTypeService dataTypeService, ILocalizationService localizationService, ILogger logger)
         {
             // create, capture, cache
             var contentOwnerResolver = new OwnerResolver<IContent>(userService);
@@ -24,7 +25,7 @@ namespace Umbraco.Web.Models.Mapping
             var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>();
             var contentTreeNodeUrlResolver = new ContentTreeNodeUrlResolver<IContent, ContentTreeController>();
             var defaultTemplateResolver = new DefaultTemplateResolver();
-            var contentUrlResolver = new ContentUrlResolver();
+            var contentUrlResolver = new ContentUrlResolver(textService, contentService, logger);
             var variantResolver = new ContentItemDisplayVariationResolver(localizationService);
 
             //FROM IContent TO ContentItemDisplay

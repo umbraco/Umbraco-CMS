@@ -13,10 +13,12 @@ namespace Umbraco.Web.Routing
     public class DomainHelper
     {
         private readonly IDomainCache _domainCache;
+        private readonly ISiteDomainHelper _siteDomainHelper;
 
-        public DomainHelper(IDomainCache domainCache)
+        public DomainHelper(IDomainCache domainCache, ISiteDomainHelper siteDomainHelper)
         {
             _domainCache = domainCache;
+            _siteDomainHelper = siteDomainHelper;
         }
 
         #region Domain for Node
@@ -43,8 +45,7 @@ namespace Umbraco.Web.Routing
                 return null;
 
             // else filter
-            var helper = Current.SiteDomainHelper;
-            var domainAndUri = DomainForUri(domains, current, domainAndUris => helper.MapDomain(current, domainAndUris));
+            var domainAndUri = DomainForUri(domains, current, domainAndUris => _siteDomainHelper.MapDomain(current, domainAndUris));
 
             if (domainAndUri == null)
                 throw new Exception("DomainForUri returned null.");
@@ -88,8 +89,7 @@ namespace Umbraco.Web.Routing
             var domainAndUris = DomainsForUri(domains, current).ToArray();
 
             // filter
-            var helper = Current.SiteDomainHelper;
-            return helper.MapDomains(current, domainAndUris, excludeDefault).ToArray();
+            return _siteDomainHelper.MapDomains(current, domainAndUris, excludeDefault).ToArray();
         }
 
         #endregion
@@ -126,8 +126,9 @@ namespace Umbraco.Web.Routing
             DomainAndUri domainAndUri;
             if (current == null)
             {
-                // take the first one by default (what else can we do?)
-                domainAndUri = domainsAndUris.First(); // .First() protected by .Any() above
+                //get the default domain (there should be one)
+                domainAndUri = domainsAndUris.FirstOrDefault(x => x.IsDefault);
+                if (domainAndUri == null) domainsAndUris.First(); // take the first one by default (what else can we do?)
             }
             else
             {

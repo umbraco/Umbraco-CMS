@@ -265,7 +265,7 @@ namespace Umbraco.Tests.TestHelpers
                 cache, publishedSnapshotAccessor,
                 Container.GetInstance<IDocumentRepository>(), Container.GetInstance<IMediaRepository>(), Container.GetInstance<IMemberRepository>(),
                 Logger,
-                Container.GetInstance<IGlobalSettings>(),
+                Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
                 ContentTypesCache,
                 null, true, Options.PublishedRepositoryEvents);
 
@@ -366,7 +366,8 @@ namespace Umbraco.Tests.TestHelpers
                 new WebSecurity(httpContext, Container.GetInstance<IUserService>(), Container.GetInstance<IGlobalSettings>()),
                 umbracoSettings ?? Container.GetInstance<IUmbracoSettingsSection>(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
-                globalSettings ?? Container.GetInstance<IGlobalSettings>());
+                globalSettings ?? Container.GetInstance<IGlobalSettings>(),
+                ServiceContext.EntityService);
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

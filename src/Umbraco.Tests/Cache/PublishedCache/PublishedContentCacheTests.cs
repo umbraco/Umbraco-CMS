@@ -62,9 +62,9 @@ namespace Umbraco.Tests.Cache.PublishedCache
             _xml.LoadXml(GetXml());
             var xmlStore = new XmlStore(() => _xml, null, null, null);
             var cacheProvider = new StaticCacheProvider();
-            var domainCache = new DomainCache(ServiceContext.DomainService);
+            var domainCache = new DomainCache(ServiceContext.DomainService, ServiceContext.LocalizationService);
             var publishedShapshot = new Umbraco.Web.PublishedCache.XmlPublishedCache.PublishedShapshot(
-                new PublishedContentCache(xmlStore, domainCache, cacheProvider, globalSettings, ContentTypesCache, null, null),
+                new PublishedContentCache(xmlStore, domainCache, cacheProvider, globalSettings, new SiteDomainHelper(), ContentTypesCache, null, null),
                 new PublishedMediaCache(xmlStore, ServiceContext.MediaService, ServiceContext.UserService, cacheProvider, ContentTypesCache),
                 new PublishedMemberCache(null, cacheProvider, Current.Services.MemberService, ContentTypesCache),
                 domainCache);
@@ -77,7 +77,8 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 new WebSecurity(_httpContextFactory.HttpContext, Current.Services.UserService, globalSettings),
                 umbracoSettings,
                 Enumerable.Empty<IUrlProvider>(),
-                globalSettings);
+                globalSettings,
+                ServiceContext.EntityService);
 
             _cache = _umbracoContext.ContentCache;
         }

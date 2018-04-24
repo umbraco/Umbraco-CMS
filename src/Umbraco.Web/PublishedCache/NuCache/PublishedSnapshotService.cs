@@ -43,6 +43,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IMediaRepository _mediaRepository;
         private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
+        private readonly ISiteDomainHelper _siteDomainHelper;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -81,7 +82,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public PublishedSnapshotService(Options options, MainDom mainDom, IRuntimeState runtime,
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, IScopeProvider scopeProvider,
-            IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository, IGlobalSettings globalSettings)
+            IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
+            IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper)
             : base(publishedSnapshotAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -96,6 +98,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _mediaRepository = mediaRepository;
             _memberRepository = memberRepository;
             _globalSettings = globalSettings;
+            _siteDomainHelper = siteDomainHelper;
 
             // we always want to handle repository events, configured or not
             // assuming no repository event will trigger before the whole db is ready
@@ -484,7 +487,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var domains = _serviceContext.DomainService.GetAll(true);
             foreach (var domain in domains
                 .Where(x => x.RootContentId.HasValue && x.LanguageIsoCode.IsNullOrWhiteSpace() == false)
-                .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, CultureInfo.GetCultureInfo(x.LanguageIsoCode), x.IsWildcard)))
+                .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, CultureInfo.GetCultureInfo(x.LanguageIsoCode), x.IsWildcard, x.IsDefaultDomain(_serviceContext.LocalizationService))))
             {
                 _domainStore.Set(domain.Id, domain);
             }
@@ -828,7 +831,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                             if (domain.RootContentId.HasValue == false) continue; // anomaly
                             if (domain.LanguageIsoCode.IsNullOrWhiteSpace()) continue; // anomaly
                             var culture = CultureInfo.GetCultureInfo(domain.LanguageIsoCode);
-                            _domainStore.Set(domain.Id, new Domain(domain.Id, domain.DomainName, domain.RootContentId.Value, culture, domain.IsWildcard));
+                            _domainStore.Set(domain.Id, new Domain(domain.Id, domain.DomainName, domain.RootContentId.Value, culture, domain.IsWildcard, domain.IsDefaultDomain(_serviceContext.LocalizationService)));
                             break;
                     }
                 }
@@ -1012,10 +1015,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _publishedContentTypeFactory, _logger);
 
             var domainCache = new DomainCache(domainSnap);
+            var domainHelper = new DomainHelper(domainCache, _siteDomainHelper);
 
             return new PublishedShapshot.PublishedSnapshotElements
             {
-                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, new DomainHelper(domainCache), _globalSettings, _serviceContext.LocalizationService),
+                ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainHelper, _globalSettings, _serviceContext.LocalizationService),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, snapshotCache, elementsCache),
                 MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, _serviceContext.DataTypeService, _serviceContext.LocalizationService, memberTypeCache, PublishedSnapshotAccessor),
                 DomainCache = domainCache,

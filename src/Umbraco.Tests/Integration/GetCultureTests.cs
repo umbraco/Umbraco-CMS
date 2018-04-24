@@ -54,18 +54,21 @@ namespace Umbraco.Tests.Integration
             var content = c2;
             var culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(null,
                 ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService,
+                new SiteDomainHelper(),
                 content.Id, content.Path, new Uri("http://domain1.com/"));
             Assert.AreEqual("en-US", culture.Name);
 
             content = c2;
             culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(null,
                 ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService,
+                new SiteDomainHelper(),
                 content.Id, content.Path, new Uri("http://domain1.fr/"));
             Assert.AreEqual("fr-FR", culture.Name);
 
             content = c4;
             culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(null,
                 ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService,
+                new SiteDomainHelper(),
                 content.Id, content.Path, new Uri("http://domain1.fr/"));
             Assert.AreEqual("de-DE", culture.Name);
         }
@@ -102,12 +105,14 @@ namespace Umbraco.Tests.Integration
             var content = c2;
             var culture = Umbraco.Web.Models.ContentExtensions.GetCulture(null,
                 ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService,
+                new SiteDomainHelper(),
                 content.Id, content.Path, new Uri("http://domain1.com/"));
             Assert.AreEqual("de-DE", culture.Name);
 
             content = c4;
             culture = Umbraco.Web.Models.ContentExtensions.GetCulture(null,
                 ServiceContext.DomainService, ServiceContext.LocalizationService, ServiceContext.ContentService,
+                new SiteDomainHelper(),
                 content.Id, content.Path, new Uri("http://domain1.fr/"));
             Assert.AreEqual("fr-FR", culture.Name);
         }

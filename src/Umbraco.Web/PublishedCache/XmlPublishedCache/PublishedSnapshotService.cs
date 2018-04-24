@@ -13,6 +13,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Cache;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
@@ -31,6 +32,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly IUserService _userService;
         private readonly ICacheProvider _requestCache;
         private readonly IGlobalSettings _globalSettings;
+        private readonly ILocalizationService _localizationService;
+        private readonly ISiteDomainHelper _siteDomainHelper;
 
         #region Constructors
 
@@ -44,11 +47,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             ILogger logger,
             IGlobalSettings globalSettings,
+            ISiteDomainHelper siteDomainHelper,
             MainDom mainDom,
             bool testing = false, bool enableRepositoryEvents = true)
             : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache, segmentProviders, publishedSnapshotAccessor,
                 documentRepository, mediaRepository, memberRepository,
-                logger, globalSettings, null, mainDom, testing, enableRepositoryEvents)
+                logger, globalSettings, siteDomainHelper, null, mainDom, testing, enableRepositoryEvents)
         { }
 
         // used in some tests
@@ -60,12 +64,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             ILogger logger,
             IGlobalSettings globalSettings,
+            ISiteDomainHelper siteDomainHelper,
             PublishedContentTypeCache contentTypeCache,
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
             : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), publishedSnapshotAccessor,
                 documentRepository, mediaRepository, memberRepository,
-                logger, globalSettings, contentTypeCache, mainDom, testing, enableRepositoryEvents)
+                logger, globalSettings, siteDomainHelper, contentTypeCache, mainDom, testing, enableRepositoryEvents)
         { }
 
         private PublishedSnapshotService(ServiceContext serviceContext,
@@ -77,6 +82,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
             ILogger logger,
             IGlobalSettings globalSettings,
+            ISiteDomainHelper siteDomainHelper,
             PublishedContentTypeCache contentTypeCache,
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
@@ -95,9 +101,11 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _memberService = serviceContext.MemberService;
             _mediaService = serviceContext.MediaService;
             _userService = serviceContext.UserService;
+            _localizationService = serviceContext.LocalizationService;
 
             _requestCache = requestCache;
             _globalSettings = globalSettings;
+            _siteDomainHelper = siteDomainHelper;
         }
 
         public override void Dispose()
@@ -138,10 +146,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // the current caches, but that would mean creating an extra cache (StaticCache
             // probably) so better use RequestCache.
 
-            var domainCache = new DomainCache(_domainService);
+            var domainCache = new DomainCache(_domainService, _localizationService);
 
             return new PublishedShapshot(
-                new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _contentTypeCache, _routesCache, previewToken),
+                new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _siteDomainHelper, _contentTypeCache, _routesCache, previewToken),
                 new PublishedMediaCache(_xmlStore, _mediaService, _userService, _requestCache, _contentTypeCache),
                 new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache),
                 domainCache);

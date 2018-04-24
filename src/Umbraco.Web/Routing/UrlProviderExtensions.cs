@@ -11,11 +11,6 @@ namespace Umbraco.Web.Routing
 {
     internal static class UrlProviderExtensions
     {
-        // fixme inject
-        private static ILocalizedTextService TextService => Current.Services.TextService;
-        private static IContentService ContentService => Current.Services.ContentService;
-        private static ILogger Logger => Current.Logger;
-
         /// <summary>
         /// Gets the URLs for the content item
         /// </summary>
@@ -26,28 +21,30 @@ namespace Umbraco.Web.Routing
         /// Use this when displaying URLs, if there are errors genertaing the urls the urls themselves will
         /// contain the errors.
         /// </remarks>
-        public static IEnumerable<string> GetContentUrls(this IContent content, UmbracoContext umbracoContext)
+        public static IEnumerable<string> GetContentUrls(this IContent content, UrlProvider urlProvider, ILocalizedTextService textService, IContentService contentService, ILogger logger)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
+            if (urlProvider == null) throw new ArgumentNullException(nameof(urlProvider));
+            if (textService == null) throw new ArgumentNullException(nameof(textService));
+            if (contentService == null) throw new ArgumentNullException(nameof(contentService));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
 
             var urls = new List<string>();
 
             if (content.Published == false)
             {
-                urls.Add(TextService.Localize("content/itemNotPublished"));
+                urls.Add(textService.Localize("content/itemNotPublished"));
                 return urls;
             }
 
             string url;
-            var urlProvider = umbracoContext.UrlProvider;
             try
             {
                 url = urlProvider.GetUrl(content.Id);
             }
             catch (Exception e)
             {
-                Logger.Error<UrlProvider>("GetUrl exception.", e);
+                logger.Error<UrlProvider>("GetUrl exception.", e);
                 url = "#ex";
             }
             if (url == "#")
@@ -57,17 +54,17 @@ namespace Umbraco.Web.Routing
                 var parent = content;
                 do
                 {
-                    parent = parent.ParentId > 0 ? parent.Parent(ContentService) : null;
+                    parent = parent.ParentId > 0 ? parent.Parent(contentService) : null;
                 }
                 while (parent != null && parent.Published);
 
                 urls.Add(parent == null
-                    ? TextService.Localize("content/parentNotPublishedAnomaly") // oops - internal error
-                    : TextService.Localize("content/parentNotPublished", new[] { parent.Name }));
+                    ? textService.Localize("content/parentNotPublishedAnomaly") // oops - internal error
+                    : textService.Localize("content/parentNotPublished", new[] { parent.Name }));
             }
             else if (url == "#ex")
             {
-                urls.Add(TextService.Localize("content/getUrlException"));
+                urls.Add(textService.Localize("content/getUrlException"));
             }
             else
             {
@@ -81,7 +78,7 @@ namespace Umbraco.Web.Routing
 
                 if (pcr.HasPublishedContent == false)
                 {
-                    urls.Add(TextService.Localize("content/routeError", new[] { "(error)" }));
+                    urls.Add(textService.Localize("content/routeError", new[] { "(error)" }));
                 }
                 else if (pcr.PublishedContent.Id != content.Id)
                 {
@@ -103,7 +100,7 @@ namespace Umbraco.Web.Routing
                         s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent.Id + ")";
 
                     }
-                    urls.Add(TextService.Localize("content/routeError", s));
+                    urls.Add(textService.Localize("content/routeError", s));
                 }
                 else
                 {

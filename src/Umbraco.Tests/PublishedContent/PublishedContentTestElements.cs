@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Moq;
 using Umbraco.Core;
@@ -58,22 +59,22 @@ namespace Umbraco.Tests.PublishedContent
             _content.Clear();
         }
 
-        public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null)
+        public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, CultureInfo culture = null)
         {
             throw new NotImplementedException();
         }
 
-        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null)
+        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, CultureInfo culture = null)
         {
             throw new NotImplementedException();
         }
 
-        public string GetRouteById(bool preview, int contentId, string language = null)
+        public string GetRouteById(bool preview, int contentId, CultureInfo culture = null)
         {
             throw new NotImplementedException();
         }
 
-        public string GetRouteById(int contentId, string language = null)
+        public string GetRouteById(int contentId, CultureInfo culture = null)
         {
             throw new NotImplementedException();
         }

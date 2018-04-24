@@ -10,6 +10,7 @@ using LightInject;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
@@ -33,6 +34,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 factory.GetInstance<IMemberRepository>(),
                 factory.GetInstance<ILogger>(),
                 factory.GetInstance<IGlobalSettings>(),
+                factory.GetInstance<ISiteDomainHelper>(),
                 factory.GetInstance<MainDom>()));
 
             // add the Xml cache health check (hidden from type finder)

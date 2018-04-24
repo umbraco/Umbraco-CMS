@@ -4,6 +4,7 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Runtime;
@@ -18,6 +19,7 @@ namespace Umbraco.Web
     {
         private readonly IGlobalSettings _globalSettings;
         private readonly Lazy<IPublishedShapshot> _publishedSnapshot;
+        private DomainHelper _domainHelper;
         private string _previewToken;
         private bool? _previewing;
 
@@ -28,10 +30,10 @@ namespace Umbraco.Web
         ///  </summary>
         /// <param name="umbracoContextAccessor"></param>
         /// <param name="httpContext">An http context.</param>
-        ///  <param name="publishedSnapshotService">A published snapshot service.</param>
-        ///  <param name="webSecurity">A security helper.</param>
-        ///  <param name="umbracoSettings">The umbraco settings.</param>
-        ///  <param name="urlProviders">Some url providers.</param>
+        /// <param name="publishedSnapshotService">A published snapshot service.</param>
+        /// <param name="webSecurity">A security helper.</param>
+        /// <param name="umbracoSettings">The umbraco settings.</param>
+        /// <param name="urlProviders">Some url providers.</param>
         /// <param name="globalSettings"></param>
         /// <param name="replace">A value indicating whether to replace the existing context.</param>
         ///  <returns>The "current" UmbracoContext.</returns>
@@ -67,6 +69,7 @@ namespace Umbraco.Web
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
             IGlobalSettings globalSettings,
+            IEntityService entityService,
             bool replace = false)
         {
             if (umbracoContextAccessor == null) throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -84,7 +87,7 @@ namespace Umbraco.Web
 
             // create & assign to accessor, dispose existing if any
             umbracoContextAccessor.UmbracoContext?.Dispose();
-            return umbracoContextAccessor.UmbracoContext = new UmbracoContext(httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings);
+            return umbracoContextAccessor.UmbracoContext = new UmbracoContext(httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings, entityService);
         }
 
         // initializes a new instance of the UmbracoContext class
@@ -96,7 +99,8 @@ namespace Umbraco.Web
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
-            IGlobalSettings globalSettings)
+            IGlobalSettings globalSettings,
+            IEntityService entityService)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -132,7 +136,7 @@ namespace Umbraco.Web
             //
             OriginalRequestUrl = GetRequestFromContext()?.Url ?? new Uri("http://localhost");
             CleanedUmbracoUrl = UriUtility.UriToUmbraco(OriginalRequestUrl);
-            UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders);
+            UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders, entityService);
         }
 
         #endregion
@@ -208,6 +212,24 @@ namespace Umbraco.Web
         /// Exposes the HttpContext for the current request
         /// </summary>
         public HttpContextBase HttpContext { get; }
+
+        /// <summary>
+        /// Creates and caches an instance of a DomainHelper
+        /// </summary>
+        /// <remarks>
+        /// We keep creating new instances of DomainHelper, it would be better if we didn't have to do that so instead we can
+        /// have one attached to the UmbracoContext. This method accepts an external ISiteDomainHelper otherwise the UmbracoContext
+        /// ctor will have to have another parameter added only for this one method which is annoying and doesn't make a ton of sense
+        /// since the UmbracoContext itself doesn't use this.
+        ///
+        /// TODO The alternative is to have a IDomainHelperAccessor singleton which is cached per UmbracoContext
+        /// </remarks>
+        internal DomainHelper GetDomainHelper(ISiteDomainHelper siteDomainHelper)
+        {
+            if (_domainHelper == null)
+                _domainHelper = new DomainHelper(PublishedShapshot.Domains, siteDomainHelper);
+            return _domainHelper;
+        }
 
         /// <summary>
         /// Gets a value indicating whether the request has debugging enabled

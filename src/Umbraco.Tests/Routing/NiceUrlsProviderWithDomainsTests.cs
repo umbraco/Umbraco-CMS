@@ -184,7 +184,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[]
             {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
             
             SetDomains1();
@@ -220,7 +220,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[]
             {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
 
             SetDomains2();
@@ -248,7 +248,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[]
             {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
 
             SetDomains3();
@@ -282,7 +282,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[]
             {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
 
             SetDomains4();
@@ -306,7 +306,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("/test", 1111, umbracoSettings: settings, urlProviders: new[]
             {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
 
             SetDomains4();
@@ -373,7 +373,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("http://domain1.com/test", 1111, umbracoSettings: settings, urlProviders: new[]
             {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
 
             SetDomains4();
@@ -405,7 +405,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoContext = GetUmbracoContext("http://domain1.com/en/test", 1111, umbracoSettings: settings, urlProviders: new[]
             {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
 
             SetDomains5();

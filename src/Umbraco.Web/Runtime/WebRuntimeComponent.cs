@@ -169,9 +169,9 @@ namespace Umbraco.Web.Runtime
                 // all built-in finders in the correct order,
                 // devs can then modify this list on application startup
                 .Append<ContentFinderByPageIdQuery>()
-                .Append<ContentFinderByNiceUrl>()
+                .Append<ContentFinderByUrl>()
                 .Append<ContentFinderByIdPath>()
-                .Append<ContentFinderByNiceUrlAndTemplate>()
+                .Append<ContentFinderByUrlAndTemplate>()
                 .Append<ContentFinderByUrlAlias>()
                 .Append<ContentFinderByRedirectUrl>();
 
@@ -212,6 +212,7 @@ namespace Umbraco.Web.Runtime
             IUserService userService,
             IUmbracoSettingsSection umbracoSettings,
             IGlobalSettings globalSettings,
+            IEntityService entityService,
             UrlProviderCollection urlProviders)
         {
             // setup mvc and webapi services
@@ -248,7 +249,8 @@ namespace Umbraco.Web.Runtime
                 new WebSecurity(httpContext, userService, globalSettings),
                 umbracoSettings,
                 urlProviders,
-                globalSettings);
+                globalSettings,
+                entityService);
 
             // ensure WebAPI is initialized, after everything
             GlobalConfiguration.Configuration.EnsureInitialized();

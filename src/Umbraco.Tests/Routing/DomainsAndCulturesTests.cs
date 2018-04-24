@@ -277,7 +277,7 @@ namespace Umbraco.Tests.Routing
 
             Assert.AreEqual(expectedCulture, frequest.Culture.Name);
             
-            var finder = new ContentFinderByNiceUrl(Logger);
+            var finder = new ContentFinderByUrl(Logger);
             var result = finder.TryFindContent(frequest);
 
             Assert.IsTrue(result);
@@ -326,7 +326,7 @@ namespace Umbraco.Tests.Routing
             publishedRouter.FindDomain(frequest);
 
             // find document
-            var finder = new ContentFinderByNiceUrl(Logger);
+            var finder = new ContentFinderByUrl(Logger);
             var result = finder.TryFindContent(frequest);
 
             // apply wildcard domain
@@ -378,7 +378,7 @@ namespace Umbraco.Tests.Routing
             var content = umbracoContext.ContentCache.GetById(nodeId);
             Assert.IsNotNull(content);
 
-            var culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(umbracoContext, domainService, ServiceContext.LocalizationService, null, content.Id, content.Path, new Uri(currentUrl));
+            var culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(umbracoContext, domainService, ServiceContext.LocalizationService, null, new SiteDomainHelper(), content.Id, content.Path, new Uri(currentUrl));
             Assert.AreEqual(expectedCulture, culture.Name);
         }
     }

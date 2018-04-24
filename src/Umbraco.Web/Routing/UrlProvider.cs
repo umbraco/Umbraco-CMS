@@ -7,6 +7,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Composing;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Routing
 {
@@ -23,13 +24,13 @@ namespace Umbraco.Web.Routing
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="routingSettings"></param>
         /// <param name="urlProviders">The list of url providers.</param>
-        public UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders)
+        public UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders, IEntityService entityService)
         {
             if (routingSettings == null) throw new ArgumentNullException(nameof(routingSettings));
 
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _urlProviders = urlProviders;
-
+            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             var provider = UrlProviderMode.Auto;
             Mode = provider;
 
@@ -55,6 +56,7 @@ namespace Umbraco.Web.Routing
 
         private readonly UmbracoContext _umbracoContext;
         private readonly IEnumerable<IUrlProvider> _urlProviders;
+        private readonly IEntityService _entityService;
 
         /// <summary>
         /// Gets or sets the provider url mode.
@@ -76,7 +78,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id)
         {
-            var intId = Current.Services.EntityService.GetId(id, UmbracoObjectTypes.Document);
+            var intId = _entityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1);
         }
 
@@ -93,7 +95,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id, bool absolute)
         {
-            var intId = Current.Services.EntityService.GetId(id, UmbracoObjectTypes.Document);
+            var intId = _entityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, absolute);
         }
 
@@ -111,7 +113,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id, Uri current, bool absolute)
         {
-            var intId = Current.Services.EntityService.GetId(id, UmbracoObjectTypes.Document);
+            var intId = _entityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, current, absolute);
         }
 
@@ -127,7 +129,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public string GetUrl(Guid id, UrlProviderMode mode)
         {
-            var intId = Current.Services.EntityService.GetId(id, UmbracoObjectTypes.Document);
+            var intId = _entityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, mode);
         }
 

@@ -425,17 +425,20 @@ namespace Umbraco.Tests.Web.Mvc
             var factory = Mock.Of<IPublishedContentTypeFactory>();
             _service = new PublishedSnapshotService(svcCtx, factory, scopeProvider, cache, Enumerable.Empty<IUrlSegmentProvider>(), null,
                 null, null, null,
-                Current.Logger, TestObjects.GetGlobalSettings(), null, true, false); // no events
+                Current.Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(), null, true, false); // no events
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
+
+            var globalSettings = TestObjects.GetGlobalSettings();
 
             var ctx = new UmbracoContext(
                 GetHttpContextFactory(url, routeData).HttpContext,
                 _service,
-                new WebSecurity(http, Current.Services.UserService, TestObjects.GetGlobalSettings()),
+                new WebSecurity(http, Current.Services.UserService, globalSettings),
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
-                TestObjects.GetGlobalSettings());
+                globalSettings,
+                Mock.Of<IEntityService>());
 
             //if (setSingleton)
             //{

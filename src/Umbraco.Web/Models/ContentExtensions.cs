@@ -11,23 +11,27 @@ namespace Umbraco.Web.Models
 {
     public static class ContentExtensions
     {
-        /// <summary>
-        /// Gets the culture that would be selected to render a specified content,
-        /// within the context of a specified current request.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="current">The request Uri.</param>
-        /// <returns>The culture that would be selected to render the content.</returns>
-        public static CultureInfo GetCulture(this IContent content, Uri current = null)
-        {
-            return GetCulture(UmbracoContext.Current,
-                Current.Services.DomainService,
-                Current.Services.LocalizationService,
-                Current.Services.ContentService,
-                content.Id, content.Path,
-                current);
-        }
+        //TODO: Not used
+        ///// <summary>
+        ///// Gets the culture that would be selected to render a specified content,
+        ///// within the context of a specified current request.
+        ///// </summary>
+        ///// <param name="content">The content.</param>
+        ///// <param name="current">The request Uri.</param>
+        ///// <returns>The culture that would be selected to render the content.</returns>
+        //public static CultureInfo GetCulture(this IContent content, Uri current = null)
+        //{
+        //    return GetCulture(UmbracoContext.Current,
+        //        Current.Services.DomainService,
+        //        Current.Services.LocalizationService,
+        //        Current.Services.ContentService,
+        //        content.Id, content.Path,
+        //        current);
+        //}
 
+
+
+        //TODO: Not used - only in tests
         /// <summary>
         /// Gets the culture that would be selected to render a specified content,
         /// within the context of a specified current request.
@@ -42,6 +46,7 @@ namespace Umbraco.Web.Models
         /// <returns>The culture that would be selected to render the content.</returns>
         internal static CultureInfo GetCulture(UmbracoContext umbracoContext,
             IDomainService domainService, ILocalizationService localizationService, IContentService contentService,
+            ISiteDomainHelper siteDomainHelper,
             int contentId, string contentPath, Uri current)
         {
             var route = umbracoContext == null
@@ -49,15 +54,17 @@ namespace Umbraco.Web.Models
                 : umbracoContext.ContentCache.GetRouteById(contentId); // may be cached
 
             var domainCache = umbracoContext == null
-                ? new PublishedCache.XmlPublishedCache.DomainCache(domainService) // for tests only
+                ? new PublishedCache.XmlPublishedCache.DomainCache(domainService, localizationService) // for tests only
                 : umbracoContext.PublishedShapshot.Domains; // default
-            var domainHelper = new DomainHelper(domainCache);
+            var domainHelper = umbracoContext.GetDomainHelper(siteDomainHelper);
             Domain domain;
 
             if (route == null)
             {
                 // if content is not published then route is null and we have to work
                 // on non-published content (note: could optimize by checking routes?)
+
+                // fixme - even non-published content is stored in the cache or in the cmsContentNu table which would be faster to lookup
 
                 var content = contentService.GetById(contentId);
                 if (content == null)
@@ -93,7 +100,7 @@ namespace Umbraco.Web.Models
 
         private static CultureInfo GetDefaultCulture(ILocalizationService localizationService)
         {
-            var defaultLanguage = localizationService.GetAllLanguages().FirstOrDefault();
+            var defaultLanguage = localizationService.GetDefaultVariantLanguage();
             return defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.IsoCode);
         }
 

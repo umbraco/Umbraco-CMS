@@ -348,6 +348,7 @@
     <Compile Include="Models\ContentTagsExtensions.cs" />
     <Compile Include="Models\ContentTypeBaseExtensions.cs" />
     <Compile Include="Models\DataTypeExtensions.cs" />
+    <Compile Include="Models\DomainExtensions.cs" />
     <Compile Include="Models\Editors\ContentPropertyFile.cs" />
     <Compile Include="Models\Entities\BeingDirty.cs" />
     <Compile Include="Models\Entities\IEntitySlim.cs" />

@@ -303,7 +303,12 @@ namespace Umbraco.Web.Routing
 
             // we do our best, but can't do the impossible
             if (qualifiedSites == null)
-                return domainAndUris.First();
+            {
+                //fixme take the default
+                var defaultDomain = domainAndUris.FirstOrDefault(x => x.IsDefault);
+                if (defaultDomain == null) defaultDomain = domainAndUris.First(); //this shouldn't occur but just in case
+                return defaultDomain;
+            }
 
             // find a site that contains the current authority
             var currentSite = qualifiedSites.FirstOrDefault(site => site.Value.Contains(currentAuthority));

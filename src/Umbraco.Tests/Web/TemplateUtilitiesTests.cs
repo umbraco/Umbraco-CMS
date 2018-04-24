@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Web;
 using LightInject;
 using Moq;
@@ -72,7 +73,7 @@ namespace Umbraco.Tests.Web
 
             //setup a mock url provider which we'll use fo rtesting
             var testUrlProvider = new Mock<IUrlProvider>();
-            testUrlProvider.Setup(x => x.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>()))
+            testUrlProvider.Setup(x => x.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>(), It.IsAny<CultureInfo>()))
                 .Returns((UmbracoContext umbCtx, int id, Uri url, UrlProviderMode mode) =>
                 {
                     return "/my-test-url";
@@ -90,6 +91,7 @@ namespace Umbraco.Tests.Web
                 //pass in the custom url provider
                 new[]{ testUrlProvider.Object },
                 globalSettings,
+                entityService.Object,
                 true))
             {
                 var output = TemplateUtilities.ParseInternalLinks(input, umbCtx.UrlProvider);

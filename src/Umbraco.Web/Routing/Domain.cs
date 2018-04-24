@@ -15,13 +15,14 @@ namespace Umbraco.Web.Routing
         /// <param name="contentId">The identifier of the content which supports the domain.</param>
         /// <param name="culture">The culture of the domain.</param>
         /// <param name="isWildcard">A value indicating whether the domain is a wildcard domain.</param>
-        public Domain(int id, string name, int contentId, CultureInfo culture, bool isWildcard)
+        public Domain(int id, string name, int contentId, CultureInfo culture, bool isWildcard, bool isDefault)
         {
             Id = id;
             Name = name;
             ContentId = contentId;
             Culture = culture;
             IsWildcard = isWildcard;
+            IsDefault = isDefault;
         }
 
         /// <summary>
@@ -35,6 +36,7 @@ namespace Umbraco.Web.Routing
             ContentId = domain.ContentId;
             Culture = domain.Culture;
             IsWildcard = domain.IsWildcard;
+            IsDefault = domain.IsDefault;
         }
 
         /// <summary>
@@ -61,5 +63,10 @@ namespace Umbraco.Web.Routing
         /// Gets a value indicating whether the domain is a wildcard domain.
         /// </summary>
         public bool IsWildcard { get; }
+
+        /// <summary>
+        /// Gets a value indicating if this is the default domain for the website.
+        /// </summary>
+        public bool IsDefault { get; }
     }
 }
