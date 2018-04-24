@@ -70,9 +70,6 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
-            if (!FindByUrlAliasEnabled)
-                return Enumerable.Empty<string>(); // we have nothing to say
-
             var node = umbracoContext.ContentCache.GetById(id);
             if (node == null)
                 return Enumerable.Empty<string>();
@@ -100,19 +97,21 @@ namespace Umbraco.Web.Routing
             else
             {
                 var result = new List<string>();
-                var languageIds = new List<int?>(domainUris.Select(x => _localizationService.GetLanguageByIsoCode(x.Culture.Name)?.Id).Where(x => x.HasValue));
-                foreach (var langId in languageIds)
+                var languageIsoCodesToIds = _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x.Id);
+                foreach(var domainUri in domainUris)
                 {
-                    var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias, languageId: langId);
-                    if (!string.IsNullOrWhiteSpace(umbracoUrlName))
+                    if (languageIsoCodesToIds.TryGetValue(domainUri.Culture.Name, out var langId))
                     {
-                        var path = "/" + umbracoUrlName;
-
-                        result.AddRange(domainUris
-                            .Select(domainUri => new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path)))
-                            .Select(uri => UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString()));
+                        var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias, languageId: langId);
+                        if (!string.IsNullOrWhiteSpace(umbracoUrlName))
+                        {
+                            var path = "/" + umbracoUrlName;
+                            var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
+                            result.Add(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
+                        }
                     }
                 }
+                
                 return result;
             }
         }
@@ -120,22 +119,6 @@ namespace Umbraco.Web.Routing
         #endregion
 
         #region Utilities
-
-        private static bool FindByUrlAliasEnabled
-        {
-            get
-            {
-                //TODO: The ContentFinderResolver instance should be injected in ctor with DI instead of using singleton!
-
-                // finder
-                if (Current.ContentFinders.Any(x => x is ContentFinderByUrlAlias))
-                    return true;
-
-
-                // anything else, we can't detect
-                return false;
-            }
-        }
 
         string CombinePaths(string path1, string path2)
         {

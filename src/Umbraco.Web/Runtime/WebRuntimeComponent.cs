@@ -159,7 +159,7 @@ namespace Umbraco.Web.Runtime
                 .Append<RenderControllerFactory>();
 
             composition.Container.RegisterCollectionBuilder<UrlProviderCollectionBuilder>()
-                //.Append<AliasUrlProvider>() // not enabled by default
+                .Append<AliasUrlProvider>()
                 .Append<DefaultUrlProvider>()
                 .Append<CustomRouteUrlProvider>();
 
