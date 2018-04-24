@@ -220,7 +220,8 @@ namespace Umbraco.Web.Models.Mapping
                     DataTypeId = p.DataTypeId,
                     SortOrder = p.SortOrder,
                     ContentTypeId = contentType.Id,
-                    ContentTypeName = contentType.Name
+                    ContentTypeName = contentType.Name,
+                    AllowCultureVariant = p.Variations.HasFlag(Core.Models.ContentVariation.CultureNeutral)
                 });
             }
 

@@ -147,7 +147,6 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 for (var i = 0; i < pcount; i++)
                 {
                     // read lang id
-                    // fixme: This will need to change to string when stephane is done his culture work
                     var key = PrimitiveSerializer.String.ReadFrom(stream);
 
                     var val = new CultureVariation();

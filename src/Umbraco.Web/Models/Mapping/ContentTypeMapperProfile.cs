@@ -163,7 +163,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.PropertyEditorAlias, opt => opt.Ignore())
                 .ForMember(dest => dest.DeleteDate, opt => opt.Ignore())
 
-                .ForMember(dto => dto.Variations, opt => opt.Ignore()) // fixme - change when UI supports it!
+                .ForMember(dto => dto.Variations, opt => opt.ResolveUsing<PropertyTypeVariationsResolver>())
 
                 //only map if it is actually set
                 .ForMember(dest => dest.Id, opt => opt.Condition(source => source.Id > 0))

@@ -262,6 +262,7 @@
     <Compile Include="Models\Mapping\MembershipUserTypeConverter.cs" />
     <Compile Include="Models\Mapping\MemberTabsAndPropertiesResolver.cs" />
     <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />
+    <Compile Include="Models\Mapping\PropertyTypeVariationsResolver.cs" />
     <Compile Include="Models\Mapping\RedirectUrlMapperProfile.cs" />
     <Compile Include="Models\Mapping\TemplateMapperProfile.cs" />
     <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
