@@ -56,8 +56,12 @@
 
         function activate() {
 
-            matchValidationType();
+            //make the default the same as the content type
+            if (!$scope.model.property.id) {
+                $scope.model.property.allowCultureVariant = $scope.model.contentTypeAllowCultureVariant;
+            }
 
+            matchValidationType();
         }
 
         function changeValidationPattern() {
