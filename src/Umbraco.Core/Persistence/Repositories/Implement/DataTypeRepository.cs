@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -280,7 +281,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private string EnsureUniqueNodeName(string nodeName, int id = 0)
         {
             var template = SqlContext.Templates.Get("Umbraco.Core.DataTypeDefinitionRepository.EnsureUniqueNodeName", tsql => tsql
-                .Select<NodeDto>(x => NPocoSqlExtensions.Statics.Alias(x.NodeId, "id"), x => NPocoSqlExtensions.Statics.Alias(x.Text, "name"))
+                .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text, "name"))
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType")));
 
