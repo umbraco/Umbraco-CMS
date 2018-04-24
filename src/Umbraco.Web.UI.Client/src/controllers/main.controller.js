@@ -23,10 +23,9 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
     };
 
     //listening for unload event to warn users of unsaved changes in case they refresh/leave the page while
-    //editing in infinite mode http://issues.umbraco.org/issue/U4-11225
+    //editing in infinite mode
     $window.onbeforeunload = function (event) {
         var editorsOpen = editorService.getEditors();
-        console.log(editorsOpen.length, editorsOpen);
 
         //most browser stopped supporting custom messages for the pop up window, but I guess is a good
         //idea to return one just in case some browser still support it
