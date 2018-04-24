@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Services;
+using System.Globalization;
 
 namespace Umbraco.Web.Routing
 {
@@ -76,10 +77,10 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>Mode</c> and on the current url.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(Guid id)
+        public string GetUrl(Guid id, CultureInfo culture = null)
         {
             var intId = _entityService.GetId(id, UmbracoObjectTypes.Document);
-            return GetUrl(intId.Success ? intId.Result : -1);
+            return GetUrl(intId.Success ? intId.Result : -1, culture);
         }
 
         /// <summary>
@@ -93,10 +94,10 @@ namespace Umbraco.Web.Routing
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(Guid id, bool absolute)
+        public string GetUrl(Guid id, bool absolute, CultureInfo culture = null)
         {
             var intId = _entityService.GetId(id, UmbracoObjectTypes.Document);
-            return GetUrl(intId.Success ? intId.Result : -1, absolute);
+            return GetUrl(intId.Success ? intId.Result : -1, absolute, culture);
         }
 
         /// <summary>
@@ -111,10 +112,10 @@ namespace Umbraco.Web.Routing
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(Guid id, Uri current, bool absolute)
+        public string GetUrl(Guid id, Uri current, bool absolute, CultureInfo culture = null)
         {
             var intId = _entityService.GetId(id, UmbracoObjectTypes.Document);
-            return GetUrl(intId.Success ? intId.Result : -1, current, absolute);
+            return GetUrl(intId.Success ? intId.Result : -1, current, absolute, culture);
         }
 
         /// <summary>
@@ -127,10 +128,10 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>mode</c> and on the current url.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(Guid id, UrlProviderMode mode)
+        public string GetUrl(Guid id, UrlProviderMode mode, CultureInfo culture = null)
         {
             var intId = _entityService.GetId(id, UmbracoObjectTypes.Document);
-            return GetUrl(intId.Success ? intId.Result : -1, mode);
+            return GetUrl(intId.Success ? intId.Result : -1, mode, culture);
         }
 
         /// <summary>
@@ -142,9 +143,9 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>Mode</c> and on the current url.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(int id)
+        public string GetUrl(int id, CultureInfo culture = null)
         {
-            return GetUrl(id, _umbracoContext.CleanedUmbracoUrl, Mode);
+            return GetUrl(id, _umbracoContext.CleanedUmbracoUrl, Mode, culture);
         }
 
         /// <summary>
@@ -158,10 +159,10 @@ namespace Umbraco.Web.Routing
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(int id, bool absolute)
+        public string GetUrl(int id, bool absolute, CultureInfo culture = null)
         {
             var mode = absolute ? UrlProviderMode.Absolute : Mode;
-            return GetUrl(id, _umbracoContext.CleanedUmbracoUrl, mode);
+            return GetUrl(id, _umbracoContext.CleanedUmbracoUrl, mode, culture);
         }
 
         /// <summary>
@@ -176,10 +177,10 @@ namespace Umbraco.Web.Routing
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(int id, Uri current, bool absolute)
+        public string GetUrl(int id, Uri current, bool absolute, CultureInfo culture = null)
         {
             var mode = absolute ? UrlProviderMode.Absolute : Mode;
-            return GetUrl(id, current, mode);
+            return GetUrl(id, current, mode, culture);
         }
 
         /// <summary>
@@ -192,9 +193,9 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>mode</c> and on the current url.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(int id, UrlProviderMode mode)
+        public string GetUrl(int id, UrlProviderMode mode, CultureInfo culture = null)
         {
-            return GetUrl(id, _umbracoContext.CleanedUmbracoUrl, mode);
+            return GetUrl(id, _umbracoContext.CleanedUmbracoUrl, mode, culture);
         }
 
         /// <summary>
@@ -208,9 +209,9 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(int id, Uri current, UrlProviderMode mode)
+        public string GetUrl(int id, Uri current, UrlProviderMode mode, CultureInfo culture = null)
         {
-            var url = _urlProviders.Select(provider => provider.GetUrl(_umbracoContext, id, current, mode))
+            var url = _urlProviders.Select(provider => provider.GetUrl(_umbracoContext, id, current, mode, culture))
                 .FirstOrDefault(u => u != null);
             return url ?? "#"; // legacy wants this
         }
