@@ -8,7 +8,9 @@
  * The main application controller
  * 
  */
-function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper, tmhDynamicLocale, localStorageService, tourService, editorService) {
+function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, $window,
+    appState, treeService, notificationsService, userService, navigationService, historyService,
+    updateChecker, assetsService, eventsService, umbRequestHelper, tmhDynamicLocale, localStorageService, tourService, editorService) {
 
     //the null is important because we do an explicit bool check on this in the view
     $scope.authenticated = null;
@@ -18,6 +20,22 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
 
     $scope.removeNotification = function (index) {
         notificationsService.remove(index);
+    };
+
+    //listening for unload event to warn users of unsaved changes in case they refresh/leave the page while
+    //editing in infinite mode http://issues.umbraco.org/issue/U4-11225
+    $window.onbeforeunload = function (event) {
+        var editorsOpen = editorService.getEditors();
+        console.log(editorsOpen.length, editorsOpen);
+
+        //most browser stopped supporting custom messages for the pop up window, but I guess is a good
+        //idea to return one just in case some browser still support it
+        var message = "You have " +
+            editorsOpen.length +
+            " open which might have unsaved changes, are you sure you want to leave/refresh the page?";
+
+        //returning null or undefine will skip the pop up and procede to refresh/leave the page.
+        return editorsOpen.length > 0 ? message : null;
     };
 
     $scope.closeDialogs = function (event) {
@@ -49,8 +67,8 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         $scope.user = null;
     }));
 
-    evts.push(eventsService.on("app.userRefresh", function(evt) {
-        userService.refreshCurrentUser().then(function(data) {
+    evts.push(eventsService.on("app.userRefresh", function (evt) {
+        userService.refreshCurrentUser().then(function (data) {
             $scope.user = data;
 
             //Load locale file
@@ -134,7 +152,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
     evts.push(eventsService.on("appState.overlay", function (name, args) {
         $scope.overlay = args;
     }));
-    
+
     // events for tours
     evts.push(eventsService.on("appState.tour.start", function (name, args) {
         $scope.tour = args;

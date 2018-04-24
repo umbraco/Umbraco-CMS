@@ -80,7 +80,8 @@
 
         var service = {
             open: open,
-            close: close
+            close: close,
+            getEditors: getEditors
         };
 
         return service;
