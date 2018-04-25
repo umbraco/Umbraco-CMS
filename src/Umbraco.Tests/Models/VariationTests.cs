@@ -236,6 +236,8 @@ namespace Umbraco.Tests.Models
 
             // can publish value
             // and get edited and published values
+            Assert.Throws<InvalidOperationException>(() => content.PublishValues(1)); // no name
+            content.SetName(1, "name-fr");
             content.PublishValues(1);
             Assert.AreEqual("b", content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));

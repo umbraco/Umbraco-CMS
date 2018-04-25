@@ -286,7 +286,7 @@ AnotherContentFinder
         public void GetDataEditors()
         {
             var types = _typeLoader.GetDataEditors();
-            Assert.AreEqual(42, types.Count());
+            Assert.AreEqual(43, types.Count());
         }
 
         [Test]

@@ -275,6 +275,19 @@ namespace Umbraco.Core.Models
             if (ValidateAll().Any())
                 return false;
 
+            // Name and PublishName are managed by the repository, but Names and PublishNames
+            // must be managed here as they depend on the existing / supported variations.
+            if (string.IsNullOrWhiteSpace(Name))
+                throw new InvalidOperationException($"Cannot publish invariant culture without a name.");
+            PublishName = Name;
+            foreach (var (languageId, name) in Names)
+            {
+                if (string.IsNullOrWhiteSpace(name))
+                    throw new InvalidOperationException($"Cannot publish {languageId} culture without a name.");
+                SetPublishName(languageId, name);
+            }
+
+
             // property.PublishAllValues only deals with supported variations (if any)
             foreach (var property in Properties)
                 property.PublishAllValues();
@@ -299,13 +312,19 @@ namespace Umbraco.Core.Models
             if (Validate(languageId, segment).Any())
                 return false;
 
+            // Name and PublishName are managed by the repository, but Names and PublishNames
+            // must be managed here as they depend on the existing / supported variations.
+            if (segment == null)
+            {
+                var name = GetName(languageId);
+                if (string.IsNullOrWhiteSpace(name))
+                    throw new InvalidOperationException($"Cannot publish {languageId?.ToString() ?? "invariant"} culture without a name.");
+                SetPublishName(languageId, name);
+            }
+
             // property.PublishValue throws on invalid variation, so filter them out
             foreach (var property in Properties.Where(x => x.PropertyType.ValidateVariation(languageId, segment, throwIfInvalid: false)))
                 property.PublishValue(languageId, segment);
-
-            // Name and PublishName are managed by the repository, but Names and PublishNames
-            // must be managed here as they depend on the existing / supported variations.
-            SetPublishName(languageId, GetName(languageId));
 
             _publishedState = PublishedState.Publishing;
             return true;
@@ -318,13 +337,16 @@ namespace Umbraco.Core.Models
             if (ValidateCulture(languageId).Any())
                 return false;
 
+            // Name and PublishName are managed by the repository, but Names and PublishNames
+            // must be managed here as they depend on the existing / supported variations.
+            var name = GetName(languageId);
+            if (string.IsNullOrWhiteSpace(name))
+                throw new InvalidOperationException($"Cannot publish {languageId?.ToString() ?? "invariant"} culture without a name.");
+            SetPublishName(languageId, name);
+
             // property.PublishCultureValues only deals with supported variations (if any)
             foreach (var property in Properties)
                 property.PublishCultureValues(languageId);
-
-            // Name and PublishName are managed by the repository, but Names and PublishNames
-            // must be managed here as they depend on the existing / supported variations.
-            SetPublishName(languageId, GetName(languageId));
 
             _publishedState = PublishedState.Publishing;
             return true;
