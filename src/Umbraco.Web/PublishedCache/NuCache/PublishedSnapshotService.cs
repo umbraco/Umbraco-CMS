@@ -1179,9 +1179,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             //var propertyEditorResolver = PropertyEditorResolver.Current;
             //var dataTypeService = ApplicationContext.Current.Services.DataTypeService;
 
-            //the dictionary that will be serialized
-            var data = new ContentSerializedData();
-
             var propertyData = new Dictionary<string, PropertyData[]>();
             foreach (var prop in content.Properties)
             {
@@ -1216,8 +1213,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 propertyData[prop.Alias] = pdatas.ToArray();
             }
 
-            data.PropertyData = propertyData;
-
             var cultureData = new Dictionary<string, CultureVariation>();
             if (content.Names != null)
             {
@@ -1233,7 +1228,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
             }
 
-            data.CultureData = cultureData;
+            //the dictionary that will be serialized
+            var nestedData = new ContentNestedData
+            {
+                PropertyData = propertyData,
+                CultureData = cultureData
+            };
 
             var dto = new ContentNuDto
             {
@@ -1243,7 +1243,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // note that numeric values (which are Int32) are serialized without their
                 // type (eg "value":1234) and JsonConvert by default deserializes them as Int64
 
-                Data = JsonConvert.SerializeObject(data)
+                Data = JsonConvert.SerializeObject(nestedData)
             };
 
             //Core.Composing.Current.Logger.Debug<PublishedSnapshotService>(dto.Data);

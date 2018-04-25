@@ -346,7 +346,7 @@
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentNodeKitSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfCultureVariationSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfPropertyDataSerializer.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\ContentSerializedData.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\ContentNestedData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\CultureVariation.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\PropertyData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\SerializerBase.cs" />

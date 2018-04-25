@@ -35,15 +35,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var properties = new List<IPublishedProperty>();
             foreach (var propertyType in _contentNode.ContentType.PropertyTypes)
             {
-                if (contentData.Properties.TryGetValue(propertyType.Alias, out var pdatas))
-                {
-                    properties.Add(new Property(propertyType, this, pdatas, _publishedSnapshotAccessor));
-                }
-                else
-                {
-                    //it doesn't exist in our serialized json but we should add it as an empty property so they are in sync
-                    properties.Add(new Property(propertyType, this, null, _publishedSnapshotAccessor));
-                }
+                // add one property per property type - this is required, for the indexing to work
+                // if contentData supplies pdatas, use them, else use null
+                contentData.Properties.TryGetValue(propertyType.Alias, out var pdatas); // else will be null
+                properties.Add(new Property(propertyType, this, pdatas, _publishedSnapshotAccessor));
             }
             PropertiesArray = properties.ToArray();
         }
@@ -265,9 +260,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override IPublishedProperty GetProperty(string alias)
         {
             var index = _contentNode.ContentType.GetPropertyIndex(alias);
-            if (index < 0) return null;
-            //fixme: This should not happen since we align the PropertiesArray with the property types in the ctor, if this does happen maybe we should throw a descriptive exception
-            if (index >= PropertiesArray.Length) return null; 
+            if (index < 0) return null; // happens when 'alias' does not match a content type property alias
+            if (index >= PropertiesArray.Length) // should never happen - properties array must be in sync with property type
+                throw new IndexOutOfRangeException("Index points outside the properties array, which means the properties array is corrupt.");
             var property = PropertiesArray[index];
             return property;
         }

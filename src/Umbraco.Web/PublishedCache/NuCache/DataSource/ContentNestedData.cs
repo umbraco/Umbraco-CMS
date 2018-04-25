@@ -6,7 +6,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     /// <summary>
     /// The content item 1:M data that is serialized to JSON
     /// </summary>
-    internal class ContentSerializedData
+    internal class ContentNestedData
     {
         [JsonProperty("properties")]
         public Dictionary<string, PropertyData[]> PropertyData { get; set; }

@@ -190,7 +190,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             }
             else
             {
-                var deserialized = DeserializeData(dto.EditData);
+                var nested = DeserializeNestedData(dto.EditData);
 
                 d = new ContentData
                 {
@@ -200,8 +200,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     VersionId = dto.VersionId,
                     VersionDate = dto.EditVersionDate,
                     WriterId = dto.EditWriterId,
-                    Properties = deserialized.PropertyData,
-                    CultureInfos = deserialized.CultureData
+                    Properties = nested.PropertyData,
+                    CultureInfos = nested.CultureData
                 };
             }
 
@@ -215,7 +215,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 }
                 else
                 {
-                    var deserialized = DeserializeData(dto.PubData);
+                    var nested = DeserializeNestedData(dto.PubData);
 
                     p = new ContentData
                     {
@@ -225,8 +225,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                         VersionId = dto.VersionId,
                         VersionDate = dto.PubVersionDate,
                         WriterId = dto.PubWriterId,
-                        Properties = deserialized.PropertyData,
-                        CultureInfos = deserialized.CultureData
+                        Properties = nested.PropertyData,
+                        CultureInfos = nested.CultureData
                     };
                 }
             }
@@ -250,7 +250,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             if (dto.EditData == null)
                 throw new Exception("No data for media " + dto.Id);
 
-            var deserialized = DeserializeData(dto.EditData);
+            var nested = DeserializeNestedData(dto.EditData);
 
             var p = new ContentData
             {
@@ -260,8 +260,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 VersionId = dto.VersionId,
                 VersionDate = dto.EditVersionDate,
                 WriterId = dto.CreatorId, // what-else?
-                Properties = deserialized.PropertyData,
-                CultureInfos = deserialized.CultureData
+                Properties = nested.PropertyData,
+                CultureInfos = nested.CultureData
             };
 
             var n = new ContentNode(dto.Id, dto.Uid,
@@ -277,7 +277,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return s;
         }
 
-        private static ContentSerializedData DeserializeData(string data)
+        private static ContentNestedData DeserializeNestedData(string data)
         {
             // by default JsonConvert will deserialize our numeric values as Int64
             // which is bad, because they were Int32 in the database - take care
@@ -287,7 +287,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 Converters = new List<JsonConverter> { new ForceInt32Converter() }
             };
 
-            return JsonConvert.DeserializeObject<ContentSerializedData>(data, settings);
+            return JsonConvert.DeserializeObject<ContentNestedData>(data, settings);
         }
     }
 }
