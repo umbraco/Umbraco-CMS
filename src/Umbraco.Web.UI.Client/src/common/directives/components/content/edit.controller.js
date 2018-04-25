@@ -533,7 +533,8 @@
                 saveMethod: "&",
                 getMethod: "&",
                 getScaffoldMethod: "&?",
-                languageId: "=?"
+                languageId: "=?",
+                model: "=?"
             }
         };
 

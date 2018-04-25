@@ -21,37 +21,34 @@
                     // shown so we don't animate a lot of editors which aren't necessary
                     var moveEditors = editorsElement.querySelectorAll('.umb-editor:nth-last-child(-n+'+ allowedNumberOfVisibleEditors +')');
                     
+                    // animation config
                     var collapseEditorAnimation = anime({
                         targets: moveEditors,
-                        width: "100%",
+                        width: function(el, index, length) {
+                            if(el.classList.contains("umb-editor--small")) {
+                                return "100%";
+                            }
+                        },
                         left: function(el, index, length){
-
                             if(length >= allowedNumberOfVisibleEditors) {
                                 return index * 80;
                             }
-
                             return (index + 1) * 80;
                         },
                         easing: 'easeInOutQuint',
-                        duration: 600,
-                        update: function(a) {
-                            //console.log('Animation update, called every frame', a.duration);
-                        },
-                        begin: function(a) {
-                            console.log('collapse begin', a.duration);
-                        },
-                        complete: function(a) {
-                            console.log('collapse done', a.duration);
-                        }
+                        duration: 600
                     });
-    
+                    
+                    // push the new editor to the dom
                     scope.editors.push(editor);
 
                 });
 
+                // slide the new editor in
                 $timeout(function() {
 
                     var editorsElement = el[0];
+                     // select the last editor we just pushed
                     var lastEditor = editorsElement.querySelector('.umb-editor:last-of-type');
                     var indentValue = scope.editors.length * 80;
 
@@ -61,28 +58,18 @@
                         indentValue = allowedNumberOfVisibleEditors * 80;
                     }
 
-                    var translateX = [100 + '%', 0];
-
                     // indent all large editors
                     if(editor.size !== "small") {
                         lastEditor.style.left = indentValue + "px";
                     }
 
+                    // animation config
                     var addEditorAnimation = anime({
                         targets: lastEditor,
-                        translateX: translateX,
+                        translateX: [100 + '%', 0],
                         opacity: [0, 1],
                         easing: 'easeInOutQuint',
-                        duration: 600,
-                        update: function(a) {
-                            //console.log('Animation update, called every frame', a.duration);
-                        },
-                        begin: function(a) {
-                            console.log('Animation begin after delay:', a.duration);
-                        },
-                        complete: function(a) {
-                            console.log('Animation end', a.duration);
-                        }
+                        duration: 600
                     });
 
                 });
@@ -102,21 +89,44 @@
                         opacity: [1, 0],
                         easing: 'easeInOutQuint',
                         duration: 600,
-                        update: function(a) {
-                            console.log('Animation update, called every frame', a.duration);
-                        },
-                        begin: function(a) {
-                            console.log('Animation begin after delay:', a.duration);
-                        },
                         complete: function(a) {
                             $timeout(function(){
-                                console.log('Animation end', a.duration);
                                 scope.editors.splice(-1,1);
-                                console.log(scope.editors);
                             });
                         }
                     });
 
+                    expandEditors();
+
+                });
+
+
+            }
+
+            function expandEditors() {
+                // expand hidden editors
+                $timeout(function() {
+ 
+                    var editorsElement = el[0];
+                    // only select the editors which are allowed to be 
+                    // shown so we don't animate a lot of editors which aren't necessary
+                    var moveEditors = editorsElement.querySelectorAll('.umb-editor:nth-last-child(-n+'+ 4 +')');
+
+                    var expandEditorAnimation = anime({
+                        targets: moveEditors,
+                        width: function(el, index, length) {
+                            if(el.classList.contains("umb-editor--small")) {
+                                return "500px";
+                            }
+                        },
+                        left: function(el, index, length){
+                            return (index + 1) * 80; 
+                        },
+                        easing: 'easeInOutQuint',
+                        duration: 600
+                    });
+                    
+    
                 });
 
             }

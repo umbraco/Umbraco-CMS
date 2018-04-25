@@ -29,24 +29,18 @@
             eventsService.emit("appState.editors.open", args);
         }
 
-        function close(editorId) {
-            var newEditorsArray = [];
-            var selectedEditor = {};
-            
-            // remove closed editor
-            angular.forEach(editors, function(editor){
-                if(editor.id !== editorId) {
-                    selectedEditor = editor;
-                    newEditorsArray.push(editor);
-                }
-            });
-
-            editors = newEditorsArray;
+        function close() {
+            var length = editors.length;
+            var closedEditor = editors[length - 1];
+            // close last opened editor
+            editors.splice(-1, 1);
 
             var args = {
                 editors: editors,
-                editor: selectedEditor
+                editor: closedEditor
             };
+
+            console.log("ARGS", args);
             
             // setIndent();
 

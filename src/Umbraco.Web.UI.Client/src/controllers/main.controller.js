@@ -159,8 +159,12 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         $scope.backdrop = args;
     }));
 
-    evts.push(eventsService.on("appState.editors", function (name, args) {
-        //$scope.editors = args;
+    evts.push(eventsService.on("appState.editors.add", function (name, args) {
+        $scope.editors = args.editors;
+    }));
+
+    evts.push(eventsService.on("appState.editors.remove", function (name, args) {
+        $scope.editors = args.editors;
     }));
 
     //ensure to unregister from all events!
