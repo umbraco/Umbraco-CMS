@@ -160,7 +160,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
     }));
 
     evts.push(eventsService.on("appState.editors", function (name, args) {
-        $scope.editors = args;
+        //$scope.editors = args;
     }));
 
     //ensure to unregister from all events!

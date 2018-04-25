@@ -5,6 +5,8 @@
 
     'lib/moment/moment.min.js',
 
+    'lib/animejs/anime.min.js',
+
     'lib/jquery-ui/jquery-ui.min.js',
     'lib/jquery-ui-touch-punch/jquery.ui.touch-punch.js',
 

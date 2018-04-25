@@ -1,3 +1,11 @@
+.umb-editors {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
 .umb-editor {
     position: absolute;
     top: 0;
@@ -7,6 +15,12 @@
     background: @gray-10;
     z-index: 100;
     box-shadow: 0px 0 30px 0 rgba(0,0,0,.3);
+}
+
+// hide all infinite editors by default
+// will be shown through animation
+.umb-editors .umb-editor {
+    opacity: 0;
 }
 
 .umb-editor--small {

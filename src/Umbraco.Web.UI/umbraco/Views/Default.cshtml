@@ -66,17 +66,14 @@
 
                 <section id="contentwrapper" ng-if="navReady">
 
-                  <div id="contentcolumn">
+                    <div id="contentcolumn">
 
-                      <div class="umb-editor" ng-view></div>
-                      <div class="umb-editor__overlay" ng-if="editors.length > 0"></div>
+                        <div class="umb-editor" ng-view></div>
+                        <div class="umb-editor__overlay" ng-if="editors.length > 0"></div>
+                        
+                        <umb-editors></umb-editors>
 
-                      <umb-editor
-                          ng-repeat="editor in editors"
-                          model="editor">
-                      </umb-editor>
-
-                  </div>
+                    </div>
 
               </section>
                 

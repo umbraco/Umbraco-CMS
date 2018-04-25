@@ -19,26 +19,38 @@
 
             editors.push(editor);
 
-            setIndent();
+            var args = {
+                editors: editors,
+                editor: editor
+            };
+
+            // setIndent();
             
-            eventsService.emit("appState.editors", editors);
+            eventsService.emit("appState.editors.open", args);
         }
 
         function close(editorId) {
             var newEditorsArray = [];
+            var selectedEditor = {};
             
             // remove closed editor
             angular.forEach(editors, function(editor){
                 if(editor.id !== editorId) {
+                    selectedEditor = editor;
                     newEditorsArray.push(editor);
                 }
             });
 
             editors = newEditorsArray;
-            
-            setIndent();
 
-            eventsService.emit("appState.editors", editors);
+            var args = {
+                editors: editors,
+                editor: selectedEditor
+            };
+            
+            // setIndent();
+
+            eventsService.emit("appState.editors.close", args);
         }
 
         function setIndent() {
@@ -77,6 +89,11 @@
             });
 
         }
+        
+        function contentEditor(editor) {
+            editor.view = "views/content/edit.html",
+            open(editor)
+        }
 
         function mediaEditor(editor) {
             editor.view = "views/media/edit.html",
@@ -93,6 +110,7 @@
             open: open,
             close: close,
             mediaEditor: mediaEditor,
+            contentEditor: contentEditor,
             mediaPicker: mediaPicker
         };
 
