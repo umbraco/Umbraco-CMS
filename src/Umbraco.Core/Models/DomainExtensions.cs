@@ -13,6 +13,9 @@ namespace Umbraco.Core.Models
         public static bool IsDefaultDomain(this IDomain domain, ILocalizationService localizationService)
         {
             var defaultLang = localizationService.GetDefaultVariantLanguage();
+            if (defaultLang == null)
+                return false; //if for some reason a null value is returned (i.e. no languages or based on mock unit test data), then assume false
+
             return domain.LanguageIsoCode == defaultLang.CultureName;
         }
     }
