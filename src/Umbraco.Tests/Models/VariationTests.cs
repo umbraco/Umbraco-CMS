@@ -244,7 +244,7 @@ namespace Umbraco.Tests.Models
 
             // can publish value
             // and get edited and published values
-            Assert.Throws<InvalidOperationException>(() => content.TryPublishValues(langFr)); // no name
+            Assert.IsFalse(content.TryPublishValues(langFr)); // no name
             content.SetName(langFr, "name-fr");
             content.TryPublishValues(langFr);
             Assert.AreEqual("b", content.GetValue("prop"));
@@ -322,7 +322,7 @@ namespace Umbraco.Tests.Models
             content.SetValue("prop", "a-es", langEs);
 
             // cannot publish without a name
-            Assert.Throws<InvalidOperationException>(() => content.TryPublishValues(langFr));
+            Assert.IsFalse(content.TryPublishValues(langFr));
 
             // works with a name
             // and then FR is available, and published
