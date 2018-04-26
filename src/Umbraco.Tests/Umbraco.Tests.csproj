@@ -232,7 +232,6 @@
     <Compile Include="Strings\StylesheetHelperTests.cs" />
     <Compile Include="Strings\StringValidationTests.cs" />
     <Compile Include="FrontEnd\UmbracoHelperTests.cs" />
-    <Compile Include="Integration\GetCultureTests.cs" />
     <Compile Include="Membership\MembershipProviderBaseTests.cs" />
     <Compile Include="Membership\UmbracoServiceMembershipProviderTests.cs" />
     <Compile Include="Migrations\Stubs\FiveZeroMigration.cs" />

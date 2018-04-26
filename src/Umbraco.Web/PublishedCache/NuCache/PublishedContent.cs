@@ -170,7 +170,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 if (_cultureNames == null)
                 {
-                    var d = new Dictionary<string, PublishedCultureName>();
+                    var d = new Dictionary<string, PublishedCultureName>(StringComparer.InvariantCultureIgnoreCase);
                     foreach(var c in _contentData.CultureInfos)
                     {
                         d[c.Key] = new PublishedCultureName(c.Value.Name, c.Value.Name.ToUrlSegment());

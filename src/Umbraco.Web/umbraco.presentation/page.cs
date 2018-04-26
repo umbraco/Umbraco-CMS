@@ -481,7 +481,7 @@ namespace umbraco
 
                     if (_cultureNames == null)
                     {
-                        var d = new Dictionary<string, PublishedCultureName>();
+                        var d = new Dictionary<string, PublishedCultureName>(StringComparer.InvariantCultureIgnoreCase);
                         foreach (var c in _inner.Names)
                         {
                             d[c.Key] = new PublishedCultureName(c.Value, c.Value.ToUrlSegment());

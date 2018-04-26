@@ -128,7 +128,8 @@ namespace Umbraco.Web.Routing
             {
                 //get the default domain (there should be one)
                 domainAndUri = domainsAndUris.FirstOrDefault(x => x.IsDefault);
-                if (domainAndUri == null) domainsAndUris.First(); // take the first one by default (what else can we do?)
+                if (domainAndUri == null)
+                    domainAndUri = domainsAndUris.First(); // take the first one by default (what else can we do?)
             }
             else
             {

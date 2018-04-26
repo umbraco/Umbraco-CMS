@@ -338,48 +338,6 @@ namespace Umbraco.Tests.Routing
         }
 
 
-
-        #region Cases
-        [TestCase(10011, "http://domain1.com/", "en-US")]
-        [TestCase(100111, "http://domain1.com/", "en-US")]
-        [TestCase(10011, "http://domain1.fr/", "fr-FR")]
-        [TestCase(100111, "http://domain1.fr/", "fr-FR")]
-        [TestCase(1001121, "http://domain1.fr/", "de-DE")]
-        #endregion
-        public void GetCulture(int nodeId, string currentUrl, string expectedCulture)
-        {
-            var domainService = SetupDomainServiceMock(new[]
-            {
-                new UmbracoDomain("domain1.com/")
-                {
-                    Id = 1,
-                    LanguageId = LangEngId,
-                    RootContentId = 1001,
-                    LanguageIsoCode = "en-US"
-                },
-                new UmbracoDomain("domain1.fr/")
-                {
-                    Id = 1,
-                    LanguageId = LangFrId,
-                    RootContentId = 1001,
-                    LanguageIsoCode = "fr-FR"
-                },
-                new UmbracoDomain("*100112")
-                {
-                    Id = 1,
-                    LanguageId = LangDeId,
-                    RootContentId = 100112,
-                    LanguageIsoCode = "de-DE"
-                }
-            });
-
-            var umbracoContext = GetUmbracoContext("http://anything/");
-
-            var content = umbracoContext.ContentCache.GetById(nodeId);
-            Assert.IsNotNull(content);
-
-            var culture = global::Umbraco.Web.Models.ContentExtensions.GetCulture(umbracoContext, domainService, ServiceContext.LocalizationService, null, new SiteDomainHelper(), content.Id, content.Path, new Uri(currentUrl));
-            Assert.AreEqual(expectedCulture, culture.Name);
-        }
+        
     }
 }

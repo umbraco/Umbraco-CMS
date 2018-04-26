@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Routing
 {
@@ -91,17 +93,68 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public virtual IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
-            // will not use cache if previewing
-            var route = umbracoContext.ContentCache.GetRouteById(id);
+            var node = umbracoContext.ContentCache.GetById(id);
+            var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
 
+            //if this is invariant, continue as we used to
+            if (!node.ContentType.Variations.Has(ContentVariation.CultureNeutral))
+            {
+                // will not use cache if previewing
+                var route = umbracoContext.ContentCache.GetRouteById(id);
+                
+                return GetOtherUrlsForSinglePath(route, id, domainHelper, current);
+            }
+            else
+            {
+                //this is variant, so we need to find the domains and use the cultures assigned to get the route/paths
+
+                var n = node;
+                var domainUris = domainHelper.DomainsForNode(n.Id, current, false);
+                while (domainUris == null && n != null) // n is null at root
+                {
+                    // move to parent node
+                    n = n.Parent;
+                    domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current);
+                }
+
+                if (domainUris == null)
+                {
+                    //we can't continue, there are no domains assigned but this is a culture variant node
+                    return Enumerable.Empty<string>();
+                }
+
+                var result = new List<string>();
+                foreach(var d in domainUris)
+                {
+                    var route = umbracoContext.ContentCache.GetRouteById(id, d.Culture);
+                    if (route == null) continue;
+
+                    //need to strip off the leading ID for the route
+                    //TODO: Is there a nicer way to deal with this?
+                    var pos = route.IndexOf('/');
+                    var path = pos == 0 ? route : route.Substring(pos);
+
+                    var uri = new Uri(CombinePaths(d.Uri.GetLeftPart(UriPartial.Path), path));
+                    uri = UriUtility.UriFromUmbraco(uri, _globalSettings, _requestSettings);
+                    result.Add(uri.ToString());
+                }
+                return result;
+            }
+            
+        }
+
+        #endregion
+
+        #region Utilities
+
+        private IEnumerable<string> GetOtherUrlsForSinglePath(string route, int id, DomainHelper domainHelper, Uri current)
+        {
             if (string.IsNullOrWhiteSpace(route))
             {
                 _logger.Debug<DefaultUrlProvider>(() =>
                     $"Couldn't find any page with nodeId={id}. This is most likely caused by the page not being published.");
                 return null;
             }
-
-            var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
 
             // extract domainUri and path
             // route is /<path> or <domainRootId>/<path>
@@ -112,10 +165,6 @@ namespace Umbraco.Web.Routing
             // assemble the alternate urls from domainUris (maybe empty) and path
             return AssembleUrls(domainUris, path).Select(uri => uri.ToString());
         }
-
-        #endregion
-
-        #region Utilities
 
         Uri AssembleUrl(DomainAndUri domainUri, string path, Uri current, UrlProviderMode mode)
         {
