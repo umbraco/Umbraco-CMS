@@ -59,7 +59,7 @@ namespace Umbraco.Core.Models
         /// Gets the date and time the content was published.
         /// </summary>
         DateTime? PublishDate { get; }
-        
+
         /// <summary>
         /// Gets or sets the date and time the content item should be published.
         /// </summary>
@@ -81,15 +81,6 @@ namespace Umbraco.Core.Models
         ContentStatus Status { get; }
 
         /// <summary>
-        /// Gets a value indicating whether a given culture is available.
-        /// </summary>
-        /// <remarks>
-        /// <para>A culture becomes available whenever the content name for this culture is
-        /// non-null, and it becomes unavailable whenever the content name is null.</para>
-        /// </remarks>
-        bool IsCultureAvailable(int? languageId);
-
-        /// <summary>
         /// Gets a value indicating whether a given culture is published.
         /// </summary>
         /// <remarks>
@@ -97,17 +88,31 @@ namespace Umbraco.Core.Models
         /// and the content published name for this culture is non-null. It becomes non-published
         /// whenever values for this culture are unpublished.</para>
         /// </remarks>
-        bool IsCulturePublished(int? languageId);
+        bool IsCulturePublished(string culture);
+
+        /// <summary>
+        /// Gets the date a culture was published.
+        /// </summary>
+        DateTime GetDateCulturePublished(string culture);
+
+        /// <summary>
+        /// Gets a value indicated whether a given culture is edited.
+        /// </summary>
+        /// <remarks>
+        /// <para>A culture is edited when it is not published, or when it is published but
+        /// it has changes.</para>
+        /// </remarks>
+        bool IsCultureEdited(string culture);
 
         /// <summary>
         /// Gets the name of the published version of the content for a given culture.
         /// </summary>
         /// <remarks>
         /// <para>When editing the content, the name can change, but this will not until the content is published.</para>
-        /// <para>When <paramref name="languageId"/> is <c>null</c>, gets the invariant
+        /// <para>When <paramref name="culture"/> is <c>null</c>, gets the invariant
         /// language, which is the value of the <see cref="PublishName"/> property.</para>
         /// </remarks>
-        string GetPublishName(int? languageId);
+        string GetPublishName(string culture);
 
         /// <summary>
         /// Gets the published names of the content.
@@ -116,7 +121,22 @@ namespace Umbraco.Core.Models
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot get the invariant
         /// name, which must be get via the <see cref="PublishName"/> property.</para>
         /// </remarks>
-        IReadOnlyDictionary<int, string> PublishNames { get; }
+        IReadOnlyDictionary<string, string> PublishNames { get; }
+
+        /// <summary>
+        /// Gets the available cultures.
+        /// </summary>
+        IEnumerable<string> AvailableCultures { get; }
+
+        /// <summary>
+        /// Gets the published cultures.
+        /// </summary>
+        IEnumerable<string> PublishedCultures { get; }
+
+        /// <summary>
+        /// Gets the edited cultures.
+        /// </summary>
+        IEnumerable<string> EditedCultures { get; }
 
         // fixme - these two should move to some kind of service
 
@@ -159,7 +179,7 @@ namespace Umbraco.Core.Models
         /// <para>The document must then be published via the content service.</para>
         /// <para>Values are not published if they are not valid.</para>
         /// </remarks>
-        bool PublishValues(int? languageId = null, string segment = null);
+        bool PublishValues(string culture = null, string segment = null);
 
         /// <summary>
         /// Publishes the culture/any values.
@@ -169,7 +189,7 @@ namespace Umbraco.Core.Models
         /// <para>The document must then be published via the content service.</para>
         /// <para>Values are not published if they are not valie.</para>
         /// </remarks>
-        bool PublishCultureValues(int? languageId = null);
+        bool PublishCultureValues(string culture = null);
 
         /// <summary>
         /// Clears all published values.
@@ -179,12 +199,12 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Clears published values.
         /// </summary>
-        void ClearPublishedValues(int? languageId = null, string segment = null);
+        void ClearPublishedValues(string culture = null, string segment = null);
 
         /// <summary>
         /// Clears the culture/any published values.
         /// </summary>
-        void ClearCulturePublishedValues(int? languageId = null);
+        void ClearCulturePublishedValues(string culture = null);
 
         /// <summary>
         /// Copies values from another document.
@@ -194,11 +214,11 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Copies values from another document.
         /// </summary>
-        void CopyValues(IContent other, int? languageId = null, string segment = null);
+        void CopyValues(IContent other, string culture = null, string segment = null);
 
         /// <summary>
         /// Copies culture/any values from another document.
         /// </summary>
-        void CopyCultureValues(IContent other, int? languageId = null);
+        void CopyCultureValues(IContent other, string culture = null);
     }
 }

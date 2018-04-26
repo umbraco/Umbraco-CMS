@@ -31,7 +31,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             memberTypeRepository = new MemberTypeRepository(accessor, DisabledCache, Logger);
             memberGroupRepository = new MemberGroupRepository(accessor, DisabledCache, Logger);
             var tagRepo = new TagRepository(accessor, DisabledCache, Logger);
-            var repository = new MemberRepository(accessor, DisabledCache, Logger, memberTypeRepository, memberGroupRepository, tagRepo);
+            var repository = new MemberRepository(accessor, DisabledCache, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>());
             return repository;
         }
 

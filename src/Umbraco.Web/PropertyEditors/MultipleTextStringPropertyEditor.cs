@@ -85,9 +85,9 @@ namespace Umbraco.Web.PropertyEditors
             /// <remarks>
             /// The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
             /// </remarks>
-            public override object ToEditor(Property property, IDataTypeService dataTypeService, int? languageId = null, string segment = null)
+            public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
             {
-                var val = property.GetValue(languageId, segment);
+                var val = property.GetValue(culture, segment);
                 return val?.ToString().Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
                            .Select(x => JObject.FromObject(new {value = x})) ?? new JObject[] { };
 

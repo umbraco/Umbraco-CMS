@@ -70,12 +70,12 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="property"></param>
         /// <param name="dataTypeService"></param>
-        /// <param name="languageId"></param>
+        /// <param name="culture"></param>
         /// <param name="segment"></param>
         /// <returns></returns>
-        public override object ToEditor(Property property, IDataTypeService dataTypeService, int? languageId = null, string segment = null)
+        public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
         {
-            var delimited = base.ToEditor(property, dataTypeService, languageId, segment).ToString();
+            var delimited = base.ToEditor(property, dataTypeService, culture, segment).ToString();
             return delimited.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
         }
 

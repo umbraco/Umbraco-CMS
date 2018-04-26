@@ -354,7 +354,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves and publishes a document branch.
         /// </summary>
-        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, int? languageId = null, string segment = null, int userId = 0);
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = null, string segment = null, int userId = 0);
 
         /// <summary>
         /// Saves and publishes a document branch.

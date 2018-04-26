@@ -116,10 +116,11 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<SuperZero>("{9DF05B77-11D1-475C-A00A-B656AF7E0908}");
             Chain<PropertyEditorsMigration>("{6FE3EF34-44A0-4992-B379-B40BC4EF1C4D}");
             Chain<LanguageColumns>("{7F59355A-0EC9-4438-8157-EB517E6D2727}");
-            Chain<AddContentVariationTable>("{66B6821A-0DE3-4DF8-A6A4-65ABD211EDDE}");
+            Chain<AddVariationTables1A>("{66B6821A-0DE3-4DF8-A6A4-65ABD211EDDE}");
+            Chain<AddVariationTables2>("{49506BAE-CEBB-4431-A1A6-24AD6EBBBC57}");
 
             // must chain to v8 final state (see at end of file)
-            Chain("{941B2ABA-2D06-4E04-81F5-74224F1DB037}");
+            Chain("{76DF5CD7-A884-41A5-8DC6-7860D95B1DF5}");
 
 
             // UPGRADE FROM 7, MORE RECENT
@@ -201,12 +202,17 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<RenamePreviewFolder>("{79591E91-01EA-43F7-AC58-7BD286DB1E77}");
 
             // 8.0.0
-            Chain<AddContentVariationTable>("{941B2ABA-2D06-4E04-81F5-74224F1DB037}");
+            // AddVariationTables1 has been superceeded by AddVariationTables2
+            //Chain<AddVariationTables1>("{941B2ABA-2D06-4E04-81F5-74224F1DB037}");
+            Chain<AddVariationTables2>("{76DF5CD7-A884-41A5-8DC6-7860D95B1DF5}");
+
+            // however, need to take care of ppl in post-AddVariationTables1 state
+            Add<AddVariationTables1A>("{941B2ABA-2D06-4E04-81F5-74224F1DB037}", "{76DF5CD7-A884-41A5-8DC6-7860D95B1DF5}");
 
             // FINAL STATE - MUST MATCH LAST ONE ABOVE !
             // whenever this changes, update all references in this file!
 
-            Add(string.Empty, "{941B2ABA-2D06-4E04-81F5-74224F1DB037}");
+            Add(string.Empty, "{76DF5CD7-A884-41A5-8DC6-7860D95B1DF5}");
         }
     }
 }

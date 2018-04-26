@@ -181,7 +181,6 @@ namespace Umbraco.Web.Models.Mapping
                 // ignore, composition is managed in AfterMapContentTypeSaveToEntity
                 .ForMember(dest => dest.ContentTypeComposition, opt => opt.Ignore());
 
-
             // ignore for members
             mapping = typeof(TDestination) == typeof(IMemberType)
                 ? mapping.ForMember(dto => dto.Variations, opt => opt.Ignore())

@@ -256,10 +256,10 @@ namespace Umbraco.Tests.PublishedContent
         public bool SolidHasValue { get; set; }
         public object SolidXPathValue { get; set; }
 
-        public object GetSourceValue(int? languageId = null, string segment = null) => SolidSourceValue;
-        public object GetValue(int? languageId = null, string segment = null) => SolidValue;
-        public object GetXPathValue(int? languageId = null, string segment = null) => SolidXPathValue;
-        public bool HasValue(int? languageId = null, string segment = null) => SolidHasValue;
+        public object GetSourceValue(string culture = null, string segment = null) => SolidSourceValue;
+        public object GetValue(string culture = null, string segment = null) => SolidValue;
+        public object GetXPathValue(string culture = null, string segment = null) => SolidXPathValue;
+        public bool HasValue(string culture = null, string segment = null) => SolidHasValue;
     }
 
     [PublishedModel("ContentType2")]

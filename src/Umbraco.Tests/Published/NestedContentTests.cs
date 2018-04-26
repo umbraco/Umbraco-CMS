@@ -242,10 +242,10 @@ namespace Umbraco.Tests.Published
                 _owner = owner;
             }
 
-            public override bool HasValue(int? languageId = null, string segment = null) => _hasValue;
-            public override object GetSourceValue(int? languageId = null, string segment = null) => _sourceValue;
-            public override object GetValue(int? languageId = null, string segment = null) => PropertyType.ConvertInterToObject(_owner, ReferenceCacheLevel, InterValue, _preview);
-            public override object GetXPathValue(int? languageId = null, string segment = null) => throw new WontImplementException();
+            public override bool HasValue(string culture = null, string segment = null) => _hasValue;
+            public override object GetSourceValue(string culture = null, string segment = null) => _sourceValue;
+            public override object GetValue(string culture = null, string segment = null) => PropertyType.ConvertInterToObject(_owner, ReferenceCacheLevel, InterValue, _preview);
+            public override object GetXPathValue(string culture = null, string segment = null) => throw new WontImplementException();
         }
 
         class TestPublishedContent : PublishedContentBase

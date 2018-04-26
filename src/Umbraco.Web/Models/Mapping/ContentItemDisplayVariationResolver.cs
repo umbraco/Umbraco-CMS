@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -32,19 +33,19 @@ namespace Umbraco.Web.Models.Mapping
             {
                 Language = x,
                 Mandatory = x.Mandatory,
-                Name = source.GetName(x.Id),
-                Exists = source.IsCultureAvailable(x.Id), // segments ??
+                Name = source.GetName(x.IsoCode),
+                Exists = source.IsCultureAvailable(x.IsoCode), // segments ??
                 PublishedState = source.PublishedState.ToString(),
                 //Segment = ?? We'll need to populate this one day when we support segments
             }).ToList();
 
-            var langId = context.GetLanguageId();
+            var culture = context.GetCulture();
 
             //set the current variant being edited to the one found in the context or the default if nothing matches
             var foundCurrent = false;
             foreach (var variant in variants)
             {
-                if (langId.HasValue && langId.Value == variant.Language.Id)
+                if (culture.InvariantEquals(variant.Language.IsoCode))
                 {
                     variant.IsCurrent = true;
                     foundCurrent = true;

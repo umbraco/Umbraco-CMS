@@ -10,24 +10,24 @@ namespace Umbraco.Web
     {
         #region Value<T>
 
-        public static T Value<T>(this IPublishedProperty property, int? languageId = null, string segment = null)
+        public static T Value<T>(this IPublishedProperty property, string culture = null, string segment = null)
         {
-            return property.Value(false, default(T), languageId, segment);
+            return property.Value(false, default(T), culture, segment);
         }
 
-        public static T Value<T>(this IPublishedProperty property, T defaultValue, int? languageId = null, string segment = null)
+        public static T Value<T>(this IPublishedProperty property, T defaultValue, string culture = null, string segment = null)
         {
-            return property.Value(true, defaultValue, languageId, segment);
+            return property.Value(true, defaultValue, culture, segment);
         }
 
-        internal static T Value<T>(this IPublishedProperty property, bool withDefaultValue, T defaultValue, int? languageId = null, string segment = null)
+        internal static T Value<T>(this IPublishedProperty property, bool withDefaultValue, T defaultValue, string culture = null, string segment = null)
         {
-            if (property.HasValue(languageId, segment) == false && withDefaultValue) return defaultValue;
+            if (property.HasValue(culture, segment) == false && withDefaultValue) return defaultValue;
 
             // else we use .Value so we give the converter a chance to handle the default value differently
             // eg for IEnumerable<T> it may return Enumerable<T>.Empty instead of null
 
-            var value = property.GetValue(languageId, segment);
+            var value = property.GetValue(culture, segment);
 
             // if value is null (strange but why not) it still is OK to call TryConvertTo
             // because it's an extension method (hence no NullRef) which will return a

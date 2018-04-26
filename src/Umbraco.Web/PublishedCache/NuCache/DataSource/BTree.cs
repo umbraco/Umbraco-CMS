@@ -159,7 +159,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                         pdatas.Add(pdata);
 
                         var type = PrimitiveSerializer.Char.ReadFrom(stream);
-                        pdata.LanguageId = (int?) ReadObject(type, stream);
+                        pdata.Culture = (string) ReadObject(type, stream);
                         type = PrimitiveSerializer.Char.ReadFrom(stream);
                         pdata.Segment = (string) ReadObject(type, stream);
                         type = PrimitiveSerializer.Char.ReadFrom(stream);
@@ -211,7 +211,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     // write each value
                     foreach (var pdata in kvp.Value)
                     {
-                        WriteObject(pdata.LanguageId, stream);
+                        WriteObject(pdata.Culture, stream);
                         WriteObject(pdata.Segment, stream);
                         WriteObject(pdata.Value, stream);
                     }

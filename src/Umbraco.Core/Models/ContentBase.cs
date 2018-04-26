@@ -18,14 +18,14 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentTypeBase.Alias}")]
     public abstract class ContentBase : TreeEntityBase, IContentBase
     {
-        protected static readonly Dictionary<int, string> NoNames = new Dictionary<int, string>();
+        protected static readonly Dictionary<string, string> NoNames = new Dictionary<string, string>();
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
         private int _contentTypeId;
         protected IContentTypeComposition ContentTypeBase;
         private int _writerId;
         private PropertyCollection _properties;
-        private Dictionary<int, string> _names;
+        private Dictionary<string, string> _names;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
             public readonly PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
             public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.WriterId);
-            public readonly PropertyInfo NamesSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyDictionary<int, string>>(x => x.Names);
+            public readonly PropertyInfo NamesSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyDictionary<string, string>>(x => x.Names);
         }
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -121,71 +121,6 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <inheritdoc />
-        [DataMember]
-        public virtual IReadOnlyDictionary<int, string> Names
-        {
-            get => _names ?? NoNames;
-            set
-            {
-                foreach (var (languageId, name) in value)
-                    SetName(languageId, name);
-            }
-        }
-
-        /// <inheritdoc />
-        public virtual void SetName(int? languageId, string name)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                ClearName(languageId);
-                return;
-            }
-
-            if (languageId == null)
-            {
-                Name = name;
-                return;
-            }
-
-            if ((ContentTypeBase.Variations & (ContentVariation.CultureNeutral | ContentVariation.CultureSegment)) == 0)
-                throw new NotSupportedException("Content type does not support varying name by culture.");
-
-            if (_names == null)
-                _names = new Dictionary<int, string>();
-
-            _names[languageId.Value] = name;
-            OnPropertyChanged(Ps.Value.NamesSelector);
-        }
-
-        private void ClearName(int? languageId)
-        {
-            if (languageId == null)
-            {
-                Name = null;
-                return;
-            }
-
-            if (_names == null) return;
-            _names.Remove(languageId.Value);
-            if (_names.Count == 0)
-                _names = null;
-        }
-
-        protected virtual void ClearNames()
-        {
-            _names = null;
-            OnPropertyChanged(Ps.Value.NamesSelector);
-        }
-
-        /// <inheritdoc />
-        public virtual string GetName(int? languageId)
-        {
-            if (languageId == null) return Name;
-            if (_names == null) return null;
-            return _names.TryGetValue(languageId.Value, out var name) ? name : null;
-        }
-
         /// <summary>
         /// Gets the enumeration of property groups for the entity.
         /// fixme is a proxy, kill this
@@ -200,6 +135,79 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public IEnumerable<PropertyType> PropertyTypes => ContentTypeBase.CompositionPropertyTypes;
 
+        #region Cultures
+
+        /// <inheritdoc />
+        [DataMember]
+        public virtual IReadOnlyDictionary<string, string> Names
+        {
+            get => _names ?? NoNames;
+            set
+            {
+                foreach (var (culture, name) in value)
+                    SetName(culture, name);
+            }
+        }
+
+        /// <inheritdoc />
+        public virtual void SetName(string culture, string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                ClearName(culture);
+                return;
+            }
+
+            if (culture == null)
+            {
+                Name = name;
+                return;
+            }
+
+            if (!ContentTypeBase.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment))
+                throw new NotSupportedException("Content type does not support varying name by culture.");
+
+            if (_names == null)
+                _names = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            _names[culture] = name;
+            OnPropertyChanged(Ps.Value.NamesSelector);
+        }
+
+        /// <inheritdoc />
+        public virtual string GetName(string culture)
+        {
+            if (culture == null) return Name;
+            if (_names == null) return null;
+            return _names.TryGetValue(culture, out var name) ? name : null;
+        }
+
+        /// <inheritdoc />
+        public bool IsCultureAvailable(string culture)
+            => !string.IsNullOrWhiteSpace(GetName(culture));
+
+        private void ClearName(string culture)
+        {
+            if (culture == null)
+            {
+                Name = null;
+                return;
+            }
+
+            if (_names == null) return;
+            _names.Remove(culture);
+            if (_names.Count == 0)
+                _names = null;
+        }
+
+        protected virtual void ClearNames()
+        {
+            _names = null;
+            OnPropertyChanged(Ps.Value.NamesSelector);
+        }
+
+        #endregion
+
         #region Has, Get, Set, Publish Property Value
 
         /// <inheritdoc />
@@ -207,29 +215,29 @@ namespace Umbraco.Core.Models
             => Properties.Contains(propertyTypeAlias);
 
         /// <inheritdoc />
-        public virtual object GetValue(string propertyTypeAlias, int? languageId = null, string segment = null, bool published = false)
+        public virtual object GetValue(string propertyTypeAlias, string culture = null, string segment = null, bool published = false)
         {
             return Properties.TryGetValue(propertyTypeAlias, out var property)
-                ? property.GetValue(languageId, segment, published)
+                ? property.GetValue(culture, segment, published)
                 : null;
         }
 
         /// <inheritdoc />
-        public virtual TValue GetValue<TValue>(string propertyTypeAlias, int? languageId = null, string segment = null, bool published = false)
+        public virtual TValue GetValue<TValue>(string propertyTypeAlias, string culture = null, string segment = null, bool published = false)
         {
             if (!Properties.TryGetValue(propertyTypeAlias, out var property))
                 return default;
 
-            var convertAttempt = property.GetValue(languageId, segment, published).TryConvertTo<TValue>();
+            var convertAttempt = property.GetValue(culture, segment, published).TryConvertTo<TValue>();
             return convertAttempt.Success ? convertAttempt.Result : default;
         }
 
         /// <inheritdoc />
-        public virtual void SetValue(string propertyTypeAlias, object value, int? languageId = null, string segment = null)
+        public virtual void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null)
         {
             if (Properties.Contains(propertyTypeAlias))
             {
-                Properties[propertyTypeAlias].SetValue(value, languageId, segment);
+                Properties[propertyTypeAlias].SetValue(value, culture, segment);
                 return;
             }
 
@@ -238,7 +246,7 @@ namespace Umbraco.Core.Models
                 throw new InvalidOperationException($"No PropertyType exists with the supplied alias \"{propertyTypeAlias}\".");
 
             var property = propertyType.CreateProperty();
-            property.SetValue(value, languageId, segment);
+            property.SetValue(value, culture, segment);
             Properties.Add(property);
         }
 
@@ -249,17 +257,17 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Sets the posted file value of a property.
         /// </summary>
-        public virtual void SetValue(string propertyTypeAlias, HttpPostedFile value, int? languageId = null, string segment = null)
+        public virtual void SetValue(string propertyTypeAlias, HttpPostedFile value, string culture = null, string segment = null)
         {
-            ContentExtensions.SetValue(this, propertyTypeAlias, new HttpPostedFileWrapper(value), languageId, segment);
+            ContentExtensions.SetValue(this, propertyTypeAlias, new HttpPostedFileWrapper(value), culture, segment);
         }
 
         /// <summary>
         /// Sets the posted file value of a property.
         /// </summary>
-        public virtual void SetValue(string propertyTypeAlias, HttpPostedFileBase value, int? languageId = null, string segment = null)
+        public virtual void SetValue(string propertyTypeAlias, HttpPostedFileBase value, string culture = null, string segment = null)
         {
-            ContentExtensions.SetValue(this, propertyTypeAlias, value, languageId, segment);
+            ContentExtensions.SetValue(this, propertyTypeAlias, value, culture, segment);
         }
 
         #endregion
@@ -271,14 +279,14 @@ namespace Umbraco.Core.Models
             return Properties.Where(x => !x.IsAllValid()).ToArray();
         }
 
-        public virtual Property[] Validate(int? languageId = null, string segment = null)
+        public virtual Property[] Validate(string culture = null, string segment = null)
         {
-            return Properties.Where(x => !x.IsValid(languageId, segment)).ToArray();
+            return Properties.Where(x => !x.IsValid(culture, segment)).ToArray();
         }
 
-        public virtual Property[] ValidateCulture(int? languageId = null)
+        public virtual Property[] ValidateCulture(string culture = null)
         {
-            return Properties.Where(x => !x.IsCultureValid(languageId)).ToArray();
+            return Properties.Where(x => !x.IsCultureValid(culture)).ToArray();
         }
 
         #endregion
