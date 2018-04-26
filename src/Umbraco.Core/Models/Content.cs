@@ -306,11 +306,11 @@ namespace Umbraco.Core.Models
         public bool Blueprint { get; internal set; }
 
         /// <inheritdoc />
-        public virtual bool PublishAllValues()
+        public virtual bool TryPublishAllValues()
         {
             // the values we want to publish should be valid
             if (ValidateAll().Any())
-                return false;
+                return false; //fixme this should return an attempt with error results
 
             // Name and PublishName are managed by the repository, but Names and PublishNames
             // must be managed here as they depend on the existing / supported variations.
@@ -321,7 +321,8 @@ namespace Umbraco.Core.Models
             foreach (var (culture, name) in Names)
             {
                 if (string.IsNullOrWhiteSpace(name))
-                    throw new InvalidOperationException($"Cannot publish {culture ?? "invariant"} culture without a name.");
+                    return false; //fixme this should return an attempt with error results
+
                 SetPublishInfos(culture, name, now);
             }
 
@@ -334,14 +335,14 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public virtual bool PublishValues(string culture = null, string segment = null)
+        public virtual bool TryPublishValues(string culture = null, string segment = null)
         {
             // the variation should be supported by the content type
             ContentType.ValidateVariation(culture, segment, throwIfInvalid: true);
 
             // the values we want to publish should be valid
             if (Validate(culture, segment).Any())
-                return false;
+                return false; //fixme this should return an attempt with error results
 
             // Name and PublishName are managed by the repository, but Names and PublishNames
             // must be managed here as they depend on the existing / supported variations.
@@ -349,7 +350,8 @@ namespace Umbraco.Core.Models
             {
                 var name = GetName(culture);
                 if (string.IsNullOrWhiteSpace(name))
-                    throw new InvalidOperationException($"Cannot publish {culture ?? "invariant"} culture without a name.");
+                    return false; //fixme this should return an attempt with error results
+                
                 SetPublishInfos(culture, name, DateTime.Now);
             }
 

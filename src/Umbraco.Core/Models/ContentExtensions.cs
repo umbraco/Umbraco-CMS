@@ -168,7 +168,7 @@ namespace Umbraco.Core.Models
         public static bool HasPropertyTypeVaryingByCulture(this IContent content)
         {
             // fixme - what about CultureSegment? what about content.ContentType.Variations?
-            return content.PropertyTypes.Any(x => x.Variations == ContentVariation.CultureNeutral);
+            return content.PropertyTypes.Any(x => x.Variations.Has(ContentVariation.CultureNeutral));
         }
 
         #endregion

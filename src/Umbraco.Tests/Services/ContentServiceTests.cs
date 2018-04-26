@@ -182,16 +182,16 @@ namespace Umbraco.Tests.Services
         {
             var contentService = ServiceContext.ContentService;
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
-            root.PublishValues();
+            root.TryPublishValues();
             Assert.IsTrue(contentService.SaveAndPublish(root).Success);
             var content = contentService.CreateAndSave("Test", -1, "umbTextpage", 0);
-            content.PublishValues();
+            content.TryPublishValues();
             Assert.IsTrue(contentService.SaveAndPublish(content).Success);
             var hierarchy = CreateContentHierarchy().OrderBy(x => x.Level).ToArray();
             contentService.Save(hierarchy, 0);
             foreach (var c in hierarchy)
             {
-                c.PublishValues();
+                c.TryPublishValues();
                 Assert.IsTrue(contentService.SaveAndPublish(c).Success);
             }
 
@@ -241,7 +241,7 @@ namespace Umbraco.Tests.Services
 
 
             // Assert
-            content.PublishValues();
+            content.TryPublishValues();
             Assert.IsTrue(contentService.SaveAndPublish(content).Success);
         }
 
@@ -256,7 +256,7 @@ namespace Umbraco.Tests.Services
             for (var i = 0; i < 20; i++)
             {
                 content.SetValue("bodyText", "hello world " + Guid.NewGuid());
-                content.PublishValues();
+                content.TryPublishValues();
                 contentService.SaveAndPublish(content);
             }
 
@@ -395,12 +395,12 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "plus" });
-            content1.PublishValues();
+            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content2.PublishValues();
+            content2.TryPublishValues();
             contentService.SaveAndPublish(content2);
 
             // verify
@@ -436,7 +436,7 @@ namespace Umbraco.Tests.Services
             allTags = tagService.GetAllContentTags();
             Assert.AreEqual(4, allTags.Count());
 
-            content1.PublishValues();
+            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
 
             Assert.IsTrue(content1.Published);
@@ -466,12 +466,12 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "bam" });
-            content1.PublishValues();
+            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content2.PublishValues();
+            content2.TryPublishValues();
             contentService.SaveAndPublish(content2);
 
             // verify
@@ -507,9 +507,9 @@ namespace Umbraco.Tests.Services
             allTags = tagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
-            content1.PublishValues();
+            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
-            content2.PublishValues();
+            content2.TryPublishValues();
             contentService.SaveAndPublish(content2);
 
             // tags are back
@@ -538,12 +538,12 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "plus" });
-            content1.PublishValues();
+            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", content1.Id);
             content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content2.PublishValues();
+            content2.TryPublishValues();
             contentService.SaveAndPublish(content2);
 
             // verify
@@ -578,7 +578,7 @@ namespace Umbraco.Tests.Services
             allTags = tagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
-            content1.PublishValues();
+            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
 
             Assert.IsTrue(content1.Published);
@@ -616,12 +616,12 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "bam" });
-            content1.PublishValues();
+            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content2.PublishValues();
+            content2.TryPublishValues();
             contentService.SaveAndPublish(content2);
 
             contentService.Unpublish(content1);
@@ -637,7 +637,7 @@ namespace Umbraco.Tests.Services
             var allTags = tagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
-            content2.PublishValues();
+            content2.TryPublishValues();
             contentService.SaveAndPublish(content2);
 
             tags = tagService.GetTagsForEntity(content2.Id);
@@ -663,12 +663,12 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "bam" });
-            content1.PublishValues();
+            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", content1);
             content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content2.PublishValues();
+            content2.TryPublishValues();
             contentService.SaveAndPublish(content2);
 
             contentService.Unpublish(content1);
@@ -684,7 +684,7 @@ namespace Umbraco.Tests.Services
             var allTags = tagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
-            content1.PublishValues();
+            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
 
             tags = tagService.GetTagsForEntity(content2.Id);
@@ -768,7 +768,7 @@ namespace Umbraco.Tests.Services
             // create a content with tags and publish
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
             content.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // edit tags and save
@@ -808,7 +808,7 @@ namespace Umbraco.Tests.Services
 
             // Act
             content.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // Assert
@@ -839,12 +839,12 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
             content.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // Act
             content.AssignTags("tags", new[] { "another", "world" }, merge: true);
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // Assert
@@ -875,12 +875,12 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
             content.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // Act
             content.RemoveTags("tags", new[] { "some", "world" });
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // Assert
@@ -1063,7 +1063,7 @@ namespace Umbraco.Tests.Services
 
             var parent = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 2);
             Assert.IsFalse(parent.Published);
-            parent.PublishValues();
+            parent.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(parent); // publishing parent, so Text Page 2 can be updated.
 
             var content = contentService.GetById(NodeDto.NodeIdSeed + 4);
@@ -1076,7 +1076,7 @@ namespace Umbraco.Tests.Services
 
             content.Name = "Text Page 2 Updated";
             content.SetValue("author", "Jane Doe");
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content); // publishes the current version, creates a version
 
             var version2 = content.VersionId;
@@ -1084,7 +1084,7 @@ namespace Umbraco.Tests.Services
 
             content.Name = "Text Page 2 ReUpdated";
             content.SetValue("author", "Bob Hope");
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content); // publishes again, creates a version
 
             var version3 = content.VersionId;
@@ -1151,11 +1151,11 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentService = ServiceContext.ContentService;
             var root = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            root.PublishValues();
+            root.TryPublishValues();
             contentService.SaveAndPublish(root);
             var content = contentService.GetById(NodeDto.NodeIdSeed + 4);
             content.ExpireDate = DateTime.Now.AddSeconds(1);
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // Act
@@ -1205,7 +1205,7 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentService = ServiceContext.ContentService;
             var content = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            content.PublishValues();
+            content.TryPublishValues();
             var published = contentService.SaveAndPublish(content, 0);
 
             using (var scope = ScopeProvider.CreateScope())
@@ -1235,7 +1235,7 @@ namespace Umbraco.Tests.Services
             var content = contentService.GetById(NodeDto.NodeIdSeed + 2);
 
             // Act
-            content.PublishValues();
+            content.TryPublishValues();
             var published = contentService.SaveAndPublish(content, 0);
 
             // Assert
@@ -1249,7 +1249,7 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentService = ServiceContext.ContentService;
             var parent = contentService.Create("parent", -1, "umbTextpage");
-            parent.PublishValues();
+            parent.TryPublishValues();
             contentService.SaveAndPublish(parent);
             var content = contentService.Create("child", parent, "umbTextpage");
             contentService.Save(content);
@@ -1275,7 +1275,7 @@ namespace Umbraco.Tests.Services
                 Assert.AreEqual("Home", content.Name);
 
                 content.Name = "foo";
-                content.PublishValues();
+                content.TryPublishValues();
                 var published = contentService.SaveAndPublish(content, 0);
 
                 Assert.That(published.Success, Is.True);
@@ -1316,7 +1316,7 @@ namespace Umbraco.Tests.Services
 
             var parent = contentService.GetById(parentId);
 
-            var parentCanPublishValues = parent.PublishValues();
+            var parentCanPublishValues = parent.TryPublishValues();
             var parentPublished = contentService.SaveAndPublish(parent);
 
             // parent can publish values
@@ -1325,7 +1325,7 @@ namespace Umbraco.Tests.Services
             Assert.IsTrue(parentPublished.Success);
             Assert.IsTrue(parent.Published);
 
-            var contentCanPublishValues = content.PublishValues();
+            var contentCanPublishValues = content.TryPublishValues();
             var contentPublished = contentService.SaveAndPublish(content);
 
             // content cannot publish values because they are invalid
@@ -1401,11 +1401,11 @@ namespace Umbraco.Tests.Services
             contentService.Save(content);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            parent.PublishValues();
+            parent.TryPublishValues();
             var parentPublished = contentService.SaveAndPublish(parent, 0);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
 
             // Act
-            content.PublishValues();
+            content.TryPublishValues();
             var published = contentService.SaveAndPublish(content, 0);
 
             // Assert
@@ -1424,11 +1424,11 @@ namespace Umbraco.Tests.Services
             contentService.Save(content, 0);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            parent.PublishValues();
+            parent.TryPublishValues();
             var parentPublished = contentService.SaveAndPublish(parent, 0);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
 
             // Act
-            content.PublishValues();
+            content.TryPublishValues();
             var published = contentService.SaveAndPublish(content, 0);
 
             // Assert
@@ -1461,7 +1461,7 @@ namespace Umbraco.Tests.Services
             var content = contentService.GetById(NodeDto.NodeIdSeed + 5);
 
             // Act
-            content.PublishValues();
+            content.TryPublishValues();
             var published = contentService.SaveAndPublish(content, 0);
 
             // Assert
@@ -1479,7 +1479,7 @@ namespace Umbraco.Tests.Services
             content.SetValue("author", "Barack Obama");
 
             // Act
-            content.PublishValues();
+            content.TryPublishValues();
             var published = contentService.SaveAndPublish(content, 0);
 
             // Assert
@@ -1504,14 +1504,14 @@ namespace Umbraco.Tests.Services
             content.SetValue("author", "Barack Obama");
 
             // Act
-            content.PublishValues();
+            content.TryPublishValues();
             var published = contentService.SaveAndPublish(content, 0);
             var childContent = contentService.Create("Child", content.Id, "umbTextpage", 0);
             // Reset all identity properties
             childContent.Id = 0;
             childContent.Path = null;
             ((Content)childContent).ResetIdentity();
-            childContent.PublishValues();
+            childContent.TryPublishValues();
             var childPublished = contentService.SaveAndPublish(childContent, 0);
 
             // Assert
@@ -1530,12 +1530,12 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             var root = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            root.PublishValues();
+            root.TryPublishValues();
             var rootPublished = contentService.SaveAndPublish(root);
 
             var content = contentService.GetById(NodeDto.NodeIdSeed + 4);
             content.Properties["title"].SetValue(content.Properties["title"].GetValue() + " Published");
-            content.PublishValues();
+            content.TryPublishValues();
             var contentPublished = contentService.SaveAndPublish(content);
             var publishedVersion = content.VersionId;
 
@@ -1835,13 +1835,13 @@ namespace Umbraco.Tests.Services
             content1.PropertyValues(obj);
             content1.ResetDirtyProperties(false);
             ServiceContext.ContentService.Save(content1, 0);
-            content1.PublishValues();
+            content1.TryPublishValues();
             Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content1, 0).Success);
             var content2 = MockedContent.CreateBasicContent(contentType);
             content2.PropertyValues(obj);
             content2.ResetDirtyProperties(false);
             ServiceContext.ContentService.Save(content2, 0);
-            content2.PublishValues();
+            content2.TryPublishValues();
             Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content2, 0).Success);
 
             var editorGroup = ServiceContext.UserService.GetUserGroupByAlias("editor");
@@ -1999,7 +1999,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(0, contentTags.Length);
 
             // publish
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // now tags have been set (published)
@@ -2016,7 +2016,7 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(0, copiedTags.Length);
 
             // publish
-            copy.PublishValues();
+            copy.TryPublishValues();
             contentService.SaveAndPublish(copy);
 
             // now tags have been set (published)
@@ -2035,7 +2035,7 @@ namespace Umbraco.Tests.Services
 
             var parent = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 2);
             Assert.IsFalse(parent.Published);
-            parent.PublishValues();
+            parent.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(parent); // publishing parent, so Text Page 2 can be updated.
 
             var content = contentService.GetById(NodeDto.NodeIdSeed + 4);
@@ -2052,7 +2052,7 @@ namespace Umbraco.Tests.Services
             // non published = edited
             Assert.IsTrue(content.Edited);
 
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content); // new version
             var version2 = content.VersionId;
             Assert.AreNotEqual(version1, version2);
@@ -2077,7 +2077,7 @@ namespace Umbraco.Tests.Services
 
             content.Name = "Text Page 2 ReReUpdated";
 
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content); // new version
             var version3 = content.VersionId;
             Assert.AreNotEqual(version2, version3);
@@ -2133,7 +2133,7 @@ namespace Umbraco.Tests.Services
             content = contentService.GetById(content.Id);
             Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
             Assert.AreEqual("Jane Doe", content.GetValue<string>("author"));
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content);
             Assert.IsFalse(content.Edited);
             content.Name = "Xxx";
@@ -2251,7 +2251,7 @@ namespace Umbraco.Tests.Services
                 Assert.IsFalse(scope.Database.Exists<ContentXmlDto>(content.Id));
             }
 
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             using (var scope = ScopeProvider.CreateScope())
@@ -2393,7 +2393,7 @@ namespace Umbraco.Tests.Services
             // becomes Published, !Edited
             // creates a new version
             // can get published property values
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             Assert.IsTrue(content.Published);
@@ -2548,8 +2548,8 @@ namespace Umbraco.Tests.Services
 
             // act
 
-            content.PublishValues(langFr.IsoCode);
-            content.PublishValues(langUk.IsoCode);
+            content.TryPublishValues(langFr.IsoCode);
+            content.TryPublishValues(langUk.IsoCode);
             contentService.SaveAndPublish(content);
 
             // both FR and UK have been published,
@@ -2591,7 +2591,7 @@ namespace Umbraco.Tests.Services
 
             // act
 
-            content.PublishValues();
+            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // now it has publish name for invariant neutral
@@ -2780,7 +2780,7 @@ namespace Umbraco.Tests.Services
 
             // act
 
-            content.PublishValues(langUk.IsoCode);
+            content.TryPublishValues(langUk.IsoCode);
             contentService.SaveAndPublish(content);
 
             content2 = contentService.GetById(content.Id);

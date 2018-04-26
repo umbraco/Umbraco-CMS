@@ -341,10 +341,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
 
                 // insert content variations
-                Database.InsertBulk(GetContentVariationDtos(content, publishing));
+                Database.BulkInsertRecords(GetContentVariationDtos(content, publishing));
 
                 // insert document variations
-                Database.InsertBulk(GetDocumentVariationDtos(content, publishing, editedCultures));
+                Database.BulkInsertRecords(GetDocumentVariationDtos(content, publishing, editedCultures));
             }
 
             // refresh content
@@ -501,14 +501,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var deleteDocumentVariations = Sql().Delete<DocumentCultureVariationDto>().Where<DocumentCultureVariationDto>(x => x.NodeId == content.Id);
                 Database.Execute(deleteDocumentVariations);
 
-                // fixme is it OK to use NPoco InsertBulk here, or should we use our own BulkInsertRecords?
+                // fixme is we'd like to use the native NPoco InsertBulk here but it causes problems (not sure exaclty all scenarios) but by using SQL Server and updating a variants name will cause: Unable to cast object of type 'Umbraco.Core.Persistence.FaultHandling.RetryDbConnection' to type 'System.Data.SqlClient.SqlConnection'.
                 // (same in PersistNewItem above)
 
                 // insert content variations
-                Database.InsertBulk(GetContentVariationDtos(content, publishing));
+                Database.BulkInsertRecords(GetContentVariationDtos(content, publishing));
 
                 // insert document variations
-                Database.InsertBulk(GetDocumentVariationDtos(content, publishing, editedCultures));
+                Database.BulkInsertRecords(GetDocumentVariationDtos(content, publishing, editedCultures));
             }
 
             // refresh content
