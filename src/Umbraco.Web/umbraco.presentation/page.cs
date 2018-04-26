@@ -374,17 +374,17 @@ namespace umbraco
                 _content = content;
             }
 
-            public override bool HasValue(int? languageId = null, string segment = null)
+            public override bool HasValue(string culture = null, string segment = null)
             {
                 return _sourceValue != null && ((_sourceValue is string) == false || string.IsNullOrWhiteSpace((string)_sourceValue) == false);
             }
 
-            public override object GetSourceValue(int? languageId = null, string segment = null)
+            public override object GetSourceValue(string culture = null, string segment = null)
             {
                 return _sourceValue;
             }
 
-            public override object GetValue(int? languageId = null, string segment = null)
+            public override object GetValue(string culture = null, string segment = null)
             {
                 // isPreviewing is true here since we want to preview anyway...
                 const bool isPreviewing = true;
@@ -392,7 +392,7 @@ namespace umbraco
                 return PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Unknown, source, isPreviewing);
             }
 
-            public override object GetXPathValue(int? languageId = null, string segment = null)
+            public override object GetXPathValue(string culture = null, string segment = null)
             {
                 throw new NotImplementedException();
             }
@@ -482,14 +482,9 @@ namespace umbraco
                     if (_cultureNames == null)
                     {
                         var d = new Dictionary<string, PublishedCultureName>();
-                        //fixme this will not be necessary when the IContentBase.Names is a string based dictionary
-                        var langs = Current.Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.Id, x => x.IsoCode);
                         foreach (var c in _inner.Names)
                         {
-                            if (langs.TryGetValue(c.Key, out var lang))
-                            {
-                                d[lang] = new PublishedCultureName(c.Value, c.Value.ToUrlSegment());
-                            }
+                            d[c.Key] = new PublishedCultureName(c.Value, c.Value.ToUrlSegment());
                         }
                         _cultureNames = d;
                     }

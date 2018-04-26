@@ -148,13 +148,13 @@ namespace Umbraco.Web.PropertyEditors
                 //copy each of the property values (variants, segments) to the destination by using the edited value
                 foreach (var propertyValue in property.Values)
                 {
-                    var propVal = property.GetValue(propertyValue.LanguageId, propertyValue.Segment);
+                    var propVal = property.GetValue(propertyValue.Culture, propertyValue.Segment);
                     var src = GetFileSrcFromPropertyValue(propVal, out var jo);
                     if (src == null) continue;
                     var sourcePath = _mediaFileSystem.GetRelativePath(src);
                     var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
                     jo["src"] = _mediaFileSystem.GetUrl(copyPath);
-                    args.Copy.SetValue(property.Alias, jo.ToString(), propertyValue.LanguageId, propertyValue.Segment);
+                    args.Copy.SetValue(property.Alias, jo.ToString(), propertyValue.Culture, propertyValue.Segment);
                     isUpdated = true;
                 }
             }
@@ -209,10 +209,10 @@ namespace Umbraco.Web.PropertyEditors
 
                 foreach (var pvalue in property.Values)
                 {
-                    var svalue = property.GetValue(pvalue.LanguageId, pvalue.Segment) as string;
+                    var svalue = property.GetValue(pvalue.Culture, pvalue.Segment) as string;
                     if (string.IsNullOrWhiteSpace(svalue))
                     {
-                        _autoFillProperties.Reset(model, autoFillConfig, pvalue.LanguageId, pvalue.Segment);
+                        _autoFillProperties.Reset(model, autoFillConfig, pvalue.Culture, pvalue.Segment);
                         continue;
                     }
 

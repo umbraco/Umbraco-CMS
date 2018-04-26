@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             mediaTypeRepository = new MediaTypeRepository(scopeAccessor, cacheHelper, Logger);
             var tagRepository = new TagRepository(scopeAccessor, cacheHelper, Logger);
-            var repository = new MediaRepository(scopeAccessor, cacheHelper, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>());
+            var repository = new MediaRepository(scopeAccessor, cacheHelper, Logger, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>(), Mock.Of<ILanguageRepository>());
             return repository;
         }
 

@@ -6,7 +6,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         ILanguage GetByIsoCode(string isoCode);
 
-        int GetIdByIsoCode(string isoCode);
-        string GetIsoCodeById(int id);
+        int? GetIdByIsoCode(string isoCode);
+        string GetIsoCodeById(int? id);
     }
 }

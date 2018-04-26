@@ -12,14 +12,8 @@ namespace Umbraco.Web.Models.Mapping
     {
         public string Resolve(IContent source, ContentItemDisplay destination, string destMember, ResolutionContext context)
         {
-            var langId = context.GetLanguageId();
-            if (langId.HasValue && source.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
-            {
-                //return the culture name being requested
-                return source.GetName(langId);
-            }
-
-            return source.Name;
+            var culture = context.GetCulture();
+            return source.GetName(culture);
         }
     }
 }

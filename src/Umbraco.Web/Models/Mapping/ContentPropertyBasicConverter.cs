@@ -46,9 +46,9 @@ namespace Umbraco.Web.Models.Mapping
                 editor = _propertyEditors[Constants.PropertyEditors.Aliases.NoEdit];
             }
 
-            var languageId = context.GetLanguageId();
+            var culture = context.GetCulture();
             
-            if (!languageId.HasValue && property.PropertyType.Variations == ContentVariation.CultureNeutral)
+            if (culture == null && property.PropertyType.Variations == ContentVariation.CultureNeutral)
             {
                 //a language Id needs to be set for a property type that can be varried by language
                 throw new InvalidOperationException($"No languageId found in mapping operation when one is required for the culture neutral property type {property.PropertyType.Alias}");
@@ -74,7 +74,7 @@ namespace Umbraco.Web.Models.Mapping
             }
 
             // if no 'IncludeProperties' were specified or this property is set to be included - we will map the value and return.
-            result.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, languageId);
+            result.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, culture);
             return result;
         }
     }

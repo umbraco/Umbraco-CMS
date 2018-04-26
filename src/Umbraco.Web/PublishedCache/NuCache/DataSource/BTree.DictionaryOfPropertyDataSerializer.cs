@@ -33,7 +33,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     pdatas.Add(pdata);
 
                     // everything that can be null is read/written as object
-                    pdata.LanguageId = ReadIntObject(stream);
+                    pdata.Culture = ReadStringObject(stream);
                     pdata.Segment = ReadStringObject(stream);
                     pdata.Value = ReadObject(stream);
                 }
@@ -61,7 +61,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 foreach (var pdata in values)
                 {
                     // everything that can be null is read/written as object
-                    WriteObject(pdata.LanguageId, stream);
+                    WriteObject(pdata.Culture, stream);
                     WriteObject(pdata.Segment, stream);
                     WriteObject(pdata.Value, stream);
                 }

@@ -97,18 +97,14 @@ namespace Umbraco.Web.Routing
             else
             {
                 var result = new List<string>();
-                var languageIsoCodesToIds = _localizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x.Id);
                 foreach(var domainUri in domainUris)
                 {
-                    if (languageIsoCodesToIds.TryGetValue(domainUri.Culture.Name, out var langId))
+                    var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture.Name);
+                    if (!string.IsNullOrWhiteSpace(umbracoUrlName))
                     {
-                        var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias, languageId: langId);
-                        if (!string.IsNullOrWhiteSpace(umbracoUrlName))
-                        {
-                            var path = "/" + umbracoUrlName;
-                            var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
-                            result.Add(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
-                        }
+                        var path = "/" + umbracoUrlName;
+                        var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
+                        result.Add(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
                     }
                 }
                 

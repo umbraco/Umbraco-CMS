@@ -1187,7 +1187,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 {
                     var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
                     if (value != null)
-                        pdatas.Add(new PropertyData { LanguageId = pvalue.LanguageId, Segment = pvalue.Segment, Value = value });
+                        pdatas.Add(new PropertyData { Culture = pvalue.Culture, Segment = pvalue.Segment, Value = value });
 
                     //Core.Composing.Current.Logger.Debug<PublishedSnapshotService>($"{content.Id} {prop.Alias} [{pvalue.LanguageId},{pvalue.Segment}] {value} {(published?"pub":"edit")}");
 
@@ -1216,15 +1216,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var cultureData = new Dictionary<string, CultureVariation>();
             if (content.Names != null)
             {
-                //fixme - when this stores a culture name reference we don't need this lookup anymore
-                var keys = content.Names.Keys;
-                var langs = _serviceContext.LocalizationService.GetAllLanguages().ToDictionary(x => x.Id, x => x.IsoCode);
                 foreach (var name in content.Names)
                 {
-                    if (langs.TryGetValue(name.Key, out var found))
-                    {
-                        cultureData[found] = new CultureVariation { Name = name.Value };
-                    }
+                    cultureData[name.Key] = new CultureVariation { Name = name.Value };
                 }
             }
 

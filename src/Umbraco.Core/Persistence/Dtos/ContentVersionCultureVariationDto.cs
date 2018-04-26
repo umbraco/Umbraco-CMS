@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     internal class ContentVersionCultureVariationDto
     {
-        private const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCultureVariation;
+        public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCultureVariation;
 
         [Column("id")]
         [PrimaryKeyColumn]
@@ -25,21 +25,21 @@ namespace Umbraco.Core.Persistence.Dtos
         [Index(IndexTypes.NonClustered, Name = "IX_" + TableName + "_LanguageId")]
         public int LanguageId { get; set; }
 
+        // this is convenient to carry the culture around, but has no db counterpart
+        [Ignore]
+        public string Culture { get; set; }
+
         [Column("name")]
-        [NullSetting(NullSetting = NullSettings.Null)]
         public string Name { get; set; }
 
-        [Column("available")]
-        public bool Available { get; set; }
+        [Column("date")]
+        public DateTime Date { get; set; }
 
-        [Column("availableDate")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public DateTime? AvailableDate { get; set; }
-
+        // fixme want?
         [Column("availableUserId")]
         // [ForeignKey(typeof(UserDto))] -- there is no foreign key so we can delete users without deleting associated content
         //[NullSetting(NullSetting = NullSettings.Null)]
-        public int AvailableUserId { get; set; }
+        public int PublishedUserId { get; set; }
 
         [Column("edited")]
         public bool Edited { get; set; }

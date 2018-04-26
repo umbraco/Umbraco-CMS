@@ -36,11 +36,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TEntity : class, IUmbracoEntity
         where TRepository : class, IRepository
     {
-        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILanguageRepository languageRepository, ILogger logger)
             : base(scopeAccessor, cache, logger)
-        { }
+        {
+            LanguageRepository = languageRepository;
+        }
 
         protected abstract TRepository This { get; }
+
+        protected ILanguageRepository LanguageRepository { get; }
 
         protected PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // fixme inject
 
@@ -465,11 +469,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     propertyDataDtos.AddRange(propertyDataDtos1);
                     if (temp.VersionId == temp.PublishedVersionId) // dirty corner case
-                        propertyDataDtos.AddRange(propertyDataDtos1.Select(x => x.Clone(-1)));                    
+                        propertyDataDtos.AddRange(propertyDataDtos1.Select(x => x.Clone(-1)));
                 }
                 if (temp.VersionId != temp.PublishedVersionId && indexedPropertyDataDtos.TryGetValue(temp.PublishedVersionId, out var propertyDataDtos2))
                     propertyDataDtos.AddRange(propertyDataDtos2);
-                var properties = PropertyFactory.BuildEntities(compositionProperties, propertyDataDtos, temp.PublishedVersionId).ToList();
+                var properties = PropertyFactory.BuildEntities(compositionProperties, propertyDataDtos, temp.PublishedVersionId, LanguageRepository).ToList();
 
                 // deal with tags
                 foreach (var property in properties)

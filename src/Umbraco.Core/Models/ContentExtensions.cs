@@ -284,7 +284,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Sets the posted file value of a property.
         /// </summary>
-        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value, int? languageId = null, string segment = null)
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, HttpPostedFileBase value, string culture = null, string segment = null)
         {
             // ensure we get the filename without the path in IE in intranet mode
             // http://stackoverflow.com/questions/382464/httppostedfile-filename-different-from-ie
@@ -303,7 +303,7 @@ namespace Umbraco.Core.Models
             if (string.IsNullOrWhiteSpace(filename)) return;
             filename = filename.ToLower(); // fixme - er... why?
 
-            MediaFileSystem.SetUploadFile(content, propertyTypeAlias, filename, value.InputStream, languageId, segment);
+            MediaFileSystem.SetUploadFile(content, propertyTypeAlias, filename, value.InputStream, culture, segment);
         }
 
         /// <summary>
@@ -312,7 +312,7 @@ namespace Umbraco.Core.Models
         /// <remarks>This really is for FileUpload fields only, and should be obsoleted. For anything else,
         /// you need to store the file by yourself using Store and then figure out
         /// how to deal with auto-fill properties (if any) and thumbnails (if any) by yourself.</remarks>
-        public static void SetValue(this IContentBase content, string propertyTypeAlias, string filename, Stream filestream, int? languageId = null, string segment = null)
+        public static void SetValue(this IContentBase content, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
         {
             if (filename == null || filestream == null) return;
 
@@ -321,7 +321,7 @@ namespace Umbraco.Core.Models
             if (string.IsNullOrWhiteSpace(filename)) return;
             filename = filename.ToLower(); // fixme - er... why?
 
-            MediaFileSystem.SetUploadFile(content, propertyTypeAlias, filename, filestream, languageId, segment);
+            MediaFileSystem.SetUploadFile(content, propertyTypeAlias, filename, filestream, culture, segment);
         }
 
         /// <summary>

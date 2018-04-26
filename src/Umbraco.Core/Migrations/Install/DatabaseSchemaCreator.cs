@@ -82,7 +82,8 @@ namespace Umbraco.Core.Migrations.Install
             typeof (UserLoginDto),
             typeof (ConsentDto),
             typeof (AuditEntryDto),
-            typeof (ContentVersionCultureVariationDto)
+            typeof (ContentVersionCultureVariationDto),
+            typeof (DocumentCultureVariationDto)
         };
 
         /// <summary>

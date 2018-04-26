@@ -304,7 +304,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public int GetLanguageIdByIsoCode(string isoCode)
+        public int? GetLanguageIdByIsoCode(string isoCode)
         {
             using (ScopeProvider.CreateScope(autoComplete: true))
             {

@@ -113,7 +113,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets a language identifier by its iso code.
         /// </summary>
-        int GetLanguageIdByIsoCode(string isoCode);
+        int? GetLanguageIdByIsoCode(string isoCode);
 
         /// <summary>
         /// Gets all available languages
