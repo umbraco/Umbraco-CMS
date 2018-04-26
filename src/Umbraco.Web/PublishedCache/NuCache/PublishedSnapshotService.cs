@@ -487,7 +487,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var domains = _serviceContext.DomainService.GetAll(true);
             foreach (var domain in domains
                 .Where(x => x.RootContentId.HasValue && x.LanguageIsoCode.IsNullOrWhiteSpace() == false)
-                .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, CultureInfo.GetCultureInfo(x.LanguageIsoCode), x.IsWildcard, x.IsDefaultDomain(_serviceContext.LocalizationService))))
+                .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, CultureInfo.GetCultureInfo(x.LanguageIsoCode), x.IsWildcard)))
             {
                 _domainStore.Set(domain.Id, domain);
             }
@@ -831,7 +831,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                             if (domain.RootContentId.HasValue == false) continue; // anomaly
                             if (domain.LanguageIsoCode.IsNullOrWhiteSpace()) continue; // anomaly
                             var culture = CultureInfo.GetCultureInfo(domain.LanguageIsoCode);
-                            _domainStore.Set(domain.Id, new Domain(domain.Id, domain.DomainName, domain.RootContentId.Value, culture, domain.IsWildcard, domain.IsDefaultDomain(_serviceContext.LocalizationService)));
+                            _domainStore.Set(domain.Id, new Domain(domain.Id, domain.DomainName, domain.RootContentId.Value, culture, domain.IsWildcard));
                             break;
                     }
                 }
@@ -1014,7 +1014,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _publishedContentTypeFactory, _logger);
 
-            var domainCache = new DomainCache(domainSnap);
+            var defaultCulture = _serviceContext.LocalizationService.GetDefaultLanguageIsoCode(); // capture - fast
+            var domainCache = new DomainCache(domainSnap, defaultCulture);
             var domainHelper = new DomainHelper(domainCache, _siteDomainHelper);
 
             return new PublishedSnapshot.PublishedSnapshotElements
@@ -1214,12 +1215,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
 
             var cultureData = new Dictionary<string, CultureVariation>();
-            if (content.Names != null)
+
+            // fixme refactor!!!
+            var names = content is IContent document
+                    ? (published
+                        ? document.PublishNames
+                        : document.Names)
+                    : content.Names;
+
+            foreach (var (culture, name) in names)
             {
-                foreach (var name in content.Names)
-                {
-                    cultureData[name.Key] = new CultureVariation { Name = name.Value };
-                }
+                        cultureData[culture] = new CultureVariation { Name = name };
             }
 
             //the dictionary that will be serialized

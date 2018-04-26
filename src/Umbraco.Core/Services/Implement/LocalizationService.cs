@@ -312,6 +312,33 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
+        /// <inheritdoc />
+        public string GetLanguageIsoCodeById(int id)
+        {
+            using (ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _languageRepository.GetIsoCodeById(id);
+            }
+        }
+
+        /// <inheritdoc />
+        public string GetDefaultLanguageIsoCode()
+        {
+            using (ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _languageRepository.GetDefaultIsoCode();
+            }
+        }
+
+        /// <inheritdoc />
+        public int? GetDefaultLanguageId()
+        {
+            using (ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _languageRepository.GetDefaultId();
+            }
+        }
+
         /// <summary>
         /// Gets all available languages
         /// </summary>

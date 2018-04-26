@@ -1487,5 +1487,11 @@ namespace Umbraco.Core
             guid[left] = guid[right];
             guid[right] = temp;
         }
+
+        /// <summary>
+        /// Turns an null-or-whitespace string into a null string.
+        /// </summary>
+        public static string NullEmpty(this string text)
+            => string.IsNullOrWhiteSpace(text) ? null : text;
     }
 }

@@ -265,8 +265,12 @@ namespace Umbraco.Web.Routing
 
             _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Uri=\"{request.Uri}\"");
 
+            var domainsCache = request.UmbracoContext.PublishedSnapshot.Domains;
+            var domains = domainsCache.GetAll(includeWildcards: false);
+            var defaultCulture = domainsCache.DefaultCulture;
+
             // try to find a domain matching the current request
-            var domainAndUri = DomainHelper.DomainForUri(request.UmbracoContext.PublishedSnapshot.Domains.GetAll(false), request.Uri);
+            var domainAndUri = DomainHelper.SelectDomain(domains, request.Uri, defaultCulture: defaultCulture);
 
             // handle domain - always has a contentId and a culture
             if (domainAndUri != null)
@@ -289,8 +293,7 @@ namespace Umbraco.Web.Routing
                 // not matching any existing domain
                 _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Matches no domain");
 
-                var defaultLanguage = _services.LocalizationService.GetAllLanguages().FirstOrDefault();
-                request.Culture = defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.IsoCode);
+                request.Culture = defaultCulture == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultCulture);
             }
 
             _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Culture=\"{request.Culture.Name}\"");

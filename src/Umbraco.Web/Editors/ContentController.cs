@@ -1191,7 +1191,7 @@ namespace Umbraco.Web.Editors
             //sent up, then it means that the user is editing the default variant language.
             if (culture == null && content.HasPropertyTypeVaryingByCulture())
             {
-                culture = Services.LocalizationService.GetDefaultVariantLanguage().IsoCode;
+                culture = Services.LocalizationService.GetDefaultLanguageIsoCode();
             }
 
             var display = ContextMapper.Map<IContent, ContentItemDisplay>(content, UmbracoContext,

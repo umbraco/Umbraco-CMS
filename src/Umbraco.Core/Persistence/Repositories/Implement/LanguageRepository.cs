@@ -242,5 +242,39 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 throw new ArgumentException($"Id {id} does not correspond to an existing language.", nameof(id));
             return null;
         }
+
+        public string GetDefaultIsoCode()
+        {
+            return GetDefault()?.IsoCode;
+        }
+
+        public int? GetDefaultId()
+        {
+            return GetDefault()?.Id;
+        }
+
+        // do NOT leak that language, it's not deep-cloned!
+        private ILanguage GetDefault()
+        {
+            // FIXME
+            var temp = SqlContext.Sql();
+            if (temp == null) return null;
+
+            // get all cached, non-cloned
+            var all = TypedCachePolicy.GetAllCached(PerformGetAll);
+
+            ILanguage first = null;
+            foreach (var language in all)
+            {
+                // if one language is default, return
+                if (language.IsDefaultVariantLanguage)
+                    return language;
+                // keep track of language with lowest id
+                if (first == null || language.Id < first.Id)
+                    first = language;
+            }
+
+            return first;
+        }
     }
 }

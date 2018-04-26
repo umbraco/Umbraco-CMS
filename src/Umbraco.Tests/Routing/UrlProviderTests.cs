@@ -220,10 +220,11 @@ namespace Umbraco.Tests.Routing
                     if (contentId != 9876) return Enumerable.Empty<Domain>();
                     return new[]
                     {
-                        new Domain(2, "example.us", 9876, CultureInfo.GetCultureInfo("en-US"), false, true), //default
-                        new Domain(3, "example.fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false, true)
+                        new Domain(2, "example.us", 9876, CultureInfo.GetCultureInfo("en-US"), false), //default
+                        new Domain(3, "example.fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false)
                     };
                 });
+            domainCache.Setup(x => x.DefaultCulture).Returns(CultureInfo.GetCultureInfo("en-US").Name);
 
             var snapshot = Mock.Of<IPublishedSnapshot>(x => x.Content == publishedContentCache.Object && x.Domains == domainCache.Object);
 
@@ -271,10 +272,11 @@ namespace Umbraco.Tests.Routing
                     if (contentId != 9876) return Enumerable.Empty<Domain>();
                     return new[]
                     {
-                        new Domain(2, "example.us", 9876, CultureInfo.GetCultureInfo("en-US"), false, true), //default
-                        new Domain(3, "example.fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false, true)
+                        new Domain(2, "example.us", 9876, CultureInfo.GetCultureInfo("en-US"), false), //default
+                        new Domain(3, "example.fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false)
                     };
                 });
+            domainCache.Setup(x => x.DefaultCulture).Returns(CultureInfo.GetCultureInfo("en-US").Name);
 
             var snapshot = Mock.Of<IPublishedSnapshot>(x => x.Content == publishedContentCache.Object && x.Domains == domainCache.Object);
 

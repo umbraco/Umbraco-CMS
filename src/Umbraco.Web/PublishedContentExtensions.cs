@@ -1257,7 +1257,7 @@ namespace Umbraco.Web
         {
             if (content.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
             {
-                var cultureCode = culture ?? localizationService.GetDefaultVariantLanguage()?.IsoCode;
+                var cultureCode = culture ?? localizationService.GetDefaultLanguageIsoCode();
                 if (cultureCode != null && content.CultureNames.TryGetValue(cultureCode, out var cultureName))
                 {
                     return cultureName.UrlName;

@@ -39,16 +39,16 @@ namespace Umbraco.Web
         ///  <returns>The "current" UmbracoContext.</returns>
         ///  <remarks>
         ///  fixme - this needs to be clarified
-        /// 
+        ///
         ///  If <paramref name="replace"/> is true then the "current" UmbracoContext is replaced
         ///  with a new one even if there is one already. See <see cref="WebRuntimeComponent"/>. Has to do with
         ///  creating a context at startup and not being able to access httpContext.Request at that time, so
         ///  the OriginalRequestUrl remains unspecified until <see cref="UmbracoModule"/> replaces the context.
-        /// 
+        ///
         ///  This *has* to be done differently!
-        /// 
+        ///
         ///  See http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
-        /// 
+        ///
         ///  </remarks>
         // used by
         // UmbracoModule BeginRequest (since it's a request it has an UmbracoContext)
@@ -225,11 +225,7 @@ namespace Umbraco.Web
         /// TODO The alternative is to have a IDomainHelperAccessor singleton which is cached per UmbracoContext
         /// </remarks>
         internal DomainHelper GetDomainHelper(ISiteDomainHelper siteDomainHelper)
-        {
-            if (_domainHelper == null)
-                _domainHelper = new DomainHelper(PublishedSnapshot.Domains, siteDomainHelper);
-            return _domainHelper;
-        }
+            => _domainHelper ?? (_domainHelper = new DomainHelper(PublishedSnapshot.Domains, siteDomainHelper));
 
         /// <summary>
         /// Gets a value indicating whether the request has debugging enabled

@@ -209,7 +209,7 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(int id, Uri current, UrlProviderMode mode, string culture = null)
+        public string GetUrl(int id, Uri current, UrlProviderMode mode, string culture = null) // FIXME DOCUMENT
         {
             var url = _urlProviders.Select(provider => provider.GetUrl(_umbracoContext, id, current, mode, culture))
                 .FirstOrDefault(u => u != null);

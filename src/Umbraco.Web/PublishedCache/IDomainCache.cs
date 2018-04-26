@@ -7,5 +7,6 @@ namespace Umbraco.Web.PublishedCache
     {
         IEnumerable<Domain> GetAll(bool includeWildcards);
         IEnumerable<Domain> GetAssigned(int contentId, bool includeWildcards);
+        string DefaultCulture { get; }
     }
 }

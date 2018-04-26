@@ -271,7 +271,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public IEnumerable<string> PublishedCultures => _publishInfos?.Keys;
+        public IEnumerable<string> PublishedCultures => _publishInfos?.Keys ?? Enumerable.Empty<string>();
 
         /// <inheritdoc />
         public bool IsCultureEdited(string culture)

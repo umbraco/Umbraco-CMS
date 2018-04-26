@@ -38,6 +38,7 @@ namespace Umbraco.Web.Routing
         /// <param name="id">The published content id.</param>
         /// <param name="current">The current absolute url.</param>
         /// <param name="mode">The url mode.</param>
+        /// <param name="culture">The culture.</param>
         /// <returns>The url for the published content.</returns>
         /// <remarks>
         /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
@@ -45,8 +46,7 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public virtual string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string culture = null)
         {
-            if (!current.IsAbsoluteUri)
-                throw new ArgumentException("Current url must be absolute.", "current");
+            if (!current.IsAbsoluteUri) throw new ArgumentException("Current url must be absolute.", nameof(current));
 
             // will not use cache if previewing
             var route = umbracoContext.ContentCache.GetRouteById(id, culture);
