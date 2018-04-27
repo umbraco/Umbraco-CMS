@@ -44,9 +44,11 @@ namespace Umbraco.Web.Routing
         /// <returns>The document node, or null.</returns>
         protected IPublishedContent FindContent(PublishedRequest docreq, string route)
         {
+            if (docreq == null) throw new System.ArgumentNullException(nameof(docreq));
+
             Logger.Debug<ContentFinderByUrl>(() => $"Test route \"{route}\"");
 
-            var node = docreq.UmbracoContext.ContentCache.GetByRoute(route, culture: docreq.Culture);
+            var node = docreq.UmbracoContext.ContentCache.GetByRoute(route, culture: docreq.Culture?.Name);
             if (node != null)
             {
                 docreq.PublishedContent = node;

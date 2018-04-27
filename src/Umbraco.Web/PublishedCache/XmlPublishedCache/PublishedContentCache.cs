@@ -64,7 +64,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         #region Routes
 
-        public virtual IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, CultureInfo culture = null)
+        public virtual IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string culture = null)
         {
             if (route == null) throw new ArgumentNullException(nameof(route));
 
@@ -108,12 +108,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 _routesCache.Store(content.Id, route, true); // trusted route
         }
 
-        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, CultureInfo culture = null)
+        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string culture = null)
         {
             return GetByRoute(PreviewDefault, route, hideTopLevelNode);
         }
 
-        public virtual string GetRouteById(bool preview, int contentId, CultureInfo culture = null)
+        public virtual string GetRouteById(bool preview, int contentId, string culture = null)
         {
             // try to get from cache if not previewing
             var route = preview || _routesCache == null ? null : _routesCache.GetRoute(contentId);
@@ -138,7 +138,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return route;
         }
 
-        public string GetRouteById(int contentId, CultureInfo culture = null)
+        public string GetRouteById(int contentId, string culture = null)
         {
             return GetRouteById(PreviewDefault, contentId, culture);
         }

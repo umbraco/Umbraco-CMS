@@ -153,7 +153,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 true); //replace it
 
             var urlHelper = new Mock<IUrlProvider>();
-            urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>(), It.IsAny<CultureInfo>()))
+            urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>()))
                 .Returns("/hello/world/1234");
 
             var membershipHelper = new MembershipHelper(umbCtx, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>());

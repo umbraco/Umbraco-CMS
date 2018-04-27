@@ -55,12 +55,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // at the moment we try our best to be backward compatible, but really,
         // should get rid of hideTopLevelNode and other oddities entirely, eventually
 
-        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, CultureInfo culture = null)
+        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string culture = null)
         {
             return GetByRoute(PreviewDefault, route, hideTopLevelNode, culture);
         }
 
-        public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, CultureInfo culture = null)
+        public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string culture = null)
         {
             if (route == null) throw new ArgumentNullException(nameof(route));
 
@@ -69,7 +69,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return cache.GetCacheItem<IPublishedContent>(key, () => GetByRouteInternal(preview, route, hideTopLevelNode, culture));
         }
 
-        private IPublishedContent GetByRouteInternal(bool preview, string route, bool? hideTopLevelNode, CultureInfo culture)
+        private IPublishedContent GetByRouteInternal(bool preview, string route, bool? hideTopLevelNode, string culture)
         {
             hideTopLevelNode = hideTopLevelNode ?? HideTopLevelNodeFromPath; // default = settings
 
@@ -120,19 +120,19 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return content;
         }
 
-        public string GetRouteById(int contentId, CultureInfo culture = null)
+        public string GetRouteById(int contentId, string culture = null)
         {
             return GetRouteById(PreviewDefault, contentId, culture);
         }
 
-        public string GetRouteById(bool preview, int contentId, CultureInfo culture = null)
+        public string GetRouteById(bool preview, int contentId, string culture = null)
         {
             var cache = (preview == false || PublishedSnapshotService.FullCacheWhenPreviewing) ? _elementsCache : _snapshotCache;
             var key = CacheKeys.ContentCacheRouteByContent(contentId, preview, culture);
             return cache.GetCacheItem<string>(key, () => GetRouteByIdInternal(preview, contentId, null, culture));
         }
 
-        private string GetRouteByIdInternal(bool preview, int contentId, bool? hideTopLevelNode, CultureInfo culture)
+        private string GetRouteByIdInternal(bool preview, int contentId, bool? hideTopLevelNode, string culture)
         {
             var node = GetById(preview, contentId);
             if (node == null)
@@ -168,7 +168,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return route;
         }
 
-        private IPublishedContent FollowRoute(IPublishedContent content, IReadOnlyList<string> parts, int start, CultureInfo culture)
+        private IPublishedContent FollowRoute(IPublishedContent content, IReadOnlyList<string> parts, int start, string culture)
         {
             var i = start;
             while (content != null && i < parts.Count)

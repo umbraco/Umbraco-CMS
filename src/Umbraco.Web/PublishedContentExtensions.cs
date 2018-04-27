@@ -1253,11 +1253,11 @@ namespace Umbraco.Web
         /// <param name="localizationService"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public static string GetUrlName(this IPublishedContent content, ILocalizationService localizationService, CultureInfo culture = null)
+        public static string GetUrlName(this IPublishedContent content, ILocalizationService localizationService, string culture = null)
         {
             if (content.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
             {
-                var cultureCode = culture != null ? culture.Name : localizationService.GetDefaultVariantLanguage()?.IsoCode;
+                var cultureCode = culture ?? localizationService.GetDefaultVariantLanguage()?.IsoCode;
                 if (cultureCode != null && content.CultureNames.TryGetValue(cultureCode, out var cultureName))
                 {
                     return cultureName.UrlName;

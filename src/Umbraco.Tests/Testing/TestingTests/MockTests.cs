@@ -74,7 +74,7 @@ namespace Umbraco.Tests.Testing.TestingTests
             var umbracoContext = TestObjects.GetUmbracoContextMock();
 
             var urlProviderMock = new Mock<IUrlProvider>();
-            urlProviderMock.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>(), It.IsAny<CultureInfo>()))
+            urlProviderMock.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>()))
                 .Returns("/hello/world/1234");
             var urlProvider = urlProviderMock.Object;
 

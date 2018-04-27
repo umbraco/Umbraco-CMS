@@ -48,7 +48,7 @@ namespace Umbraco.Web.Routing
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
         /// </remarks>
-        public string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, CultureInfo culture = null)
+        public string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string culture = null)
         {
             return null; // we have nothing to say
         }

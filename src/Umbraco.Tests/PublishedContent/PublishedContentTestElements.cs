@@ -59,22 +59,22 @@ namespace Umbraco.Tests.PublishedContent
             _content.Clear();
         }
 
-        public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, CultureInfo culture = null)
+        public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string culture = null)
         {
             throw new NotImplementedException();
         }
 
-        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, CultureInfo culture = null)
+        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string culture = null)
         {
             throw new NotImplementedException();
         }
 
-        public string GetRouteById(bool preview, int contentId, CultureInfo culture = null)
+        public string GetRouteById(bool preview, int contentId, string culture = null)
         {
             throw new NotImplementedException();
         }
 
-        public string GetRouteById(int contentId, CultureInfo culture = null)
+        public string GetRouteById(int contentId, string culture = null)
         {
             throw new NotImplementedException();
         }

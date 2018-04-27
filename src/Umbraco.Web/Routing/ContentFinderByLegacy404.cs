@@ -48,7 +48,7 @@ namespace Umbraco.Web.Routing
                 while (pos > 1)
                 {
                     route = route.Substring(0, pos);
-                    node = frequest.UmbracoContext.ContentCache.GetByRoute(route, culture: frequest.Culture);
+                    node = frequest.UmbracoContext.ContentCache.GetByRoute(route, culture: frequest?.Culture?.Name);
                     if (node != null) break;
                     pos = route.LastIndexOf('/');
                 }

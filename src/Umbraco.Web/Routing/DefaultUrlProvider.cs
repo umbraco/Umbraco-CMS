@@ -43,7 +43,7 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
         /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
         /// </remarks>
-        public virtual string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, CultureInfo culture = null)
+        public virtual string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string culture = null)
         {
             if (!current.IsAbsoluteUri)
                 throw new ArgumentException("Current url must be absolute.", "current");
@@ -116,7 +116,7 @@ namespace Umbraco.Web.Routing
             foreach (var d in domainUris)
             {
                 //although we are passing in culture here, if any node in this path is invariant, it ignores the culture anyways so this is ok
-                var route = umbracoContext.ContentCache.GetRouteById(id, d.Culture);
+                var route = umbracoContext.ContentCache.GetRouteById(id, d?.Culture?.Name);
                 if (route == null) continue;
 
                 //need to strip off the leading ID for the route

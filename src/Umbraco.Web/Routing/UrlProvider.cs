@@ -77,7 +77,7 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>Mode</c> and on the current url.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(Guid id, CultureInfo culture = null)
+        public string GetUrl(Guid id, string culture = null)
         {
             var intId = _entityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, culture);
@@ -94,7 +94,7 @@ namespace Umbraco.Web.Routing
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(Guid id, bool absolute, CultureInfo culture = null)
+        public string GetUrl(Guid id, bool absolute, string culture = null)
         {
             var intId = _entityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, absolute, culture);
@@ -112,7 +112,7 @@ namespace Umbraco.Web.Routing
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(Guid id, Uri current, bool absolute, CultureInfo culture = null)
+        public string GetUrl(Guid id, Uri current, bool absolute, string culture = null)
         {
             var intId = _entityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, current, absolute, culture);
@@ -128,7 +128,7 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>mode</c> and on the current url.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(Guid id, UrlProviderMode mode, CultureInfo culture = null)
+        public string GetUrl(Guid id, UrlProviderMode mode, string culture = null)
         {
             var intId = _entityService.GetId(id, UmbracoObjectTypes.Document);
             return GetUrl(intId.Success ? intId.Result : -1, mode, culture);
@@ -143,7 +143,7 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>Mode</c> and on the current url.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(int id, CultureInfo culture = null)
+        public string GetUrl(int id, string culture = null)
         {
             return GetUrl(id, _umbracoContext.CleanedUmbracoUrl, Mode, culture);
         }
@@ -159,7 +159,7 @@ namespace Umbraco.Web.Routing
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(int id, bool absolute, CultureInfo culture = null)
+        public string GetUrl(int id, bool absolute, string culture = null)
         {
             var mode = absolute ? UrlProviderMode.Absolute : Mode;
             return GetUrl(id, _umbracoContext.CleanedUmbracoUrl, mode, culture);
@@ -177,7 +177,7 @@ namespace Umbraco.Web.Routing
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(int id, Uri current, bool absolute, CultureInfo culture = null)
+        public string GetUrl(int id, Uri current, bool absolute, string culture = null)
         {
             var mode = absolute ? UrlProviderMode.Absolute : Mode;
             return GetUrl(id, current, mode, culture);
@@ -193,7 +193,7 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>mode</c> and on the current url.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(int id, UrlProviderMode mode, CultureInfo culture = null)
+        public string GetUrl(int id, UrlProviderMode mode, string culture = null)
         {
             return GetUrl(id, _umbracoContext.CleanedUmbracoUrl, mode, culture);
         }
@@ -209,7 +209,7 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>mode</c> and on <c>current</c>.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(int id, Uri current, UrlProviderMode mode, CultureInfo culture = null)
+        public string GetUrl(int id, Uri current, UrlProviderMode mode, string culture = null)
         {
             var url = _urlProviders.Select(provider => provider.GetUrl(_umbracoContext, id, current, mode, culture))
                 .FirstOrDefault(u => u != null);
