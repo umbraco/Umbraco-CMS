@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
@@ -44,11 +48,11 @@ namespace Umbraco.Tests.Routing
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
             SettingsForTests.ConfigureSettings(globalSettings.Object);
 
-            var umbracoContext = GetUmbracoContext("/test", 1111, urlProviders: new []
+            var umbracoContext = GetUmbracoContext("/test", 1111, urlProviders: new[]
             {
                 new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
-            }, globalSettings:globalSettings.Object);
-            
+            }, globalSettings: globalSettings.Object);
+
             var requestHandlerMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestHandlerMock.Setup(x => x.AddTrailingSlash).Returns(false);// (cached routes have none)
 
@@ -110,7 +114,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext("/test", 1111, urlProviders: new[]
             {
                 new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
-            }, globalSettings:globalSettings.Object);
+            }, globalSettings: globalSettings.Object);
 
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
@@ -140,7 +144,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext("/test", 1111, urlProviders: new[]
             {
                 new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
-            }, globalSettings:globalSettings.Object);
+            }, globalSettings: globalSettings.Object);
 
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
@@ -149,14 +153,118 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual(niceUrlMatch, result);
         }
 
+        /// <summary>
+        /// This tests DefaultUrlProvider.GetUrl with a specific culture when the current URL is the culture specific domain
+        /// </summary>
         [Test]
-        public void Get_Nice_Url_Relative_Or_Absolute()
+        public void Get_Url_For_Culture_Variant_With_Current_Url()
+        {
+            const string currentUri = "http://example.com/fr/test";
+
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
+
+            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
+            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
+
+            var publishedContentCache = new Mock<IPublishedContentCache>();
+            publishedContentCache.Setup(x => x.GetRouteById(1234, "fr-FR"))
+                .Returns("9876/home/test-fr"); //prefix with the root id node with the domain assigned as per the umbraco standard
+
+            var domainCache = new Mock<IDomainCache>();
+            domainCache.Setup(x => x.GetAssigned(It.IsAny<int>(), false))
+                .Returns((int contentId, bool includeWildcards) =>
+                {
+                    if (contentId != 9876) return Enumerable.Empty<Domain>();
+                    return new[]
+                    {
+                        new Domain(2, "example.com/en", 9876, CultureInfo.GetCultureInfo("en-US"), false, true), //default
+                        new Domain(3, "example.com/fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false, true)
+                    };
+                });
+
+            var snapshot = Mock.Of<IPublishedSnapshot>(x => x.Content == publishedContentCache.Object && x.Domains == domainCache.Object);
+
+            var snapshotService = new Mock<IPublishedSnapshotService>();
+            snapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>()))
+                .Returns(snapshot);
+
+            var umbracoContext = GetUmbracoContext(currentUri, umbracoSettings: _umbracoSettings,
+                urlProviders: new[] {
+                    new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
+                },
+                globalSettings: globalSettings.Object,
+                snapshotService: snapshotService.Object);
+
+
+            var url = umbracoContext.UrlProvider.GetUrl(1234, "fr-FR");
+
+            //the current uri is the culture specific domain we want, so the result is a relative path since we are on the culture specific domain
+            Assert.AreEqual("/fr/home/test-fr/", url);
+        }
+
+        /// <summary>
+        /// This tests DefaultUrlProvider.GetUrl with a specific culture when the current URL is not the culture specific domain
+        /// </summary>
+        [Test]
+        public void Get_Url_For_Culture_Variant_Non_Current_Url()
+        {
+            const string currentUri = "http://example.com/en/test";
+
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
+
+            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
+            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
+
+            var publishedContentCache = new Mock<IPublishedContentCache>();
+            publishedContentCache.Setup(x => x.GetRouteById(1234, "fr-FR"))
+                .Returns("9876/home/test-fr"); //prefix with the root id node with the domain assigned as per the umbraco standard
+
+            var domainCache = new Mock<IDomainCache>();
+            domainCache.Setup(x => x.GetAssigned(It.IsAny<int>(), false))
+                .Returns((int contentId, bool includeWildcards) =>
+                {
+                    if (contentId != 9876) return Enumerable.Empty<Domain>();
+                    return new[]
+                    {
+                        new Domain(2, "example.com/en", 9876, CultureInfo.GetCultureInfo("en-US"), false, true), //default
+                        new Domain(3, "example.com/fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false, true)
+                    };
+                });
+
+            var snapshot = Mock.Of<IPublishedSnapshot>(x => x.Content == publishedContentCache.Object && x.Domains == domainCache.Object);
+
+            var snapshotService = new Mock<IPublishedSnapshotService>();
+            snapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>()))
+                .Returns(snapshot);
+
+            var umbracoContext = GetUmbracoContext(currentUri, umbracoSettings: _umbracoSettings,
+                urlProviders: new[] {
+                    new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
+                },
+                globalSettings: globalSettings.Object,
+                snapshotService: snapshotService.Object);
+
+
+            var url = umbracoContext.UrlProvider.GetUrl(1234, "fr-FR");
+
+            //the current uri is not the culture specific domain we want, so the result is an absolute path to the culture specific domain
+            Assert.AreEqual("http://example.com/fr/home/test-fr/", url);
+        }
+
+        [Test]
+        public void Get_Url_Relative_Or_Absolute()
         {
             var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
             SettingsForTests.ConfigureSettings(globalSettings.Object);
-            
+
 
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
@@ -164,7 +272,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, umbracoSettings: _umbracoSettings, urlProviders: new[]
             {
                 new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
-            }, globalSettings:globalSettings.Object);
+            }, globalSettings: globalSettings.Object);
 
             Assert.AreEqual("/home/sub1/custom-sub-1/", umbracoContext.UrlProvider.GetUrl(1177));
 
@@ -187,7 +295,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, urlProviders: new[]
             {
                 new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
-            }, globalSettings:globalSettings.Object);
+            }, globalSettings: globalSettings.Object);
 
             //mock the Umbraco settings that we need
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);

@@ -178,6 +178,7 @@
     <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
     <Compile Include="TestHelpers\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
+    <Compile Include="TestHelpers\Stubs\TestPublishedContent.cs" />
     <Compile Include="Testing\ContentBaseExtensions.cs" />
     <Compile Include="Testing\TestDatabase.cs" />
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />

@@ -32,7 +32,7 @@ namespace Umbraco.Web.Routing
         #region GetUrl
 
         /// <summary>
-        /// Gets the nice url of a published content.
+        /// Gets the url of a published content.
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="id">The published content id.</param>
@@ -51,10 +51,10 @@ namespace Umbraco.Web.Routing
             // will not use cache if previewing
             var route = umbracoContext.ContentCache.GetRouteById(id, culture);
 
-            return GetUrlFromRoute(route, umbracoContext, id, current, mode);
+            return GetUrlFromRoute(route, umbracoContext, id, current, mode, culture);
         }
 
-        internal string GetUrlFromRoute(string route, UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode)
+        internal string GetUrlFromRoute(string route, UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string culture)
         {
             if (string.IsNullOrWhiteSpace(route))
             {
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Routing
             var path = pos == 0 ? route : route.Substring(pos);
             var domainUri = pos == 0
                 ? null
-                : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current);
+                : domainHelper.DomainForNode(int.Parse(route.Substring(0, pos)), current, culture);
 
             // assemble the url from domainUri (maybe null) and path
             return AssembleUrl(domainUri, path, current, mode).ToString();
@@ -119,8 +119,7 @@ namespace Umbraco.Web.Routing
                 var route = umbracoContext.ContentCache.GetRouteById(id, d?.Culture?.Name);
                 if (route == null) continue;
 
-                //need to strip off the leading ID for the route
-                //TODO: Is there a nicer way to deal with this?
+                //need to strip off the leading ID for the route if it exists (occurs if the route is for a node with a domain assigned)
                 var pos = route.IndexOf('/');
                 var path = pos == 0 ? route : route.Substring(pos);
 
@@ -170,7 +169,7 @@ namespace Umbraco.Web.Routing
             {
                 if (mode == UrlProviderMode.Auto)
                 {
-                    if (current != null && domainUri.Uri.GetLeftPart(UriPartial.Authority) == current.GetLeftPart(UriPartial.Authority))
+                    if (current != null && current.GetLeftPart(UriPartial.Path).InvariantStartsWith(domainUri.Uri.GetLeftPart(UriPartial.Path)))
                         mode = UrlProviderMode.Relative;
                     else
                         mode = UrlProviderMode.Absolute;

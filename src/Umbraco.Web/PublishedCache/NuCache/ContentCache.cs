@@ -163,7 +163,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // assemble the route
             pathParts.Reverse();
             var path = "/" + string.Join("/", pathParts); // will be "/" or "/foo" or "/foo/bar" etc
-            var route = (n?.Id.ToString(CultureInfo.InvariantCulture) ?? "") + path;
+            //prefix the root node id containing the domain if it exists (this is a standard way of creating route paths)
+            //and is done so that we know the ID of the domain node for the path
+            var route = (n?.Id.ToString(CultureInfo.InvariantCulture) ?? "") + path; 
 
             return route;
         }

@@ -31,7 +31,7 @@ namespace Umbraco.Web.Routing
         /// <returns>The domain and its uri, if any, that best matches the specified uri, else null.</returns>
         /// <remarks>If at least a domain is set on the node then the method returns the domain that
         /// best matches the specified uri, else it returns null.</remarks>
-        internal DomainAndUri DomainForNode(int nodeId, Uri current)
+        internal DomainAndUri DomainForNode(int nodeId, Uri current, string culture = null)
         {
             // be safe
             if (nodeId <= 0)
@@ -45,7 +45,7 @@ namespace Umbraco.Web.Routing
                 return null;
 
             // else filter
-            var domainAndUri = DomainForUri(domains, current, domainAndUris => _siteDomainHelper.MapDomain(current, domainAndUris));
+            var domainAndUri = DomainForUri(domains, current, culture, domainAndUris => _siteDomainHelper.MapDomain(current, domainAndUris));
 
             if (domainAndUri == null)
                 throw new Exception("DomainForUri returned null.");
@@ -108,14 +108,13 @@ namespace Umbraco.Web.Routing
         /// the right one, unless it is <c>null</c>, in which case the method returns <c>null</c>.</para>
         /// <para>The filter, if any, will be called only with a non-empty argument, and _must_ return something.</para>
         /// </remarks>
-        internal static DomainAndUri DomainForUri(IEnumerable<Domain> domains, Uri current, Func<DomainAndUri[], DomainAndUri> filter = null)
+        internal static DomainAndUri DomainForUri(IEnumerable<Domain> domains, Uri current, string culture = null, Func<DomainAndUri[], DomainAndUri> filter = null)
         {
             // sanitize the list to have proper uris for comparison (scheme, path end with /)
             // we need to end with / because example.com/foo cannot match example.com/foobar
             // we need to order so example.com/foo matches before example.com/
             var domainsAndUris = domains
                 .Where(d => d.IsWildcard == false)
-                //.Select(SanitizeForBackwardCompatibility)
                 .Select(d => new DomainAndUri(d, current))
                 .OrderByDescending(d => d.Uri.ToString())
                 .ToArray();
@@ -126,8 +125,12 @@ namespace Umbraco.Web.Routing
             DomainAndUri domainAndUri;
             if (current == null)
             {
-                //get the default domain (there should be one)
-                domainAndUri = domainsAndUris.FirstOrDefault(x => x.IsDefault);
+                //get the default domain or the one matching the culture if specified
+                domainAndUri = domainsAndUris.FirstOrDefault(x => culture.IsNullOrWhiteSpace() ? x.IsDefault : x.Culture.Name.InvariantEquals(culture));
+
+                if (domainAndUri == null && !culture.IsNullOrWhiteSpace())
+                    throw new InvalidOperationException($"No domain was found by the specified culture '{culture}'");
+
                 if (domainAndUri == null)
                     domainAndUri = domainsAndUris.First(); // take the first one by default (what else can we do?)
             }
@@ -138,13 +141,17 @@ namespace Umbraco.Web.Routing
                 var currentWithSlash = current.EndPathWithSlash();
                 domainAndUri = domainsAndUris
                     .FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(currentWithSlash));
-                if (domainAndUri != null) return domainAndUri;
+                //is culture specified? if so this will need to match too
+                if (domainAndUri != null && (culture.IsNullOrWhiteSpace() || domainAndUri.Culture.Name.InvariantEquals(culture)))
+                    return domainAndUri;
 
                 // if none matches, try again without the port
                 // ie current is www.example.com:1234/foo/bar, look for domain www.example.com
                 domainAndUri = domainsAndUris
                     .FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(currentWithSlash.WithoutPort()));
-                if (domainAndUri != null) return domainAndUri;
+                //is culture specified? if so this will need to match too
+                if (domainAndUri != null && (culture.IsNullOrWhiteSpace() || domainAndUri.Culture.Name.InvariantEquals(culture)))
+                    return domainAndUri;
 
                 // if none matches, then try to run the filter to pick a domain
                 if (filter != null)
@@ -170,7 +177,6 @@ namespace Umbraco.Web.Routing
         {
             return domains
                 .Where(d => d.IsWildcard == false)
-                //.Select(SanitizeForBackwardCompatibility)
                 .Select(d => new DomainAndUri(d, current))
                 .OrderByDescending(d => d.Uri.ToString());
         }

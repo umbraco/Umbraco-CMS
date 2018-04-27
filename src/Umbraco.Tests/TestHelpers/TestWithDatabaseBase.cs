@@ -366,7 +366,8 @@ namespace Umbraco.Tests.TestHelpers
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 service,
-                new WebSecurity(httpContext, Container.GetInstance<IUserService>(), Container.GetInstance<IGlobalSettings>()),
+                new WebSecurity(httpContext, Container.GetInstance<IUserService>(),
+                Container.GetInstance<IGlobalSettings>()),
                 umbracoSettings ?? Container.GetInstance<IUmbracoSettingsSection>(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
                 globalSettings ?? Container.GetInstance<IGlobalSettings>(),

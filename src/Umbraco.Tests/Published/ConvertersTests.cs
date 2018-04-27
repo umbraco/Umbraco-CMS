@@ -11,6 +11,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 
@@ -99,7 +100,7 @@ namespace Umbraco.Tests.Published
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
             var cntType1 = contentTypeFactory.CreateContentType(1001, "cnt1", Array.Empty<PublishedPropertyType>());
-            var cnt1 = new PublishedSnapshotTestObjects.TestPublishedContent(cntType1, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
+            var cnt1 = new TestPublishedContent(cntType1, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
             cacheContent[cnt1.Id] = cnt1;
 
             Assert.AreSame(cnt1, element1.Value("prop1"));
@@ -200,8 +201,8 @@ namespace Umbraco.Tests.Published
 
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "val1" } }, false);
             var element2 = new PublishedElement(elementType2, Guid.NewGuid(), new Dictionary<string, object> { { "prop2", "1003" } }, false);
-            var cnt1 = new PublishedSnapshotTestObjects.TestPublishedContent(contentType1, 1003, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "val1" } }, false);
-            var cnt2 = new PublishedSnapshotTestObjects.TestPublishedContent(contentType2, 1004, Guid.NewGuid(), new Dictionary<string, object> { { "prop2", "1003" } }, false);
+            var cnt1 = new TestPublishedContent(contentType1, 1003, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "val1" } }, false);
+            var cnt2 = new TestPublishedContent(contentType2, 1004, Guid.NewGuid(), new Dictionary<string, object> { { "prop2", "1003" } }, false);
 
             cacheContent[cnt1.Id] = cnt1.CreateModel();
             cacheContent[cnt2.Id] = cnt2.CreateModel();

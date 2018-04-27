@@ -216,12 +216,12 @@ namespace Umbraco.Web.Routing
             return url ?? "#"; // legacy wants this
         }
 
-        internal string GetUrlFromRoute(int id, string route)
+        internal string GetUrlFromRoute(int id, string route, string culture)
         {
             var provider = _urlProviders.OfType<DefaultUrlProvider>().FirstOrDefault();
             var url = provider == null
                 ? route // what else?
-                : provider.GetUrlFromRoute(route, UmbracoContext.Current, id, _umbracoContext.CleanedUmbracoUrl, Mode);
+                : provider.GetUrlFromRoute(route, UmbracoContext.Current, id, _umbracoContext.CleanedUmbracoUrl, Mode, culture);
             return url ?? "#";
         }
 
