@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Published
                 });
 
             var contentCache = new Mock<IPublishedContentCache>();
-            var publishedSnapshot = new Mock<IPublishedShapshot>();
+            var publishedSnapshot = new Mock<IPublishedSnapshot>();
 
             // mocked published snapshot returns a content cache
             publishedSnapshot

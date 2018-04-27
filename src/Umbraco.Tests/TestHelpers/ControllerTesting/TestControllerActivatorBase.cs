@@ -131,7 +131,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             webSecurity.Setup(x => x.UserHasSectionAccess(It.IsAny<string>(), It.IsAny<IUser>()))
                 .Returns(() => true);
 
-            var publishedSnapshot = new Mock<IPublishedShapshot>();
+            var publishedSnapshot = new Mock<IPublishedSnapshot>();
             publishedSnapshot.Setup(x => x.Members).Returns(Mock.Of<IPublishedMemberCache>());
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot.Object);

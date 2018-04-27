@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Web.Mvc
         [Test]
         public void Can_Lookup_Content()
         {
-            var publishedSnapshot = new Mock<IPublishedShapshot>();
+            var publishedSnapshot = new Mock<IPublishedSnapshot>();
             publishedSnapshot.Setup(x => x.Members).Returns(Mock.Of<IPublishedMemberCache>());
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot.Object);

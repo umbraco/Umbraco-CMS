@@ -8,7 +8,7 @@ namespace Umbraco.Web.PublishedCache
     /// </summary>
     /// <remarks>A published snapshot is a point-in-time capture of the current state of
     /// everything that is "published".</remarks>
-    public interface IPublishedShapshot
+    public interface IPublishedSnapshot
     {
         /// <summary>
         /// Gets the <see cref="IPublishedContentCache"/>.

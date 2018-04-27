@@ -7,13 +7,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     /// <summary>
     /// Implements a published snapshot.
     /// </summary>
-    class PublishedShapshot : IPublishedShapshot
+    class PublishedSnapshot : IPublishedSnapshot
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PublishedShapshot"/> class with a content cache
+        /// Initializes a new instance of the <see cref="PublishedSnapshot"/> class with a content cache
         /// and a media cache.
         /// </summary>
-        public PublishedShapshot(
+        public PublishedSnapshot(
             PublishedContentCache contentCache,
             PublishedMediaCache mediaCache,
             PublishedMemberCache memberCache,

@@ -98,7 +98,7 @@ namespace Umbraco.Web.Composing
         public static DistributedCache DistributedCache
             => Container.GetInstance<DistributedCache>();
 
-        public static IPublishedShapshot PublishedSnapshot
+        public static IPublishedSnapshot PublishedSnapshot
             => Container.GetInstance<IPublishedSnapshotAccessor>().PublishedSnapshot;
 
         public static EventMessages EventMessages

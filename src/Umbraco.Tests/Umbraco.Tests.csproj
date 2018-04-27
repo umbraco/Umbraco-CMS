@@ -128,6 +128,7 @@
     <Compile Include="Migrations\MigrationTests.cs" />
     <Compile Include="Models\PathValidationTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
+    <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
     <Compile Include="Published\NestedContentTests.cs" />
@@ -375,7 +376,6 @@
     <Compile Include="Persistence\SyntaxProvider\SqlCeSyntaxProviderTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
     <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
-    <Compile Include="PublishedContent\PublishedContentTestElements.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
     <Compile Include="Misc\HashCodeCombinerTests.cs" />

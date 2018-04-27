@@ -139,7 +139,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         #region Caches
 
-        public override IPublishedShapshot CreatePublishedSnapshot(string previewToken)
+        public override IPublishedSnapshot CreatePublishedSnapshot(string previewToken)
         {
             // use _requestCache to store recursive properties lookup, etc. both in content
             // and media cache. Life span should be the current request. Or, ideally
@@ -148,7 +148,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             var domainCache = new DomainCache(_domainService, _localizationService);
 
-            return new PublishedShapshot(
+            return new PublishedSnapshot(
                 new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _siteDomainHelper, _contentTypeCache, _routesCache, previewToken),
                 new PublishedMediaCache(_xmlStore, _mediaService, _userService, _requestCache, _contentTypeCache),
                 new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache),

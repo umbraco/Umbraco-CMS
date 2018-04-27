@@ -342,6 +342,7 @@
     <Compile Include="PropertyEditors\ValueConverters\MemberPickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueListUniqueValueValidator.cs" />
+    <Compile Include="PublishedCache\IPublishedSnapshot.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentNodeKitSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfCultureVariationSerializer.cs" />
@@ -351,13 +352,13 @@
     <Compile Include="PublishedCache\NuCache\DataSource\PropertyData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\SerializerBase.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheComponent.cs" />
+    <Compile Include="PublishedCache\NuCache\PublishedSnapshot.cs" />
     <Compile Include="PublishedCache\PublishedElement.cs" />
     <Compile Include="PublishedCache\PublishedElementPropertyBase.cs" />
     <Compile Include="Models\Trees\DisableUser.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ContentPickerValueConverter.cs" />
     <Compile Include="PublishedCache\PublishedSnapshotServiceBase.cs" />
     <Compile Include="PublishedCache\IDomainCache.cs" />
-    <Compile Include="PublishedCache\IPublishedShapshot.cs" />
     <Compile Include="PublishedCache\IPublishedSnapshotAccessor.cs" />
     <Compile Include="PublishedCache\IPublishedSnapshotService.cs" />
     <Compile Include="PublishedCache\IPublishedMemberCache.cs" />
@@ -371,7 +372,6 @@
     <Compile Include="PublishedCache\NuCache\DataSource\ContentSourceDto.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\Database.cs" />
     <Compile Include="PublishedCache\NuCache\DomainCache.cs" />
-    <Compile Include="PublishedCache\NuCache\PublishedShapshot.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotService.cs" />
     <Compile Include="PublishedCache\NuCache\MediaCache.cs" />
     <Compile Include="PublishedCache\NuCache\MemberCache.cs" />
@@ -389,7 +389,7 @@
     <Compile Include="PublishedCache\PublishedContentTypeCache.cs" />
     <Compile Include="PublishedCache\UmbracoContextPublishedSnapshotAccessor.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\DomainCache.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\PublishedShapshot.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\PublishedSnapshot.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedSnapshotService.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PreviewContent.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedMemberCache.cs" />

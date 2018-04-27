@@ -171,7 +171,7 @@ namespace Umbraco.Tests.Routing
         [TestCase(10011, "http://domain2.com", false, "http://domain1.com/1001-1/")]
         [TestCase(1001, "https://domain1.com", false, "/")]
         [TestCase(10011, "https://domain1.com", false, "/1001-1/")]
-        public void Get_Nice_Url_SimpleDomain(int nodeId, string currentUrl, bool absolute, string expected)
+        public void Get_Url_SimpleDomain(int nodeId, string currentUrl, bool absolute, string expected)
         {
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var request = Mock.Get(settings.RequestHandler);
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Routing
         [TestCase(10011, "http://domain2.com", false, "http://domain1.com/foo/1001-1/")]
         [TestCase(1001, "https://domain1.com", false, "http://domain1.com/foo/")]
         [TestCase(10011, "https://domain1.com", false, "http://domain1.com/foo/1001-1/")]
-        public void Get_Nice_Url_SimpleWithSchemeAndPath(int nodeId, string currentUrl, bool absolute, string expected)
+        public void Get_Url_SimpleWithSchemeAndPath(int nodeId, string currentUrl, bool absolute, string expected)
         {
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var request = Mock.Get(settings.RequestHandler);
@@ -235,7 +235,7 @@ namespace Umbraco.Tests.Routing
         [TestCase(10011, "http://domain1.com", false, "/")]
         [TestCase(100111, "http://domain1.com", false, "/1001-1-1/")]
         [TestCase(1002, "http://domain1.com", false, "/1002/")]
-        public void Get_Nice_Url_DeepDomain(int nodeId, string currentUrl, bool absolute, string expected)
+        public void Get_Url_DeepDomain(int nodeId, string currentUrl, bool absolute, string expected)
         {
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var request = Mock.Get(settings.RequestHandler);
@@ -269,7 +269,7 @@ namespace Umbraco.Tests.Routing
         [TestCase(1003, "http://domain3.com", false, "/")]
         [TestCase(10031, "http://domain3.com", false, "/en/")]
         [TestCase(100321, "http://domain3.com", false, "/fr/1003-2-1/")]
-        public void Get_Nice_Url_NestedDomains(int nodeId, string currentUrl, bool absolute, string expected)
+        public void Get_Url_NestedDomains(int nodeId, string currentUrl, bool absolute, string expected)
         {
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var request = Mock.Get(settings.RequestHandler);
@@ -293,7 +293,7 @@ namespace Umbraco.Tests.Routing
         }
 
         [Test]
-        public void Get_Nice_Url_DomainsAndCache()
+        public void Get_Url_DomainsAndCache()
         {
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var request = Mock.Get(settings.RequestHandler);
@@ -360,7 +360,7 @@ namespace Umbraco.Tests.Routing
         }
 
         [Test]
-        public void Get_Nice_Url_Relative_Or_Absolute()
+        public void Get_Url_Relative_Or_Absolute()
         {
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
             var requestMock = Mock.Get(settings.RequestHandler);
@@ -394,7 +394,7 @@ namespace Umbraco.Tests.Routing
         }
 
         [Test]
-        public void Get_Nice_Url_Alternate()
+        public void Get_Url_Alternate()
         {
             var settings = SettingsForTests.GenerateMockUmbracoSettings();
 

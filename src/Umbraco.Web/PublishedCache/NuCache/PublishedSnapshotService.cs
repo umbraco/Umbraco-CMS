@@ -533,7 +533,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
 
             if (draftChanged || publishedChanged)
-                ((PublishedShapshot)CurrentPublishedShapshot).Resync();
+                ((PublishedSnapshot)CurrentPublishedSnapshot).Resync();
         }
 
         private void NotifyLocked(IEnumerable<ContentCacheRefresher.JsonPayload> payloads, out bool draftChanged, out bool publishedChanged)
@@ -630,7 +630,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
 
             if (anythingChanged)
-                ((PublishedShapshot)CurrentPublishedShapshot).Resync();
+                ((PublishedSnapshot)CurrentPublishedSnapshot).Resync();
         }
 
         private void NotifyLocked(IEnumerable<MediaCacheRefresher.JsonPayload> payloads, out bool anythingChanged)
@@ -719,7 +719,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);
             Notify<IMediaType>(_mediaStore, payloads, RefreshMediaTypesLocked);
 
-            ((PublishedShapshot)CurrentPublishedShapshot).Resync();
+            ((PublishedSnapshot)CurrentPublishedSnapshot).Resync();
         }
 
         private void Notify<T>(ContentStore store, ContentTypeCacheRefresher.JsonPayload[] payloads, Action<IEnumerable<int>, IEnumerable<int>, IEnumerable<int>, IEnumerable<int>> action)
@@ -796,7 +796,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
             }
 
-            ((PublishedShapshot)CurrentPublishedShapshot).Resync();
+            ((PublishedSnapshot)CurrentPublishedSnapshot).Resync();
         }
 
         public override void Notify(DomainCacheRefresher.JsonPayload[] payloads)
@@ -945,17 +945,17 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private long _contentGen, _mediaGen, _domainGen;
         private ICacheProvider _elementsCache;
 
-        public override IPublishedShapshot CreatePublishedSnapshot(string previewToken)
+        public override IPublishedSnapshot CreatePublishedSnapshot(string previewToken)
         {
             // no cache, no joy
             if (_isReady == false)
                 throw new InvalidOperationException("The published snapshot service has not properly initialized.");
 
             var preview = previewToken.IsNullOrWhiteSpace() == false;
-            return new PublishedShapshot(this, preview);
+            return new PublishedSnapshot(this, preview);
         }
 
-        public PublishedShapshot.PublishedSnapshotElements GetElements(bool previewDefault)
+        public PublishedSnapshot.PublishedSnapshotElements GetElements(bool previewDefault)
         {
             // note: using ObjectCacheRuntimeCacheProvider for elements and snapshot caches
             // is not recommended because it creates an inner MemoryCache which is a heavy
@@ -996,7 +996,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // a MaxValue to make sure this one runs last, and it should be ok
                     scopeContext.Enlist("Umbraco.Web.PublishedCache.NuCache.PublishedSnapshotService.Resync", () => this, (completed, svc) =>
                     {
-                        ((PublishedShapshot)svc.CurrentPublishedShapshot).Resync();
+                        ((PublishedSnapshot)svc.CurrentPublishedSnapshot).Resync();
                     }, int.MaxValue);
                 }
 
@@ -1017,7 +1017,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var domainCache = new DomainCache(domainSnap);
             var domainHelper = new DomainHelper(domainCache, _siteDomainHelper);
 
-            return new PublishedShapshot.PublishedSnapshotElements
+            return new PublishedSnapshot.PublishedSnapshotElements
             {
                 ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainHelper, _globalSettings, _serviceContext.LocalizationService),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, snapshotCache, elementsCache),

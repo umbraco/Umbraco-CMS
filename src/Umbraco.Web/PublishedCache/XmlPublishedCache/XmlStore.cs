@@ -1250,7 +1250,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         private void ResyncCurrentPublishedSnapshot(XmlDocument xml)
         {
-            var publishedSnapshot = (PublishedShapshot) _publishedSnapshotAccessor.PublishedSnapshot;
+            var publishedSnapshot = (PublishedSnapshot) _publishedSnapshotAccessor.PublishedSnapshot;
             if (publishedSnapshot == null) return;
             ((PublishedContentCache) publishedSnapshot.Content).Resync(xml);
             ((PublishedMediaCache) publishedSnapshot.Media).Resync();

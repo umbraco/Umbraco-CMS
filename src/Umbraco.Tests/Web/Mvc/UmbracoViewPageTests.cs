@@ -432,7 +432,7 @@ namespace Umbraco.Tests.Web.Mvc
             var globalSettings = TestObjects.GetGlobalSettings();
 
             var ctx = new UmbracoContext(
-                GetHttpContextFactory(url, routeData).HttpContext,
+                http,
                 _service,
                 new WebSecurity(http, Current.Services.UserService, globalSettings),
                 TestObjects.GetUmbracoSettings(),

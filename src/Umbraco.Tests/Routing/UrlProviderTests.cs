@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 
@@ -99,7 +100,7 @@ namespace Umbraco.Tests.Routing
         [TestCase(1178, "/home/sub1/custom-sub-2/")]
         [TestCase(1175, "/home/sub-2/")]
         [TestCase(1172, "/test-page/")]
-        public void Get_Nice_Url_Not_Hiding_Top_Level(int nodeId, string niceUrlMatch)
+        public void Get_Url_Not_Hiding_Top_Level(int nodeId, string niceUrlMatch)
         {
             var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
@@ -129,7 +130,7 @@ namespace Umbraco.Tests.Routing
         [TestCase(1178, "/sub1/custom-sub-2/")]
         [TestCase(1175, "/sub-2/")]
         [TestCase(1172, "/test-page/")] // not hidden because not first root
-        public void Get_Nice_Url_Hiding_Top_Level(int nodeId, string niceUrlMatch)
+        public void Get_Url_Hiding_Top_Level(int nodeId, string niceUrlMatch)
         {
             var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
@@ -176,7 +177,7 @@ namespace Umbraco.Tests.Routing
         }
 
         [Test]
-        public void Get_Nice_Url_Unpublished()
+        public void Get_Url_Unpublished()
         {
             var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);

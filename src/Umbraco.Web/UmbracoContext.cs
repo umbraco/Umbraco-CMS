@@ -18,7 +18,7 @@ namespace Umbraco.Web
     public class UmbracoContext : DisposableObject, IDisposeOnRequestEnd
     {
         private readonly IGlobalSettings _globalSettings;
-        private readonly Lazy<IPublishedShapshot> _publishedSnapshot;
+        private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
         private DomainHelper _domainHelper;
         private string _previewToken;
         private bool? _previewing;
@@ -125,7 +125,7 @@ namespace Umbraco.Web
             Security = webSecurity;
 
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
-            _publishedSnapshot = new Lazy<IPublishedShapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
+            _publishedSnapshot = new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
 
             // set the urls...
             // NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
@@ -178,7 +178,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the published snapshot.
         /// </summary>
-        public IPublishedShapshot PublishedShapshot => _publishedSnapshot.Value;
+        public IPublishedSnapshot PublishedSnapshot => _publishedSnapshot.Value;
 
         // for unit tests
         internal bool HasPublishedSnapshot => _publishedSnapshot.IsValueCreated;
@@ -186,12 +186,12 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the published content cache.
         /// </summary>
-        public IPublishedContentCache ContentCache => PublishedShapshot.Content;
+        public IPublishedContentCache ContentCache => PublishedSnapshot.Content;
 
         /// <summary>
         /// Gets the published media cache.
         /// </summary>
-        public IPublishedMediaCache MediaCache => PublishedShapshot.Media;
+        public IPublishedMediaCache MediaCache => PublishedSnapshot.Media;
 
         /// <summary>
         /// Boolean value indicating whether the current request is a front-end umbraco request
@@ -227,7 +227,7 @@ namespace Umbraco.Web
         internal DomainHelper GetDomainHelper(ISiteDomainHelper siteDomainHelper)
         {
             if (_domainHelper == null)
-                _domainHelper = new DomainHelper(PublishedShapshot.Domains, siteDomainHelper);
+                _domainHelper = new DomainHelper(PublishedSnapshot.Domains, siteDomainHelper);
             return _domainHelper;
         }
 
@@ -314,7 +314,7 @@ namespace Umbraco.Web
         internal IDisposable ForcedPreview(bool preview)
         {
             InPreviewMode = preview;
-            return PublishedShapshot.ForcedPreview(preview, orig => InPreviewMode = orig);
+            return PublishedSnapshot.ForcedPreview(preview, orig => InPreviewMode = orig);
         }
 
         private HttpRequestBase GetRequestFromContext()

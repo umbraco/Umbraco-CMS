@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Published
             var cacheMock = new Mock<IPublishedContentCache>();
             var cacheContent = new Dictionary<int, IPublishedContent>();
             cacheMock.Setup(x => x.GetById(It.IsAny<int>())).Returns<int>(id => cacheContent.TryGetValue(id, out IPublishedContent content) ? content : null);
-            var publishedSnapshotMock = new Mock<IPublishedShapshot>();
+            var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
             publishedSnapshotMock.Setup(x => x.Content).Returns(cacheMock.Object);
             var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
             publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);
@@ -164,7 +164,7 @@ namespace Umbraco.Tests.Published
             var cacheMock = new Mock<IPublishedContentCache>();
             var cacheContent = new Dictionary<int, IPublishedContent>();
             cacheMock.Setup(x => x.GetById(It.IsAny<int>())).Returns<int>(id => cacheContent.TryGetValue(id, out IPublishedContent content) ? content : null);
-            var publishedSnapshotMock = new Mock<IPublishedShapshot>();
+            var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
             publishedSnapshotMock.Setup(x => x.Content).Returns(cacheMock.Object);
             var publishedSnapshotAccessorMock = new Mock<IPublishedSnapshotAccessor>();
             publishedSnapshotAccessorMock.Setup(x => x.PublishedSnapshot).Returns(publishedSnapshotMock.Object);

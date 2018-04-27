@@ -102,10 +102,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // this is for tests purposes
         // args are: current published snapshot (may be null), previewing, content id - returns: content
 
-        internal static Func<IPublishedShapshot, bool, int, IPublishedContent> GetContentByIdFunc { get; set; }
+        internal static Func<IPublishedSnapshot, bool, int, IPublishedContent> GetContentByIdFunc { get; set; }
             = (publishedShapshot, previewing, id) => publishedShapshot.Content.GetById(previewing, id);
 
-        internal static Func<IPublishedShapshot, bool, int, IPublishedContent> GetMediaByIdFunc { get; set; }
+        internal static Func<IPublishedSnapshot, bool, int, IPublishedContent> GetMediaByIdFunc { get; set; }
             = (publishedShapshot, previewing, id) => publishedShapshot.Media.GetById(previewing, id);
 
         private IPublishedContent GetContentById(bool previewing, int id)
@@ -289,7 +289,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // beware what you use that one for - you don't want to cache its result
         private ICacheProvider GetAppropriateCache()
         {
-            var publishedSnapshot = (PublishedShapshot)_publishedSnapshotAccessor.PublishedSnapshot;
+            var publishedSnapshot = (PublishedSnapshot)_publishedSnapshotAccessor.PublishedSnapshot;
             var cache = publishedSnapshot == null
                 ? null
                 : ((IsPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && (ItemType != PublishedItemType.Member)
@@ -300,7 +300,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private ICacheProvider GetCurrentSnapshotCache()
         {
-            var publishedSnapshot = (PublishedShapshot)_publishedSnapshotAccessor.PublishedSnapshot;
+            var publishedSnapshot = (PublishedSnapshot)_publishedSnapshotAccessor.PublishedSnapshot;
             return publishedSnapshot?.SnapshotCache;
         }
 

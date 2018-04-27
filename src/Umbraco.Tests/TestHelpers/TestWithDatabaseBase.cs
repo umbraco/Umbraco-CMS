@@ -343,20 +343,23 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected UmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null, IGlobalSettings globalSettings = null)
+        protected UmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null, IGlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
         {
             // ensure we have a PublishedCachesService
-            var service = PublishedSnapshotService as PublishedSnapshotService;
+            var service = snapshotService ?? PublishedSnapshotService as PublishedSnapshotService;
             if (service == null)
                 throw new Exception("Not a proper XmlPublishedCache.PublishedCachesService.");
 
-            // re-initialize PublishedCacheService content with an Xml source with proper template id
-            service.XmlStore.GetXmlDocument = () =>
+            if (service is PublishedSnapshotService)
             {
-                var doc = new XmlDocument();
-                doc.LoadXml(GetXmlContent(templateId));
-                return doc;
-            };
+                // re-initialize PublishedCacheService content with an Xml source with proper template id
+                ((PublishedSnapshotService)service).XmlStore.GetXmlDocument = () =>
+                {
+                    var doc = new XmlDocument();
+                    doc.LoadXml(GetXmlContent(templateId));
+                    return doc;
+                };
+            }
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
 
