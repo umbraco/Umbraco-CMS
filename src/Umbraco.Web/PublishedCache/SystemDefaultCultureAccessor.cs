@@ -3,17 +3,17 @@
 namespace Umbraco.Web.PublishedCache
 {
     /// <summary>
-    /// Provides the default implementation of <see cref="ISystemDefaultCultureProvider"/>.
+    /// Provides the default implementation of <see cref="ISystemDefaultCultureAccessor"/>.
     /// </summary>
-    public class SystemDefaultCultureProvider : ISystemDefaultCultureProvider
+    public class SystemDefaultCultureAccessor : ISystemDefaultCultureAccessor
     {
         private readonly ILocalizationService _localizationService;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SystemDefaultCultureProvider"/> class.
+        /// Initializes a new instance of the <see cref="SystemDefaultCultureAccessor"/> class.
         /// </summary>
         /// <param name="localizationService"></param>
-        public SystemDefaultCultureProvider(ILocalizationService localizationService)
+        public SystemDefaultCultureAccessor(ILocalizationService localizationService)
         {
             _localizationService = localizationService;
         }

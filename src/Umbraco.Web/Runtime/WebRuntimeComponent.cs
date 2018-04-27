@@ -70,7 +70,7 @@ namespace Umbraco.Web.Runtime
             composition.Container.RegisterFrom<InstallerCompositionRoot>();
 
             // register the system culture provider
-            composition.Container.RegisterSingleton<ISystemDefaultCultureProvider, SystemDefaultCultureProvider>();
+            composition.Container.RegisterSingleton<ISystemDefaultCultureAccessor, SystemDefaultCultureAccessor>();
 
             var typeLoader = composition.Container.GetInstance<TypeLoader>();
             var logger = composition.Container.GetInstance<ILogger>();

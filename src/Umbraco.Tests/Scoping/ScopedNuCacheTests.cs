@@ -93,8 +93,8 @@ namespace Umbraco.Tests.Scoping
                 Logger,
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
+                SystemDefaultCultureAccessor,
                 new DatabaseDataSource(),
-                SystemDefaultCultureProvider,
                 Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper());
         }
 

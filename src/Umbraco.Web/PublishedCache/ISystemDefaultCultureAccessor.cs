@@ -3,7 +3,7 @@
     /// <summary>
     /// Provides the system default culture.
     /// </summary>
-    public interface ISystemDefaultCultureProvider
+    public interface ISystemDefaultCultureAccessor
     {
         /// <summary>
         /// Gets the system default culture.

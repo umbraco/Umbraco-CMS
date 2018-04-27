@@ -33,7 +33,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 factory.GetInstance<IDocumentRepository>(),
                 factory.GetInstance<IMediaRepository>(),
                 factory.GetInstance<IMemberRepository>(),
-                factory.GetInstance<ISystemDefaultCultureProvider>(),
+                factory.GetInstance<ISystemDefaultCultureAccessor>(),
                 factory.GetInstance<ILogger>(),
                 factory.GetInstance<IGlobalSettings>(),
                 factory.GetInstance<ISiteDomainHelper>(),

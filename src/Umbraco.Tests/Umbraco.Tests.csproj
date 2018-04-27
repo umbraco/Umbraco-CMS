@@ -182,7 +182,7 @@
     <Compile Include="TestHelpers\Stubs\TestPublishedContent.cs" />
     <Compile Include="Testing\Objects\Accessors\TestPublishedVariationContextAccessor.cs" />
     <Compile Include="Testing\ContentBaseExtensions.cs" />
-    <Compile Include="Testing\Objects\AccessorsAndProviders\TestSystemDefaultCultureProvider.cs" />
+    <Compile Include="Testing\Objects\Accessors\TestSystemDefaultCultureAccessor.cs" />
     <Compile Include="Testing\TestDatabase.cs" />
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />
     <Compile Include="Persistence\LocksTests.cs" />

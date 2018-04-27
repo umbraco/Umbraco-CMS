@@ -18,8 +18,10 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -129,8 +131,10 @@ namespace Umbraco.Tests.PublishedContent
                 documentRepository,
                 mediaRepository,
                 memberRepository,
+                new TestSystemDefaultCultureAccessor(), 
                 dataSource,
-                globalSettings);
+                globalSettings,
+                new SiteDomainHelper());
 
             var snapshot = snapshotService.CreatePublishedSnapshot(previewToken: null);
             var publishedContent = snapshot.Content.GetById(1);
