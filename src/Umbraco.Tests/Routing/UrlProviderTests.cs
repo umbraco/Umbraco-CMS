@@ -153,6 +153,46 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual(niceUrlMatch, result);
         }
 
+        [Test]
+        public void Get_Url_For_Culture_Variant_Without_Domains_Non_Current_Url()
+        {
+            const string currentUri = "http://example.us/test";
+
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
+
+            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
+            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
+
+            var publishedContentCache = new Mock<IPublishedContentCache>();
+            publishedContentCache.Setup(x => x.GetRouteById(1234, "fr-FR"))
+                .Returns("9876/home/test-fr"); //prefix with the root id node with the domain assigned as per the umbraco standard
+
+            var domainCache = new Mock<IDomainCache>();
+            domainCache.Setup(x => x.GetAssigned(It.IsAny<int>(), false))
+                .Returns((int contentId, bool includeWildcards) => Enumerable.Empty<Domain>());
+
+            var snapshot = Mock.Of<IPublishedSnapshot>(x => x.Content == publishedContentCache.Object && x.Domains == domainCache.Object);
+
+            var snapshotService = new Mock<IPublishedSnapshotService>();
+            snapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>()))
+                .Returns(snapshot);
+
+            var umbracoContext = GetUmbracoContext(currentUri, umbracoSettings: _umbracoSettings,
+                urlProviders: new[] {
+                    new DefaultUrlProvider(_umbracoSettings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
+                },
+                globalSettings: globalSettings.Object,
+                snapshotService: snapshotService.Object);
+
+            //even though we are asking for a specific culture URL, there are no domains assigned so all that can be returned is a normal relative url.
+            var url = umbracoContext.UrlProvider.GetUrl(1234, "fr-FR");
+
+            Assert.AreEqual("/home/test-fr/", url);
+        }
+
         /// <summary>
         /// This tests DefaultUrlProvider.GetUrl with a specific culture when the current URL is the culture specific domain
         /// </summary>
