@@ -67,7 +67,7 @@ namespace Umbraco.Web
                             if (type == "internal")
                             {
                                 var linkId = a.Value<int>("link");
-                                var link = umbracoHelper.NiceUrl(linkId);
+                                var link = umbracoHelper.Url(linkId);
                                 a["link"] = link;
                             }
                         }

@@ -146,7 +146,12 @@
     <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
     <Compile Include="Persistence\Repositories\UserGroupRepositoryTest.cs" />
     <Compile Include="Published\ConvertersTests.cs" />
-    <Compile Include="Routing\NiceUrlRoutesTests.cs" />
+    <Compile Include="Routing\ContentFinderByUrlAndTemplateTests.cs" />
+    <Compile Include="Routing\ContentFinderByUrlTests.cs" />
+    <Compile Include="Routing\ContentFinderByUrlWithDomainsTests.cs" />
+    <Compile Include="Routing\UrlProviderTests.cs" />
+    <Compile Include="Routing\UrlRoutesTests.cs" />
+    <Compile Include="Routing\UrlsProviderWithDomainsTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests2.cs" />
     <Compile Include="Scoping\EventNameExtractorTests.cs" />
     <Compile Include="Scoping\PassThroughEventDispatcherTests.cs" />
@@ -425,9 +430,7 @@
     <Compile Include="Composing\LazyCollectionBuilderTests.cs" />
     <Compile Include="Composing\CollectionBuildersTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />
-    <Compile Include="Routing\ContentFinderByNiceUrlWithDomainsTests.cs" />
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
-    <Compile Include="Routing\NiceUrlsProviderWithDomainsTests.cs" />
     <Compile Include="Routing\SiteDomainHelperTests.cs" />
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />
     <Compile Include="Services\TestWithSomeContentBase.cs" />
@@ -451,10 +454,7 @@
     <Compile Include="Configurations\GlobalSettingsTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasTests.cs" />
     <Compile Include="Routing\ContentFinderByIdTests.cs" />
-    <Compile Include="Routing\ContentFinderByNiceUrlAndTemplateTests.cs" />
-    <Compile Include="Routing\ContentFinderByNiceUrlTests.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQueryTests.cs" />
-    <Compile Include="Routing\NiceUrlProviderTests.cs" />
     <Compile Include="Routing\RenderRouteHandlerTests.cs" />
     <Compile Include="Routing\RouteTestExtensions.cs" />
     <Compile Include="TestHelpers\Stubs\TestControllerFactory.cs" />
