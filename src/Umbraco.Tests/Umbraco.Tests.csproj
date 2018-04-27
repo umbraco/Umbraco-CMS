@@ -180,6 +180,7 @@
     <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
     <Compile Include="TestHelpers\Stubs\TestPublishedContent.cs" />
     <Compile Include="Testing\ContentBaseExtensions.cs" />
+    <Compile Include="Testing\Objects\AccessorsAndProviders\TestSystemDefaultCultureProvider.cs" />
     <Compile Include="Testing\TestDatabase.cs" />
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />
     <Compile Include="Persistence\LocksTests.cs" />
@@ -595,9 +596,7 @@
     <Content Include="Services\Importing\uBlogsy-Package.xml" />
     <Content Include="Services\Importing\XsltSearch-Package.xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Testing\Objects\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>

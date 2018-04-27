@@ -256,10 +256,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // do NOT leak that language, it's not deep-cloned!
         private ILanguage GetDefault()
         {
-            // FIXME
-            var temp = SqlContext.Sql();
-            if (temp == null) return null;
-
             // get all cached, non-cloned
             var all = TypedCachePolicy.GetAllCached(PerformGetAll);
 

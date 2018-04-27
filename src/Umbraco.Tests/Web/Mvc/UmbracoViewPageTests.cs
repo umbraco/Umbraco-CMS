@@ -19,6 +19,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Tests.Testing.Objects.AccessorsAndProviders;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
@@ -425,6 +426,7 @@ namespace Umbraco.Tests.Web.Mvc
             var factory = Mock.Of<IPublishedContentTypeFactory>();
             _service = new PublishedSnapshotService(svcCtx, factory, scopeProvider, cache, Enumerable.Empty<IUrlSegmentProvider>(), null,
                 null, null, null,
+                new TestSystemDefaultCultureProvider(),
                 Current.Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(), null, true, false); // no events
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;

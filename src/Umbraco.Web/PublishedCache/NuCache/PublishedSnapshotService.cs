@@ -44,6 +44,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly ISiteDomainHelper _siteDomainHelper;
+        private readonly ISystemDefaultCultureProvider _systemDefaultCultureProvider;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -83,6 +84,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
             IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
+            ISystemDefaultCultureProvider systemDefaultCultureProvider,
             IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper)
             : base(publishedSnapshotAccessor)
         {
@@ -97,6 +99,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _documentRepository = documentRepository;
             _mediaRepository = mediaRepository;
             _memberRepository = memberRepository;
+            _systemDefaultCultureProvider = systemDefaultCultureProvider;
             _globalSettings = globalSettings;
             _siteDomainHelper = siteDomainHelper;
 
@@ -1014,7 +1017,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _publishedContentTypeFactory, _logger);
 
-            var defaultCulture = _serviceContext.LocalizationService.GetDefaultLanguageIsoCode(); // capture - fast
+            var defaultCulture = _systemDefaultCultureProvider.DefaultCulture;
             var domainCache = new DomainCache(domainSnap, defaultCulture);
             var domainHelper = new DomainHelper(domainCache, _siteDomainHelper);
 

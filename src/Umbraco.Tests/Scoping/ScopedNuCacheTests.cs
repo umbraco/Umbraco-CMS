@@ -90,7 +90,9 @@ namespace Umbraco.Tests.Scoping
                 publishedSnapshotAccessor,
                 Logger,
                 ScopeProvider,
-                documentRepository, mediaRepository, memberRepository, Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper());
+                documentRepository, mediaRepository, memberRepository,
+                SystemDefaultCultureProvider,
+                Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper());
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)

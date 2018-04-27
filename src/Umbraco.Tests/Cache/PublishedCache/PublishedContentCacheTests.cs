@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             _xml.LoadXml(GetXml());
             var xmlStore = new XmlStore(() => _xml, null, null, null);
             var cacheProvider = new StaticCacheProvider();
-            var domainCache = new DomainCache(ServiceContext.DomainService, ServiceContext.LocalizationService);
+            var domainCache = new DomainCache(ServiceContext.DomainService, SystemDefaultCultureProvider);
             var publishedShapshot = new Umbraco.Web.PublishedCache.XmlPublishedCache.PublishedSnapshot(
                 new PublishedContentCache(xmlStore, domainCache, cacheProvider, globalSettings, new SiteDomainHelper(), ContentTypesCache, null, null),
                 new PublishedMediaCache(xmlStore, ServiceContext.MediaService, ServiceContext.UserService, cacheProvider, ContentTypesCache),

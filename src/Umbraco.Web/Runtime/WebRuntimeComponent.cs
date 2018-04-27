@@ -69,6 +69,9 @@ namespace Umbraco.Web.Runtime
             //it still needs to use the install controller so we can't do that
             composition.Container.RegisterFrom<InstallerCompositionRoot>();
 
+            // register the system culture provider
+            composition.Container.RegisterSingleton<ISystemDefaultCultureProvider, SystemDefaultCultureProvider>();
+
             var typeLoader = composition.Container.GetInstance<TypeLoader>();
             var logger = composition.Container.GetInstance<ILogger>();
             var proflog = composition.Container.GetInstance<ProfilingLogger>();

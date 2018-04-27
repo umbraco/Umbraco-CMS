@@ -32,7 +32,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly IUserService _userService;
         private readonly ICacheProvider _requestCache;
         private readonly IGlobalSettings _globalSettings;
-        private readonly ILocalizationService _localizationService;
+        private readonly ISystemDefaultCultureProvider _systemDefaultCultureProvider;
         private readonly ISiteDomainHelper _siteDomainHelper;
 
         #region Constructors
@@ -45,6 +45,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IEnumerable<IUrlSegmentProvider> segmentProviders,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
+            ISystemDefaultCultureProvider systemDefaultCultureProvider,
             ILogger logger,
             IGlobalSettings globalSettings,
             ISiteDomainHelper siteDomainHelper,
@@ -52,6 +53,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             bool testing = false, bool enableRepositoryEvents = true)
             : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache, segmentProviders, publishedSnapshotAccessor,
                 documentRepository, mediaRepository, memberRepository,
+                systemDefaultCultureProvider,
                 logger, globalSettings, siteDomainHelper, null, mainDom, testing, enableRepositoryEvents)
         { }
 
@@ -62,6 +64,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             ICacheProvider requestCache,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
+            ISystemDefaultCultureProvider systemDefaultCultureProvider,
             ILogger logger,
             IGlobalSettings globalSettings,
             ISiteDomainHelper siteDomainHelper,
@@ -70,6 +73,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             bool testing, bool enableRepositoryEvents)
             : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(), publishedSnapshotAccessor,
                 documentRepository, mediaRepository, memberRepository,
+                systemDefaultCultureProvider,
                 logger, globalSettings, siteDomainHelper, contentTypeCache, mainDom, testing, enableRepositoryEvents)
         { }
 
@@ -80,6 +84,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IEnumerable<IUrlSegmentProvider> segmentProviders,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
+            ISystemDefaultCultureProvider systemDefaultCultureProvider,
             ILogger logger,
             IGlobalSettings globalSettings,
             ISiteDomainHelper siteDomainHelper,
@@ -101,7 +106,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _memberService = serviceContext.MemberService;
             _mediaService = serviceContext.MediaService;
             _userService = serviceContext.UserService;
-            _localizationService = serviceContext.LocalizationService;
+            _systemDefaultCultureProvider = systemDefaultCultureProvider;
 
             _requestCache = requestCache;
             _globalSettings = globalSettings;
@@ -146,7 +151,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // the current caches, but that would mean creating an extra cache (StaticCache
             // probably) so better use RequestCache.
 
-            var domainCache = new DomainCache(_domainService, _localizationService);
+            var domainCache = new DomainCache(_domainService, _systemDefaultCultureProvider);
 
             return new PublishedSnapshot(
                 new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _siteDomainHelper, _contentTypeCache, _routesCache, previewToken),

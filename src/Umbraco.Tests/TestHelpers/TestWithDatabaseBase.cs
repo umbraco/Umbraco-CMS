@@ -32,6 +32,7 @@ using LightInject;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Tests.Testing.Objects.AccessorsAndProviders;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -77,6 +78,7 @@ namespace Umbraco.Tests.TestHelpers
 
             Container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
             Container.Register(factory => PublishedSnapshotService);
+            Container.Register(factory => SystemDefaultCultureProvider);
 
             Container.GetInstance<DataEditorCollectionBuilder>()
                 .Clear()
@@ -229,11 +231,15 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
+        protected ISystemDefaultCultureProvider SystemDefaultCultureProvider { get; set; }
+
         protected IPublishedSnapshotService PublishedSnapshotService { get; set; }
 
         protected override void Initialize() // fixme - should NOT be here!
         {
             base.Initialize();
+
+            SystemDefaultCultureProvider = new TestSystemDefaultCultureProvider();
 
             CreateAndInitializeDatabase();
 
@@ -264,6 +270,7 @@ namespace Umbraco.Tests.TestHelpers
                 ScopeProvider,
                 cache, publishedSnapshotAccessor,
                 Container.GetInstance<IDocumentRepository>(), Container.GetInstance<IMediaRepository>(), Container.GetInstance<IMemberRepository>(),
+                SystemDefaultCultureProvider,
                 Logger,
                 Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
                 ContentTypesCache,

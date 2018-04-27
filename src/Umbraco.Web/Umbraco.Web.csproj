@@ -343,6 +343,7 @@
     <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueListUniqueValueValidator.cs" />
     <Compile Include="PublishedCache\IPublishedSnapshot.cs" />
+    <Compile Include="PublishedCache\ISystemDefaultCultureProvider.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentNodeKitSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfCultureVariationSerializer.cs" />
@@ -387,6 +388,7 @@
     <Compile Include="PublishedCache\NuCache\SnapDictionary.cs" />
     <Compile Include="PublishedCache\PublishedCacheBase.cs" />
     <Compile Include="PublishedCache\PublishedContentTypeCache.cs" />
+    <Compile Include="PublishedCache\SystemDefaultCultureProvider.cs" />
     <Compile Include="PublishedCache\UmbracoContextPublishedSnapshotAccessor.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\DomainCache.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedSnapshot.cs" />
