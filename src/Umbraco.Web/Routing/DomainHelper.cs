@@ -125,6 +125,8 @@ namespace Umbraco.Web.Routing
             DomainAndUri domainAndUri;
             if (current == null)
             {
+                //match either by culture (if specified) or default
+
                 //get the default domain or the one matching the culture if specified
                 domainAndUri = domainsAndUris.FirstOrDefault(x => culture.IsNullOrWhiteSpace() ? x.IsDefault : x.Culture.Name.InvariantEquals(culture));
 
@@ -134,24 +136,31 @@ namespace Umbraco.Web.Routing
                 if (domainAndUri == null)
                     domainAndUri = domainsAndUris.First(); // take the first one by default (what else can we do?)
             }
+            else if (!culture.IsNullOrWhiteSpace())
+            {
+                //match by culture
+
+                domainAndUri = domainsAndUris.FirstOrDefault(x => x.Culture.Name.InvariantEquals(culture));
+                if (domainAndUri == null)
+                    throw new InvalidOperationException($"No domain was found by the specified culture '{culture}'");
+                return domainAndUri;
+            }
             else
             {
+                //try to match by current, else filter
+
                 // look for the first domain that would be the base of the current url
                 // ie current is www.example.com/foo/bar, look for domain www.example.com
                 var currentWithSlash = current.EndPathWithSlash();
                 domainAndUri = domainsAndUris
                     .FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(currentWithSlash));
-                //is culture specified? if so this will need to match too
-                if (domainAndUri != null && (culture.IsNullOrWhiteSpace() || domainAndUri.Culture.Name.InvariantEquals(culture)))
-                    return domainAndUri;
+                if (domainAndUri != null) return domainAndUri;
 
                 // if none matches, try again without the port
                 // ie current is www.example.com:1234/foo/bar, look for domain www.example.com
                 domainAndUri = domainsAndUris
                     .FirstOrDefault(d => d.Uri.EndPathWithSlash().IsBaseOf(currentWithSlash.WithoutPort()));
-                //is culture specified? if so this will need to match too
-                if (domainAndUri != null && (culture.IsNullOrWhiteSpace() || domainAndUri.Culture.Name.InvariantEquals(culture)))
-                    return domainAndUri;
+                if (domainAndUri != null) return domainAndUri;
 
                 // if none matches, then try to run the filter to pick a domain
                 if (filter != null)

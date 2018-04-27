@@ -159,7 +159,7 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Url_For_Culture_Variant_With_Current_Url()
         {
-            const string currentUri = "http://example.com/fr/test";
+            const string currentUri = "http://example.fr/test";
 
             var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
@@ -180,8 +180,8 @@ namespace Umbraco.Tests.Routing
                     if (contentId != 9876) return Enumerable.Empty<Domain>();
                     return new[]
                     {
-                        new Domain(2, "example.com/en", 9876, CultureInfo.GetCultureInfo("en-US"), false, true), //default
-                        new Domain(3, "example.com/fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false, true)
+                        new Domain(2, "example.us", 9876, CultureInfo.GetCultureInfo("en-US"), false, true), //default
+                        new Domain(3, "example.fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false, true)
                     };
                 });
 
@@ -201,8 +201,7 @@ namespace Umbraco.Tests.Routing
 
             var url = umbracoContext.UrlProvider.GetUrl(1234, "fr-FR");
 
-            //the current uri is the culture specific domain we want, so the result is a relative path since we are on the culture specific domain
-            Assert.AreEqual("/fr/home/test-fr/", url);
+            Assert.AreEqual("/home/test-fr/", url);
         }
 
         /// <summary>
@@ -211,7 +210,7 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Get_Url_For_Culture_Variant_Non_Current_Url()
         {
-            const string currentUri = "http://example.com/en/test";
+            const string currentUri = "http://example.us/test";
 
             var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
@@ -232,8 +231,8 @@ namespace Umbraco.Tests.Routing
                     if (contentId != 9876) return Enumerable.Empty<Domain>();
                     return new[]
                     {
-                        new Domain(2, "example.com/en", 9876, CultureInfo.GetCultureInfo("en-US"), false, true), //default
-                        new Domain(3, "example.com/fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false, true)
+                        new Domain(2, "example.us", 9876, CultureInfo.GetCultureInfo("en-US"), false, true), //default
+                        new Domain(3, "example.fr", 9876, CultureInfo.GetCultureInfo("fr-FR"), false, true)
                     };
                 });
 
@@ -254,7 +253,7 @@ namespace Umbraco.Tests.Routing
             var url = umbracoContext.UrlProvider.GetUrl(1234, "fr-FR");
 
             //the current uri is not the culture specific domain we want, so the result is an absolute path to the culture specific domain
-            Assert.AreEqual("http://example.com/fr/home/test-fr/", url);
+            Assert.AreEqual("http://example.fr/home/test-fr/", url);
         }
 
         [Test]

@@ -169,7 +169,8 @@ namespace Umbraco.Web.Routing
             {
                 if (mode == UrlProviderMode.Auto)
                 {
-                    if (current != null && current.GetLeftPart(UriPartial.Path).InvariantStartsWith(domainUri.Uri.GetLeftPart(UriPartial.Path)))
+                    //this check is a little tricky, we can't just compare domains
+                    if (current != null && domainUri.Uri.GetLeftPart(UriPartial.Authority) == current.GetLeftPart(UriPartial.Authority))
                         mode = UrlProviderMode.Relative;
                     else
                         mode = UrlProviderMode.Absolute;
