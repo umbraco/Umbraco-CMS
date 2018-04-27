@@ -544,6 +544,7 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> SelectTop(this Sql<ISqlContext> sql, int count)
         {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
             return sql.SqlContext.SqlSyntax.SelectTop(sql, count);
         }
 
@@ -554,6 +555,7 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> SelectCount(this Sql<ISqlContext> sql)
         {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
             return sql.Select("COUNT(*)");
         }
 
@@ -569,6 +571,7 @@ namespace Umbraco.Core.Persistence
         /// </remarks>
         public static Sql<ISqlContext> SelectCount<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
         {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
             var columns = fields.Length == 0
                 ? sql.GetColumns<TDto>(withAlias: false)
                 : fields.Select(x => GetFieldName(x, sql.SqlContext.SqlSyntax)).ToArray();
@@ -582,6 +585,7 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> SelectAll(this Sql<ISqlContext> sql)
         {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
             return sql.Select("*");
         }
 
@@ -597,6 +601,7 @@ namespace Umbraco.Core.Persistence
         /// </remarks>
         public static Sql<ISqlContext> Select<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
         {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
             return sql.Select(sql.GetColumns(columnExpressions: fields));
         }
 
@@ -613,6 +618,7 @@ namespace Umbraco.Core.Persistence
         /// </remarks>
         public static Sql<ISqlContext> Select<TDto>(this Sql<ISqlContext> sql, string tableAlias, params Expression<Func<TDto, object>>[] fields)
         {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
             return sql.Select(sql.GetColumns(tableAlias: tableAlias, columnExpressions: fields));
         }
 
@@ -628,6 +634,7 @@ namespace Umbraco.Core.Persistence
         /// </remarks>
         public static Sql<ISqlContext> AndSelect<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
         {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
             return sql.Append(", " + string.Join(", ", sql.GetColumns(columnExpressions: fields)));
         }
 
@@ -645,6 +652,7 @@ namespace Umbraco.Core.Persistence
         /// </remarks>
         public static Sql<ISqlContext> AndSelect<TDto>(this Sql<ISqlContext> sql, string tableAlias, params Expression<Func<TDto, object>>[] fields)
         {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
             return sql.Append(", " + string.Join(", ", sql.GetColumns(tableAlias: tableAlias, columnExpressions: fields)));
         }
 
@@ -657,6 +665,8 @@ namespace Umbraco.Core.Persistence
         /// <returns>The Sql statement.</returns>
         public static Sql<ISqlContext> Select<TDto>(this Sql<ISqlContext> sql, Func<SqlRef<TDto>, SqlRef<TDto>> reference)
         {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
+
             sql.Select(sql.GetColumns<TDto>());
 
             reference?.Invoke(new SqlRef<TDto>(sql, null));
@@ -675,6 +685,8 @@ namespace Umbraco.Core.Persistence
         /// is added, so that it is possible to add (e.g. calculated) columns to the referencing Dto.</remarks>
         public static Sql<ISqlContext> Select<TDto>(this Sql<ISqlContext> sql, Func<SqlRef<TDto>, SqlRef<TDto>> reference, Func<Sql<ISqlContext>, Sql<ISqlContext>> sqlexpr)
         {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
+
             sql.Select(sql.GetColumns<TDto>());
 
             sql = sqlexpr(sql);
@@ -789,6 +801,7 @@ namespace Umbraco.Core.Persistence
         /// </remarks>
         public static string Columns<TDto>(this Sql<ISqlContext> sql, params Expression<Func<TDto, object>>[] fields)
         {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
             return string.Join(", ", sql.GetColumns(columnExpressions: fields, withAlias: false));
         }
 
@@ -805,6 +818,7 @@ namespace Umbraco.Core.Persistence
         /// </remarks>
         public static string Columns<TDto>(this Sql<ISqlContext> sql, string alias, params Expression<Func<TDto, object>>[] fields)
         {
+            if (sql == null) throw new ArgumentNullException(nameof(sql));
             return string.Join(", ", sql.GetColumns(columnExpressions: fields, withAlias: false, tableAlias: alias));
         }
 
