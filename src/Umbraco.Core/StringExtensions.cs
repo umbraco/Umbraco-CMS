@@ -1051,7 +1051,14 @@ namespace Umbraco.Core
         /// <returns>The filtered string.</returns>
         public static string ReplaceMany(this string text, IDictionary<string, string> replacements)
         {
-            return Current.ShortStringHelper.ReplaceMany(text, replacements);
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (replacements == null) throw new ArgumentNullException(nameof(replacements));
+
+
+            foreach (KeyValuePair<string, string> item in replacements)
+                text = text.Replace(item.Key, item.Value);
+
+            return text;
         }
 
         /// <summary>
@@ -1063,7 +1070,14 @@ namespace Umbraco.Core
         /// <returns>The filtered string.</returns>
         public static string ReplaceMany(this string text, char[] chars, char replacement)
         {
-            return Current.ShortStringHelper.ReplaceMany(text, chars, replacement);
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (chars == null) throw new ArgumentNullException(nameof(chars));
+
+
+            for (int i = 0; i < chars.Length; i++)
+                text = text.Replace(chars[i], replacement);
+
+            return text;
         }
 
         // FORMAT STRINGS
