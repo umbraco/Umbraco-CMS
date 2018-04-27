@@ -29,7 +29,7 @@ namespace Umbraco.Web.Routing
             if (contentService == null) throw new ArgumentNullException(nameof(contentService));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 
-            var urls = new List<string>();
+            var urls = new HashSet<string>();
 
             if (content.Published == false)
             {
@@ -105,7 +105,10 @@ namespace Umbraco.Web.Routing
                 else
                 {
                     urls.Add(url);
-                    urls.AddRange(urlProvider.GetOtherUrls(content.Id));
+                    foreach(var otherUrl in urlProvider.GetOtherUrls(content.Id))
+                    {
+                        urls.Add(otherUrl);
+                    }
                 }
             }
             return urls;

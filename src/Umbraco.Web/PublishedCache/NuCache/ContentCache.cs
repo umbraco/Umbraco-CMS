@@ -104,8 +104,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // hideTopLevelNode = support legacy stuff, look for /*/path/to/node
                 // else normal, look for /path/to/node
                 content = hideTopLevelNode.Value
-                    ? GetAtRoot(preview).SelectMany(x => x.Children).FirstOrDefault(x => x.UrlName == parts[0])
-                    : GetAtRoot(preview).FirstOrDefault(x => x.UrlName == parts[0]);
+                    ? GetAtRoot(preview).SelectMany(x => x.Children).FirstOrDefault(x => x.GetUrlName(_localizationService, culture) == parts[0])
+                    : GetAtRoot(preview).FirstOrDefault(x => x.GetUrlName(_localizationService, culture) == parts[0]);
                 content = FollowRoute(content, parts, 1, culture);
             }
 
@@ -114,7 +114,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // have to look for /foo (see note in ApplyHideTopLevelNodeFromPath).
             if (content == null && hideTopLevelNode.Value && parts.Length == 1)
             {
-                content = GetAtRoot(preview).FirstOrDefault(x => x.UrlName == parts[0]);
+                content = GetAtRoot(preview).FirstOrDefault(x => x.GetUrlName(_localizationService, culture) == parts[0]);
             }
 
             return content;

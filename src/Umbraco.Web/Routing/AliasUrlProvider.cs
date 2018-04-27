@@ -90,7 +90,11 @@ namespace Umbraco.Web.Routing
 
             if (domainUris == null)
             {
-                var path = "/" + node.Value<string>(Constants.Conventions.Content.UrlAlias);
+                var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias);
+                if (string.IsNullOrWhiteSpace(umbracoUrlName))
+                    return Enumerable.Empty<string>();
+
+                var path = "/" + umbracoUrlName;
                 var uri = new Uri(path, UriKind.Relative);
                 return new[] { UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString() };
             }
@@ -107,7 +111,6 @@ namespace Umbraco.Web.Routing
                         result.Add(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
                     }
                 }
-                
                 return result;
             }
         }
