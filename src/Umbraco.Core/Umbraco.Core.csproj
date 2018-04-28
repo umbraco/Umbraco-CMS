@@ -368,7 +368,7 @@
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
-    <Compile Include="Models\PublishedContent\PublishedCultureName.cs" />
+    <Compile Include="Models\PublishedContent\PublishedCultureInfos.cs" />
     <Compile Include="Models\PublishedContent\IPublishedVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\IPublishedValueFallback.cs" />
     <Compile Include="Models\PublishedContent\PublishedVariationContext.cs" />

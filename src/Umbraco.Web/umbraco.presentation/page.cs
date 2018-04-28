@@ -408,7 +408,6 @@ namespace umbraco
             private readonly PublishedContentType _contentType;
             private readonly IPublishedProperty[] _properties;
             private readonly IPublishedContent _parent;
-            private IReadOnlyDictionary<string, PublishedCultureName> _cultureNames;
             private IReadOnlyDictionary<string, PublishedCultureInfos> _cultureInfos;
             private readonly IPublishedVariationContextAccessor _variationContextAccessor;
 
@@ -500,8 +499,8 @@ namespace umbraco
                     if (_cultureInfos != null)
                         return _cultureInfos;
 
-                    return _cultureInfos = _inner.Names
-                        .ToDictionary(x => x.Key, x => new PublishedCultureInfos(x.Key, x.Value, false, DateTime.MinValue)); // fixme values!
+                    return _cultureInfos = _inner.Names // fixme names, or PublishNames?
+                        .ToDictionary(x => x.Key, x => new PublishedCultureInfos(x.Key, x.Value, false, _inner.GetCulturePublishDate(x.Key))); // fixme values!
                 }
             }
 

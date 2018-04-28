@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
@@ -10,6 +11,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        //TODO: We may want some date stamps here
+        [JsonProperty("date")]
+        public DateTime Date { get; set; }
     }
 }

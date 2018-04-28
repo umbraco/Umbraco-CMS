@@ -2583,8 +2583,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, false), (langUk, false), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, false), (langUk, false), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetDateCulturePublished(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetDateCulturePublished(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
+            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
 
             // note that content and content2 culture published dates might be slightly different due to roundtrip to database
 
@@ -2644,8 +2644,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetDateCulturePublished(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetDateCulturePublished(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
+            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
 
 
             // act
@@ -2687,8 +2687,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetDateCulturePublished(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetDateCulturePublished(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
 
 
             // act
@@ -2734,8 +2734,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetDateCulturePublished(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetDateCulturePublished(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
 
 
             // act
@@ -2774,8 +2774,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetDateCulturePublished(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetDateCulturePublished(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
 
 
             // act
@@ -2797,8 +2797,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, false), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, false), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetDateCulturePublished(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetDateCulturePublished(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
 
 
             // act

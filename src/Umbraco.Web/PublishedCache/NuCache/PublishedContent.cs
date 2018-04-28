@@ -19,7 +19,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         internal readonly ContentData _contentData; // internal for ContentNode cloning
 
         private readonly string _urlSegment;
-        private IReadOnlyDictionary<string, PublishedCultureName> _cultureNames;
 
         #region Constructors
 
@@ -265,7 +264,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (_cultureInfos != null) return _cultureInfos;
 
                 return _cultureInfos = _contentData.CultureInfos // fixme can it be null?
-                    .ToDictionary(x => x.Key, x => new PublishedCultureInfos(x.Key, x.Value.Name, false, DateTime.MinValue)); // fixme values!
+                    .ToDictionary(x => x.Key, x => new PublishedCultureInfos(x.Key, x.Value.Name, false, x.Value.Date)); // fixme values!
             }
         }
 

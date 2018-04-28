@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Web;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -25,7 +26,7 @@ namespace Umbraco.Core.Models
         protected IContentTypeComposition ContentTypeBase;
         private int _writerId;
         private PropertyCollection _properties;
-        private Dictionary<string, string> _names;
+        private Dictionary<string, (string Name, DateTime Date)> _cultureInfos;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
@@ -139,14 +140,28 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public virtual IReadOnlyDictionary<string, string> Names
+        public virtual IReadOnlyDictionary<string, string> Names => _cultureInfos?.ToDictionary(x => x.Key, x => x.Value.Name) ?? NoNames;
+
+        // sets culture infos
+        // internal for repositories
+        // clear by clearing name
+        internal void SetCultureInfos(string culture, string name, DateTime date)
         {
-            get => _names ?? NoNames;
-            set
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentNullOrEmptyException(nameof(name));
+
+            if (culture == null)
             {
-                foreach (var (culture, name) in value)
-                    SetName(culture, name);
+                Name = name;
+                return;
             }
+
+            // private method, assume that culture is valid
+
+            if (_cultureInfos == null)
+                _cultureInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
+
+            _cultureInfos[culture] = (name, date);
         }
 
         /// <inheritdoc />
@@ -167,10 +182,10 @@ namespace Umbraco.Core.Models
             if (!ContentTypeBase.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment))
                 throw new NotSupportedException("Content type does not support varying name by culture.");
 
-            if (_names == null)
-                _names = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (_cultureInfos == null)
+                _cultureInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
 
-            _names[culture] = name;
+            _cultureInfos[culture] = (name, DateTime.Now) ;
             OnPropertyChanged(Ps.Value.NamesSelector);
         }
 
@@ -178,8 +193,8 @@ namespace Umbraco.Core.Models
         public virtual string GetName(string culture)
         {
             if (culture == null) return Name;
-            if (_names == null) return null;
-            return _names.TryGetValue(culture, out var name) ? name : null;
+            if (_cultureInfos == null) return null;
+            return _cultureInfos.TryGetValue(culture, out var infos) ? infos.Name : null;
         }
 
         /// <inheritdoc />
@@ -194,16 +209,24 @@ namespace Umbraco.Core.Models
                 return;
             }
 
-            if (_names == null) return;
-            _names.Remove(culture);
-            if (_names.Count == 0)
-                _names = null;
+            if (_cultureInfos == null) return;
+            _cultureInfos.Remove(culture);
+            if (_cultureInfos.Count == 0)
+                _cultureInfos = null;
         }
 
         protected virtual void ClearNames()
         {
-            _names = null;
+            _cultureInfos = null;
             OnPropertyChanged(Ps.Value.NamesSelector);
+        }
+
+        /// <inheritdoc />
+        public DateTime GetCultureDate(string culture)
+        {
+            if (_cultureInfos != null && _cultureInfos.TryGetValue(culture, out var infos))
+                return infos.Date;
+            throw new InvalidOperationException($"Culture \"{culture}\" is not available.");
         }
 
         #endregion

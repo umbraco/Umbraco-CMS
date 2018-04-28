@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Collections;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
@@ -19,6 +21,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly bool _isPreviewing;
         private readonly bool _isMember;
         private readonly PublishedContent _content;
+        private readonly ContentVariation _variations;
 
         private readonly object _locko = new object();
 
@@ -68,6 +71,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _isPreviewing = content.IsPreviewing;
             _isMember = content.ContentType.ItemType == PublishedItemType.Member;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
+            _variations = propertyType.Variations;
         }
 
         // clone for previewing as draft a published content that is published and has no draft
@@ -82,6 +86,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _isPreviewing = true;
             _isMember = origin._isMember;
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
+            _variations = origin._variations;
         }
 
         public override bool HasValue(string culture = ".", string segment = ".") => _sourceValue != null
@@ -185,9 +190,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (culture != "." && segment != ".") return;
 
             // use context values
+            // fixme CultureSegment?
             var publishedVariationContext = _content.VariationContextAccessor?.Context;
-            if (culture == ".") culture = publishedVariationContext?.Culture;
-            if (segment == ".") segment = publishedVariationContext?.Segment;
+            if (culture == ".") culture = _variations.Has(ContentVariation.CultureNeutral) ? publishedVariationContext?.Culture : null;
+            if (segment == ".") segment = _variations.Has(ContentVariation.CultureNeutral) ? publishedVariationContext?.Segment : null;
         }
 
         public override object GetValue(string culture = ".", string segment = ".")

@@ -722,7 +722,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);
             Notify<IMediaType>(_mediaStore, payloads, RefreshMediaTypesLocked);
 
-            ((PublishedSnapshot)CurrentPublishedSnapshot).Resync();
+            ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync(); // fixme all
         }
 
         private void Notify<T>(ContentStore store, ContentTypeCacheRefresher.JsonPayload[] payloads, Action<IEnumerable<int>, IEnumerable<int>, IEnumerable<int>, IEnumerable<int>> action)
@@ -799,7 +799,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 }
             }
 
-            ((PublishedSnapshot)CurrentPublishedSnapshot).Resync();
+            ((PublishedSnapshot)CurrentPublishedSnapshot)?.Resync(); // fixme elsewhere!
         }
 
         public override void Notify(DomainCacheRefresher.JsonPayload[] payloads)
@@ -900,8 +900,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // contentStore is wlocked (so readable, only no new views)
             // and it can be wlocked by 1 thread only at a time
 
-            if (!(_serviceContext.ContentService is ContentService))
-                throw new Exception("oops");
+            // fixme wtf?
+            //if (!(_serviceContext.ContentService is ContentService))
+            //    throw new Exception("oops");
 
             var refreshedIdsA = refreshedIds.ToArray();
 
@@ -1219,7 +1220,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var cultureData = new Dictionary<string, CultureVariation>();
 
-            // fixme refactor!!!
             var names = content is IContent document
                     ? (published
                         ? document.PublishNames
@@ -1228,7 +1228,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             foreach (var (culture, name) in names)
             {
-                        cultureData[culture] = new CultureVariation { Name = name };
+                cultureData[culture] = new CultureVariation { Name = name, Date = content.GetCultureDate(culture) };
             }
 
             //the dictionary that will be serialized

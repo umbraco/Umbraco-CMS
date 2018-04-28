@@ -336,19 +336,19 @@ namespace Umbraco.Tests.Models
             Assert.IsTrue(content.IsCultureAvailable(langFr));
             Assert.IsTrue(content.IsCulturePublished(langFr));
             Assert.AreEqual("name-fr", content.GetPublishName(langFr));
-            Assert.AreNotEqual(DateTime.MinValue, content.GetDateCulturePublished(langFr));
+            Assert.AreNotEqual(DateTime.MinValue, content.GetCulturePublishDate(langFr));
             Assert.IsFalse(content.IsCultureEdited(langFr)); // once published, edited is *wrong* until saved
 
             Assert.IsTrue(content.IsCultureAvailable(langUk));
             Assert.IsFalse(content.IsCulturePublished(langUk));
             Assert.IsNull(content.GetPublishName(langUk));
-            Assert.Throws<InvalidOperationException>(() => content.GetDateCulturePublished(langUk)); // not published!
+            Assert.Throws<InvalidOperationException>(() => content.GetCulturePublishDate(langUk)); // not published!
             Assert.IsTrue(content.IsCultureEdited(langEs)); // not published, so... edited
 
             Assert.IsFalse(content.IsCultureAvailable(langEs));
             Assert.IsFalse(content.IsCulturePublished(langEs));
             Assert.IsNull(content.GetPublishName(langEs));
-            Assert.Throws<InvalidOperationException>(() => content.GetDateCulturePublished(langEs)); // not published!
+            Assert.Throws<InvalidOperationException>(() => content.GetCulturePublishDate(langEs)); // not published!
             Assert.IsTrue(content.IsCultureEdited(langEs)); // not published, so... edited
 
             // cannot test IsCultureEdited here - as that requires the content service and repository

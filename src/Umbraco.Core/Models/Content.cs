@@ -225,7 +225,6 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc/>
         [IgnoreDataMember]
-        //public IReadOnlyDictionary<string, string> PublishNames => _publishNames ?? NoNames;
         public IReadOnlyDictionary<string, string> PublishNames => _publishInfos?.ToDictionary(x => x.Key, x => x.Value.Name) ?? NoNames;
 
         /// <inheritdoc/>
@@ -263,7 +262,7 @@ namespace Umbraco.Core.Models
             => !string.IsNullOrWhiteSpace(GetPublishName(culture));
 
         /// <inheritdoc />
-        public DateTime GetDateCulturePublished(string culture)
+        public DateTime GetCulturePublishDate(string culture)
         {
             if (_publishInfos != null && _publishInfos.TryGetValue(culture, out var infos))
                 return infos.Date;

@@ -945,7 +945,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             if (contentVariations.TryGetValue(content.VersionId, out var contentVariation))
                 foreach (var v in contentVariation)
-                    content.SetName(v.Culture, v.Name);
+                    content.SetCultureInfos(v.Culture, v.Name, v.Date);
             if (content.PublishedVersionId > 0 && contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
                 foreach (var v in contentVariation)
                     content.SetPublishInfos(v.Culture, v.Name, v.Date);
@@ -1028,7 +1028,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
                     Name = name,
-                    Date = content.UpdateDate
+                    Date = content.GetCultureDate(culture)
                 };
 
             // if not publishing, we're just updating the 'current' (non-published) version,
@@ -1043,7 +1043,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
                     Name = name,
-                    Date = content.GetDateCulturePublished(culture)
+                    Date = content.GetCulturePublishDate(culture)
                 };
         }
 

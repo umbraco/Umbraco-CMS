@@ -93,7 +93,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the date a culture was published.
         /// </summary>
-        DateTime GetDateCulturePublished(string culture);
+        DateTime GetCulturePublishDate(string culture);
 
         /// <summary>
         /// Gets a value indicated whether a given culture is edited.
