@@ -12,6 +12,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.Macros;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Editors
 {
@@ -26,6 +27,13 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     public class MacroController : UmbracoAuthorizedJsonController, IRequiresSessionState
     {
+        private readonly IPublishedVariationContextAccessor _variationContextAccessor;
+
+        public MacroController(IPublishedVariationContextAccessor variationContextAccessor)
+        {
+            _variationContextAccessor = variationContextAccessor;
+        }
+
         /// <summary>
         /// Gets the macro parameters to be filled in for a particular macro
         /// </summary>
@@ -113,7 +121,7 @@ namespace Umbraco.Web.Editors
             //the 'easiest' way might be to create an IPublishedContent manually and populate the legacy 'page' object with that
             //and then set the legacy parameters.
 
-            var legacyPage = new global::umbraco.page(doc);
+            var legacyPage = new global::umbraco.page(doc, _variationContextAccessor);
             UmbracoContext.HttpContext.Items["pageID"] = doc.Id;
             UmbracoContext.HttpContext.Items["pageElements"] = legacyPage.Elements;
             UmbracoContext.HttpContext.Items[global::Umbraco.Core.Constants.Conventions.Url.AltTemplate] = null;

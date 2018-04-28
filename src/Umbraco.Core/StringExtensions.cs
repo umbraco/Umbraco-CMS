@@ -1157,7 +1157,16 @@ namespace Umbraco.Core
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The safe url segment.</returns>
-        public static string ToUrlSegment(this string text, CultureInfo culture)
+        public static string ToUrlSegment(this string text, string culture)
+            => text.ToUrlSegment(CultureInfo.GetCultureInfo(culture));
+
+        /// <summary>
+        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an url segment.
+        /// </summary>
+        /// <param name="text">The text to filter.</param>
+        /// <param name="culture">The culture.</param>
+        /// <returns>The safe url segment.</returns>
+        public static string ToUrlSegment(this string text, CultureInfo culture) // fixme obsolete that one, use the string one?
         {
             return Current.ShortStringHelper.CleanStringForUrlSegment(text, culture);
         }

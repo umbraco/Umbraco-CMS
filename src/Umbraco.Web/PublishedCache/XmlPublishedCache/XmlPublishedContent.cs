@@ -150,25 +150,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
         }
 
-        public override IReadOnlyDictionary<string, PublishedCultureName> CultureNames => throw new NotSupportedException();
+        public override PublishedCultureInfos GetCulture(string culture = ".") => throw new NotSupportedException();
 
-        public override string DocumentTypeAlias
-        {
-            get
-            {
-                if (_nodeInitialized == false) InitializeNode();
-                return _docTypeAlias;
-            }
-        }
-
-        public override int DocumentTypeId
-        {
-            get
-            {
-                if (_nodeInitialized == false) InitializeNode();
-                return _docTypeId;
-            }
-        }
+        public override IReadOnlyDictionary<string, PublishedCultureInfos> Cultures => throw new NotSupportedException();
 
         public override string WriterName
         {

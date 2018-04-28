@@ -1,6 +1,8 @@
-﻿using NUnit.Framework;
+﻿using System.Collections.Generic;
+using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 
@@ -13,6 +15,7 @@ namespace Umbraco.Tests.PublishedContent
         private UmbracoContext ctx;
         private string xmlContent = "";
         private bool createContentTypes = true;
+        private Dictionary<string, PublishedContentType> _contentTypes;
 
         protected override string GetXmlContent(int templateId)
         {
@@ -49,8 +52,8 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void IsDocumentType_Recursive_BaseType_ReturnsTrue()
         {
-            ContentTypesCache.GetPublishedContentTypeByAlias = null; // fixme this is not pretty
             InitializeInheritedContentTypes();
+            ContentTypesCache.GetPublishedContentTypeByAlias = null; // fixme this is not pretty
 
             var publishedContent = ctx.ContentCache.GetById(1100);
             Assert.That(publishedContent.IsDocumentType("base", true));
@@ -76,8 +79,16 @@ namespace Umbraco.Tests.PublishedContent
                 var inheritedType = new ContentType(baseType, contentTypeAlias) { Alias = contentTypeAlias, Name = "Inherited" };
                 contentTypeService.Save(baseType);
                 contentTypeService.Save(inheritedType);
+                _contentTypes = new Dictionary<string, PublishedContentType>
+                {
+                    { baseType.Alias, new PublishedContentType(baseType, null) },
+                    { inheritedType.Alias, new PublishedContentType(inheritedType, null) }
+                };
+                ContentTypesCache.GetPublishedContentTypeByAlias = alias => _contentTypes[alias];
                 createContentTypes = false;
             }
+
+            ContentTypesCache.GetPublishedContentTypeByAlias = alias => _contentTypes[alias];
 
             xmlContent = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[

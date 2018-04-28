@@ -391,6 +391,7 @@
     <Compile Include="PublishedCache\PublishedContentTypeCache.cs" />
     <Compile Include="PublishedCache\SystemDefaultCultureAccessor.cs" />
     <Compile Include="PublishedCache\UmbracoContextPublishedSnapshotAccessor.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\DictionaryPublishedContent.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\DomainCache.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedSnapshot.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedSnapshotService.cs" />

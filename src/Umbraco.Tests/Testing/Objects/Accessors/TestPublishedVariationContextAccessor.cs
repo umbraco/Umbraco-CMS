@@ -8,6 +8,10 @@ namespace Umbraco.Tests.Testing.Objects.Accessors
     public class TestPublishedVariationContextAccessor : IPublishedVariationContextAccessor
     {
         /// <inheritdoc />
-        public PublishedVariationContext Context { get; set; }
+        public PublishedVariationContext Context
+        {
+            get;
+            set;
+        }
     }
 }

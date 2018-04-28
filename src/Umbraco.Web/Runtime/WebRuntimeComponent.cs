@@ -24,6 +24,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -69,8 +70,10 @@ namespace Umbraco.Web.Runtime
             //it still needs to use the install controller so we can't do that
             composition.Container.RegisterFrom<InstallerCompositionRoot>();
 
-            // register the system culture provider
+            // register accessors for cultures
+            // fixme merge the two accessors?
             composition.Container.RegisterSingleton<ISystemDefaultCultureAccessor, SystemDefaultCultureAccessor>();
+            composition.Container.RegisterSingleton<IPublishedVariationContextAccessor, ThreadCulturePublishedVariationContextAccessor>();
 
             var typeLoader = composition.Container.GetInstance<TypeLoader>();
             var logger = composition.Container.GetInstance<ILogger>();

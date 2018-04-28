@@ -65,7 +65,7 @@ namespace umbraco
                 throw new ArgumentException("Document request has no node.", "frequest");
 
             populatePageData(frequest.PublishedContent.Id,
-                frequest.PublishedContent.Name, frequest.PublishedContent.DocumentTypeId, frequest.PublishedContent.DocumentTypeAlias,
+                frequest.PublishedContent.Name, frequest.PublishedContent.ContentType.Id, frequest.PublishedContent.ContentType.Alias,
                 frequest.PublishedContent.WriterName, frequest.PublishedContent.CreatorName, frequest.PublishedContent.CreateDate, frequest.PublishedContent.UpdateDate,
                 frequest.PublishedContent.Path, frequest.PublishedContent.Parent == null ? -1 : frequest.PublishedContent.Parent.Id);
 
@@ -89,7 +89,7 @@ namespace umbraco
             if (doc == null) throw new ArgumentNullException("doc");
 
             populatePageData(doc.Id,
-                doc.Name, doc.DocumentTypeId, doc.DocumentTypeAlias,
+                doc.Name, doc.ContentType.Id, doc.ContentType.Alias,
                 doc.WriterName, doc.CreatorName, doc.CreateDate, doc.UpdateDate,
                 doc.Path, doc.Parent == null ? -1 : doc.Parent.Id);
 
@@ -108,8 +108,8 @@ namespace umbraco
         /// </summary>
         /// <param name="content">The content.</param>
         /// <remarks>This is for <see cref="MacroController"/> usage only.</remarks>
-        internal page(IContent content)
-            : this(new PagePublishedContent(content))
+        internal page(IContent content, IPublishedVariationContextAccessor variationContextAccessor)
+            : this(new PagePublishedContent(content, variationContextAccessor))
         { }
 
         #endregion
@@ -409,18 +409,23 @@ namespace umbraco
             private readonly IPublishedProperty[] _properties;
             private readonly IPublishedContent _parent;
             private IReadOnlyDictionary<string, PublishedCultureName> _cultureNames;
+            private IReadOnlyDictionary<string, PublishedCultureInfos> _cultureInfos;
+            private readonly IPublishedVariationContextAccessor _variationContextAccessor;
+
+            private static readonly IReadOnlyDictionary<string, PublishedCultureInfos> NoCultureInfos = new Dictionary<string, PublishedCultureInfos>();
 
             private PagePublishedContent(int id)
             {
                 _id = id;
             }
 
-            public PagePublishedContent(IContent inner)
+            public PagePublishedContent(IContent inner, IPublishedVariationContextAccessor variationContextAccessor)
             {
                 if (inner == null)
                     throw new NullReferenceException("content");
 
                 _inner = inner;
+                _variationContextAccessor = variationContextAccessor;
                 _id = _inner.Id;
                 _key = _inner.Key;
 
@@ -472,23 +477,31 @@ namespace umbraco
                 get { return _inner.Name; }
             }
 
-            public IReadOnlyDictionary<string, PublishedCultureName> CultureNames
+            public PublishedCultureInfos GetCulture(string culture = ".")
+            {
+                // handle context culture
+                if (culture == ".")
+                    culture = _variationContextAccessor.Context.Culture;
+
+                // no invariant culture infos
+                if (culture == null) return null;
+
+                // get
+                return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;
+            }
+
+            public IReadOnlyDictionary<string, PublishedCultureInfos> Cultures
             {
                 get
                 {
-                    if (!_inner.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
-                        return null;
+                    if (!_inner.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral)) // fixme CultureSegment?
+                        return NoCultureInfos;
 
-                    if (_cultureNames == null)
-                    {
-                        var d = new Dictionary<string, PublishedCultureName>(StringComparer.InvariantCultureIgnoreCase);
-                        foreach (var c in _inner.Names)
-                        {
-                            d[c.Key] = new PublishedCultureName(c.Value, c.Value.ToUrlSegment());
-                        }
-                        _cultureNames = d;
-                    }
-                    return _cultureNames;
+                    if (_cultureInfos != null)
+                        return _cultureInfos;
+
+                    return _cultureInfos = _inner.Names
+                        .ToDictionary(x => x.Key, x => new PublishedCultureInfos(x.Key, x.Value, false, DateTime.MinValue)); // fixme values!
                 }
             }
 

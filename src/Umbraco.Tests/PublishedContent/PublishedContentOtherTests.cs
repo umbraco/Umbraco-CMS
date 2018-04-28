@@ -117,6 +117,9 @@ namespace Umbraco.Tests.PublishedContent
 
             var variationAccessor = new TestPublishedVariationContextAccessor();
 
+            // invariant is the current default
+            variationAccessor.Context = new PublishedVariationContext();
+
             var options = new PublishedSnapshotService.Options { IgnoreLocalDb = true };
             var snapshotService = new PublishedSnapshotService(options,
                 null,
@@ -138,9 +141,6 @@ namespace Umbraco.Tests.PublishedContent
 
             var snapshot = snapshotService.CreatePublishedSnapshot(previewToken: null);
             var publishedContent = snapshot.Content.GetById(1);
-
-            // invariant is the current default
-            variationAccessor.Context = null;
 
             Assert.IsNotNull(publishedContent);
             Assert.AreEqual("It Works1!", publishedContent.Name);

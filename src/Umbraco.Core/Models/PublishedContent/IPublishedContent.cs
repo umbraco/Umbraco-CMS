@@ -6,36 +6,119 @@ namespace Umbraco.Core.Models.PublishedContent
 
     /// <inheritdoc />
     /// <summary>
-    /// Represents a cached content.
+    /// Represents a published content item.
     /// </summary>
+    /// <remarks>
+    /// <para>Can be a published document, media or member.</para>
+    /// </remarks>
     public interface IPublishedContent : IPublishedElement
     {
         #region Content
 
-        // fixme - all these are colliding with models => ?
-        // or could we force them to be 'new' in models?
-
-        int Id { get; }
-        int TemplateId { get; }
-        int SortOrder { get; }
-        string Name { get; }
-        string UrlName { get; } // fixme rename
-        string DocumentTypeAlias { get; } // fixme obsolete
-        int DocumentTypeId { get; } // fixme obsolete
-        string WriterName { get; }
-        string CreatorName { get; }
-        int WriterId { get; }
-        int CreatorId { get; }
-        string Path { get; }
-        DateTime CreateDate { get; }
-        DateTime UpdateDate { get; }
-        int Level { get; }
-        string Url { get; }
-
-        IReadOnlyDictionary<string, PublishedCultureName> CultureNames { get; }
+        // todo - IPublishedContent properties colliding with models
+        // we need to find a way to remove as much clutter as possible from IPublishedContent,
+        // since this is preventing someone from creating a property named 'Path' and have it
+        // in a model, for instance. we could move them all under one unique property eg
+        // Infos, so we would do .Infos.SortOrder - just an idea - not going to do it in v8
 
         /// <summary>
-        /// Gets a value indicating whether the content is a content (aka a document) or a media.
+        /// Gets the unique identifier of the content item.
+        /// </summary>
+        int Id { get; }
+
+        /// <summary>
+        /// Gets the name of the content item.
+        /// </summary>
+        /// <remarks>
+        /// <para>The value of this property is contextual. When the content type is multi-lingual,
+        /// this is the name for the 'current' culture.</para>
+        /// </remarks>
+        /// FIXME culture aware - returns the value for the 'current' culture whatever it is + see ?? for others
+        string Name { get; }
+
+        /// <summary>
+        /// Gets the url segment of the content item.
+        /// </summary>
+        /// <remarks>
+        /// <para>The value of this property is contextual. When the content type is multi-lingual,
+        /// this is the name for the 'current' culture.</para>
+        /// </remarks>
+        /// FIXME rename UrlSegment + culture aware
+        string UrlName { get; } // fixme rename, segment!
+
+        /// <summary>
+        /// Gets the sort order of the content item.
+        /// </summary>
+        int SortOrder { get; }
+
+        /// <summary>
+        /// Gets the tree level of the content item.
+        /// </summary>
+        int Level { get; }
+
+        /// <summary>
+        /// Gets the tree path of the content item.
+        /// </summary>
+        string Path { get; }
+
+        /// <summary>
+        /// Gets the identifier of the template to use to render the content item.
+        /// </summary>
+        int TemplateId { get; }
+
+        /// <summary>
+        /// Gets the identifier of the user who created the content item.
+        /// </summary>
+        int CreatorId { get; }
+
+        /// <summary>
+        /// Gets the name of the user who created the content item.
+        /// </summary>
+        string CreatorName { get; }
+
+        /// <summary>
+        /// Gets the date the content item was created.
+        /// </summary>
+        DateTime CreateDate { get; }
+
+        /// <summary>
+        /// Gets the identifier of the user who last updated the content item.
+        /// </summary>
+        int WriterId { get; }
+
+        /// <summary>
+        /// Gets the name of the user who last updated the content item.
+        /// </summary>
+        string WriterName { get; }
+
+        /// <summary>
+        /// Gets the date the content item was last updated.
+        /// </summary>
+        /// <remarks>
+        /// <para>For published content items, this is also the date the item was published.</para>
+        /// <para>This date is global to the content item, see FIXME for per-culture dates</para>
+        /// </remarks>
+        DateTime UpdateDate { get; }
+
+        /// <summary>
+        /// Gets the url of the content item.
+        /// </summary>
+        /// <remarks>
+        /// <para>The value of this property is contextual. It depends on the 'current' </para>
+        /// <para>In addition, when the content type is multi-lingual, this is the url for the
+        /// 'current' culture.</para>
+        /// </remarks>
+        /// FIXME explain what 'current' means here
+        string Url { get; }
+
+        // fixme document
+        //PublishedCultureInfos Culture(string culture = ".");
+        //string GetName(string culture = "."); // best naming? GetName? CultureName?
+        PublishedCultureInfos GetCulture(string culture = ".");
+        IReadOnlyDictionary<string, PublishedCultureInfos> Cultures { get; }
+
+        /// <summary>
+        /// Gets the type of the content item (document, media...).
         /// </summary>
         PublishedItemType ItemType { get; }
 
@@ -51,13 +134,13 @@ namespace Umbraco.Core.Models.PublishedContent
         #region Tree
 
         /// <summary>
-        /// Gets the parent of the content.
+        /// Gets the parent of the content item.
         /// </summary>
         /// <remarks>The parent of root content is <c>null</c>.</remarks>
         IPublishedContent Parent { get; }
 
         /// <summary>
-        /// Gets the children of the content.
+        /// Gets the children of the content item.
         /// </summary>
         /// <remarks>Children are sorted by their sortOrder.</remarks>
         IEnumerable<IPublishedContent> Children { get; }

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
 
@@ -10,18 +7,31 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 {
     internal class TestPublishedContent : PublishedElement, IPublishedContent
     {
-        public TestPublishedContent(PublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing, Dictionary<string, PublishedCultureName> cultureNames = null)
+        public TestPublishedContent(PublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing, Dictionary<string, PublishedCultureInfos> cultures = null)
             : base(contentType, key, values, previewing)
         {
             Id = id;
-            CultureNames = cultureNames;
+            Cultures = cultures;
         }
 
         public int Id { get; }
         public int TemplateId { get; set; }
         public int SortOrder { get; set; }
         public string Name { get; set; }
-        public IReadOnlyDictionary<string, PublishedCultureName> CultureNames { get; set; }
+        public IPublishedVariationContextAccessor VariationContextAccessor { get; set; }
+        public PublishedCultureInfos GetCulture(string culture = ".")
+        {
+            // handle context culture
+            if (culture == ".")
+                culture = VariationContextAccessor?.Context.Culture;
+
+            // no invariant culture infos
+            if (culture == null || Cultures == null) return null;
+
+            // get
+            return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;
+        }
+        public IReadOnlyDictionary<string, PublishedCultureInfos> Cultures { get; set; }
         public string UrlName { get; set; }
         public string DocumentTypeAlias => ContentType.Alias;
         public int DocumentTypeId { get; set; }

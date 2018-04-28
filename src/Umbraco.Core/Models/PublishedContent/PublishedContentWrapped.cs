@@ -40,71 +40,98 @@ namespace Umbraco.Core.Models.PublishedContent
 
         #region ContentType
 
+        /// <inheritdoc />
         public virtual PublishedContentType ContentType => _content.ContentType;
 
         #endregion
 
-        #region Content
+        #region PublishedElement
 
-        public virtual int Id => _content.Id;
-
+        /// <inheritdoc />
         public Guid Key => _content.Key;
 
-        public virtual int TemplateId => _content.TemplateId;
+        #endregion
 
-        public virtual int SortOrder => _content.SortOrder;
+        #region PublishedContent
 
+        /// <inheritdoc />
+        public virtual int Id => _content.Id;
+
+        /// <inheritdoc />
         public virtual string Name => _content.Name;
 
-        public virtual IReadOnlyDictionary<string, PublishedCultureName> CultureNames => _content.CultureNames;
-
+        /// <inheritdoc />
         public virtual string UrlName => _content.UrlName;
 
-        public virtual string DocumentTypeAlias => _content.DocumentTypeAlias;
+        /// <inheritdoc />
+        public virtual int SortOrder => _content.SortOrder;
 
-        public virtual int DocumentTypeId => _content.DocumentTypeId;
-
-        public virtual string WriterName => _content.WriterName;
-
-        public virtual string CreatorName => _content.CreatorName;
-
-        public virtual int WriterId => _content.WriterId;
-
-        public virtual int CreatorId => _content.CreatorId;
-
-        public virtual string Path => _content.Path;
-
-        public virtual DateTime CreateDate => _content.CreateDate;
-
-        public virtual DateTime UpdateDate => _content.UpdateDate;
-
+        /// <inheritdoc />
         public virtual int Level => _content.Level;
 
+        /// <inheritdoc />
+        public virtual string Path => _content.Path;
+
+        /// <inheritdoc />
+        public virtual int TemplateId => _content.TemplateId;
+
+        /// <inheritdoc />
+        public virtual int CreatorId => _content.CreatorId;
+
+        /// <inheritdoc />
+        public virtual string CreatorName => _content.CreatorName;
+
+        /// <inheritdoc />
+        public virtual DateTime CreateDate => _content.CreateDate;
+
+        /// <inheritdoc />
+        public virtual int WriterId => _content.WriterId;
+
+        /// <inheritdoc />
+        public virtual string WriterName => _content.WriterName;
+
+        /// <inheritdoc />
+        public virtual DateTime UpdateDate => _content.UpdateDate;
+
+        /// <inheritdoc />
         public virtual string Url => _content.Url;
 
+        /// <inheritdoc />
+        public PublishedCultureInfos GetCulture(string culture = ".") => _content.GetCulture(culture);
+
+        /// <inheritdoc />
+        public IReadOnlyDictionary<string, PublishedCultureInfos> Cultures => _content.Cultures;
+
+        /// <inheritdoc />
         public virtual PublishedItemType ItemType => _content.ItemType;
 
+        /// <inheritdoc />
         public virtual bool IsDraft => _content.IsDraft;
 
         #endregion
 
         #region Tree
 
+        /// <inheritdoc />
         public virtual IPublishedContent Parent => _content.Parent;
 
+        /// <inheritdoc />
         public virtual IEnumerable<IPublishedContent> Children => _content.Children;
 
         #endregion
 
         #region Properties
 
+        /// <inheritdoc cref="IPublishedElement.Properties"/>
         public virtual IEnumerable<IPublishedProperty> Properties => _content.Properties;
 
+        /// <inheritdoc cref="IPublishedElement.GetProperty(string)"/>
         public virtual IPublishedProperty GetProperty(string alias)
         {
             return _content.GetProperty(alias);
         }
 
+        /// <inheritdoc cref="IPublishedContent.GetProperty(string, bool)"/>
         public virtual IPublishedProperty GetProperty(string alias, bool recurse)
         {
             return _content.GetProperty(alias, recurse);

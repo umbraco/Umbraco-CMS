@@ -19,24 +19,75 @@ namespace Umbraco.Web.Models
     [DebuggerDisplay("Content Id: {Id}, Name: {Name}")]
     public abstract class PublishedContentBase : IPublishedContent
     {
-        #region Content
-
         private string _url;
 
-        /// <summary>
-        /// Gets the url of the content.
-        /// </summary>
+        #region ContentType
+
+        public abstract PublishedContentType ContentType { get; }
+
+        #endregion
+
+        #region PublishedElement
+
+        /// <inheritdoc />
+        public abstract Guid Key { get; }
+
+        #endregion
+
+        #region PublishedContent
+
+        /// <inheritdoc />
+        public abstract int Id { get; }
+
+        /// <inheritdoc />
+        public abstract string Name { get; }
+
+        /// <inheritdoc />
+        public abstract string UrlName { get; }
+
+        /// <inheritdoc />
+        public abstract int SortOrder { get; }
+
+        /// <inheritdoc />
+        public abstract int Level { get; }
+
+        /// <inheritdoc />
+        public abstract string Path { get; }
+
+        /// <inheritdoc />
+        public abstract int TemplateId { get; }
+
+        /// <inheritdoc />
+        public abstract int CreatorId { get; }
+
+        /// <inheritdoc />
+        public abstract string CreatorName { get; }
+
+        /// <inheritdoc />
+        public abstract DateTime CreateDate { get; }
+
+        /// <inheritdoc />
+        public abstract int WriterId { get; }
+
+        /// <inheritdoc />
+        public abstract string WriterName { get; }
+
+        /// <inheritdoc />
+        public abstract DateTime UpdateDate { get; }
+
+        /// <inheritdoc />
         /// <remarks>
-        /// If this content is Content, the url that is returned is the one computed by the NiceUrlProvider, otherwise if
-        /// this content is Media, the url returned is the value found in the 'umbracoFile' property.
+        /// The url of documents are computed by the document url providers. The url of medias are, at the moment,
+        /// computed here from the 'umbracoFile' property -- but we should move to media url providers at some point.
         /// </remarks>
         public virtual string Url
         {
+            // fixme contextual!
             get
             {
                 // should be thread-safe although it won't prevent url from being resolved more than once
                 if (_url != null)
-                    return _url;
+                    return _url; // fixme very bad idea with nucache? or?
 
                 switch (ItemType)
                 {
@@ -87,85 +138,44 @@ namespace Umbraco.Web.Models
                 return _url;
             }
         }
+  
+        /// <inheritdoc />
+        public abstract PublishedCultureInfos GetCulture(string culture = ".");
 
+        /// <inheritdoc />
+        public abstract IReadOnlyDictionary<string, PublishedCultureInfos> Cultures { get; }
+
+        /// <inheritdoc />
         public abstract PublishedItemType ItemType { get; }
-        public abstract int Id { get; }
-        public abstract Guid Key { get; }
-        public abstract int TemplateId { get; }
-        public abstract int SortOrder { get; }
-        public abstract string Name { get; }
-        //TODO: On the base ContentData instance this dictionary contains a CultureVariation, should we expose that model here or a different model?
-        public abstract IReadOnlyDictionary<string, PublishedCultureName> CultureNames { get; }
-        public abstract string UrlName { get; }
-        public abstract string DocumentTypeAlias { get; }
-        public abstract int DocumentTypeId { get; }
-        public abstract string WriterName { get; }
-        public abstract string CreatorName { get; }
-        public abstract int WriterId { get; }
-        public abstract int CreatorId { get; }
-        public abstract string Path { get; }
-        public abstract DateTime CreateDate { get; }
-        public abstract DateTime UpdateDate { get; }
-        public abstract int Level { get; }
 
+        /// <inheritdoc />
         public abstract bool IsDraft { get; }
 
         #endregion
 
         #region Tree
 
-        /// <summary>
-        /// Gets the parent of the content.
-        /// </summary>
+        /// <inheritdoc />
         public abstract IPublishedContent Parent { get; }
 
-        /// <summary>
-        /// Gets the children of the content.
-        /// </summary>
-        /// <remarks>Children are sorted by their sortOrder.</remarks>
+        /// <inheritdoc />
         public abstract IEnumerable<IPublishedContent> Children { get; }
-
-        #endregion
-
-        #region ContentType
-
-        public abstract PublishedContentType ContentType { get; }
 
         #endregion
 
         #region Properties
 
-        /// <summary>
-        /// Gets the properties of the content.
-        /// </summary>
+        /// <inheritdoc cref="IPublishedElement.Properties"/>
         public abstract IEnumerable<IPublishedProperty> Properties { get; }
 
-        /// <summary>
-        /// Gets a property identified by its alias.
-        /// </summary>
-        /// <param name="alias">The property alias.</param>
-        /// <returns>The property identified by the alias.</returns>
-        /// <remarks>
-        /// <para>If no property with the specified alias exists, returns <c>null</c>.</para>
-        /// <para>The returned property may have no value (ie <c>HasValue</c> is <c>false</c>).</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
+        /// <inheritdoc cref="IPublishedElement.GetProperty(string)"/>
         public abstract IPublishedProperty GetProperty(string alias);
 
-        /// <summary>
-        /// Gets a property identified by its alias.
-        /// </summary>
-        /// <param name="alias">The property alias.</param>
-        /// <param name="recurse">A value indicating whether to navigate the tree upwards until a property with a value is found.</param>
-        /// <returns>The property identified by the alias.</returns>
-        /// <remarks>
-        /// <para>Navigate the tree upwards and look for a property with that alias and with a value (ie <c>HasValue</c> is <c>true</c>).
-        /// If found, return the property. If no property with that alias is found, having a value or not, return <c>null</c>. Otherwise
-        /// return the first property that was found with the alias but had no value (ie <c>HasValue</c> is <c>false</c>).</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
+        /// <inheritdoc cref="IPublishedContent.GetProperty(string, bool)"/>
         public virtual IPublishedProperty GetProperty(string alias, bool recurse)
         {
+            // fixme - but can this work with variants?
+
             var property = GetProperty(alias);
             if (recurse == false) return property;
 

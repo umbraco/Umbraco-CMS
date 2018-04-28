@@ -290,7 +290,7 @@ namespace Umbraco.Web
         /// <returns>True if the content is of the specified content type; otherwise false.</returns>
         public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias)
         {
-            return content.DocumentTypeAlias.InvariantEquals(docTypeAlias);
+            return content.ContentType.Alias.InvariantEquals(docTypeAlias);
         }
 
         /// <summary>
@@ -477,7 +477,7 @@ namespace Umbraco.Web
         /// <remarks>Does not consider the content itself. Returns all ancestors, of the specified content type.</remarks>
         public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.AncestorsOrSelf(false, n => n.DocumentTypeAlias == contentTypeAlias);
+            return content.AncestorsOrSelf(false, n => n.ContentType.Alias == contentTypeAlias);
         }
 
         /// <summary>
@@ -542,7 +542,7 @@ namespace Umbraco.Web
         /// <remarks>May or may not begin with the content itself, depending on its content type.</remarks>
         public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.AncestorsOrSelf(true, n => n.DocumentTypeAlias == contentTypeAlias);
+            return content.AncestorsOrSelf(true, n => n.ContentType.Alias == contentTypeAlias);
         }
 
         /// <summary>
@@ -605,7 +605,7 @@ namespace Umbraco.Web
         /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
         public static IPublishedContent Ancestor(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.EnumerateAncestors(false).FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAlias);
+            return content.EnumerateAncestors(false).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
         }
 
         /// <summary>
@@ -668,7 +668,7 @@ namespace Umbraco.Web
         /// <remarks>May or may not return the content itself depending on its content type. May return <c>null</c>.</remarks>
         public static IPublishedContent AncestorOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.EnumerateAncestors(true).FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAlias);
+            return content.EnumerateAncestors(true).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
         }
 
         /// <summary>
@@ -781,7 +781,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.DescendantsOrSelf(false, p => p.DocumentTypeAlias == contentTypeAlias);
+            return content.DescendantsOrSelf(false, p => p.ContentType.Alias == contentTypeAlias);
         }
 
         public static IEnumerable<T> Descendants<T>(this IPublishedContent content)
@@ -808,7 +808,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.DescendantsOrSelf(true, p => p.DocumentTypeAlias == contentTypeAlias);
+            return content.DescendantsOrSelf(true, p => p.ContentType.Alias == contentTypeAlias);
         }
 
         public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content)
@@ -835,7 +835,7 @@ namespace Umbraco.Web
 
         public static IPublishedContent Descendant(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.EnumerateDescendants(false).FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAlias);
+            return content.EnumerateDescendants(false).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
         }
 
         public static T Descendant<T>(this IPublishedContent content)
@@ -862,7 +862,7 @@ namespace Umbraco.Web
 
         public static IPublishedContent DescendantOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.EnumerateDescendants(true).FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAlias);
+            return content.EnumerateDescendants(true).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
         }
 
         public static T DescendantOrSelf<T>(this IPublishedContent content)
@@ -1018,7 +1018,7 @@ namespace Umbraco.Web
         /// <returns>The children of the content, of any of the specified types.</returns>
         public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, params string[] alias)
         {
-            return content.Children(x => alias.InvariantContains(x.DocumentTypeAlias));
+            return content.Children(x => alias.InvariantContains(x.ContentType.Alias));
         }
 
         /// <summary>
@@ -1094,14 +1094,14 @@ namespace Umbraco.Web
                                 ? content.Children.Any()
                                     ? content.Children.ElementAt(0)
                                     : null
-                                : content.Children.FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAliasFilter);
+                                : content.Children.FirstOrDefault(x => x.ContentType.Alias == contentTypeAliasFilter);
             if (firstNode == null)
                 return new DataTable(); //no children found
 
             //use new utility class to create table so that we don't have to maintain code in many places, just one
             var dt = Core.DataTableExtensions.GenerateDataTable(
                 //pass in the alias of the first child node since this is the node type we're rendering headers for
-                firstNode.DocumentTypeAlias,
+                firstNode.ContentType.Alias,
                 //pass in the callback to extract the Dictionary<string, string> of all defined aliases to their names
                 alias => GetPropertyAliasesAndNames(services, alias),
                 //pass in a callback to populate the datatable, yup its a bit ugly but it's already legacy and we just want to maintain code in one place.
@@ -1114,7 +1114,7 @@ namespace Umbraco.Web
                     {
                         if (contentTypeAliasFilter.IsNullOrWhiteSpace() == false)
                         {
-                            if (n.DocumentTypeAlias != contentTypeAliasFilter)
+                            if (n.ContentType.Alias != contentTypeAliasFilter)
                                 continue; //skip this one, it doesn't match the filter
                         }
 
@@ -1122,7 +1122,7 @@ namespace Umbraco.Web
                             {
                                     { "Id", n.Id },
                                     { "NodeName", n.Name },
-                                    { "NodeTypeAlias", n.DocumentTypeAlias },
+                                    { "NodeTypeAlias", n.ContentType.Alias },
                                     { "CreateDate", n.CreateDate },
                                     { "UpdateDate", n.UpdateDate },
                                     { "CreatorName", n.CreatorName },
@@ -1205,34 +1205,6 @@ namespace Umbraco.Web
         private static Dictionary<string, string> GetAliasesAndNames(IContentTypeBase contentType)
         {
             return contentType.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
-        }
-
-        #endregion
-
-        #region Culture
-
-        /// <summary>
-        /// Return the URL name for the <see cref="IPublishedContent"/> based on the culture specified or default culture defined
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="localizationService"></param>
-        /// <param name="culture"></param>
-        /// <returns></returns>
-        public static string GetUrlName(this IPublishedContent content, ILocalizationService localizationService, string culture = null)
-        {
-            // fixme publishedContent could get ISystemDefaultCultureAccessor injected!
-
-            if (content.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
-            {
-                var cultureCode = culture ?? localizationService.GetDefaultLanguageIsoCode(); // fixme kill.kill.kill
-                if (cultureCode != null && content.CultureNames.TryGetValue(cultureCode, out var cultureName))
-                {
-                    return cultureName.UrlName;
-                }
-            }
-
-            //if we get here, the content type is invariant or we don't have access to a usable culture code
-            return content.UrlName;
         }
 
         #endregion
