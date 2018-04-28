@@ -22,6 +22,12 @@ namespace Umbraco.Core.Services.Implement
         // that one is always immediate (transactional)
         public static event TypedEventHandler<TService, ContentTypeChange<TItem>.EventArgs> UowRefreshedEntity;
 
+        // used by tests to clear events
+        internal static void ClearScopeEvents()
+        {
+            UowRefreshedEntity = null;
+        }
+
         // these must be dispatched
         public static event TypedEventHandler<TService, SaveEventArgs<TItem>> Saving;
         public static event TypedEventHandler<TService, SaveEventArgs<TItem>> Saved;

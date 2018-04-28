@@ -20,8 +20,11 @@ namespace Umbraco.Core.Models.PublishedContent
         private readonly Lazy<object> _objectValue;
         private readonly Lazy<object> _xpathValue;
 
+        // RawValueProperty does not (yet?) support variants,
+        // only manages the current "default" value
+
         public override object GetSourceValue(string culture = ".", string segment = ".")
-            => culture == null & segment == null ? _sourceValue : null;
+            => culture == "." & segment == "." ? _sourceValue : null;
 
         public override bool HasValue(string culture = ".", string segment = ".")
         {
@@ -30,10 +33,10 @@ namespace Umbraco.Core.Models.PublishedContent
         }
 
         public override object GetValue(string culture = ".", string segment = ".")
-            => culture == null & segment == null ? _objectValue.Value : null;
+            => culture == "." & segment == "." ? _objectValue.Value : null;
 
         public override object GetXPathValue(string culture = ".", string segment = ".")
-            => culture == null & segment == null ? _xpathValue.Value : null;
+            => culture == "." & segment == "." ? _xpathValue.Value : null;
 
         public RawValueProperty(PublishedPropertyType propertyType, IPublishedElement content, object sourceValue, bool isPreviewing = false)
             : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored

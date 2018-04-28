@@ -565,6 +565,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public static event TypedEventHandler<TRepository, ScopedEntityEventArgs> ScopeEntityRemove;
         public static event TypedEventHandler<TRepository, ScopedVersionEventArgs> ScopeVersionRemove;
 
+        // used by tests to clear events
+        internal static void ClearScopeEvents()
+        {
+            ScopedEntityRefresh = null;
+            ScopeEntityRemove = null;
+            ScopeVersionRemove = null;
+        }
+
         protected void OnUowRefreshedEntity(ScopedEntityEventArgs args)
         {
             ScopedEntityRefresh.RaiseEvent(args, This);

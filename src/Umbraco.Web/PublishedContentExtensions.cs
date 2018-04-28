@@ -1220,9 +1220,11 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetUrlName(this IPublishedContent content, ILocalizationService localizationService, string culture = null)
         {
+            // fixme publishedContent could get ISystemDefaultCultureAccessor injected!
+
             if (content.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
             {
-                var cultureCode = culture ?? localizationService.GetDefaultLanguageIsoCode();
+                var cultureCode = culture ?? localizationService.GetDefaultLanguageIsoCode(); // fixme kill.kill.kill
                 if (cultureCode != null && content.CultureNames.TryGetValue(cultureCode, out var cultureName))
                 {
                     return cultureName.UrlName;

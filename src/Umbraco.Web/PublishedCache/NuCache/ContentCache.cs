@@ -178,9 +178,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var part = parts[i++];
                 content = content.Children.FirstOrDefault(x =>
                 {
+                    // fixme - should use ISystemDefaultCultureAccessor NOT ILocalizationService!
                     var urlName = x.GetUrlName(_localizationService, culture);
                     return urlName == part;
                 });
+
+                // fixme - if content has a wildcard domain, switch culture! or, shall we?
+                // no - do NOT support wildcard domains, it makes no sense
+                // OTOH support '*/en' as a valid domain
             }
             return content;
         }
