@@ -44,7 +44,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// this is the name for the 'current' culture.</para>
         /// </remarks>
         /// FIXME rename UrlSegment + culture aware
-        string UrlName { get; } // fixme rename, segment!
+        string UrlSegment { get; }
 
         /// <summary>
         /// Gets the sort order of the content item.

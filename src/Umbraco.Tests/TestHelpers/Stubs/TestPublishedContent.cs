@@ -32,7 +32,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
             return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;
         }
         public IReadOnlyDictionary<string, PublishedCultureInfos> Cultures { get; set; }
-        public string UrlName { get; set; }
+        public string UrlSegment { get; set; }
         public string DocumentTypeAlias => ContentType.Alias;
         public int DocumentTypeId { get; set; }
         public string WriterName { get; set; }

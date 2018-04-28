@@ -505,7 +505,7 @@ namespace umbraco
                 }
             }
 
-            public string UrlName
+            public string UrlSegment
             {
                 get { throw new NotImplementedException(); }
             }

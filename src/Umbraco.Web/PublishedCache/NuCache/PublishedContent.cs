@@ -191,7 +191,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         /// <inheritdoc />
-        public override string UrlName
+        public override string UrlSegment
         {
             get
             {

@@ -275,7 +275,7 @@ namespace Umbraco.Tests.Published
             public override string Name { get; }
             public override PublishedCultureInfos GetCulture(string culture = ".") => throw new NotSupportedException();
             public override IReadOnlyDictionary<string, PublishedCultureInfos> Cultures => throw new NotSupportedException();
-            public override string UrlName { get; }
+            public override string UrlSegment { get; }
             public override string WriterName { get; }
             public override string CreatorName { get; }
             public override int WriterId { get; }

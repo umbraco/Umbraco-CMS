@@ -142,7 +142,7 @@ namespace Umbraco.Tests.PublishedContent
                     TemplateId = 5,
                     UpdateDate = DateTime.Now,
                     Path = "-1,3",
-                    UrlName = "home-page",
+                    UrlSegment = "home-page",
                     Name = "Page" + Guid.NewGuid().ToString(),
                     Version = Guid.NewGuid(),
                     WriterId = 1,
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.PublishedContent
             public string Name { get; set; }
             public PublishedCultureInfos GetCulture(string culture = ".") => throw new NotSupportedException();
             public IReadOnlyDictionary<string, PublishedCultureInfos> Cultures => throw new NotSupportedException();
-            public string UrlName { get; set; }
+            public string UrlSegment { get; set; }
             public string WriterName { get; set; }
             public string CreatorName { get; set; }
             public int WriterId { get; set; }

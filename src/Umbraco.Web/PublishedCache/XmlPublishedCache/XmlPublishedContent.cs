@@ -217,7 +217,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
         }
 
-        public override string UrlName
+        public override string UrlSegment
         {
             get
             {

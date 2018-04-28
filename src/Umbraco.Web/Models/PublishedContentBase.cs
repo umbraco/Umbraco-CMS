@@ -43,7 +43,7 @@ namespace Umbraco.Web.Models
         public abstract string Name { get; }
 
         /// <inheritdoc />
-        public abstract string UrlName { get; }
+        public abstract string UrlSegment { get; }
 
         /// <inheritdoc />
         public abstract int SortOrder { get; }
