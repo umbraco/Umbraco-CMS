@@ -31,9 +31,8 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </summary>
         /// <remarks>
         /// <para>The value of this property is contextual. When the content type is multi-lingual,
-        /// this is the name for the 'current' culture.</para>
+        /// this is the name for the 'current' culture. Otherwise, it is the invariant name.</para>
         /// </remarks>
-        /// FIXME culture aware - returns the value for the 'current' culture whatever it is + see ?? for others
         string Name { get; }
 
         /// <summary>
@@ -41,9 +40,8 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </summary>
         /// <remarks>
         /// <para>The value of this property is contextual. When the content type is multi-lingual,
-        /// this is the name for the 'current' culture.</para>
+        /// this is the name for the 'current' culture. Otherwise, it is the invariant url segment.</para>
         /// </remarks>
-        /// FIXME rename UrlSegment + culture aware
         string UrlSegment { get; }
 
         /// <summary>
@@ -96,7 +94,8 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </summary>
         /// <remarks>
         /// <para>For published content items, this is also the date the item was published.</para>
-        /// <para>This date is global to the content item, see FIXME for per-culture dates</para>
+        /// <para>This date is always global to the content item, see GetCulture().Date for the
+        /// date each culture was published.</para>
         /// </remarks>
         DateTime UpdateDate { get; }
 
@@ -104,17 +103,35 @@ namespace Umbraco.Core.Models.PublishedContent
         /// Gets the url of the content item.
         /// </summary>
         /// <remarks>
-        /// <para>The value of this property is contextual. It depends on the 'current' </para>
-        /// <para>In addition, when the content type is multi-lingual, this is the url for the
-        /// 'current' culture.</para>
+        /// <para>The value of this property is contextual. It depends on the 'current' request uri,
+        /// if any. In addition, when the content type is multi-lingual, this is the url for the
+        /// 'current' culture. Otherwise, it is the invariant url.</para>
         /// </remarks>
-        /// FIXME explain what 'current' means here
         string Url { get; }
 
-        // fixme document
-        //PublishedCultureInfos Culture(string culture = ".");
-        //string GetName(string culture = "."); // best naming? GetName? CultureName?
+        /// <summary>
+        /// Gets the url of the content item.
+        /// </summary>
+        /// <remarks>
+        /// <para>The value of this property is contextual. It depends on the 'current' request uri,
+        /// if any. In addition, when the content type is multi-lingual, this is the url for the
+        /// specified culture. Otherwise, it is the invariant url.</para>
+        /// </remarks>
+        string GetUrl(string culture = ".");
+
+        /// <summary>
+        /// Gets culture infos for a culture.
+        /// </summary>
         PublishedCultureInfos GetCulture(string culture = ".");
+
+        /// <summary>
+        /// Gets culture infos.
+        /// </summary>
+        /// <remarks>
+        /// <para>Contains only those culture that are available. For a published content, these are
+        /// the cultures that are published. For a draft content, those that are 'available' ie
+        /// have a non-empty content name.</para>
+        /// </remarks>
         IReadOnlyDictionary<string, PublishedCultureInfos> Cultures { get; }
 
         /// <summary>

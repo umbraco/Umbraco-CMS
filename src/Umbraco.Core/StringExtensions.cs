@@ -1166,7 +1166,8 @@ namespace Umbraco.Core
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The safe url segment.</returns>
-        public static string ToUrlSegment(this string text, CultureInfo culture) // fixme obsolete that one, use the string one?
+        // todo: obsolete that one and use the string one (requires changes to IShortStringHelper)
+        public static string ToUrlSegment(this string text, CultureInfo culture)
         {
             return Current.ShortStringHelper.CleanStringForUrlSegment(text, culture);
         }

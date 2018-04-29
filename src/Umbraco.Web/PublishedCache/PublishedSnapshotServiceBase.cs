@@ -7,14 +7,14 @@ namespace Umbraco.Web.PublishedCache
 {
     abstract class PublishedSnapshotServiceBase : IPublishedSnapshotService
     {
-        protected PublishedSnapshotServiceBase(IPublishedSnapshotAccessor publishedSnapshotAccessor, IPublishedVariationContextAccessor variationContextAccessor)
+        protected PublishedSnapshotServiceBase(IPublishedSnapshotAccessor publishedSnapshotAccessor, ICurrentVariationAccessor variationAccessor)
         {
             PublishedSnapshotAccessor = publishedSnapshotAccessor;
-            VariationContextAccessor = variationContextAccessor;
+            VariationAccessor = variationAccessor;
         }
 
         public IPublishedSnapshotAccessor PublishedSnapshotAccessor { get; }
-        public IPublishedVariationContextAccessor VariationContextAccessor { get; }
+        public ICurrentVariationAccessor VariationAccessor { get; }
 
         // note: NOT setting _publishedSnapshotAccessor.PublishedSnapshot here because it is the
         // responsibility of the caller to manage what the 'current' facade is

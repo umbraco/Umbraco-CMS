@@ -29,7 +29,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 factory.GetInstance<CacheHelper>().RequestCache,
                 factory.GetInstance<UrlSegmentProviderCollection>(),
                 factory.GetInstance<IPublishedSnapshotAccessor>(),
-                factory.GetInstance<IPublishedVariationContextAccessor>(),
+                factory.GetInstance<ICurrentVariationAccessor>(),
                 factory.GetInstance<IDocumentRepository>(),
                 factory.GetInstance<IMediaRepository>(),
                 factory.GetInstance<IMemberRepository>(),

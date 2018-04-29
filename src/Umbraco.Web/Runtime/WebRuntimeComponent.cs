@@ -71,9 +71,8 @@ namespace Umbraco.Web.Runtime
             composition.Container.RegisterFrom<InstallerCompositionRoot>();
 
             // register accessors for cultures
-            // fixme merge the two accessors?
             composition.Container.RegisterSingleton<ISystemDefaultCultureAccessor, SystemDefaultCultureAccessor>();
-            composition.Container.RegisterSingleton<IPublishedVariationContextAccessor, ThreadCulturePublishedVariationContextAccessor>();
+            composition.Container.RegisterSingleton<ICurrentVariationAccessor, ThreadCultureCurrentVariationAccessor>();
 
             var typeLoader = composition.Container.GetInstance<TypeLoader>();
             var logger = composition.Container.GetInstance<ILogger>();

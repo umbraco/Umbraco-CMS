@@ -189,6 +189,7 @@ namespace Umbraco.Tests.PublishedContent
         public Guid Version { get; set; }
         public int Level { get; set; }
         public string Url { get; set; }
+        public string GetUrl(string culture = ".") => throw new NotSupportedException();
 
         public PublishedItemType ItemType { get { return PublishedItemType.Content; } }
         public bool IsDraft { get; set; }

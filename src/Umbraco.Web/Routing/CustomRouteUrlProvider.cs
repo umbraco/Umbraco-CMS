@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
 {
@@ -14,25 +14,15 @@ namespace Umbraco.Web.Routing
         /// <summary>
         /// This will simply return the URL that is returned by the assigned IPublishedContent if this is a custom route
         /// </summary>
-        /// <param name="umbracoContext"></param>
-        /// <param name="id"></param>
-        /// <param name="current"></param>
-        /// <param name="mode"></param>
-        /// <returns></returns>
-        public string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string culture = null)
+        public string GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlProviderMode mode, string culture, Uri current)
         {
-            if (umbracoContext == null) return null;
-            if (umbracoContext.PublishedRequest == null) return null;
-            if (umbracoContext.PublishedRequest.PublishedContent == null) return null;
-            if (umbracoContext.HttpContext == null) return null;
-            if (umbracoContext.HttpContext.Request == null) return null;
-            if (umbracoContext.HttpContext.Request.RequestContext == null) return null;
-            if (umbracoContext.HttpContext.Request.RequestContext.RouteData == null) return null;
-            if (umbracoContext.HttpContext.Request.RequestContext.RouteData.DataTokens == null) return null;
-            if (umbracoContext.HttpContext.Request.RequestContext.RouteData.DataTokens.ContainsKey(Umbraco.Core.Constants.Web.CustomRouteDataToken) == false) return null;
+            if (umbracoContext?.PublishedRequest?.PublishedContent == null) return null;
+            if (umbracoContext.HttpContext?.Request?.RequestContext?.RouteData?.DataTokens == null) return null;
+            if (umbracoContext.HttpContext.Request.RequestContext.RouteData.DataTokens.ContainsKey(Core.Constants.Web.CustomRouteDataToken) == false) return null;
+
             //ok so it's a custom route with published content assigned, check if the id being requested for is the same id as the assigned published content
-            return id == umbracoContext.PublishedRequest.PublishedContent.Id
-                ? umbracoContext.PublishedRequest.PublishedContent.Url
+            return content.Id == umbracoContext.PublishedRequest.PublishedContent.Id
+                ? umbracoContext.PublishedRequest.PublishedContent.GetUrl(culture) // fixme ∞ loop.
                 : null;
         }
 

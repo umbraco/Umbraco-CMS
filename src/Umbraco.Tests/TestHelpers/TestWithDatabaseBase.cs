@@ -264,7 +264,7 @@ namespace Umbraco.Tests.TestHelpers
             // testing=true so XmlStore will not use the file nor the database
 
             var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
-            var variationContextAccessor = new TestPublishedVariationContextAccessor();
+            var variationContextAccessor = new TestCurrentVariationAccessor();
             var service = new PublishedSnapshotService(
                 ServiceContext,
                 Container.GetInstance<IPublishedContentTypeFactory>(),

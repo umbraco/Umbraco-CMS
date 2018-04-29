@@ -191,7 +191,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // use context values
             // fixme CultureSegment?
-            var publishedVariationContext = _content.VariationContextAccessor?.Context;
+            var publishedVariationContext = _content.VariationAccessor?.CurrentVariation;
             if (culture == ".") culture = _variations.Has(ContentVariation.CultureNeutral) ? publishedVariationContext?.Culture : null;
             if (segment == ".") segment = _variations.Has(ContentVariation.CultureNeutral) ? publishedVariationContext?.Segment : null;
         }

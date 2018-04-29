@@ -108,8 +108,8 @@ namespace umbraco
         /// </summary>
         /// <param name="content">The content.</param>
         /// <remarks>This is for <see cref="MacroController"/> usage only.</remarks>
-        internal page(IContent content, IPublishedVariationContextAccessor variationContextAccessor)
-            : this(new PagePublishedContent(content, variationContextAccessor))
+        internal page(IContent content, ICurrentVariationAccessor variationAccessor)
+            : this(new PagePublishedContent(content, variationAccessor))
         { }
 
         #endregion
@@ -409,7 +409,7 @@ namespace umbraco
             private readonly IPublishedProperty[] _properties;
             private readonly IPublishedContent _parent;
             private IReadOnlyDictionary<string, PublishedCultureInfos> _cultureInfos;
-            private readonly IPublishedVariationContextAccessor _variationContextAccessor;
+            private readonly ICurrentVariationAccessor _variationAccessor;
 
             private static readonly IReadOnlyDictionary<string, PublishedCultureInfos> NoCultureInfos = new Dictionary<string, PublishedCultureInfos>();
 
@@ -418,13 +418,13 @@ namespace umbraco
                 _id = id;
             }
 
-            public PagePublishedContent(IContent inner, IPublishedVariationContextAccessor variationContextAccessor)
+            public PagePublishedContent(IContent inner, ICurrentVariationAccessor variationAccessor)
             {
                 if (inner == null)
                     throw new NullReferenceException("content");
 
                 _inner = inner;
-                _variationContextAccessor = variationContextAccessor;
+                _variationAccessor = variationAccessor;
                 _id = _inner.Id;
                 _key = _inner.Key;
 
@@ -480,7 +480,7 @@ namespace umbraco
             {
                 // handle context culture
                 if (culture == ".")
-                    culture = _variationContextAccessor.Context.Culture;
+                    culture = _variationAccessor.CurrentVariation.Culture;
 
                 // no invariant culture infos
                 if (culture == null) return null;
@@ -563,6 +563,8 @@ namespace umbraco
             {
                 get { throw new NotImplementedException(); }
             }
+
+            public string GetUrl(string culture = ".") => throw new NotSupportedException();
 
             public PublishedItemType ItemType
             {

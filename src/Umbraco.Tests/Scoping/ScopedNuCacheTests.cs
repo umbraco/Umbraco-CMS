@@ -89,7 +89,7 @@ namespace Umbraco.Tests.Scoping
                 contentTypeFactory,
                 null,
                 publishedSnapshotAccessor,
-                Mock.Of<IPublishedVariationContextAccessor>(),
+                Mock.Of<ICurrentVariationAccessor>(),
                 Logger,
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,

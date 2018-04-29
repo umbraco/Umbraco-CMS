@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 
@@ -19,7 +15,7 @@ namespace Umbraco.Web.Models
     [DebuggerDisplay("Content Id: {Id}, Name: {Name}")]
     public abstract class PublishedContentBase : IPublishedContent
     {
-        private string _url;
+        private string _url; // fixme meaning?
 
         #region ContentType
 
@@ -76,33 +72,30 @@ namespace Umbraco.Web.Models
         public abstract DateTime UpdateDate { get; }
 
         /// <inheritdoc />
+        public virtual string Url => GetUrl();
+
+        /// <inheritdoc />
         /// <remarks>
         /// The url of documents are computed by the document url providers. The url of medias are, at the moment,
         /// computed here from the 'umbracoFile' property -- but we should move to media url providers at some point.
         /// </remarks>
-        public virtual string Url
+        public virtual string GetUrl(string culture = ".") // fixme - consider .GetCulture("fr-FR").Url
         {
-            // fixme contextual!
-            get
-            {
-                // should be thread-safe although it won't prevent url from being resolved more than once
-                if (_url != null)
-                    return _url; // fixme very bad idea with nucache? or?
-
                 switch (ItemType)
                 {
                     case PublishedItemType.Content:
+                        // fixme inject an umbraco context accessor!
                         if (UmbracoContext.Current == null)
-                            throw new InvalidOperationException(
-                                "Cannot resolve a Url for a content item when UmbracoContext.Current is null.");
+                            throw new InvalidOperationException("Cannot compute Url for a content item when UmbracoContext.Current is null.");
                         if (UmbracoContext.Current.UrlProvider == null)
-                            throw new InvalidOperationException(
-                                "Cannot resolve a Url for a content item when UmbracoContext.Current.UrlProvider is null.");
-                        _url = UmbracoContext.Current.UrlProvider.GetUrl(Id);
-                        break;
+                            throw new InvalidOperationException("Cannot compute Url for a content item when UmbracoContext.Current.UrlProvider is null.");
+                        return UmbracoContext.Current.UrlProvider.GetUrl(this);
+
                     case PublishedItemType.Media:
+                        if (_url != null) return _url; // assume it will not depend on current uri/culture
+
                         var prop = GetProperty(Constants.Conventions.Media.File);
-                        if (prop == null || prop.GetValue() == null)
+                        if (prop?.GetValue() == null)
                         {
                             _url = string.Empty;
                             return _url;
@@ -110,7 +103,7 @@ namespace Umbraco.Web.Models
 
                         var propType = ContentType.GetPropertyType(Constants.Conventions.Media.File);
 
-                        // fixme this is horrible we need url providers for media too
+                        // fixme this is horrible we need url providers for media too + this does NOT support variations
                         //This is a hack - since we now have 2 properties that support a URL: upload and cropper, we need to detect this since we always
                         // want to return the normal URL and the cropper stores data as json
                         switch (propType.EditorAlias)
@@ -130,13 +123,12 @@ namespace Umbraco.Web.Models
                                 _url = prop.GetValue()?.ToString();
                                 break;
                         }
-                        break;
+
+                        return _url;
+
                     default:
                         throw new NotSupportedException();
                 }
-
-                return _url;
-            }
         }
   
         /// <inheritdoc />
@@ -174,7 +166,7 @@ namespace Umbraco.Web.Models
         /// <inheritdoc cref="IPublishedContent.GetProperty(string, bool)"/>
         public virtual IPublishedProperty GetProperty(string alias, bool recurse)
         {
-            // fixme - but can this work with variants?
+            // fixme - but can recurse work with variants?
 
             var property = GetProperty(alias);
             if (recurse == false) return property;

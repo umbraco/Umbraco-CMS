@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedCultureInfos"/> class.
         /// </summary>
-        public PublishedCultureInfos(string culture, string name, bool published, DateTime publishedDate)
+        public PublishedCultureInfos(string culture, string name, bool published, DateTime date)
         {
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentNullOrEmptyException(nameof(culture));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Models.PublishedContent
             Name = name;
             UrlSegment = name.ToUrlSegment(culture);
             Published = published;
-            PublishedDate = publishedDate;
+            Date = date;
         }
 
         /// <summary>
@@ -48,8 +48,13 @@ namespace Umbraco.Core.Models.PublishedContent
         public bool Published { get; }
 
         /// <summary>
-        /// Gets the date when fixme?
+        /// Gets the date associated with the culture.
         /// </summary>
-        public DateTime PublishedDate { get; } // fixme - model? model.UpdateDate - here?
+        /// <remarks>
+        /// <para>For published culture, this is the date the culture was published. For draft
+        /// cultures, this is the date the culture was made available, ie the last time its
+        /// name changed.</para>
+        /// </remarks>
+        public DateTime Date { get; }
     }
 }

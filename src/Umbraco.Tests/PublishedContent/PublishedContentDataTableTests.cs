@@ -134,9 +134,6 @@ namespace Umbraco.Tests.PublishedContent
                     CreateDate = DateTime.Now,
                     CreatorId = 1,
                     CreatorName = "Shannon",
-                    // fixme what're we gonna do?
-                    //DocumentTypeAlias = contentTypeAlias,
-                    //DocumentTypeId = 2,
                     Id = 3,
                     SortOrder = 4,
                     TemplateId = 5,
@@ -187,6 +184,8 @@ namespace Umbraco.Tests.PublishedContent
         private class TestPublishedContent : IPublishedContent
         {
             public string Url { get; set; }
+            public string GetUrl(string culture = ".") => throw new NotSupportedException();
+
             public PublishedItemType ItemType { get; set; }
 
             IPublishedContent IPublishedContent.Parent

@@ -369,11 +369,11 @@
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
     <Compile Include="Models\PublishedContent\PublishedCultureInfos.cs" />
-    <Compile Include="Models\PublishedContent\IPublishedVariationContextAccessor.cs" />
+    <Compile Include="Models\PublishedContent\ICurrentVariationAccessor.cs" />
     <Compile Include="Models\PublishedContent\IPublishedValueFallback.cs" />
-    <Compile Include="Models\PublishedContent\PublishedVariationContext.cs" />
-    <Compile Include="Models\PublishedContent\ThreadCulturePublishedVariationContextAccessor.cs" />
-    <Compile Include="Models\PublishedContent\ThreadStaticPublishedVariationContextAccessor.cs" />
+    <Compile Include="Models\PublishedContent\CurrentVariation.cs" />
+    <Compile Include="Models\PublishedContent\ThreadCultureCurrentVariationAccessor.cs" />
+    <Compile Include="Models\PublishedContent\ThreadStaticCurrentVariationAccessor.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
     <Compile Include="Persistence\Dtos\ContentVersionCultureVariationDto.cs" />

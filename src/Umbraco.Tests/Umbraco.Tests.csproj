@@ -129,7 +129,8 @@
     <Compile Include="Models\PathValidationTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
-    <Compile Include="PublishedContent\PublishedContentOtherTests.cs" />
+    <Compile Include="PublishedContent\NuCacheTests.cs" />
+    <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
     <Compile Include="Published\NestedContentTests.cs" />
@@ -180,7 +181,7 @@
     <Compile Include="Testing\Objects\Accessors\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
     <Compile Include="TestHelpers\Stubs\TestPublishedContent.cs" />
-    <Compile Include="Testing\Objects\Accessors\TestPublishedVariationContextAccessor.cs" />
+    <Compile Include="Testing\Objects\Accessors\TestCurrentVariationAccessor.cs" />
     <Compile Include="Testing\ContentBaseExtensions.cs" />
     <Compile Include="Testing\Objects\Accessors\TestSystemDefaultCultureAccessor.cs" />
     <Compile Include="Testing\TestDatabase.cs" />

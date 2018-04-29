@@ -14,7 +14,7 @@ namespace Umbraco.Core.Strings
         /// </summary>
         /// <param name="content">The content.</param>
         /// <returns>The url segment.</returns>
-        string GetUrlSegment(IContentBase content);
+        string GetUrlSegment(IContentBase content); // fixme do we need to have both?
 
         /// <summary>
         /// Gets the url segment for a specified content and culture.

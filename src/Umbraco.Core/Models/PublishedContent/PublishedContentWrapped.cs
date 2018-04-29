@@ -97,6 +97,9 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual string Url => _content.Url;
 
         /// <inheritdoc />
+        public virtual string GetUrl(string culture = ".") => _content.GetUrl(culture);
+
+        /// <inheritdoc />
         public PublishedCultureInfos GetCulture(string culture = ".") => _content.GetCulture(culture);
 
         /// <inheritdoc />

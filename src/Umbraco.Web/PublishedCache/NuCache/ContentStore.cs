@@ -19,7 +19,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // SnapDictionary has unit tests to ensure it all works correctly
 
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
-        private readonly IPublishedVariationContextAccessor _variationContextAccessor;
+        private readonly ICurrentVariationAccessor _variationAccessor;
         private readonly ConcurrentDictionary<int, LinkedNode<ContentNode>> _contentNodes;
         private readonly ConcurrentDictionary<int, LinkedNode<object>> _contentRootNodes;
         private readonly ConcurrentDictionary<int, LinkedNode<PublishedContentType>> _contentTypesById;
@@ -44,10 +44,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Ctor
 
-        public ContentStore(IPublishedSnapshotAccessor publishedSnapshotAccessor, IPublishedVariationContextAccessor variationContextAccessor, ILogger logger, BPlusTree<int, ContentNodeKit> localDb = null)
+        public ContentStore(IPublishedSnapshotAccessor publishedSnapshotAccessor, ICurrentVariationAccessor variationAccessor, ILogger logger, BPlusTree<int, ContentNodeKit> localDb = null)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
-            _variationContextAccessor = variationContextAccessor;
+            _variationAccessor = variationAccessor;
             _logger = logger;
             _localDb = localDb;
 
@@ -279,7 +279,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (node == null) continue;
                     var contentTypeId = node.ContentType.Id;
                     if (index.TryGetValue(contentTypeId, out PublishedContentType contentType) == false) continue;
-                    SetValueLocked(_contentNodes, node.Id, new ContentNode(node, contentType, _publishedSnapshotAccessor, _variationContextAccessor));
+                    SetValueLocked(_contentNodes, node.Id, new ContentNode(node, contentType, _publishedSnapshotAccessor, _variationAccessor));
                 }
             }
             finally
@@ -393,7 +393,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         _contentNodes.TryGetValue(id, out LinkedNode<ContentNode> link);
                         if (link?.Value == null)
                             continue;
-                        var node = new ContentNode(link.Value, contentType, _publishedSnapshotAccessor, _variationContextAccessor);
+                        var node = new ContentNode(link.Value, contentType, _publishedSnapshotAccessor, _variationAccessor);
                         SetValueLocked(_contentNodes, id, node);
                         if (_localDb != null) RegisterChange(id, node.ToKit());
                     }
@@ -416,7 +416,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return false;
 
             // and use
-            kit.Build(link.Value, _publishedSnapshotAccessor, _variationContextAccessor);
+            kit.Build(link.Value, _publishedSnapshotAccessor, _variationAccessor);
 
             return true;
         }

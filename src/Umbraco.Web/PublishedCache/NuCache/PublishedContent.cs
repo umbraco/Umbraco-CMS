@@ -22,12 +22,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Constructors
 
-        public PublishedContent(ContentNode contentNode, ContentData contentData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IPublishedVariationContextAccessor variationContextAccessor)
+        public PublishedContent(ContentNode contentNode, ContentData contentData, IPublishedSnapshotAccessor publishedSnapshotAccessor, ICurrentVariationAccessor variationAccessor)
         {
             _contentNode = contentNode;
             _contentData = contentData;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
-            VariationContextAccessor = variationContextAccessor; // fixme why is this a property? should be be on the base class?
+            VariationAccessor = variationAccessor; // fixme why is this a property? should be be on the base class?
 
             _urlSegment = _contentData.Name.ToUrlSegment();
             IsPreviewing = _contentData.Published == false;
@@ -70,7 +70,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             _contentNode = contentNode;
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
-            VariationContextAccessor = origin.VariationContextAccessor;
+            VariationAccessor = origin.VariationAccessor;
             _contentData = origin._contentData;
 
             _urlSegment = origin._urlSegment;
@@ -86,7 +86,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private PublishedContent(PublishedContent origin)
         {
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
-            VariationContextAccessor = origin.VariationContextAccessor;
+            VariationAccessor = origin.VariationAccessor;
             _contentNode = origin._contentNode;
             _contentData = origin._contentData;
 
@@ -181,7 +181,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (!ContentType.Variations.Has(ContentVariation.CultureNeutral)) // fixme CultureSegment?
                     return _contentData.Name;
 
-                var culture = VariationContextAccessor.Context.Culture;
+                var culture = VariationAccessor.CurrentVariation.Culture;
                 if (culture == null)
                     return _contentData.Name;
 
@@ -197,7 +197,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (!ContentType.Variations.Has(ContentVariation.CultureNeutral)) // fixme CultureSegment?
                     return _urlSegment;
 
-                var culture = VariationContextAccessor.Context.Culture;
+                var culture = VariationAccessor.CurrentVariation.Culture;
                 if (culture == null)
                     return _urlSegment;
 
@@ -244,7 +244,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             // handle context culture
             if (culture == ".")
-                culture = VariationContextAccessor.Context.Culture;
+                culture = VariationAccessor.CurrentVariation.Culture;
 
             // no invariant culture infos
             if (culture == null) return null;
@@ -397,7 +397,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Internal
 
-        internal IPublishedVariationContextAccessor VariationContextAccessor { get; }
+        internal ICurrentVariationAccessor VariationAccessor { get; }
 
         // used by navigable content
         internal IPublishedProperty[] PropertiesArray { get; }
