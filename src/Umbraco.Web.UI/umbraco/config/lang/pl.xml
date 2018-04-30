@@ -497,8 +497,6 @@
     <key alias="stylesNoStylesOnPage">Brak dostępnych aktywnych stylów</key>
     <key alias="tableColMergeLeft">Proszę ustaw kursor po lewej stronie dwóch komórek, które chcesz połączyć</key>
     <key alias="tableSplitNotSplittable">Nie możesz podzielić komórki, która nie była wcześniej połączona.</key>
-    <key alias="xsltErrorHeader">Błąd w źródle XSLT</key>
-    <key alias="xsltErrorText">Plik XSLT nie został zapisany, ponieważ wystąpiły błędy</key>
     <key alias="missingPropertyEditorErrorMessage">Wystąpił błąd konfiguracji związany z typem danych użytych we właściwościach, proszę sprawdź typ danych</key>
   </area>
   <area alias="general">
@@ -1140,11 +1138,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="templateErrorText">Proszę się upewnić że nie ma dwóch szablonów o tym samym aliasie</key>
     <key alias="templateSavedHeader">Szablon został zapisany</key>
     <key alias="templateSavedText">Szablon został zapisany bez żadnych błędów!</key>
-    <key alias="xsltErrorHeader">Nie zapisano XSLT</key>
-    <key alias="xsltErrorText">XSLT zawiera błędy</key>
-    <key alias="xsltPermissionErrorText">Nie można zapisać XSLT, sprawdź uprawnienia dostępu do pliku</key>
-    <key alias="xsltSavedHeader">Zapisano XSLT</key>
-    <key alias="xsltSavedText">XSLT nie zawiera błedów</key>
     <key alias="contentUnpublished">Cofnięto publikację treści</key>
     <key alias="partialViewSavedHeader">Częściowy Widok został zapisany</key>
     <key alias="partialViewSavedText">Częściowy Widok został zapisany bez błędów!</key>
@@ -1500,7 +1493,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="scripts">Skrypty</key>
     <key alias="stylesheets">Arkusze stylów</key>
     <key alias="templates">Szablony</key>
-    <key alias="xslt">Pliki XSLT</key>
     <key alias="analytics">Analizy</key>
 	<key alias="partialViews">Częściowe Widoki</key>
     <key alias="partialViewMacros">Pliki Makro Częściowych Widoków</key>

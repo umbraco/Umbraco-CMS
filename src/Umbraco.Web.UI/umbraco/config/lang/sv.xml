@@ -326,8 +326,6 @@
     <key alias="stylesNoStylesOnPage">Det finns inga tillgängliga stilar</key>
     <key alias="tableColMergeLeft">Placera markören i den vänstra av de två celler du vill slå ihop</key>
     <key alias="tableSplitNotSplittable">Du kan inte dela en cell som inte är ihopslagen.</key>
-    <key alias="xsltErrorHeader">Fel i XSLT-scriptet</key>
-    <key alias="xsltErrorText">XSLT-scriptet har inte sparats eftersom det innehåller ett eller flera fel</key>
   </area>
   <area alias="general">
     <key alias="about">Om</key>
@@ -756,11 +754,6 @@
     <key alias="templateErrorText">Kontrollera att du inte har två sidmallar med samma alias</key>
     <key alias="templateSavedHeader">Sidmallen har sparats</key>
     <key alias="templateSavedText">Sidmallen sparades utan fel</key>
-    <key alias="xsltErrorHeader">XSLT-scriptet sparades inte</key>
-    <key alias="xsltErrorText">XSLT-scriptet innehöll ett fel</key>
-    <key alias="xsltPermissionErrorText">XSLT-scripet kunde inte sparas, kontrollera filrättigheterna</key>
-    <key alias="xsltSavedHeader">XSLT-scriptet har sparats</key>
-    <key alias="xsltSavedText">Inga fel i XSLT-scriptet</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Använder CSS-syntax, t ex: h1, .redHeader, .blueTex</key>
@@ -905,7 +898,6 @@
     <key alias="scripts">Skript</key>
     <key alias="stylesheets">Stilmallar</key>
     <key alias="templates">Sidmallar</key>
-    <key alias="xslt">XSLT-filer</key>
     <key alias="userPermissions">Användarrättigheter</key>
     <key alias="userTypes">Användartyper</key>
     <key alias="users">Användare</key>

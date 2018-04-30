@@ -96,9 +96,7 @@ namespace Umbraco.Core.Models
         private bool _cacheByMember;
         private bool _dontRender;
         private string _scriptFile;
-        private string _scriptAssembly;
         private string _scriptPath;
-        private string _xslt;
         private MacroPropertyCollection _properties;
         private List<string> _addedProperties;
         private List<string> _removedProperties;

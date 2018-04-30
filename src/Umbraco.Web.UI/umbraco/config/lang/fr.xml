@@ -398,8 +398,6 @@
     <key alias="stylesNoStylesOnPage">Aucun style actif disponible</key>
     <key alias="tableColMergeLeft">Veuillez placer le curseur à gauche des deux cellules que vous voulez fusionner</key>
     <key alias="tableSplitNotSplittable">Vous ne pouvez pas scinder une cellule qui n'a pas été fusionnée.</key>
-    <key alias="xsltErrorHeader">Erreur dans le code source XSLT</key>
-    <key alias="xsltErrorText">Le XSLT n'a pas été sauvegardé car il contient des erreurs</key>
     <key alias="missingPropertyEditorErrorMessage">Il y a une erreur de configuration du type de données utilisé pour cette propriété, veuillez vérifier le type de données.</key>
   </area>
   <area alias="general">
@@ -988,11 +986,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="templateErrorText">Assurez-vous de ne pas avoir 2 modèles avec le même alias.</key>
     <key alias="templateSavedHeader">Modèle sauvegardé</key>
     <key alias="templateSavedText">Modèle sauvegardé sans aucune erreurs !</key>
-    <key alias="xsltErrorHeader">Le XSLT n'a pas été sauvegardé</key>
-    <key alias="xsltErrorText">Le XSLT contenait une erreur</key>
-    <key alias="xsltPermissionErrorText">Le XSLT n'a pas pu être sauvegardé, vérifiez les permissions de fichier</key>
-    <key alias="xsltSavedHeader">Le XSLT a été sauvegardé</key>
-    <key alias="xsltSavedText">Aucune erreur dans le XSLT</key>
     <key alias="contentUnpublished">Contenu publié</key>
     <key alias="partialViewSavedHeader">Vue partielle sauvegardée</key>
     <key alias="partialViewSavedText">Vue partielle sauvegardée sans erreurs !</key>
@@ -1249,7 +1242,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="scripts">Scripts</key>
     <key alias="stylesheets">Feuilles de style</key>
     <key alias="templates">Modèles</key>
-    <key alias="xslt">Fichiers XSLT</key>
     <key alias="userPermissions">Permissions utilisateur</key>
     <key alias="userTypes">Types d'utilisateurs</key>
     <key alias="users">Utilisateurs</key>

@@ -523,8 +523,6 @@
     <key alias="stylesNoStylesOnPage">Не определен ни один доступный стиль</key>
     <key alias="tableColMergeLeft">Поместите курсор в левую из двух ячеек, которые хотите объединить</key>
     <key alias="tableSplitNotSplittable">Нельзя разделить ячейку, которая не была до этого объединена</key>
-    <key alias="xsltErrorHeader">Ошибка в XSLT-документе</key>
-    <key alias="xsltErrorText">XSLT-документ не был сохранен, так как он содержит одну или несколько ошибок</key>
   </area>
   <area alias="general">
     <key alias="about">О системе</key>
@@ -1387,11 +1385,6 @@
     <key alias="templateSavedText">Шаблон сохранен без ошибок</key>
     <key alias="validationFailedHeader">Проверка значений</key>
     <key alias="validationFailedMessage">Ошибки, найденные при проверке значений, должны быть исправлены, чтобы было возможно сохранить документ</key>
-    <key alias="xsltErrorHeader">XSLT-документ не сохранен</key>
-    <key alias="xsltErrorText">XSLT-документ содержит одну или несколько ошибок</key>
-    <key alias="xsltPermissionErrorText">XSLT-документ не может быть сохранен, проверьте установки файловых разрешений</key>
-    <key alias="xsltSavedHeader">XSLT-документ сохранен</key>
-    <key alias="xsltSavedText">Ошибок в XSLT-документе нет</key>
     <key alias="deleteUserGroupsSuccess">Удалено %0% групп пользователей</key>
     <key alias="deleteUserGroupSuccess">'%0%' была удалена</key>
     <key alias="enableUsersSuccess">Активировано %0% пользователей</key>
@@ -1647,7 +1640,6 @@
     <key alias="stylesheets">Стили CSS</key>
     <key alias="templates">Шаблоны</key>
     <key alias="users">Пользователи</key>
-    <key alias="xslt">Файлы XSLT</key>
   </area>
   <area alias="update">
     <key alias="updateAvailable">Доступны обновления</key>

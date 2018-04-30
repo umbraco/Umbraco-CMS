@@ -380,8 +380,6 @@
     <key alias="stylesNoStylesOnPage">有効なスタイルがありません</key>
     <key alias="tableColMergeLeft">結合したい2つのセルの左側にカーソルを置いてください</key>
     <key alias="tableSplitNotSplittable">このセルは結合されたものではないので分離する事はできません。</key>
-    <key alias="xsltErrorHeader">XSLTソースにエラーがあります</key>
-    <key alias="xsltErrorText">1つ以上のエラーがあるのでこのXSLTは保存できませんでした</key>
     <key alias="missingPropertyEditorErrorMessage">このプロパティに使用されているデータタイプにエラーがあります</key>
   </area>
   <area alias="general">
@@ -939,11 +937,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="templateErrorText">2つのテンプレートで同じエイリアスを使用していないか確認してください</key>
     <key alias="templateSavedHeader">テンプレートを保存しました</key>
     <key alias="templateSavedText">エラーなくテンプレートを保存しました！</key>
-    <key alias="xsltErrorHeader">XSLTは未保存です</key>
-    <key alias="xsltErrorText">XSLTにエラーがあります</key>
-    <key alias="xsltPermissionErrorText">XSLTを保存できません。アクセス権を確認してください。</key>
-    <key alias="xsltSavedHeader">XSLTを保存しました</key>
-    <key alias="xsltSavedText">XSLTにエラーはありません</key>
     <key alias="contentUnpublished">コンテンツは公開されていません</key>
     <key alias="partialViewSavedHeader">部分ビュー保存しました</key>
     <key alias="partialViewSavedText">部分ビューをエラーなしで保存しました!</key>
@@ -1188,7 +1181,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="scripts">スクリプト</key>
     <key alias="stylesheets">スタイルシート</key>
     <key alias="templates">テンプレート</key>
-    <key alias="xslt">XSLT ファイル</key>
     <key alias="analytics">アナリティクス</key>
     <key alias="userPermissions">ユーザーの権限</key>
     <key alias="userTypes">ユーザータイプ</key>

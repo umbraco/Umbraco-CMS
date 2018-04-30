@@ -56,7 +56,6 @@ namespace Umbraco.Tests.TestHelpers
             var security = new Mock<ISecuritySection>();
             var requestHandler = new Mock<IRequestHandlerSection>();
             var templates = new Mock<ITemplatesSection>();
-            var dev = new Mock<IDeveloperSection>();
             var logging = new Mock<ILoggingSection>();
             var tasks = new Mock<IScheduledTasksSection>();
             var distCall = new Mock<IDistributedCallSection>();
@@ -67,7 +66,6 @@ namespace Umbraco.Tests.TestHelpers
             settings.Setup(x => x.Security).Returns(security.Object);
             settings.Setup(x => x.RequestHandler).Returns(requestHandler.Object);
             settings.Setup(x => x.Templates).Returns(templates.Object);
-            settings.Setup(x => x.Developer).Returns(dev.Object);
             settings.Setup(x => x.Logging).Returns(logging.Object);
             settings.Setup(x => x.ScheduledTasks).Returns(tasks.Object);
             settings.Setup(x => x.DistributedCall).Returns(distCall.Object);

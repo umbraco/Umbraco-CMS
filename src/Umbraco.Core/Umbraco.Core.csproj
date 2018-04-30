@@ -250,7 +250,6 @@
     <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentScriptEditorElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentSectionExtensions.cs" />
-    <Compile Include="Configuration\UmbracoSettings\DeveloperElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\DisabledLogTypesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\DistributedCallElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ExternalLoggerElement.cs" />
@@ -259,7 +258,6 @@
     <Compile Include="Configuration\UmbracoSettings\IChar.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentErrorPage.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IDeveloperSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IDistributedCallSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IFileExtension.cs" />
     <Compile Include="Configuration\UmbracoSettings\IImagingAutoFillUploadField.cs" />

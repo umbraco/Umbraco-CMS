@@ -228,20 +228,6 @@
     <Compile Include="Umbraco\Masterpages\UmbracoPage.master.designer.cs">
       <DependentUpon>umbracoPage.Master</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx.cs">
-      <DependentUpon>editstylesheet.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx.designer.cs">
-      <DependentUpon>editstylesheet.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx.cs">
-      <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx.designer.cs">
-      <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\TreeInit.aspx.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -411,7 +397,6 @@
     <Content Include="Umbraco\Dialogs\Preview.aspx" />
     <Content Include="Umbraco\Controls\ProgressBar.ascx" />
     <Content Include="Umbraco\Controls\Tree\TreeControl.ascx" />
-    <Content Include="Umbraco_Client\CodeArea\UmbracoEditor.js" />
     <Content Include="default.aspx" />
     <Content Include="Umbraco\Config\Lang\da.xml" />
     <Content Include="Umbraco\Config\Lang\de.xml" />
@@ -425,7 +410,6 @@
     <Content Include="Umbraco_Client\Tablesorting\Img\bg.gif" />
     <Content Include="Umbraco\Dialogs\empty.htm" />
     <Content Include="Umbraco\Dialogs\republish.aspx" />
-    <Content Include="Umbraco\Dialogs\search.aspx" />
     <Content Include="Umbraco\Dialogs\SendPublish.aspx" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery-fieldselection.js" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.metadata.min.js" />
@@ -552,9 +536,6 @@
       <SubType>Form</SubType>
     </Content>
     <Content Include="Umbraco\Settings\EditDictionaryItem.aspx" />
-    <Content Include="Umbraco\Settings\Modals\ShowUmbracoTags.aspx" />
-    <Content Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx" />
-    <Content Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx" />
     <Content Include="Umbraco\Dialogs\sort.aspx" />
     <Content Include="Umbraco\treeInit.aspx" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
@@ -565,8 +546,6 @@
     <Content Include="Umbraco\Webservices\codeEditorSave.asmx" />
     <Content Include="Umbraco\Webservices\legacyAjaxCalls.asmx" />
     <Content Include="Umbraco\Webservices\nodeSorter.asmx" />
-    <Content Include="Umbraco_Client\CodeArea\javascript.js" />
-    <Content Include="Umbraco_Client\CodeArea\styles.css" />
     <Content Include="Umbraco_Client\Menuicon\Images\buttonbg.gif" />
     <Content Include="Umbraco_Client\Menuicon\Images\buttonbgdown.gif" />
     <Content Include="Umbraco_Client\Menuicon\Images\split.gif" />

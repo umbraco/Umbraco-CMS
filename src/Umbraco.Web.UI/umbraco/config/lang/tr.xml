@@ -324,8 +324,6 @@
     <key alias="stylesNoStylesOnPage">Henüz aktif stilleri</key>
     <key alias="tableColMergeLeft">Birleştirmek istediğiniz iki hücre solundaki imleci Lütfen</key>
     <key alias="tableSplitNotSplittable">Sen birleştirilmiş henüz bir hücreyi bölemezsiniz.</key>
-    <key alias="xsltErrorHeader">XSLT kaynak hatae</key>
-    <key alias="xsltErrorText">O hatayı içerdiği XSLT, kaydedilmemiş (ler))</key>
     <key alias="missingPropertyEditorErrorMessage">Bu özellik için kullanılan veri türüne sahip bir yapılandırma hatası var, veri türünü kontrol edin</key>
   </area>
   <area alias="general">
@@ -892,11 +890,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="templateErrorText">Aynı isim ile 2 template bulunmadığından emin olun</key>
     <key alias="templateSavedHeader">Template kaydedildi</key>
     <key alias="templateSavedText">Template sorunsuz kaydedildi!</key>
-    <key alias="xsltErrorHeader">XSLT kaydedilmedi</key>
-    <key alias="xsltErrorText">XSLT hata içeriyor</key>
-    <key alias="xsltPermissionErrorText">XSLT kaydedilemedi, dosya izinlerini kontrol edin</key>
-    <key alias="xsltSavedHeader">XSLT kaydedildi</key>
-    <key alias="xsltSavedText">XSLT'de hata içermiyor</key>
     <key alias="contentUnpublished">İçerik yayından kaldırıldı</key>
     <key alias="partialViewSavedHeader">Partial view kaydedildi</key>
     <key alias="partialViewSavedText">Partial view sorunsuz kaydedildi!</key>
@@ -1079,7 +1072,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="scripts">Scriptler</key>
     <key alias="stylesheets">Stil dosyaları</key>
     <key alias="templates">Şablonlar</key>
-    <key alias="xslt">XSLT Dosyaları</key>
     <key alias="analytics">Analitikler</key>
   </area>
   <area alias="update">

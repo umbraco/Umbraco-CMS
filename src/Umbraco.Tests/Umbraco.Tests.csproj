@@ -282,8 +282,6 @@
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ContentElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ContentElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\DeveloperElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\DeveloperElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\DistributedCallElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\DistributedCallElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementDefaultTests.cs" />

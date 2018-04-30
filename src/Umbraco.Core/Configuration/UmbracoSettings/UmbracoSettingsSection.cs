@@ -37,14 +37,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return (TemplatesElement)this["templates"]; }
         }
-
-        [ConfigurationProperty("developer")]
-        internal DeveloperElement Developer
-        {
-            get { return (DeveloperElement)this["developer"]; }
-        }
-
-
+        
         [ConfigurationProperty("logging")]
         internal LoggingElement Logging
         {
@@ -99,11 +92,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IBackOfficeSection IUmbracoSettingsSection.BackOffice
         {
             get { return BackOffice; }
-        }
-
-        IDeveloperSection IUmbracoSettingsSection.Developer
-        {
-            get { return Developer; }
         }
 
         ILoggingSection IUmbracoSettingsSection.Logging
