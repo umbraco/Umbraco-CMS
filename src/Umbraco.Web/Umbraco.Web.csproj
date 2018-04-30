@@ -799,9 +799,6 @@
     <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\Language.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackager.cs" />
     <Compile Include="UmbracoComponentRenderer.cs" />
     <Compile Include="Web References\org.umbraco.our\Reference.cs">
@@ -1230,16 +1227,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\ContentPicker.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControl.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\dualSelectBox.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx.cs">
-      <DependentUpon>ProgressBar.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx.designer.cs">
-      <DependentUpon>ProgressBar.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\SaveClickEventArgs.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeControl.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1255,8 +1243,6 @@
     <Compile Include="umbraco.presentation\umbraco\create\dictionaryTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\macroTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\MemberGroupTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\stylesheetPropertyTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\StylesheetTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx.cs">
       <DependentUpon>FeedProxy.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1318,9 +1304,6 @@
       <DependentUpon>SendPublish.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\dialogHandler_temp.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\languageTasks.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.cs">
@@ -1523,9 +1506,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\Preview.aspx" />
-    <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\empty.htm" />
     <Content Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx">
       <SubType>ASPXCodeBehind</SubType>

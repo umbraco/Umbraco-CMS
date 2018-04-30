@@ -395,7 +395,6 @@
     <Content Include="Umbraco_Client\Ui\knockout.mapping.js" />
     <Content Include="Umbraco\endPreview.aspx" />
     <Content Include="Umbraco\Dialogs\Preview.aspx" />
-    <Content Include="Umbraco\Controls\ProgressBar.ascx" />
     <Content Include="Umbraco\Controls\Tree\TreeControl.ascx" />
     <Content Include="default.aspx" />
     <Content Include="Umbraco\Config\Lang\da.xml" />
