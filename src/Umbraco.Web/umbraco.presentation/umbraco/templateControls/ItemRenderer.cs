@@ -56,12 +56,10 @@ namespace umbraco.presentation.templateControls
 
                 // parse macros and execute the XSLT transformation on the result if not empty
                 string renderOutput = renderOutputWriter.ToString();
-                string xsltTransformedOutput = renderOutput.Trim().Length == 0
-                                               ? String.Empty
-                                               : XsltTransform(item.Xslt, renderOutput, item.XsltDisableEscaping);
+                renderOutput = renderOutput.Trim().Length == 0 ? string.Empty : renderOutput;
                 // handle text before/after
-                xsltTransformedOutput = AddBeforeAfterText(xsltTransformedOutput, helper.FindAttribute(item.LegacyAttributes, "insertTextBefore"), helper.FindAttribute(item.LegacyAttributes, "insertTextAfter"));
-                string finalResult = xsltTransformedOutput.Trim().Length > 0 ? xsltTransformedOutput : GetEmptyText(item);
+                renderOutput = AddBeforeAfterText(renderOutput, helper.FindAttribute(item.LegacyAttributes, "insertTextBefore"), helper.FindAttribute(item.LegacyAttributes, "insertTextAfter"));
+                string finalResult = renderOutput.Trim().Length > 0 ? renderOutput : GetEmptyText(item);
 
                 //Don't parse urls if a content item is assigned since that is taken care
                 // of with the value converters
@@ -190,48 +188,6 @@ namespace umbraco.presentation.templateControls
                 }
             }
 
-        }
-
-        /// <summary>
-        /// Transforms the content using the XSLT attribute, if provided.
-        /// </summary>
-        /// <param name="xpath">The xpath expression.</param>
-        /// <param name="itemData">The item's rendered content.</param>
-        /// <param name="disableEscaping">if set to <c>true</c>, escaping is disabled.</param>
-        /// <returns>The transformed content if the XSLT attribute is present, otherwise the original content.</returns>
-        protected virtual string XsltTransform(string xpath, string itemData, bool disableEscaping)
-        {
-            if (!String.IsNullOrEmpty(xpath))
-            {
-                // XML-encode the expression and add the itemData parameter to it
-                string xpathEscaped = xpath.Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
-                string xpathExpression = string.Format(xpathEscaped, "$itemData");
-
-                // prepare support for XSLT extensions
-                StringBuilder namespaceList = new StringBuilder();
-                StringBuilder namespaceDeclaractions = new StringBuilder();
-                foreach (KeyValuePair<string, object> extension in Umbraco.Web.Macros.XsltMacroEngine.GetXsltExtensions())
-                {
-                    namespaceList.Append(extension.Key).Append(' ');
-                    namespaceDeclaractions.AppendFormat("xmlns:{0}=\"urn:{0}\" ", extension.Key);
-                }
-
-                // add the XSLT expression into the full XSLT document, together with the needed parameters
-                string xslt = string.Format(Umbraco.Web.umbraco.presentation.umbraco.templateControls.Resources.InlineXslt, xpathExpression, disableEscaping ? "yes" : "no",
-                                                                  namespaceList, namespaceDeclaractions);
-
-                // create the parameter
-                Dictionary<string, object> parameters = new Dictionary<string, object>(1);
-                parameters.Add("itemData", itemData);
-
-                // apply the XSLT transformation
-                using (var xslReader = new XmlTextReader(new StringReader(xslt)))
-                {
-                    var transform = Umbraco.Web.Macros.XsltMacroEngine.GetXsltTransform(xslReader, false);
-                    return Umbraco.Web.Macros.XsltMacroEngine.ExecuteItemRenderer(Current.ProfilingLogger, transform, itemData);
-                }
-            }
-            return itemData;
         }
 
         protected string AddBeforeAfterText(string text, string before, string after)

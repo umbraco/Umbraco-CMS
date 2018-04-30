@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public IMacro BuildEntity(MacroDto dto)
         {
-            var model = new Macro(dto.Id, dto.UniqueId, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.ScriptType, dto.ScriptAssembly, dto.Xslt, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.MacroFilePath);
+            var model = new Macro(dto.Id, dto.UniqueId, dto.UseInEditor, dto.RefreshRate, dto.Alias, dto.Name, dto.ScriptType, dto.CacheByPage, dto.CachePersonalized, dto.DontRender, dto.MacroFilePath);
 
             try
             {
@@ -42,10 +42,8 @@ namespace Umbraco.Core.Persistence.Factories
                     Name = entity.Name,
                     MacroFilePath = entity.ScriptPath,
                     RefreshRate = entity.CacheDuration,
-                    ScriptAssembly = entity.ControlAssembly,
                     ScriptType = entity.ControlType,
                     UseInEditor = entity.UseInEditor,
-                    Xslt = entity.XsltPath,
                     MacroPropertyDtos = BuildPropertyDtos(entity)
                 };
 

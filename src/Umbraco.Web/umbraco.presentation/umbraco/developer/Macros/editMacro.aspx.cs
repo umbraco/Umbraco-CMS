@@ -47,22 +47,9 @@ namespace umbraco.cms.presentation.developer
                 ClientTools
                     .SyncTree("-1," + _macro.Id, false);
 
-                string tempMacroAssembly = _macro.ControlAssembly ?? "";
                 string tempMacroType = _macro.ControlType ?? "";
 
-                PopulateFieldsOnLoad(_macro, tempMacroAssembly, tempMacroType);
-
-                // Check for assemblyBrowser
-                if (tempMacroType.IndexOf(".ascx", StringComparison.Ordinal) > 0)
-                    assemblyBrowserUserControl.Controls.Add(
-                        new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('" + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/developer/macros/assemblyBrowser.aspx?fileName=" + macroUserControl.Text +
-                                           "&macroID=" + _macro.Id.ToInvariantString() +
-                                           "', 'Browse Properties', true, 475,500); return false;\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
-                else if (tempMacroType != string.Empty && tempMacroAssembly != string.Empty)
-                    assemblyBrowser.Controls.Add(
-                        new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('" + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "/developer/macros/assemblyBrowser.aspx?fileName=" + macroAssembly.Text +
-                                           "&macroID=" + _macro.Id.ToInvariantString() + "&type=" + macroType.Text +
-                                           "', 'Browse Properties', true, 475,500); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
+                PopulateFieldsOnLoad(_macro, tempMacroType);
 
                 // Load elements from macro
                 macroPropertyBind();
@@ -83,12 +70,11 @@ namespace umbraco.cms.presentation.developer
         /// <param name="macro"></param>
         /// <param name="macroAssemblyValue"></param>
         /// <param name="macroTypeValue"></param>
-        protected virtual void PopulateFieldsOnLoad(IMacro macro, string macroAssemblyValue, string macroTypeValue)
+        protected virtual void PopulateFieldsOnLoad(IMacro macro, string macroTypeValue)
         {
             macroName.Text = macro.Name;
             macroAlias.Text = macro.Alias;
             macroKey.Text = macro.Key.ToString();
-            macroXslt.Text = macro.XsltPath;
             cachePeriod.Text = macro.CacheDuration.ToInvariantString();
             macroRenderContent.Checked = macro.DontRender == false;
             macroEditor.Checked = macro.UseInEditor;
@@ -96,9 +82,8 @@ namespace umbraco.cms.presentation.developer
             cachePersonalized.Checked = macro.CacheByMember;
 
             // Populate either user control or custom control
-            if (macroTypeValue != string.Empty && macroAssemblyValue != string.Empty)
+            if (macroTypeValue != string.Empty)
             {
-                macroAssembly.Text = macroAssemblyValue;
                 macroType.Text = macroTypeValue;
             }
             else
@@ -119,9 +104,7 @@ namespace umbraco.cms.presentation.developer
             macro.CacheDuration = macroCachePeriod;
             macro.Alias = macroAlias.Text;
             macro.Name = macroName.Text;
-            macro.ControlAssembly = macroAssemblyValue;
             macro.ControlType = macroTypeValue;
-            macro.XsltPath = macroXslt.Text;
         }
 
         private static void GetXsltFilesFromDir(string orgPath, string path, ArrayList files)
@@ -229,7 +212,7 @@ namespace umbraco.cms.presentation.developer
             return Convert.ToBoolean(isChecked);
         }
 
-        public void AddChooseList(Object sender, EventArgs e)
+        public void AddChooseList(object sender, EventArgs e)
         {
             if (IsPostBack == false)
             {
@@ -341,18 +324,6 @@ namespace umbraco.cms.presentation.developer
 
             ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, "Macro saved", "");
 
-            // Check for assemblyBrowser
-            if (tempMacroType.IndexOf(".ascx", StringComparison.Ordinal) > 0)
-                assemblyBrowserUserControl.Controls.Add(
-                    new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('developer/macros/assemblyBrowser.aspx?fileName=" + macroUserControl.Text +
-                        "&macroID=" + Request.QueryString["macroID"] +
-                            "', 'Browse Properties', true, 500, 475); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
-            else if (tempMacroType != string.Empty && tempMacroAssembly != string.Empty)
-                assemblyBrowser.Controls.Add(
-                    new LiteralControl("<br/><button onClick=\"UmbClientMgr.openModalWindow('developer/macros/assemblyBrowser.aspx?fileName=" + macroAssembly.Text +
-                        "&macroID=" + Request.QueryString["macroID"] + "&type=" + macroType.Text +
-                            "', 'Browse Properties', true, 500, 475); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
-
             macroPropertyBind();
         }
 
@@ -418,16 +389,7 @@ namespace umbraco.cms.presentation.developer
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Umbraco.Web._Legacy.Controls.Pane Pane1_2;
-
-        /// <summary>
-        /// macroXslt control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox macroXslt;
-
+        
         /// <summary>
         /// xsltFiles control.
         /// </summary>
@@ -454,16 +416,7 @@ namespace umbraco.cms.presentation.developer
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList userControlList;
-
-        /// <summary>
-        /// assemblyBrowserUserControl control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder assemblyBrowserUserControl;
-
+        
         /// <summary>
         /// macroAssembly control.
         /// </summary>
@@ -481,16 +434,7 @@ namespace umbraco.cms.presentation.developer
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox macroType;
-
-        /// <summary>
-        /// assemblyBrowser control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.PlaceHolder assemblyBrowser;
-
+        
         /// <summary>
         /// Pane1_3 control.
         /// </summary>

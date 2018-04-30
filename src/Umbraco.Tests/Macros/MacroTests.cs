@@ -78,7 +78,6 @@ namespace Umbraco.Tests.Macros
             var model = new MacroModel
             {
                 MacroType = macroType,
-                Xslt = "anything",
                 ScriptName = "anything",
                 TypeName = "anything"
             };

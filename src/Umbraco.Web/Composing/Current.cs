@@ -124,10 +124,7 @@ namespace Umbraco.Web.Composing
 
         internal static EditorValidatorCollection EditorValidators
             => Container.GetInstance<EditorValidatorCollection>();
-
-        internal static XsltExtensionCollection XsltExtensions
-            => Container.GetInstance<XsltExtensionCollection>();
-
+        
         internal static UmbracoApiControllerTypeCollection UmbracoApiControllerTypes
             => Container.GetInstance<UmbracoApiControllerTypeCollection>();
 
@@ -143,9 +140,6 @@ namespace Umbraco.Web.Composing
         internal static IPublishedSnapshotService PublishedSnapshotService
             => Container.GetInstance<IPublishedSnapshotService>();
         
-        public static ThumbnailProviderCollection ThumbnailProviders
-            => Container.GetInstance<ThumbnailProviderCollection>();
-
         #endregion
 
         #region Web Constants

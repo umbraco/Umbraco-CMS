@@ -19,12 +19,7 @@ namespace Umbraco.Web.Macros
 
         public MacroTypes MacroType { get; set; }
 
-        // that one was for CustomControls which are gone in v8
-        //public string TypeAssembly { get; set; }
-
         public string TypeName { get; set; }
-
-        public string Xslt { get; set; }
 
         public string ScriptName { get; set; }
 
@@ -54,9 +49,7 @@ namespace Umbraco.Web.Macros
             Id = macro.Id;
             Name = macro.Name;
             Alias = macro.Alias;
-            //TypeAssembly = macro.ControlAssembly;
             TypeName = macro.ControlType;
-            Xslt = macro.XsltPath;
             ScriptName = macro.ScriptPath;
             CacheDuration = macro.CacheDuration;
             CacheByPage = macro.CacheByPage;

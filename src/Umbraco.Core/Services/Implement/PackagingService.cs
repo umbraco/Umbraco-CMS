@@ -1271,8 +1271,6 @@ namespace Umbraco.Core.Services.Implement
             var macroName = macroElement.Element("name").Value;
             var macroAlias = macroElement.Element("alias").Value;
             var controlType = macroElement.Element("scriptType").Value;
-            var controlAssembly = macroElement.Element("scriptAssembly").Value;
-            var xsltPath = macroElement.Element("xslt").Value;
             var scriptPath = macroElement.Element("scriptingFile").Value;
 
             //Following xml elements are treated as nullable properties
@@ -1308,7 +1306,7 @@ namespace Umbraco.Core.Services.Implement
             }
 
             var existingMacro = _macroService.GetByAlias(macroAlias) as Macro;
-            var macro = existingMacro ?? new Macro(macroAlias, macroName, controlType, controlAssembly, xsltPath, scriptPath,
+            var macro = existingMacro ?? new Macro(macroAlias, macroName, controlType, scriptPath,
                 cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration);
 
             var properties = macroElement.Element("properties");

@@ -33,15 +33,7 @@ namespace Umbraco.Core.Components
         /// <returns></returns>
         internal static ActionCollectionBuilder Actions(this Composition composition)
             => composition.Container.GetInstance<ActionCollectionBuilder>();
-
-        /// <summary>
-        /// Gets the content finders collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        /// <returns></returns>
-        internal static XsltExtensionCollectionBuilder XsltExtensions(this Composition composition)
-            => composition.Container.GetInstance<XsltExtensionCollectionBuilder>();
-
+        
         /// <summary>
         /// Gets the content finders collection builder.
         /// </summary>
@@ -79,13 +71,6 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         internal static ImageUrlProviderCollectionBuilder ImageUrlProviders(this Composition composition)
             => composition.Container.GetInstance<ImageUrlProviderCollectionBuilder>();
-
-        /// <summary>
-        /// Gets the thumbnail providers collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        internal static ThumbnailProviderCollectionBuilder ThumbnailProviders(this Composition composition)
-            => composition.Container.GetInstance<ThumbnailProviderCollectionBuilder>();
 
         /// <summary>
         /// Gets the url providers collection builder.

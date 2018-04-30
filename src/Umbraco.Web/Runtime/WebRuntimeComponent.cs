@@ -121,9 +121,6 @@ namespace Umbraco.Web.Runtime
             composition.Container.EnableWebApi(GlobalConfiguration.Configuration);
             composition.Container.RegisterApiControllers(typeLoader, GetType().Assembly);
 
-            XsltExtensionCollectionBuilder.Register(composition.Container)
-                .AddExtensionObjectProducer(() => typeLoader.GetXsltExtensions());
-
             composition.Container.RegisterCollectionBuilder<SearchableTreeCollectionBuilder>()
                 .Add(() => typeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
 
@@ -179,13 +176,7 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentFinderByRedirectUrl>();
 
             composition.Container.RegisterSingleton<ISiteDomainHelper, SiteDomainHelper>();
-
-            composition.Container.RegisterCollectionBuilder<ThumbnailProviderCollectionBuilder>()
-                .Add(typeLoader.GetThumbnailProviders());
-
-            composition.Container.RegisterCollectionBuilder<ImageUrlProviderCollectionBuilder>()
-                .Append(typeLoader.GetImageUrlProviders());
-
+            
             composition.Container.RegisterSingleton<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course

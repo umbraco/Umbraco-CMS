@@ -177,22 +177,12 @@ namespace Umbraco.Web.Macros
 
             switch (model.MacroType)
             {
-                case MacroTypes.Xslt:
-                    filename = SystemDirectories.Xslt.EnsureEndsWith('/') + model.Xslt;
-                    break;
-                //case MacroTypes.Script:
-                //    // was "~/macroScripts/"
-                //    filename = SystemDirectories.MacroScripts.EnsureEndsWith('/') + model.ScriptName;
-                //    break;
                 case MacroTypes.PartialView:
                     filename = model.ScriptName; //partial views are saved with their full virtual path
                     break;
                 case MacroTypes.UserControl:
                     filename = model.TypeName; //user controls are saved with their full virtual path
                     break;
-                //case MacroTypes.Script:
-                //case MacroTypes.CustomControl:
-                //case MacroTypes.Unknown:
                 default:
                     // not file-based, or not supported
                     filename = null;
@@ -381,24 +371,7 @@ namespace Umbraco.Web.Macros
                         "Executed PartialView.",
                         () => ExecutePartialView(model),
                         () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.ScriptName }));
-
-                //case MacroTypes.Script:
-                //    return ExecuteMacroWithErrorWrapper(model,
-                //        "Executing Script: " + (string.IsNullOrWhiteSpace(model.ScriptCode)
-                //            ? "ScriptName=\"" + model.ScriptName + "\""
-                //            : "Inline, Language=\"" + model.ScriptLanguage + "\""),
-                //        "Executed Script.",
-                //        () => ExecuteScript(model),
-                //        () => textService.Localize("errors/macroErrorLoadingMacroEngineScript", new[] { model.ScriptName }));
-
-                case MacroTypes.Xslt:
-                    return ExecuteMacroWithErrorWrapper(model,
-                        $"Executing Xslt: TypeName=\"{model.TypeName}\", ScriptName=\"{model.Xslt}\".",
-                        "Executed Xslt.",
-                        () => ExecuteXslt(model, _plogger),
-                        // cannot diff. between reading & parsing... bah
-                        () => textService.Localize("errors/macroErrorParsingXSLTFile", new[] { model.Xslt }));
-
+                    
                 case MacroTypes.UserControl:
                     return ExecuteMacroWithErrorWrapper(model,
                         $"Loading UserControl: TypeName=\"{model.TypeName}\".",
@@ -445,16 +418,6 @@ namespace Umbraco.Web.Macros
             var engine = new PartialViewMacroEngine();
             var content = UmbracoContext.Current.PublishedRequest.PublishedContent;
             return engine.Execute(macro, content);
-        }
-
-        /// <summary>
-        /// Renders an Xslt Macro.
-        /// </summary>
-        /// <returns>The text output of the macro execution.</returns>
-        public static MacroContent ExecuteXslt(MacroModel macro, ProfilingLogger plogger)
-        {
-            var engine = new XsltMacroEngine(plogger);
-            return engine.Execute(macro);
         }
 
         public static MacroContent ExecuteUserControl(MacroModel macro)

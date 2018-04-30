@@ -31,9 +31,6 @@ namespace Umbraco.Core.Services.Implement
         /// <returns><see cref="MacroTypes"/></returns>
         internal static MacroTypes GetMacroType(IMacro macro)
         {
-            if (string.IsNullOrEmpty(macro.XsltPath) == false)
-                return MacroTypes.Xslt;
-
             if (string.IsNullOrEmpty(macro.ScriptPath) == false)
                 return MacroTypes.PartialView;
 

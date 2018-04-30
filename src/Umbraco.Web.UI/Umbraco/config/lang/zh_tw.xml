@@ -378,8 +378,6 @@
     <key alias="macroErrorLoadingUsercontrol">讀取使用者控制項 %0% 錯誤</key>
     <key alias="macroErrorLoadingCustomControl">讀取使用者控制項 %0% 錯誤（組件：%0%，類別：%1%）</key>
     <key alias="macroErrorLoadingMacroEngineScript">讀取巨集引擎腳本錯誤（檔案：%0%）</key>
-    <key alias="macroErrorParsingXSLTFile">分析XSLT檔案錯誤：%0%</key>
-    <key alias="macroErrorReadingXSLTFile">讀取XSLT檔案錯誤：%0%</key>
     <key alias="missingTitle">請輸入標題</key>
     <key alias="missingType">請選擇類型</key>
     <key alias="pictureResizeBiggerThanOrg">圖片尺寸大於原始尺寸不會提高圖片品質，您確定要把圖片尺寸變大嗎?</key>

@@ -503,8 +503,6 @@
         <key alias="macroErrorLoadingUsercontrol">Error loading userControl '%0%'</key>
         <key alias="macroErrorLoadingCustomControl">Error loading customControl (Assembly: %0%, Type: '%1%')</key>
         <key alias="macroErrorLoadingMacroEngineScript">Error loading MacroEngine script (file: %0%)</key>
-        <key alias="macroErrorParsingXSLTFile">"Error parsing XSLT file: %0%</key>
-        <key alias="macroErrorReadingXSLTFile">"Error reading XSLT file: %0%</key>
         <key alias="missingTitle">Please enter a title</key>
         <key alias="missingType">Please choose a type</key>
         <key alias="pictureResizeBiggerThanOrg">You're about to make the picture larger than the original size. Are you sure that you want to proceed?</key>

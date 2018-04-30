@@ -28,9 +28,9 @@ namespace Umbraco.Tests.Services
             {
                 var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
-                repository.Save(new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "MyAssembly1", "test1.xslt", "~/views/macropartials/test1.cshtml"));
-                repository.Save(new Macro("test2", "Test2", "~/usercontrol/test2.ascx", "MyAssembly2", "test2.xslt", "~/views/macropartials/test2.cshtml"));
-                repository.Save(new Macro("test3", "Tet3", "~/usercontrol/test3.ascx", "MyAssembly3", "test3.xslt", "~/views/macropartials/test3.cshtml"));
+                repository.Save(new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "~/views/macropartials/test1.cshtml"));
+                repository.Save(new Macro("test2", "Test2", "~/usercontrol/test2.ascx", "~/views/macropartials/test2.cshtml"));
+                repository.Save(new Macro("test3", "Tet3", "~/usercontrol/test3.ascx", "~/views/macropartials/test3.cshtml"));
                 scope.Complete();
             }
         }

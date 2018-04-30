@@ -314,8 +314,6 @@
     <key alias="macroErrorLoadingUsercontrol">Error loading userControl '%0%'</key>
     <key alias="macroErrorLoadingCustomControl">Error loading customControl (Assembly: %0%, Type: '%1%')</key>
     <key alias="macroErrorLoadingMacroEngineScript">Error loading MacroEngine script (Dosya: %0%)</key>
-    <key alias="macroErrorParsingXSLTFile">"Error parsing XSLT file: %0%</key>
-    <key alias="macroErrorReadingXSLTFile">"Error reading XSLT file: %0%</key>
     <key alias="missingTitle">Lütfen bir başlık girin</key>
     <key alias="missingType">Lütfen bir tür seçin</key>
     <key alias="pictureResizeBiggerThanOrg">Orijinal boyutundan daha resmi büyütmek üzereyiz. Devam etmek istediğinizden emin misiniz?</key>

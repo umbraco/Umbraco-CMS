@@ -393,8 +393,6 @@
     <key alias="macroErrorLoadingUsercontrol">加载 userControl 时出错 '%0%'</key>
     <key alias="macroErrorLoadingCustomControl">加载 customControl 时出错(程序集: %0%, 类型: '%1%')</key>
     <key alias="macroErrorLoadingMacroEngineScript">加载 MacroEngine 脚本时出错 (文件: %0%)</key>
-    <key alias="macroErrorParsingXSLTFile">"解析 xslt 文件时出错: %0%</key>
-    <key alias="macroErrorReadingXSLTFile">"读取 xslt 文件时出错: %0%</key>
     <key alias="missingTitle">请输入标题</key>
     <key alias="missingType">请选择类型</key>
     <key alias="pictureResizeBiggerThanOrg">图片尺寸大于原始尺寸不会提高图片质量，您确定要把图片尺寸变大吗?</key>

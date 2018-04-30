@@ -37,15 +37,7 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("macroScriptType")]
         [NullSetting(NullSetting = NullSettings.Null)]
         public string ScriptType { get; set; }
-
-        [Column("macroScriptAssembly")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public string ScriptAssembly { get; set; }
-
-        [Column("macroXSLT")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public string Xslt { get; set; }
-
+        
         [Column("macroCacheByPage")]
         [Constraint(Default = "1")]
         public bool CacheByPage { get; set; }

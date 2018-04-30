@@ -487,8 +487,6 @@
     <key alias="macroErrorLoadingUsercontrol">Wystąpił błąd podczas ładowania userControl '%0%'</key>
     <key alias="macroErrorLoadingCustomControl">Wystąpił błąd podczas ładowania customControl (Assembly: %0%, Typ: '%1%')</key>
     <key alias="macroErrorLoadingMacroEngineScript">Wystąpił błąd podczas ładowania skryptu MacroEngine (plik: %0%)</key>
-    <key alias="macroErrorParsingXSLTFile">"Wystąpił błąd podczas parsowania pliku XSLT: %0%</key>
-    <key alias="macroErrorReadingXSLTFile">"Wystąpił błąd odczytu pliku XSLT: %0%</key>
     <key alias="missingTitle">Proszę podać tytuł</key>
     <key alias="missingType">Proszę wybrać typ</key>
     <key alias="pictureResizeBiggerThanOrg">Chcesz utworzyć obraz większy niż rozmiar oryginalny. Czy na pewno chcesz kontynuować?</key>

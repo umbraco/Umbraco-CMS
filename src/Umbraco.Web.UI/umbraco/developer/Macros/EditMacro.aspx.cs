@@ -29,9 +29,9 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
         /// <param name="macro"> </param>
         /// <param name="macroAssemblyValue"></param>
         /// <param name="macroTypeValue"></param>
-        protected override void PopulateFieldsOnLoad(IMacro macro, string macroAssemblyValue, string macroTypeValue)
+        protected override void PopulateFieldsOnLoad(IMacro macro, string macroTypeValue)
         {
-            base.PopulateFieldsOnLoad(macro, macroAssemblyValue, macroTypeValue);
+            base.PopulateFieldsOnLoad(macro, macroTypeValue);
             //check if the ScriptingFile property contains the MacroPartials path
             if (macro.ScriptPath.IsNullOrWhiteSpace() == false &&
                 (macro.ScriptPath.StartsWith(SystemDirectories.MvcViews + "/MacroPartials/")

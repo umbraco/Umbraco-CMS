@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Services
         public void PackagingService_Can_Export_Macro()
         {
             // Arrange
-            var macro = new Macro("test1", "Test", "~/usercontrol/blah.ascx", "MyAssembly", "test.xslt", "~/views/macropartials/test.cshtml");
+            var macro = new Macro("test1", "Test", "~/usercontrol/blah.ascx", "~/views/macropartials/test.cshtml");
             ServiceContext.MacroService.Save(macro);
 
             // Act

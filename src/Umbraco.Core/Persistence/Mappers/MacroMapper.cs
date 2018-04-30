@@ -18,14 +18,12 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<Macro, MacroDto>(src => src.Alias, dto => dto.Alias);
             CacheMap<Macro, MacroDto>(src => src.CacheByPage, dto => dto.CacheByPage);
             CacheMap<Macro, MacroDto>(src => src.CacheByMember, dto => dto.CachePersonalized);
-            CacheMap<Macro, MacroDto>(src => src.ControlAssembly, dto => dto.ScriptAssembly);
             CacheMap<Macro, MacroDto>(src => src.ControlType, dto => dto.ScriptType);
             CacheMap<Macro, MacroDto>(src => src.DontRender, dto => dto.DontRender);
             CacheMap<Macro, MacroDto>(src => src.Name, dto => dto.Name);
             CacheMap<Macro, MacroDto>(src => src.CacheDuration, dto => dto.RefreshRate);
             CacheMap<Macro, MacroDto>(src => src.ScriptPath, dto => dto.MacroFilePath);
             CacheMap<Macro, MacroDto>(src => src.UseInEditor, dto => dto.UseInEditor);
-            CacheMap<Macro, MacroDto>(src => src.XsltPath, dto => dto.Xslt);
         }
     }
 }

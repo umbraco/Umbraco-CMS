@@ -487,8 +487,6 @@
         <key alias="macroErrorLoadingUsercontrol">Error cargando userControl '%0%'</key>
         <key alias="macroErrorLoadingCustomControl">Error cargandog customControl (Assembly: %0%, Type: '%1%')</key>
         <key alias="macroErrorLoadingMacroEngineScript">Error cargando MacroEngine script (file: %0%)</key>
-        <key alias="macroErrorParsingXSLTFile">"Error analizando archivo XSLT: %0%</key>
-        <key alias="macroErrorReadingXSLTFile">"Error leyendo archivo XSLT: %0%</key>
         <key alias="missingTitle">
             <![CDATA[Por favor, introduzca un título
 ]]>

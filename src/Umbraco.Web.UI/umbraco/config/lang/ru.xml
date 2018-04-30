@@ -512,8 +512,6 @@
     <key alias="macroErrorLoadingUsercontrol">Ошибка загрузки пользовательского элемента управления '%0%'</key>
     <key alias="macroErrorLoadingCustomControl">Ошибка загрузки внешнего типа (сборка: %0%, тип: '%1%')</key>
     <key alias="macroErrorLoadingMacroEngineScript">Ошибка загрузки макроса (файл: %0%)</key>
-    <key alias="macroErrorParsingXSLTFile">"Ошибка разбора кода XSLT в файле: %0%</key>
-    <key alias="macroErrorReadingXSLTFile">"Ошибка чтения XSLT-файла: %0%</key>
     <key alias="missingPropertyEditorErrorMessage">Ошибка в конфигурации типа данных, используемого для свойства, проверьте тип данных</key>
     <key alias="missingTitle">Укажите заголовок</key>
     <key alias="missingType">Выберите тип</key>

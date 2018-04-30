@@ -132,9 +132,6 @@ namespace umbraco.cms.businesslogic.packager
 
             if (appendFile)
             {
-                if (!string.IsNullOrEmpty(mcr.XsltPath))
-                    AppendFileToManifest(IOHelper.ResolveUrl(SystemDirectories.Xslt) + "/" + mcr.XsltPath, packageDirectory, doc);
-
                 //TODO: Clearly the packager hasn't worked very well for packaging Partial Views to date since there is no logic in here for that
 
                 //if (!string.IsNullOrEmpty(mcr.ScriptingFile))

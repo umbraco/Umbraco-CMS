@@ -562,10 +562,6 @@
     <Compile Include="Logging\WebProfilerProvider.cs" />
     <Compile Include="Macros\MacroErrorBehaviour.cs" />
     <Compile Include="Macros\MacroTagParser.cs" />
-    <Compile Include="Macros\XsltExtension.cs" />
-    <Compile Include="Macros\XsltExtensionAttribute.cs" />
-    <Compile Include="Macros\XsltExtensionCollection.cs" />
-    <Compile Include="Macros\XsltExtensionCollectionBuilder.cs" />
     <Compile Include="MainDom.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ValueValidatorConverter.cs" />

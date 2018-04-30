@@ -398,8 +398,6 @@
     <key alias="macroErrorLoadingUsercontrol">Error bij het laden van userControl '%0%'</key>
     <key alias="macroErrorLoadingCustomControl">Error bij het laden van customControl (Assembly: %0%, Type: '%1%')</key>
     <key alias="macroErrorLoadingMacroEngineScript">Error bij het laden van MacroEngine script (file: %0%)</key>
-    <key alias="macroErrorParsingXSLTFile">"Error bij het parsen van XSLT file: %0%</key>
-    <key alias="macroErrorReadingXSLTFile">"Error bij het laden van XSLT file: %0%</key>
     <key alias="missingTitle">Vul een titel in</key>
     <key alias="missingType">Selecteer een type</key>
     <key alias="pictureResizeBiggerThanOrg">U wilt een afbeelding groter maken dan de originele afmetingen. Weet je zeker dat je wilt doorgaan?</key>

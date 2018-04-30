@@ -388,8 +388,6 @@
 	<key alias="macroErrorLoadingUsercontrol">Erreur de chargement du userControl '%0%'</key>
 	<key alias="macroErrorLoadingCustomControl">Erreur de chargement d'un customControl (Assembly: %0%, Type: '%1%')</key>
 	<key alias="macroErrorLoadingMacroEngineScript">Erreur de chargement d'un script du MacroEngine (fichier : %0%)</key>
-	<key alias="macroErrorParsingXSLTFile">"Erreur de parsing d'un fichier XSLT : %0%</key>
-	<key alias="macroErrorReadingXSLTFile">"Erreur de lecture d'un fichier XSLT : %0%</key>
     <key alias="missingTitle">Veuillez entrer un titre</key>
     <key alias="missingType">Veuillez choisir un type</key>
     <key alias="pictureResizeBiggerThanOrg">Vous allez définir une taille d'image supérieure à sa taille d'origine. Êtes-vous certain(e) de vouloir continuer?</key>

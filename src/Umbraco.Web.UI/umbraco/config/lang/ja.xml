@@ -370,8 +370,6 @@
     <key alias="macroErrorLoadingUsercontrol">userControl の読み込みエラー '%0%'</key>
     <key alias="macroErrorLoadingCustomControl">customControl の読み込みエラー (アセンブリ: %0%, タイプ: '%1%')</key>
     <key alias="macroErrorLoadingMacroEngineScript">MacroEngine スクリプトの読み込みエラー (ファイル: %0%)</key>
-    <key alias="macroErrorParsingXSLTFile">XSLT ファイル解析エラー: %0%</key>
-    <key alias="macroErrorReadingXSLTFile">XSLT ファイル読み込みエラー: %0%</key>
     <key alias="missingTitle">タイトルを入力してください</key>
     <key alias="missingType">型を選択してください</key>
     <key alias="pictureResizeBiggerThanOrg">元画像より大きくしようとしていますが、本当によろしいのですか？</key>
