@@ -5,7 +5,7 @@ using Umbraco.Core.Cache;
 namespace Umbraco.Web.PublishedCache.NuCache
 {
     // implements published snapshot
-    internal class PublishedShapshot : IPublishedShapshot, IDisposable
+    internal class PublishedSnapshot : IPublishedSnapshot, IDisposable
     {
         private readonly PublishedSnapshotService _service;
         private bool _defaultPreview;
@@ -13,7 +13,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Constructors
 
-        public PublishedShapshot(PublishedSnapshotService service, bool defaultPreview)
+        public PublishedSnapshot(PublishedSnapshotService service, bool defaultPreview)
         {
             _service = service;
             _defaultPreview = defaultPreview;
@@ -72,13 +72,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private class ForcedPreviewObject : DisposableObject
         {
-            private readonly PublishedShapshot _publishedShapshot;
+            private readonly PublishedSnapshot _publishedSnapshot;
             private readonly bool _origPreview;
             private readonly Action<bool> _callback;
 
-            public ForcedPreviewObject(PublishedShapshot publishedShapshot, bool preview, Action<bool> callback)
+            public ForcedPreviewObject(PublishedSnapshot publishedShapshot, bool preview, Action<bool> callback)
             {
-                _publishedShapshot = publishedShapshot;
+                _publishedSnapshot = publishedShapshot;
                 _callback = callback;
 
                 // save and force
@@ -89,7 +89,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             protected override void DisposeResources()
             {
                 // restore
-                _publishedShapshot._defaultPreview = _origPreview;
+                _publishedSnapshot._defaultPreview = _origPreview;
                 _callback?.Invoke(_origPreview);
             }
         }

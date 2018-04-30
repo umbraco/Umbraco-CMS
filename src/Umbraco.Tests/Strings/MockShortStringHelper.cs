@@ -59,16 +59,6 @@ namespace Umbraco.Tests.Strings
             return "SPLIT-PASCAL-CASING::" + text;
         }
 
-        public string ReplaceMany(string text, IDictionary<string, string> replacements)
-        {
-            return "REPLACE-MANY-A::" + text;
-        }
-
-        public string ReplaceMany(string text, char[] chars, char replacement)
-        {
-            return "REPLACE-MANY-B::" + text;
-        }
-
         public string CleanString(string text, CleanStringType stringType)
         {
             return "CLEAN-STRING-A::" + text;

@@ -74,7 +74,8 @@ namespace Umbraco.Tests.PublishedContent
                 new WebSecurity(httpContext, Current.Services.UserService, globalSettings),
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
-                globalSettings);
+                globalSettings,
+                ServiceContext.EntityService);
 
             return umbracoContext;
         }
@@ -196,13 +197,13 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(2, result[1].Id);
         }
 
-        private static SolidPublishedShapshot CreatePublishedSnapshot()
+        private static SolidPublishedSnapshot CreatePublishedSnapshot()
         {
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
 
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
-            var caches = new SolidPublishedShapshot();
+            var caches = new SolidPublishedSnapshot();
             var cache = caches.InnerContentCache;
 
             var props = new[]

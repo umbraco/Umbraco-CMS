@@ -6,7 +6,7 @@ using Umbraco.Web.Cache;
 namespace Umbraco.Web.PublishedCache
 {
     /// <summary>
-    /// Creates and manages <see cref="IPublishedShapshot"/> instances.
+    /// Creates and manages <see cref="IPublishedSnapshot"/> instances.
     /// </summary>
     public interface IPublishedSnapshotService : IDisposable
     {
@@ -32,7 +32,7 @@ namespace Umbraco.Web.PublishedCache
         /// <remarks>If <paramref name="previewToken"/> is null, the snapshot is not previewing, else it
         /// is previewing, and what is or is not visible in preview depends on the content of the token,
         /// which is not specified and depends on the actual published snapshot service implementation.</remarks>
-        IPublishedShapshot CreatePublishedSnapshot(string previewToken);
+        IPublishedSnapshot CreatePublishedSnapshot(string previewToken);
 
         /// <summary>
         /// Gets the published snapshot accessor.

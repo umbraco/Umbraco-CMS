@@ -215,7 +215,7 @@ namespace Umbraco.Tests.Models
 
             // can publish value
             // and get edited and published values
-            content.PublishValues();
+            content.TryPublishValues();
             Assert.AreEqual("a", content.GetValue("prop"));
             Assert.AreEqual("a", content.GetValue("prop", published: true));
 
@@ -244,9 +244,9 @@ namespace Umbraco.Tests.Models
 
             // can publish value
             // and get edited and published values
-            Assert.Throws<InvalidOperationException>(() => content.PublishValues(langFr)); // no name
+            Assert.IsFalse(content.TryPublishValues(langFr)); // no name
             content.SetName(langFr, "name-fr");
-            content.PublishValues(langFr);
+            content.TryPublishValues(langFr);
             Assert.AreEqual("b", content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
             Assert.AreEqual("c", content.GetValue("prop", langFr));
@@ -260,7 +260,7 @@ namespace Umbraco.Tests.Models
             Assert.IsNull(content.GetValue("prop", langFr, published: true));
 
             // can publish all
-            content.PublishAllValues();
+            content.TryPublishAllValues();
             Assert.AreEqual("b", content.GetValue("prop"));
             Assert.AreEqual("b", content.GetValue("prop", published: true));
             Assert.AreEqual("c", content.GetValue("prop", langFr));
@@ -322,12 +322,12 @@ namespace Umbraco.Tests.Models
             content.SetValue("prop", "a-es", langEs);
 
             // cannot publish without a name
-            Assert.Throws<InvalidOperationException>(() => content.PublishValues(langFr));
+            Assert.IsFalse(content.TryPublishValues(langFr));
 
             // works with a name
             // and then FR is available, and published
             content.SetName(langFr, "name-fr");
-            content.PublishValues(langFr);
+            content.TryPublishValues(langFr);
 
             // now UK is available too
             content.SetName(langUk, "name-uk");

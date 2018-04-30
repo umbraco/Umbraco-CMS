@@ -368,6 +368,7 @@
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
+    <Compile Include="Models\PublishedContent\PublishedCultureName.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
     <Compile Include="Persistence\Dtos\ContentVersionCultureVariationDto.cs" />
@@ -1418,7 +1419,6 @@
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\Implement\LocalizationService.cs" />
     <Compile Include="Services\Implement\LocalizedTextService.cs" />
-    <Compile Include="Services\LocalizationServiceExtensions.cs" />
     <Compile Include="Services\LocalizedTextServiceExtensions.cs" />
     <Compile Include="Services\Implement\LocalizedTextServiceFileSources.cs" />
     <Compile Include="Services\Implement\LocalizedTextServiceSupplementaryFileSource.cs" />

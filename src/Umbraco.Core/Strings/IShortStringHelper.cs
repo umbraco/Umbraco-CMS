@@ -78,23 +78,6 @@ namespace Umbraco.Core.Strings
         string SplitPascalCasing(string text, char separator);
 
         /// <summary>
-        /// Returns a new string in which all occurences of specified strings are replaced by other specified strings.
-        /// </summary>
-        /// <param name="text">The string to filter.</param>
-        /// <param name="replacements">The replacements definition.</param>
-        /// <returns>The filtered string.</returns>
-        string ReplaceMany(string text, IDictionary<string, string> replacements);
-
-        /// <summary>
-        /// Returns a new string in which all occurences of specified characters are replaced by a specified character.
-        /// </summary>
-        /// <param name="text">The string to filter.</param>
-        /// <param name="chars">The characters to replace.</param>
-        /// <param name="replacement">The replacement character.</param>
-        /// <returns>The filtered string.</returns>
-        string ReplaceMany(string text, char[] chars, char replacement);
-
-        /// <summary>
         /// Cleans a string.
         /// </summary>
         /// <param name="text">The text to clean.</param>

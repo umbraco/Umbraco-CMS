@@ -147,15 +147,6 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Can_Get_Language_By_Culture_Code()
-        {
-            var danish = ServiceContext.LocalizationService.GetLanguageByCultureCode("Danish");
-            var english = ServiceContext.LocalizationService.GetLanguageByCultureCode("English");
-            Assert.NotNull(danish);
-            Assert.NotNull(english);
-        }
-
-        [Test]
         public void Can_GetLanguageById()
         {
             var danish = ServiceContext.LocalizationService.GetLanguageById(_danishLangId);

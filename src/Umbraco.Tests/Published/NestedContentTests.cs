@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Published
                 });
 
             var contentCache = new Mock<IPublishedContentCache>();
-            var publishedSnapshot = new Mock<IPublishedShapshot>();
+            var publishedSnapshot = new Mock<IPublishedSnapshot>();
 
             // mocked published snapshot returns a content cache
             publishedSnapshot
@@ -273,6 +273,7 @@ namespace Umbraco.Tests.Published
             public override int TemplateId { get; }
             public override int SortOrder { get; }
             public override string Name { get; }
+            public override IReadOnlyDictionary<string, PublishedCultureName> CultureNames => throw new NotSupportedException();
             public override string UrlName { get; }
             public override string DocumentTypeAlias { get; }
             public override int DocumentTypeId { get; }

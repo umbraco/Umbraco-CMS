@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using ContentVariation = Umbraco.Core.Models.ContentVariation;
@@ -13,7 +14,12 @@ namespace Umbraco.Web.Models.Mapping
         public string Resolve(IContent source, ContentItemDisplay destination, string destMember, ResolutionContext context)
         {
             var culture = context.GetCulture();
-            return source.GetName(culture);
+            if (culture != null && source.ContentType.Variations.Has(ContentVariation.CultureNeutral))
+            {
+                //return the culture name being requested
+                return source.GetName(culture);
+            }
+            return source.Name;
         }
     }
 }

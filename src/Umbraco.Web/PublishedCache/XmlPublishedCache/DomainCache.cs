@@ -7,13 +7,14 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 {
-    class DomainCache : IDomainCache
+    internal class DomainCache : IDomainCache
     {
         private readonly IDomainService _domainService;
 
-        public DomainCache(IDomainService domainService)
+        public DomainCache(IDomainService domainService, ISystemDefaultCultureProvider systemDefaultCultureProvider)
         {
             _domainService = domainService;
+            DefaultCulture = systemDefaultCultureProvider.DefaultCulture;
         }
 
         public IEnumerable<Domain> GetAll(bool includeWildcards)
@@ -29,5 +30,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                  .Where(x => x.RootContentId.HasValue && x.LanguageIsoCode.IsNullOrWhiteSpace() == false)
                 .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, CultureInfo.GetCultureInfo(x.LanguageIsoCode), x.IsWildcard));
         }
+
+        public string DefaultCulture { get; }
     }
 }

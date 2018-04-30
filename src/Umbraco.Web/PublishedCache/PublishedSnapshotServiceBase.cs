@@ -15,9 +15,9 @@ namespace Umbraco.Web.PublishedCache
 
         // note: NOT setting _publishedSnapshotAccessor.PublishedSnapshot here because it is the
         // responsibility of the caller to manage what the 'current' facade is
-        public abstract IPublishedShapshot CreatePublishedSnapshot(string previewToken);
+        public abstract IPublishedSnapshot CreatePublishedSnapshot(string previewToken);
 
-        protected IPublishedShapshot CurrentPublishedShapshot => PublishedSnapshotAccessor.PublishedSnapshot;
+        protected IPublishedSnapshot CurrentPublishedSnapshot => PublishedSnapshotAccessor.PublishedSnapshot;
 
         public abstract bool EnsureEnvironment(out IEnumerable<string> errors);
 

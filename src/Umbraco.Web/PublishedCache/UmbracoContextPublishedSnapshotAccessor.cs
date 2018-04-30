@@ -11,13 +11,13 @@ namespace Umbraco.Web.PublishedCache
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 
-        public IPublishedShapshot PublishedSnapshot
+        public IPublishedSnapshot PublishedSnapshot
         {
             get
             {
                 var umbracoContext = _umbracoContextAccessor.UmbracoContext;
                 if (umbracoContext == null) throw new Exception("The IUmbracoContextAccessor could not provide an UmbracoContext.");
-                return umbracoContext.PublishedShapshot;
+                return umbracoContext.PublishedSnapshot;
             }
 
             set

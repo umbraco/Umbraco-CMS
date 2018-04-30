@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
+using LightInject;
 
 namespace Umbraco.Tests.Routing
 {
@@ -15,7 +17,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext(urlAsString);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            var lookup = new ContentFinderByIdPath(Logger);
+            var lookup = new ContentFinderByIdPath(Container.GetInstance<IUmbracoSettingsSection>().WebRouting, Logger);
 
 
             var result = lookup.TryFindContent(frequest);

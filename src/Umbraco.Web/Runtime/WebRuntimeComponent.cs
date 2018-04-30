@@ -69,6 +69,9 @@ namespace Umbraco.Web.Runtime
             //it still needs to use the install controller so we can't do that
             composition.Container.RegisterFrom<InstallerCompositionRoot>();
 
+            // register the system culture provider
+            composition.Container.RegisterSingleton<ISystemDefaultCultureProvider, SystemDefaultCultureProvider>();
+
             var typeLoader = composition.Container.GetInstance<TypeLoader>();
             var logger = composition.Container.GetInstance<ILogger>();
             var proflog = composition.Container.GetInstance<ProfilingLogger>();
@@ -159,7 +162,7 @@ namespace Umbraco.Web.Runtime
                 .Append<RenderControllerFactory>();
 
             composition.Container.RegisterCollectionBuilder<UrlProviderCollectionBuilder>()
-                //.Append<AliasUrlProvider>() // not enabled by default
+                .Append<AliasUrlProvider>()
                 .Append<DefaultUrlProvider>()
                 .Append<CustomRouteUrlProvider>();
 
@@ -169,9 +172,9 @@ namespace Umbraco.Web.Runtime
                 // all built-in finders in the correct order,
                 // devs can then modify this list on application startup
                 .Append<ContentFinderByPageIdQuery>()
-                .Append<ContentFinderByNiceUrl>()
+                .Append<ContentFinderByUrl>()
                 .Append<ContentFinderByIdPath>()
-                .Append<ContentFinderByNiceUrlAndTemplate>()
+                .Append<ContentFinderByUrlAndTemplate>()
                 .Append<ContentFinderByUrlAlias>()
                 .Append<ContentFinderByRedirectUrl>();
 
@@ -212,6 +215,7 @@ namespace Umbraco.Web.Runtime
             IUserService userService,
             IUmbracoSettingsSection umbracoSettings,
             IGlobalSettings globalSettings,
+            IEntityService entityService,
             UrlProviderCollection urlProviders)
         {
             // setup mvc and webapi services
@@ -248,7 +252,8 @@ namespace Umbraco.Web.Runtime
                 new WebSecurity(httpContext, userService, globalSettings),
                 umbracoSettings,
                 urlProviders,
-                globalSettings);
+                globalSettings,
+                entityService);
 
             // ensure WebAPI is initialized, after everything
             GlobalConfiguration.Configuration.EnsureInitialized();

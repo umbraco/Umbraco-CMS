@@ -94,7 +94,7 @@ namespace Umbraco.Web.Security
             _umbracoContext = umbracoContext;
             _membershipProvider = membershipProvider;
             _roleProvider = roleProvider;
-            _memberCache = umbracoContext.PublishedShapshot.Members;
+            _memberCache = umbracoContext.PublishedSnapshot.Members;
 
             // helpers are *not* instanciated by the container so we have to
             // get our dependencies injected manually, through properties.

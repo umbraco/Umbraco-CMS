@@ -1,10 +1,10 @@
 ﻿namespace Umbraco.Web.PublishedCache
 {
     /// <summary>
-    /// Provides access to the "current" <see cref="IPublishedShapshot"/>.
+    /// Provides access to the "current" <see cref="IPublishedSnapshot"/>.
     /// </summary>
     public interface IPublishedSnapshotAccessor
     {
-        IPublishedShapshot PublishedSnapshot { get; set; }
+        IPublishedSnapshot PublishedSnapshot { get; set; }
     }
 }

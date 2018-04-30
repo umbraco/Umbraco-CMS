@@ -127,7 +127,7 @@ namespace umbraco
         /// <returns>String with a friendly url from a node</returns>
         public static string NiceUrl(int nodeID)
         {
-            return GetUmbracoHelper().NiceUrl(nodeID);
+            return GetUmbracoHelper().Url(nodeID);
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace umbraco
         /// <returns>String with a friendly url with full domain from a node</returns>
         public static string NiceUrlWithDomain(int nodeId)
         {
-            return GetUmbracoHelper().NiceUrlWithDomain(nodeId);
+            return GetUmbracoHelper().UrlAbsolute(nodeId);
         }
 
         /// <summary>

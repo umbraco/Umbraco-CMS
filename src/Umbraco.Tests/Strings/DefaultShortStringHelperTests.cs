@@ -596,32 +596,7 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual(expected, output);
         }
 
-        [Test] // can't do cases with an IDictionary
-        public void ReplaceManyWithCharMap()
-        {
-            const string input = "télévisiön tzvâr ßup &nbsp; pof";
-            const string expected = "television tzvar ssup   pof";
-            IDictionary<string, string> replacements = new Dictionary<string, string>
-                {
-                    { "é", "e" },
-                    { "ö", "o" },
-                    { "â", "a" },
-                    { "ß", "ss" },
-                    { "&nbsp;", " " },
-                };
-            var output = _helper.ReplaceMany(input, replacements);
-            Assert.AreEqual(expected, output);
-        }
-
-        #region Cases
-        [TestCase("val$id!ate|this|str'ing", "$!'", '-', "val-id-ate|this|str-ing")]
-        [TestCase("val$id!ate|this|str'ing", "$!'", '*', "val*id*ate|this|str*ing")]
-        #endregion
-        public void ReplaceManyByOneChar(string input, string toReplace, char replacement, string expected)
-        {
-            var output = _helper.ReplaceMany(input, toReplace.ToArray(), replacement);
-            Assert.AreEqual(expected, output);
-        }
+        
 
         #region Cases
         [TestCase("foo.txt", "foo.txt")]

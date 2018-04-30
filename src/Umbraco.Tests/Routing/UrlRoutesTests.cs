@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Routing
     // the quirks due to hideTopLevelFromPath and backward compatibility.
 
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
-    public class NiceUrlRoutesTests : TestWithDatabaseBase
+    public class UrlRoutesTests : TestWithDatabaseBase
     {
         #region Test Setup
 

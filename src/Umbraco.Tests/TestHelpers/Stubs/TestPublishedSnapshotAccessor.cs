@@ -4,6 +4,6 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 {
     public class TestPublishedSnapshotAccessor : IPublishedSnapshotAccessor
     {
-        public IPublishedShapshot PublishedSnapshot { get; set; }
+        public IPublishedSnapshot PublishedSnapshot { get; set; }
     }
 }

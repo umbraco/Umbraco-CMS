@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 namespace Umbraco.Web.PublishedCache.NuCache
@@ -9,6 +10,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private static string DraftOrPub(bool previewing)
         {
             return previewing ? "D:" : "P:";
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string LangId(string culture)
+        {
+            return culture != null ? ("-L:" + culture) : string.Empty;
         }
 
         public static string PublishedContentChildren(Guid contentUid, bool previewing)
@@ -50,14 +57,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // a valid ID in the database at that point, whereas content and properties
         // may be virtual (and not in umbracoNode).
 
-        public static string ContentCacheRouteByContent(int id, bool previewing)
+        public static string ContentCacheRouteByContent(int id, bool previewing, string culture)
         {
-            return "NuCache.ContentCache.RouteByContent[" + DraftOrPub(previewing) + id + "]";
+            return "NuCache.ContentCache.RouteByContent[" + DraftOrPub(previewing) + id + LangId(culture) + "]";
         }
 
-        public static string ContentCacheContentByRoute(string route, bool previewing)
+        public static string ContentCacheContentByRoute(string route, bool previewing, string culture)
         {
-            return "NuCache.ContentCache.ContentByRoute[" + DraftOrPub(previewing) + route + "]";
+            return "NuCache.ContentCache.ContentByRoute[" + DraftOrPub(previewing) + route + LangId(culture) + "]";
         }
 
         //public static string ContentCacheRouteByContentStartsWith()

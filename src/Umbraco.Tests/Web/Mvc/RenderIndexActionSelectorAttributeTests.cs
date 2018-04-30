@@ -71,7 +71,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<WebSecurity>(null, null, globalSettings).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
-                globalSettings, 
+                globalSettings,
+                Mock.Of<IEntityService>(),
                 true);
             var ctrl = new MatchesDefaultIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);
@@ -94,7 +95,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<WebSecurity>(null, null, globalSettings).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
-                globalSettings, 
+                globalSettings,
+                Mock.Of<IEntityService>(),
                 true);
             var ctrl = new MatchesOverriddenIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);
@@ -117,7 +119,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<WebSecurity>(null, null, globalSettings).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
-                globalSettings, 
+                globalSettings,
+                Mock.Of<IEntityService>(),
                 true);
             var ctrl = new MatchesCustomIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);
@@ -140,7 +143,8 @@ namespace Umbraco.Tests.Web.Mvc
                 new Mock<WebSecurity>(null, null, globalSettings).Object,
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
-                globalSettings, 
+                globalSettings,
+                Mock.Of<IEntityService>(),
                 true);
             var ctrl = new MatchesAsyncIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);

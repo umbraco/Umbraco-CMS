@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Translations = new List<IDictionaryTranslation>
                     {
-                        new DictionaryTranslation(ServiceContext.LocalizationService.GetLanguageByCultureCode("en-US"), "Hello world")
+                        new DictionaryTranslation(ServiceContext.LocalizationService.GetLanguageByIsoCode("en-US"), "Hello world")
                     }
                 };
 
@@ -70,7 +70,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Translations = new List<IDictionaryTranslation>
                     {
-                        new DictionaryTranslation(ServiceContext.LocalizationService.GetLanguageByCultureCode("en-US"), "Hello world")
+                        new DictionaryTranslation(ServiceContext.LocalizationService.GetLanguageByIsoCode("en-US"), "Hello world")
                     }
                 };
 
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     Translations = new List<IDictionaryTranslation>
                     {
-                        new DictionaryTranslation(ServiceContext.LocalizationService.GetLanguageByCultureCode("en-US"), "Hello world")
+                        new DictionaryTranslation(ServiceContext.LocalizationService.GetLanguageByIsoCode("en-US"), "Hello world")
                     }
                 };
 
@@ -371,7 +371,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         public void CreateTestData()
         {
-            var language = ServiceContext.LocalizationService.GetLanguageByCultureCode("en-US");
+            var language = ServiceContext.LocalizationService.GetLanguageByIsoCode("en-US");
 
             var languageDK = new Language("da-DK") { CultureName = "da-DK" };
             ServiceContext.LocalizationService.Save(languageDK);//Id 2

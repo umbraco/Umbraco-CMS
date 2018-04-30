@@ -401,6 +401,7 @@
     <Content Include="Umbraco_Client\Dialogs\AssignDomain2.js" />
     <Content Include="Umbraco_Client\Dialogs\AssignDomain2.css" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
+    <Content Include="Umbraco_Client\PunyCode\punycode.min.js" />
     <Content Include="Umbraco_Client\Splitbutton\InsertMacroSplitButton.js" />
     <Content Include="Umbraco_Client\Tablesorting\img\asc.gif" />
     <Content Include="Umbraco_Client\Tablesorting\img\desc.gif" />

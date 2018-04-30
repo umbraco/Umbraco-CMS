@@ -56,6 +56,9 @@ namespace Umbraco.Web
         public IUserService UserService { get; set; }
 
         [Inject]
+        public IEntityService EntityService { get; set; }
+
+        [Inject]
         public UrlProviderCollection UrlProviders { get; set; }
 
         [Inject]
@@ -112,6 +115,7 @@ namespace Umbraco.Web
                 UmbracoConfig.For.UmbracoSettings(),
                 UrlProviders,
                 GlobalSettings,
+                EntityService,
                 true);
         }
 

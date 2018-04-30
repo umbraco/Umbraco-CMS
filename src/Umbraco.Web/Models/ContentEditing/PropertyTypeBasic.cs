@@ -46,5 +46,8 @@ namespace Umbraco.Web.Models.ContentEditing
         //SD: Is this really needed ?
         [DataMember(Name = "groupId")]
         public int GroupId { get; set; }
+
+        [DataMember(Name = "allowCultureVariant")]
+        public bool AllowCultureVariant { get; set; }
     }
 }

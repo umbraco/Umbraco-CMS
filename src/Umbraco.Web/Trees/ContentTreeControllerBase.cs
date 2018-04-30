@@ -211,7 +211,7 @@ namespace Umbraco.Web.Trees
             }
 
             //This should really never be null, but we'll error check anyways
-            int? currLangId = langId.HasValue ? langId.Value : Services.LocalizationService.GetDefaultVariantLanguage()?.Id;
+            var currLangId = langId ?? Services.LocalizationService.GetDefaultLanguageId();
 
             //Try to see if there is a variant name for the current language for the item and set the name accordingly.
             //If any of this fails, the tree node name will remain the default invariant culture name.

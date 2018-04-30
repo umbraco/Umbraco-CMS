@@ -265,8 +265,12 @@ namespace Umbraco.Web.Routing
 
             _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Uri=\"{request.Uri}\"");
 
+            var domainsCache = request.UmbracoContext.PublishedSnapshot.Domains;
+            var domains = domainsCache.GetAll(includeWildcards: false);
+            var defaultCulture = domainsCache.DefaultCulture;
+
             // try to find a domain matching the current request
-            var domainAndUri = DomainHelper.DomainForUri(request.UmbracoContext.PublishedShapshot.Domains.GetAll(false), request.Uri);
+            var domainAndUri = DomainHelper.SelectDomain(domains, request.Uri, defaultCulture: defaultCulture);
 
             // handle domain - always has a contentId and a culture
             if (domainAndUri != null)
@@ -289,8 +293,7 @@ namespace Umbraco.Web.Routing
                 // not matching any existing domain
                 _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Matches no domain");
 
-                var defaultLanguage = _services.LocalizationService.GetAllLanguages().FirstOrDefault();
-                request.Culture = defaultLanguage == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultLanguage.IsoCode);
+                request.Culture = defaultCulture == null ? CultureInfo.CurrentUICulture : new CultureInfo(defaultCulture);
             }
 
             _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Culture=\"{request.Culture.Name}\"");
@@ -311,7 +314,7 @@ namespace Umbraco.Web.Routing
             var nodePath = request.PublishedContent.Path;
             _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Path=\"{nodePath}\"");
             var rootNodeId = request.HasDomain ? request.Domain.ContentId : (int?)null;
-            var domain = DomainHelper.FindWildcardDomainInPath(request.UmbracoContext.PublishedShapshot.Domains.GetAll(true), nodePath, rootNodeId);
+            var domain = DomainHelper.FindWildcardDomainInPath(request.UmbracoContext.PublishedSnapshot.Domains.GetAll(true), nodePath, rootNodeId);
 
             // always has a contentId and a culture
             if (domain != null)
@@ -602,14 +605,14 @@ namespace Umbraco.Web.Routing
                     var loginPageId = publicAccessAttempt.Result.LoginNodeId;
 
                     if (loginPageId != request.PublishedContent.Id)
-                        request.PublishedContent = request.UmbracoContext.PublishedShapshot.Content.GetById(loginPageId);
+                        request.PublishedContent = request.UmbracoContext.PublishedSnapshot.Content.GetById(loginPageId);
                 }
                 else if (_services.PublicAccessService.HasAccess(request.PublishedContent.Id, _services.ContentService, GetRolesForLogin(membershipHelper.CurrentUserName)) == false)
                 {
                     _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Current member has not access, redirect to error page");
                     var errorPageId = publicAccessAttempt.Result.NoAccessNodeId;
                     if (errorPageId != request.PublishedContent.Id)
-                        request.PublishedContent = request.UmbracoContext.PublishedShapshot.Content.GetById(errorPageId);
+                        request.PublishedContent = request.UmbracoContext.PublishedSnapshot.Content.GetById(errorPageId);
                 }
                 else
                 {

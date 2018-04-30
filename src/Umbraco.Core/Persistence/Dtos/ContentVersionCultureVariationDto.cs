@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     internal class ContentVersionCultureVariationDto
     {
-        private const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCultureVariation;
+        public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCultureVariation;
 
         [Column("id")]
         [PrimaryKeyColumn]

@@ -25,10 +25,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly ICacheProvider _elementsCache;
         private readonly DomainHelper _domainHelper;
         private readonly IGlobalSettings _globalSettings;
+        private readonly ILocalizationService _localizationService;
 
         #region Constructor
 
-        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider snapshotCache, ICacheProvider elementsCache, DomainHelper domainHelper, IGlobalSettings globalSettings)
+        public ContentCache(bool previewDefault, ContentStore.Snapshot snapshot, ICacheProvider snapshotCache, ICacheProvider elementsCache, DomainHelper domainHelper, IGlobalSettings globalSettings, ILocalizationService localizationService)
             : base(previewDefault)
         {
             _snapshot = snapshot;
@@ -36,6 +37,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _elementsCache = elementsCache;
             _domainHelper = domainHelper;
             _globalSettings = globalSettings;
+            _localizationService = localizationService;
         }
 
         private bool HideTopLevelNodeFromPath => _globalSettings.HideTopLevelNodeFromPath;
@@ -53,21 +55,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // at the moment we try our best to be backward compatible, but really,
         // should get rid of hideTopLevelNode and other oddities entirely, eventually
 
-        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null)
+        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string culture = null)
         {
-            return GetByRoute(PreviewDefault, route, hideTopLevelNode);
+            return GetByRoute(PreviewDefault, route, hideTopLevelNode, culture);
         }
 
-        public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null)
+        public IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string culture = null)
         {
             if (route == null) throw new ArgumentNullException(nameof(route));
 
             var cache = preview == false || PublishedSnapshotService.FullCacheWhenPreviewing ? _elementsCache : _snapshotCache;
-            var key = CacheKeys.ContentCacheContentByRoute(route, preview);
-            return cache.GetCacheItem<IPublishedContent>(key, () => GetByRouteInternal(preview, route, hideTopLevelNode));
+            var key = CacheKeys.ContentCacheContentByRoute(route, preview, culture);
+            return cache.GetCacheItem<IPublishedContent>(key, () => GetByRouteInternal(preview, route, hideTopLevelNode, culture));
         }
 
-        private IPublishedContent GetByRouteInternal(bool preview, string route, bool? hideTopLevelNode)
+        private IPublishedContent GetByRouteInternal(bool preview, string route, bool? hideTopLevelNode, string culture)
         {
             hideTopLevelNode = hideTopLevelNode ?? HideTopLevelNodeFromPath; // default = settings
 
@@ -88,7 +90,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // note: if domain has a path (eg example.com/en) which is not recommended anymore
                 //  then then /en part of the domain is basically ignored here...
                 content = GetById(preview, startNodeId);
-                content = FollowRoute(content, parts, 0);
+                content = FollowRoute(content, parts, 0, culture);
             }
             else if (parts.Length == 0)
             {
@@ -102,9 +104,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // hideTopLevelNode = support legacy stuff, look for /*/path/to/node
                 // else normal, look for /path/to/node
                 content = hideTopLevelNode.Value
-                    ? GetAtRoot(preview).SelectMany(x => x.Children).FirstOrDefault(x => x.UrlName == parts[0])
-                    : GetAtRoot(preview).FirstOrDefault(x => x.UrlName == parts[0]);
-                content = FollowRoute(content, parts, 1);
+                    ? GetAtRoot(preview).SelectMany(x => x.Children).FirstOrDefault(x => x.GetUrlName(_localizationService, culture) == parts[0])
+                    : GetAtRoot(preview).FirstOrDefault(x => x.GetUrlName(_localizationService, culture) == parts[0]);
+                content = FollowRoute(content, parts, 1, culture);
             }
 
             // if hideTopLevelNodePath is true then for url /foo we looked for /*/foo
@@ -112,25 +114,25 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // have to look for /foo (see note in ApplyHideTopLevelNodeFromPath).
             if (content == null && hideTopLevelNode.Value && parts.Length == 1)
             {
-                content = GetAtRoot(preview).FirstOrDefault(x => x.UrlName == parts[0]);
+                content = GetAtRoot(preview).FirstOrDefault(x => x.GetUrlName(_localizationService, culture) == parts[0]);
             }
 
             return content;
         }
 
-        public string GetRouteById(int contentId)
+        public string GetRouteById(int contentId, string culture = null)
         {
-            return GetRouteById(PreviewDefault, contentId);
+            return GetRouteById(PreviewDefault, contentId, culture);
         }
 
-        public string GetRouteById(bool preview, int contentId)
+        public string GetRouteById(bool preview, int contentId, string culture = null)
         {
             var cache = (preview == false || PublishedSnapshotService.FullCacheWhenPreviewing) ? _elementsCache : _snapshotCache;
-            var key = CacheKeys.ContentCacheRouteByContent(contentId, preview);
-            return cache.GetCacheItem<string>(key, () => GetRouteByIdInternal(preview, contentId, null));
+            var key = CacheKeys.ContentCacheRouteByContent(contentId, preview, culture);
+            return cache.GetCacheItem<string>(key, () => GetRouteByIdInternal(preview, contentId, null, culture));
         }
 
-        private string GetRouteByIdInternal(bool preview, int contentId, bool? hideTopLevelNode)
+        private string GetRouteByIdInternal(bool preview, int contentId, bool? hideTopLevelNode, string culture)
         {
             var node = GetById(preview, contentId);
             if (node == null)
@@ -145,8 +147,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var hasDomains = _domainHelper.NodeHasDomains(n.Id);
             while (hasDomains == false && n != null) // n is null at root
             {
-                // get the url
-                var urlName = n.UrlName;
+                var urlName = n.GetUrlName(_localizationService, culture);
+
                 pathParts.Add(urlName);
 
                 // move to parent node
@@ -161,18 +163,24 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // assemble the route
             pathParts.Reverse();
             var path = "/" + string.Join("/", pathParts); // will be "/" or "/foo" or "/foo/bar" etc
-            var route = (n?.Id.ToString(CultureInfo.InvariantCulture) ?? "") + path;
+            //prefix the root node id containing the domain if it exists (this is a standard way of creating route paths)
+            //and is done so that we know the ID of the domain node for the path
+            var route = (n?.Id.ToString(CultureInfo.InvariantCulture) ?? "") + path; 
 
             return route;
         }
 
-        private static IPublishedContent FollowRoute(IPublishedContent content, IReadOnlyList<string> parts, int start)
+        private IPublishedContent FollowRoute(IPublishedContent content, IReadOnlyList<string> parts, int start, string culture)
         {
             var i = start;
             while (content != null && i < parts.Count)
             {
                 var part = parts[i++];
-                content = content.Children.FirstOrDefault(x => x.UrlName == part);
+                content = content.Children.FirstOrDefault(x =>
+                {
+                    var urlName = x.GetUrlName(_localizationService, culture);
+                    return urlName == part;
+                });
             }
             return content;
         }
@@ -248,7 +256,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return GetAtRootNoCache(preview);
 
             // note: ToArray is important here, we want to cache the result, not the function!
-            return (IEnumerable<IPublishedContent>) cache.GetCacheItem(
+            return (IEnumerable<IPublishedContent>)cache.GetCacheItem(
                 CacheKeys.ContentCacheRoots(preview),
                 () => GetAtRootNoCache(preview).ToArray());
         }
