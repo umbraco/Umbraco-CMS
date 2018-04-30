@@ -18,8 +18,6 @@ namespace Umbraco.Core.Services
         IPartialView GetPartialView(string path);
         IPartialView GetPartialViewMacro(string path);
         IEnumerable<IPartialView> GetPartialViewMacros(params string[] names);
-        IXsltFile GetXsltFile(string path);
-        IEnumerable<IXsltFile> GetXsltFiles(params string[] names);
         Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = 0);
         Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = 0);
         bool DeletePartialView(string path, int userId = 0);
@@ -304,27 +302,6 @@ namespace Umbraco.Core.Services
         /// <param name="filepath">The filesystem path to the script file.</param>
         /// <returns>The size of the script file.</returns>
         long GetScriptFileSize(string filepath);
-
-        /// <summary>
-        /// Gets the content of a XSLT file as a stream.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the XSLT file.</param>
-        /// <returns>The content of the XSLT file.</returns>
-        Stream GetXsltFileContentStream(string filepath);
-
-        /// <summary>
-        /// Sets the content of a XSLT file.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the XSLT file.</param>
-        /// <param name="content">The content of the XSLT file.</param>
-        void SetXsltFileContent(string filepath, Stream content);
-
-        /// <summary>
-        /// Gets the size of a XSLT file.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the XSLT file.</param>
-        /// <returns>The size of the XSLT file.</returns>
-        long GetXsltFileSize(string filepath);
 
         /// <summary>
         /// Gets the content of a macro partial view as a stream.

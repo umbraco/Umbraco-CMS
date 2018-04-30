@@ -76,7 +76,6 @@ namespace Umbraco.Core.Composing.CompositionRoots
             container.RegisterSingleton<IPartialViewRepository, PartialViewRepository>();
             container.RegisterSingleton<IScriptRepository, ScriptRepository>();
             container.RegisterSingleton<IStylesheetRepository, StylesheetRepository>();
-            container.RegisterSingleton<IXsltFileRepository, XsltFileRepository>();
         }
     }
 }

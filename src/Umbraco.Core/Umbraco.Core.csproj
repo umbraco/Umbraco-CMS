@@ -686,7 +686,6 @@
     <Compile Include="Models\IServerRegistration.cs" />
     <Compile Include="Models\ITag.cs" />
     <Compile Include="Models\ITemplate.cs" />
-    <Compile Include="Models\IXsltFile.cs" />
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Macro.cs" />
     <Compile Include="Models\MacroProperty.cs" />
@@ -844,7 +843,6 @@
     <Compile Include="Models\ObjectTypes.cs" />
     <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="Models\Validation\RequiredForPersistenceAttribute.cs" />
-    <Compile Include="Models\XsltFile.cs" />
     <Compile Include="MonitorLock.cs" />
     <Compile Include="NamedUdiRange.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
@@ -1178,7 +1176,6 @@
     <Compile Include="Persistence\Repositories\IUserGroupRepository.cs" />
     <Compile Include="Persistence\Repositories\IUserRepository.cs" />
     <Compile Include="Persistence\IWriteRepository.cs" />
-    <Compile Include="Persistence\Repositories\IXsltFileRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\LanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\MacroRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\MediaRepository.cs" />
@@ -1213,7 +1210,6 @@
     <Compile Include="Persistence\Repositories\Implement\UserRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentRepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\Implement\VersionableRepositoryBaseAliasRegex.cs" />
-    <Compile Include="Persistence\Repositories\Implement\XsltFileRepository.cs" />
     <Compile Include="Persistence\SqlContext.cs" />
     <Compile Include="Persistence\SqlSyntax\ColumnInfo.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />

@@ -105,11 +105,6 @@ namespace Umbraco.Web.Cache
                 {
                     CacheKeys.MacroCacheKey, // umbraco.cms.businesslogic.macro.Macro objects cache
                     CacheKeys.MacroContentCacheKey, // macro render cache
-                    //CacheKeys.MacroControlCacheKey,
-                    //CacheKeys.MacroHtmlCacheKey,
-                    //CacheKeys.MacroHtmlDateAddedCacheKey,
-                    //CacheKeys.MacroControlDateAddedCacheKey,
-                    CacheKeys.MacroXsltCacheKey, // XsltMacroEngine transforms cache
                 };
         }
 
