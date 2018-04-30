@@ -1228,24 +1228,6 @@ namespace Umbraco.Web
 
         #region Culture
 
-        //TODO: Not used
-        ///// <summary>
-        ///// Gets the culture that would be selected to render a specified content,
-        ///// within the context of a specified current request.
-        ///// </summary>
-        ///// <param name="content">The content.</param>
-        ///// <param name="current">The request Uri.</param>
-        ///// <returns>The culture that would be selected to render the content.</returns>
-        //public static CultureInfo GetCulture(this IPublishedContent content, Uri current = null)
-        //{
-        //    return Models.ContentExtensions.GetCulture(UmbracoContext.Current,
-        //        Current.Services.DomainService,
-        //        Current.Services.LocalizationService,
-        //        Current.Services.ContentService,
-        //        content.Id, content.Path,
-        //        current);
-        //}
-
         /// <summary>
         /// Return the URL name for the <see cref="IPublishedContent"/> based on the culture specified or default culture defined
         /// </summary>
