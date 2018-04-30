@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PublishController($scope, eventsService) {
+    function PublishController($scope) {
 
         var vm = this;
         var variants = $scope.model.variants;

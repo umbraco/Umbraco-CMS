@@ -213,11 +213,15 @@ Use this directive to construct a header inside the main editor window.
             scope.vm.currentVariant = "";
 
             function onInit() {
+                setVariantDraftState(scope.variants);
+
                 setCurrentVariant(scope.variants);
                 setVariantStatusColor(scope.variants);
             }
 
             function setCurrentVariant(variants) {
+                setVariantDraftState(variants);
+
                 angular.forEach(variants, function (variant) {
                     if(variant.current) {
                         scope.vm.currentVariant = variant;
@@ -245,8 +249,16 @@ Use this directive to construct a header inside the main editor window.
                 });
             }
 
-            scope.goBack = function() {
-                if(scope.onBack) {
+            function setVariantDraftState(variants) {
+                _.each(variants, function (variant) {
+                    if (variant.isEdited === true && !variant.state.includes("Draft")) {
+                        variant.state += ", Draft";
+                    }
+                });
+            }
+
+            scope.goBack = function () {
+                if (scope.onBack) {
                     scope.onBack();
                 }
             };
