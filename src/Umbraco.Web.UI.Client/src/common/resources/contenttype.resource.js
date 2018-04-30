@@ -260,11 +260,19 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                 'Failed to copy content');
         },
 
-        createContainer: function(parentId, name) {
+        createContainer: function (parentId, name) {
 
             return umbRequestHelper.resourcePromise(
-                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateContainer", { parentId: parentId, name: name })),
+                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateContainer", { parentId: parentId, name: name })),
                 'Failed to create a folder under parent id ' + parentId);
+
+        },
+
+        createCollection: function (parentId, collectionName, itemName) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateCollection", { parentId: parentId,  collectionName: collectionName, itemName: itemName})),
+                'Failed to create collection under ' + parentId);
 
         },
 

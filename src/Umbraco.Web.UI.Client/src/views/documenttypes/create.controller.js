@@ -12,6 +12,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
         allowCreateFolder: $scope.dialogOptions.currentNode.parentId === null || $scope.dialogOptions.currentNode.nodeType === "container",
         folderName: "",
         creatingFolder: false,
+        creatingDoctypeCollection: false
     };
 
     var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
@@ -22,6 +23,10 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
     $scope.showCreateFolder = function () {
         $scope.model.creatingFolder = true;
+    };
+
+    $scope.showCreateDocTypeCollection = function () {
+        $scope.model.creatingDoctypeCollection = true;
     };
 
     $scope.createContainer = function () {
@@ -46,6 +51,39 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
                 });
 
                 var section = appState.getSectionState("currentSection");
+
+            }, function (err) {
+
+                $scope.error = err;
+
+                //show any notifications
+                if (angular.isArray(err.data.notifications)) {
+                    for (var i = 0; i < err.data.notifications.length; i++) {
+                        notificationsService.showNotification(err.data.notifications[i]);
+                    }
+                }
+            });
+        }
+    };
+
+    $scope.createCollection = function () {
+
+        if (formHelper.submitForm({ scope: $scope, formCtrl: this.createDoctypeCollectionForm, statusMessage: "Creating Doctype Collection..." })) {
+
+            contentTypeResource.createCollection(node.id, $scope.model.collectionName, $scope.model.collectionItemName).then(function (collectionData) {
+
+                navigationService.hideMenu();
+                $location.search('create', null);
+                $location.search('notemplate', null);
+
+                formHelper.resetForm({
+                    scope: $scope
+                });
+
+                var section = appState.getSectionState("currentSection");
+
+                // redirect to the item id
+                $location.path("/settings/documenttypes/edit/" + collectionData.ItemId);
 
             }, function (err) {
 
