@@ -191,7 +191,7 @@ namespace Umbraco.Web.Editors
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
         
-        public DocumentTypeCollectionDisplay PostCreateCollection(int parentId, string collectionName, string itemName)
+        public DocumentTypeCollectionDisplay PostCreateCollection(int parentId, string collectionName, string collectionItemName, string collectionIcon, string collectionItemIcon)
         {
             var storeInContainer = false;
             var allowUnderDocType = -1;
@@ -209,16 +209,17 @@ namespace Umbraco.Web.Editors
 
             // create item doctype
             var itemDocType = new ContentType(parentId);
-            itemDocType.Name = itemName;
-            itemDocType.Alias = itemName.ToSafeAlias();
-            itemDocType.Icon = "icon-document";
+            itemDocType.Name = collectionItemName;
+            itemDocType.Alias = collectionItemName.ToSafeAlias();
+            itemDocType.Icon = collectionItemIcon;
             Services.ContentTypeService.Save(itemDocType);
 
             // create collection doctype
             var collectionDocType = new ContentType(parentId);
             collectionDocType.Name = collectionName;
             collectionDocType.Alias = collectionName.ToSafeAlias();
-            collectionDocType.Icon = "icon-folders";
+            collectionDocType.Icon = collectionIcon;
+            collectionDocType.IsContainer = true;
             collectionDocType.AllowedContentTypes = new List<ContentTypeSort>()
             {
                 new ContentTypeSort(itemDocType.Id, 0)

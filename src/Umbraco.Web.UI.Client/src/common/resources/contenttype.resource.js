@@ -268,10 +268,10 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
 
         },
 
-        createCollection: function (parentId, collectionName, itemName) {
+        createCollection: function (parentId, collectionName, collectionItemName, collectionIcon, collectionItemIcon) {
 
             return umbRequestHelper.resourcePromise(
-                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateCollection", { parentId: parentId,  collectionName: collectionName, itemName: itemName})),
+                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateCollection", { parentId: parentId, collectionName: collectionName, collectionItemName: collectionItemName, collectionIcon: collectionIcon, collectionItemIcon: collectionItemIcon})),
                 'Failed to create collection under ' + parentId);
 
         },
