@@ -149,7 +149,7 @@ namespace umbraco
 
         void populatePageData(XmlNode node)
         {
-            String s;
+            string s;
             DateTime dt;
             Guid guid;
             int i;
@@ -250,21 +250,6 @@ namespace umbraco
                     Current.Logger.Debug<page>(
                         string.Format("Load element \"{0}\"", alias));
                 }
-            }
-        }
-
-        #endregion
-
-        #region Wtf?
-
-        public void RenderPage(int templateId)
-        {
-            if (templateId != 0)
-            {
-                template templateDesign = new template(templateId);
-
-                _pageContentControl = templateDesign.ParseWithControls(this);
-                _pageContent.Append(templateDesign.TemplateContent);
             }
         }
 

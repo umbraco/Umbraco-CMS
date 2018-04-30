@@ -213,12 +213,6 @@ namespace umbraco.cms.businesslogic.packager
                     retVal.UmbracoVersion = parsedVersion;
                 }
 
-                bool enableSkins = false;
-                bool.TryParse(SafeAttribute("enableSkins", n), out enableSkins);
-                retVal.EnableSkins = enableSkins;
-
-                retVal.SkinRepoGuid = string.IsNullOrEmpty(SafeAttribute("skinRepoGuid", n)) ? Guid.Empty : new Guid(SafeAttribute("skinRepoGuid", n));
-
                 retVal.License = SafeNodeValue(n.SelectSingleNode("license"));
                 retVal.LicenseUrl = n.SelectSingleNode("license").Attributes.GetNamedItem("url").Value;
 
@@ -293,8 +287,6 @@ namespace umbraco.cms.businesslogic.packager
             XmlHelper.SetAttribute(Source, xmlDef, "repositoryGuid", package.RepositoryGuid);
             XmlHelper.SetAttribute(Source, xmlDef, "packageGuid", package.PackageGuid);
             XmlHelper.SetAttribute(Source, xmlDef, "hasUpdate", package.HasUpdate.ToString());
-            XmlHelper.SetAttribute(Source, xmlDef, "enableSkins", package.EnableSkins.ToString());
-            XmlHelper.SetAttribute(Source, xmlDef, "skinRepoGuid", package.SkinRepoGuid.ToString());
             XmlHelper.SetAttribute(Source, xmlDef, "iconUrl", package.IconUrl);
             if (package.UmbracoVersion != null)
                 XmlHelper.SetAttribute(Source, xmlDef, "umbVersion", package.UmbracoVersion.ToString(3));

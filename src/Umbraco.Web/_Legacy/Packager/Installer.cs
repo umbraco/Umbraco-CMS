@@ -247,10 +247,6 @@ namespace umbraco.cms.businesslogic.packager
             insPack.Data.Url = packUrl;
             insPack.Data.IconUrl = iconUrl;
 
-            //skinning
-            insPack.Data.EnableSkins = enableSkins;
-            insPack.Data.SkinRepoGuid = string.IsNullOrEmpty(skinRepoGuid) ? Guid.Empty : new Guid(skinRepoGuid);
-
             insPack.Data.PackageGuid = guid; //the package unique key.
             insPack.Data.RepositoryGuid = repoGuid; //the repository unique key, if the package is a file install, the repository will not get logged.
             insPack.Save();

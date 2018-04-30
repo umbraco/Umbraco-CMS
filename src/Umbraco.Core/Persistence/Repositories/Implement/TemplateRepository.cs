@@ -776,7 +776,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
             else
             {
-                validExts.Add(_templateConfig.UseAspNetMasterPages ? "master" : "aspx");
+                validExts.Add("master");
             }
 
             // validate path and extension

@@ -145,12 +145,7 @@ namespace Umbraco.Web.Macros
                 var key = member?.ProviderUserKey;
                 if (key == null) return;
             }
-
-            // scripts and xslt can be cached as strings but not controls
-            // as page events (Page_Load) wouldn't be hit -- yet caching
-            // controls is a bad idea, it can lead to plenty of issues ?!
-            // eg with IDs...
-
+            
             // this is legacy and I'm not sure what exactly it is supposed to do
             if (macroContent.Control != null)
                 macroContent.ControlId = macroContent.Control.ID;
