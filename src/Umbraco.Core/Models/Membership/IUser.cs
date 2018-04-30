@@ -18,11 +18,7 @@ namespace Umbraco.Core.Models.Membership
         int[] StartContentIds { get; set; }
         int[] StartMediaIds { get; set; }
         string Language { get; set; }
-
-        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        IUserType UserType { get; set; }
-
+        
         DateTime? EmailConfirmedDate { get; set; }
         DateTime? InvitedDate { get; set; }
 
@@ -36,14 +32,6 @@ namespace Umbraco.Core.Models.Membership
         void AddGroup(IReadOnlyUserGroup group);
 
         IEnumerable<string> AllowedSections { get; }
-
-        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        void RemoveAllowedSection(string sectionAlias);
-
-        [Obsolete("This should not be used it exists for legacy reasons only, use user groups instead, it will be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        void AddAllowedSection(string sectionAlias);
 
         /// <summary>
         /// Exposes the basic profile data

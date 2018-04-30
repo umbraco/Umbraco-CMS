@@ -206,7 +206,6 @@
     <Compile Include="HealthCheck\Checks\Security\HttpsCheck.cs" />
     <Compile Include="HealthCheck\StatusResultType.cs" />
     <Compile Include="HealthCheck\Checks\DataIntegrity\XmlDataIntegrityHealthCheck.cs" />
-    <Compile Include="Media\ImageUrlProviderCollection.cs" />
     <Compile Include="Models\BackOfficeTour.cs" />
     <Compile Include="Models\BackOfficeTourFile.cs" />
     <Compile Include="Models\BackOfficeTourStep.cs" />
@@ -215,7 +214,6 @@
     <Compile Include="Models\ContentEditing\BackOfficePreview.cs" />
     <Compile Include="Models\ContentEditing\CodeFileDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />
-    <Compile Include="Media\ImageUrlProviderCollectionBuilder.cs" />
     <Compile Include="Models\ContentEditing\ContentVariation.cs" />
     <Compile Include="Models\ContentEditing\ContentVariationPublish.cs" />
     <Compile Include="Models\ContentEditing\EditorNavigation.cs" />
@@ -467,7 +465,6 @@
     <Compile Include="_Legacy\Actions\ActionImport.cs" />
     <Compile Include="_Legacy\Actions\ActionMove.cs" />
     <Compile Include="_Legacy\Actions\ActionNew.cs" />
-    <Compile Include="_Legacy\Actions\ActionNewFolder.cs" />
     <Compile Include="_Legacy\Actions\ActionNotify.cs" />
     <Compile Include="_Legacy\Actions\ActionNull.cs" />
     <Compile Include="_Legacy\Actions\ActionPackage.cs" />
@@ -940,8 +937,6 @@
     <Compile Include="Macros\PartialViewMacroController.cs" />
     <Compile Include="Macros\PartialViewMacroEngine.cs" />
     <Compile Include="Macros\PartialViewMacroPage.cs" />
-    <Compile Include="Media\ImageUrl.cs" />
-    <Compile Include="Media\ImageUrlProviders\ImageUrlProvider.cs" />
     <Compile Include="Models\PartialViewMacroModel.cs" />
     <Compile Include="Models\PublishedContentBase.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
@@ -1123,7 +1118,6 @@
     <Compile Include="_Legacy\PackageActions\removeStringFromTemplate.cs" />
     <Compile Include="_Legacy\Packager\data.cs" />
     <Compile Include="_Legacy\Packager\Installer.cs" />
-    <Compile Include="_Legacy\Packager\Package.cs" />
     <Compile Include="_Legacy\Packager\PackageInstance\CreatedPackage.cs" />
     <Compile Include="_Legacy\Packager\PackageInstance\InstalledPackage.cs" />
     <Compile Include="_Legacy\Packager\PackageInstance\IPackageInstance.cs" />
@@ -1163,9 +1157,6 @@
     <Compile Include="umbraco.presentation\umbraco\Default.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\ping.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1181,7 +1172,6 @@
     <Compile Include="umbraco.presentation\umbraco\masterpages\umbracoDialog.master.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\templateControls\Image.cs" />
     <Compile Include="UmbracoHelper.cs" />
     <Compile Include="Mvc\ViewContextExtensions.cs" />
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
@@ -1210,10 +1200,6 @@
     <Compile Include="Routing\LegacyRequestInitializer.cs" />
     <Compile Include="Mvc\ControllerExtensions.cs" />
     <Compile Include="Routing\ContentFinderByUrlAlias.cs" />
-    <Compile Include="Media\ThumbnailProviders\AbstractThumbnailProvider.cs" />
-    <Compile Include="Media\ThumbnailProviders\MediaTypeIconThumbnailProvider.cs" />
-    <Compile Include="Media\ThumbnailProviders\FileExtensionIconThumbnailProvider.cs" />
-    <Compile Include="Media\ThumbnailProviders\ImageThumbnailProvider.cs" />
     <Compile Include="Routing\ContentFinderByIdPath.cs" />
     <Compile Include="TypeLoaderExtensions.cs" />
     <Compile Include="Routing\DomainHelper.cs" />

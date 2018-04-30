@@ -55,7 +55,7 @@ namespace Umbraco.Web.Editors
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetChildren", "id", typeof(int), typeof(Guid), typeof(Udi), typeof(string))));
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetChildren", "id", typeof(int), typeof(Guid), typeof(Udi))));
             }
         }
 
@@ -369,29 +369,6 @@ namespace Umbraco.Web.Editors
             throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
-        [Obsolete("Do not use this method, use either the overload with INT or GUID instead, this will be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
-        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(string id,
-           int pageNumber = 0,
-           int pageSize = 0,
-           string orderBy = "SortOrder",
-           Direction orderDirection = Direction.Ascending,
-           bool orderBySystemField = true,
-           string filter = "")
-        {
-            foreach (var type in new[] { typeof(int), typeof(Guid) })
-            {
-                var parsed = id.TryConvertTo(type);
-                if (parsed)
-                {
-                    //oooh magic! will auto select the right overload
-                    return GetChildren((dynamic)parsed.Result);
-                }
-            }
-
-            throw new HttpResponseException(HttpStatusCode.NotFound);
-        }
         #endregion
 
         /// <summary>

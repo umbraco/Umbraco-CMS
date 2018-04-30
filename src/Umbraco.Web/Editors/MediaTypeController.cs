@@ -40,7 +40,7 @@ namespace Umbraco.Web.Editors
             public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetAllowedChildren", "contentId", typeof(int), typeof(Guid), typeof(Udi), typeof(string))));
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetAllowedChildren", "contentId", typeof(int), typeof(Guid), typeof(Udi))));
             }
         }
 
@@ -260,23 +260,6 @@ namespace Umbraco.Web.Editors
             throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
-        [Obsolete("Do not use this method, use either the overload with INT, GUID or UDI instead, this will be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
-        public IEnumerable<ContentTypeBasic> GetAllowedChildren(string contentId)
-        {
-            foreach (var type in new[] { typeof(int), typeof(Guid) })
-            {
-                var parsed = contentId.TryConvertTo(type);
-                if (parsed)
-                {
-                    //oooh magic! will auto select the right overload
-                    return GetAllowedChildren((dynamic)parsed.Result);
-                }
-            }
-
-            throw new HttpResponseException(HttpStatusCode.NotFound);
-        }
         #endregion
 
         /// <summary>

@@ -261,7 +261,6 @@
     <Compile Include="Configuration\UmbracoSettings\IDistributedCallSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IFileExtension.cs" />
     <Compile Include="Configuration\UmbracoSettings\IImagingAutoFillUploadField.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ILink.cs" />
     <Compile Include="Configuration\UmbracoSettings\ILoggingSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ILogType.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillPropertiesCollection.cs" />
@@ -550,7 +549,6 @@
     <Compile Include="Logging\LogProfiler.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
-    <Compile Include="Logging\ParallelForwardingAppender.cs" />
     <Compile Include="Logging\ProfilerExtensions.cs" />
     <Compile Include="Logging\ProfilingLogger.cs" />
     <Compile Include="Logging\RingBuffer.cs" />
@@ -597,9 +595,7 @@
     <Compile Include="Media\Exif\Utility.cs" />
     <Compile Include="Media\IEmbedProvider.cs" />
     <Compile Include="Media\IEmbedSettingProvider.cs" />
-    <Compile Include="Media\IImageUrlProvider.cs" />
     <Compile Include="Media\ImageExtensions.cs" />
-    <Compile Include="Media\IThumbnailProvider.cs" />
     <Compile Include="Media\ProviderSetting.cs" />
     <Compile Include="Media\Result.cs" />
     <Compile Include="Media\Status.cs" />
@@ -703,7 +699,6 @@
     <Compile Include="Models\Membership\IReadOnlyUserGroup.cs" />
     <Compile Include="Models\Membership\IUser.cs" />
     <Compile Include="Models\Membership\IUserGroup.cs" />
-    <Compile Include="Models\Membership\IUserType.cs" />
     <Compile Include="Models\Membership\MemberCountType.cs" />
     <Compile Include="Models\Membership\MembershipScenario.cs" />
     <Compile Include="Models\Membership\MembershipUserExtensions.cs" />
@@ -715,7 +710,6 @@
     <Compile Include="Models\Membership\UserGroupExtensions.cs" />
     <Compile Include="Models\Membership\UserProfile.cs" />
     <Compile Include="Models\Membership\UserState.cs" />
-    <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\MemberType.cs" />
     <Compile Include="Models\MemberTypePropertyProfileAccess.cs" />
     <Compile Include="Models\MigrationEntry.cs" />

@@ -398,19 +398,6 @@ namespace umbraco
             return GetUmbracoHelper().MemberHasAccess(NodeId, Path);
         }
 
-
-        /// <summary>
-        /// Returns an MD5 hash of the string specified
-        /// </summary>
-        /// <param name="text">The text to create a hash from</param>
-        /// <returns>Md5 hash of the string</returns>
-        [Obsolete("Please use the CreateHash method instead. This may be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static string md5(string text)
-        {
-            return text.ToMd5();
-        }
-
         /// <summary>
         /// Generates a hash based on the text string passed in.  This method will detect the
         /// security requirements (is FIPS enabled) and return an appropriate hash.

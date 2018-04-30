@@ -6,7 +6,6 @@ using Umbraco.Core.Macros;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Media;
-using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -64,13 +63,6 @@ namespace Umbraco.Core.Components
         /// <param name="composition">The composition.</param>
         public static HealthCheckCollectionBuilder HealthChecks(this Composition composition)
             => composition.Container.GetInstance<HealthCheckCollectionBuilder>();
-
-        /// <summary>
-        /// Gets the image url providers collection builder.
-        /// </summary>
-        /// <param name="composition">The composition.</param>
-        internal static ImageUrlProviderCollectionBuilder ImageUrlProviders(this Composition composition)
-            => composition.Container.GetInstance<ImageUrlProviderCollectionBuilder>();
 
         /// <summary>
         /// Gets the url providers collection builder.

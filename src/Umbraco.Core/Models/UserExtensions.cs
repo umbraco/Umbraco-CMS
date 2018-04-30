@@ -112,15 +112,6 @@ namespace Umbraco.Core.Models
 
         }
 
-        public static void ClearAllowedSections(this IUser user)
-        {
-            var allowed = user.AllowedSections.ToArray();
-            foreach (var s in allowed)
-            {
-                user.RemoveAllowedSection(s);
-            }
-        }
-
         /// <summary>
         /// Returns the culture info associated with this user, based on the language they're assigned to in the back office
         /// </summary>

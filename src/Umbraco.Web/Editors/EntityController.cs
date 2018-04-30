@@ -843,8 +843,6 @@ namespace Umbraco.Web.Editors
                     return UmbracoObjectTypes.MediaType;
                 case UmbracoEntityTypes.MemberGroup:
                     return UmbracoObjectTypes.MemberGroup;
-                case UmbracoEntityTypes.ContentItem:
-                    return UmbracoObjectTypes.ContentItem;
                 case UmbracoEntityTypes.MediaType:
                     return UmbracoObjectTypes.MediaType;
                 case UmbracoEntityTypes.DocumentType:
