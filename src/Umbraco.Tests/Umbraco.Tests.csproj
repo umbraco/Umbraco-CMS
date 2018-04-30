@@ -181,9 +181,9 @@
     <Compile Include="Testing\Objects\Accessors\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
     <Compile Include="TestHelpers\Stubs\TestPublishedContent.cs" />
-    <Compile Include="Testing\Objects\Accessors\TestCurrentVariationAccessor.cs" />
+    <Compile Include="Testing\Objects\Accessors\TestVariationContextAccessor.cs" />
     <Compile Include="Testing\ContentBaseExtensions.cs" />
-    <Compile Include="Testing\Objects\Accessors\TestSystemDefaultCultureAccessor.cs" />
+    <Compile Include="Testing\Objects\Accessors\TestDefaultCultureAccessor.cs" />
     <Compile Include="Testing\TestDatabase.cs" />
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />
     <Compile Include="Persistence\LocksTests.cs" />

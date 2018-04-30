@@ -90,11 +90,11 @@ namespace Umbraco.Tests.Scoping
                 contentTypeFactory,
                 null,
                 publishedSnapshotAccessor,
-                Mock.Of<ICurrentVariationAccessor>(),
+                Mock.Of<IVariationContextAccessor>(),
                 Logger,
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
-                SystemDefaultCultureAccessor,
+                DefaultCultureAccessor,
                 new DatabaseDataSource(),
                 Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper());
         }
@@ -114,7 +114,7 @@ namespace Umbraco.Tests.Scoping
                 umbracoSettings ?? SettingsForTests.GetDefaultUmbracoSettings(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                new TestCurrentVariationAccessor());
+                new TestVariationContextAccessor());
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

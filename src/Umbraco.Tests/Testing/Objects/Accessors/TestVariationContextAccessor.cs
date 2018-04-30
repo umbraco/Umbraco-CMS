@@ -3,12 +3,12 @@
 namespace Umbraco.Tests.Testing.Objects.Accessors
 {
     /// <summary>
-    /// Provides an implementation of <see cref="ICurrentVariationAccessor"/> for tests.
+    /// Provides an implementation of <see cref="IVariationContextAccessor"/> for tests.
     /// </summary>
-    public class TestCurrentVariationAccessor : ICurrentVariationAccessor
+    public class TestVariationContextAccessor : IVariationContextAccessor
     {
         /// <inheritdoc />
-        public CurrentVariation CurrentVariation
+        public VariationContext VariationContext
         {
             get;
             set;

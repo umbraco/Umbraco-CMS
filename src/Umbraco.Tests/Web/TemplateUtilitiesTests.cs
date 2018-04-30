@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Web
                 //pass in the custom url provider
                 new[]{ testUrlProvider.Object },
                 globalSettings,
-                new TestCurrentVariationAccessor(),
+                new TestVariationContextAccessor(),
                 true))
             {
                 var output = TemplateUtilities.ParseInternalLinks(input, umbCtx.UrlProvider);

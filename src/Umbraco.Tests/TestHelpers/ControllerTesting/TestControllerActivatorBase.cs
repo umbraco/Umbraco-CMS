@@ -150,7 +150,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == UrlProviderMode.Auto.ToString())),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                new TestCurrentVariationAccessor(),
+                new TestVariationContextAccessor(),
                 true); //replace it
 
             var urlHelper = new Mock<IUrlProvider>();

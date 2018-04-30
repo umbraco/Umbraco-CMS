@@ -1,9 +1,9 @@
 ﻿namespace Umbraco.Web.PublishedCache
 {
     /// <summary>
-    /// Provides the system default culture.
+    /// Gives access to the default culture.
     /// </summary>
-    public interface ISystemDefaultCultureAccessor
+    public interface IDefaultCultureAccessor
     {
         /// <summary>
         /// Gets the system default culture.

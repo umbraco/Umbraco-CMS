@@ -108,8 +108,8 @@ namespace umbraco
         /// </summary>
         /// <param name="content">The content.</param>
         /// <remarks>This is for <see cref="MacroController"/> usage only.</remarks>
-        internal page(IContent content, ICurrentVariationAccessor variationAccessor)
-            : this(new PagePublishedContent(content, variationAccessor))
+        internal page(IContent content, IVariationContextAccessor variationContextAccessor)
+            : this(new PagePublishedContent(content, variationContextAccessor))
         { }
 
         #endregion
@@ -409,7 +409,7 @@ namespace umbraco
             private readonly IPublishedProperty[] _properties;
             private readonly IPublishedContent _parent;
             private IReadOnlyDictionary<string, PublishedCultureInfos> _cultureInfos;
-            private readonly ICurrentVariationAccessor _variationAccessor;
+            private readonly IVariationContextAccessor _variationContextAccessor;
 
             private static readonly IReadOnlyDictionary<string, PublishedCultureInfos> NoCultureInfos = new Dictionary<string, PublishedCultureInfos>();
 
@@ -418,13 +418,13 @@ namespace umbraco
                 _id = id;
             }
 
-            public PagePublishedContent(IContent inner, ICurrentVariationAccessor variationAccessor)
+            public PagePublishedContent(IContent inner, IVariationContextAccessor variationContextAccessor)
             {
                 if (inner == null)
                     throw new NullReferenceException("content");
 
                 _inner = inner;
-                _variationAccessor = variationAccessor;
+                _variationContextAccessor = variationContextAccessor;
                 _id = _inner.Id;
                 _key = _inner.Key;
 
@@ -480,7 +480,7 @@ namespace umbraco
             {
                 // handle context culture
                 if (culture == null)
-                    culture = _variationAccessor.CurrentVariation.Culture;
+                    culture = _variationContextAccessor.VariationContext.Culture;
 
                 // no invariant culture infos
                 if (culture == "") return null;

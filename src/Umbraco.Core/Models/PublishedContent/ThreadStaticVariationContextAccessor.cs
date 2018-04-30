@@ -3,18 +3,18 @@
 namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
-    /// Provides a ThreadStatic-based implementation of <see cref="ICurrentVariationAccessor"/>.
+    /// Provides a ThreadStatic-based implementation of <see cref="IVariationContextAccessor"/>.
     /// </summary>
     /// <remarks>
     /// <para>Something must set the current context.</para>
     /// </remarks>
-    public class ThreadStaticCurrentVariationAccessor : ICurrentVariationAccessor
+    public class ThreadStaticVariationContextAccessor : IVariationContextAccessor
     {
         [ThreadStatic]
-        private static CurrentVariation _context;
+        private static VariationContext _context;
 
         /// <inheritdoc />
-        public CurrentVariation CurrentVariation
+        public VariationContext VariationContext
         {
             get => _context;
             set => _context = value;

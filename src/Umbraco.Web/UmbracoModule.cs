@@ -69,7 +69,7 @@ namespace Umbraco.Web
         internal IUmbracoDatabaseFactory DatabaseFactory { get; set; }
 
         [Inject]
-        internal ICurrentVariationAccessor CurrentVariationAccessor { get; set; }
+        internal IVariationContextAccessor VariationContextAccessor { get; set; }
 
         #endregion
 
@@ -113,7 +113,7 @@ namespace Umbraco.Web
                 UmbracoConfig.For.UmbracoSettings(),
                 UrlProviders,
                 GlobalSettings,
-                CurrentVariationAccessor,
+                VariationContextAccessor,
                 true);
         }
 

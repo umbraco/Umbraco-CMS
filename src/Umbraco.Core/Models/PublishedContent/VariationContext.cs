@@ -1,14 +1,14 @@
 ﻿namespace Umbraco.Core.Models.PublishedContent
 {
     /// <summary>
-    /// Represents the current variation.
+    /// Represents the variation context.
     /// </summary>
-    public class CurrentVariation
+    public class VariationContext
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CurrentVariation"/> class.
+        /// Initializes a new instance of the <see cref="VariationContext"/> class.
         /// </summary>
-        public CurrentVariation(string culture = null, string segment = null)
+        public VariationContext(string culture = null, string segment = null)
         {
             Culture = culture ?? ""; // cannot be null, default to invariant
             Segment = segment ?? ""; // cannot be null, default to neutral

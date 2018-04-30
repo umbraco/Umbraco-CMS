@@ -15,13 +15,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
     {
         private readonly IMember _member;
 
-        private PublishedMember(IMember member, ContentNode contentNode, ContentData contentData, IPublishedSnapshotAccessor publishedSnapshotAccessor, ICurrentVariationAccessor variationAccessor)
-            : base(contentNode, contentData, publishedSnapshotAccessor, variationAccessor)
+        private PublishedMember(IMember member, ContentNode contentNode, ContentData contentData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)
+            : base(contentNode, contentData, publishedSnapshotAccessor, variationContextAccessor)
         {
             _member = member;
         }
 
-        public static IPublishedContent Create(IMember member, PublishedContentType contentType, bool previewing, IPublishedSnapshotAccessor publishedSnapshotAccessor, ICurrentVariationAccessor variationAccessor)
+        public static IPublishedContent Create(IMember member, PublishedContentType contentType, bool previewing, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)
         {
             var d = new ContentData
             {
@@ -37,7 +37,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 member.Level, member.Path, member.SortOrder,
                 member.ParentId,
                 member.CreateDate, member.CreatorId);
-            return new PublishedMember(member, n, d, publishedSnapshotAccessor, variationAccessor).CreateModel();
+            return new PublishedMember(member, n, d, publishedSnapshotAccessor, variationContextAccessor).CreateModel();
         }
 
         private static Dictionary<string, PropertyData[]> GetPropertyValues(PublishedContentType contentType, IMember member)

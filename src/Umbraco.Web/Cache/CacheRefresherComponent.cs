@@ -237,7 +237,7 @@ namespace Umbraco.Web.Cache
                     UmbracoConfig.For.UmbracoSettings(),
                     Current.UrlProviders,
                     UmbracoConfig.For.GlobalSettings(),
-                    Current.Container.GetInstance<ICurrentVariationAccessor>(),
+                    Current.Container.GetInstance<IVariationContextAccessor>(),
                     true);
             }
 

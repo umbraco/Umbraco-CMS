@@ -11,10 +11,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
     {
         private readonly IDomainService _domainService;
 
-        public DomainCache(IDomainService domainService, ISystemDefaultCultureAccessor systemDefaultCultureAccessor)
+        public DomainCache(IDomainService domainService, IDefaultCultureAccessor defaultCultureAccessor)
         {
             _domainService = domainService;
-            DefaultCulture = systemDefaultCultureAccessor.DefaultCulture;
+            DefaultCulture = defaultCultureAccessor.DefaultCulture;
         }
 
         public IEnumerable<Domain> GetAll(bool includeWildcards)

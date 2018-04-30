@@ -70,7 +70,7 @@ namespace Umbraco.Web
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
             IGlobalSettings globalSettings,
-            ICurrentVariationAccessor variationAccessor,
+            IVariationContextAccessor variationContextAccessor,
             bool replace = false)
         {
             if (umbracoContextAccessor == null) throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -88,7 +88,7 @@ namespace Umbraco.Web
 
             // create & assign to accessor, dispose existing if any
             umbracoContextAccessor.UmbracoContext?.Dispose();
-            return umbracoContextAccessor.UmbracoContext = new UmbracoContext(httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings, variationAccessor);
+            return umbracoContextAccessor.UmbracoContext = new UmbracoContext(httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings, variationContextAccessor);
         }
 
         // initializes a new instance of the UmbracoContext class
@@ -101,14 +101,14 @@ namespace Umbraco.Web
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
             IGlobalSettings globalSettings,
-            ICurrentVariationAccessor variationAccessor)
+            IVariationContextAccessor variationContextAccessor)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
             if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
             if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
             if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
-            CurrentVariationAccessor = variationAccessor ??  throw new ArgumentNullException(nameof(variationAccessor));
+            VariationContextAccessor = variationContextAccessor ??  throw new ArgumentNullException(nameof(variationContextAccessor));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
 
             // ensure that this instance is disposed when the request terminates, though we *also* ensure
@@ -138,7 +138,7 @@ namespace Umbraco.Web
             //
             OriginalRequestUrl = GetRequestFromContext()?.Url ?? new Uri("http://localhost");
             CleanedUmbracoUrl = UriUtility.UriToUmbraco(OriginalRequestUrl);
-            UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders, variationAccessor);
+            UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders, variationContextAccessor);
         }
 
         #endregion
@@ -215,7 +215,7 @@ namespace Umbraco.Web
         /// </summary>
         public HttpContextBase HttpContext { get; }
 
-        public ICurrentVariationAccessor CurrentVariationAccessor { get; }
+        public IVariationContextAccessor VariationContextAccessor { get; }
 
         /// <summary>
         /// Creates and caches an instance of a DomainHelper

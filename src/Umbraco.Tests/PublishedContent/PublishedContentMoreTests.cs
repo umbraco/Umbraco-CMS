@@ -76,7 +76,7 @@ namespace Umbraco.Tests.PublishedContent
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                new TestCurrentVariationAccessor());
+                new TestVariationContextAccessor());
 
             return umbracoContext;
         }

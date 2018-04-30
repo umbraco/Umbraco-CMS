@@ -32,7 +32,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private readonly IUserService _userService;
         private readonly ICacheProvider _requestCache;
         private readonly IGlobalSettings _globalSettings;
-        private readonly ISystemDefaultCultureAccessor _systemDefaultCultureAccessor;
+        private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly ISiteDomainHelper _siteDomainHelper;
 
         #region Constructors
@@ -43,18 +43,18 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IScopeProvider scopeProvider,
             ICacheProvider requestCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor, ICurrentVariationAccessor variationAccessor,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
-            ISystemDefaultCultureAccessor systemDefaultCultureAccessor,
+            IDefaultCultureAccessor defaultCultureAccessor,
             ILogger logger,
             IGlobalSettings globalSettings,
             ISiteDomainHelper siteDomainHelper,
             MainDom mainDom,
             bool testing = false, bool enableRepositoryEvents = true)
             : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache, segmentProviders,
-                publishedSnapshotAccessor, variationAccessor,
+                publishedSnapshotAccessor, variationContextAccessor,
                 documentRepository, mediaRepository, memberRepository,
-                systemDefaultCultureAccessor,
+                defaultCultureAccessor,
                 logger, globalSettings, siteDomainHelper, null, mainDom, testing, enableRepositoryEvents)
         { }
 
@@ -63,9 +63,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IPublishedContentTypeFactory publishedContentTypeFactory,
             IScopeProvider scopeProvider,
             ICacheProvider requestCache,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor, ICurrentVariationAccessor variationAccessor,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
-            ISystemDefaultCultureAccessor systemDefaultCultureAccessor,
+            IDefaultCultureAccessor defaultCultureAccessor,
             ILogger logger,
             IGlobalSettings globalSettings,
             ISiteDomainHelper siteDomainHelper,
@@ -73,9 +73,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
             : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache, Enumerable.Empty<IUrlSegmentProvider>(),
-                publishedSnapshotAccessor, variationAccessor,
+                publishedSnapshotAccessor, variationContextAccessor,
                 documentRepository, mediaRepository, memberRepository,
-                systemDefaultCultureAccessor,
+                defaultCultureAccessor,
                 logger, globalSettings, siteDomainHelper, contentTypeCache, mainDom, testing, enableRepositoryEvents)
         { }
 
@@ -84,16 +84,16 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IScopeProvider scopeProvider,
             ICacheProvider requestCache,
             IEnumerable<IUrlSegmentProvider> segmentProviders,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor, ICurrentVariationAccessor variationAccessor,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
-            ISystemDefaultCultureAccessor systemDefaultCultureAccessor,
+            IDefaultCultureAccessor defaultCultureAccessor,
             ILogger logger,
             IGlobalSettings globalSettings,
             ISiteDomainHelper siteDomainHelper,
             PublishedContentTypeCache contentTypeCache,
             MainDom mainDom,
             bool testing, bool enableRepositoryEvents)
-            : base(publishedSnapshotAccessor, variationAccessor)
+            : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             _routesCache = new RoutesCache();
             _publishedContentTypeFactory = publishedContentTypeFactory;
@@ -108,7 +108,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _memberService = serviceContext.MemberService;
             _mediaService = serviceContext.MediaService;
             _userService = serviceContext.UserService;
-            _systemDefaultCultureAccessor = systemDefaultCultureAccessor;
+            _defaultCultureAccessor = defaultCultureAccessor;
 
             _requestCache = requestCache;
             _globalSettings = globalSettings;
@@ -153,7 +153,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // the current caches, but that would mean creating an extra cache (StaticCache
             // probably) so better use RequestCache.
 
-            var domainCache = new DomainCache(_domainService, _systemDefaultCultureAccessor);
+            var domainCache = new DomainCache(_domainService, _defaultCultureAccessor);
 
             return new PublishedSnapshot(
                 new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _siteDomainHelper, _contentTypeCache, _routesCache, previewToken),

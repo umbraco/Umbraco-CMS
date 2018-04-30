@@ -71,8 +71,8 @@ namespace Umbraco.Web.Runtime
             composition.Container.RegisterFrom<InstallerCompositionRoot>();
 
             // register accessors for cultures
-            composition.Container.RegisterSingleton<ISystemDefaultCultureAccessor, SystemDefaultCultureAccessor>();
-            composition.Container.RegisterSingleton<ICurrentVariationAccessor, ThreadCultureCurrentVariationAccessor>();
+            composition.Container.RegisterSingleton<IDefaultCultureAccessor, DefaultCultureAccessor>();
+            composition.Container.RegisterSingleton<IVariationContextAccessor, ThreadCultureVariationContextAccessor>();
 
             var typeLoader = composition.Container.GetInstance<TypeLoader>();
             var logger = composition.Container.GetInstance<ILogger>();
@@ -218,7 +218,7 @@ namespace Umbraco.Web.Runtime
             IUmbracoSettingsSection umbracoSettings,
             IGlobalSettings globalSettings,
             IEntityService entityService,
-            ICurrentVariationAccessor variationAccessor,
+            IVariationContextAccessor variationContextAccessor,
             UrlProviderCollection urlProviders)
         {
             // setup mvc and webapi services
@@ -256,7 +256,7 @@ namespace Umbraco.Web.Runtime
                 umbracoSettings,
                 urlProviders,
                 globalSettings,
-                variationAccessor);
+                variationContextAccessor);
 
             // ensure WebAPI is initialized, after everything
             GlobalConfiguration.Configuration.EnsureInitialized();

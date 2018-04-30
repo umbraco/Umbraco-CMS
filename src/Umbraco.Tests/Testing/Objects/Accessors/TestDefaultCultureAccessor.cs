@@ -2,7 +2,7 @@
 
 namespace Umbraco.Tests.Testing.Objects.Accessors
 {
-    public class TestSystemDefaultCultureAccessor : ISystemDefaultCultureAccessor
+    public class TestDefaultCultureAccessor : IDefaultCultureAccessor
     {
         private string _defaultCulture = string.Empty;
 

@@ -427,7 +427,7 @@ namespace Umbraco.Tests.Web.Mvc
             _service = new PublishedSnapshotService(svcCtx, factory, scopeProvider, cache, Enumerable.Empty<IUrlSegmentProvider>(),
                 null, null,
                 null, null, null,
-                new TestSystemDefaultCultureAccessor(),
+                new TestDefaultCultureAccessor(),
                 Current.Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(), null, true, false); // no events
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
@@ -441,7 +441,7 @@ namespace Umbraco.Tests.Web.Mvc
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                new TestCurrentVariationAccessor());
+                new TestVariationContextAccessor());
 
             //if (setSingleton)
             //{

@@ -128,7 +128,7 @@ namespace Umbraco.Tests.PublishedContent
                 dataTypeService);
 
             // create a variation accessor
-            var variationAccessor = new TestCurrentVariationAccessor();
+            var variationAccessor = new TestVariationContextAccessor();
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotService.Options { IgnoreLocalDb = true };
@@ -145,7 +145,7 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IDocumentRepository>(),
                 Mock.Of<IMediaRepository>(),
                 Mock.Of<IMemberRepository>(),
-                new TestSystemDefaultCultureAccessor(),
+                new TestDefaultCultureAccessor(),
                 dataSource,
                 globalSettings,
                 new SiteDomainHelper());
@@ -155,7 +155,7 @@ namespace Umbraco.Tests.PublishedContent
             var publishedContent = snapshot.Content.GetById(1);
 
             // invariant is the current default
-            variationAccessor.CurrentVariation = new CurrentVariation();
+            variationAccessor.VariationContext = new VariationContext();
 
             Assert.IsNotNull(publishedContent);
             Assert.AreEqual("It Works1!", publishedContent.Name);
@@ -176,14 +176,14 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual("name-uk2", draftContent.GetCulture("en-UK").Name);
 
             // now french is default
-            variationAccessor.CurrentVariation = new CurrentVariation("fr-FR");
+            variationAccessor.VariationContext = new VariationContext("fr-FR");
             Assert.AreEqual("val-fr1", publishedContent.Value<string>("prop"));
             Assert.AreEqual("name-fr1", publishedContent.GetCulture().Name);
             Assert.AreEqual("name-fr1", publishedContent.Name);
             Assert.AreEqual(new DateTime(2018, 01, 01, 01, 00, 00), publishedContent.GetCulture().Date);
 
             // now uk is default
-            variationAccessor.CurrentVariation = new CurrentVariation("en-UK");
+            variationAccessor.VariationContext = new VariationContext("en-UK");
             Assert.AreEqual("val-uk1", publishedContent.Value<string>("prop"));
             Assert.AreEqual("name-uk1", publishedContent.GetCulture().Name);
             Assert.AreEqual("name-uk1", publishedContent.Name);

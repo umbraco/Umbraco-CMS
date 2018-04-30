@@ -43,7 +43,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IMemberRepository _memberRepository;
         private readonly IGlobalSettings _globalSettings;
         private readonly ISiteDomainHelper _siteDomainHelper;
-        private readonly ISystemDefaultCultureAccessor _systemDefaultCultureAccessor;
+        private readonly IDefaultCultureAccessor _defaultCultureAccessor;
 
         // volatile because we read it with no lock
         private volatile bool _isReady;
@@ -81,12 +81,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public PublishedSnapshotService(Options options, MainDom mainDom, IRuntimeState runtime,
             ServiceContext serviceContext, IPublishedContentTypeFactory publishedContentTypeFactory, IdkMap idkMap,
-            IPublishedSnapshotAccessor publishedSnapshotAccessor, ICurrentVariationAccessor variationAccessor,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor,
             ILogger logger, IScopeProvider scopeProvider,
             IDocumentRepository documentRepository, IMediaRepository mediaRepository, IMemberRepository memberRepository,
-            ISystemDefaultCultureAccessor systemDefaultCultureAccessor,
+            IDefaultCultureAccessor defaultCultureAccessor,
             IDataSource dataSource, IGlobalSettings globalSettings, ISiteDomainHelper siteDomainHelper)
-            : base(publishedSnapshotAccessor, variationAccessor)
+            : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
             //    throw new Exception("Singleton must be instancianted only once!");
@@ -99,7 +99,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _documentRepository = documentRepository;
             _mediaRepository = mediaRepository;
             _memberRepository = memberRepository;
-            _systemDefaultCultureAccessor = systemDefaultCultureAccessor;
+            _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
             _siteDomainHelper = siteDomainHelper;
 
@@ -145,13 +145,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // stores are created with a db so they can write to it, but they do not read from it,
                 // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
                 // figure out whether it can read the dbs or it should populate them from sql
-                _contentStore = new ContentStore(publishedSnapshotAccessor, variationAccessor, logger, _localContentDb);
-                _mediaStore = new ContentStore(publishedSnapshotAccessor, variationAccessor, logger, _localMediaDb);
+                _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localContentDb);
+                _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localMediaDb);
             }
             else
             {
-                _contentStore = new ContentStore(publishedSnapshotAccessor, variationAccessor, logger);
-                _mediaStore = new ContentStore(publishedSnapshotAccessor, variationAccessor, logger);
+                _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
+                _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger);
             }
 
             _domainStore = new SnapDictionary<int, Domain>();
@@ -996,7 +996,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var memberTypeCache = new PublishedContentTypeCache(null, null, _serviceContext.MemberTypeService, _publishedContentTypeFactory, _logger);
 
-            var defaultCulture = _systemDefaultCultureAccessor.DefaultCulture;
+            var defaultCulture = _defaultCultureAccessor.DefaultCulture;
             var domainCache = new DomainCache(domainSnap, defaultCulture);
             var domainHelper = new DomainHelper(domainCache, _siteDomainHelper);
 
@@ -1004,7 +1004,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainHelper, _globalSettings, _serviceContext.LocalizationService),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, snapshotCache, elementsCache),
-                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, _serviceContext.DataTypeService, _serviceContext.LocalizationService, memberTypeCache, PublishedSnapshotAccessor, VariationAccessor),
+                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, _serviceContext.DataTypeService, _serviceContext.LocalizationService, memberTypeCache, PublishedSnapshotAccessor, VariationContextAccessor),
                 DomainCache = domainCache,
                 SnapshotCache = snapshotCache,
                 ElementsCache = elementsCache

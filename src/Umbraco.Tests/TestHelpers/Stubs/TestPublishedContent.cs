@@ -18,12 +18,12 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         public int TemplateId { get; set; }
         public int SortOrder { get; set; }
         public string Name { get; set; }
-        public ICurrentVariationAccessor VariationAccessor { get; set; }
+        public IVariationContextAccessor VariationContextAccessor { get; set; }
         public PublishedCultureInfos GetCulture(string culture = null)
         {
             // handle context culture
             if (culture == null)
-                culture = VariationAccessor?.CurrentVariation.Culture;
+                culture = VariationContextAccessor?.VariationContext.Culture;
 
             // no invariant culture infos
             if (culture == "" || Cultures == null) return null;
