@@ -9,7 +9,7 @@
     </div>
 
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
-        <div class="umb-list-item" ng-repeat="variant in vm.variants">
+        <div class="umb-list-item" ng-repeat="variant in vm.dirtyVariants">
             <ng-form name="publishVariantSelectorForm">
                 <label class="flex" for="{{variant.htmlId}}">
                     <input
