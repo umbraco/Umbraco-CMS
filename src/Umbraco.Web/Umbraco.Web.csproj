@@ -812,9 +812,6 @@
     <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\Installer.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackager.cs" />
     <Compile Include="UmbracoComponentRenderer.cs" />
     <Compile Include="Web References\org.umbraco.our\Reference.cs">
@@ -1146,8 +1143,6 @@
     <Compile Include="_Legacy\Packager\PackageInstance\PackageActions.cs" />
     <Compile Include="_Legacy\Packager\PackageInstance\PackageInstance.cs" />
     <Compile Include="_Legacy\Packager\PackageInstance\PackagerUtility.cs" />
-    <Compile Include="_Legacy\Packager\Repositories\Repository.cs" />
-    <Compile Include="_Legacy\Packager\Repositories\RepositoryWebservice.cs" />
     <Compile Include="_Legacy\Packager\RequirementsType.cs" />
     <Compile Include="_Legacy\Packager\Settings.cs" />
     <Compile Include="_Legacy\UI\ITask.cs" />
@@ -1506,7 +1501,6 @@
       <DependentUpon>xml.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadPackages.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadTranslationTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\NullTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeDefinitionCollection.cs" />

@@ -1450,13 +1450,11 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public string FetchPackageFile(Guid packageId, Version umbracoVersion, int userId)
         {
-            var packageRepo = UmbracoConfig.For.UmbracoSettings().PackageRepositories.GetDefault();
-
             using (var httpClient = new HttpClient())
             using (var scope = _scopeProvider.CreateScope())
             {
                 //includeHidden = true because we don't care if it's hidden we want to get the file regardless
-                var url = $"{packageRepo.RestApiUrl}/{packageId}?version={umbracoVersion.ToString(3)}&includeHidden=true&asFile=true";
+                var url = $"{Constants.PackageRepository.RestApiBaseUrl}/{packageId}?version={umbracoVersion.ToString(3)}&includeHidden=true&asFile=true";
                 byte[] bytes;
                 try
                 {
@@ -1485,7 +1483,7 @@ namespace Umbraco.Core.Services.Implement
                     }
                 }
 
-                Audit(AuditType.PackagerInstall, $"Package {packageId} fetched from {packageRepo.Id}", userId, -1);
+                Audit(AuditType.PackagerInstall, $"Package {packageId} fetched from {Constants.PackageRepository.DefaultRepositoryId}", userId, -1);
                 return null;
             }
         }
