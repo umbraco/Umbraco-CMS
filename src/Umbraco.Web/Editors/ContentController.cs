@@ -957,7 +957,7 @@ namespace Umbraco.Web.Editors
                 if (contentItem.LanguageId.HasValue && contentItem.PersistedContent.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
                 {
                     var culture = Services.LocalizationService.GetLanguageById(contentItem.LanguageId.Value).IsoCode;
-                    contentItem.PersistedContent.SetName(culture, contentItem.Name);
+                    contentItem.PersistedContent.SetName(contentItem.Name, culture);
                 }
                 else
                 {

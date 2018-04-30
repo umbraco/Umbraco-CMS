@@ -2512,8 +2512,8 @@ namespace Umbraco.Tests.Services
             content.SetValue("author", "Barack Obama");
             content.SetValue("prop", "value-fr1", langFr.IsoCode);
             content.SetValue("prop", "value-uk1", langUk.IsoCode);
-            content.SetName(langFr.IsoCode, "name-fr");
-            content.SetName(langUk.IsoCode, "name-uk");
+            content.SetName("name-fr", langFr.IsoCode);
+            content.SetName("name-uk", langUk.IsoCode);
             contentService.Save(content);
 
             // content has been saved,
@@ -2603,9 +2603,9 @@ namespace Umbraco.Tests.Services
 
             // act
 
-            content.SetName(null, "Home US2");
-            content.SetName(langFr.IsoCode, "name-fr2");
-            content.SetName(langUk.IsoCode, "name-uk2");
+            content.SetName("Home US2", null);
+            content.SetName("name-fr2", langFr.IsoCode);
+            content.SetName("name-uk2", langUk.IsoCode);
             content.SetValue("author", "Barack Obama2");
             content.SetValue("prop", "value-fr2", langFr.IsoCode);
             content.SetValue("prop", "value-uk2", langUk.IsoCode);
@@ -2803,7 +2803,7 @@ namespace Umbraco.Tests.Services
 
             // act
 
-            content.SetName(langUk.IsoCode, "name-uk3");
+            content.SetName("name-uk3", langUk.IsoCode);
             contentService.Save(content);
 
             content2 = contentService.GetById(content.Id);

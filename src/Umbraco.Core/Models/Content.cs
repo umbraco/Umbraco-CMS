@@ -350,7 +350,7 @@ namespace Umbraco.Core.Models
                 var name = GetName(culture);
                 if (string.IsNullOrWhiteSpace(name))
                     return false; //fixme this should return an attempt with error results
-                
+
                 SetPublishInfos(culture, name, DateTime.Now);
             }
 
@@ -470,8 +470,8 @@ namespace Umbraco.Core.Models
 
             // copy names
             ClearNames();
-            foreach (var (languageId, name) in other.Names)
-                SetName(languageId, name);
+            foreach (var (culture, name) in other.Names)
+                SetName(name, culture);
             Name = other.Name;
         }
 
@@ -511,7 +511,7 @@ namespace Umbraco.Core.Models
             }
 
             // copy name
-            SetName(culture, other.GetName(culture));
+            SetName(other.GetName(culture), culture);
         }
 
         /// <inheritdoc />
@@ -545,7 +545,7 @@ namespace Umbraco.Core.Models
             }
 
             // copy name
-            SetName(culture, other.GetName(culture));
+            SetName(other.GetName(culture), culture);
         }
 
         /// <summary>

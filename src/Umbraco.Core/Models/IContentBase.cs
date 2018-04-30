@@ -35,7 +35,7 @@ namespace Umbraco.Core.Models
         /// <para>When <paramref name="culture"/> is <c>null</c>, sets the invariant
         /// language, which sets the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        void SetName(string culture, string value);
+        void SetName(string value, string culture);
 
         /// <summary>
         /// Gets the name of the content item for a specified language.

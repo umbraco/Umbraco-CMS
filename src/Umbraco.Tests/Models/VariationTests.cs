@@ -165,7 +165,7 @@ namespace Umbraco.Tests.Models
             const string langUk = "en-UK";
 
             // throws if the content type does not support the variation
-            Assert.Throws<NotSupportedException>(() => content.SetName(langFr, "name-fr"));
+            Assert.Throws<NotSupportedException>(() => content.SetName("name-fr", langFr));
 
             // now it will work
             contentType.Variations = ContentVariation.CultureNeutral;
@@ -173,13 +173,13 @@ namespace Umbraco.Tests.Models
             // invariant name works
             content.Name = "name";
             Assert.AreEqual("name", content.GetName(null));
-            content.SetName(null, "name2");
+            content.SetName("name2", null);
             Assert.AreEqual("name2", content.Name);
             Assert.AreEqual("name2", content.GetName(null));
 
             // variant names work
-            content.SetName(langFr, "name-fr");
-            content.SetName(langUk, "name-uk");
+            content.SetName("name-fr", langFr);
+            content.SetName("name-uk", langUk);
             Assert.AreEqual("name-fr", content.GetName(langFr));
             Assert.AreEqual("name-uk", content.GetName(langUk));
 
@@ -245,7 +245,7 @@ namespace Umbraco.Tests.Models
             // can publish value
             // and get edited and published values
             Assert.IsFalse(content.TryPublishValues(langFr)); // no name
-            content.SetName(langFr, "name-fr");
+            content.SetName("name-fr", langFr);
             content.TryPublishValues(langFr);
             Assert.AreEqual("b", content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
@@ -326,11 +326,11 @@ namespace Umbraco.Tests.Models
 
             // works with a name
             // and then FR is available, and published
-            content.SetName(langFr, "name-fr");
+            content.SetName("name-fr", langFr);
             content.TryPublishValues(langFr);
 
             // now UK is available too
-            content.SetName(langUk, "name-uk");
+            content.SetName("name-uk", langUk);
 
             // test available, published
             Assert.IsTrue(content.IsCultureAvailable(langFr));
