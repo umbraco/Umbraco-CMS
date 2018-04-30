@@ -379,7 +379,7 @@ namespace Umbraco.Tests.TestHelpers
                 umbracoSettings ?? Container.GetInstance<IUmbracoSettingsSection>(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
                 globalSettings ?? Container.GetInstance<IGlobalSettings>(),
-                ServiceContext.EntityService);
+                new TestCurrentVariationAccessor());
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

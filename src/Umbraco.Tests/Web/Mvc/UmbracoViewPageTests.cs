@@ -441,7 +441,7 @@ namespace Umbraco.Tests.Web.Mvc
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>());
+                new TestCurrentVariationAccessor());
 
             //if (setSingleton)
             //{

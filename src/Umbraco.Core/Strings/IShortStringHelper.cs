@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
-
-namespace Umbraco.Core.Strings
+﻿namespace Umbraco.Core.Strings
 {
     /// <summary>
     /// Provides string functions for short strings such as aliases or url segments.
@@ -31,7 +28,7 @@ namespace Umbraco.Core.Strings
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The safe alias.</returns>
-        string CleanStringForSafeAlias(string text, CultureInfo culture);
+        string CleanStringForSafeAlias(string text, string culture);
 
         /// <summary>
         /// Cleans a string to produce a string that can safely be used in an url segment.
@@ -47,7 +44,7 @@ namespace Umbraco.Core.Strings
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The safe url segment.</returns>
-        string CleanStringForUrlSegment(string text, CultureInfo culture);
+        string CleanStringForUrlSegment(string text, string culture);
 
         /// <summary>
         /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
@@ -66,7 +63,7 @@ namespace Umbraco.Core.Strings
         /// <param name="culture">The culture.</param>
         /// <returns>The safe filename.</returns>
         /// <remarks>Legacy says this was used to "overcome an issue when Umbraco is used in IE in an intranet environment" but that issue is not documented.</remarks>
-        string CleanStringForSafeFileName(string text, CultureInfo culture);
+        string CleanStringForSafeFileName(string text, string culture);
 
         /// <summary>
         /// Splits a pascal-cased string by inserting a separator in between each term.
@@ -106,7 +103,7 @@ namespace Umbraco.Core.Strings
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
-        string CleanString(string text, CleanStringType stringType, CultureInfo culture);
+        string CleanString(string text, CleanStringType stringType, string culture);
 
         /// <summary>
         /// Cleans a string in the context of a specified culture, using a specified separator.
@@ -117,6 +114,6 @@ namespace Umbraco.Core.Strings
         /// <param name="separator">The separator.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
-        string CleanString(string text, CleanStringType stringType, char separator, CultureInfo culture);
+        string CleanString(string text, CleanStringType stringType, char separator, string culture);
     }
 }

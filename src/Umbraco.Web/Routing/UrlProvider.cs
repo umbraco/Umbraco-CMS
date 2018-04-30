@@ -20,15 +20,16 @@ namespace Umbraco.Web.Routing
         /// Initializes a new instance of the <see cref="UrlProvider"/> class with an Umbraco context and a list of url providers.
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
-        /// <param name="routingSettings"></param>
+        /// <param name="routingSettings">Routing settings.</param>
         /// <param name="urlProviders">The list of url providers.</param>
-        public UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders, IEntityService entityService)
+        /// <param name="variationAccessor">The current variation accessor.</param>
+        public UrlProvider(UmbracoContext umbracoContext, IWebRoutingSection routingSettings, IEnumerable<IUrlProvider> urlProviders, ICurrentVariationAccessor variationAccessor)
         {
             if (routingSettings == null) throw new ArgumentNullException(nameof(routingSettings));
 
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _urlProviders = urlProviders;
-            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+            _variationAccessor = variationAccessor ?? throw new ArgumentNullException(nameof(variationAccessor));
             var provider = UrlProviderMode.Auto;
             Mode = provider;
 
@@ -43,19 +44,20 @@ namespace Umbraco.Web.Routing
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="urlProviders">The list of url providers.</param>
-        /// <param name="provider"></param>
-        public UrlProvider(UmbracoContext umbracoContext, IEnumerable<IUrlProvider> urlProviders, UrlProviderMode provider = UrlProviderMode.Auto)
+        /// <param name="variationAccessor">The current variation accessor.</param>
+        /// <param name="mode">An optional provider mode.</param>
+        public UrlProvider(UmbracoContext umbracoContext, IEnumerable<IUrlProvider> urlProviders, ICurrentVariationAccessor variationAccessor, UrlProviderMode mode = UrlProviderMode.Auto)
         {
             _umbracoContext = umbracoContext ?? throw new ArgumentNullException(nameof(umbracoContext));
             _urlProviders = urlProviders;
+            _variationAccessor = variationAccessor;
 
-            Mode = provider;
+            Mode = mode;
         }
 
         private readonly UmbracoContext _umbracoContext;
         private readonly IEnumerable<IUrlProvider> _urlProviders;
-        private readonly IEntityService _entityService;
-        private readonly ICurrentVariationAccessor _variationAccessor; // fixme set!
+        private readonly ICurrentVariationAccessor _variationAccessor;
 
         /// <summary>
         /// Gets or sets the provider url mode.

@@ -29,6 +29,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using LightInject;
 using System.Globalization;
+using Umbraco.Tests.Testing.Objects.Accessors;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {
@@ -149,7 +150,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == UrlProviderMode.Auto.ToString())),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                mockedEntityService,
+                new TestCurrentVariationAccessor(),
                 true); //replace it
 
             var urlHelper = new Mock<IUrlProvider>();

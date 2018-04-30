@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Umbraco.Core.Models;
+﻿using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Strings
 {
@@ -9,22 +8,12 @@ namespace Umbraco.Core.Strings
     public class DefaultUrlSegmentProvider : IUrlSegmentProvider
     {
         /// <summary>
-        /// Gets the default url segment for a specified content.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <returns>The url segment.</returns>
-        public string GetUrlSegment(IContentBase content)
-        {
-            return GetUrlSegmentSource(content).ToUrlSegment();
-        }
-
-        /// <summary>
         /// Gets the url segment for a specified content and culture.
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The url segment.</returns>
-        public string GetUrlSegment(IContentBase content, CultureInfo culture)
+        public string GetUrlSegment(IContentBase content, string culture = null)
         {
             return GetUrlSegmentSource(content).ToUrlSegment(culture);
         }

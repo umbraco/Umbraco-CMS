@@ -4,6 +4,7 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -69,7 +70,7 @@ namespace Umbraco.Web
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
             IGlobalSettings globalSettings,
-            IEntityService entityService,
+            ICurrentVariationAccessor variationAccessor,
             bool replace = false)
         {
             if (umbracoContextAccessor == null) throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -87,7 +88,7 @@ namespace Umbraco.Web
 
             // create & assign to accessor, dispose existing if any
             umbracoContextAccessor.UmbracoContext?.Dispose();
-            return umbracoContextAccessor.UmbracoContext = new UmbracoContext(httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings, entityService);
+            return umbracoContextAccessor.UmbracoContext = new UmbracoContext(httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings, variationAccessor);
         }
 
         // initializes a new instance of the UmbracoContext class
@@ -100,13 +101,14 @@ namespace Umbraco.Web
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
             IGlobalSettings globalSettings,
-            IEntityService entityService)
+            ICurrentVariationAccessor variationAccessor)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
             if (webSecurity == null) throw new ArgumentNullException(nameof(webSecurity));
             if (umbracoSettings == null) throw new ArgumentNullException(nameof(umbracoSettings));
             if (urlProviders == null) throw new ArgumentNullException(nameof(urlProviders));
+            CurrentVariationAccessor = variationAccessor ??  throw new ArgumentNullException(nameof(variationAccessor));
             _globalSettings = globalSettings ?? throw new ArgumentNullException(nameof(globalSettings));
 
             // ensure that this instance is disposed when the request terminates, though we *also* ensure
@@ -136,7 +138,7 @@ namespace Umbraco.Web
             //
             OriginalRequestUrl = GetRequestFromContext()?.Url ?? new Uri("http://localhost");
             CleanedUmbracoUrl = UriUtility.UriToUmbraco(OriginalRequestUrl);
-            UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders, entityService);
+            UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders, variationAccessor);
         }
 
         #endregion
@@ -212,6 +214,8 @@ namespace Umbraco.Web
         /// Exposes the HttpContext for the current request
         /// </summary>
         public HttpContextBase HttpContext { get; }
+
+        public ICurrentVariationAccessor CurrentVariationAccessor { get; }
 
         /// <summary>
         /// Creates and caches an instance of a DomainHelper

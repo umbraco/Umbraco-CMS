@@ -18,6 +18,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Tests.Testing.Objects.Accessors;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -75,7 +76,7 @@ namespace Umbraco.Tests.PublishedContent
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                ServiceContext.EntityService);
+                new TestCurrentVariationAccessor());
 
             return umbracoContext;
         }

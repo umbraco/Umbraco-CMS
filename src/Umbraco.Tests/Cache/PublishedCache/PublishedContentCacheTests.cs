@@ -6,6 +6,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
@@ -78,7 +79,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 umbracoSettings,
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                ServiceContext.EntityService);
+                new TestCurrentVariationAccessor());
 
             _cache = _umbracoContext.ContentCache;
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -18,7 +17,7 @@ namespace Umbraco.Core.Strings
     /// </remarks>
     public class DefaultShortStringHelper : IShortStringHelper
     {
-        #region Ctor and vars
+        #region Ctor, consts and vars
 
         public DefaultShortStringHelper(IUmbracoSettingsSection settings)
         {
@@ -30,6 +29,8 @@ namespace Umbraco.Core.Strings
         {
             _config = config.Clone();
         }
+
+        public const string InvariantCulture = "xx-xx";
 
         // see notes for CleanAsciiString
         //// beware! the order is quite important here!
@@ -138,7 +139,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// <remarks>
         /// <para>Safe aliases are Ascii only.</para>
         /// </remarks>
-        public virtual string CleanStringForSafeAlias(string text, CultureInfo culture)
+        public virtual string CleanStringForSafeAlias(string text, string culture)
         {
             return CleanString(text, CleanStringType.Alias, culture);
         }
@@ -166,7 +167,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// <remarks>
         /// <para>Url segments are Ascii only (no accents...).</para>
         /// </remarks>
-        public virtual string CleanStringForUrlSegment(string text, CultureInfo culture)
+        public virtual string CleanStringForUrlSegment(string text, string culture)
         {
             return CleanString(text, CleanStringType.UrlSegment, culture);
         }
@@ -190,11 +191,12 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The safe filename.</returns>
-        public virtual string CleanStringForSafeFileName(string text, CultureInfo culture)
+        public virtual string CleanStringForSafeFileName(string text, string culture)
         {
             if (string.IsNullOrWhiteSpace(text))
                 return string.Empty;
 
+            culture = culture ?? InvariantCulture;
             text = text.ReplaceMany(Path.GetInvalidFileNameChars(), '-');
 
             var name = Path.GetFileNameWithoutExtension(text);
@@ -266,7 +268,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
-        public string CleanString(string text, CleanStringType stringType, CultureInfo culture)
+        public string CleanString(string text, CleanStringType stringType, string culture)
         {
             return CleanString(text, stringType, culture, null);
         }
@@ -280,16 +282,16 @@ function validateSafeAlias(input, value, immediate, callback) {{
         /// <param name="separator">The separator.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
-        public string CleanString(string text, CleanStringType stringType, char separator, CultureInfo culture)
+        public string CleanString(string text, CleanStringType stringType, char separator, string culture)
         {
             return CleanString(text, stringType, culture, separator);
         }
 
-        protected virtual string CleanString(string text, CleanStringType stringType, CultureInfo culture, char? separator)
+        protected virtual string CleanString(string text, CleanStringType stringType, string culture, char? separator)
         {
             // be safe
             if (text == null) throw new ArgumentNullException(nameof(text));
-            if (culture == null) throw new ArgumentNullException(nameof(culture));
+            culture = culture ?? InvariantCulture;
 
             // get config
             var config = _config.For(stringType, culture);
@@ -367,11 +369,12 @@ function validateSafeAlias(input, value, immediate, callback) {{
         // that the utf8 version. Micro-optimizing sometimes isn't such a good idea.
 
         // note: does NOT support surrogate pairs in text
-        internal string CleanCodeString(string text, CleanStringType caseType, char separator, CultureInfo culture, DefaultShortStringHelperConfig.Config config)
+        internal string CleanCodeString(string text, CleanStringType caseType, char separator, string culture, DefaultShortStringHelperConfig.Config config)
         {
             int opos = 0, ipos = 0;
             var state = StateBreak;
 
+            culture = culture ?? InvariantCulture;
             caseType &= CleanStringType.CaseMask;
 
             // if we apply global ToUpper or ToLower to text here
@@ -501,9 +504,10 @@ function validateSafeAlias(input, value, immediate, callback) {{
 
         // note: supports surrogate pairs in input string
         internal void CopyTerm(string input, int ipos, char[] output, ref int opos, int len,
-            CleanStringType caseType, CultureInfo culture, bool isAcronym)
+            CleanStringType caseType, string culture, bool isAcronym)
         {
             var term = input.Substring(ipos, len);
+            var cultureInfo = culture == null || culture == InvariantCulture ? CultureInfo.InvariantCulture : CultureInfo.GetCultureInfo(culture);
 
             if (isAcronym)
             {
@@ -529,13 +533,13 @@ function validateSafeAlias(input, value, immediate, callback) {{
                     break;
 
                 case CleanStringType.LowerCase:
-                    term = term.ToLower(culture);
+                    term = term.ToLower(cultureInfo);
                     term.CopyTo(0, output, opos, term.Length);
                     opos += term.Length;
                     break;
 
                 case CleanStringType.UpperCase:
-                    term = term.ToUpper(culture);
+                    term = term.ToUpper(cultureInfo);
                     term.CopyTo(0, output, opos, term.Length);
                     opos += term.Length;
                     break;
@@ -546,18 +550,18 @@ function validateSafeAlias(input, value, immediate, callback) {{
                     if (char.IsSurrogate(c))
                     {
                         s = term.Substring(ipos, 2);
-                        s = opos == 0 ? s.ToLower(culture) : s.ToUpper(culture);
+                        s = opos == 0 ? s.ToLower(cultureInfo) : s.ToUpper(cultureInfo);
                         s.CopyTo(0, output, opos, s.Length);
                         opos += s.Length;
                         i++; // surrogate pair len is 2
                     }
                     else
                     {
-                        output[opos] = opos++ == 0 ? char.ToLower(c, culture) : char.ToUpper(c, culture);
+                        output[opos] = opos++ == 0 ? char.ToLower(c, cultureInfo) : char.ToUpper(c, cultureInfo);
                     }
                     if (len > i)
                     {
-                        term = term.Substring(i).ToLower(culture);
+                        term = term.Substring(i).ToLower(cultureInfo);
                         term.CopyTo(0, output, opos, term.Length);
                         opos += term.Length;
                     }
@@ -569,18 +573,18 @@ function validateSafeAlias(input, value, immediate, callback) {{
                     if (char.IsSurrogate(c))
                     {
                         s = term.Substring(ipos, 2);
-                        s = s.ToUpper(culture);
+                        s = s.ToUpper(cultureInfo);
                         s.CopyTo(0, output, opos, s.Length);
                         opos += s.Length;
                         i++; // surrogate pair len is 2
                     }
                     else
                     {
-                        output[opos++] = char.ToUpper(c, culture);
+                        output[opos++] = char.ToUpper(c, cultureInfo);
                     }
                     if (len > i)
                     {
-                        term = term.Substring(i).ToLower(culture);
+                        term = term.Substring(i).ToLower(cultureInfo);
                         term.CopyTo(0, output, opos, term.Length);
                         opos += term.Length;
                     }
@@ -592,14 +596,14 @@ function validateSafeAlias(input, value, immediate, callback) {{
                     if (char.IsSurrogate(c))
                     {
                         s = term.Substring(ipos, 2);
-                        s = opos == 0 ? s : s.ToUpper(culture);
+                        s = opos == 0 ? s : s.ToUpper(cultureInfo);
                         s.CopyTo(0, output, opos, s.Length);
                         opos += s.Length;
                         i++; // surrogate pair len is 2
                     }
                     else
                     {
-                        output[opos] = opos++ == 0 ? c : char.ToUpper(c, culture);
+                        output[opos] = opos++ == 0 ? c : char.ToUpper(c, cultureInfo);
                     }
                     if (len > i)
                     {
@@ -668,8 +672,6 @@ function validateSafeAlias(input, value, immediate, callback) {{
             return new string(output, 0, opos);
         }
 
-        #endregion
-
-       
+        #endregion      
     }
 }

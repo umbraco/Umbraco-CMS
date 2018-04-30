@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Web;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -56,7 +54,9 @@ namespace Umbraco.Web
             return prop != null && prop.HasValue(culture, segment);
         }
 
-        // fixme - that one is missing variations
+        // fixme - .Value() refactoring - in progress
+        // missing variations...
+
         /// <summary>
         /// Returns one of two strings depending on whether the content has a value for a property identified by its alias.
         /// </summary>
@@ -134,7 +134,7 @@ namespace Umbraco.Web
 
         #region Value or Umbraco.Field - WORK IN PROGRESS
 
-        // fixme - more work-in-progress for element.Value() and element.Value<T>() here
+        // fixme - .Value() refactoring - in progress
         // trying to reproduce Umbraco.Field so we can get rid of it
         //
         // what we want:
@@ -150,10 +150,10 @@ namespace Umbraco.Web
         // see UmbracoComponentRenderer.Field - which is ugly ;-(
 
         // recurse first, on each alias (that's how it's done in Field)
-        // TODO: strongly typed properties howto?
+        //
         // there is no strongly typed recurse, etc => needs to be in ModelsBuilder?
 
-        // todo - that one can only happen in ModelsBuilder as that's where the attributes are defined
+        // that one can only happen in ModelsBuilder as that's where the attributes are defined
         // the attribute that carries the alias is in ModelsBuilder!
         //public static TValue Value<TModel, TValue>(this TModel content, Expression<Func<TModel, TValue>> propertySelector, ...)
         //    where TModel : IPublishedElement
@@ -163,6 +163,8 @@ namespace Umbraco.Web
         //    var alias = attr.Alias;
         //    return content.Value<TValue>(alias, ...)
         //}
+
+        // recurse should be implemented via fallback
 
         // todo - that one should be refactored, missing culture and so many things
         public static IHtmlString Value<T>(this IPublishedElement content, string aliases, Func<T, string> format, string alt = "")

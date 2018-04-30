@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Globalization;
 using System.Linq;
 using System.Web;
 using Examine;
@@ -123,28 +122,6 @@ namespace Umbraco.Web
 
         #region Value
 
-        // fixme missing variations, but recurse/variations/fallback = ?
-
-        /// <summary>
-        /// Recursively gets the value of a content's property identified by its alias.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <param name="recurse">A value indicating whether to recurse.</param>
-        /// <returns>The recursive value of the content's property identified by the alias.</returns>
-        /// <remarks>
-        /// <para>Recursively means: walking up the tree from <paramref name="content"/>, get the first value that can be found.</para>
-        /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
-        /// <para>If no property with the specified alias exists, or if the property has no value, returns <c>null</c>.</para>
-        /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        public static object Value(this IPublishedContent content, string alias, bool recurse)
-        {
-            var property = content.GetProperty(alias, recurse);
-            return property?.GetValue();
-        }
-
         /// <summary>
         /// Recursively the value of a content's property identified by its alias, if it exists, otherwise a default value.
         /// </summary>
@@ -164,7 +141,7 @@ namespace Umbraco.Web
         /// </remarks>
         public static object Value(this IPublishedContent content, string alias,  string culture = ".", string segment = ".",  object defaultValue = default, bool recurse = false)
         {
-            // fixme - variations+recurse not implemented here
+            // fixme - refactor with fallback
             var property = content.GetProperty(alias, recurse);
             return property == null || property.HasValue(culture, segment) == false ? defaultValue : property.GetValue();
         }
@@ -193,7 +170,7 @@ namespace Umbraco.Web
         /// </remarks>
         public static T Value<T>(this IPublishedContent content, string alias, string culture = ".", string segment = ".", T defaultValue = default, bool recurse = false)
         {
-            // fixme - variations+recurse not implemented here
+            // fixme - refactor with fallback
             var property = content.GetProperty(alias, recurse);
             if (property == null) return defaultValue;
 
@@ -209,8 +186,8 @@ namespace Umbraco.Web
             //TODO: we should pass in the IExamineManager?
 
             var searcher = string.IsNullOrEmpty(indexName)
-                ? Examine.ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer)
-                : Examine.ExamineManager.Instance.GetSearcher(indexName);
+                ? ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer)
+                : ExamineManager.Instance.GetSearcher(indexName);
 
             if (searcher == null)
                 throw new InvalidOperationException("No searcher found for index " + indexName);
@@ -235,8 +212,8 @@ namespace Umbraco.Web
             //TODO: we should pass in the IExamineManager?
 
             var searcher = string.IsNullOrEmpty(indexName)
-                ? Examine.ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer)
-                : Examine.ExamineManager.Instance.GetSearcher(indexName);
+                ? ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer)
+                : ExamineManager.Instance.GetSearcher(indexName);
 
             if (searcher == null)
                 throw new InvalidOperationException("No searcher found for index " + indexName);
@@ -255,7 +232,7 @@ namespace Umbraco.Web
         {
             //TODO: we should pass in the IExamineManager?
 
-            var s = searchProvider ?? Examine.ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer);
+            var s = searchProvider ?? ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer);
 
             var results = s.Search(criteria);
             return results.ToPublishedSearchResults(UmbracoContext.Current.ContentCache);
@@ -1170,8 +1147,8 @@ namespace Umbraco.Web
         /// </summary>
         internal static Func<ServiceContext, string, Dictionary<string, string>> GetPropertyAliasesAndNames
         {
-            get { return _getPropertyAliasesAndNames ?? GetAliasesAndNames; }
-            set { _getPropertyAliasesAndNames = value; }
+            get => _getPropertyAliasesAndNames ?? GetAliasesAndNames;
+            set => _getPropertyAliasesAndNames = value;
         }
 
         private static Dictionary<string, string> GetAliasesAndNames(ServiceContext services, string alias)

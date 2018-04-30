@@ -218,6 +218,7 @@ namespace Umbraco.Web.Runtime
             IUmbracoSettingsSection umbracoSettings,
             IGlobalSettings globalSettings,
             IEntityService entityService,
+            ICurrentVariationAccessor variationAccessor,
             UrlProviderCollection urlProviders)
         {
             // setup mvc and webapi services
@@ -255,7 +256,7 @@ namespace Umbraco.Web.Runtime
                 umbracoSettings,
                 urlProviders,
                 globalSettings,
-                entityService);
+                variationAccessor);
 
             // ensure WebAPI is initialized, after everything
             GlobalConfiguration.Configuration.EnsureInitialized();

@@ -15,7 +15,7 @@ namespace Umbraco.Web.Models
     [DebuggerDisplay("Content Id: {Id}, Name: {Name}")]
     public abstract class PublishedContentBase : IPublishedContent
     {
-        private string _url; // fixme meaning?
+        private string _url; // fixme - cannot cache urls! depends on the current request!
 
         #region ContentType
 
@@ -84,7 +84,7 @@ namespace Umbraco.Web.Models
                 switch (ItemType)
                 {
                     case PublishedItemType.Content:
-                        // fixme inject an umbraco context accessor!
+                        // fixme - consider injecting an umbraco context accessor
                         if (UmbracoContext.Current == null)
                             throw new InvalidOperationException("Cannot compute Url for a content item when UmbracoContext.Current is null.");
                         if (UmbracoContext.Current.UrlProvider == null)
@@ -103,7 +103,8 @@ namespace Umbraco.Web.Models
 
                         var propType = ContentType.GetPropertyType(Constants.Conventions.Media.File);
 
-                        // fixme this is horrible we need url providers for media too + this does NOT support variations
+                        // fixme - consider implementing media url providers
+                        // note: that one does not support variations
                         //This is a hack - since we now have 2 properties that support a URL: upload and cropper, we need to detect this since we always
                         // want to return the normal URL and the cropper stores data as json
                         switch (propType.EditorAlias)
@@ -130,7 +131,7 @@ namespace Umbraco.Web.Models
                         throw new NotSupportedException();
                 }
         }
-  
+
         /// <inheritdoc />
         public abstract PublishedCultureInfos GetCulture(string culture = ".");
 
@@ -166,7 +167,7 @@ namespace Umbraco.Web.Models
         /// <inheritdoc cref="IPublishedContent.GetProperty(string, bool)"/>
         public virtual IPublishedProperty GetProperty(string alias, bool recurse)
         {
-            // fixme - but can recurse work with variants?
+            // fixme - refactor with fallback
 
             var property = GetProperty(alias);
             if (recurse == false) return property;

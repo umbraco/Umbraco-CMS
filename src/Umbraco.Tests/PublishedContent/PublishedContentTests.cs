@@ -324,8 +324,8 @@ namespace Umbraco.Tests.PublishedContent
         public void GetPropertyValueRecursiveTest()
         {
             var doc = GetNode(1174);
-            var rVal = doc.Value("testRecursive", true);
-            var nullVal = doc.Value("DoNotFindThis", true);
+            var rVal = doc.Value("testRecursive", recurse: true);
+            var nullVal = doc.Value("DoNotFindThis", recurse: true);
             Assert.AreEqual("This is the recursive val", rVal);
             Assert.AreEqual(null, nullVal);
         }

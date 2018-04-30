@@ -43,9 +43,9 @@ namespace Umbraco.Core.Models.PublishedContent
         /// </summary>
         /// <remarks>
         /// A published content item will only have published cultures, and therefore this
-        /// value will always be true. On the other hand, fixme drafts?
+        /// value will always be true. On the other hand, ... ???
         /// </remarks>
-        public bool Published { get; }
+        public bool Published { get; } // fixme - what is culture.Published?
 
         /// <summary>
         /// Gets the date associated with the culture.

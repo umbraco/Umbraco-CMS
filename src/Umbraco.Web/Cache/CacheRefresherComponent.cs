@@ -6,7 +6,6 @@ using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
 using System.Linq;
 using System.Reflection;
@@ -15,12 +14,13 @@ using System.Web.Hosting;
 using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 using Umbraco.Web.Services;
-using Content = Umbraco.Core.Models.Content;
+using LightInject;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
 
 namespace Umbraco.Web.Cache
@@ -237,7 +237,7 @@ namespace Umbraco.Web.Cache
                     UmbracoConfig.For.UmbracoSettings(),
                     Current.UrlProviders,
                     UmbracoConfig.For.GlobalSettings(),
-                    Current.Services.EntityService,
+                    Current.Container.GetInstance<ICurrentVariationAccessor>(),
                     true);
             }
 

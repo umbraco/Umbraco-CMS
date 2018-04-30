@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Web.Mvc
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>(),
+                new TestCurrentVariationAccessor(),
                 true);
 
             var ctrl = new TestSurfaceController { UmbracoContext = umbracoContext };
@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Web.Mvc
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>(),
+                new TestCurrentVariationAccessor(),
                 true);
 
             var ctrl = new TestSurfaceController { UmbracoContext = umbCtx };
@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Web.Mvc
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>(),
+                new TestCurrentVariationAccessor(),
                 true);
 
             var controller = new TestSurfaceController { UmbracoContext = umbracoContext };
@@ -115,7 +115,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>(),
+                new TestCurrentVariationAccessor(),
                 true);
 
             var helper = new UmbracoHelper(
@@ -153,7 +153,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == webRoutingSettings),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>(),
+                new TestCurrentVariationAccessor(),
                 true);
 
             var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);

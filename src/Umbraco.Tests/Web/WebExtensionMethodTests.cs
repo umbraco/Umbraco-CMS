@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Web
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
-                Mock.Of<IEntityService>());
+                new TestCurrentVariationAccessor());
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
 
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Web
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
-                Mock.Of<IEntityService>());
+                new TestCurrentVariationAccessor());
 
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Web
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
-                Mock.Of<IEntityService>());
+                new TestCurrentVariationAccessor());
 
             var httpContext = Mock.Of<HttpContextBase>();
 
