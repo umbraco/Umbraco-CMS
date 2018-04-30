@@ -439,7 +439,6 @@
     <Compile Include="Trees\StylesheetsTreeController.cs" />
     <Compile Include="Trees\UserPermissionsTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
-    <Compile Include="Trees\XsltTreeController.cs" />
     <Compile Include="Trees\UsersTreeController.cs" />
     <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>

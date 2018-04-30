@@ -173,13 +173,6 @@
     <Compile Include="Umbraco\Create.aspx.designer.cs">
       <DependentUpon>create.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Create\xslt.ascx.cs">
-      <DependentUpon>xslt.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Create\xslt.ascx.designer.cs">
-      <DependentUpon>xslt.ascx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Dashboard\UserControlProxy.aspx.cs">
       <DependentUpon>UserControlProxy.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -573,13 +566,7 @@
     <Content Include="Umbraco\Translation\default.aspx" />
     <Content Include="Umbraco\Translation\preview.aspx" />
     <Content Include="Umbraco\Translation\xml.aspx" />
-    <Content Include="Umbraco\Create\language.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
     <Content Include="Umbraco\Create\simple.ascx" />
-    <Content Include="Umbraco\Create\xslt.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
     <Content Include="Umbraco\Developer\Macros\assemblyBrowser.aspx" />
     <Content Include="Umbraco\Developer\Macros\editMacro.aspx" />
     <Content Include="Umbraco\Developer\Xslt\editXslt.aspx" />
