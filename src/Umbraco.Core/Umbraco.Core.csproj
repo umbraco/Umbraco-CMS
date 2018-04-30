@@ -797,8 +797,6 @@
     <Compile Include="Persistence\Dtos\RelationDto.cs" />
     <Compile Include="Persistence\Dtos\RelationTypeDto.cs" />
     <Compile Include="Persistence\Dtos\ServerRegistrationDto.cs" />
-    <Compile Include="Persistence\Dtos\StylesheetDto.cs" />
-    <Compile Include="Persistence\Dtos\StylesheetPropertyDto.cs" />
     <Compile Include="Persistence\Dtos\TagDto.cs" />
     <Compile Include="Persistence\Dtos\TagRelationshipDto.cs" />
     <Compile Include="Persistence\Dtos\TaskDto.cs" />

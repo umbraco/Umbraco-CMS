@@ -415,35 +415,7 @@ namespace Umbraco.Tests.Persistence
                 scope.Complete();
             }
         }
-
-        [Test]
-        public void Can_Create_cmsStylesheet_Table()
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                var helper = new DatabaseSchemaCreator(scope.Database, Mock.Of<ILogger>());
-
-                helper.CreateTable<NodeDto>();
-                helper.CreateTable<StylesheetDto>();
-
-                scope.Complete();
-            }
-        }
-
-        [Test]
-        public void Can_Create_cmsStylesheetProperty_Table()
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                var helper = new DatabaseSchemaCreator(scope.Database, Mock.Of<ILogger>());
-
-                helper.CreateTable<NodeDto>();
-                helper.CreateTable<StylesheetPropertyDto>();
-
-                scope.Complete();
-            }
-        }
-
+        
         [Test]
         public void Can_Create_cmsTags_Table()
         {

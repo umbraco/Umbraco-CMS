@@ -471,7 +471,6 @@
     <Compile Include="_Legacy\Actions\ActionPackageCreate.cs" />
     <Compile Include="_Legacy\Actions\ActionProtect.cs" />
     <Compile Include="_Legacy\Actions\ActionPublish.cs" />
-    <Compile Include="_Legacy\Actions\ActionQuit.cs" />
     <Compile Include="_Legacy\Actions\ActionRefresh.cs" />
     <Compile Include="_Legacy\Actions\ActionRePublish.cs" />
     <Compile Include="_Legacy\Actions\ActionRestore.cs" />
@@ -1058,7 +1057,6 @@
     <Compile Include="Mvc\SurfaceController.cs" />
     <Compile Include="Mvc\PluginControllerArea.cs" />
     <Compile Include="Mvc\PluginControllerAttribute.cs" />
-    <Compile Include="Mvc\SurfaceControllerFactory.cs" />
     <Compile Include="Mvc\PluginControllerMetadata.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="PropertyEditors\ValueConverters\RteMacroRenderingValueConverter.cs" />
@@ -1231,7 +1229,6 @@
     <Compile Include="umbraco.presentation\umbracoPageHolder.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\ContentControl.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ContentPicker.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControl.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\dualSelectBox.cs" />
