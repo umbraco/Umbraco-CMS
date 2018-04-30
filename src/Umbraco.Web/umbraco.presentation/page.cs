@@ -374,17 +374,17 @@ namespace umbraco
                 _content = content;
             }
 
-            public override bool HasValue(string culture = ".", string segment = ".")
+            public override bool HasValue(string culture = null, string segment = null)
             {
                 return _sourceValue != null && ((_sourceValue is string) == false || string.IsNullOrWhiteSpace((string)_sourceValue) == false);
             }
 
-            public override object GetSourceValue(string culture = ".", string segment = ".")
+            public override object GetSourceValue(string culture = null, string segment = null)
             {
                 return _sourceValue;
             }
 
-            public override object GetValue(string culture = ".", string segment = ".")
+            public override object GetValue(string culture = null, string segment = null)
             {
                 // isPreviewing is true here since we want to preview anyway...
                 const bool isPreviewing = true;
@@ -392,7 +392,7 @@ namespace umbraco
                 return PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Unknown, source, isPreviewing);
             }
 
-            public override object GetXPathValue(string culture = ".", string segment = ".")
+            public override object GetXPathValue(string culture = null, string segment = null)
             {
                 throw new NotImplementedException();
             }
@@ -476,14 +476,14 @@ namespace umbraco
                 get { return _inner.Name; }
             }
 
-            public PublishedCultureInfos GetCulture(string culture = ".")
+            public PublishedCultureInfos GetCulture(string culture = null)
             {
                 // handle context culture
-                if (culture == ".")
+                if (culture == null)
                     culture = _variationAccessor.CurrentVariation.Culture;
 
                 // no invariant culture infos
-                if (culture == null) return null;
+                if (culture == "") return null;
 
                 // get
                 return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;
@@ -564,7 +564,7 @@ namespace umbraco
                 get { throw new NotImplementedException(); }
             }
 
-            public string GetUrl(string culture = ".") => throw new NotSupportedException();
+            public string GetUrl(string culture = null) => throw new NotSupportedException();
 
             public PublishedItemType ItemType
             {

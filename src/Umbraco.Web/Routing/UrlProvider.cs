@@ -79,7 +79,7 @@ namespace Umbraco.Web.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The url for the published content.</returns>
-        public string GetUrl(IPublishedContent content, string culture = ".", Uri current = null)
+        public string GetUrl(IPublishedContent content, string culture = null, Uri current = null)
             => GetUrl(content, Mode, culture, current);
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>Mode</c> and on <c>current</c>, unless
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// </remarks>
-        public string GetUrl(IPublishedContent content, bool absolute, Uri current = null, string culture = ".")
+        public string GetUrl(IPublishedContent content, bool absolute, Uri current = null, string culture = null)
             => GetUrl(content, GetMode(absolute), culture, current);
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The url for the published content.</returns>
-        public string GetUrl(IPublishedContent content, UrlProviderMode mode, Uri current = null, string culture = ".")
+        public string GetUrl(IPublishedContent content, UrlProviderMode mode, Uri current = null, string culture = null)
             => GetUrl(content, mode, culture, current);
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The url for the published content.</returns>
-        public string GetUrl(Guid id, string culture = ".", Uri current = null)
+        public string GetUrl(Guid id, string culture = null, Uri current = null)
             => GetUrl(GetDocument(id), Mode, culture, current);
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>Mode</c> and on <c>current</c>, unless
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// </remarks>
-        public string GetUrl(Guid id, bool absolute, string culture = ".", Uri current = null)
+        public string GetUrl(Guid id, bool absolute, string culture = null, Uri current = null)
             => GetUrl(GetDocument(id), GetMode(absolute), culture, current);
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace Umbraco.Web.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The url for the published content.</returns>
-        public string GetUrl(Guid id, UrlProviderMode mode, string culture = ".", Uri current = null)
+        public string GetUrl(Guid id, UrlProviderMode mode, string culture = null, Uri current = null)
             => GetUrl(GetDocument(id), mode, culture, current);
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace Umbraco.Web.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The url for the published content.</returns>
-        public string GetUrl(int id, string culture = ".", Uri current = null)
+        public string GetUrl(int id, string culture = null, Uri current = null)
             => GetUrl(GetDocument(id), Mode, culture, current);
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>Mode</c> and on <c>current</c>, unless
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// </remarks>
-        public string GetUrl(int id, bool absolute, string culture = ".", Uri current = null)
+        public string GetUrl(int id, bool absolute, string culture = null, Uri current = null)
             => GetUrl(GetDocument(id), GetMode(absolute), culture, current);
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace Umbraco.Web.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute url.</param>
         /// <returns>The url for the published content.</returns>
-        public string GetUrl(int id, UrlProviderMode mode, string culture = ".", Uri current = null)
+        public string GetUrl(int id, UrlProviderMode mode, string culture = null, Uri current = null)
             => GetUrl(GetDocument(id), mode, culture, current);
 
         /// <summary>
@@ -194,13 +194,13 @@ namespace Umbraco.Web.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a url, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(IPublishedContent content, UrlProviderMode mode, string culture = ".", Uri current = null)
+        public string GetUrl(IPublishedContent content, UrlProviderMode mode, string culture = null, Uri current = null)
         {
             if (content == null)
                 return "#";
 
             // this the ONLY place where we deal with default culture - IUrlProvider always receive a culture
-            if (culture == ".")
+            if (culture == null)
             {
                 culture = content.ContentType.Variations.Has(ContentVariation.CultureNeutral) // fixme CultureSegment
                     ? _variationAccessor.CurrentVariation.Culture

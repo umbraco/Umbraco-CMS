@@ -30,8 +30,6 @@ namespace Umbraco.Core.Strings
             _config = config.Clone();
         }
 
-        public const string InvariantCulture = "xx-xx";
-
         // see notes for CleanAsciiString
         //// beware! the order is quite important here!
         //const string ValidStringCharactersSource = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -196,7 +194,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
             if (string.IsNullOrWhiteSpace(text))
                 return string.Empty;
 
-            culture = culture ?? InvariantCulture;
+            culture = culture ?? "";
             text = text.ReplaceMany(Path.GetInvalidFileNameChars(), '-');
 
             var name = Path.GetFileNameWithoutExtension(text);
@@ -291,7 +289,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
         {
             // be safe
             if (text == null) throw new ArgumentNullException(nameof(text));
-            culture = culture ?? InvariantCulture;
+            culture = culture ?? "";
 
             // get config
             var config = _config.For(stringType, culture);
@@ -374,7 +372,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
             int opos = 0, ipos = 0;
             var state = StateBreak;
 
-            culture = culture ?? InvariantCulture;
+            culture = culture ?? "";
             caseType &= CleanStringType.CaseMask;
 
             // if we apply global ToUpper or ToLower to text here
@@ -507,7 +505,7 @@ function validateSafeAlias(input, value, immediate, callback) {{
             CleanStringType caseType, string culture, bool isAcronym)
         {
             var term = input.Substring(ipos, len);
-            var cultureInfo = culture == null || culture == InvariantCulture ? CultureInfo.InvariantCulture : CultureInfo.GetCultureInfo(culture);
+            var cultureInfo = string.IsNullOrEmpty(culture) ? CultureInfo.InvariantCulture : CultureInfo.GetCultureInfo(culture);
 
             if (isAcronym)
             {

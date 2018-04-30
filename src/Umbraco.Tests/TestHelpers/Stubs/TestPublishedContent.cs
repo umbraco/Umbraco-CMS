@@ -19,14 +19,14 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         public int SortOrder { get; set; }
         public string Name { get; set; }
         public ICurrentVariationAccessor VariationAccessor { get; set; }
-        public PublishedCultureInfos GetCulture(string culture = ".")
+        public PublishedCultureInfos GetCulture(string culture = null)
         {
             // handle context culture
-            if (culture == ".")
+            if (culture == null)
                 culture = VariationAccessor?.CurrentVariation.Culture;
 
             // no invariant culture infos
-            if (culture == null || Cultures == null) return null;
+            if (culture == "" || Cultures == null) return null;
 
             // get
             return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         public Guid Version { get; set; }
         public int Level { get; set; }
         public string Url { get; set; }
-        public string GetUrl(string culture = ".") => throw new NotSupportedException();
+        public string GetUrl(string culture = null) => throw new NotSupportedException();
         public PublishedItemType ItemType => ContentType.ItemType;
         public bool IsDraft { get; set; }
         public IPublishedContent Parent { get; set; }

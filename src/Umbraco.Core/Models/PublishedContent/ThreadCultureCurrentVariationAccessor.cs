@@ -16,7 +16,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         public CurrentVariation CurrentVariation
         {
-            get => _contexts.GetOrAdd(Thread.CurrentThread.CurrentUICulture.Name, culture => new CurrentVariation { Culture = culture });
+            get => _contexts.GetOrAdd(Thread.CurrentThread.CurrentUICulture.Name, culture => new CurrentVariation(culture));
             set => throw new NotSupportedException();
         }
     }

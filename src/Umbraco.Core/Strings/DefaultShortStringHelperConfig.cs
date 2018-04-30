@@ -28,7 +28,7 @@ namespace Umbraco.Core.Strings
             return config;
         }
 
-        public string DefaultCulture { get; set; } = DefaultShortStringHelper.InvariantCulture;
+        public string DefaultCulture { get; set; } = ""; // invariant
 
         public Dictionary<string, string> UrlReplaceCharacters { get; set; }
 
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Strings
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
 
-            culture = culture ?? DefaultShortStringHelper.InvariantCulture;
+            culture = culture ?? "";
 
             if (_configs.ContainsKey(culture) == false)
                 _configs[culture] = new Dictionary<CleanStringType, Config>();
@@ -115,7 +115,7 @@ namespace Umbraco.Core.Strings
         // (the helper uses a private clone to prevent modifications)
         internal Config For(CleanStringType stringType, string culture)
         {
-            culture = culture ?? DefaultShortStringHelper.InvariantCulture;
+            culture = culture ?? "";
             stringType = stringType & CleanStringType.RoleMask;
 
             Dictionary<CleanStringType, Config> config;

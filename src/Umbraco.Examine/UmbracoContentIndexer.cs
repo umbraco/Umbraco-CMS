@@ -321,7 +321,7 @@ namespace Umbraco.Examine
         {
             foreach (var c in content)
             {
-                var urlValue = c.GetUrlSegment(urlSegmentProviders);
+                var urlValue = c.GetUrlSegment(urlSegmentProviders, ""); // for now, index with invariant culture
                 var values = new Dictionary<string, object[]>
                 {
                     {"icon", new object[] {c.ContentType.Icon}},
@@ -348,7 +348,7 @@ namespace Umbraco.Examine
                 {
                     //only add the value if its not null or empty (we'll check for string explicitly here too)
                     //fixme support variants with language id
-                    var val = property.GetValue();
+                    var val = property.GetValue("", ""); // for now, index the invariant values
                     switch (val)
                     {
                         case null:

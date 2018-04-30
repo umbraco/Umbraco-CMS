@@ -53,15 +53,15 @@ namespace Umbraco.Core.Models.PublishedContent
         public string Alias => PropertyType.Alias;
 
         /// <inheritdoc />
-        public abstract bool HasValue(string culture = ".", string segment = ".");
+        public abstract bool HasValue(string culture = null, string segment = null);
 
         /// <inheritdoc />
-        public abstract object GetSourceValue(string culture = ".", string segment = ".");
+        public abstract object GetSourceValue(string culture = null, string segment = null);
 
         /// <inheritdoc />
-        public abstract object GetValue(string culture = ".", string segment = ".");
+        public abstract object GetValue(string culture = null, string segment = null);
 
         /// <inheritdoc />
-        public abstract object GetXPathValue(string culture = ".", string segment = ".");
+        public abstract object GetXPathValue(string culture = null, string segment = null);
     }
 }

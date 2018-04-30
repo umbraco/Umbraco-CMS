@@ -117,12 +117,12 @@ namespace Umbraco.Core.Models.PublishedContent
         /// if any. In addition, when the content type is multi-lingual, this is the url for the
         /// specified culture. Otherwise, it is the invariant url.</para>
         /// </remarks>
-        string GetUrl(string culture = ".");
+        string GetUrl(string culture = null);
 
         /// <summary>
         /// Gets culture infos for a culture.
         /// </summary>
-        PublishedCultureInfos GetCulture(string culture = ".");
+        PublishedCultureInfos GetCulture(string culture = null);
 
         /// <summary>
         /// Gets culture infos.

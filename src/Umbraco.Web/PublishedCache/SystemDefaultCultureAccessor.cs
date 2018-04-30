@@ -19,6 +19,6 @@ namespace Umbraco.Web.PublishedCache
         }
 
         /// <inheritdoc />
-        public string DefaultCulture => _localizationService.GetDefaultLanguageIsoCode(); // fast 
+        public string DefaultCulture => _localizationService.GetDefaultLanguageIsoCode() ?? ""; // fast 
     }
 }

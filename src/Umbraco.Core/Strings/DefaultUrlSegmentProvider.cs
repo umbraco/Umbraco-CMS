@@ -15,16 +15,16 @@ namespace Umbraco.Core.Strings
         /// <returns>The url segment.</returns>
         public string GetUrlSegment(IContentBase content, string culture = null)
         {
-            return GetUrlSegmentSource(content).ToUrlSegment(culture);
+            return GetUrlSegmentSource(content, culture).ToUrlSegment(culture);
         }
 
-        private static string GetUrlSegmentSource(IContentBase content)
+        private static string GetUrlSegmentSource(IContentBase content, string culture)
         {
             string source = null;
             if (content.HasProperty(Constants.Conventions.Content.UrlName))
-                source = (content.GetValue<string>(Constants.Conventions.Content.UrlName) ?? string.Empty).Trim();
+                source = (content.GetValue<string>(Constants.Conventions.Content.UrlName, culture) ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(source))
-                source = content.Name;
+                source = content.GetName(culture);
             return source;
         }
     }

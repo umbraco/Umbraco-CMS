@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models;
 
@@ -21,7 +20,6 @@ namespace Umbraco.Core.Strings
         public static string GetUrlSegment(this IContentBase content, IEnumerable<IUrlSegmentProvider> urlSegmentProviders, string culture = null)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
-            if (culture == null) throw new ArgumentNullException(nameof(culture));
             if (urlSegmentProviders == null) throw new ArgumentNullException(nameof(urlSegmentProviders));
 
             var url = urlSegmentProviders.Select(p => p.GetUrlSegment(content, culture)).FirstOrDefault(u => u != null);

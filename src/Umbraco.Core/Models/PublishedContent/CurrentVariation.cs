@@ -10,18 +10,18 @@
         /// </summary>
         public CurrentVariation(string culture = null, string segment = null)
         {
-            Culture = culture;
-            Segment = segment;
+            Culture = culture ?? ""; // cannot be null, default to invariant
+            Segment = segment ?? ""; // cannot be null, default to neutral
         }
 
         /// <summary>
         /// Gets the culture.
         /// </summary>
-        public string Culture { get; set; }
+        public string Culture { get; }
 
         /// <summary>
         /// Gets the segment.
         /// </summary>
-        public string Segment { get; set; }
+        public string Segment { get; }
     }
 }

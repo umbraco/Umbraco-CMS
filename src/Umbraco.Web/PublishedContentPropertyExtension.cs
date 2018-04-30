@@ -10,7 +10,7 @@ namespace Umbraco.Web
     {
         #region Value<T>
 
-        public static T Value<T>(this IPublishedProperty property, string culture = ".", string segment = ".", T defaultValue = default)
+        public static T Value<T>(this IPublishedProperty property, string culture = null, string segment = null, T defaultValue = default)
         {
             // for Value<T> when defaultValue is not specified, and HasValue() is false, we still want to convert the result (see below)
             // but we have no way to tell whether default value is specified or not - we could do it with overloads, but then defaultValue

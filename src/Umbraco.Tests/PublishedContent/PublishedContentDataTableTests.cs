@@ -184,7 +184,7 @@ namespace Umbraco.Tests.PublishedContent
         private class TestPublishedContent : IPublishedContent
         {
             public string Url { get; set; }
-            public string GetUrl(string culture = ".") => throw new NotSupportedException();
+            public string GetUrl(string culture = null) => throw new NotSupportedException();
 
             public PublishedItemType ItemType { get; set; }
 
@@ -204,7 +204,7 @@ namespace Umbraco.Tests.PublishedContent
             public int TemplateId { get; set; }
             public int SortOrder { get; set; }
             public string Name { get; set; }
-            public PublishedCultureInfos GetCulture(string culture = ".") => throw new NotSupportedException();
+            public PublishedCultureInfos GetCulture(string culture = null) => throw new NotSupportedException();
             public IReadOnlyDictionary<string, PublishedCultureInfos> Cultures => throw new NotSupportedException();
             public string UrlSegment { get; set; }
             public string WriterName { get; set; }

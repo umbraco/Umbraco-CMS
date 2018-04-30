@@ -23,20 +23,20 @@ namespace Umbraco.Core.Models.PublishedContent
         // RawValueProperty does not (yet?) support variants,
         // only manages the current "default" value
 
-        public override object GetSourceValue(string culture = ".", string segment = ".")
-            => culture == "." & segment == "." ? _sourceValue : null;
+        public override object GetSourceValue(string culture = null, string segment = null)
+            => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _sourceValue : null;
 
-        public override bool HasValue(string culture = ".", string segment = ".")
+        public override bool HasValue(string culture = null, string segment = null)
         {
             var sourceValue = GetSourceValue(culture, segment);
             return sourceValue is string s ? !string.IsNullOrWhiteSpace(s) : sourceValue != null;
         }
 
-        public override object GetValue(string culture = ".", string segment = ".")
-            => culture == "." & segment == "." ? _objectValue.Value : null;
+        public override object GetValue(string culture = null, string segment = null)
+            => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _objectValue.Value : null;
 
-        public override object GetXPathValue(string culture = ".", string segment = ".")
-            => culture == "." & segment == "." ? _xpathValue.Value : null;
+        public override object GetXPathValue(string culture = null, string segment = null)
+            => string.IsNullOrEmpty(culture) & string.IsNullOrEmpty(segment) ? _xpathValue.Value : null;
 
         public RawValueProperty(PublishedPropertyType propertyType, IPublishedElement content, object sourceValue, bool isPreviewing = false)
             : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored

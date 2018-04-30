@@ -48,7 +48,7 @@ namespace Umbraco.Web
         /// Gets a value indicating whether the content has a value for a property identified by its alias.
         /// </summary>
         /// <remarks>Returns true if <c>GetProperty(alias)</c> is not <c>null</c> and <c>GetProperty(alias).HasValue</c> is <c>true</c>.</remarks>
-        public static bool HasValue(this IPublishedElement content, string alias, string culture = ".", string segment = ".")
+        public static bool HasValue(this IPublishedElement content, string alias, string culture = null, string segment = null)
         {
             var prop = content.GetProperty(alias);
             return prop != null && prop.HasValue(culture, segment);
@@ -92,7 +92,7 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(this IPublishedElement content, string alias, string culture = ".", string segment = ".", object defaultValue = default)
+        public static object Value(this IPublishedElement content, string alias, string culture = null, string segment = null, object defaultValue = default)
         {
             var property = content.GetProperty(alias);
             if (property == null || !property.HasValue(culture, segment)) return defaultValue;
@@ -121,7 +121,7 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T Value<T>(this IPublishedElement content, string alias, string culture = ".", string segment = ".", T defaultValue = default)
+        public static T Value<T>(this IPublishedElement content, string alias, string culture = null, string segment = null, T defaultValue = default)
         {
             var property = content.GetProperty(alias);
             if (property == null) return defaultValue;

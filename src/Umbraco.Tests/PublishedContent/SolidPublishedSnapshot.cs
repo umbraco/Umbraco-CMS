@@ -176,7 +176,7 @@ namespace Umbraco.Tests.PublishedContent
         public int TemplateId { get; set; }
         public int SortOrder { get; set; }
         public string Name { get; set; }
-        public PublishedCultureInfos GetCulture(string culture = ".") => throw new NotSupportedException();
+        public PublishedCultureInfos GetCulture(string culture = null) => throw new NotSupportedException();
         public IReadOnlyDictionary<string, PublishedCultureInfos> Cultures => throw new NotSupportedException();
         public string UrlSegment { get; set; }
         public string WriterName { get; set; }
@@ -189,7 +189,7 @@ namespace Umbraco.Tests.PublishedContent
         public Guid Version { get; set; }
         public int Level { get; set; }
         public string Url { get; set; }
-        public string GetUrl(string culture = ".") => throw new NotSupportedException();
+        public string GetUrl(string culture = null) => throw new NotSupportedException();
 
         public PublishedItemType ItemType { get { return PublishedItemType.Content; } }
         public bool IsDraft { get; set; }
@@ -256,10 +256,10 @@ namespace Umbraco.Tests.PublishedContent
         public bool SolidHasValue { get; set; }
         public object SolidXPathValue { get; set; }
 
-        public object GetSourceValue(string culture = ".", string segment = ".") => SolidSourceValue;
-        public object GetValue(string culture = ".", string segment = ".") => SolidValue;
-        public object GetXPathValue(string culture = ".", string segment = ".") => SolidXPathValue;
-        public bool HasValue(string culture = ".", string segment = ".") => SolidHasValue;
+        public object GetSourceValue(string culture = null, string segment = null) => SolidSourceValue;
+        public object GetValue(string culture = null, string segment = null) => SolidValue;
+        public object GetXPathValue(string culture = null, string segment = null) => SolidXPathValue;
+        public bool HasValue(string culture = null, string segment = null) => SolidHasValue;
     }
 
     [PublishedModel("ContentType2")]

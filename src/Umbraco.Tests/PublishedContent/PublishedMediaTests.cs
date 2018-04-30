@@ -133,7 +133,6 @@ namespace Umbraco.Tests.PublishedContent
             }
         }
 
-
         [Test]
         public void Do_Not_Find_In_Recycle_Bin()
         {

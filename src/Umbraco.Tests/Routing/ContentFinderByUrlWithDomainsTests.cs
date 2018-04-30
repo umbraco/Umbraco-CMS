@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("http://domain1.com/fr/1001-2-1", 100121, "fr-FR")]
         [TestCase("http://domain1.com/1001-3", 10013, "en-US")]
 
-        [TestCase("http://domain2.com/1002", 1002, null)]
+        [TestCase("http://domain2.com/1002", 1002, "")]
 
         [TestCase("http://domain3.com/", 1003, "en-US")]
         [TestCase("http://domain3.com/en", 10031, "en-US")]
@@ -158,7 +158,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("http://domain3.com/1003-3", 10033, "en-US")]
 
         [TestCase("https://domain1.com/", 1001, "en-US")]
-        [TestCase("https://domain3.com/", 1001, null)] // because domain3 is explicitely set on http
+        [TestCase("https://domain3.com/", 1001, "")] // because domain3 is explicitely set on http
 
         public void Lookup_NestedDomains(string url, int expectedId, string expectedCulture)
         {

@@ -15,7 +15,7 @@ namespace Umbraco.Web.Models
     [DebuggerDisplay("Content Id: {Id}, Name: {Name}")]
     public abstract class PublishedContentBase : IPublishedContent
     {
-        private string _url; // fixme - cannot cache urls! depends on the current request!
+        private string _url; // fixme - cannot cache urls, they depends on the current request
 
         #region ContentType
 
@@ -79,7 +79,7 @@ namespace Umbraco.Web.Models
         /// The url of documents are computed by the document url providers. The url of medias are, at the moment,
         /// computed here from the 'umbracoFile' property -- but we should move to media url providers at some point.
         /// </remarks>
-        public virtual string GetUrl(string culture = ".") // fixme - consider .GetCulture("fr-FR").Url
+        public virtual string GetUrl(string culture = null) // fixme - consider .GetCulture("fr-FR").Url
         {
                 switch (ItemType)
                 {
@@ -133,7 +133,7 @@ namespace Umbraco.Web.Models
         }
 
         /// <inheritdoc />
-        public abstract PublishedCultureInfos GetCulture(string culture = ".");
+        public abstract PublishedCultureInfos GetCulture(string culture = null);
 
         /// <inheritdoc />
         public abstract IReadOnlyDictionary<string, PublishedCultureInfos> Cultures { get; }

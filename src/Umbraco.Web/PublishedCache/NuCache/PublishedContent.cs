@@ -182,7 +182,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     return _contentData.Name;
 
                 var culture = VariationAccessor.CurrentVariation.Culture;
-                if (culture == null)
+                if (culture == "")
                     return _contentData.Name;
 
                 return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos.Name : null;
@@ -198,7 +198,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     return _urlSegment;
 
                 var culture = VariationAccessor.CurrentVariation.Culture;
-                if (culture == null)
+                if (culture == "")
                     return _urlSegment;
 
                 return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos.UrlSegment : null;
@@ -240,14 +240,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private static readonly IReadOnlyDictionary<string, PublishedCultureInfos> NoCultureInfos = new Dictionary<string, PublishedCultureInfos>();
 
         /// <inheritdoc />
-        public override PublishedCultureInfos GetCulture(string culture = ".")
+        public override PublishedCultureInfos GetCulture(string culture = null)
         {
             // handle context culture
-            if (culture == ".")
+            if (culture == null)
                 culture = VariationAccessor.CurrentVariation.Culture;
 
             // no invariant culture infos
-            if (culture == null) return null;
+            if (culture == "") return null;
 
             // get
             return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;

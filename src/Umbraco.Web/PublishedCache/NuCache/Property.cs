@@ -52,7 +52,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 foreach (var sourceValue in sourceValues)
                 {
-                    if (sourceValue.Culture == null && sourceValue.Segment == null)
+                    if (sourceValue.Culture == "" && sourceValue.Segment == "")
                     {
                         _sourceValue = sourceValue.Value;
                     }
@@ -89,7 +89,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _variations = origin._variations;
         }
 
-        public override bool HasValue(string culture = ".", string segment = ".") => _sourceValue != null
+        public override bool HasValue(string culture = null, string segment = null) => _sourceValue != null
             && (!(_sourceValue is string) || string.IsNullOrWhiteSpace((string) _sourceValue) == false);
 
         // used to cache the recursive *property* for this property
@@ -150,7 +150,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // this is always invoked from within a lock, so does not require its own lock
         private object GetInterValue(string culture, string segment)
         {
-            if (culture == null && segment == null)
+            if (culture == "" && segment == "")
             {
                 if (_interInitialized) return _interValue;
                 _interValue = PropertyType.ConvertSourceToInter(_content, _sourceValue, _isPreviewing);
@@ -163,7 +163,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var k = new CompositeStringStringKey(culture, segment);
             if (!_sourceValues.TryGetValue(k, out var vvalue))
-                _sourceValues[k] = vvalue = new SourceInterValue { Culture = culture, Segment = segment };
+                _sourceValues[k] = vvalue = new SourceInterValue { Culture = culture, Segment = segment, SourceValue = GetSourceValue(culture, segment) }; // fixme where is the source?
 
             if (vvalue.InterInitialized) return vvalue.InterValue;
             vvalue.InterValue = PropertyType.ConvertSourceToInter(_content, vvalue.SourceValue, _isPreviewing);
@@ -171,11 +171,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return vvalue.InterValue;
         }
 
-        public override object GetSourceValue(string culture = ".", string segment = ".")
+        public override object GetSourceValue(string culture = null, string segment = null)
         {
             ContextualizeVariation(ref culture, ref segment);
 
-            if (culture == null && segment == null)
+            if (culture == "" && segment == "")
                 return _sourceValue;
 
             lock (_locko)
@@ -187,16 +187,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private void ContextualizeVariation(ref string culture, ref string segment)
         {
-            if (culture != "." && segment != ".") return;
+            if (culture != null && segment != null) return;
 
             // use context values
             // fixme CultureSegment?
             var publishedVariationContext = _content.VariationAccessor?.CurrentVariation;
-            if (culture == ".") culture = _variations.Has(ContentVariation.CultureNeutral) ? publishedVariationContext?.Culture : null;
-            if (segment == ".") segment = _variations.Has(ContentVariation.CultureNeutral) ? publishedVariationContext?.Segment : null;
+            if (culture == null) culture = _variations.Has(ContentVariation.CultureNeutral) ? publishedVariationContext?.Culture : "";
+            if (segment == null) segment = _variations.Has(ContentVariation.CultureNeutral) ? publishedVariationContext?.Segment : "";
         }
 
-        public override object GetValue(string culture = ".", string segment = ".")
+        public override object GetValue(string culture = null, string segment = null)
         {
             ContextualizeVariation(ref culture, ref segment);
 
@@ -217,7 +217,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return value;
         }
 
-        public override object GetXPathValue(string culture = ".", string segment = ".")
+        public override object GetXPathValue(string culture = null, string segment = null)
         {
             ContextualizeVariation(ref culture, ref segment);
 
@@ -252,7 +252,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // this is always invoked from within a lock, so does not require its own lock
             public CacheValue For(string culture, string segment)
             {
-                if (culture == null && segment == null)
+                if (culture == "" && segment == "")
                     return this;
 
                 if (_values == null)

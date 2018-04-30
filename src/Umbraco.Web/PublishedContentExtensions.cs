@@ -139,7 +139,7 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(this IPublishedContent content, string alias,  string culture = ".", string segment = ".",  object defaultValue = default, bool recurse = false)
+        public static object Value(this IPublishedContent content, string alias,  string culture = null, string segment = null,  object defaultValue = default, bool recurse = false)
         {
             // fixme - refactor with fallback
             var property = content.GetProperty(alias, recurse);
@@ -168,7 +168,7 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T Value<T>(this IPublishedContent content, string alias, string culture = ".", string segment = ".", T defaultValue = default, bool recurse = false)
+        public static T Value<T>(this IPublishedContent content, string alias, string culture = null, string segment = null, T defaultValue = default, bool recurse = false)
         {
             // fixme - refactor with fallback
             var property = content.GetProperty(alias, recurse);

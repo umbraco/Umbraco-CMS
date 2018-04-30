@@ -45,9 +45,9 @@ namespace Umbraco.Tests.PublishedContent
                 DraftData = new ContentData { Name="It Works2!", Published = false, TemplateId = 0, VersionId = 2, VersionDate = DateTime.Now, WriterId = 0,
                     Properties = new Dictionary<string, PropertyData[]> { { "prop", new[]
                     {
-                        new PropertyData { Value = "val2" },
-                        new PropertyData { Culture = "fr-FR", Value = "val-fr2" },
-                        new PropertyData { Culture = "en-UK", Value = "val-uk2" }
+                        new PropertyData { Culture = "", Segment = "", Value = "val2" },
+                        new PropertyData { Culture = "fr-FR", Segment = "", Value = "val-fr2" },
+                        new PropertyData { Culture = "en-UK", Segment = "", Value = "val-uk2" }
                     } } },
                     CultureInfos = new Dictionary<string, CultureVariation>
                     {
@@ -58,9 +58,9 @@ namespace Umbraco.Tests.PublishedContent
                 PublishedData = new ContentData { Name="It Works1!", Published = true, TemplateId = 0, VersionId = 1, VersionDate = DateTime.Now, WriterId = 0,
                     Properties = new Dictionary<string, PropertyData[]> { { "prop", new[]
                     {
-                        new PropertyData { Value = "val1" },
-                        new PropertyData { Culture = "fr-FR", Value = "val-fr1" },
-                        new PropertyData { Culture = "en-UK", Value = "val-uk1" }
+                        new PropertyData { Culture = "", Segment = "", Value = "val1" },
+                        new PropertyData { Culture = "fr-FR", Segment = "", Value = "val-fr1" },
+                        new PropertyData { Culture = "en-UK", Segment = "", Value = "val-uk1" }
                     } } },
                     CultureInfos = new Dictionary<string, CultureVariation>
                     {
@@ -160,7 +160,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNotNull(publishedContent);
             Assert.AreEqual("It Works1!", publishedContent.Name);
             Assert.AreEqual("val1", publishedContent.Value<string>("prop"));
-            Assert.AreEqual("val-fr1", publishedContent.Value<string>("prop", "fr-FR"));
+            Assert.AreEqual("val-fr1", publishedContent.Value<string>("prop", "fr-FR")); // fixme wtf is happening here?
             Assert.AreEqual("val-uk1", publishedContent.Value<string>("prop", "en-UK"));
 
             Assert.AreEqual("name-fr1", publishedContent.GetCulture("fr-FR").Name);
@@ -190,7 +190,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(new DateTime(2018, 01, 02, 01, 00, 00), publishedContent.GetCulture().Date);
 
             // invariant needs to be retrieved explicitely, when it's not default
-            Assert.AreEqual("val1", publishedContent.Value<string>("prop", culture: null));
+            Assert.AreEqual("val1", publishedContent.Value<string>("prop", culture: ""));
 
             // but,
             // if the content type / property type does not vary, then it's all invariant again
