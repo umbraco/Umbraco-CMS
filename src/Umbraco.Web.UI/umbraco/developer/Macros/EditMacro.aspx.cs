@@ -49,9 +49,9 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
         /// <param name="macroCachePeriod"></param>
         /// <param name="macroAssemblyValue"></param>
         /// <param name="macroTypeValue"></param>
-        protected override void SetMacroValuesFromPostBack(IMacro macro, int macroCachePeriod, string macroAssemblyValue, string macroTypeValue)
+        protected override void SetMacroValuesFromPostBack(IMacro macro, int macroCachePeriod, string macroTypeValue)
         {
-            base.SetMacroValuesFromPostBack(macro, macroCachePeriod, macroAssemblyValue, macroTypeValue);
+            base.SetMacroValuesFromPostBack(macro, macroCachePeriod, macroTypeValue);
             if (!SelectedPartialView.Text.IsNullOrWhiteSpace())
             {
                 macro.ScriptPath = SelectedPartialView.Text;

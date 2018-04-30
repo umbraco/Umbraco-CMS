@@ -17,8 +17,6 @@ namespace Umbraco.Web.Trees
 
         protected override string FileIcon => "icon-script";
 
-        protected override bool EnableCreateOnFolder => true;
-
         protected override void OnRenderFolderNode(ref TreeNode treeNode)
         {
             //TODO: This isn't the best way to ensure a noop process for clicking a node but it works for now.

@@ -14,7 +14,5 @@ namespace Umbraco.Web.Trees
         protected override string[] Extensions => ExtensionsStatic;
 
         protected override string FileIcon => "icon-brackets";
-
-        protected override bool EnableCreateOnFolder => false;
     }
 }

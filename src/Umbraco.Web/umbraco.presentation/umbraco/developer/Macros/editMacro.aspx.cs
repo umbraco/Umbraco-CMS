@@ -52,10 +52,7 @@ namespace umbraco.cms.presentation.developer
                 PopulateFieldsOnLoad(_macro, tempMacroType);
 
                 // Load elements from macro
-                macroPropertyBind();
-
-                // Load xslt files from default dir
-                PopulateXsltFiles();
+                MacroPropertyBind();
 
                 // Load usercontrols
                 PopulateUserControls(IOHelper.MapPath(SystemDirectories.UserControls));
@@ -81,21 +78,13 @@ namespace umbraco.cms.presentation.developer
             cacheByPage.Checked = macro.CacheByPage;
             cachePersonalized.Checked = macro.CacheByMember;
 
-            // Populate either user control or custom control
-            if (macroTypeValue != string.Empty)
-            {
-                macroType.Text = macroTypeValue;
-            }
-            else
-            {
-                macroUserControl.Text = macroTypeValue;
-            }
+            macroUserControl.Text = macroTypeValue;
         }
 
         /// <summary>
         /// Sets the values on the Macro object from the values posted back before saving the macro
         /// </summary>
-        protected virtual void SetMacroValuesFromPostBack(IMacro macro, int macroCachePeriod, string macroAssemblyValue, string macroTypeValue)
+        protected virtual void SetMacroValuesFromPostBack(IMacro macro, int macroCachePeriod, string macroTypeValue)
         {
             macro.UseInEditor = macroEditor.Checked;
             macro.DontRender = macroRenderContent.Checked == false;
@@ -106,37 +95,8 @@ namespace umbraco.cms.presentation.developer
             macro.Name = macroName.Text;
             macro.ControlType = macroTypeValue;
         }
-
-        private static void GetXsltFilesFromDir(string orgPath, string path, ArrayList files)
-        {
-            var dirInfo = new DirectoryInfo(path);
-
-            if (dirInfo.Exists == false) return;
-
-            // Populate subdirectories
-            var dirInfos = dirInfo.GetDirectories();
-            foreach (var dir in dirInfos)
-                GetXsltFilesFromDir(orgPath, path + "/" + dir.Name, files);
-
-            var fileInfo = dirInfo.GetFiles("*.xsl*");
-
-            foreach (var file in fileInfo)
-                files.Add((path.Replace(orgPath, string.Empty).Trim('/') + "/" + file.Name).Trim('/'));
-        }
-
-        private void PopulateXsltFiles()
-        {
-            var xslts = new ArrayList();
-            var xsltDir = IOHelper.MapPath(SystemDirectories.Xslt + "/");
-            GetXsltFilesFromDir(xsltDir, xsltDir, xslts);
-            xsltFiles.DataSource = xslts;
-            xsltFiles.DataBind();
-            xsltFiles.Items.Insert(0, new ListItem("Browse xslt files on server...", string.Empty));
-        }
-
-
-
-        public void deleteMacroProperty(object sender, EventArgs e)
+        
+        public void DeleteMacroProperty(object sender, EventArgs e)
         {
             var macroPropertyId = (HtmlInputHidden)((Control)sender).Parent.FindControl("macroPropertyID");
 
@@ -145,10 +105,10 @@ namespace umbraco.cms.presentation.developer
 
             Services.MacroService.Save(_macro);
 
-            macroPropertyBind();
+            MacroPropertyBind();
         }
 
-        public void macroPropertyBind()
+        public void MacroPropertyBind()
         {
             macroProperties.DataSource = _macro.Properties.OrderBy(x => x.SortOrder);
             macroProperties.DataBind();
@@ -203,7 +163,7 @@ namespace umbraco.cms.presentation.developer
 
                 Services.MacroService.Save(_macro);
 
-                macroPropertyBind();
+                MacroPropertyBind();
             }
         }
 
@@ -274,15 +234,13 @@ namespace umbraco.cms.presentation.developer
             ClientTools
                 .SyncTree("-1," + _macro.Id.ToInvariantString(), true); //true forces the reload
 
-            var tempMacroAssembly = macroAssembly.Text;
-            var tempMacroType = macroType.Text;
+            
             var tempCachePeriod = cachePeriod.Text;
             if (tempCachePeriod == string.Empty)
                 tempCachePeriod = "0";
-            if (tempMacroAssembly == string.Empty && macroUserControl.Text != string.Empty)
-                tempMacroType = macroUserControl.Text;
+            var tempMacroType = macroUserControl.Text;
 
-            SetMacroValuesFromPostBack(_macro, Convert.ToInt32(tempCachePeriod), tempMacroAssembly, tempMacroType);
+            SetMacroValuesFromPostBack(_macro, Convert.ToInt32(tempCachePeriod), tempMacroType);
 
             // save elements
             // this is oh so completely broken
@@ -324,7 +282,7 @@ namespace umbraco.cms.presentation.developer
 
             ClientTools.ShowSpeechBubble(SpeechBubbleIcon.Save, "Macro saved", "");
 
-            macroPropertyBind();
+            MacroPropertyBind();
         }
 
         /// <summary>
@@ -391,15 +349,6 @@ namespace umbraco.cms.presentation.developer
         protected global::Umbraco.Web._Legacy.Controls.Pane Pane1_2;
         
         /// <summary>
-        /// xsltFiles control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList xsltFiles;
-
-        /// <summary>
         /// macroUserControl control.
         /// </summary>
         /// <remarks>
@@ -416,25 +365,7 @@ namespace umbraco.cms.presentation.developer
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList userControlList;
-        
-        /// <summary>
-        /// macroAssembly control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox macroAssembly;
-
-        /// <summary>
-        /// macroType control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox macroType;
-        
+                
         /// <summary>
         /// Pane1_3 control.
         /// </summary>
