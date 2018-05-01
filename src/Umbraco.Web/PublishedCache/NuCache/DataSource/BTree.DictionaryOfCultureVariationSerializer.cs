@@ -9,12 +9,12 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     {
         public IReadOnlyDictionary<string, CultureVariation> ReadFrom(Stream stream)
         {
-            var dict = new Dictionary<string, CultureVariation>();
-
             // read variations count
             var pcount = PrimitiveSerializer.Int32.ReadFrom(stream);
+            if (pcount == 0) return Empty;
 
             // read each variation
+            var dict = new Dictionary<string, CultureVariation>();
             for (var i = 0; i < pcount; i++)
             {
                 var languageId = PrimitiveSerializer.String.ReadFrom(stream);

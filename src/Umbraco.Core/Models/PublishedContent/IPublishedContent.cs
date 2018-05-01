@@ -142,9 +142,19 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets a value indicating whether the content is draft.
         /// </summary>
-        /// <remarks>A content is draft when it is the unpublished version of a content, which may
-        /// have a published version, or not.</remarks>
+        /// <remarks>
+        /// <para>A content is draft when it is the unpublished version of a content, which may
+        /// have a published version, or not.</para>
+        /// <para>When retrieving documents from cache in non-preview mode, IsDraft is always false,
+        /// as only published documents are returned. When retrieving in preview mode, IsDraft can
+        /// either be true (document is not published, or has been edited, and what is returned
+        /// is the edited version) or false (document is published, and has not been edited, and
+        /// what is returned is the published version).</para>
+        /// </remarks>
         bool IsDraft { get; }
+
+        // fixme - consider having an IsPublished flag too
+        // so that when IsDraft is true, we can check whether there is a published version?
 
         #endregion
 

@@ -263,8 +263,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 if (_cultureInfos != null) return _cultureInfos;
 
-                return _cultureInfos = _contentData.CultureInfos // fixme can it be null?
-                    .ToDictionary(x => x.Key, x => new PublishedCultureInfos(x.Key, x.Value.Name, false, x.Value.Date)); // fixme values!
+                if (_contentData.CultureInfos == null)
+                    throw new Exception("oops: _contentDate.CultureInfos is null.");
+                return _cultureInfos = _contentData.CultureInfos
+                    .ToDictionary(x => x.Key, x => new PublishedCultureInfos(x.Key, x.Value.Name, x.Value.Date));
             }
         }
 

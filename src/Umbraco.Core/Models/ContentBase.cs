@@ -165,7 +165,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public virtual void SetName(string culture, string name)
+        public virtual void SetName(string name, string culture)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
