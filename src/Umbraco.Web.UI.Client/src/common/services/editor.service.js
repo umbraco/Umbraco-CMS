@@ -23,8 +23,6 @@
                 editors: editors,
                 editor: editor
             };
-
-            // setIndent();
             
             eventsService.emit("appState.editors.open", args);
         }
@@ -40,48 +38,7 @@
                 editor: closedEditor
             };
 
-            console.log("ARGS", args);
-            
-            // setIndent();
-
             eventsService.emit("appState.editors.close", args);
-        }
-
-        function setIndent() {
-
-            var indentSize = 80;
-            var numberOfCollapsed = editors.length;
-
-            angular.forEach(editors, function(editor, index){
-
-                var lastOpened = false;
-                var style = {};
-
-                // clear editor settings
-                editor.style = null;
-                editor.showOverlay = false;
-
-                if(index + 1 === editors.length) {
-                    lastOpened = true;
-                }
-
-                // show black overlay on all editors but the latest
-                if(lastOpened === false) {
-                    editor.showOverlay = true;
-                }
-
-                // if it's a small editor we don't want it to indent when it is the last opened 
-                // beacuse it doesn't take up the full screen
-                if(editor.size === "small" && lastOpened === true) {
-                    return;
-                }
-
-                // set indent
-                style.left = (index + 1) * indentSize + "px";
-                editor.style = style;
-                
-            });
-
         }
         
         function contentEditor(editor) {
