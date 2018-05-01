@@ -35,7 +35,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return content;
         }
 
-        public static Content CreateSimpleContent(IContentType contentType, string name, int parentId = -1)
+        public static Content CreateSimpleContent(IContentType contentType, string name, int parentId = -1, string culture = null, string segment = null)
         {
             var content = new Content(name, parentId, contentType) { CreatorId = 0, WriterId = 0 };
             object obj =
@@ -46,18 +46,20 @@ namespace Umbraco.Tests.TestHelpers.Entities
                     author = "John Doe"
                 };
 
-            content.PropertyValues(obj);
+            content.PropertyValues(obj, culture, segment);
 
             content.ResetDirtyProperties(false);
 
             return content;
         }
 
-        public static Content CreateSimpleContent(IContentType contentType, string name, IContent parent, string culture = null, string segment = null)
+        public static Content CreateSimpleContent(IContentType contentType, string name, IContent parent, string culture = null, string segment = null, bool setPropertyValues = true)
         {
             var content = new Content(name, parent, contentType, culture) { CreatorId = 0, WriterId = 0 };
-            
-            object obj =
+
+            if (setPropertyValues)
+            {
+                object obj =
                 new
                 {
                     title = name + " Subpage",
@@ -65,7 +67,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
                     author = "John Doe"
                 };
 
-            content.PropertyValues(obj, culture, segment);
+                content.PropertyValues(obj, culture, segment);
+            }
 
             content.ResetDirtyProperties(false);
 
