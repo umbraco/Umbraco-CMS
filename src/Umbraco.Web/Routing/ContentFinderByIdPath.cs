@@ -16,16 +16,11 @@ namespace Umbraco.Web.Routing
     {
         private readonly ILogger _logger;
         private readonly IWebRoutingSection _webRoutingSection;
-
-        public ContentFinderByIdPath(ILogger logger)
-            : this(UmbracoConfig.For.UmbracoSettings().WebRouting)
+        
+        public ContentFinderByIdPath(IWebRoutingSection webRoutingSection, ILogger logger)
         {
-            _logger = logger;
-        }
-
-        public ContentFinderByIdPath(IWebRoutingSection webRoutingSection)
-        {
-            _webRoutingSection = webRoutingSection;
+            _webRoutingSection = webRoutingSection ?? throw new System.ArgumentNullException(nameof(webRoutingSection));
+            _logger = logger ?? throw new System.ArgumentNullException(nameof(logger));
         }
 
         /// <summary>

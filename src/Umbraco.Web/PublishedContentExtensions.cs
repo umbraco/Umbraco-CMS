@@ -273,7 +273,7 @@ namespace Umbraco.Web
             //TODO: we should pass in the IExamineManager?
 
             var s = searchProvider ?? Examine.ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer);
-            
+
             var results = s.Search(criteria);
             return results.ToPublishedSearchResults(UmbracoContext.Current.ContentCache);
         }
@@ -1066,7 +1066,7 @@ namespace Umbraco.Web
         /// <returns>The first child of content, of the given content type.</returns>
         public static IPublishedContent FirstChild(this IPublishedContent content, string alias)
         {
-            return content.Children( alias ).FirstOrDefault();
+            return content.Children(alias).FirstOrDefault();
         }
 
         public static IPublishedContent FirstChild(this IPublishedContent content, Func<IPublishedContent, bool> predicate)
@@ -1229,20 +1229,25 @@ namespace Umbraco.Web
         #region Culture
 
         /// <summary>
-        /// Gets the culture that would be selected to render a specified content,
-        /// within the context of a specified current request.
+        /// Return the URL name for the <see cref="IPublishedContent"/> based on the culture specified or default culture defined
         /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="current">The request Uri.</param>
-        /// <returns>The culture that would be selected to render the content.</returns>
-        public static CultureInfo GetCulture(this IPublishedContent content, Uri current = null)
+        /// <param name="content"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        public static string GetUrlName(this IPublishedContent content, ILocalizationService localizationService, string culture = null)
         {
-            return Models.ContentExtensions.GetCulture(UmbracoContext.Current,
-                Current.Services.DomainService,
-                Current.Services.LocalizationService,
-                Current.Services.ContentService,
-                content.Id, content.Path,
-                current);
+            if (content.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
+            {
+                var cultureCode = culture ?? localizationService.GetDefaultLanguageIsoCode();
+                if (cultureCode != null && content.CultureNames.TryGetValue(cultureCode, out var cultureName))
+                {
+                    return cultureName.UrlName;
+                }
+            }
+
+            //if we get here, the content type is invariant or we don't have access to a usable culture code
+            return content.UrlName;
         }
 
         #endregion

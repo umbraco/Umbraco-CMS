@@ -24,16 +24,15 @@ namespace Umbraco.Core.Services.Implement
         private readonly ITemplateRepository _templateRepository;
         private readonly IPartialViewRepository _partialViewRepository;
         private readonly IPartialViewMacroRepository _partialViewMacroRepository;
-        private readonly IXsltFileRepository _xsltRepository;
         private readonly IAuditRepository _auditRepository;
 
-        private const string PartialViewHeader = "@inherits Umbraco.Web.Mvc.UmbracoTemplatePage";
+        private const string PartialViewHeader = "@inherits Umbraco.Web.Mvc.UmbracoViewPage";
         private const string PartialViewMacroHeader = "@inherits Umbraco.Web.Macros.PartialViewMacroPage";
 
         public FileService(IScopeProvider uowProvider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
             IStylesheetRepository stylesheetRepository, IScriptRepository scriptRepository, ITemplateRepository templateRepository,
             IPartialViewRepository partialViewRepository, IPartialViewMacroRepository partialViewMacroRepository,
-            IXsltFileRepository xsltRepository, IAuditRepository auditRepository)
+            IAuditRepository auditRepository)
             : base(uowProvider, logger, eventMessagesFactory)
         {
             _stylesheetRepository = stylesheetRepository;
@@ -41,7 +40,6 @@ namespace Umbraco.Core.Services.Implement
             _templateRepository = templateRepository;
             _partialViewRepository = partialViewRepository;
             _partialViewMacroRepository = partialViewMacroRepository;
-            _xsltRepository = xsltRepository;
             _auditRepository = auditRepository;
         }
 
@@ -724,22 +722,6 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public IXsltFile GetXsltFile(string path)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _xsltRepository.Get(path);
-            }
-        }
-
-        public IEnumerable<IXsltFile> GetXsltFiles(params string[] names)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _xsltRepository.GetMany(names).OrderBy(x => x.Name);
-            }
-        }
-
         public Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = 0)
         {
             return CreatePartialViewMacro(partialView, PartialViewType.PartialView, snippetName, userId);
@@ -1051,36 +1033,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         #endregion
-
-        #region Xslt
-
-        public Stream GetXsltFileContentStream(string filepath)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _xsltRepository.GetFileContentStream(filepath);
-            }
-        }
-
-        public void SetXsltFileContent(string filepath, Stream content)
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                _xsltRepository.SetFileContent(filepath, content);
-                scope.Complete();
-            }
-        }
-
-        public long GetXsltFileSize(string filepath)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _xsltRepository.GetFileSize(filepath);
-            }
-        }
-
-        #endregion
-
+        
         private void Audit(AuditType type, string message, int userId, int objectId)
         {
             _auditRepository.Save(new AuditItem(objectId, message, type, userId));

@@ -259,8 +259,6 @@
     <key alias="stylesNoStylesOnPage">사용할 수 있는 스타일이 없습니다.</key>
     <key alias="tableColMergeLeft">합치기 원하시는 두셀의 왼쪽에 커서를 가져다놓으세요</key>
     <key alias="tableSplitNotSplittable">병합되지 않은 셀을 분리할 수 없습니다.</key>
-    <key alias="xsltErrorHeader">XSLT 소스에러</key>
-    <key alias="xsltErrorText">에러를 포함하고 있어 XSLT가 저장되지 않았습니다.</key>
   </area>
   <area alias="general">
     <key alias="about">정보</key>
@@ -702,11 +700,6 @@
     <key alias="templateErrorText">2 템플릿에 동일한 별칭이 적용되지 않았는지 확인하시기 바랍니다.</key>
     <key alias="templateSavedHeader">템플릿 저장</key>
     <key alias="templateSavedText">탬플릿이 에러없이 저장되었습니다!</key>
-    <key alias="xsltErrorHeader">XSLT 저장되지 않음</key>
-    <key alias="xsltErrorText">XSLT 에 에러가 포함됨</key>
-    <key alias="xsltPermissionErrorText">XSLT가 저장되지 않았습니다. 권한을 확인하세요</key>
-    <key alias="xsltSavedHeader">XSLT 저장</key>
-    <key alias="xsltSavedText">XSLT 에러없음</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">CSS 태그를 사용하세요 예: h1, .redHeader, .blueTex</key>
@@ -875,7 +868,6 @@
     <key alias="scripts">스크립트</key>
     <key alias="stylesheets">스타일시트</key>
     <key alias="templates">템플릿</key>
-    <key alias="xslt">XSLT 파일</key>
     <key alias="userPermissions">사용자권한</key>
     <key alias="userTypes">사용자 유형</key>
     <key alias="users">사용자</key>

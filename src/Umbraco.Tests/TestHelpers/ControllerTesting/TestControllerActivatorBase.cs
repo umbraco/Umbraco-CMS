@@ -28,6 +28,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using LightInject;
+using System.Globalization;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {
@@ -130,7 +131,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             webSecurity.Setup(x => x.UserHasSectionAccess(It.IsAny<string>(), It.IsAny<IUser>()))
                 .Returns(() => true);
 
-            var publishedSnapshot = new Mock<IPublishedShapshot>();
+            var publishedSnapshot = new Mock<IPublishedSnapshot>();
             publishedSnapshot.Setup(x => x.Members).Returns(Mock.Of<IPublishedMemberCache>());
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedSnapshot.Object);
@@ -148,10 +149,11 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == UrlProviderMode.Auto.ToString())),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
+                mockedEntityService,
                 true); //replace it
 
             var urlHelper = new Mock<IUrlProvider>();
-            urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>()))
+            urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>()))
                 .Returns("/hello/world/1234");
 
             var membershipHelper = new MembershipHelper(umbCtx, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>());

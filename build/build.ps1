@@ -372,8 +372,6 @@
     Write-Host "Add web.config transforms to NuGet package"
     mv "$($this.BuildTemp)\WebApp\Views\Web.config" "$($this.BuildTemp)\WebApp\Views\Web.config.transform"
 
-    # fixme - that one does not exist in .bat build either?
-    #mv "$($this.BuildTemp)\WebApp\Xslt\Web.config" "$($this.BuildTemp)\WebApp\Xslt\Web.config.transform"
   })
 
   $ubuild.DefineMethod("RestoreNuGet",

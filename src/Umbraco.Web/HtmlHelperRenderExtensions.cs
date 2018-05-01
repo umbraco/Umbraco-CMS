@@ -55,7 +55,7 @@ namespace Umbraco.Web
 
         /// <summary>
         /// Will render the preview badge when in preview mode which is not required ever unless the MVC page you are
-        /// using does not inherit from UmbracoTemplatePage
+        /// using does not inherit from UmbracoViewPage
         /// </summary>
         /// <param name="helper"></param>
         /// <returns></returns>

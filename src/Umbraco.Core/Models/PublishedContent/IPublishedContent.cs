@@ -3,17 +3,11 @@ using System.Collections.Generic;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
+
     /// <inheritdoc />
     /// <summary>
     /// Represents a cached content.
     /// </summary>
-    /// <remarks>
-    /// <para>SD: A replacement for INode which needs to occur since INode doesn't contain the document type alias
-    /// and INode is poorly formatted with mutable properties (i.e. Lists instead of IEnumerable).</para>
-    /// <para>Stephan: initially, that was for cached published content only. Now, we're using it also for
-    /// cached preview (so, maybe unpublished) content. A better name would therefore be ICachedContent, as
-    /// has been suggested. However, can't change now. Maybe in v7?</para>
-    /// </remarks>
     public interface IPublishedContent : IPublishedElement
     {
         #region Content
@@ -37,6 +31,8 @@ namespace Umbraco.Core.Models.PublishedContent
         DateTime UpdateDate { get; }
         int Level { get; }
         string Url { get; }
+
+        IReadOnlyDictionary<string, PublishedCultureName> CultureNames { get; }
 
         /// <summary>
         /// Gets a value indicating whether the content is a content (aka a document) or a media.

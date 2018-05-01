@@ -337,8 +337,6 @@
     <key alias="stylesNoStylesOnPage">Det er ingen aktive stiler eller formateringer på denne siden</key>
     <key alias="tableColMergeLeft">Sett markøren til venstre i de 2 cellene du ønsker å slå sammen</key>
     <key alias="tableSplitNotSplittable">Du kan ikke dele en celle som allerede er delt.</key>
-    <key alias="xsltErrorHeader">Feil i XSLT kode</key>
-    <key alias="xsltErrorText">XSLT ble ikke lagret på grunn av feil i koden</key>
     <key alias="missingPropertyEditorErrorMessage">Det er et problem dem datatypen som brukes til denne egenskapen. Kontroller innstillingene og prøv igjen.</key>
   </area>
   <area alias="general">
@@ -795,11 +793,6 @@ Vennlig hilsen Umbraco roboten
     <key alias="templateErrorText">Vennligst forviss deg om at du ikke har to maler med samme alias</key>
     <key alias="templateSavedHeader">Malen ble lagret</key>
     <key alias="templateSavedText">Malen ble lagret uten feil!</key>
-    <key alias="xsltErrorHeader">XSLT-koden ble ikke lagret</key>
-    <key alias="xsltErrorText">XSLT-koden inneholdt en feil</key>
-    <key alias="xsltPermissionErrorText">XSLT-koden ble ikke lagret, sjekk filrettigheter</key>
-    <key alias="xsltSavedHeader">XSLT lagret</key>
-    <key alias="xsltSavedText">Ingen feil i XSLT!</key>
     <key alias="contentUnpublished">Innhold avpublisert</key>
     <key alias="partialViewSavedHeader">Delmal lagret</key>
     <key alias="partialViewSavedText">Delmal lagret uten feil</key>
@@ -974,7 +967,6 @@ Vennlig hilsen Umbraco roboten
     <key alias="scripts">Skript</key>
     <key alias="stylesheets">Stiler</key>
     <key alias="templates">Maler</key>
-    <key alias="xslt">XSLT Filer</key>
     <key alias="analytics">Analytics</key>
     <key alias="userPermissions">Brukertillatelser</key>
     <key alias="userTypes">Brukertyper typer</key>

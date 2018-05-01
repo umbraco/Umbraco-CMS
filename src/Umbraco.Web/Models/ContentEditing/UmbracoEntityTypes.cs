@@ -52,14 +52,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// Member Group
         /// </summary>
         MemberGroup,
-
-        /// <summary>
-        /// Content Item
-        /// </summary>
-        [Obsolete("This is not used and will be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        ContentItem,
-
+        
         /// <summary>
         /// "Media Type
         /// </summary>

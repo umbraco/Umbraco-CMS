@@ -63,36 +63,6 @@ namespace Umbraco.Web
         {
             return mgr.GetTypes<ISearchableTree>();
         }
-
-        /// <summary>
-        /// Returns all classes attributed with XsltExtensionAttribute attribute
-        /// </summary>
-        /// <param name="mgr"></param>
-        /// <returns></returns>
-        internal static IEnumerable<Type> GetXsltExtensions(this TypeLoader mgr)
-        {
-            return mgr.GetAttributedTypes<Core.Macros.XsltExtensionAttribute>();
-        }
-
-        /// <summary>
-        /// Returns all IThumbnailProvider classes
-        /// </summary>
-        /// <param name="mgr"></param>
-        /// <returns></returns>
-        internal static IEnumerable<Type> GetThumbnailProviders(this TypeLoader mgr)
-        {
-            return mgr.GetTypes<IThumbnailProvider>();
-        }
-
-        /// <summary>
-        /// Returns all IImageUrlProvider classes
-        /// </summary>
-        /// <param name="mgr"></param>
-        /// <returns></returns>
-        internal static IEnumerable<Type> GetImageUrlProviders(this TypeLoader mgr)
-        {
-            return mgr.GetTypes<IImageUrlProvider>();
-        }
-
+        
     }
 }

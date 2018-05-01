@@ -47,7 +47,6 @@ namespace Umbraco.Tests.IO
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.UmbracoClient, true), IOHelper.MapPath(SystemDirectories.UmbracoClient, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.UserControls, true), IOHelper.MapPath(SystemDirectories.UserControls, false));
             Assert.AreEqual(IOHelper.MapPath(SystemDirectories.WebServices, true), IOHelper.MapPath(SystemDirectories.WebServices, false));
-            Assert.AreEqual(IOHelper.MapPath(SystemDirectories.Xslt, true), IOHelper.MapPath(SystemDirectories.Xslt, false));
         }
 
         [Test]

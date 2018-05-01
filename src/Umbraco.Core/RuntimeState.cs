@@ -19,6 +19,8 @@ namespace Umbraco.Core
         private readonly ILogger _logger;
         private readonly Lazy<IServerRegistrar> _serverRegistrar;
         private readonly Lazy<MainDom> _mainDom;
+        private readonly IUmbracoSettingsSection _settings;
+        private readonly IGlobalSettings _globalSettings;
         private readonly HashSet<string> _applicationUrls = new HashSet<string>();
         private RuntimeLevel _level;
 
@@ -28,11 +30,13 @@ namespace Umbraco.Core
         /// <param name="logger">A logger.</param>
         /// <param name="serverRegistrar">A (lazy) server registrar.</param>
         /// <param name="mainDom">A (lazy) MainDom.</param>
-        public RuntimeState(ILogger logger, Lazy<IServerRegistrar> serverRegistrar, Lazy<MainDom> mainDom)
+        public RuntimeState(ILogger logger, Lazy<IServerRegistrar> serverRegistrar, Lazy<MainDom> mainDom, IUmbracoSettingsSection settings, IGlobalSettings globalSettings)
         {
             _logger = logger;
             _serverRegistrar = serverRegistrar;
             _mainDom = mainDom;
+            _settings = settings;
+            _globalSettings = globalSettings;
         }
 
         private IServerRegistrar ServerRegistrar => _serverRegistrar.Value;
@@ -103,15 +107,13 @@ namespace Umbraco.Core
         /// <summary>
         /// Ensures that the <see cref="ApplicationUrl"/> property has a value.
         /// </summary>
-        /// <param name="globalSettings"></param>
         /// <param name="request"></param>
-        /// <param name="settings"></param>
-        internal void EnsureApplicationUrl(IUmbracoSettingsSection settings, IGlobalSettings globalSettings, HttpRequestBase request = null)
+        internal void EnsureApplicationUrl(HttpRequestBase request = null)
         {
             // see U4-10626 - in some cases we want to reset the application url
             // (this is a simplified version of what was in 7.x)
             // note: should this be optional? is it expensive?
-            var url = request == null ? null : ApplicationUrlHelper.GetApplicationUrlFromCurrentRequest(request, globalSettings);
+            var url = request == null ? null : ApplicationUrlHelper.GetApplicationUrlFromCurrentRequest(request, _globalSettings);
             var change = url != null && !_applicationUrls.Contains(url);
             if (change)
             {
@@ -120,7 +122,7 @@ namespace Umbraco.Core
             }
 
             if (ApplicationUrl != null && !change) return;
-            ApplicationUrl = new Uri(ApplicationUrlHelper.GetApplicationUrl(_logger, globalSettings, settings, request));
+            ApplicationUrl = new Uri(ApplicationUrlHelper.GetApplicationUrl(_logger, _globalSettings, _settings, ServerRegistrar, request));
         }
 
         private readonly ManualResetEventSlim _runLevel = new ManualResetEventSlim(false);

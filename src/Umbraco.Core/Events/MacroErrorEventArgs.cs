@@ -19,7 +19,7 @@ namespace Umbraco.Core.Events
         /// <summary>
         /// Filename, file path, fully qualified class name, or other key used by the macro engine to do it's processing of the faulting macro.
         /// </summary>
-        public string ItemKey { get; set; }
+        public string MacroSource { get; set; }
 
         /// <summary>
         /// Exception raised.

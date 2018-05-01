@@ -48,13 +48,13 @@ namespace Umbraco.Web.Routing
                 while (pos > 1)
                 {
                     route = route.Substring(0, pos);
-                    node = frequest.UmbracoContext.ContentCache.GetByRoute(route);
+                    node = frequest.UmbracoContext.ContentCache.GetByRoute(route, culture: frequest?.Culture?.Name);
                     if (node != null) break;
                     pos = route.LastIndexOf('/');
                 }
                 if (node != null)
                 {
-                    var d = DomainHelper.FindWildcardDomainInPath(frequest.UmbracoContext.PublishedShapshot.Domains.GetAll(true), node.Path, null);
+                    var d = DomainHelper.FindWildcardDomainInPath(frequest.UmbracoContext.PublishedSnapshot.Domains.GetAll(true), node.Path, null);
                     if (d != null)
                         errorCulture = d.Culture;
                 }

@@ -21,7 +21,6 @@
                 public const string StylesheetFileSystem = "StylesheetFileSystem";
                 public const string MasterpageFileSystem = "MasterpageFileSystem";
                 public const string ViewFileSystem = "ViewFileSystem";
-                public const string XsltFileSystem = "XsltFileSystem";
                 public const string JavascriptLibraryFileSystem = "JavascriptLibraryFileSystem";
             }
         }

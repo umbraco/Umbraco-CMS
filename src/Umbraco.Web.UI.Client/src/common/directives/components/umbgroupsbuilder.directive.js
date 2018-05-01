@@ -496,6 +496,7 @@
           scope.propertySettingsDialogModel.property = property;
           scope.propertySettingsDialogModel.contentType = scope.contentType;
           scope.propertySettingsDialogModel.contentTypeName = scope.model.name;
+          scope.propertySettingsDialogModel.contentTypeAllowCultureVariant = scope.model.allowCultureVariant;
           scope.propertySettingsDialogModel.view = "views/common/overlays/contenttypeeditor/propertysettings/propertysettings.html";
           scope.propertySettingsDialogModel.show = true;
 

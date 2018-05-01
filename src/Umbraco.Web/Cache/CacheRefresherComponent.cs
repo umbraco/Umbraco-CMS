@@ -237,6 +237,7 @@ namespace Umbraco.Web.Cache
                     UmbracoConfig.For.UmbracoSettings(),
                     Current.UrlProviders,
                     UmbracoConfig.For.GlobalSettings(),
+                    Current.Services.EntityService,
                     true);
             }
 

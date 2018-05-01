@@ -128,6 +128,7 @@
     <Compile Include="Migrations\MigrationTests.cs" />
     <Compile Include="Models\PathValidationTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
+    <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="Published\PublishedSnapshotTestObjects.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
     <Compile Include="Published\NestedContentTests.cs" />
@@ -146,7 +147,12 @@
     <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
     <Compile Include="Persistence\Repositories\UserGroupRepositoryTest.cs" />
     <Compile Include="Published\ConvertersTests.cs" />
-    <Compile Include="Routing\NiceUrlRoutesTests.cs" />
+    <Compile Include="Routing\ContentFinderByUrlAndTemplateTests.cs" />
+    <Compile Include="Routing\ContentFinderByUrlTests.cs" />
+    <Compile Include="Routing\ContentFinderByUrlWithDomainsTests.cs" />
+    <Compile Include="Routing\UrlProviderTests.cs" />
+    <Compile Include="Routing\UrlRoutesTests.cs" />
+    <Compile Include="Routing\UrlsProviderWithDomainsTests.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunnerTests2.cs" />
     <Compile Include="Scoping\EventNameExtractorTests.cs" />
     <Compile Include="Scoping\PassThroughEventDispatcherTests.cs" />
@@ -172,7 +178,9 @@
     <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
     <Compile Include="TestHelpers\NoHttpContextAccessor.cs" />
     <Compile Include="TestHelpers\Stubs\TestExamineManager.cs" />
+    <Compile Include="TestHelpers\Stubs\TestPublishedContent.cs" />
     <Compile Include="Testing\ContentBaseExtensions.cs" />
+    <Compile Include="Testing\Objects\AccessorsAndProviders\TestSystemDefaultCultureProvider.cs" />
     <Compile Include="Testing\TestDatabase.cs" />
     <Compile Include="Testing\TestingTests\NUnitTests.cs" />
     <Compile Include="Persistence\LocksTests.cs" />
@@ -198,7 +206,6 @@
     <Compile Include="Web\AngularIntegration\JsInitializationTests.cs" />
     <Compile Include="Web\AngularIntegration\ServerVariablesParserTests.cs" />
     <Compile Include="CoreThings\AttemptTests.cs" />
-    <Compile Include="Cache\CacheRefresherTests.cs" />
     <Compile Include="Migrations\Stubs\DropForeignKeyMigrationStub.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMappingTests.cs" />
     <Compile Include="Cache\DeepCloneRuntimeCacheProviderTests.cs" />
@@ -232,7 +239,6 @@
     <Compile Include="Strings\StylesheetHelperTests.cs" />
     <Compile Include="Strings\StringValidationTests.cs" />
     <Compile Include="FrontEnd\UmbracoHelperTests.cs" />
-    <Compile Include="Integration\GetCultureTests.cs" />
     <Compile Include="Membership\MembershipProviderBaseTests.cs" />
     <Compile Include="Membership\UmbracoServiceMembershipProviderTests.cs" />
     <Compile Include="Migrations\Stubs\FiveZeroMigration.cs" />
@@ -275,14 +281,8 @@
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ContentElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ContentElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\DeveloperElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\DeveloperElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\DistributedCallElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\DistributedCallElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\PackageRepositoriesElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\PackageRepositoriesElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ProvidersElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ProvidersElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\RequestHandlerElementDefaultTests.cs" />
@@ -330,7 +330,6 @@
     <Compile Include="Services\LocalizedTextServiceTests.cs" />
     <Compile Include="Services\TagServiceTests.cs" />
     <Compile Include="Services\LocalizationServiceTests.cs" />
-    <Compile Include="Composing\XsltExtensionCollectionTests.cs" />
     <Compile Include="Services\MemberServiceTests.cs" />
     <Compile Include="Services\MediaServiceTests.cs" />
     <Compile Include="Services\MemberTypeServiceTests.cs" />
@@ -371,7 +370,6 @@
     <Compile Include="Persistence\SyntaxProvider\SqlCeSyntaxProviderTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
     <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
-    <Compile Include="PublishedContent\PublishedContentTestElements.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
     <Compile Include="Misc\HashCodeCombinerTests.cs" />
@@ -426,9 +424,7 @@
     <Compile Include="Composing\LazyCollectionBuilderTests.cs" />
     <Compile Include="Composing\CollectionBuildersTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />
-    <Compile Include="Routing\ContentFinderByNiceUrlWithDomainsTests.cs" />
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
-    <Compile Include="Routing\NiceUrlsProviderWithDomainsTests.cs" />
     <Compile Include="Routing\SiteDomainHelperTests.cs" />
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />
     <Compile Include="Services\TestWithSomeContentBase.cs" />
@@ -452,10 +448,7 @@
     <Compile Include="Configurations\GlobalSettingsTests.cs" />
     <Compile Include="Routing\ContentFinderByAliasTests.cs" />
     <Compile Include="Routing\ContentFinderByIdTests.cs" />
-    <Compile Include="Routing\ContentFinderByNiceUrlAndTemplateTests.cs" />
-    <Compile Include="Routing\ContentFinderByNiceUrlTests.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQueryTests.cs" />
-    <Compile Include="Routing\NiceUrlProviderTests.cs" />
     <Compile Include="Routing\RenderRouteHandlerTests.cs" />
     <Compile Include="Routing\RouteTestExtensions.cs" />
     <Compile Include="TestHelpers\Stubs\TestControllerFactory.cs" />
@@ -595,9 +588,7 @@
     <Content Include="Services\Importing\uBlogsy-Package.xml" />
     <Content Include="Services\Importing\XsltSearch-Package.xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Testing\Objects\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>

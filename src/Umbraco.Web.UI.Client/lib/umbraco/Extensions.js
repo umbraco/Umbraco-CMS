@@ -84,27 +84,21 @@
         };
     }
     
-    if (!String.prototype.trimStart) {
-        
-        /** trims the start of the string*/
-        String.prototype.trimStart = function (str) {
-            if (this.startsWith(str)) {
-                return this.substring(str.length);
-            }
-            return this;
-        };
-    }
-    
-    if (!String.prototype.trimEnd) {
+    /** trims the start of the string*/
+    String.prototype.trimStart = function (str) {
+        if (this.startsWith(str)) {
+            return this.substring(str.length);
+        }
+        return this;
+    };
 
-        /** trims the end of the string*/
-        String.prototype.trimEnd = function (str) {
-            if (this.endsWith(str)) {
-                return this.substring(0, this.length - str.length);
-            }
-            return this;
-        };
-    }
+    /** trims the end of the string*/
+    String.prototype.trimEnd = function (str) {
+        if (this.endsWith(str)) {
+            return this.substring(0, this.length - str.length);
+        }
+        return this;
+    };
 
     if (!String.prototype.utf8Encode) {
 

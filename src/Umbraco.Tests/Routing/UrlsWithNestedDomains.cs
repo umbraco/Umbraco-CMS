@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Routing
             // get the nice url for 100111
             var umbracoContext = GetUmbracoContext(url, 9999, umbracoSettings: settings, urlProviders: new []
             {
-                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object)
+                new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
             Assert.AreEqual("http://domain2.com/1001-1-1/", umbracoContext.UrlProvider.GetUrl(100111, true));
 
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Routing
             Assert.IsTrue(frequest.HasDomain);
 
             // check that it's been routed
-            var lookup = new ContentFinderByNiceUrl(Logger);
+            var lookup = new ContentFinderByUrl(Logger);
             var result = lookup.TryFindContent(frequest);
             Assert.IsTrue(result);
             Assert.AreEqual(100111, frequest.PublishedContent.Id);

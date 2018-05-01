@@ -90,7 +90,9 @@ namespace Umbraco.Tests.Scoping
                 publishedSnapshotAccessor,
                 Logger,
                 ScopeProvider,
-                documentRepository, mediaRepository, memberRepository, Container.GetInstance<IGlobalSettings>());
+                documentRepository, mediaRepository, memberRepository,
+                SystemDefaultCultureProvider,
+                Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper());
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)
@@ -100,13 +102,15 @@ namespace Umbraco.Tests.Scoping
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
 
+            var globalSettings = TestObjects.GetGlobalSettings();
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 service,
-                new WebSecurity(httpContext, Current.Services.UserService, TestObjects.GetGlobalSettings()),
+                new WebSecurity(httpContext, Current.Services.UserService, globalSettings),
                 umbracoSettings ?? SettingsForTests.GetDefaultUmbracoSettings(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
-                TestObjects.GetGlobalSettings());
+                globalSettings,
+                Mock.Of<IEntityService>());
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;
@@ -144,7 +148,7 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                item.PublishValues();
+                item.TryPublishValues();
                 Current.Services.ContentService.SaveAndPublish(item);
                 scope.Complete();
             }
@@ -159,7 +163,7 @@ namespace Umbraco.Tests.Scoping
             using (var scope = ScopeProvider.CreateScope())
             {
                 item.Name = "changed";
-                item.PublishValues();
+                item.TryPublishValues();
                 Current.Services.ContentService.SaveAndPublish(item);
 
                 if (complete)

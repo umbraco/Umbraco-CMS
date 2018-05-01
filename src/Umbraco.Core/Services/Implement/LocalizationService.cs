@@ -291,19 +291,6 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
-        /// Gets a <see cref="Language"/> by its culture code
-        /// </summary>
-        /// <param name="cultureName">Culture Name - also refered to as the Friendly name</param>
-        /// <returns><see cref="Language"/></returns>
-        public ILanguage GetLanguageByCultureCode(string cultureName)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _languageRepository.GetByCultureName(cultureName);
-            }
-        }
-
-        /// <summary>
         /// Gets a <see cref="Language"/> by its iso code
         /// </summary>
         /// <param name="isoCode">Iso Code of the language (ie. en-US)</param>
@@ -322,6 +309,33 @@ namespace Umbraco.Core.Services.Implement
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _languageRepository.GetIdByIsoCode(isoCode);
+            }
+        }
+
+        /// <inheritdoc />
+        public string GetLanguageIsoCodeById(int id)
+        {
+            using (ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _languageRepository.GetIsoCodeById(id);
+            }
+        }
+
+        /// <inheritdoc />
+        public string GetDefaultLanguageIsoCode()
+        {
+            using (ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _languageRepository.GetDefaultIsoCode();
+            }
+        }
+
+        /// <inheritdoc />
+        public int? GetDefaultLanguageId()
+        {
+            using (ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _languageRepository.GetDefaultId();
             }
         }
 

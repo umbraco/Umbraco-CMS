@@ -59,13 +59,6 @@
       <create assembly="umbraco" type="StylesheetTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="initxslt">
-    <header>XSLT file</header>
-    <usercontrol>/create/xslt.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="XsltTasks" />
-    </tasks>
-  </nodeType>    
   <nodeType alias="initmember">
     <header>member</header>
     <usercontrol>/create/member.ascx</usercontrol>
@@ -108,20 +101,6 @@
     <tasks>
       <create assembly="umbraco" type="dictionaryTasks" />
       <delete assembly="umbraco" type="dictionaryTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="initlanguages">
-    <header>Language</header>
-    <usercontrol>/create/language.ascx</usercontrol>
-    <tasks>
-      <create assembly="umbraco" type="languageTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="languages">
-    <header>Language</header>
-    <usercontrol>/create/language.ascx</usercontrol>
-    <tasks>
-      <delete assembly="umbraco" type="languageTasks" />
     </tasks>
   </nodeType>
   <nodeType alias="cache">

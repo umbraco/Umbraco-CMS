@@ -398,8 +398,6 @@
     <key alias="macroErrorLoadingUsercontrol">Error bij het laden van userControl '%0%'</key>
     <key alias="macroErrorLoadingCustomControl">Error bij het laden van customControl (Assembly: %0%, Type: '%1%')</key>
     <key alias="macroErrorLoadingMacroEngineScript">Error bij het laden van MacroEngine script (file: %0%)</key>
-    <key alias="macroErrorParsingXSLTFile">"Error bij het parsen van XSLT file: %0%</key>
-    <key alias="macroErrorReadingXSLTFile">"Error bij het laden van XSLT file: %0%</key>
     <key alias="missingTitle">Vul een titel in</key>
     <key alias="missingType">Selecteer een type</key>
     <key alias="pictureResizeBiggerThanOrg">U wilt een afbeelding groter maken dan de originele afmetingen. Weet je zeker dat je wilt doorgaan?</key>
@@ -410,8 +408,6 @@
     <key alias="stylesNoStylesOnPage">Geen actieve stijlen beschikbaar</key>
     <key alias="tableColMergeLeft">Plaats de cursor links van de twee cellen die je wilt samenvoegen</key>
     <key alias="tableSplitNotSplittable">Je kunt een cel die is samengevoegd niet delen</key>
-    <key alias="xsltErrorHeader">Fout in de XSLT bron</key>
-    <key alias="xsltErrorText">De XSLT is niet opgeslagen omdat deze fout(en) bevat</key>
     <key alias="missingPropertyEditorErrorMessage">Er is een configuratiefout bij het gegevenstype dat wordt gebruikt voor deze eigenschap. Controleer het gegevenstype</key>
   </area>
   <area alias="general">
@@ -1003,11 +999,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="templateErrorText">Controleer dat je geen 2 tamplates met dezelfde naam hebt</key>
     <key alias="templateSavedHeader">Template opgeslagen</key>
     <key alias="templateSavedText">Template opgeslagen zonder fouten!</key>
-    <key alias="xsltErrorHeader">XSLT niet opgeslagen</key>
-    <key alias="xsltErrorText">XSLT bevat een fout</key>
-    <key alias="xsltPermissionErrorText">XSLT kon niet worden opgeslagen, controleer de bestandsbeveiliging</key>
-    <key alias="xsltSavedHeader">XSLT opgeslagen</key>
-    <key alias="xsltSavedText">Geen fouten in de XSLT!</key>
     <key alias="contentUnpublished">Inhoud gedepubliceerd</key>
     <key alias="partialViewSavedHeader">Partial view opgeslagen</key>
     <key alias="partialViewSavedText">Partial view opgeslagen zonder fouten!</key>
@@ -1264,7 +1255,6 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="scripts">Scripts</key>
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Sjablonen</key>
-    <key alias="xslt">XSLT Bestanden</key>
 	<key alias="analytics">Analytics</key>
   </area>
   <area alias="update">

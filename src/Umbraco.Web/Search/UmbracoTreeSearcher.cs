@@ -329,7 +329,7 @@ namespace Umbraco.Web.Search
                 var intId = m.Id.TryConvertTo<int>();
                 if (intId.Success)
                 {
-                    m.AdditionalData["Url"] = umbracoHelper.NiceUrl(intId.Result);
+                    m.AdditionalData["Url"] = umbracoHelper.Url(intId.Result);
                 }
             }
             return mapped;

@@ -121,7 +121,7 @@ namespace Umbraco.Tests.Published
             var elementsCache = new DictionaryCacheProvider();
             var snapshotCache = new DictionaryCacheProvider();
 
-            var publishedSnapshot = new Mock<IPublishedShapshot>();
+            var publishedSnapshot = new Mock<IPublishedSnapshot>();
             publishedSnapshot.Setup(x => x.SnapshotCache).Returns(snapshotCache);
             publishedSnapshot.Setup(x => x.ElementsCache).Returns(elementsCache);
 

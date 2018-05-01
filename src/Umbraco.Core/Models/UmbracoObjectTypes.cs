@@ -14,14 +14,6 @@ namespace Umbraco.Core.Models
         /// </summary>
         Unknown,
 
-        /// <summary>
-        /// Content Item Type
-        /// </summary>
-        [UmbracoObjectType(Constants.ObjectTypes.Strings.ContentItemType)]
-        [FriendlyName("Content Item Type")]
-        [Obsolete("This is not used and will be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        ContentItemType,
 
         /// <summary>
         /// Root
@@ -69,17 +61,7 @@ namespace Umbraco.Core.Models
         [FriendlyName("Member Group")]
         [UmbracoUdiType(Constants.UdiEntityType.MemberGroup)]
         MemberGroup,
-
-        //TODO: What is a 'Content Item' supposed to be???
-        /// <summary>
-        /// Content Item
-        /// </summary>
-        [UmbracoObjectType(Constants.ObjectTypes.Strings.ContentItem)]
-        [FriendlyName("Content Item")]
-        [Obsolete("This is not used and will be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        ContentItem,
-
+        
         /// <summary>
         /// "Media Type
         /// </summary>

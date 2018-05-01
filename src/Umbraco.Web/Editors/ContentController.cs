@@ -343,7 +343,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public HttpResponseMessage GetNiceUrl(int id)
         {
-            var url = Umbraco.NiceUrl(id);
+            var url = Umbraco.Url(id);
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(url, Encoding.UTF8, "application/json");
             return response;
@@ -643,22 +643,22 @@ namespace Umbraco.Web.Editors
             else
             {
                 //publish the item and check if it worked, if not we will show a diff msg below
-                contentItem.PersistedContent.PublishValues(GetLanguageCulture(contentItem.LanguageId)); //we are not checking for a return value here because we've alraedy pre-validated the property values
+                contentItem.PersistedContent.TryPublishValues(GetLanguageCulture(contentItem.LanguageId)); //we are not checking for a return value here because we've already pre-validated the property values
 
                 //check if we are publishing other variants and validate them
-                var allLangs = Services.LocalizationService.GetAllLanguages().ToList();
+                var allLangs = Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.Id, x => x);
                 var variantsToValidate = contentItem.PublishVariations.Where(x => x.LanguageId != contentItem.LanguageId).ToList();
                 foreach (var publishVariation in variantsToValidate)
                 {
-                    if (!contentItem.PersistedContent.PublishValues(GetLanguageCulture(publishVariation.LanguageId)))
+                    if (!contentItem.PersistedContent.TryPublishValues(GetLanguageCulture(publishVariation.LanguageId)))
                     {
-                        var errMsg = Services.TextService.Localize("speechBubbles/contentLangValidationError", new[]{allLangs.First(x => x.Id == publishVariation.LanguageId).CultureName});
+                        var errMsg = Services.TextService.Localize("speechBubbles/contentLangValidationError", new[] {allLangs[publishVariation.LanguageId].CultureName});
                         ModelState.AddModelError("publish_variant_" + publishVariation.LanguageId + "_", errMsg);
                     }
                 }
 
                 //validate any mandatory variants that are not in the list
-                var mandatoryLangs = Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLangs)
+                var mandatoryLangs = Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLangs.Values)
                     .Where(x => variantsToValidate.All(v => v.LanguageId != x.Id)) //don't include variants above
                     .Where(x => x.Id != contentItem.LanguageId) //don't include the current variant
                     .Where(x => x.Mandatory);
@@ -666,7 +666,7 @@ namespace Umbraco.Web.Editors
                 {
                     if (contentItem.PersistedContent.Validate(GetLanguageCulture(lang.Id)).Length > 0)
                     {
-                        var errMsg = Services.TextService.Localize("speechBubbles/contentReqLangValidationError", new[]{allLangs.First(x => x.Id == lang.Id).CultureName});
+                        var errMsg = Services.TextService.Localize("speechBubbles/contentReqLangValidationError", new[]{allLangs[lang.Id].CultureName});
                         ModelState.AddModelError("publish_variant_" + lang.Id + "_", errMsg);
                     }
                 }
@@ -749,7 +749,7 @@ namespace Umbraco.Web.Editors
                 return HandleContentNotFound(id, false);
             }
 
-            foundContent.PublishValues(); // fixme variants?
+            foundContent.TryPublishValues(); // fixme variants?
             var publishResult = Services.ContentService.SaveAndPublish(foundContent, Security.GetUserId().ResultOr(0));
             if (publishResult.Success == false)
             {
@@ -907,7 +907,7 @@ namespace Umbraco.Web.Editors
         {
             var toCopy = ValidateMoveOrCopy(copy);
 
-            var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive);
+            var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, Security.CurrentUser.Id);
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(c.Path, Encoding.UTF8, "application/json");
@@ -1191,7 +1191,7 @@ namespace Umbraco.Web.Editors
             //sent up, then it means that the user is editing the default variant language.
             if (culture == null && content.HasPropertyTypeVaryingByCulture())
             {
-                culture = Services.LocalizationService.GetDefaultVariantLanguage().IsoCode;
+                culture = Services.LocalizationService.GetDefaultLanguageIsoCode();
             }
 
             var display = ContextMapper.Map<IContent, ContentItemDisplay>(content, UmbracoContext,

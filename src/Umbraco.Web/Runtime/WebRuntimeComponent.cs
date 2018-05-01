@@ -38,7 +38,6 @@ using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Install;
 using Umbraco.Web.Media;
-using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -68,6 +67,9 @@ namespace Umbraco.Web.Runtime
             //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts
             //it still needs to use the install controller so we can't do that
             composition.Container.RegisterFrom<InstallerCompositionRoot>();
+
+            // register the system culture provider
+            composition.Container.RegisterSingleton<ISystemDefaultCultureProvider, SystemDefaultCultureProvider>();
 
             var typeLoader = composition.Container.GetInstance<TypeLoader>();
             var logger = composition.Container.GetInstance<ILogger>();
@@ -118,9 +120,6 @@ namespace Umbraco.Web.Runtime
             composition.Container.EnableWebApi(GlobalConfiguration.Configuration);
             composition.Container.RegisterApiControllers(typeLoader, GetType().Assembly);
 
-            XsltExtensionCollectionBuilder.Register(composition.Container)
-                .AddExtensionObjectProducer(() => typeLoader.GetXsltExtensions());
-
             composition.Container.RegisterCollectionBuilder<SearchableTreeCollectionBuilder>()
                 .Add(() => typeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
 
@@ -159,7 +158,7 @@ namespace Umbraco.Web.Runtime
                 .Append<RenderControllerFactory>();
 
             composition.Container.RegisterCollectionBuilder<UrlProviderCollectionBuilder>()
-                //.Append<AliasUrlProvider>() // not enabled by default
+                .Append<AliasUrlProvider>()
                 .Append<DefaultUrlProvider>()
                 .Append<CustomRouteUrlProvider>();
 
@@ -169,20 +168,14 @@ namespace Umbraco.Web.Runtime
                 // all built-in finders in the correct order,
                 // devs can then modify this list on application startup
                 .Append<ContentFinderByPageIdQuery>()
-                .Append<ContentFinderByNiceUrl>()
+                .Append<ContentFinderByUrl>()
                 .Append<ContentFinderByIdPath>()
-                .Append<ContentFinderByNiceUrlAndTemplate>()
+                .Append<ContentFinderByUrlAndTemplate>()
                 .Append<ContentFinderByUrlAlias>()
                 .Append<ContentFinderByRedirectUrl>();
 
             composition.Container.RegisterSingleton<ISiteDomainHelper, SiteDomainHelper>();
-
-            composition.Container.RegisterCollectionBuilder<ThumbnailProviderCollectionBuilder>()
-                .Add(typeLoader.GetThumbnailProviders());
-
-            composition.Container.RegisterCollectionBuilder<ImageUrlProviderCollectionBuilder>()
-                .Append(typeLoader.GetImageUrlProviders());
-
+            
             composition.Container.RegisterSingleton<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
@@ -212,6 +205,7 @@ namespace Umbraco.Web.Runtime
             IUserService userService,
             IUmbracoSettingsSection umbracoSettings,
             IGlobalSettings globalSettings,
+            IEntityService entityService,
             UrlProviderCollection urlProviders)
         {
             // setup mvc and webapi services
@@ -248,7 +242,8 @@ namespace Umbraco.Web.Runtime
                 new WebSecurity(httpContext, userService, globalSettings),
                 umbracoSettings,
                 urlProviders,
-                globalSettings);
+                globalSettings,
+                entityService);
 
             // ensure WebAPI is initialized, after everything
             GlobalConfiguration.Configuration.EnsureInitialized();

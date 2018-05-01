@@ -53,9 +53,6 @@ namespace Umbraco.Web.Cache
 
             foreach (var payload in payloads)
             {
-                if (dataTypeCache)
-                    dataTypeCache.Result.ClearCacheByKeySearch(CacheKeys.DataTypePreValuesCacheKey + "_" + payload.Id);
-
                 _idkMap.ClearCache(payload.Id);
             }
 

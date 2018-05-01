@@ -80,8 +80,7 @@ namespace Umbraco.Web.Cache
                 // when a public version changes
                 Current.ApplicationCache.ClearPartialViewCache();
                 MacroCacheRefresher.ClearMacroContentCache(CacheHelper); // just the content
-                ClearXsltCache();
-
+                
                 Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
                 Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
             }
@@ -145,7 +144,6 @@ namespace Umbraco.Web.Cache
 
             cacheHelper.ClearPartialViewCache();
             MacroCacheRefresher.ClearMacroContentCache(cacheHelper); // just the content
-            ClearXsltCache();
 
             cacheHelper.IsolatedRuntimeCache.ClearCache<PublicAccessEntry>();
             cacheHelper.IsolatedRuntimeCache.ClearCache<IContent>();
@@ -153,15 +151,5 @@ namespace Umbraco.Web.Cache
 
         #endregion
 
-        #region Helpers
-
-        private static void ClearXsltCache()
-        {
-            // todo: document where this is coming from
-            if (UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration <= 0) return;
-            Current.ApplicationCache.ClearCacheObjectTypes("MS.Internal.Xml.XPath.XPathSelectionIterator");
-        }
-
-        #endregion
     }
 }

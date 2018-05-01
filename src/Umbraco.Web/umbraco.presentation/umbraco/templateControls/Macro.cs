@@ -150,7 +150,7 @@ namespace umbraco.presentation.templateControls
                 if (extension.InvariantEndsWith(".cshtml") == false && extension.InvariantEndsWith(".vbhtml") == false)
                     throw new NotSupportedException("");
 
-                tempMacro.ScriptName = FileLocation;
+                tempMacro.MacroSource = FileLocation;
                 tempMacro.MacroType = MacroTypes.PartialView;
 
                 if (string.IsNullOrEmpty(Attributes["Cache"]) == false)

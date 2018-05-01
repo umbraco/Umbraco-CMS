@@ -4,10 +4,38 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface ILanguageRepository : IReadWriteQueryRepository<int, ILanguage>
     {
-        ILanguage GetByCultureName(string cultureName);
         ILanguage GetByIsoCode(string isoCode);
 
+        /// <summary>
+        /// Gets a language identifier from its ISO code.
+        /// </summary>
+        /// <remarks>
+        /// <para>This can be optimized and bypass all deep cloning.</para>
+        /// </remarks>
         int? GetIdByIsoCode(string isoCode);
+
+        /// <summary>
+        /// Gets a language ISO code from its identifier.
+        /// </summary>
+        /// <remarks>
+        /// <para>This can be optimized and bypass all deep cloning.</para>
+        /// </remarks>
         string GetIsoCodeById(int? id);
+
+        /// <summary>
+        /// Gets the default language ISO code.
+        /// </summary>
+        /// <remarks>
+        /// <para>This can be optimized and bypass all deep cloning.</para>
+        /// </remarks>
+        string GetDefaultIsoCode();
+
+        /// <summary>
+        /// Gets the default language identifier.
+        /// </summary>
+        /// <remarks>
+        /// <para>This can be optimized and bypass all deep cloning.</para>
+        /// </remarks>
+        int? GetDefaultId();
     }
 }

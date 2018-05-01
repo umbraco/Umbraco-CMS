@@ -47,7 +47,6 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.TourData, opt => opt.Ignore())
                 .ForMember(dest => dest.SessionTimeout, opt => opt.Ignore())
                 .ForMember(dest => dest.EmailConfirmedDate, opt => opt.Ignore())
-                .ForMember(dest => dest.UserType, opt => opt.Ignore())
                 .ForMember(dest => dest.InvitedDate, opt => opt.Ignore())
                 .ForMember(dest => dest.SecurityStamp, opt => opt.Ignore())
                 .ForMember(dest => dest.Avatar, opt => opt.Ignore())
@@ -79,7 +78,6 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(detail => detail.TourData, opt => opt.Ignore())
                 .ForMember(dest => dest.StartContentIds, opt => opt.Ignore())
                 .ForMember(dest => dest.StartMediaIds, opt => opt.Ignore())
-                .ForMember(dest => dest.UserType, opt => opt.Ignore())
                 .ForMember(dest => dest.Language, opt => opt.Ignore())
                 .ForMember(dest => dest.Username, opt => opt.Ignore())
                 .ForMember(dest => dest.PasswordQuestion, opt => opt.Ignore())
@@ -331,26 +329,6 @@ namespace Umbraco.Web.Models.Mapping
                     //but we should attempt to return any group that is the built in ones first
                     var groups = user.Groups.ToArray();
                     detail.UserGroups = user.Groups.Select(x => x.Alias).ToArray();
-
-                    if (groups.Length == 0)
-                    {
-                        //In backwards compatibility land, a user type cannot be null! so we need to return a fake one.
-                        detail.UserType = "temp";
-                    }
-                    else
-                    {
-                        var builtIns = new[] { Constants.Security.AdminGroupAlias, "writer", "editor", Constants.Security.TranslatorGroupAlias };
-                        var foundBuiltIn = groups.FirstOrDefault(x => builtIns.Contains(x.Alias));
-                        if (foundBuiltIn != null)
-                        {
-                            detail.UserType = foundBuiltIn.Alias;
-                        }
-                        else
-                        {
-                            //otherwise return the first
-                            detail.UserType = groups[0].Alias;
-                        }
-                    }
 
                 });
 

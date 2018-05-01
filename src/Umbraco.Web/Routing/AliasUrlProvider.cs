@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 
@@ -16,11 +18,15 @@ namespace Umbraco.Web.Routing
     {
         private readonly IGlobalSettings _globalSettings;
         private readonly IRequestHandlerSection _requestConfig;
+        private readonly ILocalizationService _localizationService;
+        private readonly ISiteDomainHelper _siteDomainHelper;
 
-        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig)
+        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ILocalizationService localizationService, ISiteDomainHelper siteDomainHelper)
         {
             _globalSettings = globalSettings;
             _requestConfig = requestConfig;
+            _localizationService = localizationService;
+            _siteDomainHelper = siteDomainHelper;
         }
 
         // note - at the moment we seem to accept pretty much anything as an alias
@@ -42,7 +48,7 @@ namespace Umbraco.Web.Routing
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
         /// </remarks>
-        public string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode)
+        public string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string culture = null)
         {
             return null; // we have nothing to say
         }
@@ -64,17 +70,14 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
-            if (!FindByUrlAliasEnabled)
-                return Enumerable.Empty<string>(); // we have nothing to say
-
             var node = umbracoContext.ContentCache.GetById(id);
-            string umbracoUrlName = null;
-            if (node.HasProperty(Constants.Conventions.Content.UrlAlias))
-                umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias);
-            if (string.IsNullOrWhiteSpace(umbracoUrlName))
+            if (node == null)
                 return Enumerable.Empty<string>();
 
-            var domainHelper = new DomainHelper(umbracoContext.PublishedShapshot.Domains);
+            if (!node.HasProperty(Constants.Conventions.Content.UrlAlias))
+                return Enumerable.Empty<string>();
+
+            var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
 
             var n = node;
             var domainUris = domainHelper.DomainsForNode(n.Id, current, false);
@@ -85,38 +88,36 @@ namespace Umbraco.Web.Routing
                 domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current, false);
             }
 
-            var path = "/" + umbracoUrlName;
-
             if (domainUris == null)
             {
+                var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias);
+                if (string.IsNullOrWhiteSpace(umbracoUrlName))
+                    return Enumerable.Empty<string>();
+
+                var path = "/" + umbracoUrlName;
                 var uri = new Uri(path, UriKind.Relative);
                 return new[] { UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString() };
             }
-
-            return domainUris
-                .Select(domainUri => new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path)))
-                .Select(uri => UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
+            else
+            {
+                var result = new List<string>();
+                foreach(var domainUri in domainUris)
+                {
+                    var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture.Name);
+                    if (!string.IsNullOrWhiteSpace(umbracoUrlName))
+                    {
+                        var path = "/" + umbracoUrlName;
+                        var uri = new Uri(CombinePaths(domainUri.Uri.GetLeftPart(UriPartial.Path), path));
+                        result.Add(UriUtility.UriFromUmbraco(uri, _globalSettings, _requestConfig).ToString());
+                    }
+                }
+                return result;
+            }
         }
 
         #endregion
 
         #region Utilities
-
-        private static bool FindByUrlAliasEnabled
-        {
-            get
-            {
-                //TODO: The ContentFinderResolver instance should be injected in ctor with DI instead of using singleton!
-
-                // finder
-                if (Current.ContentFinders.Any(x => x is ContentFinderByUrlAlias))
-                    return true;
-
-
-                // anything else, we can't detect
-                return false;
-            }
-        }
 
         string CombinePaths(string path1, string path2)
         {

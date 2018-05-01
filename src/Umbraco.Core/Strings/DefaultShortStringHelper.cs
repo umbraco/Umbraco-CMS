@@ -670,45 +670,6 @@ function validateSafeAlias(input, value, immediate, callback) {{
 
         #endregion
 
-        #region ReplaceMany
-
-        /// <summary>
-        /// Returns a new string in which all occurences of specified strings are replaced by other specified strings.
-        /// </summary>
-        /// <param name="text">The string to filter.</param>
-        /// <param name="replacements">The replacements definition.</param>
-        /// <returns>The filtered string.</returns>
-        public virtual string ReplaceMany(string text, IDictionary<string, string> replacements)
-        {
-            if (text == null) throw new ArgumentNullException(nameof(text));
-            if (replacements == null) throw new ArgumentNullException(nameof(replacements));
-
-
-            foreach (KeyValuePair<string, string> item in replacements)
-                text = text.Replace(item.Key, item.Value);
-
-            return text;
-        }
-
-        /// <summary>
-        /// Returns a new string in which all occurences of specified characters are replaced by a specified character.
-        /// </summary>
-        /// <param name="text">The string to filter.</param>
-        /// <param name="chars">The characters to replace.</param>
-        /// <param name="replacement">The replacement character.</param>
-        /// <returns>The filtered string.</returns>
-        public virtual string ReplaceMany(string text, char[] chars, char replacement)
-        {
-            if (text == null) throw new ArgumentNullException(nameof(text));
-            if (chars == null) throw new ArgumentNullException(nameof(chars));
-
-
-            for (int i = 0; i < chars.Length; i++)
-                text = text.Replace(chars[i], replacement);
-
-            return text;
-        }
-
-        #endregion
+       
     }
 }

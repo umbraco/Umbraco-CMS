@@ -76,31 +76,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [Test]
-        public void Can_Perform_Get_By_Culture_Name_On_LanguageRepository()
-        {
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = provider.CreateScope())
-            {
-                var repository = CreateRepository(provider);
-
-                var au = CultureInfo.GetCultureInfo("en-AU");
-                var language = (ILanguage)new Language(au.Name)
-                {
-                    CultureName = au.DisplayName
-                };
-                repository.Save(language);
-
-                //re-get
-                language = repository.GetByCultureName(au.DisplayName);
-
-                // Assert
-                Assert.That(language, Is.Not.Null);
-                Assert.That(language.HasIdentity, Is.True);
-                Assert.That(language.CultureName, Is.EqualTo(au.DisplayName));
-                Assert.That(language.IsoCode, Is.EqualTo(au.Name));
-            }
-        }
 
         [Test]
         public void Get_When_Id_Doesnt_Exist_Returns_Null()

@@ -34,10 +34,7 @@ namespace umbraco.dialogs
             pp_casing.Text = Services.TextService.Localize("templateEditor/casing");
             pp_encode.Text = Services.TextService.Localize("templateEditor/encoding");
 
-            if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
-            {
-                tagName.Value = "umbraco:Item";
-            }
+            tagName.Value = "umbraco:Item";
 
             using (var scope = Current.ScopeProvider.CreateScope())
             {

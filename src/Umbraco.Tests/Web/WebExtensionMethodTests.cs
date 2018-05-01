@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
@@ -29,7 +30,8 @@ namespace Umbraco.Tests.Web
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings()),
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>(),
-                TestObjects.GetGlobalSettings());
+                TestObjects.GetGlobalSettings(),
+                Mock.Of<IEntityService>());
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
 
@@ -46,7 +48,8 @@ namespace Umbraco.Tests.Web
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings()),
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>(),
-                TestObjects.GetGlobalSettings());
+                TestObjects.GetGlobalSettings(),
+                Mock.Of<IEntityService>());
 
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
@@ -73,7 +76,8 @@ namespace Umbraco.Tests.Web
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, TestObjects.GetGlobalSettings()),
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>(),
-                TestObjects.GetGlobalSettings());
+                TestObjects.GetGlobalSettings(),
+                Mock.Of<IEntityService>());
 
             var httpContext = Mock.Of<HttpContextBase>();
 

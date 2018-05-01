@@ -199,14 +199,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var entity = factory.BuildEntity(dto);
             return entity;
         }
-
-        public ILanguage GetByCultureName(string cultureName)
-        {
-            // use the underlying GetMany which will force cache all languages
-            // TODO we are cloning ALL in GetMany just to retrieve ONE, this is surely not optimized
-            return GetMany().FirstOrDefault(x => x.CultureName.InvariantEquals(cultureName));
-        }
-
+        
         public ILanguage GetByIsoCode(string isoCode)
         {
             TypedCachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way
@@ -248,6 +241,36 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (throwOnNotFound)
                 throw new ArgumentException($"Id {id} does not correspond to an existing language.", nameof(id));
             return null;
+        }
+
+        public string GetDefaultIsoCode()
+        {
+            return GetDefault()?.IsoCode;
+        }
+
+        public int? GetDefaultId()
+        {
+            return GetDefault()?.Id;
+        }
+
+        // do NOT leak that language, it's not deep-cloned!
+        private ILanguage GetDefault()
+        {
+            // get all cached, non-cloned
+            var all = TypedCachePolicy.GetAllCached(PerformGetAll);
+
+            ILanguage first = null;
+            foreach (var language in all)
+            {
+                // if one language is default, return
+                if (language.IsDefaultVariantLanguage)
+                    return language;
+                // keep track of language with lowest id
+                if (first == null || language.Id < first.Id)
+                    first = language;
+            }
+
+            return first;
         }
     }
 }

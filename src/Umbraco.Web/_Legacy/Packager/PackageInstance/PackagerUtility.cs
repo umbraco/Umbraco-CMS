@@ -132,16 +132,8 @@ namespace umbraco.cms.businesslogic.packager
 
             if (appendFile)
             {
-                if (!string.IsNullOrEmpty(mcr.XsltPath))
-                    AppendFileToManifest(IOHelper.ResolveUrl(SystemDirectories.Xslt) + "/" + mcr.XsltPath, packageDirectory, doc);
-
-                //TODO: Clearly the packager hasn't worked very well for packaging Partial Views to date since there is no logic in here for that
-
-                //if (!string.IsNullOrEmpty(mcr.ScriptingFile))
-                //    AppendFileToManifest(IOHelper.ResolveUrl(SystemDirectories.MacroScripts) + "/" + mcr.ScriptingFile, packageDirectory, doc);
-
-                if (!string.IsNullOrEmpty(mcr.ControlType))
-                    AppendFileToManifest(mcr.ControlType, packageDirectory, doc);
+                if (!string.IsNullOrEmpty(mcr.MacroSource))
+                    AppendFileToManifest(mcr.MacroSource, packageDirectory, doc);
             }
 
             var serializer = new EntityXmlSerializer();

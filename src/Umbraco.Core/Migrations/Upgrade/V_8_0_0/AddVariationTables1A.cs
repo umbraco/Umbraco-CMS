@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence.Dtos;
+﻿using System;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {
@@ -26,7 +27,13 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             // was not used
             Delete.Column("availableDate").FromTable(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation).Do();
-            AddColumn<ContentVersionCultureVariationDto>("date");
+
+            //special trick to add the column without constraints and return the sql to add them later
+            AddColumn<ContentVersionCultureVariationDto>("date", out var sqls);
+            //now we need to update the new column with some values because this column doesn't allow NULL values
+            Update.Table(ContentVersionCultureVariationDto.TableName).Set(new {date = DateTime.Now}).AllRows().Do();
+            //now apply constraints (NOT NULL) to new table
+            foreach (var sql in sqls) Execute.Sql(sql).Do();
 
             // name, languageId are now non-nullable
             AlterColumn<ContentVersionCultureVariationDto>(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation, "name");

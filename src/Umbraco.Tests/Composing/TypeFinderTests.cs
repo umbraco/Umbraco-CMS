@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Composing
             Assert.AreEqual(0, typesFound.Count()); // 0 classes in _assemblies are marked with [Tree]
 
             typesFound = TypeFinder.FindClassesWithAttribute<TreeAttribute>(new[] { typeof (UmbracoContext).Assembly });
-            Assert.AreEqual(23, typesFound.Count()); // + classes in Umbraco.Web are marked with [Tree]
+            Assert.AreEqual(22, typesFound.Count()); // + classes in Umbraco.Web are marked with [Tree]
         }
 
         private static ProfilingLogger GetTestProfilingLogger()
@@ -98,70 +98,6 @@ namespace Umbraco.Tests.Composing
             var logger = new DebugDiagnosticsLogger();
             var profiler = new TestProfiler();
             return new ProfilingLogger(logger, profiler);
-        }
-
-        [Ignore("fixme - ignored test")]
-        [Test]
-        public void Benchmark_Original_Finder()
-        {
-            var profilingLogger = GetTestProfilingLogger();
-            using (profilingLogger.TraceDuration<TypeFinderTests>("Starting test", "Finished test"))
-            {
-                using (profilingLogger.TraceDuration<TypeFinderTests>("Starting FindClassesOfType", "Finished FindClassesOfType"))
-                {
-                    for (var i = 0; i < 1000; i++)
-                    {
-                        Assert.Greater(TypeFinderOriginal.FindClassesOfType<DisposableObject>(_assemblies).Count(), 0);
-                    }
-                }
-                using (profilingLogger.TraceDuration<TypeFinderTests>("Starting FindClassesOfTypeWithAttribute", "Finished FindClassesOfTypeWithAttribute"))
-                {
-                    for (var i = 0; i < 1000; i++)
-                    {
-                        Assert.Greater(TypeFinderOriginal.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies).Count(), 0);
-                    }
-                }
-                using (profilingLogger.TraceDuration<TypeFinderTests>("Starting FindClassesWithAttribute", "Finished FindClassesWithAttribute"))
-                {
-                    for (var i = 0; i < 1000; i++)
-                    {
-                        Assert.Greater(TypeFinderOriginal.FindClassesWithAttribute<XsltExtensionAttribute>(_assemblies).Count(), 0);
-                    }
-                }
-            }
-
-        }
-
-        [Ignore("fixme - ignored test")]
-        [Test]
-        public void Benchmark_New_Finder()
-        {
-            var profilingLogger = GetTestProfilingLogger();
-            using (profilingLogger.TraceDuration<TypeFinderTests>("Starting test", "Finished test"))
-            {
-                using (profilingLogger.TraceDuration<TypeFinderTests>("Starting FindClassesOfType", "Finished FindClassesOfType"))
-                {
-                    for (var i = 0; i < 1000; i++)
-                    {
-                        Assert.Greater(TypeFinder.FindClassesOfType<DisposableObject>(_assemblies).Count(), 0);
-                    }
-                }
-                using (profilingLogger.TraceDuration<TypeFinderTests>("Starting FindClassesOfTypeWithAttribute", "Finished FindClassesOfTypeWithAttribute"))
-                {
-                    for (var i = 0; i < 1000; i++)
-                    {
-                        Assert.Greater(TypeFinder.FindClassesOfTypeWithAttribute<TestEditor, MyTestAttribute>(_assemblies).Count(), 0);
-                    }
-                }
-                using (profilingLogger.TraceDuration<TypeFinderTests>("Starting FindClassesWithAttribute", "Finished FindClassesWithAttribute"))
-                {
-                    for (var i = 0; i < 1000; i++)
-                    {
-                        Assert.Greater(TypeFinder.FindClassesWithAttribute<XsltExtensionAttribute>(_assemblies).Count(), 0);
-                    }
-                }
-            }
-
         }
 
         [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]

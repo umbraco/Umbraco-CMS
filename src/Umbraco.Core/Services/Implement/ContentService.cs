@@ -1070,7 +1070,7 @@ namespace Umbraco.Core.Services.Implement
                     try
                     {
                         d.ReleaseDate = null;
-                        d.PublishValues(); // fixme variants?
+                        d.TryPublishValues(); // fixme variants?
                         result = SaveAndPublish(d, d.WriterId);
                         if (result.Success == false)
                             Logger.Error<ContentService>($"Failed to publish document id={d.Id}, reason={result.Result}.");
@@ -1110,7 +1110,7 @@ namespace Umbraco.Core.Services.Implement
             bool IsEditing(IContent c, string l, string s)
                 => c.Properties.Any(x => x.Values.Where(y => y.Culture == l && y.Segment == s).Any(y => y.EditedValue != y.PublishedValue));
 
-            return SaveAndPublishBranch(content, force, document => IsEditing(document, culture, segment), document => document.PublishValues(culture, segment), userId);
+            return SaveAndPublishBranch(content, force, document => IsEditing(document, culture, segment), document => document.TryPublishValues(culture, segment), userId);
         }
 
         /// <inheritdoc />

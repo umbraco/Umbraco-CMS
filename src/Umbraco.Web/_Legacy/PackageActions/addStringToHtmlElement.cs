@@ -42,9 +42,7 @@ namespace Umbraco.Web._Legacy.PackageActions
             string value = XmlHelper.GetNodeValue(xmlData);
             var tmp = Current.Services.FileService.GetTemplate(templateAlias);
 
-            if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
-                //value = tmp.EnsureMasterPageSyntax(value);
-                value = MasterPageHelper.EnsureMasterPageSyntax(templateAlias, value);
+            value = MasterPageHelper.EnsureMasterPageSyntax(templateAlias, value);
 
             _addStringToHtmlElement(tmp, value, htmlElementId, position);
 
@@ -65,9 +63,7 @@ namespace Umbraco.Web._Legacy.PackageActions
             string value = XmlHelper.GetNodeValue(xmlData);
             var tmp = Current.Services.FileService.GetTemplate(templateAlias);
 
-            if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
-                //value = tmp.EnsureMasterPageSyntax(value);
-                value = MasterPageHelper.EnsureMasterPageSyntax(templateAlias, value);
+            value = MasterPageHelper.EnsureMasterPageSyntax(templateAlias, value);
 
             _removeStringFromHtmlElement(tmp, value, htmlElementId);
             return true;

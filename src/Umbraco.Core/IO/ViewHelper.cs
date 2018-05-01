@@ -67,10 +67,9 @@ namespace Umbraco.Core.IO
                 modelNamespaceAlias = "ContentModels";
 
             // either
-            // @inherits Umbraco.Web.Mvc.UmbracoTemplatePage
-            // @inherits Umbraco.Web.Mvc.UmbracoTemplatePage<ModelClass>
-            // @inherits Umbraco.Web.Mvc.UmbracoTemplatePage<ContentModels.ModelClass>
-            content.Append("@inherits Umbraco.Web.Mvc.UmbracoTemplatePage");
+            // @inherits Umbraco.Web.Mvc.UmbracoViewPage
+            // @inherits Umbraco.Web.Mvc.UmbracoViewPage<ModelClass>
+            content.Append("@inherits Umbraco.Web.Mvc.UmbracoViewPage");
             if (modelClassName.IsNullOrWhiteSpace() == false)
             {
                 content.Append("<");

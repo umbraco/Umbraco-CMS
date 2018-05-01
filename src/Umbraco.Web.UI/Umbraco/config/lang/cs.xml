@@ -321,8 +321,6 @@
     <key alias="stylesNoStylesOnPage">Žádne aktivní styly nejsou dostupné</key>
     <key alias="tableColMergeLeft">Umístěte, prosím, kurzor nalevo od těch dvou buňek, které chcete sloučit</key>
     <key alias="tableSplitNotSplittable">Nemužete rozdělit buňku, která nebyla sloučená.</key>
-    <key alias="xsltErrorHeader">Chyba ve zdroji XSLT</key>
-    <key alias="xsltErrorText">Soubor XSLT nebyl uložen, protože obsahoval chyby</key>
     <key alias="missingPropertyEditorErrorMessage">V nastavení datového typu použitého pro tuto vlastnost je chyba, zkontrolujte, prosím, datový typ</key>
   </area>
   <area alias="general">
@@ -817,11 +815,6 @@
     <key alias="templateErrorText">Ujistěte se, prosím, že nemáte 2 šablony se stejným aliasem</key>
     <key alias="templateSavedHeader">Šablona byla uložena</key>
     <key alias="templateSavedText">Šablona byla uložena bez chyb!</key>
-    <key alias="xsltErrorHeader">XSLT nebyl uložen</key>
-    <key alias="xsltErrorText">XSLT obsahoval chybu</key>
-    <key alias="xsltPermissionErrorText">XSLT nemohl být uložen, zkontrolujte oprávnění k souboru</key>
-    <key alias="xsltSavedHeader">XSLT byl uložen</key>
-    <key alias="xsltSavedText">V XSLT nejsou žádné chyby</key>
     <key alias="contentUnpublished">Publikování obsahu bylo zrušeno</key>
     <key alias="partialViewSavedHeader">Částečný pohled byl uložen</key>
     <key alias="partialViewSavedText">Částečný pohled byl uložen bez chyb!</key>
@@ -990,7 +983,6 @@
     <key alias="scripts">Skripty</key>
     <key alias="stylesheets">Stylopisy</key>
     <key alias="templates">Šablony</key>
-    <key alias="xslt">XSLT soubory</key>
     <key alias="userPermissions">Oprávnění Uživatele</key>
     <key alias="userTypes">Typy Uživatelů</key>
     <key alias="users">Uživatelé</key>

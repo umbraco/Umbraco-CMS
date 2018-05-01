@@ -189,7 +189,7 @@ namespace Umbraco.Tests.Services.Importing
             Assert.That(templates.Count(), Is.EqualTo(numberOfTemplates));
 
             Assert.AreEqual(init + numberOfTemplates, allTemplates.Count());
-            Assert.IsTrue(allTemplates.All(x => x.Content.Contains("UmbracoTemplatePage")));
+            Assert.IsTrue(allTemplates.All(x => x.Content.Contains("UmbracoViewPage")));
         }
 
         [Test]

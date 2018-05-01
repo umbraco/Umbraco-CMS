@@ -170,6 +170,17 @@ namespace Umbraco.Web.Editors
 
         public DocumentTypeDisplay PostSave(DocumentTypeSave contentTypeSave)
         {
+            //Before we send this model into this saving/mapping pipeline, we need to do some cleanup on variations.
+            //If the doc type does not allow content variations, we need to update all of it's property types to not allow this either
+            //else we may end up with ysods. I'm unsure if the service level handles this but we'll make sure it is updated here
+            if (!contentTypeSave.AllowCultureVariant)
+            {
+                foreach(var prop in contentTypeSave.Groups.SelectMany(x => x.Properties))
+                {
+                    prop.AllowCultureVariant = false;
+                }
+            }
+
             var savedCt = PerformPostSave<DocumentTypeDisplay, DocumentTypeSave, PropertyTypeBasic>(
                 contentTypeSave:    contentTypeSave,
                 getContentType:     i => Services.ContentTypeService.Get(i),
