@@ -39,7 +39,6 @@
         }
 
         function onInit() {
-            console.log(variants);
             _.each(variants,
                 function (variant) {
                     variant.compositeId = variant.language.id + "_" + (variant.segment ? variant.segment : "");
