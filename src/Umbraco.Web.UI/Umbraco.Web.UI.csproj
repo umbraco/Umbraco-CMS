@@ -425,7 +425,6 @@
     <Content Include="Umbraco\Dialogs\exportDocumenttype.aspx" />
     <Content Include="Umbraco\Dialogs\importDocumenttype.aspx" />
     <Content Include="Umbraco\Dialogs\notifications.aspx" />
-    <Content Include="Umbraco\Developer\Packages\installer.aspx" />
     <Content Include="Umbraco\Dialogs\protectPage.aspx" />
     <Content Include="Umbraco\Dialogs\rollBack.aspx" />
     <Content Include="Umbraco\Dialogs\sendToTranslation.aspx" />
