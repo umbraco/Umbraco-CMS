@@ -681,6 +681,83 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void GetPagedResultsByQuery_With_Variant_Names()
+        {
+            //2x content types, one invariant, one variant
+
+            var invariantCT = MockedContentTypes.CreateSimpleContentType("umbInvariantTextpage", "Invariant Textpage");
+            invariantCT.Variations = ContentVariation.InvariantNeutral;
+            foreach (var p in invariantCT.PropertyTypes) p.Variations = ContentVariation.InvariantNeutral;
+            ServiceContext.FileService.SaveTemplate(invariantCT.DefaultTemplate); // else, FK violation on contentType!
+            ServiceContext.ContentTypeService.Save(invariantCT);
+
+            var variantCT = MockedContentTypes.CreateSimpleContentType("umbVariantTextpage", "Variant Textpage");
+            variantCT.Variations = ContentVariation.CultureNeutral;
+            foreach (var p in variantCT.PropertyTypes) p.Variations = ContentVariation.CultureNeutral;
+            ServiceContext.FileService.SaveTemplate(variantCT.DefaultTemplate); // else, FK violation on contentType!
+            ServiceContext.ContentTypeService.Save(variantCT);
+
+            invariantCT.AllowedContentTypes = new[] { new ContentTypeSort(invariantCT.Id, 0), new ContentTypeSort(variantCT.Id, 1) };
+            ServiceContext.ContentTypeService.Save(invariantCT);
+
+            //create content
+
+            var root = MockedContent.CreateSimpleContent(invariantCT);
+            ServiceContext.ContentService.Save(root);
+
+            for (int i = 0; i < 25; i++)
+            {
+                var isInvariant = i % 2 == 0;
+                var child = MockedContent.CreateSimpleContent(
+                    isInvariant ? invariantCT : variantCT,
+                    (isInvariant ? "INV" : "VAR") + "_" + Guid.NewGuid().ToString(),
+                    root,
+                    culture: isInvariant ? null : "en-US");
+
+                ServiceContext.ContentService.Save(child);
+            }
+
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                var repository = CreateRepository((IScopeAccessor)provider, out _);
+
+                var query = scope.SqlContext.Query<IContent>().Where(x => x.ParentId == root.Id);
+
+                try
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = true;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = true;
+
+                    var result = repository.GetPage(query, 0, 20, out var totalRecords, "UpdateDate", Direction.Ascending, true);
+
+                    Assert.AreEqual(25, totalRecords);
+                    foreach(var r in result)
+                    {
+                        var isInvariant = r.ContentType.Alias == "umbInvariantTextpage";
+                        var name = isInvariant ? r.Name : r.Names["en-US"];
+                        var namePrefix = (isInvariant ? "INV" : "VAR");
+
+                        //ensure the correct name (invariant vs variant) is in the result
+                        Assert.IsTrue(name.StartsWith(namePrefix));
+
+                        foreach (var p in r.Properties)
+                        {
+                            //ensure there is a value for the correct variant/invariant property
+                            var value = p.GetValue(isInvariant ? null : "en-US");
+                            Assert.IsNotNull(value);
+                        }
+                    }
+                }
+                finally
+                {
+                    scope.Database.AsUmbracoDatabase().EnableSqlTrace = false;
+                    scope.Database.AsUmbracoDatabase().EnableSqlCount = false;
+                }
+            }
+        }
+
+        [Test]
         public void GetPagedResultsByQuery_CustomPropertySort()
         {
             var provider = TestObjects.GetScopeProvider(Logger);

@@ -30,8 +30,8 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
         /// </summary>
-        protected ContentBase(string name, int parentId, IContentTypeComposition contentType, PropertyCollection properties)
-            : this(name, contentType, properties)
+        protected ContentBase(string name, int parentId, IContentTypeComposition contentType, PropertyCollection properties, string culture = null)
+            : this(name, contentType, properties, culture)
         {
             if (parentId == 0) throw new ArgumentOutOfRangeException(nameof(parentId));
             ParentId = parentId;
@@ -40,14 +40,14 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentBase"/> class.
         /// </summary>
-        protected ContentBase(string name, IContentBase parent, IContentTypeComposition contentType, PropertyCollection properties)
-            : this(name, contentType, properties)
+        protected ContentBase(string name, IContentBase parent, IContentTypeComposition contentType, PropertyCollection properties, string culture = null)
+            : this(name, contentType, properties, culture)
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
             SetParent(parent);
         }
 
-        private ContentBase(string name, IContentTypeComposition contentType, PropertyCollection properties)
+        private ContentBase(string name, IContentTypeComposition contentType, PropertyCollection properties, string culture = null)
         {
             ContentTypeBase = contentType ?? throw new ArgumentNullException(nameof(contentType));
 
@@ -55,7 +55,10 @@ namespace Umbraco.Core.Models
             Id = 0; // no identity
             VersionId = 0; // no versions
 
+            //fixme we always need to set the invariant name else an exception will throw if we try to persist
             Name = name;
+            SetName(culture, name);
+
             _contentTypeId = contentType.Id;
             _properties = properties ?? throw new ArgumentNullException(nameof(properties));
             _properties.EnsurePropertyTypes(PropertyTypes);

@@ -10,7 +10,7 @@ namespace Umbraco.Tests.Testing
         /// Set property values by alias with an annonymous object.
         /// </summary>
         /// <remarks>Does not support variants.</remarks>
-        public static void PropertyValues(this IContentBase content, object value)
+        public static void PropertyValues(this IContentBase content, object value, string culture = null, string segment = null)
         {
             if (value == null)
                 throw new Exception("No properties has been passed in");
@@ -27,7 +27,7 @@ namespace Umbraco.Tests.Testing
                 var item = content.Properties.FirstOrDefault(x => x.Alias == propertyInfo.Name);
                 if (item != null)
                 {
-                    item.SetValue(propertyInfo.GetValue(value, null));
+                    item.SetValue(propertyInfo.GetValue(value, null), culture, segment);
                     //Update item with newly added value
                     content.Properties.Add(item);
                 }
@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Testing
                 {
                     //Create new Property to add to collection
                     var property = propertyType.CreateProperty();
-                    property.SetValue(propertyInfo.GetValue(value, null));
+                    property.SetValue(propertyInfo.GetValue(value, null), culture, segment);
                     content.Properties.Add(property);
                 }
             }

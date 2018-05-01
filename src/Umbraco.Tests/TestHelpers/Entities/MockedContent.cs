@@ -53,9 +53,10 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return content;
         }
 
-        public static Content CreateSimpleContent(IContentType contentType, string name, IContent parent)
+        public static Content CreateSimpleContent(IContentType contentType, string name, IContent parent, string culture = null, string segment = null)
         {
-            var content = new Content(name, parent, contentType) { CreatorId = 0, WriterId = 0 };
+            var content = new Content(name, parent, contentType, culture) { CreatorId = 0, WriterId = 0 };
+            
             object obj =
                 new
                 {
@@ -64,7 +65,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                     author = "John Doe"
                 };
 
-            content.PropertyValues(obj);
+            content.PropertyValues(obj, culture, segment);
 
             content.ResetDirtyProperties(false);
 
