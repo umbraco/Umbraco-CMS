@@ -14,7 +14,7 @@ namespace Umbraco.Web.Macros
     {
         public MacroContent Execute(MacroModel model)
         {
-            var filename = model.TypeName;
+            var filename = model.MacroSource;
 
             // ensure the file exists
             var path = IOHelper.FindFile(filename);

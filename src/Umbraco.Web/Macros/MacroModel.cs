@@ -19,13 +19,7 @@ namespace Umbraco.Web.Macros
 
         public MacroTypes MacroType { get; set; }
 
-        public string TypeName { get; set; }
-
-        public string ScriptName { get; set; }
-
-        public string ScriptCode { get; set; }
-
-        public string ScriptLanguage { get; set; }
+        public string MacroSource { get; set; }
 
         public int CacheDuration { get; set; }
 
@@ -49,8 +43,8 @@ namespace Umbraco.Web.Macros
             Id = macro.Id;
             Name = macro.Name;
             Alias = macro.Alias;
-            TypeName = macro.ControlType;
-            ScriptName = macro.ScriptPath;
+            MacroType = macro.MacroType;
+            MacroSource = macro.MacroSource;
             CacheDuration = macro.CacheDuration;
             CacheByPage = macro.CacheByPage;
             CacheByMember = macro.CacheByMember;
@@ -59,8 +53,7 @@ namespace Umbraco.Web.Macros
             foreach (var prop in macro.Properties)
                 Properties.Add(new MacroPropertyModel(prop.Alias, string.Empty, prop.EditorAlias));
 
-            // can convert enums
-            MacroType = MacroService.GetMacroType(macro);
+            MacroType = macro.MacroType;
         }
     }
 }

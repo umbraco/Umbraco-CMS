@@ -46,9 +46,7 @@ namespace Umbraco.Web.Macros
         {
             var id = new StringBuilder();
 
-            var alias = string.IsNullOrEmpty(model.ScriptCode)
-                ? model.Alias
-                : GenerateCacheKeyFromCode(model.ScriptCode);
+            var alias = model.Alias;
             id.AppendFormat("{0}-", alias);
 
             if (model.CacheByPage)
@@ -173,10 +171,8 @@ namespace Umbraco.Web.Macros
             switch (model.MacroType)
             {
                 case MacroTypes.PartialView:
-                    filename = model.ScriptName; //partial views are saved with their full virtual path
-                    break;
                 case MacroTypes.UserControl:
-                    filename = model.TypeName; //user controls are saved with their full virtual path
+                    filename = model.MacroSource; //user controls & partial views are saved with their full virtual path
                     break;
                 default:
                     // not file-based, or not supported
@@ -314,7 +310,7 @@ namespace Umbraco.Web.Macros
                 {
                     Name = macro.Name,
                     Alias = macro.Alias,
-                    ItemKey = macro.ScriptName,
+                    MacroSource = macro.MacroSource,
                     Exception = e,
                     Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour
                 };
@@ -362,17 +358,17 @@ namespace Umbraco.Web.Macros
             {
                 case MacroTypes.PartialView:
                     return ExecuteMacroWithErrorWrapper(model,
-                        $"Executing PartialView: TypeName=\"{model.TypeName}\", ScriptName=\"{model.ScriptName}\".",
+                        $"Executing PartialView: MacroSource=\"{model.MacroSource}\".",
                         "Executed PartialView.",
                         () => ExecutePartialView(model),
-                        () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.ScriptName }));
+                        () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
                     
                 case MacroTypes.UserControl:
                     return ExecuteMacroWithErrorWrapper(model,
-                        $"Loading UserControl: TypeName=\"{model.TypeName}\".",
+                        $"Loading UserControl: MacroSource=\"{model.MacroSource}\".",
                         "Loaded UserControl.",
                         () => ExecuteUserControl(model),
-                        () => textService.Localize("errors/macroErrorLoadingUsercontrol", new[] { model.TypeName }));
+                        () => textService.Localize("errors/macroErrorLoadingUsercontrol", new[] { model.MacroSource }));
 
                 //case MacroTypes.Script:
                 default:
@@ -418,9 +414,9 @@ namespace Umbraco.Web.Macros
         public static MacroContent ExecuteUserControl(MacroModel macro)
         {
             // add tilde for v4 defined macros
-            if (string.IsNullOrEmpty(macro.TypeName) == false
-                && macro.TypeName.StartsWith("~") == false)
-                macro.TypeName = "~/" + macro.TypeName;
+            if (string.IsNullOrEmpty(macro.MacroSource) == false
+                && macro.MacroSource.StartsWith("~") == false)
+                macro.MacroSource = "~/" + macro.MacroSource;
 
             var engine = new UserControlMacroEngine();
             return engine.Execute(macro);

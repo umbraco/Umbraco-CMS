@@ -34,12 +34,11 @@ namespace Umbraco.Core.Models
         /// <param name="cacheDuration"></param>
         /// <param name="alias"></param>
         /// <param name="name"></param>
-        /// <param name="controlType"></param>
         /// <param name="cacheByPage"></param>
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
-        /// <param name="scriptPath"></param>
-        public Macro(int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string name, string controlType, bool cacheByPage, bool cacheByMember, bool dontRender, string scriptPath)
+        /// <param name="macroSource"></param>
+        public Macro(int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string name, bool cacheByPage, bool cacheByMember, bool dontRender, string macroSource, MacroTypes macroType)
             : this()
         {
             Id = id;
@@ -48,11 +47,11 @@ namespace Umbraco.Core.Models
             CacheDuration = cacheDuration;
             Alias = alias.ToCleanString(CleanStringType.Alias);
             Name = name;
-            ControlType = controlType;
             CacheByPage = cacheByPage;
             CacheByMember = cacheByMember;
             DontRender = dontRender;
-            ScriptPath = scriptPath;
+            MacroSource = macroSource;
+            MacroType = macroType;
         }
 
         /// <summary>
@@ -62,14 +61,13 @@ namespace Umbraco.Core.Models
         /// <param name="cacheDuration"></param>
         /// <param name="alias"></param>
         /// <param name="name"></param>
-        /// <param name="controlType"></param>
         /// <param name="cacheByPage"></param>
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
-        /// <param name="scriptPath"></param>
+        /// <param name="macroSource"></param>
         public Macro(string @alias, string name,
-            string controlType = "",
-            string scriptPath = "",
+            string macroSource,
+            MacroTypes macroType,
             bool cacheByPage = false,
             bool cacheByMember = false,
             bool dontRender = true,
@@ -81,11 +79,11 @@ namespace Umbraco.Core.Models
             CacheDuration = cacheDuration;
             Alias = alias.ToCleanString(CleanStringType.Alias);
             Name = name;
-            ControlType = controlType;
             CacheByPage = cacheByPage;
             CacheByMember = cacheByMember;
             DontRender = dontRender;
-            ScriptPath = scriptPath;
+            MacroSource = macroSource;
+            MacroType = macroType;
         }
 
         private string _alias;
@@ -95,8 +93,8 @@ namespace Umbraco.Core.Models
         private bool _cacheByPage;
         private bool _cacheByMember;
         private bool _dontRender;
-        private string _scriptFile;
-        private string _scriptPath;
+        private string _macroSource;
+        private MacroTypes _macroType = MacroTypes.Unknown;
         private MacroPropertyCollection _properties;
         private List<string> _addedProperties;
         private List<string> _removedProperties;
@@ -112,8 +110,8 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo CacheByPageSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.CacheByPage);
             public readonly PropertyInfo CacheByMemberSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.CacheByMember);
             public readonly PropertyInfo DontRenderSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.DontRender);
-            public readonly PropertyInfo ControlPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.ControlType);
-            public readonly PropertyInfo ScriptPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.ScriptPath);
+            public readonly PropertyInfo ScriptPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.MacroSource);
+            public readonly PropertyInfo MacroTypeSelector = ExpressionHelper.GetPropertyInfo<Macro, MacroTypes>(x => x.MacroType);
             public readonly PropertyInfo PropertiesSelector = ExpressionHelper.GetPropertyInfo<Macro, MacroPropertyCollection>(x => x.Properties);
         }
 
@@ -258,24 +256,23 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets or sets the path to user control or the Control Type to render
+        /// Gets or set the path to the Partial View to render
         /// </summary>
         [DataMember]
-        public string ControlType
+        public string MacroSource
         {
-            get { return _scriptFile; }
-            set { SetPropertyValueAndDetectChanges(value, ref _scriptFile, Ps.Value.ControlPathSelector); }
+            get { return _macroSource; }
+            set { SetPropertyValueAndDetectChanges(value, ref _macroSource, Ps.Value.ScriptPathSelector); }
         }
 
         /// <summary>
-        /// Gets or set the path to the Python file in use
+        /// Gets or set the path to the Partial View to render
         /// </summary>
-        /// <remarks>Optional: Can only be one of three Script, Python or Xslt</remarks>
         [DataMember]
-        public string ScriptPath
+        public MacroTypes MacroType
         {
-            get { return _scriptPath; }
-            set { SetPropertyValueAndDetectChanges(value, ref _scriptPath, Ps.Value.ScriptPathSelector); }
+            get { return _macroType; }
+            set { SetPropertyValueAndDetectChanges(value, ref _macroType, Ps.Value.MacroTypeSelector); }
         }
 
         /// <summary>

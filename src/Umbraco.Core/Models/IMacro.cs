@@ -51,20 +51,19 @@ namespace Umbraco.Core.Models
         /// </summary>
         [DataMember]
         bool DontRender { get; set; }
+                
+        /// <summary>
+        /// Gets or set the path to the macro source to render
+        /// </summary>
+        [DataMember]
+        string MacroSource { get; set; }
 
         /// <summary>
-        /// Gets or sets the path to user control or the Control Type to render
+        /// Gets or set the macro type
         /// </summary>
         [DataMember]
-        string ControlType { get; set; }
-        
-        /// <summary>
-        /// Gets or set the path to the Python file in use
-        /// </summary>
-        /// <remarks>Optional: Can only be one of three Script, Python or Xslt</remarks>
-        [DataMember]
-        string ScriptPath { get; set; }
-        
+        MacroTypes MacroType { get; set; }
+
         /// <summary>
         /// Gets or sets a list of Macro Properties
         /// </summary>

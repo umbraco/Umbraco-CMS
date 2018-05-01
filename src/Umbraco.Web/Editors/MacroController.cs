@@ -143,7 +143,7 @@ namespace Umbraco.Web.Editors
             {
                 Alias = macroName.ToSafeAlias(),
                 Name = macroName,
-                ScriptPath = model.VirtualPath.EnsureStartsWith("~")
+                MacroSource = model.VirtualPath.EnsureStartsWith("~")
             };
 
             Services.MacroService.Save(macro); // may throw

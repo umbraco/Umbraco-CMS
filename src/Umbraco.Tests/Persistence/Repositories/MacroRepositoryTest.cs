@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
-                var macro = new Macro("test1", "Test", "~/usercontrol/blah.ascx", "~/views/macropartials/test.cshtml");
+                var macro = new Macro("test1", "Test", "~/views/macropartials/test.cshtml", MacroTypes.PartialView);
                 ;
 
                 Assert.Throws<SqlCeException>(() => repository.Save(macro));
@@ -94,11 +94,10 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(macro.Alias, Is.EqualTo("test1"));
                 Assert.That(macro.CacheByPage, Is.EqualTo(false));
                 Assert.That(macro.CacheByMember, Is.EqualTo(false));
-                Assert.That(macro.ControlType, Is.EqualTo("~/usercontrol/test1.ascx"));
                 Assert.That(macro.DontRender, Is.EqualTo(true));
                 Assert.That(macro.Name, Is.EqualTo("Test1"));
                 Assert.That(macro.CacheDuration, Is.EqualTo(0));
-                Assert.That(macro.ScriptPath, Is.EqualTo("~/views/macropartials/test1.cshtml"));
+                Assert.That(macro.MacroSource, Is.EqualTo("~/views/macropartials/test1.cshtml"));
                 Assert.That(macro.UseInEditor, Is.EqualTo(false));
             }
 
@@ -169,7 +168,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
                 // Act
-                var macro = new Macro("test", "Test", "~/usercontrol/blah.ascx", "~/views/macropartials/test.cshtml");
+                var macro = new Macro("test", "Test", "~/views/macropartials/test.cshtml", MacroTypes.PartialView);
                 macro.Properties.Add(new MacroProperty("test", "Test", 0, "test"));
                 repository.Save(macro);
 
@@ -195,9 +194,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 macro.CacheDuration = 1234;
                 macro.CacheByPage = true;
                 macro.CacheByMember = true;
-                macro.ControlType = "";
                 macro.DontRender = false;
-                macro.ScriptPath = "~/newpath.cshtml";
+                macro.MacroSource = "~/newpath.cshtml";
                 macro.UseInEditor = true;
 
                 repository.Save(macro);
@@ -210,9 +208,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(macroUpdated.CacheDuration, Is.EqualTo(1234));
                 Assert.That(macroUpdated.CacheByPage, Is.EqualTo(true));
                 Assert.That(macroUpdated.CacheByMember, Is.EqualTo(true));
-                Assert.That(macroUpdated.ControlType, Is.EqualTo(""));
                 Assert.That(macroUpdated.DontRender, Is.EqualTo(false));
-                Assert.That(macroUpdated.ScriptPath, Is.EqualTo("~/newpath.cshtml"));
+                Assert.That(macroUpdated.MacroSource, Is.EqualTo("~/newpath.cshtml"));
                 Assert.That(macroUpdated.UseInEditor, Is.EqualTo(true));
             }
         }
@@ -293,7 +290,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
-                var macro = new Macro("newmacro", "A new macro", "~/usercontrol/test1.ascx", "~/views/macropartials/test1.cshtml");
+                var macro = new Macro("newmacro", "A new macro", "~/views/macropartials/test1.cshtml", MacroTypes.PartialView);
                 macro.Properties.Add(new MacroProperty("blah1", "New1", 4, "test.editor"));
 
                 repository.Save(macro);
@@ -318,7 +315,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
-                var macro = new Macro("newmacro", "A new macro", "~/usercontrol/test1.ascx", "~/views/macropartials/test1.cshtml");
+                var macro = new Macro("newmacro", "A new macro", "~/views/macropartials/test1.cshtml", MacroTypes.PartialView);
                 macro.Properties.Add(new MacroProperty("blah1", "New1", 4, "test.editor"));
                 repository.Save(macro);
 
@@ -342,7 +339,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
-                var macro = new Macro("newmacro", "A new macro", "~/usercontrol/test1.ascx", "~/views/macropartials/test1.cshtml");
+                var macro = new Macro("newmacro", "A new macro", "~/views/macropartials/test1.cshtml", MacroTypes.PartialView);
                 var prop1 = new MacroProperty("blah1", "New1", 4, "test.editor");
                 var prop2 = new MacroProperty("blah2", "New2", 3, "test.editor");
 
@@ -428,9 +425,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
 
-                repository.Save(new Macro("test1", "Test1", "~/usercontrol/test1.ascx", "~/views/macropartials/test1.cshtml"));
-                repository.Save(new Macro("test2", "Test2", "~/usercontrol/test2.ascx", "~/views/macropartials/test2.cshtml"));
-                repository.Save(new Macro("test3", "Tet3", "~/usercontrol/test3.ascx", "~/views/macropartials/test3.cshtml"));
+                repository.Save(new Macro("test1", "Test1", "~/views/macropartials/test1.cshtml", MacroTypes.PartialView));
+                repository.Save(new Macro("test2", "Test2", "~/views/macropartials/test2.cshtml", MacroTypes.PartialView));
+                repository.Save(new Macro("test3", "Tet3", "~/views/macropartials/test3.cshtml", MacroTypes.PartialView));
                 scope.Complete();
             }
 

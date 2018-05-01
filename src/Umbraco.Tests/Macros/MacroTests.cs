@@ -53,7 +53,7 @@ namespace Umbraco.Tests.Macros
             {
                 Name = "test",
                 Alias = "test",
-                ScriptName = "~/usercontrols/menu.ascx"
+                MacroSource = "~/usercontrols/menu.ascx"
             };
             macroModel.Properties.Add(new MacroPropertyModel(macroPropName, val));
 
@@ -77,8 +77,7 @@ namespace Umbraco.Tests.Macros
             var model = new MacroModel
             {
                 MacroType = macroType,
-                ScriptName = "anything",
-                TypeName = "anything"
+                MacroSource = "anything"
             };
             var filename = MacroRenderer.GetMacroFileName(model);
             if (expectedNonNull)

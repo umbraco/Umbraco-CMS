@@ -65,7 +65,7 @@ namespace Umbraco.Web.Macros
         {
             if (macro == null) throw new ArgumentNullException(nameof(macro));
             if (content == null) throw new ArgumentNullException(nameof(content));
-            if (macro.ScriptName.IsNullOrWhiteSpace()) throw new ArgumentException("The ScriptName property of the macro object cannot be null or empty");
+            if (macro.MacroSource.IsNullOrWhiteSpace()) throw new ArgumentException("The MacroSource property of the macro object cannot be null or empty");
 
             var http = _getHttpContext();
             var umbCtx = _getUmbracoContext();
