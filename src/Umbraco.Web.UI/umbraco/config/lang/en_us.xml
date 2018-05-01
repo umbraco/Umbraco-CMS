@@ -201,6 +201,7 @@
         <key alias="publish">Publish</key>
         <key alias="published">Published</key>
         <key alias="publishedPendingChanges">Published (pending changes)</key>
+        <key alias="unpublishedPendingChanges">Unpublished (pending changes)</key>
         <key alias="publishStatus">Publication Status</key>
         <key alias="releaseDate">Publish at</key>
         <key alias="unpublishDate">Unpublish at</key>
