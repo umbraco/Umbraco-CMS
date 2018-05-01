@@ -1,7 +1,8 @@
 <div ng-controller="Umbraco.Overlays.PublishController as vm">
 
     <div style="margin-bottom: 15px;">
-        <p> {{vm.dirtyVariants.length > 0 ? 'What languages would you like to publish?' : 'Nothing here to publish!'}}</p>
+        <p ng-if="vm.dirtyVariants.length > 0"><localize key="content_languagesToPublish"></localize></p>
+        <p ng-if="vm.dirtyVariants.length === 0"><localize key="content_noLanguagesToPublish"></localize></p>
     </div>
 
     <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
@@ -35,15 +36,9 @@
         <br/>
     </div>
 
-
-
-    <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
-        <umb-load-indicator></umb-load-indicator>
-    </div>
-
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading && vm.pristineVariants">
         <div style="margin-bottom: 15px; font-weight: bold;">
-            <p>Published languages.</p>
+            <p><localize key="content_publishedLanguages"></localize></p>
         </div>
 
         <div class="umb-list-item" ng-repeat="variant in vm.pristineVariants">
