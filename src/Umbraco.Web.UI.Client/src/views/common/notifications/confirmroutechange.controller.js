@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Notifications.ConfirmRouteChangeController",
-	function ($scope, $location, $log, notificationsService) {	
+	function ($scope, $location, $log, notificationsService, navigationService) {	
 
 		$scope.discard = function(not){
 
