@@ -5,22 +5,44 @@
 
         function link(scope, el, attr, ctrl) {
 
-            scope.editors = [];
-
             var evts = [];
-            var minAvailableSpace = 1000;
             var allowedNumberOfVisibleEditors = 3;
+
+            scope.editors = [];
 
             function addEditor(editor) {
 
+                showOverlayOnPrevEditor();
+                
                 // start collapsing editors to make room for new ones
                 $timeout(function() {
- 
+                   
                     var editorsElement = el[0];
                     // only select the editors which are allowed to be 
                     // shown so we don't animate a lot of editors which aren't necessary
                     var moveEditors = editorsElement.querySelectorAll('.umb-editor:nth-last-child(-n+'+ allowedNumberOfVisibleEditors +')');
-                    
+
+                    // this is a temporary fix because the animations doesn't perform well
+                    // TODO: fix animation and remove this
+                    moveEditors.forEach(function(editor, index){
+
+                        // resize the small editors to 100% so we can easily slide them
+                        if(editor.classList.contains("umb-editor--small")) {
+                            editor.style.width = "100%";
+                        }
+
+                        // set left position to indent the editors
+                        if(scope.editors.length >= allowedNumberOfVisibleEditors) {
+                            $(editor).css({"left": index * 80});
+                        } else {
+                            $(editor).css({"left": (index + 1) * 80});
+                        }
+
+                    });
+
+                    // We need to figure out how to performance optimize this
+                    // TODO: optimize animation
+                    /*
                     // animation config
                     var collapseEditorAnimation = anime({
                         targets: moveEditors,
@@ -38,7 +60,8 @@
                         easing: 'easeInOutQuint',
                         duration: 600
                     });
-                    
+                    */
+
                     // push the new editor to the dom
                     scope.editors.push(editor);
 
@@ -92,14 +115,13 @@
                         complete: function(a) {
                             $timeout(function(){
                                 scope.editors.splice(-1,1);
+                                removeOverlayFromPrevEditor();
+                                expandEditors();
                             });
                         }
                     });
 
-                    expandEditors();
-
                 });
-
 
             }
 
@@ -112,30 +134,57 @@
                     // shown so we don't animate a lot of editors which aren't necessary
                     var moveEditors = editorsElement.querySelectorAll('.umb-editor:nth-last-child(-n+'+ 4 +')');
 
+                    // this is a temporary fix because the animations doesn't perform well
+                    // TODO: fix animation and remove this
+                    moveEditors.forEach(function(editor, index){
+                        // set left position
+                        $(editor).css({"left": (index + 1) * 80});
+
+                        // if the new top editor is a small editor we will have to resize it back to the right size on 
+                        // move it all the way to the right side
+                        if(editor.classList.contains("umb-editor--small") && index + 1 === moveEditors.length) {
+                            editor.style.width = "500px";
+                            $(editor).css({"left": ""});
+                        }
+                    });
+
+                    // We need to figure out how to performance optimize this
+                    // TODO: optimize animation
+                    /*
                     var expandEditorAnimation = anime({
                         targets: moveEditors,
+                        left: function(el, index, length){
+                            return (index + 1) * 80;
+                        },
                         width: function(el, index, length) {
                             if(el.classList.contains("umb-editor--small")) {
                                 return "500px";
                             }
                         },
-                        left: function(el, index, length){
-                            return (index + 1) * 80; 
-                        },
                         easing: 'easeInOutQuint',
-                        duration: 600
+                        duration: 600,
+                        completed: function() {
+
+                        }
                     });
-                    
+                    */
     
                 });
 
             }
 
             // show backdrop on previous editor
-            function showOverlay() {
+            function showOverlayOnPrevEditor() {
                 var numberOfEditors = scope.editors.length;
                 if(numberOfEditors > 0) {
                     scope.editors[numberOfEditors - 1].showOverlay = true;
+                }
+            }
+
+            function removeOverlayFromPrevEditor() {
+                var numberOfEditors = scope.editors.length;
+                if(numberOfEditors > 0) {
+                    scope.editors[numberOfEditors - 1].showOverlay = false;
                 }
             }
 
