@@ -13,7 +13,7 @@ angular.module("umbraco").controller("Umbraco.Notifications.ConfirmRouteChangeCo
 			// when no callback is added run the normal functionality of the discard button
 			not.args.listener();
 			
-			$location.search("");
+            navigationService.clearSearch();
 
 		    //we need to break the path up into path and query
 		    var parts = not.args.path.split("?");

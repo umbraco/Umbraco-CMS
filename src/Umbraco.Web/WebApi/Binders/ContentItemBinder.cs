@@ -27,14 +27,14 @@ namespace Umbraco.Web.WebApi.Binders
 
         protected override ContentItemDto<IContent> MapFromPersisted(ContentItemSave model)
         {
-            return MapFromPersisted(model.PersistedContent, model.LanguageId);
+            return MapFromPersisted(model.PersistedContent, model.Culture);
         }
 
-        internal static ContentItemDto<IContent> MapFromPersisted(IContent content, int? languageId)
+        internal static ContentItemDto<IContent> MapFromPersisted(IContent content, string culture)
         {
             return ContextMapper.Map<IContent, ContentItemDto<IContent>>(content, new Dictionary<string, object>
             {
-                [ContextMapper.CultureKey] = languageId
+                [ContextMapper.CultureKey] = culture
             });
         }
     }

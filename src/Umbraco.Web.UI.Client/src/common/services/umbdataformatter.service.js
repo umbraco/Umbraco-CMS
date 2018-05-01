@@ -333,11 +333,11 @@
                         function (d) {
                             //set the selected variant if this is current
                             if (d.current === true) {
-                                saveModel.languageId = d.language.id;
+                                saveModel.culture = d.language.culture;
                             }
                             if (d.publish === true) {
                                 saveModel.publishVariations.push({
-                                    languageId: d.language.id,
+                                    culture: d.language.culture,
                                     segment: d.segment
                                 });
                             }

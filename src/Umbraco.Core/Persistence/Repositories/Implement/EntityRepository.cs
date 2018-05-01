@@ -24,9 +24,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class EntityRepository : IEntityRepository
     {
         private readonly IScopeAccessor _scopeAccessor;
-        public EntityRepository(IScopeAccessor scopeAccessor)
+        private readonly ILanguageRepository _langRepository;
+
+        public EntityRepository(IScopeAccessor scopeAccessor, ILanguageRepository langRepository)
         {
             _scopeAccessor = scopeAccessor;
+            _langRepository = langRepository;
         }
 
         protected IUmbracoDatabase Database => _scopeAccessor.AmbientScope.Database;
@@ -889,17 +892,19 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        private static EntitySlim BuildDocumentEntity(ContentEntityDto dto)
+        private EntitySlim BuildDocumentEntity(ContentEntityDto dto)
         {
             // EntitySlim does not track changes
             var entity = new DocumentEntitySlim();
             BuildDocumentEntity(entity, dto);
-            var variantInfo = new Dictionary<int, string>();
+            var variantInfo = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
             if (dto.VariationInfo != null)
             {
                 foreach (var info in dto.VariationInfo)
                 {
-                    variantInfo[info.LanguageId] = info.Name;
+                    var isoCode = _langRepository.GetIsoCodeById(info.LanguageId);
+                    if (isoCode != null)
+                        variantInfo[isoCode] = info.Name;
                 }
                 entity.AdditionalData["CultureNames"] = variantInfo;
             }

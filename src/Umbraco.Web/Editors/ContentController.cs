@@ -253,11 +253,11 @@ namespace Umbraco.Web.Editors
         /// Gets the content json for the content id
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="languageId"></param>
+        /// <param name="culture"></param>
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [EnsureUserPermissionForContent("id")]
-        public ContentItemDisplay GetById(int id, int? languageId = null)
+        public ContentItemDisplay GetById(int id, string culture = null)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
             if (foundContent == null)
@@ -266,7 +266,7 @@ namespace Umbraco.Web.Editors
                 return null;//irrelevant since the above throws
             }
 
-            var content = MapToDisplay(foundContent, GetLanguageCulture(languageId));
+            var content = MapToDisplay(foundContent, culture);
             return content;
         }
 
@@ -573,12 +573,12 @@ namespace Umbraco.Web.Editors
         public ContentItemDisplay PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
             var contentItemDisplay = PostSaveInternal(contentItem, content => Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id));
-            //ensure the active language is still selected
-            if (contentItem.LanguageId.HasValue)
+            //ensure the active culture is still selected
+            if (!contentItem.Culture.IsNullOrWhiteSpace())
             {
                 foreach (var contentVariation in contentItemDisplay.Variants)
                 {
-                    contentVariation.IsCurrent = contentVariation.Language.Id == contentItem.LanguageId;
+                    contentVariation.IsCurrent = contentVariation.Language.IsoCode.InvariantEquals(contentItem.Culture);
                 }
             }
             return contentItemDisplay;
@@ -606,7 +606,7 @@ namespace Umbraco.Web.Editors
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the modelstate to the outgoing object and throw a validation message
-                    var forDisplay = MapToDisplay(contentItem.PersistedContent, GetLanguageCulture(contentItem.LanguageId));
+                    var forDisplay = MapToDisplay(contentItem.PersistedContent, contentItem.Culture);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
 
@@ -643,30 +643,30 @@ namespace Umbraco.Web.Editors
             else
             {
                 //publish the item and check if it worked, if not we will show a diff msg below
-                contentItem.PersistedContent.TryPublishValues(GetLanguageCulture(contentItem.LanguageId)); //we are not checking for a return value here because we've already pre-validated the property values
+                contentItem.PersistedContent.TryPublishValues(contentItem.Culture); //we are not checking for a return value here because we've already pre-validated the property values
 
                 //check if we are publishing other variants and validate them
-                var allLangs = Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.Id, x => x);
-                var variantsToValidate = contentItem.PublishVariations.Where(x => x.LanguageId != contentItem.LanguageId).ToList();
+                var allLangs = Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase);
+                var variantsToValidate = contentItem.PublishVariations.Where(x => !x.Culture.InvariantEquals(contentItem.Culture)).ToList();
                 foreach (var publishVariation in variantsToValidate)
                 {
-                    if (!contentItem.PersistedContent.TryPublishValues(GetLanguageCulture(publishVariation.LanguageId)))
+                    if (!contentItem.PersistedContent.TryPublishValues(publishVariation.Culture))
                     {
-                        var errMsg = Services.TextService.Localize("speechBubbles/contentLangValidationError", new[] {allLangs[publishVariation.LanguageId].CultureName});
-                        ModelState.AddModelError("publish_variant_" + publishVariation.LanguageId + "_", errMsg);
+                        var errMsg = Services.TextService.Localize("speechBubbles/contentLangValidationError", new[] {allLangs[publishVariation.Culture].CultureName});
+                        ModelState.AddModelError("publish_variant_" + publishVariation.Culture + "_", errMsg);
                     }
                 }
 
                 //validate any mandatory variants that are not in the list
                 var mandatoryLangs = Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLangs.Values)
-                    .Where(x => variantsToValidate.All(v => v.LanguageId != x.Id)) //don't include variants above
-                    .Where(x => x.Id != contentItem.LanguageId) //don't include the current variant
+                    .Where(x => variantsToValidate.All(v => !v.Culture.InvariantEquals(x.IsoCode))) //don't include variants above
+                    .Where(x => !x.IsoCode.InvariantEquals(contentItem.Culture)) //don't include the current variant
                     .Where(x => x.Mandatory);
                 foreach (var lang in mandatoryLangs)
                 {
-                    if (contentItem.PersistedContent.Validate(GetLanguageCulture(lang.Id)).Length > 0)
+                    if (contentItem.PersistedContent.Validate(lang.IsoCode).Length > 0)
                     {
-                        var errMsg = Services.TextService.Localize("speechBubbles/contentReqLangValidationError", new[]{allLangs[lang.Id].CultureName});
+                        var errMsg = Services.TextService.Localize("speechBubbles/contentReqLangValidationError", new[]{allLangs[lang.IsoCode].CultureName});
                         ModelState.AddModelError("publish_variant_" + lang.Id + "_", errMsg);
                     }
                 }
@@ -676,7 +676,7 @@ namespace Umbraco.Web.Editors
             }
 
             //get the updated model
-            var display = MapToDisplay(contentItem.PersistedContent, GetLanguageCulture(contentItem.LanguageId));
+            var display = MapToDisplay(contentItem.PersistedContent, contentItem.Culture);
 
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
@@ -954,10 +954,9 @@ namespace Umbraco.Web.Editors
             if (contentItem.Name.IsNullOrWhiteSpace() == false)
             {
                 //set the name according to the culture settings
-                if (contentItem.LanguageId.HasValue && contentItem.PersistedContent.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
+                if (!contentItem.Culture.IsNullOrWhiteSpace() && contentItem.PersistedContent.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
                 {
-                    var culture = Services.LocalizationService.GetLanguageById(contentItem.LanguageId.Value).IsoCode;
-                    contentItem.PersistedContent.SetName(culture, contentItem.Name);
+                    contentItem.PersistedContent.SetName(contentItem.Culture, contentItem.Name);
                 }
                 else
                 {
@@ -990,8 +989,8 @@ namespace Umbraco.Web.Editors
 
             base.MapPropertyValues<IContent, ContentItemSave>(
                 contentItem,
-                (save, property) => property.GetValue(GetLanguageCulture(save.LanguageId)),         //get prop val
-                (save, property, v) => property.SetValue(v, GetLanguageCulture(save.LanguageId)));  //set prop val
+                (save, property) => property.GetValue(save.Culture),         //get prop val
+                (save, property, v) => property.SetValue(v, save.Culture));  //set prop val
         }
 
         /// <summary>
@@ -1199,11 +1198,6 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
-
-        private string GetLanguageCulture(int? languageId)
-        {
-            if (languageId == null) return null;
-            return Core.Composing.Current.Services.LocalizationService.GetLanguageById(languageId.Value).IsoCode; // fixme optimize!
-        }
+        
     }
 }
