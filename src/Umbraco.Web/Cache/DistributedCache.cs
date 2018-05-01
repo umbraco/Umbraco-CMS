@@ -38,7 +38,6 @@ namespace Umbraco.Web.Cache
             if (refresherGuid == Guid.Empty || instances.Length == 0 || getNumericId == null) return;
 
             Current.ServerMessenger.PerformRefresh(
-                Current.ServerRegistrar.Registrations,
                 GetRefresherById(refresherGuid),
                 getNumericId,
                 instances);
@@ -54,7 +53,6 @@ namespace Umbraco.Web.Cache
             if (refresherGuid == Guid.Empty || id == default(int)) return;
 
             Current.ServerMessenger.PerformRefresh(
-                Current.ServerRegistrar.Registrations,
                 GetRefresherById(refresherGuid),
                 id);
         }
@@ -69,7 +67,6 @@ namespace Umbraco.Web.Cache
             if (refresherGuid == Guid.Empty || id == Guid.Empty) return;
 
             Current.ServerMessenger.PerformRefresh(
-                Current.ServerRegistrar.Registrations,
                 GetRefresherById(refresherGuid),
                 id);
         }
@@ -81,7 +78,6 @@ namespace Umbraco.Web.Cache
             if (refresherGuid == Guid.Empty || payload == null) return;
 
             Current.ServerMessenger.PerformRefresh(
-                Current.ServerRegistrar.Registrations,
                 GetRefresherById(refresherGuid),
                 payload);
         }
@@ -93,7 +89,6 @@ namespace Umbraco.Web.Cache
             if (refresherGuid == Guid.Empty || payloads == null) return;
 
             Current.ServerMessenger.PerformRefresh(
-                Current.ServerRegistrar.Registrations,
                 GetRefresherById(refresherGuid),
                 payloads.ToArray());
         }
@@ -107,7 +102,6 @@ namespace Umbraco.Web.Cache
             if (refresherGuid == Guid.Empty || jsonPayload.IsNullOrWhiteSpace()) return;
 
             Current.ServerMessenger.PerformRefresh(
-                Current.ServerRegistrar.Registrations,
                 GetRefresherById(refresherGuid),
                 jsonPayload);
         }
@@ -136,7 +130,6 @@ namespace Umbraco.Web.Cache
             if (refresherGuid == Guid.Empty) return;
 
             Current.ServerMessenger.PerformRefreshAll(
-                Current.ServerRegistrar.Registrations,
                 GetRefresherById(refresherGuid));
         }
 
@@ -150,7 +143,6 @@ namespace Umbraco.Web.Cache
             if (refresherGuid == Guid.Empty || id == default(int)) return;
 
             Current.ServerMessenger.PerformRemove(
-                Current.ServerRegistrar.Registrations,
                 GetRefresherById(refresherGuid),
                 id);
         }
@@ -168,7 +160,6 @@ namespace Umbraco.Web.Cache
         public void Remove<T>(Guid refresherGuid, Func<T, int> getNumericId, params T[] instances)
         {
             Current.ServerMessenger.PerformRemove(
-                Current.ServerRegistrar.Registrations,
                 GetRefresherById(refresherGuid),
                 getNumericId,
                 instances);

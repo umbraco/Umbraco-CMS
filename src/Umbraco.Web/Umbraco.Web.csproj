@@ -417,7 +417,6 @@
     <Compile Include="SignalR\IPreviewHub.cs" />
     <Compile Include="SignalR\PreviewHub.cs" />
     <Compile Include="SignalR\PreviewHubComponent.cs" />
-    <Compile Include="Components\LegacyServerRegistrarAndMessengerComponent.cs" />
     <Compile Include="Suspendable.cs" />
     <Compile Include="Tour\BackOfficeTourFilter.cs" />
     <Compile Include="Tour\TourFilterCollection.cs" />
@@ -575,7 +574,6 @@
     <Compile Include="Mvc\UrlHelperExtensions.cs" />
     <Compile Include="Scheduling\BackgroundTaskRunner.cs" />
     <Compile Include="BatchedDatabaseServerMessenger.cs" />
-    <Compile Include="BatchedWebServiceServerMessenger.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
     <Compile Include="Cache\ApplicationCacheRefresher.cs" />
     <Compile Include="Cache\ApplicationTreeCacheRefresher.cs" />
@@ -1410,10 +1408,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\TreeService.cs" />
     <Compile Include="umbraco.presentation\umbraco\urlRewriter\UrlRewriterFormWriter.cs" />
     <Compile Include="umbraco.presentation\umbraco\webservices\ajaxHelpers.cs" />
-    <Compile Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx.cs">
-      <DependentUpon>CacheRefresher.asmx</DependentUpon>
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\webservices\CheckForUpgrade.asmx.cs">
       <DependentUpon>CheckForUpgrade.asmx</DependentUpon>
       <SubType>Component</SubType>
@@ -1487,9 +1481,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
-    <Content Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\webservices\legacyAjaxCalls.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\nodeSorter.asmx" />
     <Content Include="PublishedCache\NuCache\notes.txt" />

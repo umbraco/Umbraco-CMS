@@ -19,8 +19,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         IScheduledTasksSection ScheduledTasks { get; }
 
-        IDistributedCallSection DistributedCall { get; }
-        
         IProvidersSection Providers { get; }
 
         IWebRoutingSection WebRouting { get; }

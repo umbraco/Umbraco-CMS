@@ -539,9 +539,6 @@
     <Content Include="Umbraco\treeInit.aspx" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="Umbraco\Webservices\ajax.js" />
-    <Content Include="Umbraco\Webservices\CacheRefresher.asmx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="Umbraco\Webservices\codeEditorSave.asmx" />
     <Content Include="Umbraco\Webservices\legacyAjaxCalls.asmx" />
     <Content Include="Umbraco\Webservices\nodeSorter.asmx" />

@@ -10,6 +10,7 @@ using Umbraco.Web;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
+using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Tests.Routing
 {
@@ -24,14 +25,16 @@ namespace Umbraco.Tests.Routing
             base.SetUp();
 
             //create the module
-            _module = new UmbracoModule();
+            _module = new UmbracoModule
+            {
+                GlobalSettings = TestObjects.GetGlobalSettings(),
+                Logger = Mock.Of<ILogger>()
+            };
+            var runtime = new RuntimeState(_module.Logger, new Lazy<IServerRegistrar>(), new Lazy<MainDom>(), Mock.Of<IUmbracoSettingsSection>(), _module.GlobalSettings);
 
-            // test
-            _module.Logger = Mock.Of<ILogger>();
-            var runtime = new RuntimeState(_module.Logger, new Lazy<IServerRegistrar>(), new Lazy<MainDom>());
             _module.Runtime = runtime;
             runtime.Level = RuntimeLevel.Run;
-            _module.GlobalSettings = TestObjects.GetGlobalSettings();
+            
 
             //SettingsForTests.ReservedPaths = "~/umbraco,~/install/";
             //SettingsForTests.ReservedUrls = "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd";

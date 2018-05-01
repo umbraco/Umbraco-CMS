@@ -129,52 +129,52 @@ namespace Umbraco.Tests.Cache.DistributedCache
             public List<string> PayloadsRefreshed = new List<string>();
             public int CountOfFullRefreshes = 0;
 
-            public void PerformRefresh<TPayload>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, TPayload[] payload)
+            public void PerformRefresh<TPayload>(ICacheRefresher refresher, TPayload[] payload)
             {
                 // doing nothing
             }
 
-            public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, string jsonPayload)
+            public void PerformRefresh(ICacheRefresher refresher, string jsonPayload)
             {
                 PayloadsRefreshed.Add(jsonPayload);
             }
 
-            public void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
+            public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
             {
                 IntIdsRefreshed.AddRange(instances.Select(getNumericId));
             }
 
-            public void PerformRefresh<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
+            public void PerformRefresh<T>(ICacheRefresher refresher, Func<T, Guid> getGuidId, params T[] instances)
             {
                 GuidIdsRefreshed.AddRange(instances.Select(getGuidId));
             }
 
-            public void PerformRemove(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, string jsonPayload)
+            public void PerformRemove(ICacheRefresher refresher, string jsonPayload)
             {
                 PayloadsRemoved.Add(jsonPayload);
             }
 
-            public void PerformRemove<T>(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
+            public void PerformRemove<T>(ICacheRefresher refresher, Func<T, int> getNumericId, params T[] instances)
             {
                 IntIdsRemoved.AddRange(instances.Select(getNumericId));
             }
 
-            public void PerformRemove(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params int[] numericIds)
+            public void PerformRemove(ICacheRefresher refresher, params int[] numericIds)
             {
                 IntIdsRemoved.AddRange(numericIds);
             }
 
-            public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params int[] numericIds)
+            public void PerformRefresh(ICacheRefresher refresher, params int[] numericIds)
             {
                 IntIdsRefreshed.AddRange(numericIds);
             }
 
-            public void PerformRefresh(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, params Guid[] guidIds)
+            public void PerformRefresh(ICacheRefresher refresher, params Guid[] guidIds)
             {
                 GuidIdsRefreshed.AddRange(guidIds);
             }
 
-            public void PerformRefreshAll(IEnumerable<IServerAddress> servers, ICacheRefresher refresher)
+            public void PerformRefreshAll(ICacheRefresher refresher)
             {
                 CountOfFullRefreshes++;
             }

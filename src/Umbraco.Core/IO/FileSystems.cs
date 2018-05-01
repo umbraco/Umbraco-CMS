@@ -354,7 +354,7 @@ namespace Umbraco.Core.IO
             if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
 
             var typed = _wrappers.ToArray();
-            var wrappers = new ShadowWrapper[typed.Length + 7];
+            var wrappers = new ShadowWrapper[typed.Length + 6];
             var i = 0;
             while (i < typed.Length) wrappers[i] = typed[i++];
             wrappers[i++] = _macroPartialFileSystem;

@@ -251,14 +251,12 @@
     <Compile Include="Configuration\UmbracoSettings\ContentScriptEditorElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentSectionExtensions.cs" />
     <Compile Include="Configuration\UmbracoSettings\DisabledLogTypesCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\DistributedCallElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ExternalLoggerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\FileExtensionElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\IBackOfficeSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IChar.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentErrorPage.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IDistributedCallSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IFileExtension.cs" />
     <Compile Include="Configuration\UmbracoSettings\IImagingAutoFillUploadField.cs" />
     <Compile Include="Configuration\UmbracoSettings\ILoggingSection.cs" />
@@ -270,7 +268,6 @@
     <Compile Include="Configuration\UmbracoSettings\IScheduledTask.cs" />
     <Compile Include="Configuration\UmbracoSettings\IScheduledTasksSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ISecuritySection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IServer.cs" />
     <Compile Include="Configuration\UmbracoSettings\ITemplatesSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ITourSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUmbracoSettingsSection.cs" />
@@ -284,8 +281,6 @@
     <Compile Include="Configuration\UmbracoSettings\ScheduledTasksCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ScheduledTasksElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\SecurityElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ServerCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ServerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\TemplatesElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\TourConfigElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\UmbracoConfigurationElement.cs" />
@@ -1447,9 +1442,6 @@
     <Compile Include="Strings\Utf8ToAsciiConverter.cs" />
     <Compile Include="StringUdi.cs" />
     <Compile Include="Sync\ApplicationUrlHelper.cs" />
-    <Compile Include="Sync\BatchedWebServiceServerMessenger.cs" />
-    <Compile Include="Sync\ConfigServerAddress.cs" />
-    <Compile Include="Sync\ConfigServerRegistrar.cs" />
     <Compile Include="Sync\DatabaseServerMessenger.cs" />
     <Compile Include="Sync\DatabaseServerMessengerOptions.cs" />
     <Compile Include="Sync\DatabaseServerRegistrar.cs" />
@@ -1464,7 +1456,6 @@
     <Compile Include="Sync\ServerMessengerBase.cs" />
     <Compile Include="Sync\ServerRole.cs" />
     <Compile Include="Sync\SingleServerRegistrar.cs" />
-    <Compile Include="Sync\WebServiceServerMessenger.cs" />
     <Compile Include="SystemUtilities.cs" />
     <Compile Include="ThreadExtensions.cs" />
     <Compile Include="Collections\TopoGraph.cs" />

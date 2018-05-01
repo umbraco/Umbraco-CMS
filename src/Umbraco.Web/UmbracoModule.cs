@@ -89,7 +89,7 @@ namespace Umbraco.Web
         private void BeginRequest(HttpContextBase httpContext)
         {
             // ensure application url is initialized
-            ((RuntimeState) Current.RuntimeState).EnsureApplicationUrl(UmbracoSettings, GlobalSettings, httpContext.Request);
+            ((RuntimeState) Current.RuntimeState).EnsureApplicationUrl(httpContext.Request);
 
             // do not process if client-side request
             if (httpContext.Request.Url.IsClientSideRequest())

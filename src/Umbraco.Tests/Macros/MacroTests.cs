@@ -68,7 +68,6 @@ namespace Umbraco.Tests.Macros
             Assert.AreEqual(converted.Result, prop.GetValue(ctrl));
         }
 
-        [TestCase("Xslt", true)]
         [TestCase("PartialView", true)]
         [TestCase("UserControl", true)]
         [TestCase("Unknown", false)]

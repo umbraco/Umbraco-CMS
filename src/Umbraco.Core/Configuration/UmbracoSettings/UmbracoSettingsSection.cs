@@ -50,13 +50,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (ScheduledTasksElement)this["scheduledTasks"]; }
         }
 
-        [ConfigurationProperty("distributedCall")]
-        internal DistributedCallElement DistributedCall
-        {
-            get { return (DistributedCallElement)this["distributedCall"]; }
-        }
-        
-
         [ConfigurationProperty("providers")]
         internal ProvidersElement Providers
         {
@@ -103,12 +96,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return ScheduledTasks; }
         }
-
-        IDistributedCallSection IUmbracoSettingsSection.DistributedCall
-        {
-            get { return DistributedCall; }
-        }
-
+        
         IProvidersSection IUmbracoSettingsSection.Providers
         {
             get { return Providers; }

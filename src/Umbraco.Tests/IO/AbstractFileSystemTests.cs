@@ -123,12 +123,12 @@ namespace Umbraco.Tests.IO
             var created = _fileSystem.GetCreated("test.txt");
             var modified = _fileSystem.GetLastModified("test.txt");
 
-            Assert.AreEqual(DateTime.Today.Year, created.Year);
-            Assert.AreEqual(DateTime.Today.Month, created.Month);
+            Assert.AreEqual(DateTime.UtcNow.Year, created.Year);
+            Assert.AreEqual(DateTime.UtcNow.Month, created.Month);
             Assert.AreEqual(DateTime.UtcNow.Date, created.Date);
 
-            Assert.AreEqual(DateTime.Today.Year, modified.Year);
-            Assert.AreEqual(DateTime.Today.Month, modified.Month);
+            Assert.AreEqual(DateTime.UtcNow.Year, modified.Year);
+            Assert.AreEqual(DateTime.UtcNow.Month, modified.Month);
             Assert.AreEqual(DateTime.UtcNow.Date, modified.Date);
 
             _fileSystem.DeleteFile("test.txt");
