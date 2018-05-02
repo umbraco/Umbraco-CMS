@@ -241,8 +241,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (entity.Template == null)
                 entity.Template = entity.ContentType.DefaultTemplate;
 
+            // sanitize names: ensure we have an invariant name, and names are unique-ish
+            // (well, only invariant name is unique at the moment)
             EnsureInvariantNameValues(entity, publishing);
-            // ensure unique name on the same level
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
 
             // ensure that strings don't contain characters that are invalid in xml
@@ -420,8 +421,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, false)).Where<DocumentVersionDto>(x => x.Id == content.PublishedVersionId));
             }
 
+            // sanitize names: ensure we have an invariant name, and names are unique-ish
+            // (well, only invariant name is unique at the moment)
             EnsureInvariantNameValues(entity, publishing);
-            // ensure unique name on the same level
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
 
             // ensure that strings don't contain characters that are invalid in xml
@@ -1080,37 +1082,39 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         #region Utilities
 
         /// <summary>
-        /// This ensures that the Name/PublishName properties are filled in and validates if all names are null
+        /// Ensures that the Name/PublishName properties are filled in and validates if all names are null
         /// </summary>
-        /// <param name="content"></param>
-        /// <returns></returns>
         private void EnsureInvariantNameValues(IContent content, bool publishing)
         {
-            //fixme - if we are saving a variant, we current need to have the invariant name set too, discuss! http://issues.umbraco.org/issue/U4-11286
-            //NOTE - this doesn't deal with the PublishName since that is readonly, instead this scenario is dealt with in `Content.SetPublishInfos`
+            // here we have to ensure we have names and publish names,
+            // and to try and fix the situation if we have no name
+            // see also: U4-11286
 
-            //validate
-
-            if (content.Name.IsNullOrWhiteSpace() && content.Names.Count == 0)
-                throw new InvalidOperationException("Cannot save content with an empty name.");
-
-            if (publishing && content.PublishName.IsNullOrWhiteSpace() && content.PublishNames.Count == 0)
-                throw new InvalidOperationException("Cannot publish content with an empty name.");
-
-            //ensure the invariant Name
-
-            if (content.Name.IsNullOrWhiteSpace() && content.Names.Count > 0)
+            // cannot save without an invariant name
+            if (string.IsNullOrWhiteSpace(content.Name))
             {
+                // no variant name = error
+                if (content.Names.Count == 0)
+                    throw new InvalidOperationException("Cannot save content with an empty name.");
+
+                // else pick the name for the default culture, or any name
                 var defaultCulture = LanguageRepository.GetDefaultIsoCode();
-                if (!defaultCulture.IsNullOrWhiteSpace() && content.Names.TryGetValue(defaultCulture, out var cultureName))
-                {
+                if (defaultCulture != null && content.Names.TryGetValue(defaultCulture, out var cultureName))
                     content.Name = cultureName;
-                }
                 else
-                {
-                    //our only option is to take the first
-                    content.Name = content.Names.First().Value;
-                }
+                    content.Name = content.Names.First().Value; // only option is to take the first
+            }
+
+            // cannot publish without an invariant name
+            if (publishing && string.IsNullOrWhiteSpace(content.PublishName))
+            {
+                // no variant name = error
+                if (content.PublishNames.Count == 0)
+                    throw new InvalidOperationException("Cannot publish content with an empty name.");
+
+                // else... we cannot deal with it here because PublishName is readonly, so in reality, PublishName
+                // should not be null because it should have been set when preparing the content for publish.
+                // see also: Content.SetPublishInfos() - it deals with PublishName
             }
         }
 

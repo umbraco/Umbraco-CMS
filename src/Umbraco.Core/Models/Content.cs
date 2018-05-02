@@ -208,9 +208,16 @@ namespace Umbraco.Core.Models
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentNullOrEmptyException(nameof(name));
 
-            //fixme - we always need to set the invariant values since these cannot be null! discuss http://issues.umbraco.org/issue/U4-11286
-            PublishName = name;
-            PublishDate = date;
+            // this is the only place where we set PublishName (apart from factories etc), and we must ensure
+            // that we do have an invariant name, as soon as we have a variant name, else we would end up not
+            // being able to publish - and not being able to change the name, as PublishName is readonly.
+            // see also: DocumentRepository.EnsureInvariantNameValues() - which deals with Name.
+            // see also: U4-11286
+            if (culture == null || string.IsNullOrEmpty(PublishName))
+            {
+                PublishName = name;
+                PublishDate = date;
+            }
 
             if (culture != null)
             {
