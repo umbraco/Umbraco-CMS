@@ -134,12 +134,6 @@ namespace Umbraco.Core.Models.PublishedContent
             return _content.GetProperty(alias);
         }
 
-        /// <inheritdoc cref="IPublishedContent.GetProperty(string, bool)"/>
-        public virtual IPublishedProperty GetProperty(string alias, bool recurse)
-        {
-            return _content.GetProperty(alias, recurse);
-        }
-
         #endregion
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web
@@ -8,6 +9,22 @@ namespace Umbraco.Web
     /// </summary>
     public static class PublishedPropertyExtension
     {
+        // see notes in PublishedElementExtensions
+        //
+        private static IPublishedValueFallback PublishedValueFallback => Current.PublishedValueFallback;
+
+        #region Value
+
+        public static object Value(this IPublishedProperty property, string culture = null, string segment = null, object defaultValue = default)
+        {
+            if (property.HasValue(culture, segment))
+                return property.GetValue(culture, segment);
+
+            return PublishedValueFallback.GetValue(property, culture, segment, defaultValue);
+        }
+
+        #endregion
+
         #region Value<T>
 
         public static T Value<T>(this IPublishedProperty property, string culture = null, string segment = null, T defaultValue = default)

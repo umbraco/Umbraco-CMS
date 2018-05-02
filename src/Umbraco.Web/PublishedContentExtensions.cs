@@ -20,6 +20,10 @@ namespace Umbraco.Web
     /// </summary>
     public static class PublishedContentExtensions
     {
+        // see notes in PublishedElementExtensions
+        //
+        private static IPublishedValueFallback PublishedValueFallback => Current.PublishedValueFallback;
+
         #region Urls
 
         /// <summary>
@@ -84,6 +88,8 @@ namespace Umbraco.Web
 
         #endregion
 
+        // fixme - .HasValue() and .Value() refactoring - in progress - see exceptions below
+
         #region HasValue
 
         /// <summary>
@@ -96,8 +102,10 @@ namespace Umbraco.Web
         /// <remarks>Returns true if <c>GetProperty(alias, recurse)</c> is not <c>null</c> and <c>GetProperty(alias, recurse).HasValue</c> is <c>true</c>.</remarks>
         public static bool HasValue(this IPublishedContent content, string alias, bool recurse)
         {
-            var prop = content.GetProperty(alias, recurse);
-            return prop != null && prop.HasValue();
+            throw new NotImplementedException("WorkInProgress");
+
+            //var prop = content.GetProperty(alias, recurse);
+            //return prop != null && prop.HasValue();
         }
 
         /// <summary>
@@ -113,9 +121,11 @@ namespace Umbraco.Web
         public static IHtmlString HasValue(this IPublishedContent content, string alias, bool recurse,
             string valueIfTrue, string valueIfFalse = null)
         {
-            return content.HasValue(alias, recurse)
-                ? new HtmlString(valueIfTrue)
-                : new HtmlString(valueIfFalse ?? string.Empty);
+            throw new NotImplementedException("WorkInProgress");
+
+            //return content.HasValue(alias, recurse)
+            //    ? new HtmlString(valueIfTrue)
+            //    : new HtmlString(valueIfFalse ?? string.Empty);
         }
 
         #endregion
@@ -141,9 +151,12 @@ namespace Umbraco.Web
         /// </remarks>
         public static object Value(this IPublishedContent content, string alias,  string culture = null, string segment = null,  object defaultValue = default, bool recurse = false)
         {
-            // fixme - refactor with fallback
-            var property = content.GetProperty(alias, recurse);
-            return property == null || property.HasValue(culture, segment) == false ? defaultValue : property.GetValue();
+            var property = content.GetProperty(alias);
+
+            if (property != null && property.HasValue(culture, segment))
+                return property.GetValue(culture, segment);
+
+            return PublishedValueFallback.GetValue(content, alias, culture, segment, defaultValue, recurse);
         }
 
         #endregion
@@ -170,11 +183,35 @@ namespace Umbraco.Web
         /// </remarks>
         public static T Value<T>(this IPublishedContent content, string alias, string culture = null, string segment = null, T defaultValue = default, bool recurse = false)
         {
-            // fixme - refactor with fallback
-            var property = content.GetProperty(alias, recurse);
-            if (property == null) return defaultValue;
+            var property = content.GetProperty(alias);
 
-            return property.Value(culture, segment, defaultValue);
+            if (property != null && property.HasValue(culture, segment))
+                return property.Value<T>(culture, segment);
+
+            return PublishedValueFallback.GetValue<T>(content, alias, culture, segment, defaultValue, recurse);
+        }
+
+        // fixme - .Value() refactoring - in progress
+        public static IHtmlString Value<T>(this IPublishedContent content, string aliases, Func<T, string> format, string alt = "", bool recurse = false)
+        {
+            var aliasesA = aliases.Split(',');
+            if (aliasesA.Length == 0)
+                return new HtmlString(string.Empty);
+
+            throw new NotImplementedException("WorkInProgress");
+
+            var property = content.GetProperty(aliasesA[0]);
+
+            //var property = aliases.Split(',')
+            //    .Where(x => string.IsNullOrWhiteSpace(x) == false)
+            //    .Select(x => content.GetProperty(x.Trim(), recurse))
+            //    .FirstOrDefault(x => x != null);
+
+            //if (format == null) format = x => x.ToString();
+
+            //return property != null
+            //    ? new HtmlString(format(property.Value<T>()))
+            //    : new HtmlString(alt);
         }
 
         #endregion

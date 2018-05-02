@@ -164,31 +164,6 @@ namespace Umbraco.Web.Models
         /// <inheritdoc cref="IPublishedElement.GetProperty(string)"/>
         public abstract IPublishedProperty GetProperty(string alias);
 
-        /// <inheritdoc cref="IPublishedContent.GetProperty(string, bool)"/>
-        public virtual IPublishedProperty GetProperty(string alias, bool recurse)
-        {
-            // fixme - refactor with fallback
-
-            var property = GetProperty(alias);
-            if (recurse == false) return property;
-
-            IPublishedContent content = this;
-            var firstNonNullProperty = property;
-            while (content != null && (property == null || property.HasValue() == false))
-            {
-                content = content.Parent;
-                property = content?.GetProperty(alias);
-                if (firstNonNullProperty == null && property != null) firstNonNullProperty = property;
-            }
-
-            // if we find a content with the property with a value, return that property
-            // if we find no content with the property, return null
-            // if we find a content with the property without a value, return that property
-            //   have to save that first property while we look further up, hence firstNonNullProperty
-
-            return property != null && property.HasValue() ? property : firstNonNullProperty;
-        }
-
         #endregion
     }
 }

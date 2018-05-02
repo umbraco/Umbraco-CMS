@@ -16,6 +16,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PublishedContent
@@ -33,6 +34,7 @@ namespace Umbraco.Tests.PublishedContent
 
             Container.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
             Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
+            Container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
 
             var logger = Mock.Of<ILogger>();
             var dataTypeService = new TestObjects.TestDataTypeService(

@@ -937,6 +937,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return new PublishedSnapshot(this, preview);
         }
 
+        // gets a new set of elements
+        // always creates a new set of elements,
+        // even though the underlying elements may not change (store snapshots)
         public PublishedSnapshot.PublishedSnapshotElements GetElements(bool previewDefault)
         {
             // note: using ObjectCacheRuntimeCacheProvider for elements and snapshot caches

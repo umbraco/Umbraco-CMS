@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web
@@ -11,6 +12,19 @@ namespace Umbraco.Web
     /// </summary>
     public static class PublishedElementExtensions
     {
+        // lots of debates about accessing dependencies (IPublishedValueFallback) from extension methods, ranging
+        // from "don't do it" i.e. if an extension method is relying on dependencies, a proper service should be
+        // created instead, to discussing method injection vs service locator vs other subtleties, see for example
+        // this post http://marisks.net/2016/12/19/dependency-injection-with-extension-methods/
+        //
+        // point is, we do NOT want a service, we DO want to write model.Value<int>("alias", "fr-FR") and hit
+        // fallback somehow - which pretty much rules out method injection, and basically anything but service
+        // locator - bah, let's face it, it works
+        //
+        // besides, for tests, Current support setting a fallback without even a container
+        //
+        private static IPublishedValueFallback PublishedValueFallback => Current.PublishedValueFallback;
+
         #region IsComposedOf
 
         /// <summary>
@@ -95,10 +109,11 @@ namespace Umbraco.Web
         public static object Value(this IPublishedElement content, string alias, string culture = null, string segment = null, object defaultValue = default)
         {
             var property = content.GetProperty(alias);
-            if (property == null || !property.HasValue(culture, segment)) return defaultValue;
 
-            // note: supporting the "." notation for 'current' is the responsibility of the IPublishedProperty
-            return property.GetValue(culture, segment); // tested HasValue() right above
+            if (property != null && property.HasValue(culture, segment))
+                return property.GetValue(culture, segment);
+
+            return PublishedValueFallback.GetValue(content, alias, culture, segment, defaultValue);
         }
 
         #endregion
@@ -124,10 +139,11 @@ namespace Umbraco.Web
         public static T Value<T>(this IPublishedElement content, string alias, string culture = null, string segment = null, T defaultValue = default)
         {
             var property = content.GetProperty(alias);
-            if (property == null) return defaultValue;
 
-            // note: supporting the "." notation for 'current' is the responsibility of the IPublishedProperty
-            return property.Value(culture, segment, defaultValue);
+            if (property != null && property.HasValue(culture, segment))
+                return property.Value<T>(culture, segment);
+
+            return PublishedValueFallback.GetValue<T>(content, alias, culture, segment, defaultValue);
         }
 
         #endregion
@@ -174,21 +190,6 @@ namespace Umbraco.Web
             var property = aliases.Split(',')
                 .Where(x => string.IsNullOrWhiteSpace(x) == false)
                 .Select(x => content.GetProperty(x.Trim()))
-                .FirstOrDefault(x => x != null);
-
-            return property != null
-                ? new HtmlString(format(property.Value<T>()))
-                : new HtmlString(alt);
-        }
-
-        // todo - that one should move to PublishedContentExtensions
-        public static IHtmlString Value<T>(this IPublishedContent content, string aliases, Func<T, string> format, string alt = "", bool recurse = false)
-        {
-            if (format == null) format = x => x.ToString();
-
-            var property = aliases.Split(',')
-                .Where(x => string.IsNullOrWhiteSpace(x) == false)
-                .Select(x => content.GetProperty(x.Trim(), recurse))
                 .FirstOrDefault(x => x != null);
 
             return property != null

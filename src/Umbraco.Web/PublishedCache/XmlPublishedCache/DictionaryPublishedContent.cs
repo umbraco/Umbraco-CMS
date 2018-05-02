@@ -189,18 +189,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         public override PublishedContentType ContentType => _contentType;
 
-        // override to implement cache
-        //   cache at context level, ie once for the whole request
-        //   but cache is not shared by requests because we wouldn't know how to clear it
-        public override IPublishedProperty GetProperty(string alias, bool recurse)
-        {
-            if (recurse == false) return GetProperty(alias);
-
-            var key = $"XmlPublishedCache.PublishedMediaCache:RecursiveProperty-{Id}-{alias.ToLowerInvariant()}";
-            var cacheProvider = _cacheProvider;
-            return cacheProvider.GetCacheItem<IPublishedProperty>(key, () => base.GetProperty(alias, true));
-        }
-
         private readonly List<string> _keysAdded = new List<string>();
         private int _id;
         private Guid _key;

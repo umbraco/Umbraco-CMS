@@ -359,20 +359,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return property;
         }
 
-        /// <inheritdoc cref="IPublishedContent.GetProperty(string, bool)"/>
-        public override IPublishedProperty GetProperty(string alias, bool recurse)
-        {
-            var property = GetProperty(alias);
-            if (recurse == false) return property;
-
-            var cache = GetAppropriateCache();
-            if (cache == null)
-                return base.GetProperty(alias, true);
-
-            var key = ((Property)property).RecurseCacheKey;
-            return (Property)cache.GetCacheItem(key, () => base.GetProperty(alias, true));
-        }
-
         #endregion
 
         #region Caching

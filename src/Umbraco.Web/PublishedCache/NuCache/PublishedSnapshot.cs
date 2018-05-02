@@ -17,7 +17,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             _service = service;
             _defaultPreview = defaultPreview;
-            SnapshotCache = new ObjectCacheRuntimeCacheProvider();
         }
 
         public class PublishedSnapshotElements : IDisposable
@@ -49,7 +48,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Caches
 
-        public ICacheProvider SnapshotCache { get; }
+        public ICacheProvider SnapshotCache => Elements.SnapshotCache;
 
         public ICacheProvider ElementsCache => Elements.ElementsCache;
 

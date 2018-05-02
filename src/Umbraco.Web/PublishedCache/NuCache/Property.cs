@@ -91,10 +91,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override bool HasValue(string culture = null, string segment = null) => _sourceValue != null
             && (!(_sourceValue is string) || string.IsNullOrWhiteSpace((string) _sourceValue) == false);
 
-        // used to cache the recursive *property* for this property
-        internal string RecurseCacheKey => _recurseCacheKey
-            ?? (_recurseCacheKey = CacheKeys.PropertyRecurse(_contentUid, Alias, _isPreviewing));
-
         // used to cache the CacheValues of this property
         internal string ValuesCacheKey => _valuesCacheKey
             ?? (_valuesCacheKey = CacheKeys.PropertyCacheValues(_contentUid, Alias, _isPreviewing));

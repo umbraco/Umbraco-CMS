@@ -142,7 +142,7 @@ namespace Umbraco.Web.Composing
 
         internal static IPublishedSnapshotService PublishedSnapshotService
             => Container.GetInstance<IPublishedSnapshotService>();
-        
+
         public static ThumbnailProviderCollection ThumbnailProviders
             => Container.GetInstance<ThumbnailProviderCollection>();
 
@@ -256,6 +256,8 @@ namespace Umbraco.Web.Composing
         public static ISqlContext SqlContext=> CoreCurrent.SqlContext;
 
         public static IPublishedContentTypeFactory PublishedContentTypeFactory => CoreCurrent.PublishedContentTypeFactory;
+
+        public static IPublishedValueFallback PublishedValueFallback => CoreCurrent.PublishedValueFallback;
 
         #endregion
     }

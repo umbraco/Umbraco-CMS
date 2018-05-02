@@ -40,6 +40,7 @@ using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Install;
 using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
+using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -206,6 +207,9 @@ namespace Umbraco.Web.Runtime
 
             // register preview SignalR hub
             composition.Container.Register(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>(), new PerContainerLifetime());
+
+            // register properties fallback
+            composition.Container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
         }
 
         internal void Initialize(
@@ -408,7 +412,7 @@ namespace Umbraco.Web.Runtime
                     // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
                     // utilizing an old path
                     appDomainHash);
-                
+
                 //set the file map and composite file default location to the %temp% location
                 BaseCompositeFileProcessingProvider.CompositeFilePathDefaultFolder
                     = XmlFileMapper.FileMapDefaultFolder

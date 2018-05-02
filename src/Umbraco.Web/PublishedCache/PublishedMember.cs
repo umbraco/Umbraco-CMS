@@ -87,15 +87,6 @@ namespace Umbraco.Web.PublishedCache
 
         public override IEnumerable<IPublishedProperty> Properties => _properties;
 
-        public override IPublishedProperty GetProperty(string alias, bool recurse)
-        {
-            if (recurse)
-            {
-                throw new NotSupportedException();
-            }
-            return GetProperty(alias);
-        }
-
         public override IPublishedProperty GetProperty(string alias)
         {
             return _properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));

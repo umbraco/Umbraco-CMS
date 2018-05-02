@@ -173,23 +173,5 @@ namespace Umbraco.Core.Models.PublishedContent
         IEnumerable<IPublishedContent> Children { get; }
 
         #endregion
-
-        #region Properties
-
-        /// <summary>
-        /// Gets a property identified by its alias.
-        /// </summary>
-        /// <param name="alias">The property alias.</param>
-        /// <param name="recurse">A value indicating whether to navigate the tree upwards until a property with a value is found.</param>
-        /// <returns>The property identified by the alias.</returns>
-        /// <remarks>
-        /// <para>Navigate the tree upwards and look for a property with that alias and with a value (ie <c>HasValue</c> is <c>true</c>).
-        /// If found, return the property. If no property with that alias is found, having a value or not, return <c>null</c>. Otherwise
-        /// return the first property that was found with the alias but had no value (ie <c>HasValue</c> is <c>false</c>).</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        IPublishedProperty GetProperty(string alias, bool recurse);
-
-        #endregion
     }
 }

@@ -368,6 +368,7 @@
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
+    <Compile Include="Models\PublishedContent\NoopPublishedValueFallback.cs" />
     <Compile Include="Models\PublishedContent\PublishedCultureInfos.cs" />
     <Compile Include="Models\PublishedContent\IVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\IPublishedValueFallback.cs" />
