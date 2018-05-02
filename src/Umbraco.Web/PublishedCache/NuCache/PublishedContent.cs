@@ -27,7 +27,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _contentNode = contentNode;
             _contentData = contentData;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
-            VariationContextAccessor = variationContextAccessor; // fixme why is this a property? should be be on the base class?
+            VariationContextAccessor = variationContextAccessor;
 
             _urlSegment = _contentData.Name.ToUrlSegment();
             IsPreviewing = _contentData.Published == false;
@@ -399,6 +399,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Internal
 
+        // used by property
         internal IVariationContextAccessor VariationContextAccessor { get; }
 
         // used by navigable content

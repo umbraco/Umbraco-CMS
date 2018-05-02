@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Xml.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -163,7 +162,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var k = new CompositeStringStringKey(culture, segment);
             if (!_sourceValues.TryGetValue(k, out var vvalue))
-                _sourceValues[k] = vvalue = new SourceInterValue { Culture = culture, Segment = segment, SourceValue = GetSourceValue(culture, segment) }; // fixme where is the source?
+                _sourceValues[k] = vvalue = new SourceInterValue { Culture = culture, Segment = segment, SourceValue = GetSourceValue(culture, segment) };
 
             if (vvalue.InterInitialized) return vvalue.InterValue;
             vvalue.InterValue = PropertyType.ConvertSourceToInter(_content, vvalue.SourceValue, _isPreviewing);

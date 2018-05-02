@@ -22,7 +22,7 @@ namespace Umbraco.Web.Routing
 
             //ok so it's a custom route with published content assigned, check if the id being requested for is the same id as the assigned published content
             return content.Id == umbracoContext.PublishedRequest.PublishedContent.Id
-                ? umbracoContext.PublishedRequest.PublishedContent.GetUrl(culture) // fixme ∞ loop.
+                ? umbracoContext.PublishedRequest.PublishedContent.GetUrl(culture)
                 : null;
         }
 

@@ -160,7 +160,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNotNull(publishedContent);
             Assert.AreEqual("It Works1!", publishedContent.Name);
             Assert.AreEqual("val1", publishedContent.Value<string>("prop"));
-            Assert.AreEqual("val-fr1", publishedContent.Value<string>("prop", "fr-FR")); // fixme wtf is happening here?
+            Assert.AreEqual("val-fr1", publishedContent.Value<string>("prop", "fr-FR"));
             Assert.AreEqual("val-uk1", publishedContent.Value<string>("prop", "en-UK"));
 
             Assert.AreEqual("name-fr1", publishedContent.GetCulture("fr-FR").Name);
