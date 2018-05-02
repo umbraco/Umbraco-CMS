@@ -16,6 +16,7 @@ using System.Web.Security;
 using Umbraco.Core.Strings;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core
