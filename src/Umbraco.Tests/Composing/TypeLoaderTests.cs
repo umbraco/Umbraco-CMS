@@ -272,14 +272,14 @@ AnotherContentFinder
         public void Resolves_Actions()
         {
             var actions = _typeLoader.GetActions();
-            Assert.AreEqual(37, actions.Count());
+            Assert.AreEqual(35, actions.Count());
         }
 
         [Test]
         public void Resolves_Trees()
         {
             var trees = _typeLoader.GetTrees();
-            Assert.AreEqual(5, trees.Count());
+            Assert.AreEqual(4, trees.Count());
         }
 
         [Test]
@@ -288,14 +288,7 @@ AnotherContentFinder
             var types = _typeLoader.GetDataEditors();
             Assert.AreEqual(43, types.Count());
         }
-
-        [Test]
-        public void Resolves_XsltExtensions()
-        {
-            var types = _typeLoader.GetXsltExtensions();
-            Assert.AreEqual(3, types.Count());
-        }
-
+        
         /// <summary>
         /// This demonstrates this issue: http://issues.umbraco.org/issue/U4-3505 - the TypeList was returning a list of assignable types
         /// not explicit types which is sort of ideal but is confusing so we'll do it the less confusing way.
@@ -317,12 +310,6 @@ AnotherContentFinder
             var shouldNotFind = types.SingleOrDefault(x => x.BaseType == typeof (IDataEditor) && x.AttributeType == null);
 
             Assert.IsNull(shouldNotFind);
-        }
-
-        [XsltExtension("Blah.Blah")]
-        public class MyXsltExtension
-        {
-
         }
 
         public interface IFindMe : IDiscoverable

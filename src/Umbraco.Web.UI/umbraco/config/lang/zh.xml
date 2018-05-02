@@ -393,8 +393,6 @@
     <key alias="macroErrorLoadingUsercontrol">加载 userControl 时出错 '%0%'</key>
     <key alias="macroErrorLoadingCustomControl">加载 customControl 时出错(程序集: %0%, 类型: '%1%')</key>
     <key alias="macroErrorLoadingMacroEngineScript">加载 MacroEngine 脚本时出错 (文件: %0%)</key>
-    <key alias="macroErrorParsingXSLTFile">"解析 xslt 文件时出错: %0%</key>
-    <key alias="macroErrorReadingXSLTFile">"读取 xslt 文件时出错: %0%</key>
     <key alias="missingTitle">请输入标题</key>
     <key alias="missingType">请选择类型</key>
     <key alias="pictureResizeBiggerThanOrg">图片尺寸大于原始尺寸不会提高图片质量，您确定要把图片尺寸变大吗?</key>
@@ -405,8 +403,6 @@
     <key alias="stylesNoStylesOnPage">没有可用的样式</key>
     <key alias="tableColMergeLeft">请把光标放在您要合并的两个单元格中的左边单元格</key>
     <key alias="tableSplitNotSplittable">非合并单元格不能分离。</key>
-    <key alias="xsltErrorHeader">XSLT源码出错</key>
-    <key alias="xsltErrorText">XSLT未保存，因为包含错误。</key>
     <key alias="missingPropertyEditorErrorMessage">此属性使用的数据类型存在配置错误, 请检查数据类型</key>
   </area>
   <area alias="general">
@@ -992,11 +988,6 @@
     <key alias="templateErrorText">模板别名相同</key>
     <key alias="templateSavedHeader">模板已保存</key>
     <key alias="templateSavedText">模板保存，无错误。</key>
-    <key alias="xsltErrorHeader">XSLT未保存</key>
-    <key alias="xsltErrorText">XSLT有错误</key>
-    <key alias="xsltPermissionErrorText">XSLT无法保存，请检查权限。</key>
-    <key alias="xsltSavedHeader">XSLT已保存</key>
-    <key alias="xsltSavedText">XSLT无错误</key>
     <key alias="contentUnpublished">未发布内容</key>
     <key alias="partialViewSavedHeader">片段视图已保存</key>
     <key alias="partialViewSavedText">片段视图保存，无错误。</key>
@@ -1247,7 +1238,6 @@
     <key alias="scripts">脚本</key>
     <key alias="stylesheets">样式表</key>
     <key alias="templates">模板</key>
-    <key alias="xslt">XSLT文件</key>
     <key alias="userPermissions">用户权限</key>
     <key alias="users">Users</key>
     <key alias="partialViews">分部视图</key>

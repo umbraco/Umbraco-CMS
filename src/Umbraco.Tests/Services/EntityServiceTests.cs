@@ -549,7 +549,6 @@ namespace Umbraco.Tests.Services
             var objectTypeId = Constants.ObjectTypes.ContentItem;
 
             Assert.Throws<NotSupportedException>(() => service.GetAll<IContentBase>());
-            Assert.Throws<NotSupportedException>(() => service.GetAll(UmbracoObjectTypes.ContentItem));
             Assert.Throws<NotSupportedException>(() => service.GetAll(objectTypeId));
         }
 

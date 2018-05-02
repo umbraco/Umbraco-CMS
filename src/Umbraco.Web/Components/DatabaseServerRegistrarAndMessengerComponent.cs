@@ -50,9 +50,6 @@ namespace Umbraco.Web.Components
 
         public override void Compose(Composition composition)
         {
-            //fixme inject IUmbracoSettingsSection
-            if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled) return;
-
             composition.SetServerMessenger(factory =>
             {
                 var runtime = factory.GetInstance<IRuntimeState>();
@@ -96,8 +93,6 @@ namespace Umbraco.Web.Components
 
         public void Initialize(IRuntimeState runtime, IServerRegistrar serverRegistrar, IServerMessenger serverMessenger, IServerRegistrationService registrationService, ILogger logger, IExamineManager examineManager)
         {
-            if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled) return;
-
             _registrar = serverRegistrar as DatabaseServerRegistrar;
             if (_registrar == null) throw new Exception("panic: registar.");
 

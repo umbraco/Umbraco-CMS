@@ -334,7 +334,7 @@ namespace Umbraco.Tests.Scoping
                 : base(false)
             { }
 
-            protected override void DeliverRemote(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
+            protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
             {
                 throw new NotImplementedException();
             }

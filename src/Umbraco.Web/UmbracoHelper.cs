@@ -890,19 +890,7 @@ namespace Umbraco.Web
         {
             return StringUtilities.ReplaceLineBreaksForHtml(text);
         }
-
-        /// <summary>
-        /// Returns an MD5 hash of the string specified
-        /// </summary>
-        /// <param name="text">The text to create a hash from</param>
-        /// <returns>Md5 has of the string</returns>
-        [Obsolete("Please use the CreateHash method instead. This may be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public string CreateMd5Hash(string text)
-        {
-            return text.ToMd5();
-        }
-
+        
         /// <summary>
         /// Generates a hash based on the text string passed in.  This method will detect the
         /// security requirements (is FIPS enabled) and return an appropriate hash.

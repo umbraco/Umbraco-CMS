@@ -488,8 +488,6 @@
     <key alias="stylesNoStylesOnPage">Der er ingen aktive styles eller formatteringer på denne side</key>
     <key alias="tableColMergeLeft">Du skal stå til venstre for de 2 celler du ønsker at samle!</key>
     <key alias="tableSplitNotSplittable">Du kan ikke opdele en celle, som ikke allerede er delt.</key>
-    <key alias="xsltErrorHeader">Fejl i XSLT kode</key>
-    <key alias="xsltErrorText">Din XSLT er ikke opdateret, da det indeholdt en fejl</key>
     <key alias="missingPropertyEditorErrorMessage">Der er et problem med den datatype, der bruges til denn egenskab. Kontroller konfigurationen og prøv igen.</key>
   </area>
   <area alias="general">
@@ -1058,11 +1056,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="templateErrorText">Undgå venligst at du har 2 templates med samme alias</key>
     <key alias="templateSavedHeader">Skabelon gemt</key>
     <key alias="templateSavedText">Skabelon gemt uden fejl!</key>
-    <key alias="xsltErrorHeader">XSLT'en blev ikke gemt</key>
-    <key alias="xsltErrorText">XSLT'en indeholdt fejl</key>
-    <key alias="xsltPermissionErrorText">XSLT kunne ikke gemmes, check filrettigheder</key>
-    <key alias="xsltSavedHeader">XSLT gemt</key>
-    <key alias="xsltSavedText">Der var ingen fejl i din XSLT!</key>
     <key alias="contentUnpublished">Indhold fjernet fra udgivelse</key>
     <key alias="partialViewSavedHeader">Partial view gemt</key>
     <key alias="partialViewSavedText">Partial view gemt uden fejl!</key>
@@ -1313,7 +1306,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="scripts">Scripts</key>
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Skabeloner</key>
-    <key alias="xslt">XSLT-filer</key>
     <key alias="analytics">Analytics</key>
     <key alias="userPermissions">Brugertilladelser</key>
     <key alias="userTypes">Bruger Typer</key>

@@ -378,8 +378,6 @@
     <key alias="macroErrorLoadingUsercontrol">讀取使用者控制項 %0% 錯誤</key>
     <key alias="macroErrorLoadingCustomControl">讀取使用者控制項 %0% 錯誤（組件：%0%，類別：%1%）</key>
     <key alias="macroErrorLoadingMacroEngineScript">讀取巨集引擎腳本錯誤（檔案：%0%）</key>
-    <key alias="macroErrorParsingXSLTFile">分析XSLT檔案錯誤：%0%</key>
-    <key alias="macroErrorReadingXSLTFile">讀取XSLT檔案錯誤：%0%</key>
     <key alias="missingTitle">請輸入標題</key>
     <key alias="missingType">請選擇類型</key>
     <key alias="pictureResizeBiggerThanOrg">圖片尺寸大於原始尺寸不會提高圖片品質，您確定要把圖片尺寸變大嗎?</key>
@@ -390,8 +388,6 @@
     <key alias="stylesNoStylesOnPage">沒有可用的樣式</key>
     <key alias="tableColMergeLeft">請把游標放在您要合併的兩個儲存格中的左邊儲存格</key>
     <key alias="tableSplitNotSplittable">非合併儲存格不能分離。</key>
-    <key alias="xsltErrorHeader">XSLT源碼出錯</key>
-    <key alias="xsltErrorText">XSLT未保存，因為包含錯誤。</key>
     <key alias="missingPropertyEditorErrorMessage">這是此屬性所使用的資料類別設定錯誤，請檢查資料類別</key>
   </area>
   <area alias="general">
@@ -959,11 +955,6 @@
     <key alias="templateErrorText">範本別名相同</key>
     <key alias="templateSavedHeader">範本已保存</key>
     <key alias="templateSavedText">範本保存，無錯誤。</key>
-    <key alias="xsltErrorHeader">XSLT未保存</key>
-    <key alias="xsltErrorText">XSLT有錯誤</key>
-    <key alias="xsltPermissionErrorText">XSLT無法保存，請檢查許可權。</key>
-    <key alias="xsltSavedHeader">XSLT已保存</key>
-    <key alias="xsltSavedText">XSLT無錯誤</key>
     <key alias="contentUnpublished">內容已取消發佈</key>
     <key alias="partialViewSavedHeader">片段視圖已保存</key>
     <key alias="partialViewSavedText">片段視圖保存，無錯誤。</key>
@@ -1186,7 +1177,6 @@
     <key alias="scripts">腳本</key>
     <key alias="stylesheets">樣式表</key>
     <key alias="templates">範本</key>
-    <key alias="xslt">XSLT文件</key>
     <key alias="analytics">統計</key>
   </area>
   <area alias="update">

@@ -342,8 +342,6 @@
     <key alias="stylesNoStylesOnPage">Keine aktiven Stile vorhanden</key>
     <key alias="tableColMergeLeft">Bitte platzieren Sie den Mauszeiger in die erste der zusammenzuführenden Zellen</key>
     <key alias="tableSplitNotSplittable">Sie können keine Zelle trennen, die nicht zuvor aus mehreren zusammengeführt wurde.</key>
-    <key alias="xsltErrorHeader">Fehler im XSLT</key>
-    <key alias="xsltErrorText">Das XSLT ist fehlerhaft und wurde daher nicht gespeichert.</key>
     <key alias="missingPropertyEditorErrorMessage">Es liegt ein Konfigurationsfehler beim Datentyp dieser Eigenschaft vor. Bitte prüfen Sie den Datentyp bzw. die Eigenschaft.</key>
   </area>
   <area alias="general">
@@ -817,11 +815,6 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="templateErrorText">Bitte prüfen Sie, ob möglicherweise zwei Vorlagen den gleichen Alias verwenden.</key>
     <key alias="templateSavedHeader">Vorlage gespeichert</key>
     <key alias="templateSavedText">Vorlage erfolgreich gespeichert!</key>
-    <key alias="xsltErrorHeader">XSLT nicht gespeichert</key>
-    <key alias="xsltErrorText">Das XSLT enthält Fehler</key>
-    <key alias="xsltPermissionErrorText">XSLT kann nicht gespeichert werden. Bitte überprüfen Sie die Schreibrechte auf Dateiebene.</key>
-    <key alias="xsltSavedHeader">XSLT gespeichert</key>
-    <key alias="xsltSavedText">Keine Fehler im XSLT</key>
     <key alias="contentUnpublished">Veröffentlichung des Inhalts aufgehoben</key>
     <key alias="partialViewSavedHeader">Partielle Ansicht gespeichert</key>
     <key alias="partialViewSavedText">Partielle Ansicht ohne Fehler gespeichert.</key>
@@ -982,7 +975,6 @@ Ihr freundlicher Umbraco-Robot
     <key alias="scripts">Client-Skripte</key>
     <key alias="stylesheets">Stylesheets</key>
     <key alias="templates">Vorlagen</key>
-    <key alias="xslt">XSLT-Dateien</key>
     <key alias="analytics">Auswertungen</key>
     <key alias="userPermissions">Berechtigungen</key>
     <key alias="userTypes">Benutzertypen</key>

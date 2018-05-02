@@ -31,7 +31,5 @@ namespace Umbraco.Web.Trees
             treeNode.AdditionalData["jsClickCallback"] = "javascript:void(0);";
             treeNode.Icon = "icon-article";
         }
-
-        protected override bool EnableCreateOnFolder => true;
     }
 }

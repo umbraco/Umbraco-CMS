@@ -34,18 +34,6 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.Null)]
         public string Name { get; set; }
 
-        [Column("macroScriptType")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public string ScriptType { get; set; }
-
-        [Column("macroScriptAssembly")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public string ScriptAssembly { get; set; }
-
-        [Column("macroXSLT")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public string Xslt { get; set; }
-
         [Column("macroCacheByPage")]
         [Constraint(Default = "1")]
         public bool CacheByPage { get; set; }
@@ -58,10 +46,13 @@ namespace Umbraco.Core.Persistence.Dtos
         [Constraint(Default = "0")]
         public bool DontRender { get; set; }
 
-        //TODO: Rename this column! - actually please revamp all of the macros! :)
-        [Column("macroPython")]
-        [NullSetting(NullSetting = NullSettings.Null)]
-        public string MacroFilePath { get; set; }
+        [Column("macroSource")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        public string MacroSource { get; set; }
+
+        [Column("macroType")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        public int MacroType { get; set; }
 
         [ResultColumn]
         [Reference(ReferenceType.Many, ReferenceMemberName = "Macro")]

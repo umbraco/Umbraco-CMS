@@ -398,19 +398,6 @@ namespace umbraco
             return GetUmbracoHelper().MemberHasAccess(NodeId, Path);
         }
 
-
-        /// <summary>
-        /// Returns an MD5 hash of the string specified
-        /// </summary>
-        /// <param name="text">The text to create a hash from</param>
-        /// <returns>Md5 hash of the string</returns>
-        [Obsolete("Please use the CreateHash method instead. This may be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static string md5(string text)
-        {
-            return text.ToMd5();
-        }
-
         /// <summary>
         /// Generates a hash based on the text string passed in.  This method will detect the
         /// security requirements (is FIPS enabled) and return an appropriate hash.
@@ -756,34 +743,6 @@ namespace umbraco
         }
 
         /// <summary>
-        /// Renders the content of a macro. Uses the normal template umbraco macro markup as input.
-        /// This only works properly with xslt macros.
-        /// Python and .ascx based macros will not render properly, as viewstate is not included.
-        /// </summary>
-        /// <param name="Text">The macro markup to be rendered.</param>
-        /// <param name="PageId">The page id.</param>
-        /// <returns>The rendered macro as a string</returns>
-        public static string RenderMacroContent(string Text, int PageId)
-        {
-            try
-            {
-                var p = new page(GetSafeContentCache().GetById(PageId));
-                template t = new template(p.Template);
-                Control c = t.parseStringBuilder(new StringBuilder(Text), p);
-
-                StringWriter sw = new StringWriter();
-                HtmlTextWriter hw = new HtmlTextWriter(sw);
-                c.RenderControl(hw);
-
-                return sw.ToString();
-            }
-            catch (Exception ee)
-            {
-                return string.Format("<!-- Error generating macroContent: '{0}' -->", ee);
-            }
-        }
-
-        /// <summary>
         /// Renders a template.
         /// </summary>
         /// <param name="PageId">The page id.</param>
@@ -791,37 +750,20 @@ namespace umbraco
         /// <returns>The rendered template as a string</returns>
         public static string RenderTemplate(int PageId, int TemplateId)
         {
-            if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
+            using (var sw = new StringWriter())
             {
-                using (var sw = new StringWriter())
+                try
                 {
-                    try
-                    {
-                        var altTemplate = TemplateId == -1 ? null : (int?)TemplateId;
-                        var templateRenderer = new TemplateRenderer(Umbraco.Web.UmbracoContext.Current, PageId, altTemplate);
-                        templateRenderer.Render(sw);
-                    }
-                    catch (Exception ee)
-                    {
-                        sw.Write("<!-- Error rendering template with id {0}: '{1}' -->", PageId, ee);
-                    }
-
-                    return sw.ToString();
+                    var altTemplate = TemplateId == -1 ? null : (int?)TemplateId;
+                    var templateRenderer = new TemplateRenderer(Umbraco.Web.UmbracoContext.Current, PageId, altTemplate);
+                    templateRenderer.Render(sw);
                 }
-            }
-            else
-            {
-                var p = new page(GetSafeContentCache().GetById(PageId));
-                p.RenderPage(TemplateId);
-                var c = p.PageContentControl;
-
-                using (var sw = new StringWriter())
-                using(var hw = new HtmlTextWriter(sw))
+                catch (Exception ee)
                 {
-                    c.RenderControl(hw);
-                    return sw.ToString();
+                    sw.Write("<!-- Error rendering template with id {0}: '{1}' -->", PageId, ee);
                 }
 
+                return sw.ToString();
             }
         }
 

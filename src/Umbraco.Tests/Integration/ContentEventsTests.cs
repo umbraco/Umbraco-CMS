@@ -14,8 +14,10 @@ using Umbraco.Core.Sync;
 using Umbraco.Tests.Cache.DistributedCache;
 using Umbraco.Tests.Services;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Cache;
+using static Umbraco.Tests.Cache.DistributedCache.DistributedCacheTests;
 
 namespace Umbraco.Tests.Integration
 {
@@ -50,8 +52,8 @@ namespace Umbraco.Tests.Integration
         {
             base.Compose();
 
-            Container.Register<IServerRegistrar>(_ => new DistributedCacheTests.TestServerRegistrar()); // localhost-only
-            Container.Register<IServerMessenger, WebServiceServerMessenger>(new PerContainerLifetime());
+            Container.Register<IServerRegistrar>(_ => new TestServerRegistrar()); // localhost-only
+            Container.Register<IServerMessenger, LocalServerMessenger>(new PerContainerLifetime());
 
             Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add<ContentTypeCacheRefresher>()
@@ -2234,5 +2236,15 @@ namespace Umbraco.Tests.Integration
         // all content type events
 
         #endregion
+
+        public class LocalServerMessenger : ServerMessengerBase
+        {
+            public LocalServerMessenger() : base(false)
+            { }
+
+            protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
+            {
+            }
+        }
     }
 }

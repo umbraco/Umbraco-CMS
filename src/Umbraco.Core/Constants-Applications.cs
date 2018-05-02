@@ -121,9 +121,7 @@
             public const string Templates = "templates";
 
             public const string RelationTypes = "relationTypes";
-
-            public const string Xslt = "xslt";
-
+            
             public const string Languages = "languages";
 
             /// <summary>

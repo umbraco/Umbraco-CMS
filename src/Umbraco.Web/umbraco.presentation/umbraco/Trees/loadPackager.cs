@@ -16,7 +16,6 @@ namespace umbraco
     [Obsolete("This is no longer used and will be removed from the codebase in the future")]
     public class loadPackager : BaseTree
     {
-        #region TreeI Members
         public loadPackager(string application) : base(application) { }
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {
@@ -78,10 +77,9 @@ namespace umbraco
         {
             string[,] items = { { "BrowseRepository.aspx", "Install from repository" }, { "CreatePackage.aspx", "Created Packages" }, { "installedPackages.aspx", "Installed packages" }, { "StarterKits.aspx", "Starter kit" }, { "installer.aspx", "Install local package" } };
 
-
-            for (int i = 0; i <= items.GetUpperBound(0); i++)
+            for (var i = 0; i <= items.GetUpperBound(0); i++)
             {
-                XmlTreeNode xNode = XmlTreeNode.Create(this);
+                var xNode = XmlTreeNode.Create(this);
                 xNode.NodeID = (i + 1).ToInvariantString();
                 xNode.Text = items[i, 1];
                 xNode.Icon = "icon-folder";
@@ -95,7 +93,7 @@ namespace umbraco
 
                         if (cms.businesslogic.packager.InstalledPackage.GetAllInstalledPackages().Count > 0)
                         {
-                            xNode.Source = "tree.aspx?app=" + this._app + "&id=" + this._id + "&treeType=packagerPackages&packageType=installed" + "&rnd=" + Guid.NewGuid();
+                            xNode.Source = $"tree.aspx?app={_app}&id={_id}&treeType=packagerPackages&packageType=installed&rnd={Guid.NewGuid()}";
                             xNode.NodeType = "installedPackages";
                             xNode.Text =  Services.TextService.Localize("treeHeaders/installedPackages");
                             xNode.HasChildren = true;
@@ -104,45 +102,22 @@ namespace umbraco
                         {
                             xNode.Text = "";
                         }
-
                         xNode.Action = "javascript:void(0);";
-
                         break;
 
 
                     case "BrowseRepository.aspx":
+                        xNode.Text = Constants.PackageRepository.DefaultRepositoryName;
+                        xNode.Source = $"tree.aspx?app={_app}&id={_id}&treeType=packagerPackages&packageType=repository&repoGuid={Constants.PackageRepository.DefaultRepositoryId}&rnd={Guid.NewGuid()}";
 
-                        /*
-                        //Gets all the repositories registered in umbracoSettings.config
-                        var repos = cms.businesslogic.packager.repositories.Repository.getAll();
-
-
-                        //if more then one repo, then list them as child nodes under the "Install from repository" node.
-                        // the repositories will then be fetched from the loadPackages class.
-                        if (repos.Count > 1)
-                        {
-                            xNode.Source = "tree.aspx?app=" + this._app + "&id=" + this._id + "&treeType=packagerPackages&packageType=repositories" + "&rnd=" + Guid.NewGuid();
-                            xNode.NodeType = "packagesRepositories";
-                            xNode.Text = Services.TextService.Localize("treeHeaders/repositories");
-                            xNode.HasChildren = true;
-                        }
-                        */
-                        //if only one repo, then just list it directly and name it as the repository.
-                        //the packages will be loaded from the loadPackages class with a repoAlias querystring
-                        var repos = cms.businesslogic.packager.repositories.Repository.getAll();
-
-                        xNode.Text = repos[0].Name;
-                        xNode.Source = "tree.aspx?app=" + this._app + "&id=" + this._id + "&treeType=packagerPackages&packageType=repository&repoGuid=" + repos[0].Guid + "&rnd=" + Guid.NewGuid();
                         xNode.NodeType = "packagesRepository";
-                        xNode.Action = "javascript:openPackageCategory('BrowseRepository.aspx?repoGuid=" + repos[0].Guid + "');";
+                        xNode.Action = $"javascript:openPackageCategory(\'BrowseRepository.aspx?repoGuid={Constants.PackageRepository.DefaultRepositoryId}\');";
                         xNode.Icon = "icon-server-alt";
                         xNode.HasChildren = true;
-
                         break;
 
-
                     case "CreatePackage.aspx":
-                        xNode.Source = "tree.aspx?app=" + this._app + "&id=" + this._id + "&treeType=packagerPackages&packageType=created" + "&rnd=" + Guid.NewGuid();
+                        xNode.Source = $"tree.aspx?app={_app}&id={_id}&treeType=packagerPackages&packageType=created&rnd={Guid.NewGuid()}";
                         xNode.NodeType = "createdPackages";
                         xNode.Menu.Clear();
                         xNode.Menu.Add(ActionNew.Instance);
@@ -150,14 +125,13 @@ namespace umbraco
                         xNode.Text = Services.TextService.Localize("treeHeaders/createdPackages");
                         xNode.HasChildren = true;
                         xNode.Action = "javascript:void(0);";
-
                         break;
 
                     case "installer.aspx":
                         xNode.Source = "";
                         xNode.NodeType = "uploadPackage";
                         xNode.Icon = "icon-page-up";
-                        xNode.Action = "javascript:openPackageCategory('" + items[i, 0] + "');";
+                        xNode.Action = $"javascript:openPackageCategory(\'{items[i, 0]}\');";
                         xNode.Text = Services.TextService.Localize("treeHeaders/localPackage");
                         xNode.Menu.Clear();
                         break;
@@ -165,7 +139,7 @@ namespace umbraco
                     case "StarterKits.aspx":
                         xNode.Source = "";
                         xNode.NodeType = "starterKits";
-                        xNode.Action = "javascript:openPackageCategory('" + items[i, 0] + "');";
+                        xNode.Action = $"javascript:openPackageCategory(\'{items[i, 0]}\');";
                         xNode.Icon = "icon-flash";
                         xNode.Text = Services.TextService.Localize("treeHeaders/installStarterKit");
                         xNode.Menu.Clear();
@@ -181,7 +155,4 @@ namespace umbraco
 
         }
     }
-
-        #endregion
-
 }

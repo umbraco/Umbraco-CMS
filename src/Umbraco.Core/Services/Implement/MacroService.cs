@@ -26,24 +26,6 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
-        /// Returns an enum <see cref="MacroTypes"/> based on the properties on the Macro
-        /// </summary>
-        /// <returns><see cref="MacroTypes"/></returns>
-        internal static MacroTypes GetMacroType(IMacro macro)
-        {
-            if (string.IsNullOrEmpty(macro.XsltPath) == false)
-                return MacroTypes.Xslt;
-
-            if (string.IsNullOrEmpty(macro.ScriptPath) == false)
-                return MacroTypes.PartialView;
-
-            if (string.IsNullOrEmpty(macro.ControlType) == false && macro.ControlType.InvariantContains(".ascx"))
-                return MacroTypes.UserControl;
-
-            return MacroTypes.Unknown;
-        }
-
-        /// <summary>
         /// Gets an <see cref="IMacro"/> object by its alias
         /// </summary>
         /// <param name="alias">Alias to retrieve an <see cref="IMacro"/> for</param>

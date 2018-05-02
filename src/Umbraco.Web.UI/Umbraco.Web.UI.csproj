@@ -173,13 +173,6 @@
     <Compile Include="Umbraco\Create.aspx.designer.cs">
       <DependentUpon>create.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Create\xslt.ascx.cs">
-      <DependentUpon>xslt.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Create\xslt.ascx.designer.cs">
-      <DependentUpon>xslt.ascx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\Dashboard\UserControlProxy.aspx.cs">
       <DependentUpon>UserControlProxy.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -235,20 +228,6 @@
     <Compile Include="Umbraco\Masterpages\UmbracoPage.master.designer.cs">
       <DependentUpon>umbracoPage.Master</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx.cs">
-      <DependentUpon>editstylesheet.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx.designer.cs">
-      <DependentUpon>editstylesheet.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx.cs">
-      <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx.designer.cs">
-      <DependentUpon>EditStyleSheetProperty.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Umbraco\TreeInit.aspx.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -295,10 +274,6 @@
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\Dashboard\UserControlProxy.aspx" />
-    <Content Include="Umbraco\Xslt\Web.config">
-      <SubType>
-      </SubType>
-    </Content>
     <Content Include="Umbraco\Install\Views\Web.config" />
     <Content Include="App_Plugins\ModelsBuilder\package.manifest" />
     <None Include="Config\404handlers.Release.config">
@@ -419,25 +394,8 @@
     <Content Include="Umbraco_Client\Ui\knockout.js" />
     <Content Include="Umbraco_Client\Ui\knockout.mapping.js" />
     <Content Include="Umbraco\endPreview.aspx" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\Breadcrumb.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\Clean.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListSubPagesAsThumbnails.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListSubPagesByDateAndLimit.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListSubPagesByDocumentType.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListSubPagesByLevel.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListSubPagesFromAChangableSource.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListSubPagesFromCurrentPage.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListThumbnailsFromCurrentPage.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\ListWholeStructureFromCurrentPage.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\NavigationPrototype.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\RelatedLinks.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\RSSFeed.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\Sitemap.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Schema2\TablePrototype.xslt" />
     <Content Include="Umbraco\Dialogs\Preview.aspx" />
-    <Content Include="Umbraco\Controls\ProgressBar.ascx" />
     <Content Include="Umbraco\Controls\Tree\TreeControl.ascx" />
-    <Content Include="Umbraco_Client\CodeArea\UmbracoEditor.js" />
     <Content Include="default.aspx" />
     <Content Include="Umbraco\Config\Lang\da.xml" />
     <Content Include="Umbraco\Config\Lang\de.xml" />
@@ -449,10 +407,8 @@
     <Content Include="Umbraco\Config\Lang\sv.xml" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.cookie.js" />
     <Content Include="Umbraco_Client\Tablesorting\Img\bg.gif" />
-    <Content Include="Umbraco\Developer\Xslt\xsltVisualize.aspx" />
     <Content Include="Umbraco\Dialogs\empty.htm" />
     <Content Include="Umbraco\Dialogs\republish.aspx" />
-    <Content Include="Umbraco\Dialogs\search.aspx" />
     <Content Include="Umbraco\Dialogs\SendPublish.aspx" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery-fieldselection.js" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.metadata.min.js" />
@@ -469,7 +425,6 @@
     <Content Include="Umbraco\Dialogs\exportDocumenttype.aspx" />
     <Content Include="Umbraco\Dialogs\importDocumenttype.aspx" />
     <Content Include="Umbraco\Dialogs\notifications.aspx" />
-    <Content Include="Umbraco\Developer\Packages\installer.aspx" />
     <Content Include="Umbraco\Dialogs\protectPage.aspx" />
     <Content Include="Umbraco\Dialogs\rollBack.aspx" />
     <Content Include="Umbraco\Dialogs\sendToTranslation.aspx" />
@@ -566,26 +521,12 @@
     <Content Include="Umbraco\Masterpages\umbracoPage.Master" />
     <Content Include="Umbraco\Masterpages\umbracoDialog.Master" />
     <Content Include="Umbraco\Webservices\CheckForUpgrade.asmx" />
-    <Content Include="Umbraco\Xslt\searchResult.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\RelatedLinks.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\RSSFeed.xslt" />
     <Content Include="Umbraco\Settings\DictionaryItemList.aspx" />
     <Content Include="Umbraco\Translation\default.aspx" />
     <Content Include="Umbraco\Translation\preview.aspx" />
     <Content Include="Umbraco\Translation\xml.aspx" />
-    <Content Include="Umbraco\Create\language.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
     <Content Include="Umbraco\Create\simple.ascx" />
-    <Content Include="Umbraco\Create\xslt.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
-    <Content Include="Umbraco\Developer\Macros\assemblyBrowser.aspx" />
     <Content Include="Umbraco\Developer\Macros\editMacro.aspx" />
-    <Content Include="Umbraco\Developer\Xslt\editXslt.aspx" />
-    <Content Include="Umbraco\Developer\Xslt\getXsltStatus.asmx" />
-    <Content Include="Umbraco\Developer\Xslt\xsltChooseExtension.aspx" />
-    <Content Include="Umbraco\Developer\Xslt\xsltInsertValueOf.aspx" />
     <Content Include="Umbraco\Js\dualSelectBox.js" />
     <Content Include="Umbraco\Js\guiFunctions.js" />
     <Content Include="Umbraco\Js\umbracoCheckKeys.js" />
@@ -593,37 +534,13 @@
       <SubType>Form</SubType>
     </Content>
     <Content Include="Umbraco\Settings\EditDictionaryItem.aspx" />
-    <Content Include="Umbraco\Settings\Modals\ShowUmbracoTags.aspx" />
-    <Content Include="Umbraco\Settings\Stylesheet\editstylesheet.aspx" />
-    <Content Include="Umbraco\Settings\Stylesheet\Property\EditStyleSheetProperty.aspx" />
     <Content Include="Umbraco\Dialogs\sort.aspx" />
     <Content Include="Umbraco\treeInit.aspx" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="Umbraco\Webservices\ajax.js" />
-    <Content Include="Umbraco\Webservices\CacheRefresher.asmx">
-      <SubType>Form</SubType>
-    </Content>
     <Content Include="Umbraco\Webservices\codeEditorSave.asmx" />
     <Content Include="Umbraco\Webservices\legacyAjaxCalls.asmx" />
     <Content Include="Umbraco\Webservices\nodeSorter.asmx" />
-    <Content Include="Umbraco\Xslt\macroGetCurrent.xsl" />
-    <Content Include="Umbraco\Xslt\macroGetSubs.xsl" />
-    <Content Include="Umbraco\Xslt\sqlNodeHierachy.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Breadcrumb.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Clean.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListSubPagesAsThumbnails.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListSubPagesByDateAndLimit.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListSubPagesByDocumentType.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListSubPagesByLevel.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListSubPagesFromAChangableSource.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListSubPagesFromCurrentPage.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListThumbnailsFromCurrentPage.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\ListWholeStructureFromCurrentPage.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\NavigationPrototype.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\Sitemap.xslt" />
-    <Content Include="Umbraco\Xslt\Templates\TablePrototype.xslt" />
-    <Content Include="Umbraco_Client\CodeArea\javascript.js" />
-    <Content Include="Umbraco_Client\CodeArea\styles.css" />
     <Content Include="Umbraco_Client\Menuicon\Images\buttonbg.gif" />
     <Content Include="Umbraco_Client\Menuicon\Images\buttonbgdown.gif" />
     <Content Include="Umbraco_Client\Menuicon\Images\split.gif" />

@@ -21,6 +21,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebServices;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -118,7 +119,7 @@ namespace Umbraco.Web.Editors
                         {"serverVarsJs", _urlHelper.Action("Application", "BackOffice")},
                         //API URLs
                         {
-                            "packagesRestApiBaseUrl", UmbracoConfig.For.UmbracoSettings().PackageRepositories.GetDefault().RestApiUrl
+                            "packagesRestApiBaseUrl", Constants.PackageRepository.RestApiBaseUrl
                         },
                         {
                             "redirectUrlManagementApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<RedirectUrlManagementController>(

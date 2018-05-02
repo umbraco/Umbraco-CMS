@@ -53,28 +53,24 @@ namespace umbraco
                 _frequest = UmbracoContext.Current.PublishedRequest;
                 _upage = _frequest.UmbracoPage;
 
-                //we need to check this for backwards compatibility in case people still arent' using master pages
-                if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
+                var args = new RequestInitEventArgs()
                 {
-                    var args = new RequestInitEventArgs()
-                    {
-                        Page = _upage,
-                        PageId = _upage.PageID,
-                        Context = Context
-                    };
-                    FireBeforeRequestInit(args);
+                    Page = _upage,
+                    PageId = _upage.PageID,
+                    Context = Context
+                };
+                FireBeforeRequestInit(args);
 
-                    //if we are cancelling then return and don't proceed
-                    if (args.Cancel) return;
+                //if we are cancelling then return and don't proceed
+                if (args.Cancel) return;
 
-                    this.MasterPageFile = template.GetMasterPageName(_upage.Template);
+                this.MasterPageFile = template.GetMasterPageName(_upage.Template);
 
-                    // reset the friendly path so it's used by forms, etc.
-                    Context.RewritePath(UmbracoContext.Current.OriginalRequestUrl.PathAndQuery);
+                // reset the friendly path so it's used by forms, etc.
+                Context.RewritePath(UmbracoContext.Current.OriginalRequestUrl.PathAndQuery);
 
-                    //fire the init finished event
-                    FireAfterRequestInit(args);
-                }
+                //fire the init finished event
+                FireAfterRequestInit(args);
             }
         }
 
@@ -95,33 +91,6 @@ namespace umbraco
                 var ctx = new ControllerContext(new HttpContextWrapper(Context), new RouteData(), new TempDataController());
                 provider.LoadTempData(ctx);
 
-                //This is only here for legacy if people arent' using master pages...
-                //TODO: We need to test that this still works!! Or do we ??
-                if (!UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
-                {
-                    var args = new RequestInitEventArgs()
-                                   {
-                                       Page = _upage,
-                                       PageId = _upage.PageID,
-                                       Context = Context
-                                   };
-                    FireBeforeRequestInit(args);
-
-                    //if we are cancelling then return and don't proceed
-                    if (args.Cancel) return;
-
-                    var pageHolder = new umbraco.layoutControls.umbracoPageHolder
-                                         {
-                                             ID = "umbPageHolder"
-                                         };
-                    Page.Controls.Add(pageHolder);
-                    _upage.RenderPage(_upage.Template);
-                    var umbPageHolder = (layoutControls.umbracoPageHolder)Page.FindControl("umbPageHolder");
-                    umbPageHolder.Populate(_upage);
-
-                    //fire the init finished event
-                    FireAfterRequestInit(args);
-                }
             }
         }
 

@@ -33,7 +33,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             //now we need to update the new column with some values because this column doesn't allow NULL values
             Update.Table(ContentVersionCultureVariationDto.TableName).Set(new {date = DateTime.Now}).AllRows().Do();
             //now apply constraints (NOT NULL) to new table
-            foreach (var sql in sqls) Database.Execute(sql);
+            foreach (var sql in sqls) Execute.Sql(sql).Do();
 
             // name, languageId are now non-nullable
             AlterColumn<ContentVersionCultureVariationDto>(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation, "name");

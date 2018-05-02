@@ -19,10 +19,10 @@ namespace umbraco
     /// </summary>
     public class item
     {
-        private String _fieldContent = "";
-        private readonly String _fieldName;
+        private string _fieldContent = "";
+        private readonly string _fieldName;
 
-        public String FieldContent
+        public string FieldContent
         {
             get { return _fieldContent; }
         }
@@ -131,7 +131,7 @@ namespace umbraco
                     throw new InvalidOperationException("Unsupported IPublishedContentCache, only the Xml one is supported.");
                 var umbracoXml = cache.GetXml(umbracoContext.InPreviewMode);
 
-                var splitpath = (String[])elements["splitpath"];
+                var splitpath = (string[])elements["splitpath"];
                 for (int i = 0; i < splitpath.Length - 1; i++)
                 {
                     XmlNode element = umbracoXml.GetElementById(splitpath[splitpath.Length - i - 1]);
@@ -208,15 +208,7 @@ namespace umbraco
                     _fieldContent = _fieldContent.ToCleanString(CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.PascalCase);
 
                 // OTHER FORMATTING FUNCTIONS
-                // If we use masterpages, this is moved to the ItemRenderer to add support for before/after in inline XSLT
-                if (!UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
-                {
-                    if (_fieldContent != "" && helper.FindAttribute(attributes, "insertTextBefore") != "")
-                        _fieldContent = HttpContext.Current.Server.HtmlDecode(helper.FindAttribute(attributes, "insertTextBefore")) +
-                                        _fieldContent;
-                    if (_fieldContent != "" && helper.FindAttribute(attributes, "insertTextAfter") != "")
-                        _fieldContent += HttpContext.Current.Server.HtmlDecode(helper.FindAttribute(attributes, "insertTextAfter"));
-                }
+                
                 if (helper.FindAttribute(attributes, "urlEncode") == "true")
                     _fieldContent = HttpUtility.UrlEncode(_fieldContent);
                 if (helper.FindAttribute(attributes, "htmlEncode") == "true")

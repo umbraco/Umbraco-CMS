@@ -46,8 +46,6 @@ namespace Umbraco.Core.IO
 
         public static string WebServices => IOHelper.ReturnPath("umbracoWebservicesPath", Umbraco.EnsureEndsWith("/") + "webservices");
 
-        public static string Xslt => IOHelper.ReturnPath("umbracoXsltPath", "~/xslt");
-
         //by default the packages folder should exist in the data folder
         public static string Packages => IOHelper.ReturnPath("umbracoPackagesPath", Data + IOHelper.DirSepChar + "packages");
 

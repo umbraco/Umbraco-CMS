@@ -57,7 +57,7 @@ namespace Umbraco.Web
             FlushBatch();
         }
 
-        protected override void DeliverRemote(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
+        protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
         {
             var idsA = ids?.ToArray();
 
@@ -65,7 +65,7 @@ namespace Umbraco.Web
             if (GetArrayType(idsA, out arrayType) == false)
                 throw new ArgumentException("All items must be of the same type, either int or Guid.", nameof(ids));
 
-            BatchMessage(servers, refresher, messageType, idsA, arrayType, json);
+            BatchMessage(refresher, messageType, idsA, arrayType, json);
         }
 
         public void FlushBatch()
@@ -124,7 +124,6 @@ namespace Umbraco.Web
         }
 
         protected void BatchMessage(
-            IEnumerable<IServerAddress> servers,
             ICacheRefresher refresher,
             MessageType messageType,
             IEnumerable<object> ids = null,
@@ -149,7 +148,7 @@ namespace Umbraco.Web
             }
             else
             {
-                batch.Add(new RefreshInstructionEnvelope(servers, refresher, instructions));
+                batch.Add(new RefreshInstructionEnvelope(refresher, instructions));
             }
 
         }

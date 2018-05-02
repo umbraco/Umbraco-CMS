@@ -34,7 +34,7 @@ namespace Umbraco.Web.Macros
                 _macro.Alias,
                 _macro.Name,
                 _macro.Properties.ToDictionary(x => x.Key, x => (object)x.Value));
-            return PartialView(_macro.ScriptName, model);
+            return PartialView(_macro.MacroSource, model);
         }
     }
 }

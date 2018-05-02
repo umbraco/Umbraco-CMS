@@ -11,13 +11,9 @@ namespace Umbraco.Core.Models
     public enum MacroTypes
     {
         [EnumMember]
-        Xslt = 1,
-        [EnumMember]
         UserControl = 3,
         [EnumMember]
         Unknown = 4,
-        [EnumMember]
-        Script = 6,
         [EnumMember]
         PartialView = 7
     }

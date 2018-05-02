@@ -52,7 +52,6 @@ namespace Umbraco.Core.Runtime
             composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().StylesheetsFileSystem, Constants.Composing.FileSystems.StylesheetFileSystem);
             composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MasterPagesFileSystem, Constants.Composing.FileSystems.MasterpageFileSystem);
             composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MvcViewsFileSystem, Constants.Composing.FileSystems.ViewFileSystem);
-            composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().XsltFileSystem, Constants.Composing.FileSystems.XsltFileSystem);
 
             // register manifest parser, will be injected in collection builders where needed
             composition.Container.RegisterSingleton<ManifestParser>();
@@ -72,12 +71,9 @@ namespace Umbraco.Core.Runtime
             composition.Container.RegisterSingleton<PropertyEditorCollection>();
             composition.Container.RegisterSingleton<ParameterEditorCollection>();
 
-            // register a server registrar, by default it's the db registrar unless the dev
-            // has the legacy dist calls enabled - fixme - should obsolete the legacy thing
+            // register a server registrar, by default it's the db registrar 
             composition.Container.RegisterSingleton<IServerRegistrar>(f =>
             {
-                if (UmbracoConfig.For.UmbracoSettings().DistributedCall.Enabled)
-                    return new ConfigServerRegistrar(f.GetInstance<IUmbracoSettingsSection>(), f.GetInstance<ILogger>(), f.GetInstance<IGlobalSettings>());
                 if ("true".InvariantEquals(ConfigurationManager.AppSettings["umbracoDisableElectionForSingleServer"]))
                     return new SingleServerRegistrar(f.GetInstance<IRuntimeState>());
                 return new DatabaseServerRegistrar(

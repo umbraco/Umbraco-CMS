@@ -3,7 +3,7 @@ using Umbraco.Core.Models;
 using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.UI;
 
-namespace umbraco
+namespace Umbraco.Web
 {
     public class macroTasks : LegacyDialogTask
     {
@@ -12,7 +12,7 @@ namespace umbraco
             var macro = Current.Services.MacroService.GetByAlias(Alias);
             if (macro == null)
             {
-                macro = new Macro(Alias, Alias);
+                macro = new Macro(Alias, Alias, string.Empty, MacroTypes.Unknown);
                 Current.Services.MacroService.Save(macro);
             }
             _returnUrl = string.Format("developer/Macros/editMacro.aspx?macroID={0}", macro.Id);

@@ -29,9 +29,9 @@ namespace Umbraco.Core.Sync
         // FIXME need another way to do it, eg an interface, injected!
         public static Func<HttpRequestBase, string> ApplicationUrlProvider { get; set; }
 
-        internal static string GetApplicationUrl(ILogger logger, IGlobalSettings globalSettings, IUmbracoSettingsSection settings, HttpRequestBase request = null)
+        internal static string GetApplicationUrl(ILogger logger, IGlobalSettings globalSettings, IUmbracoSettingsSection settings, IServerRegistrar serverRegistrar, HttpRequestBase request = null)
         {
-            var umbracoApplicationUrl = TryGetApplicationUrl(settings, logger, globalSettings);
+            var umbracoApplicationUrl = TryGetApplicationUrl(settings, logger, globalSettings, serverRegistrar);
             if (umbracoApplicationUrl != null)
                 return umbracoApplicationUrl;
 
@@ -50,7 +50,7 @@ namespace Umbraco.Core.Sync
             return umbracoApplicationUrl;
         }
 
-        internal static string TryGetApplicationUrl(IUmbracoSettingsSection settings, ILogger logger, IGlobalSettings globalSettings)
+        internal static string TryGetApplicationUrl(IUmbracoSettingsSection settings, ILogger logger, IGlobalSettings globalSettings, IServerRegistrar serverRegistrar)
         {
             // try umbracoSettings:settings/web.routing/@umbracoApplicationUrl
             // which is assumed to:
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Sync
             // - contain a scheme
             // - end or not with a slash, it will be taken care of
             // eg "http://www.mysite.com/umbraco"
-            url = Current.ServerRegistrar.GetCurrentServerUmbracoApplicationUrl();
+            url = serverRegistrar.GetCurrentServerUmbracoApplicationUrl();
             if (url.IsNullOrWhiteSpace() == false)
             {
                 var umbracoApplicationUrl = url.TrimEnd('/');
