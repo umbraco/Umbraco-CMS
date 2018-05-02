@@ -241,7 +241,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (entity.Template == null)
                 entity.Template = entity.ContentType.DefaultTemplate;
 
-            entity.Name = FormatInvariantNameValue(entity);
+            EnsureInvariantNameValues(entity, publishing);
             // ensure unique name on the same level
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
 
@@ -309,7 +309,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 content.PublishedVersionId = content.VersionId;
                 contentVersionDto.Id = 0;
                 contentVersionDto.Current = true;
-                contentVersionDto.Text = content.Name;
+                contentVersionDto.Text = content.PublishName;
                 Database.Insert(contentVersionDto);
                 content.VersionId = contentVersionDto.Id;
 
@@ -420,7 +420,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, false)).Where<DocumentVersionDto>(x => x.Id == content.PublishedVersionId));
             }
 
-            entity.Name = FormatInvariantNameValue(entity);
+            EnsureInvariantNameValues(entity, publishing);
             // ensure unique name on the same level
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
 
@@ -1080,33 +1080,38 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         #region Utilities
 
         /// <summary>
-        /// This ensures that the Name property exists and validates if all names are null
+        /// This ensures that the Name/PublishName properties are filled in and validates if all names are null
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        private string FormatInvariantNameValue(IContent content)
+        private void EnsureInvariantNameValues(IContent content, bool publishing)
         {
+            //fixme - if we are saving a variant, we current need to have the invariant name set too, discuss! http://issues.umbraco.org/issue/U4-11286
+            //NOTE - this doesn't deal with the PublishName since that is readonly, instead this scenario is dealt with in `Content.SetPublishInfos`
+
+            //validate
+
             if (content.Name.IsNullOrWhiteSpace() && content.Names.Count == 0)
-                throw new InvalidOperationException("Cannot save content with empty name.");
+                throw new InvalidOperationException("Cannot save content with an empty name.");
+
+            if (publishing && content.PublishName.IsNullOrWhiteSpace() && content.PublishNames.Count == 0)
+                throw new InvalidOperationException("Cannot publish content with an empty name.");
+
+            //ensure the invariant Name
 
             if (content.Name.IsNullOrWhiteSpace() && content.Names.Count > 0)
             {
-                //if we are saving a variant, we current need to have the invariant name set too
-                //fixme - this needs to be discussed! http://issues.umbraco.org/issue/U4-11286
-
                 var defaultCulture = LanguageRepository.GetDefaultIsoCode();
                 if (!defaultCulture.IsNullOrWhiteSpace() && content.Names.TryGetValue(defaultCulture, out var cultureName))
                 {
-                    return cultureName;
+                    content.Name = cultureName;
                 }
                 else
                 {
                     //our only option is to take the first
-                    return content.Names.First().Value;
+                    content.Name = content.Names.First().Value;
                 }
             }
-
-            return content.Name;
         }
 
         protected override string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
