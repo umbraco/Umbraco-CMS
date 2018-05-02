@@ -218,6 +218,7 @@ Use this directive to construct a header inside the main editor window.
             }
 
             function setCurrentVariant(variants) {
+
                 angular.forEach(variants, function (variant) {
                     if(variant.current) {
                         scope.vm.currentVariant = variant;
@@ -245,8 +246,8 @@ Use this directive to construct a header inside the main editor window.
                 });
             }
 
-            scope.goBack = function() {
-                if(scope.onBack) {
+            scope.goBack = function () {
+                if (scope.onBack) {
                     scope.onBack();
                 }
             };

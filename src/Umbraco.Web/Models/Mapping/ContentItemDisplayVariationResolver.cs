@@ -36,6 +36,7 @@ namespace Umbraco.Web.Models.Mapping
                 Name = source.GetName(x.IsoCode),
                 Exists = source.IsCultureAvailable(x.IsoCode), // segments ??
                 PublishedState = source.PublishedState.ToString(),
+                IsEdited = source.IsCultureEdited(x.IsoCode)
                 //Segment = ?? We'll need to populate this one day when we support segments
             }).ToList();
 

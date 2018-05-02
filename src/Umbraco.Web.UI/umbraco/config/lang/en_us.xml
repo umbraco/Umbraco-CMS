@@ -201,6 +201,7 @@
         <key alias="publish">Publish</key>
         <key alias="published">Published</key>
         <key alias="publishedPendingChanges">Published (pending changes)</key>
+        <key alias="unpublishedPendingChanges">Unpublished (pending changes)</key>
         <key alias="publishStatus">Publication Status</key>
         <key alias="releaseDate">Publish at</key>
         <key alias="unpublishDate">Unpublish at</key>
@@ -231,6 +232,10 @@
         <key alias="contentRoot">Content root</key>
         <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
         <key alias="isSensitiveValue_short">This value is hidden.</key>
+        <key alias="languagesToPublish">What languages would you like to publish?</key>
+        <key alias="noLanguagesToPublish">No languages available to be published.</key>
+        <key alias="publishedLanguages">Published Languages.</key>
+
     </area>
     <area alias="blueprints">
         <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>

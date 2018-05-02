@@ -59,7 +59,9 @@
                         <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.current}" ng-repeat="variant in variants">
                             <a href="" class="umb-variant-switcher__name-wrapper" ng-click="selectVariant($event, variant)" prevent-default>
                                 <span class="umb-variant-switcher__name">{{variant.language.name}}</span>
-                                <span class="umb-variant-switcher__state">{{variant.state}}</span>
+                                <span class="umb-variant-switcher__state" ng-if="!variant.validationError && variant.isEdited && variant.state === 'Published'"><localize key="content_publishedPendingChanges"></localize></span>
+                                <span class="umb-variant-switcher__state" ng-if="!variant.validationError && variant.isEdited && variant.state === 'Unpublished'"><localize key="content_unpublishedPendingChanges"></localize></span>
+                                <span class="umb-variant-switcher__state" ng-if="variant.isEdited === false">{{variant.state}}</span>
                             </a>
                             <!-- Commented out as opposed to removed until we fully support split view (U4-11290) -->
                             <!--
