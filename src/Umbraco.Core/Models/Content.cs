@@ -31,8 +31,8 @@ namespace Umbraco.Core.Models
         /// <param name="name">Name of the content</param>
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
-        public Content(string name, IContent parent, IContentType contentType)
-            : this(name, parent, contentType, new PropertyCollection())
+        public Content(string name, IContent parent, IContentType contentType, string culture = null)
+            : this(name, parent, contentType, new PropertyCollection(), culture)
         { }
 
         /// <summary>
@@ -42,8 +42,8 @@ namespace Umbraco.Core.Models
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
-        public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties)
-            : base(name, parent, contentType, properties)
+        public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties, string culture = null)
+            : base(name, parent, contentType, properties, culture)
         {
             _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             _publishedState = PublishedState.Unpublished;
@@ -56,8 +56,8 @@ namespace Umbraco.Core.Models
         /// <param name="name">Name of the content</param>
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
-        public Content(string name, int parentId, IContentType contentType)
-            : this(name, parentId, contentType, new PropertyCollection())
+        public Content(string name, int parentId, IContentType contentType, string culture = null)
+            : this(name, parentId, contentType, new PropertyCollection(), culture)
         { }
 
         /// <summary>
@@ -67,8 +67,8 @@ namespace Umbraco.Core.Models
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
-        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties)
-            : base(name, parentId, contentType, properties)
+        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties, string culture = null)
+            : base(name, parentId, contentType, properties, culture)
         {
             _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             _publishedState = PublishedState.Unpublished;
