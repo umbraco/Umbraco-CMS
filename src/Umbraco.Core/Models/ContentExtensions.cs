@@ -159,20 +159,7 @@ namespace Umbraco.Core.Models
             return Current.Services.MediaService.GetById(media.ParentId);
         }
         #endregion
-
-        #region Variants
-
-        /// <summary>
-        /// Returns true if the content has any property type that allows language variants
-        /// </summary>
-        public static bool HasPropertyTypeVaryingByCulture(this IContent content)
-        {
-            // fixme - what about CultureSegment? what about content.ContentType.Variations?
-            return content.PropertyTypes.Any(x => x.Variations.Has(ContentVariation.CultureNeutral));
-        }
-
-        #endregion
-
+        
         /// <summary>
         /// Removes characters that are not valide XML characters from all entity properties
         /// of type string. See: http://stackoverflow.com/a/961504/5018

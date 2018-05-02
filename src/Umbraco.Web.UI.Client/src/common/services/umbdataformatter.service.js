@@ -327,8 +327,8 @@
                 //get the selected variant and build the additional published variants
                 saveModel.publishVariations = [];
 
-                //if there's more than 1 variant than we need to set the language and include the variants to publish
-                if (displayModel.variants.length > 1) {
+                //if there's any variants than we need to set the language and include the variants to publish
+                if (displayModel.variants.length > 0) {
                     _.each(displayModel.variants,
                         function (d) {
                             //set the selected variant if this is current

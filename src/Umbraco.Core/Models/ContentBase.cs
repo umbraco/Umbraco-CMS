@@ -55,8 +55,6 @@ namespace Umbraco.Core.Models
             Id = 0; // no identity
             VersionId = 0; // no versions
 
-            //fixme we always need to set the invariant name else an exception will throw if we try to persist
-            Name = name;
             SetName(culture, name);
 
             _contentTypeId = contentType.Id;

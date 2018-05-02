@@ -73,6 +73,8 @@ namespace Umbraco.Web.Editors
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemDisplay>))]
         public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
         {
+            //fixme what about cultures?
+
             var foundContent = Services.ContentService.GetByIds(ids);
             return foundContent.Select(x => MapToDisplay(x));
         }
@@ -218,6 +220,7 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        //fixme what about cultures?
         public ContentItemDisplay GetBlueprintById(int id)
         {
             var foundContent = Services.ContentService.GetBlueprintById(id);
@@ -267,19 +270,6 @@ namespace Umbraco.Web.Editors
             }
 
             var content = MapToDisplay(foundContent, culture);
-            return content;
-        }
-
-        [EnsureUserPermissionForContent("id")]
-        public ContentItemDisplay GetWithTreeDefinition(int id)
-        {
-            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
-            if (foundContent == null)
-            {
-                HandleContentNotFound(id);
-            }
-
-            var content = MapToDisplay(foundContent);
             return content;
         }
 
@@ -954,8 +944,9 @@ namespace Umbraco.Web.Editors
             if (contentItem.Name.IsNullOrWhiteSpace() == false)
             {
                 //set the name according to the culture settings
-                if (!contentItem.Culture.IsNullOrWhiteSpace() && contentItem.PersistedContent.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
+                if (contentItem.PersistedContent.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
                 {
+                    if (contentItem.Culture.IsNullOrWhiteSpace()) throw new InvalidOperationException($"Cannot save a content item that is {ContentVariation.CultureNeutral} with a culture specified");
                     contentItem.PersistedContent.SetName(contentItem.Culture, contentItem.Name);
                 }
                 else
@@ -1185,11 +1176,11 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private ContentItemDisplay MapToDisplay(IContent content, string culture = null)
         {
-            //a languageId must exist in the mapping context if this content item has any property type that can be varied by language
-            //otherwise the property validation will fail since it's expecting to be get/set with a language ID. If a languageId is not explicitly
-            //sent up, then it means that the user is editing the default variant language.
-            if (culture == null && content.HasPropertyTypeVaryingByCulture())
+            //A culture must exist in the mapping context if this content type is CultureNeutral since for a culture variant to be edited,
+            // the Cuture property of ContentItemDisplay must exist (at least currently).
+            if (culture == null && content.ContentType.Variations.Has(ContentVariation.CultureNeutral))
             {
+                //If a culture is not explicitly sent up, then it means that the user is editing the default variant language.
                 culture = Services.LocalizationService.GetDefaultLanguageIsoCode();
             }
 

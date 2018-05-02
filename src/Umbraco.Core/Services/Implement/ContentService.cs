@@ -163,6 +163,8 @@ namespace Umbraco.Core.Services.Implement
         /// <returns><see cref="IContent"/></returns>
         public IContent Create(string name, Guid parentId, string contentTypeAlias, int userId = 0)
         {
+            //fixme - what about culture?
+
             var parent = GetById(parentId);
             return Create(name, parent, contentTypeAlias, userId);
         }
@@ -181,6 +183,8 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent Create(string name, int parentId, string contentTypeAlias, int userId = 0)
         {
+            //fixme - what about culture?
+
             var contentType = GetContentType(contentTypeAlias);
             if (contentType == null)
                 throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias));
@@ -212,6 +216,8 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent Create(string name, IContent parent, string contentTypeAlias, int userId = 0)
         {
+            //fixme - what about culture?
+
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
             using (var scope = ScopeProvider.CreateScope())
@@ -241,6 +247,8 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = 0)
         {
+            //fixme - what about culture?
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 // locking the content tree secures content types too
@@ -273,6 +281,8 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>The content object.</returns>
         public IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = 0)
         {
+            //fixme - what about culture?
+
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
             using (var scope = ScopeProvider.CreateScope())
@@ -864,11 +874,6 @@ namespace Umbraco.Core.Services.Implement
                     return OperationResult.Cancel(evtMsgs);
                 }
 
-                if (string.IsNullOrWhiteSpace(content.Name))
-                {
-                    throw new ArgumentException("Cannot save content with empty name.");
-                }
-
                 var isNew = content.IsNewEntity();
 
                 scope.WriteLock(Constants.Locks.ContentTree);
@@ -1217,7 +1222,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 var deleteEventArgs = new DeleteEventArgs<IContent>(content, evtMsgs);
-                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
+                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs, nameof(Deleting)))
                 {
                     scope.Complete();
                     return OperationResult.Cancel(evtMsgs);
@@ -1229,7 +1234,7 @@ namespace Umbraco.Core.Services.Implement
                 // but... UnPublishing event makes no sense (not going to cancel?) and no need to save
                 // just raise the event
                 if (content.Trashed == false && content.Published)
-                    scope.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
+                    scope.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), nameof(UnPublished));
 
                 DeleteLocked(scope, content);
 
@@ -1265,7 +1270,7 @@ namespace Umbraco.Core.Services.Implement
 
                 _documentRepository.Delete(c);
                 var args = new DeleteEventArgs<IContent>(c, false); // raise event & get flagged files
-                scope.Events.Dispatch(Deleted, this, args);
+                scope.Events.Dispatch(Deleted, this, args, nameof(Deleted));
 
                 // fixme not going to work, do it differently
                 _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
@@ -2149,7 +2154,7 @@ namespace Umbraco.Core.Services.Implement
                 var query = Query<IContent>().WhereIn(x => x.ContentTypeId, contentTypeIdsA);
                 var contents = _documentRepository.Get(query).ToArray();
 
-                if (scope.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IContent>(contents)))
+                if (scope.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IContent>(contents), nameof(Deleting)))
                 {
                     scope.Complete();
                     return;
@@ -2296,7 +2301,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
                 _documentBlueprintRepository.Delete(content);
-                scope.Events.Dispatch(DeletedBlueprint, this, new DeleteEventArgs<IContent>(content), "DeletedBlueprint");
+                scope.Events.Dispatch(DeletedBlueprint, this, new DeleteEventArgs<IContent>(content), nameof(DeletedBlueprint));
                 scope.Complete();
             }
         }
@@ -2357,7 +2362,7 @@ namespace Umbraco.Core.Services.Implement
                     _documentBlueprintRepository.Delete(blueprint);
                 }
 
-                scope.Events.Dispatch(DeletedBlueprint, this, new DeleteEventArgs<IContent>(blueprints), "DeletedBlueprint");
+                scope.Events.Dispatch(DeletedBlueprint, this, new DeleteEventArgs<IContent>(blueprints), nameof(DeletedBlueprint));
                 scope.Complete();
             }
         }

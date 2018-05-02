@@ -177,9 +177,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Domain + " WHERE domainRootStructureID = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Document + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentCultureVariation + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentVersion + " WHERE id IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
                 "DELETE FROM cmsPreviewXml WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersionCultureVariation + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
                 "DELETE FROM cmsContentXml WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
@@ -229,6 +231,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IContent entity)
         {
+            //fixme - stop doing this just so we have access to AddingEntity
             var content = (Content) entity;
 
             content.AddingEntity();
@@ -238,6 +241,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (entity.Template == null)
                 entity.Template = entity.ContentType.DefaultTemplate;
 
+            entity.Name = FormatInvariantNameValue(entity);
             // ensure unique name on the same level
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
 
@@ -416,6 +420,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, false)).Where<DocumentVersionDto>(x => x.Id == content.PublishedVersionId));
             }
 
+            entity.Name = FormatInvariantNameValue(entity);
             // ensure unique name on the same level
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
 
@@ -1073,6 +1078,36 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         #region Utilities
+
+        /// <summary>
+        /// This ensures that the Name property exists and validates if all names are null
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        private string FormatInvariantNameValue(IContent content)
+        {
+            if (content.Name.IsNullOrWhiteSpace() && content.Names.Count == 0)
+                throw new InvalidOperationException("Cannot save content with empty name.");
+
+            if (content.Name.IsNullOrWhiteSpace() && content.Names.Count > 0)
+            {
+                //if we are saving a variant, we current need to have the invariant name set too
+                //fixme - this needs to be discussed! http://issues.umbraco.org/issue/U4-11286
+
+                var defaultCulture = LanguageRepository.GetDefaultIsoCode();
+                if (!defaultCulture.IsNullOrWhiteSpace() && content.Names.TryGetValue(defaultCulture, out var cultureName))
+                {
+                    return cultureName;
+                }
+                else
+                {
+                    //our only option is to take the first
+                    return content.Names.First().Value;
+                }
+            }
+
+            return content.Name;
+        }
 
         protected override string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
         {

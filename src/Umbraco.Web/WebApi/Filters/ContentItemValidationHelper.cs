@@ -48,8 +48,14 @@ namespace Umbraco.Web.WebApi.Filters
         {
             //now do each validation step
             if (ValidateExistingContent(contentItem, actionContext) == false) return;
+            if (ValidateCultureVariant(contentItem, actionContext) == false) return;
             if (ValidateProperties(contentItem, actionContext) == false) return;
             if (ValidatePropertyData(contentItem, contentItem.ContentDto, actionContext.ModelState) == false) return;
+        }
+
+        protected virtual bool ValidateCultureVariant(TModelSave postedItem, HttpActionContext actionContext)
+        {
+            return true;
         }
 
         /// <summary>
@@ -58,7 +64,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// <param name="postedItem"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        protected virtual bool ValidateExistingContent(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
+        protected virtual bool ValidateExistingContent(TModelSave postedItem, HttpActionContext actionContext)
         {
             if (postedItem.PersistedContent == null)
             {
@@ -76,7 +82,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// <param name="postedItem"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        protected virtual bool ValidateProperties(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
+        protected virtual bool ValidateProperties(TModelSave postedItem, HttpActionContext actionContext)
         {
             return ValidateProperties(postedItem.Properties.ToList(), postedItem.PersistedContent.Properties.ToList(), actionContext);
         }
@@ -116,7 +122,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// <remarks>
         /// All property data validation goes into the modelstate with a prefix of "Properties"
         /// </remarks>
-        public virtual bool ValidatePropertyData(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, ContentItemDto<TPersisted> dto, ModelStateDictionary modelState)
+        public virtual bool ValidatePropertyData(TModelSave postedItem, ContentItemDto<TPersisted> dto, ModelStateDictionary modelState)
         {
             foreach (var p in dto.Properties)
             {

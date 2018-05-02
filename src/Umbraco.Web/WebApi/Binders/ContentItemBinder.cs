@@ -1,15 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http.Controllers;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.WebApi.Binders
 {
     internal class ContentItemBinder : ContentItemBaseBinder<IContent, ContentItemSave>
     {
+        protected override ContentItemValidationHelper<IContent, ContentItemSave> GetValidationHelper()
+        {
+            return new ContentValidationHelper();
+        }
+
         protected override IContent GetExisting(ContentItemSave model)
         {
             return Services.ContentService.GetById(Convert.ToInt32(model.Id));
@@ -36,6 +45,27 @@ namespace Umbraco.Web.WebApi.Binders
             {
                 [ContextMapper.CultureKey] = culture
             });
+        }
+
+        internal class ContentValidationHelper : ContentItemValidationHelper<IContent, ContentItemSave>
+        {
+            /// <summary>
+            /// Validates that the correct information is in the request for saving a culture variant
+            /// </summary>
+            /// <param name="postedItem"></param>
+            /// <param name="actionContext"></param>
+            /// <returns></returns>
+            protected override bool ValidateCultureVariant(ContentItemSave postedItem, HttpActionContext actionContext)
+            {
+                var contentType = postedItem.PersistedContent.GetContentType();
+                if (contentType.Variations.Has(Core.Models.ContentVariation.CultureNeutral) && postedItem.Culture.IsNullOrWhiteSpace())
+                {
+                    //we cannot save a content item that is culture variant if no culture was specified in the request!
+                    actionContext.Response = actionContext.Request.CreateValidationErrorResponse($"No 'Culture' found in request. Cannot save a content item that is of a {Core.Models.ContentVariation.CultureNeutral} content type without a specified culture.");
+                    return false;
+                }
+                return true;
+            }
         }
     }
 }
