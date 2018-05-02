@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -17,12 +18,14 @@ namespace Umbraco.Web.Cache
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IdkMap _idkMap;
+        private readonly IDomainService _domainService;
 
-        public ContentCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap)
+        public ContentCacheRefresher(CacheHelper cacheHelper, IPublishedSnapshotService publishedSnapshotService, IdkMap idkMap, IDomainService domainService)
             : base(cacheHelper)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _idkMap = idkMap;
+            _domainService = domainService;
         }
 
         #region Define
@@ -49,6 +52,8 @@ namespace Umbraco.Web.Cache
             runtimeCache.ClearCacheByKeySearch(CacheKeys.IdToKeyCacheKey);
             runtimeCache.ClearCacheByKeySearch(CacheKeys.KeyToIdCacheKey);
 
+            var idsRemoved = new HashSet<int>();
+
             foreach (var payload in payloads)
             {
                 // remove that one
@@ -61,6 +66,31 @@ namespace Umbraco.Web.Cache
                 {
                     var pathid = "," + payload.Id + ",";
                     runtimeCache.ClearCacheObjectTypes<IContent>((k, v) => v.Path.Contains(pathid));
+                }
+
+                //if the item is being completely removed, we need to refresh the domains cache if any domain was assigned to the content
+                if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.Remove))
+                {
+                    idsRemoved.Add(payload.Id);
+                }
+            }
+
+            if (idsRemoved.Count > 0)
+            {
+                var assignedDomains = _domainService.GetAll(true).Where(x => x.RootContentId.HasValue && idsRemoved.Contains(x.RootContentId.Value)).ToList();
+
+                if (assignedDomains.Count > 0)
+                {
+                    //fixme - this is duplicating the logic in DomainCacheRefresher BUT we cannot inject that into this because it it not registered explicitly in the container,
+                    // and we cannot inject the CacheRefresherCollection since that would be a circular reference, so what is the best way to call directly in to the
+                    // DomainCacheRefresher?
+
+                    ClearAllIsolatedCacheByEntityType<IDomain>();
+                    // note: must do what's above FIRST else the repositories still have the old cached
+                    // content and when the PublishedCachesService is notified of changes it does not see
+                    // the new content...
+                    // notify
+                    _publishedSnapshotService.Notify(assignedDomains.Select(x => new DomainCacheRefresher.JsonPayload(x.Id, DomainChangeTypes.Remove)).ToArray());
                 }
             }
 
@@ -127,10 +157,6 @@ namespace Umbraco.Web.Cache
 
             public TreeChangeTypes ChangeTypes { get; }
         }
-
-        #endregion
-
-        #region Events
 
         #endregion
 

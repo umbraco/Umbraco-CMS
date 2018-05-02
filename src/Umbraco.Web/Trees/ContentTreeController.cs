@@ -47,7 +47,7 @@ namespace Umbraco.Web.Trees
         /// <inheritdoc />
         protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormDataCollection queryStrings)
         {
-            var langId = queryStrings["languageId"].TryConvertTo<int?>();
+            var langId = queryStrings["culture"].TryConvertTo<string>();
             
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(entity);
             if (CanUserAccessNode(entity, allowedUserOptions, langId.Success ? langId.Result : null))

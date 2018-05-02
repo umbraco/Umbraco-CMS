@@ -36,7 +36,7 @@ angular.module("umbraco")
 
             //perform the path change, if it is successful then the promise will resolve otherwise it will fail
             $scope.model.close();
-            $location.path("/logout");
+            $location.path("/logout").search('');
         };
 
         $scope.gotoHistory = function (link) {

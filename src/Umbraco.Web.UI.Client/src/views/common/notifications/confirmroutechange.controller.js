@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Notifications.ConfirmRouteChangeController",
-	function ($scope, $location, $log, notificationsService) {	
+	function ($scope, $location, $log, notificationsService, navigationService) {	
 
 		$scope.discard = function(not){
 
@@ -13,7 +13,7 @@ angular.module("umbraco").controller("Umbraco.Notifications.ConfirmRouteChangeCo
 			// when no callback is added run the normal functionality of the discard button
 			not.args.listener();
 			
-			$location.search("");
+            navigationService.clearSearch();
 
 		    //we need to break the path up into path and query
 		    var parts = not.args.path.split("?");

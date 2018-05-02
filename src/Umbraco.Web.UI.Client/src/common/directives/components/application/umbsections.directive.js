@@ -38,7 +38,7 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 						calculateWidth();
 					});
 			}
-
+            
 			function calculateWidth(){
 				$timeout(function(){
 					//total width minus room for avatar, search, and help icon
@@ -119,9 +119,10 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
                 }
                 else {
                     var lastAccessed = historyService.getLastAccessedItemForSection(section.alias);
-                    var path = lastAccessed != null ? lastAccessed.link : section.alias;                  
-                    $location.path(path).search('');
+                    var path = lastAccessed != null ? lastAccessed.link : section.alias;
+                    $location.path(path);
                 }
+                navigationService.clearSearch();
 			    
 			};
 

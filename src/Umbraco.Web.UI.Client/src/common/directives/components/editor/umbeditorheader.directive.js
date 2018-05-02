@@ -254,7 +254,7 @@ Use this directive to construct a header inside the main editor window.
 
             scope.selectVariant = function (event, variant) {
                 scope.vm.dropdownOpen = false;
-                $location.search({ languageId: variant.language.id });
+                $location.search("cculture", variant.language.culture);
             };
 
             scope.openIconPicker = function() {

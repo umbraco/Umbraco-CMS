@@ -50,7 +50,7 @@
                         server-validation-field="Alias">
                     </umb-generate-alias>
                     
-                    <a ng-if="variants.length > 1" class="umb-variant-switcher__toggle" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
+                    <a ng-if="variants.length > 0" class="umb-variant-switcher__toggle" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
                         <span>{{vm.currentVariant.language.name}}</span>
                         <ins class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</ins>
                     </a>

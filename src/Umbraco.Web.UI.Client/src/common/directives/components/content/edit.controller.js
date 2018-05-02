@@ -20,7 +20,7 @@
         $scope.page.listViewPath = null;
         $scope.page.isNew = $scope.isNew ? true : false;
         $scope.page.buttonGroupState = "init";
-        $scope.page.languageId = $scope.languageId;
+        $scope.page.culture = $scope.culture;
         $scope.allowOpen = true;
 
         // add all editors to an editors array to support split view 
@@ -122,14 +122,14 @@
 
         /**
          *  This does the content loading and initializes everything, called on load and changing variants
-         * @param {any} languageId
+         * @param {any} culture
          */
-        function getNode(languageId) {
+        function getNode(culture) {
 
             $scope.page.loading = true;
 
             //we are editing so get the content item from the server
-            $scope.getMethod()($scope.contentId, languageId)
+            $scope.getMethod()($scope.contentId, culture)
                 .then(function (data) {
 
                     $scope.content = data;
@@ -258,7 +258,7 @@
         else {
 
             //Browse content nodes based on the selected tree language variant
-            $scope.page.languageId ? getNode($scope.page.languageId) : getNode();
+            $scope.page.culture ? getNode($scope.page.culture) : getNode();
 
         }
 
@@ -527,7 +527,7 @@
                 saveMethod: "&",
                 getMethod: "&",
                 getScaffoldMethod: "&?",
-                languageId: "=?"
+                culture: "=?"
             }
         };
 

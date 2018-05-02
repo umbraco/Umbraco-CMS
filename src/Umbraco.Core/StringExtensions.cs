@@ -1148,6 +1148,7 @@ namespace Umbraco.Core
         /// <returns>The safe url segment.</returns>
         public static string ToUrlSegment(this string text)
         {
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("message", nameof(text));
             return Current.ShortStringHelper.CleanStringForUrlSegment(text);
         }
 
@@ -1159,6 +1160,9 @@ namespace Umbraco.Core
         /// <returns>The safe url segment.</returns>
         public static string ToUrlSegment(this string text, CultureInfo culture)
         {
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("message", nameof(text));
+            if (culture == null) throw new ArgumentNullException(nameof(culture));
+
             return Current.ShortStringHelper.CleanStringForUrlSegment(text, culture);
         }
 

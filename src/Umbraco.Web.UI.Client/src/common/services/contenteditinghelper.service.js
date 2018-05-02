@@ -5,7 +5,7 @@
 * @description A helper service for most editors, some methods are specific to content/media/member model types but most are used by
 * all editors to share logic and reduce the amount of replicated code among editors.
 **/
-function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, localizationService, serverValidationManager, dialogService, formHelper, appState) {
+function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, navigationService, localizationService, serverValidationManager, dialogService, formHelper, appState) {
 
     function isValidIdentifier(id){
         //empty id <= 0
@@ -596,7 +596,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 // /belle/#/content/edit/9876 (where 9876 is the new id)
 
                 //clear the query strings
-                $location.search("");
+                navigationService.clearSearch();
 
                 //change to new path
                 $location.path("/" + $routeParams.section + "/" + $routeParams.tree  + "/" + $routeParams.method + "/" + id);
@@ -617,9 +617,9 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          * For some editors like scripts or entites that have names as ids, these names can change and we need to redirect
          * to their new paths, this is helper method to do that.
          */
-        redirectToRenamedContent: function (id) {            
+        redirectToRenamedContent: function (id) {
             //clear the query strings
-            $location.search("");
+            navigationService.clearSearch();
             //change to new path
             $location.path("/" + $routeParams.section + "/" + $routeParams.tree + "/" + $routeParams.method + "/" + id);
             //don't add a browser history for this

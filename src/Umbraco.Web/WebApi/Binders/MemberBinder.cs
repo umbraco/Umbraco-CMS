@@ -186,9 +186,9 @@ namespace Umbraco.Web.WebApi.Binders
             /// <param name="dto"></param>
             /// <param name="modelState"></param>
             /// <returns></returns>
-            public override bool ValidatePropertyData(ContentItemBasic<ContentPropertyBasic, IMember> postedItem, ContentItemDto<IMember> dto, ModelStateDictionary modelState)
+            public override bool ValidatePropertyData(MemberSave postedItem, ContentItemDto<IMember> dto, ModelStateDictionary modelState)
             {
-                var memberSave = (MemberSave)postedItem;
+                var memberSave = postedItem;
 
                 if (memberSave.Username.IsNullOrWhiteSpace())
                 {
@@ -234,7 +234,7 @@ namespace Umbraco.Web.WebApi.Binders
             /// <param name="postedItem"></param>
             /// <param name="actionContext"></param>
             /// <returns></returns>
-            protected override bool ValidateProperties(ContentItemBasic<ContentPropertyBasic, IMember> postedItem, HttpActionContext actionContext)
+            protected override bool ValidateProperties(MemberSave postedItem, HttpActionContext actionContext)
             {
                 var propertiesToValidate = postedItem.Properties.ToList();
                 var defaultProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();

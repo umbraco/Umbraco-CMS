@@ -104,6 +104,25 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
         /**
          * @ngdoc method
+         * @name umbraco.services.navigationService#clearSearch
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * utility to clear the querystring/search params while maintaining a known list of parameters that should be maintained throughout the app
+         */
+        clearSearch: function () {
+            var retainKeys = ["mculture"];
+            var currentSearch = $location.search();
+            $location.search('');
+            _.each(retainKeys, function (k) {
+                if (currentSearch[k]) {
+                    $location.search(k, currentSearch[k]);
+                }
+            });
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.navigationService#load
          * @methodOf umbraco.services.navigationService
          *

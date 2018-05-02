@@ -208,19 +208,19 @@ namespace Umbraco.Core.Models
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentNullOrEmptyException(nameof(name));
 
-            if (culture == null)
+            //fixme - we always need to set the invariant values since these cannot be null! discuss http://issues.umbraco.org/issue/U4-11286
+            PublishName = name;
+            PublishDate = date;
+
+            if (culture != null)
             {
-                PublishName = name;
-                PublishDate = date;
-                return;
+                // private method, assume that culture is valid
+
+                if (_publishInfos == null)
+                    _publishInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
+
+                _publishInfos[culture] = (name, date);
             }
-
-            // private method, assume that culture is valid
-
-            if (_publishInfos == null)
-                _publishInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
-
-            _publishInfos[culture] = (name, date);
         }
 
         /// <inheritdoc/>
