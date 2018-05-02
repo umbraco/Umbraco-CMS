@@ -29,10 +29,9 @@ function contentCreateController($scope,
   }
 
   function createBlank(docType) {
-      $location
-          .path("/content/content/edit/" + $scope.currentNode.id)
-          .search("doctype", docType.alias)
-          .search("create", true);
+    $location
+      .path("/content/content/edit/" + $scope.currentNode.id)
+      .search("doctype=" + docType.alias + "&create=true");
     close();
   }
 
