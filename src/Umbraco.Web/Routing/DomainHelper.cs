@@ -179,17 +179,21 @@ namespace Umbraco.Web.Routing
             return null;
         }
 
+        private static bool IsBaseOf(DomainAndUri domain, Uri uri)
+            => domain.Uri.EndPathWithSlash().IsBaseOf(uri);
+
         private static IReadOnlyCollection<DomainAndUri> SelectByBase(IReadOnlyCollection<DomainAndUri> domainsAndUris, Uri uri)
         {
             // look for domains that would be the base of the uri
             // ie current is www.example.com/foo/bar, look for domain www.example.com
             var currentWithSlash = uri.EndPathWithSlash();
-            var baseDomains = domainsAndUris.Where(d => d.Uri.EndPathWithSlash().IsBaseOf(currentWithSlash)).ToList();
+            var baseDomains = domainsAndUris.Where(d => IsBaseOf(d, currentWithSlash)).ToList();
 
             // if none matches, try again without the port
             // ie current is www.example.com:1234/foo/bar, look for domain www.example.com
+            var currentWithoutPort = currentWithSlash.WithoutPort();
             if (baseDomains.Count == 0)
-                baseDomains = domainsAndUris.Where(d => d.Uri.EndPathWithSlash().IsBaseOf(currentWithSlash.WithoutPort())).ToList();
+                baseDomains = domainsAndUris.Where(d => IsBaseOf(d, currentWithoutPort)).ToList();
 
             return baseDomains;
         }
