@@ -177,9 +177,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Domain + " WHERE domainRootStructureID = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Document + " WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentCultureVariation + " WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentVersion + " WHERE id IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
                 "DELETE FROM cmsPreviewXml WHERE nodeId = @id",
+                "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersionCultureVariation + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
                 "DELETE FROM cmsContentXml WHERE nodeId = @id",
                 "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
@@ -229,6 +231,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IContent entity)
         {
+            //fixme - stop doing this just so we have access to AddingEntity
             var content = (Content) entity;
 
             content.AddingEntity();
@@ -238,7 +241,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (entity.Template == null)
                 entity.Template = entity.ContentType.DefaultTemplate;
 
-            // ensure unique name on the same level
+            // sanitize names: ensure we have an invariant name, and names are unique-ish
+            // (well, only invariant name is unique at the moment)
+            EnsureInvariantNameValues(entity, publishing);
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
 
             // ensure that strings don't contain characters that are invalid in xml
@@ -305,7 +310,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 content.PublishedVersionId = content.VersionId;
                 contentVersionDto.Id = 0;
                 contentVersionDto.Current = true;
-                contentVersionDto.Text = content.Name;
+                contentVersionDto.Text = content.PublishName;
                 Database.Insert(contentVersionDto);
                 content.VersionId = contentVersionDto.Id;
 
@@ -416,7 +421,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, false)).Where<DocumentVersionDto>(x => x.Id == content.PublishedVersionId));
             }
 
-            // ensure unique name on the same level
+            // sanitize names: ensure we have an invariant name, and names are unique-ish
+            // (well, only invariant name is unique at the moment)
+            EnsureInvariantNameValues(entity, publishing);
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
 
             // ensure that strings don't contain characters that are invalid in xml
@@ -1073,6 +1080,43 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         #region Utilities
+
+        /// <summary>
+        /// Ensures that the Name/PublishName properties are filled in and validates if all names are null
+        /// </summary>
+        private void EnsureInvariantNameValues(IContent content, bool publishing)
+        {
+            // here we have to ensure we have names and publish names,
+            // and to try and fix the situation if we have no name
+            // see also: U4-11286
+
+            // cannot save without an invariant name
+            if (string.IsNullOrWhiteSpace(content.Name))
+            {
+                // no variant name = error
+                if (content.Names.Count == 0)
+                    throw new InvalidOperationException("Cannot save content with an empty name.");
+
+                // else pick the name for the default culture, or any name
+                var defaultCulture = LanguageRepository.GetDefaultIsoCode();
+                if (defaultCulture != null && content.Names.TryGetValue(defaultCulture, out var cultureName))
+                    content.Name = cultureName;
+                else
+                    content.Name = content.Names.First().Value; // only option is to take the first
+            }
+
+            // cannot publish without an invariant name
+            if (publishing && string.IsNullOrWhiteSpace(content.PublishName))
+            {
+                // no variant name = error
+                if (content.PublishNames.Count == 0)
+                    throw new InvalidOperationException("Cannot publish content with an empty name.");
+
+                // else... we cannot deal with it here because PublishName is readonly, so in reality, PublishName
+                // should not be null because it should have been set when preparing the content for publish.
+                // see also: Content.SetPublishInfos() - it deals with PublishName
+            }
+        }
 
         protected override string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
         {

@@ -1148,6 +1148,8 @@ namespace Umbraco.Core
         /// <returns>The safe url segment.</returns>
         public static string ToUrlSegment(this string text)
         {
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullOrEmptyException(nameof(text));
+
             return Current.ShortStringHelper.CleanStringForUrlSegment(text);
         }
 
@@ -1158,7 +1160,12 @@ namespace Umbraco.Core
         /// <param name="culture">The culture.</param>
         /// <returns>The safe url segment.</returns>
         public static string ToUrlSegment(this string text, string culture)
-            => Current.ShortStringHelper.CleanStringForUrlSegment(text, culture);
+        {
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullOrEmptyException(nameof(text));
+            if (culture == null) throw new ArgumentNullException(nameof(culture));
+
+            return Current.ShortStringHelper.CleanStringForUrlSegment(text, culture);
+        }
 
         // the new methods to clean a string (to alias, url segment...)
 

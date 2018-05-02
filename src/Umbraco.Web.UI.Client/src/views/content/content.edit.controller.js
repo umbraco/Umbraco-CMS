@@ -21,7 +21,7 @@ function ContentEditController($scope, $routeParams, contentResource) {
     $scope.getScaffoldMethod = $routeParams.blueprintId ? scaffoldBlueprint : scaffoldEmpty;
     $scope.page = $routeParams.page;
     $scope.isNew = $routeParams.create;
-    $scope.languageId = $routeParams.languageId;
+    $scope.culture = $routeParams.cculture;
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.Content.EditController", ContentEditController);

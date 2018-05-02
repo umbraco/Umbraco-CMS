@@ -15,8 +15,8 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <summary>
         /// The language Id for the content variation being saved
         /// </summary>
-        [DataMember(Name = "languageId")]
-        public int? LanguageId { get; set; } //TODO: Change this to ContentVariationPublish, but this will all change anyways when we can edit all variants at once
+        [DataMember(Name = "culture")]
+        public string Culture { get; set; } //TODO: Change this to ContentVariationPublish, but this will all change anyways when we can edit all variants at once
 
         /// <summary>
         /// The template alias to save

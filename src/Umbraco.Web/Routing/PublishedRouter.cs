@@ -266,7 +266,11 @@ namespace Umbraco.Web.Routing
             _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Uri=\"{request.Uri}\"");
 
             var domainsCache = request.UmbracoContext.PublishedSnapshot.Domains;
-            var domains = domainsCache.GetAll(includeWildcards: false);
+
+            //get the domains but filter to ensure that any referenced content is actually published
+            var domains = domainsCache.GetAll(includeWildcards: false)
+                .Where(x => request.UmbracoContext.PublishedSnapshot.Content.GetById(x.ContentId) != null);
+
             var defaultCulture = domainsCache.DefaultCulture;
 
             // try to find a domain matching the current request

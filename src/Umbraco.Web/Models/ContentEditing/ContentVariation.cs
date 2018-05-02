@@ -23,7 +23,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "name")]
         public string Name { get; set; }
-        
+
         [DataMember(Name = "state")]
         public string PublishedState { get; set; }
 
@@ -32,6 +32,9 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "exists")]
         public bool Exists { get; set; }
+
+        [DataMember(Name = "isEdited")]
+        public bool IsEdited { get; set; }
 
         /// <summary>
         /// Determines if this is the variant currently being edited

@@ -802,7 +802,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     switch (payload.ChangeType)
                     {
                         case DomainChangeTypes.RefreshAll:
-
                             using (var scope = _scopeProvider.CreateScope())
                             {
                                 scope.ReadLock(Constants.Locks.Domains);

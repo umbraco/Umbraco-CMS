@@ -96,10 +96,12 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 appState.setMenuState("currentNode", args.node);
 
                 //not legacy, lets just set the route value and clear the query string if there is one.
-                $location.path(n.routePath).search("");
+                $location.path(n.routePath);
+                navigationService.clearSearch();
             }
             else if (n.section) {
-                $location.path(n.section).search("");
+                $location.path(n.section);
+                navigationService.clearSearch();
             }
 
             navigationService.hideNavigation();
@@ -236,24 +238,37 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         languageResource.getAll().then(function(languages) {
             $scope.languages = languages;
 
-            // make the default language selected
-            $scope.languages.forEach(function (language) {
-                if (language.isDefault) {
-                    $scope.selectedLanguage = language;
+            if ($scope.languages.length > 1) {
+                var defaultLang = _.find($scope.languages, function (l) {
+                    return l.isDefault;
+                });
+                if (defaultLang) {
+                    //set the route param
+                    $location.search("mculture", defaultLang.culture);
                 }
-            });
-        });
+            }
 
+            init();
+        });
     }));
 
-    /**
-    * Updates the tree's query parameters
-    */
-    function initTree() {
+    function init() {
+        //select the current language if set in the query string
+        var mainCulture = $location.search().mculture;
+        if (mainCulture && $scope.languages && $scope.languages.length > 1) {
+            var found = _.find($scope.languages, function (l) {
+                return l.culture === mainCulture;
+            });
+            if (found) {
+                //set the route param
+                $scope.selectedLanguage = found;
+            }
+        }
+
         //create the custom query string param for this tree
         var queryParams = {};
-        if ($scope.selectedLanguage && $scope.selectedLanguage.id) {
-            queryParams["languageId"] = $scope.selectedLanguage.id;
+        if ($scope.selectedLanguage && $scope.selectedLanguage.culture) {
+            queryParams["culture"] = $scope.selectedLanguage.culture;
         }
         var queryString = $.param(queryParams); //create the query string from the params object
 
@@ -266,6 +281,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         }
     }
 
+
     function nodeExpandedHandler(args) {
         //store the reference to the expanded node path
         if (args.node) {
@@ -274,11 +290,15 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     }
 
     $scope.selectLanguage = function(language) {
-        $scope.selectedLanguage = language;
+
+        $location.search("mculture", language.culture);
+
+        //$scope.selectedLanguage = language;
+
         // close the language selector
         $scope.page.languageSelectorIsOpen = false;
 
-        initTree(); //this will reset the tree params and the tree directive will pick up the changes in a $watch
+        init(); //re-bind language to the query string and update the tree params
 
         //execute after next digest because the internal watch on the customtreeparams needs to be bound now that we've changed it
         $timeout(function () {

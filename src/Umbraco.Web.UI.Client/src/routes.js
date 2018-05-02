@@ -104,7 +104,6 @@ app.config(function ($routeProvider) {
             resolve: doLogout()
         })
         .when('/:section', {
-            
             //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
             template: "<div ng-include='templateUrl'></div>",
             //This controller will execute for this route, then we can execute some code in order to set the template Url

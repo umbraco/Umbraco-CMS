@@ -31,8 +31,8 @@ namespace Umbraco.Core.Models
         /// <param name="name">Name of the content</param>
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
-        public Content(string name, IContent parent, IContentType contentType)
-            : this(name, parent, contentType, new PropertyCollection())
+        public Content(string name, IContent parent, IContentType contentType, string culture = null)
+            : this(name, parent, contentType, new PropertyCollection(), culture)
         { }
 
         /// <summary>
@@ -42,8 +42,8 @@ namespace Umbraco.Core.Models
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
-        public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties)
-            : base(name, parent, contentType, properties)
+        public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties, string culture = null)
+            : base(name, parent, contentType, properties, culture)
         {
             _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             _publishedState = PublishedState.Unpublished;
@@ -56,8 +56,8 @@ namespace Umbraco.Core.Models
         /// <param name="name">Name of the content</param>
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
-        public Content(string name, int parentId, IContentType contentType)
-            : this(name, parentId, contentType, new PropertyCollection())
+        public Content(string name, int parentId, IContentType contentType, string culture = null)
+            : this(name, parentId, contentType, new PropertyCollection(), culture)
         { }
 
         /// <summary>
@@ -67,8 +67,8 @@ namespace Umbraco.Core.Models
         /// <param name="parentId">Id of the Parent content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
-        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties)
-            : base(name, parentId, contentType, properties)
+        public Content(string name, int parentId, IContentType contentType, PropertyCollection properties, string culture = null)
+            : base(name, parentId, contentType, properties, culture)
         {
             _contentType = contentType ?? throw new ArgumentNullException(nameof(contentType));
             _publishedState = PublishedState.Unpublished;
@@ -208,19 +208,26 @@ namespace Umbraco.Core.Models
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentNullOrEmptyException(nameof(name));
 
-            if (culture == null)
+            // this is the only place where we set PublishName (apart from factories etc), and we must ensure
+            // that we do have an invariant name, as soon as we have a variant name, else we would end up not
+            // being able to publish - and not being able to change the name, as PublishName is readonly.
+            // see also: DocumentRepository.EnsureInvariantNameValues() - which deals with Name.
+            // see also: U4-11286
+            if (culture == null || string.IsNullOrEmpty(PublishName))
             {
                 PublishName = name;
                 PublishDate = date;
-                return;
             }
 
-            // private method, assume that culture is valid
+            if (culture != null)
+            {
+                // private method, assume that culture is valid
 
-            if (_publishInfos == null)
-                _publishInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
+                if (_publishInfos == null)
+                    _publishInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
 
-            _publishInfos[culture] = (name, date);
+                _publishInfos[culture] = (name, date);
+            }
         }
 
         /// <inheritdoc/>
