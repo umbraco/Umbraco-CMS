@@ -1,11 +1,10 @@
 app.config(function ($routeProvider) {
-    
+
     /**
      * This determines if the route can continue depending on authentication and initialization requirements
-     * @param {boolean} authRequired If true, it first checks if the user is authenticated and will resolve successfully
+     * @param {boolean} authRequired If true, it checks if the user is authenticated and will resolve successfully
         otherwise the route will fail and the $routeChangeError event will execute, in that handler we will redirect to the rejected
         path that is resolved from this method and prevent default (prevent the route from executing)
-     * @param {boolean} navRequired if true, the route can only continue once the main navigation is ready
      * @returns {promise} 
      */
     var canRoute = function(authRequired) {
@@ -13,7 +12,7 @@ app.config(function ($routeProvider) {
         return {
             /** Checks that the user is authenticated, then ensures that are requires assets are loaded */
             isAuthenticatedAndReady: function ($q, userService, $route, assetsService, appState) {
-                
+
                 //don't need to check if we've redirected to login and we've already checked auth
                 if (!$route.current.params.section
                     && ($route.current.params.check === false || $route.current.params.check === "false")) {
@@ -23,6 +22,7 @@ app.config(function ($routeProvider) {
                 return userService.isAuthenticated()
                     .then(function () {
 
+                        //before proceeding all initial assets must be loaded
                         return assetsService._loadInitAssets().then(function () {
 
                             //This could be the first time has loaded after the user has logged in, in this case
@@ -123,7 +123,7 @@ app.config(function ($routeProvider) {
                     else {
                         //there's no custom route path so continue as normal
                         $routeParams.url = "dashboard.aspx?app=" + $routeParams.section;
-                        $scope.templateUrl = 'views/common/dashboard.html';            
+                        $scope.templateUrl = 'views/common/dashboard.html';
                     }
                 });
             },
@@ -186,4 +186,6 @@ app.config(function ($routeProvider) {
 
         //$locationProvider.html5Mode(false).hashPrefix('!'); //turn html5 mode off
         // $locationProvider.html5Mode(true);         //turn html5 mode on
+
+        
     });

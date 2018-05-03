@@ -215,9 +215,13 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * @returns {Promise} resourcePromise object.
           *
           */
-        unPublish: function (id) {
+        unPublish: function (id, culture) {
             if (!id) {
                 throw "id cannot be null";
+            }
+
+            if (!culture) {
+                culture = null;
             }
 
             return umbRequestHelper.resourcePromise(
@@ -225,7 +229,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                                           umbRequestHelper.getApiUrl(
                                                 "contentApiBaseUrl",
                                                 "PostUnPublish",
-                                                [{ id: id }])),
+                                        { id: id, culture: culture })),
                                     'Failed to publish content with id ' + id);
         },
         /**

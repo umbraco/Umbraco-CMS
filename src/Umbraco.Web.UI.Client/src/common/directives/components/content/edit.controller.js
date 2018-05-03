@@ -124,7 +124,7 @@
          *  This does the content loading and initializes everything, called on load and changing variants
          * @param {any} culture
          */
-        function getNode(culture) {
+        function loadContent(culture) {
 
             $scope.page.loading = true;
 
@@ -258,17 +258,33 @@
         else {
 
             //Browse content nodes based on the selected tree language variant
-            $scope.page.culture ? getNode($scope.page.culture) : getNode();
-
+            if ($scope.page.culture) {
+                loadContent($scope.page.culture);
+            }
+            else {
+                loadContent();
+            }
         }
 
         $scope.unPublish = function () {
+
+            //if there's any variants than we need to set the language and include the variants to publish
+            var culture = null;
+            if ($scope.content.variants.length > 0) {
+                _.each($scope.content.variants,
+                    function (d) {
+                        //set the culture if this is current
+                        if (d.current === true) {
+                            culture = d.language.culture;
+                        }
+                    });
+            }
 
             if (formHelper.submitForm({ scope: $scope, skipValidation: true })) {
 
                 $scope.page.buttonGroupState = "busy";
 
-                contentResource.unPublish($scope.content.id)
+                contentResource.unPublish($scope.content.id, culture)
                     .then(function (data) {
 
                         formHelper.resetForm({ scope: $scope, notifications: data.notifications });
@@ -494,7 +510,7 @@
                     notificationsService.success("Successfully restored " + node.name + " to " + target.name);
 
                     // reload the node
-                    getNode();
+                    loadContent();
 
                 }, function (err) {
                     $scope.page.buttonRestore = "error";

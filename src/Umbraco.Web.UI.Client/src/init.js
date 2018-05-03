@@ -1,7 +1,11 @@
 /** Executed when the application starts, binds to events and set global state */
 app.run(['userService', '$q', '$log', '$rootScope', '$location', 'queryStrings', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService', 'tourService', 'dashboardResource',
     function (userService, $q, $log, $rootScope, $location, queryStrings, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService, tourService, dashboardResource) {
-        
+
+        $rootScope.$on('$locationChangeStart', function (event, next, current, newState, oldState) {
+            $log.info("location changing to:" + next);
+        });
+
         //This sets the default jquery ajax headers to include our csrf token, we
         // need to user the beforeSend method because our token changes per user/login so
         // it cannot be static
@@ -17,27 +21,17 @@ app.run(['userService', '$q', '$log', '$rootScope', '$location', 'queryStrings',
         /** Listens for authentication and checks if our required assets are loaded, if/once they are we'll broadcast a ready event */
         eventsService.on("app.authenticated", function (evt, data) {
 
-            assetsService._loadInitAssets().then(function() {
-                $q.all([
-                    userService.loadMomentLocaleForCurrentUser(),
-                    tourService.registerAllTours()
-                ]).then(function () {
+            assetsService._loadInitAssets().then(function () {
 
-                    //Register all of the tours on the server
-                    tourService.registerAllTours().then(function () {
-                        appReady(data);
+                appReady(data);
 
-                        // Auto start intro tour
-                        tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
-                            // start intro tour if it hasn't been completed or disabled
-                            if (introTour && introTour.disabled !== true && introTour.completed !== true) {
-                                tourService.startTour(introTour);
-                            }
-                        });
-
-                    }, function () {
-                        appAuthenticated = true;
-                        appReady(data);
+                tourService.registerAllTours().then(function () {
+                    // Auto start intro tour
+                    tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
+                        // start intro tour if it hasn't been completed or disabled
+                        if (introTour && introTour.disabled !== true && introTour.completed !== true) {
+                            tourService.startTour(introTour);
+                        }
                     });
                 });
             });
@@ -112,9 +106,6 @@ app.run(['userService', '$q', '$log', '$rootScope', '$location', 'queryStrings',
             }
 
         });
-
-        /* this will initialize the navigation service once the application has started */
-        navigationService.init();
 
         //check for touch device, add to global appState
         //var touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints === 5 || window.DocumentTouch && document instanceof DocumentTouch);
