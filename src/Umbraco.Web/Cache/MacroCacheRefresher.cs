@@ -32,9 +32,8 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            GetAllMacroCacheKeys().ForEach(
-                    prefix =>
-                    CacheHelper.RuntimeCache.ClearCacheByKeySearch(prefix));
+            foreach (var prefix in GetAllMacroCacheKeys())
+                CacheHelper.RuntimeCache.ClearCacheByKeySearch(prefix);
 
             ClearAllIsolatedCacheByEntityType<IMacro>();
 
@@ -47,18 +46,17 @@ namespace Umbraco.Web.Cache
         {
             var payloads = Deserialize(json);
 
-            payloads.ForEach(payload =>
+            foreach (var payload in payloads)
             {
-                GetCacheKeysForAlias(payload.Alias).ForEach(
-                    alias =>
-                    CacheHelper.RuntimeCache.ClearCacheByKeySearch(alias));
+                foreach (var alias in GetCacheKeysForAlias(payload.Alias))
+                    CacheHelper.RuntimeCache.ClearCacheByKeySearch(alias);
 
                 var macroRepoCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMacro>();
                 if (macroRepoCache)
                 {
                     macroRepoCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IMacro>(payload.Id));
                 }
-            });
+            };
 
             base.Refresh(json);
         }

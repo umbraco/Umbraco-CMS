@@ -165,7 +165,7 @@ namespace Umbraco.Core
                 var obj = JsonConvert.DeserializeObject(input);
                 return obj;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return input;
             }
@@ -623,7 +623,7 @@ namespace Umbraco.Core
                 byte[] decodedBytes = UrlTokenDecode(input);
                 return decodedBytes != null ? Encoding.UTF8.GetString(decodedBytes) : null;
             }
-            catch (FormatException ex)
+            catch (FormatException)
             {
                 return null;
             }

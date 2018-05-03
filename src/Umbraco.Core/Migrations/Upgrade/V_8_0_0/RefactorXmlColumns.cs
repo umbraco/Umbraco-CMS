@@ -67,13 +67,6 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 .Do();
         }
 
-        private bool ColumnExists(string tableName, string columnName)
-        {
-            // that's ok even on MySql
-            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).Distinct().ToArray();
-            return columns.Any(x => x.TableName.InvariantEquals(tableName) && x.ColumnName.InvariantEquals(columnName));
-        }
-
         private void RemoveDuplicates()
         {
             const string sql = @"delete from cmsPreviewXml where versionId in (

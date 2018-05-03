@@ -310,7 +310,7 @@ namespace Umbraco.Tests.Composing
                 using (new WriteLock(LocalFilteredAssemblyCacheLocker))
                 {
                     var assemblies = GetFilteredAssemblies(excludeFromResults, KnownAssemblyExclusionFilter);
-                    assemblies.ForEach(LocalFilteredAssemblyCache.Add);
+                    foreach (var assembly in assemblies) LocalFilteredAssemblyCache.Add(assembly);
                 }
                 return LocalFilteredAssemblyCache;
             }

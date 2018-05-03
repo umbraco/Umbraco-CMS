@@ -35,8 +35,6 @@ namespace Umbraco.Web.Trees
 
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
-            var baseUrl = Constants.Applications.Developer + "/packages/";
-
             var nodes = new TreeNodeCollection();
 
             var createdPackages = CreatedPackage.GetAllCreatedPackages();

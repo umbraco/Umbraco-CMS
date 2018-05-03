@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Globalization;
-using System.Linq;
 using System.Web.UI;
 using System.Xml;
 using Umbraco.Core.IO;
 using Umbraco.Web;
-using umbraco.cms.businesslogic;
 using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web._Legacy.Actions;
 using Button = System.Web.UI.WebControls.Button;

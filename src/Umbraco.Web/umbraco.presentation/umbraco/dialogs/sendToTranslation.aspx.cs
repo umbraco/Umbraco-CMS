@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Net.Mail;
 using System.Web;
-using System.Linq;
 using System.Web.UI.WebControls;
 using Umbraco.Core;
 using Umbraco.Core.Services;
@@ -13,7 +12,6 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
-using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Entities;
 

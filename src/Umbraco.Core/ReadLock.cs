@@ -10,9 +10,11 @@ namespace Umbraco.Core
     /// Provides a convenience methodology for implementing locked access to resources.
     /// </summary>
     /// <remarks>
-    /// Intended as an infrastructure class.
+    /// <para>Intended as an infrastructure class.</para>
+    /// <para>This is a very unefficient way to lock as it allocates one object each time we lock,
+    /// so it's OK to use this class for things that happen once, where it is convenient, but not
+    /// for performance-critical code!</para>
     /// </remarks>
-    [Obsolete("stop using, allocates")]
     public class ReadLock : IDisposable
     {
         private readonly ReaderWriterLockSlim _rwLock;

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Mvc;
-using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
 {

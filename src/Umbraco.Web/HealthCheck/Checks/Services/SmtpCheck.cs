@@ -52,7 +52,6 @@ namespace Umbraco.Web.HealthCheck.Checks.Services
             var success = false;
 
             // appPath is the virtual application root path on the server
-            var appPath = "";
             var config = WebConfigurationManager.OpenWebConfiguration(_runtime.ApplicationVirtualPath);
             var settings = (MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
             if (settings == null)
