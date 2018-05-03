@@ -47,7 +47,6 @@
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Transactions" />
-    <Reference Include="System.ValueTuple" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.Web.Extensions" />
@@ -74,7 +73,7 @@
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.0" />
     <PackageReference Include="Microsoft.Web.Xdt" Version="2.1.2" />
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
-    <PackageReference Include="MySql.Data" Version="6.10.6" />
+    <PackageReference Include="MySql.Data" Version="6.10.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NPoco" Version="3.9.3" />
     <PackageReference Include="NuGet.Core" Version="2.14.0" />
