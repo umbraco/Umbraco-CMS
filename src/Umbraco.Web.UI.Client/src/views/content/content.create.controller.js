@@ -32,7 +32,7 @@ function contentCreateController($scope,
       $location
           .path("/content/content/edit/" + $scope.currentNode.id)
           .search("doctype", docType.alias)
-          .search("create", true);
+          .search("create", "true");
     close();
   }
 
@@ -54,7 +54,9 @@ function contentCreateController($scope,
   function createFromBlueprint(blueprintId) {
     $location
       .path("/content/content/edit/" + $scope.currentNode.id)
-      .search("doctype=" + $scope.docType.alias + "&create=true&blueprintId=" + blueprintId);
+          .search("doctype", $scope.docType.alias)
+          .search("create", "true")
+          .search("blueprintId", blueprintId);
     close();
   }
 
