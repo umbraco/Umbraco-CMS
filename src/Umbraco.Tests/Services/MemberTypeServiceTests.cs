@@ -108,9 +108,9 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberTypeService.Save(contentType1);
             ServiceContext.MemberTypeService.Save(contentType2);
             var contentItems1 = MockedMember.CreateSimpleMember(contentType1, 10).ToArray();
-            contentItems1.ForEach(x => ServiceContext.MemberService.Save(x));
+            foreach (var x in contentItems1) ServiceContext.MemberService.Save(x);
             var contentItems2 = MockedMember.CreateSimpleMember(contentType2, 5).ToArray();
-            contentItems2.ForEach(x => ServiceContext.MemberService.Save(x));
+            foreach (var x in contentItems2) ServiceContext.MemberService.Save(x);
             //only update the contentType1 alias which will force an xml rebuild for all content of that type
             contentType1.Alias = "newAlias";
             ServiceContext.MemberTypeService.Save(contentType1);
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Services
             var contentType1 = MockedContentTypes.CreateSimpleMemberType("test1", "Test1");
             ServiceContext.MemberTypeService.Save(contentType1);
             var contentItems1 = MockedMember.CreateSimpleMember(contentType1, 10).ToArray();
-            contentItems1.ForEach(x => ServiceContext.MemberService.Save(x));
+            foreach (var x in contentItems1) ServiceContext.MemberService.Save(x);
 
             var alias = contentType1.PropertyTypes.First(x => standardProps.ContainsKey(x.Alias) == false).Alias;
             var elementToMatch = "<" + alias + ">";

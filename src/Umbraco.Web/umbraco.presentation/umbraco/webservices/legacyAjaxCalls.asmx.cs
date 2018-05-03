@@ -21,8 +21,6 @@ namespace umbraco.presentation.webservices
     [ScriptService]
     public class legacyAjaxCalls : UmbracoAuthorizedWebService
     {
-        private IUser _currentUser;
-
         /// <summary>
         /// method to accept a string value for the node id. Used for tree's such as python
         /// and xslt since the file names are the node IDs

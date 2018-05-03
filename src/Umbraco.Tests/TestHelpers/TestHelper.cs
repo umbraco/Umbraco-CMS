@@ -85,7 +85,8 @@ namespace Umbraco.Tests.TestHelpers
                 var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
                 var preserve = preserves.ContainsKey(directory) ? preserves[directory] : null;
                 if (directoryInfo.Exists)
-                    directoryInfo.GetFiles().Where(x => preserve == null || preserve.Contains(x.Name) == false).ForEach(x => x.Delete());
+                    foreach (var x in directoryInfo.GetFiles().Where(x => preserve == null || preserve.Contains(x.Name) == false))
+                        x.Delete();
             }
         }
 

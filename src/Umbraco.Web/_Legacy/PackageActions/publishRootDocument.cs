@@ -28,8 +28,6 @@ namespace Umbraco.Web._Legacy.PackageActions
 
             string documentName = xmlData.Attributes["documentName"].Value;
 
-            int parentDocid = 0;
-
             //global::umbraco.cms.businesslogic.web.Document[] rootDocs = global::umbraco.cms.businesslogic.web.Document.GetRootDocuments();
             var rootDocs = Current.Services.ContentService.GetRootContent();
 
