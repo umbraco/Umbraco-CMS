@@ -126,13 +126,31 @@
             open(editor)
         }
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#iconPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens an icon picker in infinite editing, the submit callback returns the selected icon
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function iconPicker(editor) {
+            editor.view = "views/common/infiniteeditors/iconpicker/iconpicker.html",
+            editor.size = "small"
+            open(editor);
+        }
+
         var service = {
             getEditors: getEditors,
             open: open,
             close: close,
             mediaEditor: mediaEditor,
             contentEditor: contentEditor,
-            mediaPicker: mediaPicker
+            mediaPicker: mediaPicker,
+            iconPicker: iconPicker
         };
 
         return service;
