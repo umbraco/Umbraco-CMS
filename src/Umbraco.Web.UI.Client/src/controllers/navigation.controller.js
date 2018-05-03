@@ -210,7 +210,11 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 if (b === "true") {
                     //load languages if there are more than 1
                     loadLanguages();
+                } else {
+                    $scope.languages = [];
+                    init();
                 }
+
             });
         }
     }));
@@ -248,7 +252,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     function loadLanguages() {
         languageResource.getAll().then(function (languages) {
-            $scope.languages = languages;
             $scope.languages = languages;
 
             if ($scope.languages.length > 1) {
