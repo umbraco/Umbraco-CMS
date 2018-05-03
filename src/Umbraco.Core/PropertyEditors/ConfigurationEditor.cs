@@ -73,7 +73,10 @@ namespace Umbraco.Core.PropertyEditors
             // but only keep entries that have a non-null/empty value
             // rest will fall back to default during ToConfigurationEditor()
 
-            var keys = editorValues.Where(x => x.Value == null || x.Value is string stringValue && string.IsNullOrWhiteSpace(stringValue)).Select(x => x.Key);
+            var keys = editorValues.Where(x =>
+                    x.Value == null || x.Value is string stringValue && string.IsNullOrWhiteSpace(stringValue))
+                .Select(x => x.Key).ToList();
+
             foreach (var key in keys) editorValues.Remove(key);
 
             return editorValues;
