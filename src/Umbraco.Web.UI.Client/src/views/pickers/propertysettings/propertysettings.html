@@ -28,9 +28,9 @@
                                 focus-on-filled="true"
                                 umb-auto-resize
                                 required
-                                overlay-submit-on-enter>
-                                </textarea>
-                                <div class="umb-validation-label" val-msg-for="propertyLabel" val-toggle-msg="required">Required label</div>
+                                ng-keypress="vm.submitOnEnter($event)">
+                            </textarea>
+                            <div class="umb-validation-label" val-msg-for="propertyLabel" val-toggle-msg="required">Required label</div>
                         </div>
                         <div class="control-group -no-margin">
                             <umb-generate-alias enable-lock="true" alias-from="model.property.label" alias="model.property.alias"></umb-generate-alias>
@@ -44,7 +44,7 @@
                             ng-model="model.property.description"
                             localize="placeholder"
                             placeholder="@placeholders_enterDescription"
-                            overlay-submit-on-enter
+                            ng-keypress="vm.submitOnEnter($event)"
                             umb-auto-resize>
                         </textarea>
                     </div>
@@ -100,7 +100,7 @@
                             ng-if="vm.showValidationPattern"
                             umb-auto-resize
                             focus-when="{{vm.focusOnPatternField}}"
-                            overlay-submit-on-enter>
+                            ng-keypress="vm.submitOnEnter($event)">
                         </textarea>
                     
                     </div>

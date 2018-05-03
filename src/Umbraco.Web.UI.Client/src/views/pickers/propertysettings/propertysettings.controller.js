@@ -49,6 +49,7 @@
         vm.changeValidationPattern = changeValidationPattern;
         vm.openDataTypePicker = openDataTypePicker;
         vm.openDataTypeSettings = openDataTypeSettings;
+        vm.submitOnEnter = submitOnEnter;
         vm.submit = submit;
         vm.close = close;
 
@@ -147,6 +148,12 @@
             });
 
         }
+
+        function submitOnEnter(event) {
+            if(event && event.keyCode === 13) {
+                submit();
+            }
+        } 
 
         function submit() {
             if($scope.model.submit) {
