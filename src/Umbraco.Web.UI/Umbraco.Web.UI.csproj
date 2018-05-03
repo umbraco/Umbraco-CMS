@@ -656,11 +656,12 @@
   <Target Name="CleanBelle" AfterTargets="Clean" Condition="'$(UmbracoBuild)' == ''">
     <Message Text="-CleanBelle-" Importance="high" />
     <Message Text="Nothing to clean, as $(ProjectDir)Umbraco\lib does not exist." Importance="High" Condition="!Exists('$(ProjectDir)Umbraco\lib')" />
-    <Message Text="Remove $(ProjectDir)Umbraco\lib." Importance="High" Condition="Exists('$(ProjectDir)Umbraco\lib')" />
+    <Message Text="Not cleaning (found src/preserve.belle)." Importance="High" Condition="Exists('$(ProjectDir)Umbraco\lib') and Exists('$(SolutionDir)preserve.belle')" />
+    <Message Text="Remove $(ProjectDir)Umbraco\lib." Importance="High" Condition="Exists('$(ProjectDir)Umbraco\lib') and !Exists('$(SolutionDir)preserve.belle')" />
     <ItemGroup>
       <BelleLib Include="$(ProjectDir)Umbraco\lib" />
     </ItemGroup>
-    <RemoveDir Directories="@(BelleLib)" />
+    <RemoveDir Directories="@(BelleLib)" Condition="Exists('$(ProjectDir)Umbraco\lib') and !Exists('$(SolutionDir)preserve.belle')"/>
   </Target>
   <Target Name="AfterBuild">
     <Message Text="-AfterBuild-" Importance="high" />
