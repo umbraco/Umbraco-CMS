@@ -72,7 +72,7 @@
             var dataTypePicker = {
                 property: $scope.model.property,
                 contentTypeName: $scope.model.contentTypeName,
-                view: "views/pickers/datatypepicker/datatypepicker.html",
+                view: "views/common/infiniteeditors/datatypepicker/datatypepicker.html",
                 size: "small",
                 submit: function(model) {
 
@@ -108,7 +108,7 @@
 
                 var dataTypeSettings = {
                     title: "Data type settings",
-                    view: "views/pickers/datatypesettings/datatypesettings.html",
+                    view: "views/common/infiniteeditors/datatypesettings/datatypesettings.html",
                     dataType: dataType,
                     submit: function(model) {
 

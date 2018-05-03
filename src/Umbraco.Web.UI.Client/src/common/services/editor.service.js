@@ -121,7 +121,7 @@
          * @returns {Object} editor object
          */
         function mediaPicker(editor) {
-            editor.view = "views/pickers/mediapicker/mediapicker.html",
+            editor.view = "views/common/infiniteeditors/mediapicker/mediapicker.html",
             editor.size = "small",
             open(editor)
         }

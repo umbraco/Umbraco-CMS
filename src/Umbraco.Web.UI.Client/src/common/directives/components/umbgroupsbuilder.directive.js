@@ -498,7 +498,7 @@
             property: property,
             contentType: scope.contentType,
             contentTypeName: scope.model.name,
-            view: "views/pickers/propertysettings/propertysettings.html",
+            view: "views/common/infiniteeditors/propertysettings/propertysettings.html",
             size: "small",
             submit: function(model) {
 

@@ -166,7 +166,7 @@
                 title: localizationService.localize("contentTypeEditor_editorSettings"),
                 dataType: dataType,
                 create: isNew,
-                view: "views/pickers/datatypesettings/datatypesettings.html",
+                view: "views/common/infiniteeditors/datatypesettings/datatypesettings.html",
                 submit: function(model) {
                     var preValues = dataTypeHelper.createPreValueProps(model.dataType.preValues);
                     dataTypeResource.save(model.dataType, preValues, isNew).then(function(newDataType) {
