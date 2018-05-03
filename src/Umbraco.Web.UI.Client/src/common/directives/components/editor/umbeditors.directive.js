@@ -7,6 +7,7 @@
 
             var evts = [];
             var allowedNumberOfVisibleEditors = 3;
+            var editorIndent = 60;
 
             scope.editors = [];
 
@@ -35,29 +36,29 @@
 
                         // set left position to indent the editors
                         if(scope.editors.length >= allowedNumberOfVisibleEditors) {
-                            $(editor).css({"left": index * 80});
+                            $(editor).css({"left": index * editorIndent});
                         } else {
-                            $(editor).css({"left": (index + 1) * 80});
+                            $(editor).css({"left": (index + 1) * editorIndent});
                         }
 
                     });
 
-                    // We need to figure out how to performance optimize this
-                    // TODO: optimize animation
                     /*
-                    // animation config
+                    // collapse open editors before opening the new one
                     var collapseEditorAnimation = anime({
                         targets: moveEditors,
                         width: function(el, index, length) {
+                            // we have to resize all small editors when they move to the 
+                            // left side so they don't leave a gap
                             if(el.classList.contains("umb-editor--small")) {
                                 return "100%";
                             }
                         },
                         left: function(el, index, length){
                             if(length >= allowedNumberOfVisibleEditors) {
-                                return index * 80;
+                                return index * editorIndent;
                             }
-                            return (index + 1) * 80;
+                            return (index + 1) * editorIndent;
                         },
                         easing: 'easeInOutQuint',
                         duration: 500
@@ -73,14 +74,14 @@
                 $timeout(function() {
 
                     var editorsElement = el[0];
-                     // select the last editor we just pushed
+                    // select the last editor we just pushed
                     var lastEditor = editorsElement.querySelector('.umb-editor:last-of-type');
-                    var indentValue = scope.editors.length * 80;
+                    var indentValue = scope.editors.length * editorIndent;
 
-                    // don't allow indent larger than what 
-                    // fits the max number of visible editors
+                    /* don't allow indent larger than what 
+                    fits the max number of visible editors */
                     if(scope.editors.length >= allowedNumberOfVisibleEditors) {
-                        indentValue = allowedNumberOfVisibleEditors * 80;
+                        indentValue = allowedNumberOfVisibleEditors * editorIndent;
                     }
 
                     // indent all large editors
@@ -147,7 +148,7 @@
                     // TODO: fix animation and remove this
                     moveEditors.forEach(function(editor, index){
                         // set left position
-                        $(editor).css({"left": (index + 1) * 80});
+                        $(editor).css({"left": (index + 1) * editorIndent});
 
                         // if the new top editor is a small editor we will have to resize it back to the right size on 
                         // move it all the way to the right side
@@ -163,7 +164,7 @@
                     var expandEditorAnimation = anime({
                         targets: moveEditors,
                         left: function(el, index, length){
-                            return (index + 1) * 80;
+                            return (index + 1) * editorIndent;
                         },
                         width: function(el, index, length) {
                             if(el.classList.contains("umb-editor--small")) {
