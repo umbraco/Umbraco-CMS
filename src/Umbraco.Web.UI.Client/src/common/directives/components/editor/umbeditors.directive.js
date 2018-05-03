@@ -12,6 +12,8 @@
 
             function addEditor(editor) {
 
+                editor.animating = true;
+
                 showOverlayOnPrevEditor();
                 
                 // start collapsing editors to make room for new ones
@@ -58,7 +60,7 @@
                             return (index + 1) * 80;
                         },
                         easing: 'easeInOutQuint',
-                        duration: 600
+                        duration: 500
                     });
                     */
 
@@ -92,7 +94,12 @@
                         translateX: [100 + '%', 0],
                         opacity: [0, 1],
                         easing: 'easeInOutQuint',
-                        duration: 600
+                        duration: 500,
+                        complete: function() {
+                            $timeout(function(){
+                                editor.animating = false;
+                            });
+                        }
                     });
 
                 });
@@ -100,6 +107,8 @@
             }
 
             function removeEditor(editor) {
+
+                editor.animating = true;
 
                 $timeout(function(){
 
@@ -111,7 +120,7 @@
                         translateX: [0, 100 + '%'],
                         opacity: [1, 0],
                         easing: 'easeInOutQuint',
-                        duration: 600,
+                        duration: 500,
                         complete: function(a) {
                             $timeout(function(){
                                 scope.editors.splice(-1,1);
@@ -162,7 +171,7 @@
                             }
                         },
                         easing: 'easeInOutQuint',
-                        duration: 600,
+                        duration: 500,
                         completed: function() {
 
                         }
