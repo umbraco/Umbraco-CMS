@@ -95,7 +95,7 @@
                         translateX: [100 + '%', 0],
                         opacity: [0, 1],
                         easing: 'easeInOutQuint',
-                        duration: 500,
+                        duration: 400,
                         complete: function() {
                             $timeout(function(){
                                 editor.animating = false;
@@ -121,7 +121,7 @@
                         translateX: [0, 100 + '%'],
                         opacity: [1, 0],
                         easing: 'easeInOutQuint',
-                        duration: 500,
+                        duration: 300,
                         complete: function(a) {
                             $timeout(function(){
                                 scope.editors.splice(-1,1);
