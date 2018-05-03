@@ -836,9 +836,7 @@
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Collections\OrderedHashSet.cs" />
     <Compile Include="Packaging\ConflictingPackageData.cs" />
-    <Compile Include="Packaging\DefaultPackageContext.cs" />
     <Compile Include="Packaging\IConflictingPackageData.cs" />
-    <Compile Include="Packaging\IPackageContext.cs" />
     <Compile Include="Packaging\IPackageExtraction.cs" />
     <Compile Include="Packaging\IPackageInstallation.cs" />
     <Compile Include="Packaging\Models\UninstallationSummary.cs" />

@@ -198,7 +198,7 @@ namespace Umbraco.Core.Services.Implement
                 {
                     return _userRepository.GetByUsername(username, includeSecurityData: true);
                 }
-                catch (DbException ex)
+                catch (DbException)
                 {
                     // fixme - refactor users/upgrade
                     // currently kinda accepting anything on upgrade, but that won't deal with all cases
@@ -727,7 +727,7 @@ namespace Umbraco.Core.Services.Implement
                 {
                     return _userRepository.Get(id);
                 }
-                catch (DbException ex)
+                catch (DbException)
                 {
                     // fixme - refactor users/upgrade
                     // currently kinda accepting anything on upgrade, but that won't deal with all cases
