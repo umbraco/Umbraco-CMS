@@ -24,8 +24,13 @@ namespace Umbraco.Core.Cache
         protected abstract object GetEntry(string key);
 
         // read-write lock the underlying cache
-        protected abstract IDisposable ReadLock { get; }
-        protected abstract IDisposable WriteLock { get; }
+        //protected abstract IDisposable ReadLock { get; }
+        //protected abstract IDisposable WriteLock { get; }
+
+        protected abstract void EnterReadLock();
+        protected abstract void ExitReadLock();
+        protected abstract void EnterWriteLock();
+        protected abstract void ExitWriteLock();
 
         protected string GetCacheKey(string key)
         {
@@ -88,20 +93,30 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearAllCache()
         {
-            using (WriteLock)
+            try
             {
+                EnterWriteLock();
                 foreach (var entry in GetDictionaryEntries()
                     .ToArray())
                     RemoveEntry((string) entry.Key);
+            }
+            finally
+            {
+                ExitWriteLock();
             }
         }
 
         public virtual void ClearCacheItem(string key)
         {
             var cacheKey = GetCacheKey(key);
-            using (WriteLock)
+            try
             {
+                EnterWriteLock();
                 RemoveEntry(cacheKey);
+            }
+            finally
+            {
+                ExitWriteLock();
             }
         }
 
@@ -110,15 +125,16 @@ namespace Umbraco.Core.Cache
             var type = TypeFinder.GetTypeByName(typeName);
             if (type == null) return;
             var isInterface = type.IsInterface;
-            using (WriteLock)
+            try
             {
+                EnterWriteLock();
                 foreach (var entry in GetDictionaryEntries()
                     .Where(x =>
                     {
                         // entry.Value is Lazy<object> and not null, its value may be null
                         // remove null values as well, does not hurt
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        var value = GetSafeLazyValue((Lazy<object>) x.Value, true);
 
                         // if T is an interface remove anything that implements that interface
                         // otherwise remove exact types (not inherited types)
@@ -127,14 +143,19 @@ namespace Umbraco.Core.Cache
                     .ToArray())
                     RemoveEntry((string) entry.Key);
             }
+            finally
+            {
+                ExitWriteLock();
+            }
         }
 
         public virtual void ClearCacheObjectTypes<T>()
         {
             var typeOfT = typeof(T);
             var isInterface = typeOfT.IsInterface;
-            using (WriteLock)
+            try
             {
+                EnterWriteLock();
                 foreach (var entry in GetDictionaryEntries()
                     .Where(x =>
                     {
@@ -142,7 +163,7 @@ namespace Umbraco.Core.Cache
                         // remove null values as well, does not hurt
                         // compare on exact type, don't use "is"
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        var value = GetSafeLazyValue((Lazy<object>) x.Value, true);
 
                         // if T is an interface remove anything that implements that interface
                         // otherwise remove exact types (not inherited types)
@@ -151,6 +172,10 @@ namespace Umbraco.Core.Cache
                     .ToArray())
                     RemoveEntry((string) entry.Key);
             }
+            finally
+            {
+                ExitWriteLock();
+            }
         }
 
         public virtual void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
@@ -158,8 +183,9 @@ namespace Umbraco.Core.Cache
             var typeOfT = typeof(T);
             var isInterface = typeOfT.IsInterface;
             var plen = CacheItemPrefix.Length + 1;
-            using (WriteLock)
+            try
             {
+                EnterWriteLock();
                 foreach (var entry in GetDictionaryEntries()
                     .Where(x =>
                     {
@@ -167,7 +193,7 @@ namespace Umbraco.Core.Cache
                         // remove null values as well, does not hurt
                         // compare on exact type, don't use "is"
                         // get non-created as NonCreatedValue & exceptions as null
-                        var value = GetSafeLazyValue((Lazy<object>)x.Value, true);
+                        var value = GetSafeLazyValue((Lazy<object>) x.Value, true);
                         if (value == null) return true;
 
                         // if T is an interface remove anything that implements that interface
@@ -178,29 +204,43 @@ namespace Umbraco.Core.Cache
                     }))
                     RemoveEntry((string) entry.Key);
             }
+            finally
+            {
+                ExitWriteLock();
+            }
         }
 
         public virtual void ClearCacheByKeySearch(string keyStartsWith)
         {
             var plen = CacheItemPrefix.Length + 1;
-            using (WriteLock)
+            try
             {
+                EnterWriteLock();
                 foreach (var entry in GetDictionaryEntries()
                     .Where(x => ((string)x.Key).Substring(plen).InvariantStartsWith(keyStartsWith))
                     .ToArray())
                     RemoveEntry((string) entry.Key);
+            }
+            finally
+            {
+                ExitWriteLock();
             }
         }
 
         public virtual void ClearCacheByKeyExpression(string regexString)
         {
             var plen = CacheItemPrefix.Length + 1;
-            using (WriteLock)
+            try
             {
+                EnterWriteLock();
                 foreach (var entry in GetDictionaryEntries()
                     .Where(x => Regex.IsMatch(((string)x.Key).Substring(plen), regexString))
                     .ToArray())
                     RemoveEntry((string) entry.Key);
+            }
+            finally
+            {
+                ExitWriteLock();
             }
         }
 
@@ -212,12 +252,18 @@ namespace Umbraco.Core.Cache
         {
             var plen = CacheItemPrefix.Length + 1;
             IEnumerable<DictionaryEntry> entries;
-            using (ReadLock)
+            try
             {
+                EnterReadLock();
                 entries = GetDictionaryEntries()
                     .Where(x => ((string)x.Key).Substring(plen).InvariantStartsWith(keyStartsWith))
                     .ToArray(); // evaluate while locked
             }
+            finally
+            {
+                ExitReadLock();
+            }
+
             return entries
                     .Select(x => GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
                     .Where(x => x != null); // backward compat, don't store null values in the cache
@@ -228,11 +274,16 @@ namespace Umbraco.Core.Cache
             const string prefix = CacheItemPrefix + "-";
             var plen = prefix.Length;
             IEnumerable<DictionaryEntry> entries;
-            using (ReadLock)
+            try
             {
+                EnterReadLock();
                 entries = GetDictionaryEntries()
                     .Where(x => Regex.IsMatch(((string)x.Key).Substring(plen), regexString))
                     .ToArray(); // evaluate while locked
+            }
+            finally
+            {
+                ExitReadLock();
             }
             return entries
                     .Select(x => GetSafeLazyValue((Lazy<object>)x.Value)) // return exceptions as null
@@ -243,9 +294,14 @@ namespace Umbraco.Core.Cache
         {
             cacheKey = GetCacheKey(cacheKey);
             Lazy<object> result;
-            using (ReadLock)
+            try
             {
+                EnterReadLock();
                 result = GetEntry(cacheKey) as Lazy<object>; // null if key not found
+            }
+            finally
+            {
+                ExitReadLock();
             }
             return result == null ? null : GetSafeLazyValue(result); // return exceptions as null
         }

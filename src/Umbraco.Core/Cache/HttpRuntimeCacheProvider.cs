@@ -50,14 +50,26 @@ namespace Umbraco.Core.Cache
 
         #region Lock
 
-        protected override IDisposable ReadLock
+        protected override void EnterReadLock()
         {
-            get { return new ReadLock(_locker); }
+            _locker.EnterReadLock();
         }
 
-        protected override IDisposable WriteLock
+        protected override void EnterWriteLock()
         {
-            get { return new WriteLock(_locker); }
+            _locker.EnterWriteLock();;
+        }
+
+        protected override void ExitReadLock()
+        {
+            if (_locker.IsReadLockHeld)
+                _locker.ExitReadLock();
+        }
+
+        protected override void ExitWriteLock()
+        {
+            if (_locker.IsWriteLockHeld)
+                _locker.ExitWriteLock();
         }
 
         #endregion
@@ -118,9 +130,15 @@ namespace Umbraco.Core.Cache
             // reads. We first try with a normal ReadLock for maximum concurrency and take the penalty of
             // having to re-lock in case there's no value. Would need to benchmark to figure out whether
             // it's worth it, though...
-            using (new ReadLock(_locker))
+            try
             {
+                _locker.EnterReadLock();
                 result = _cache.Get(cacheKey) as Lazy<object>; // null if key not found
+            }
+            finally
+            {
+                if (_locker.IsReadLockHeld)
+                    _locker.ExitReadLock();
             }
             var value = result == null ? null : GetSafeLazyValue(result);
             if (value != null) return value;
@@ -195,10 +213,16 @@ namespace Umbraco.Core.Cache
             var absolute = isSliding ? System.Web.Caching.Cache.NoAbsoluteExpiration : (timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
             var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);
 
-            using (new WriteLock(_locker))
+            try
             {
+                _locker.EnterWriteLock();
                 //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
                 _cache.Insert(cacheKey, result, dependency, absolute, sliding, priority, removedCallback);
+            }
+            finally
+            {
+                if (_locker.IsWriteLockHeld)
+                    _locker.ExitWriteLock();
             }
         }
 

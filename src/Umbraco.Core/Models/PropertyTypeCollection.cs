@@ -80,8 +80,9 @@ namespace Umbraco.Core.Models
             item.IsPublishing = IsPublishing;
 
             // fixme redo this entirely!!!
-            using (new WriteLock(_addLocker))
+            try
             {
+                _addLocker.EnterWriteLock();
                 var key = GetKeyForItem(item);
                 if (key != null)
                 {
@@ -104,6 +105,11 @@ namespace Umbraco.Core.Models
                 OnAdd?.Invoke();
 
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+            }
+            finally
+            {
+                if (_addLocker.IsWriteLockHeld)
+                    _addLocker.ExitWriteLock();
             }
         }
 
