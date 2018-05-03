@@ -10,7 +10,7 @@
 (function () {
     "use strict";
 
-    function PropertySettingsEditor($scope, contentTypeResource, dataTypeResource, dataTypeHelper, localizationService, userService, editorService) {
+    function PropertySettingsEditor($scope, contentTypeResource, dataTypeResource, dataTypeHelper, formHelper, localizationService, userService, editorService) {
 
         var vm = this;
 
@@ -156,8 +156,12 @@
         } 
 
         function submit() {
+            console.log($scope);
+            console.log(vm.propertySettingsForm);
             if($scope.model.submit) {
-                $scope.model.submit($scope.model);
+                if (formHelper.submitForm({scope: $scope})) {
+                    $scope.model.submit($scope.model);
+                }
             }
         }
 
