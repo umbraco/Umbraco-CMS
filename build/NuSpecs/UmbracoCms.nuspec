@@ -27,8 +27,6 @@
     <file src="$BuildTmp$\WebApp\Global.asax" target="Content\Global.asax" />
     <file src="$BuildTmp$\WebApp\Web.config" target="UmbracoFiles\Web.config" />
     <file src="$BuildTmp$\WebApp\App_Browsers\**" target="UmbracoFiles\App_Browsers" />
-    <file src="$BuildTmp$\WebApp\bin\amd64\**" target="UmbracoFiles\bin\amd64" />
-    <file src="$BuildTmp$\WebApp\bin\x86\**" target="UmbracoFiles\bin\x86" />
     <file src="$BuildTmp$\WebApp\config\splashes\**" target="UmbracoFiles\Config\splashes" />
     <file src="$BuildTmp$\WebApp\config\BackOfficeTours\**" target="Content\Config\BackOfficeTours" />
     <file src="$BuildTmp$\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />

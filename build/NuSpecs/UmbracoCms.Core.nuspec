@@ -58,6 +58,7 @@
         <dependency id="System.ValueTuple" version="[4.4.0,4.666666)" />
         <dependency id="System.Xml.ReaderWriter" version="[4.3.1,4.666666)" />
         <dependency id="Umbraco.ModelsBuilder" version="[8.0.0-alpha.17,8.666666)" />
+        <dependency id="Umbraco.SqlServerCE" version="[4.0.0.1,4.666666)" />
         <!--
           although these are package references in csproj files, they cannot or
           should not be part of nuspecs, either because we directly distribute the
@@ -65,19 +66,16 @@
         -->
         <!--<dependency id="xmlrpcnet" version="[3.0.0.266,3.666666)" />-->
         <!--<dependency id="dotless" version="[1.5.2,1.666666)" />-->
-        <!--<dependency id="SqlServerCE" version="[4.0.0.1,4.666666)" />-->
     </dependencies>
   </metadata>
   <files>
-    <file src="$BuildTmp$\WebApp\bin\System.Data.SqlServerCe.dll" target="lib\System.Data.SqlServerCe.dll" />
-    <file src="$BuildTmp$\WebApp\bin\System.Data.SqlServerCe.Entity.dll" target="lib\System.Data.SqlServerCe.Entity.dll" />
-    <file src="$BuildTmp$\WebApp\bin\Umbraco.Core.dll" target="lib\Umbraco.Core.dll" />
+    <file src="$BuildTmp$\WebApp\bin\Umbraco.Core.dll" target="lib\net47\Umbraco.Core.dll" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Core.xml" target="lib\Umbraco.Core.xml" />
-    <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.dll" target="lib\Umbraco.Web.dll" />
+    <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.dll" target="lib\net47\Umbraco.Web.dll" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.xml" target="lib\Umbraco.Web.xml" />
-    <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.dll" target="lib\Umbraco.Web.UI.dll" />
+    <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.dll" target="lib\net47\Umbraco.Web.UI.dll" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.xml" target="lib\Umbraco.Web.UI.xml" />
-    <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.dll" target="lib\Umbraco.Examine.dll" />
+    <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.dll" target="lib\net47\Umbraco.Examine.dll" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.xml" target="lib\Umbraco.Examine.xml" />
 
     <file src="tools\install.core.ps1" target="tools\install.ps1" />
