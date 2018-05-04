@@ -18,6 +18,15 @@ namespace Umbraco.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
+  // check if user is lockedout
+   var memberService = Services.MemberService;
+   var _member = memberService.GetByUsername(model.Username); 
+   if (_member.IsLockedOut)
+   {
+    ModelState.AddModelError("loginModel", "User is blocked, contact admin");
+    return CurrentUmbracoPage();
+   }
+   
             if (Members.Login(model.Username, model.Password) == false)
             {
                 //don't add a field level error, just model level
