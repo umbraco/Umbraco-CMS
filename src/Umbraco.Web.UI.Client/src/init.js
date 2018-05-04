@@ -42,13 +42,13 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
             returnToPath = null, returnToSearch = null;
         }
 
-        var currentRoute = null;
+        var currentRouteParams = null;
         var globalQueryStrings = ["mculture"];
 
         /** execute code on each successful route */
         $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
 
-            currentRoute = current; //store this so we can reference it in $routeUpdate
+            currentRouteParams = angular.copy(current.params); //store this so we can reference it in $routeUpdate
 
             var deployConfig = Umbraco.Sys.ServerVariables.deploy;
             var deployEnv, deployEnvTitle;
@@ -118,7 +118,7 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
         //We can then detect if it's a location change that should force a route or not programatically.
         $rootScope.$on('$routeUpdate', function (event, next) {
 
-            if (!currentRoute) {
+            if (!currentRouteParams) {
                 //if there is no current route then always route which is done with reload
                 $route.reload();
             }
@@ -126,22 +126,25 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
                 //check if the location being changed is only the mculture query string, if so, cancel the routing since this is just
                 //used as a global persistent query string that does not change routes.
 
-                var currUrlParts = currentRoute.params;
+                var currUrlParts = currentRouteParams;
                 var nextUrlParts = next.params;
 
-                var allowRoute = false;
+                var allowRoute = true;
 
-                if (_.keys(currUrlParts).length == _.keys(nextUrlParts).length) {  //the number of parts are the same
-
-                    //check if any route parameter is not the same (excluding our special global query strings), in that case
-                    //we should allow the route.
+                //the only time that we want to cancel is if any of the globalQueryStrings have changed
+                //in which case the number of parts need to be equal before comparing values
+                if (_.keys(currUrlParts).length == _.keys(nextUrlParts).length) {
+                    var partsChanged = 0;
                     _.each(currUrlParts, function (value, key) {
                         if (globalQueryStrings.indexOf(key) === -1) {
                             if (value.toLowerCase() !== nextUrlParts[key].toLowerCase()) {
-                                allowRoute = true;
+                                partsChanged++;
                             }
                         }
                     });
+                    if (partsChanged === 0) {
+                        allowRoute = false; //nothing except our query strings chagned, so don't continue routing
+                    }
                 }
 
                 if (allowRoute) {
