@@ -1,10 +1,6 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['userService', '$q', '$log', '$rootScope', '$location', 'queryStrings', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService', 'tourService', 'dashboardResource',
-    function (userService, $q, $log, $rootScope, $location, queryStrings, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService, tourService, dashboardResource) {
-
-        $rootScope.$on('$locationChangeStart', function (event, next, current, newState, oldState) {
-            $log.info("location changing to:" + next);
-        });
+app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlHelper', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService', 'tourService', 'dashboardResource',
+    function (userService, $q, $log, $rootScope, $route, $location, urlHelper, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService, tourService, dashboardResource) {
 
         //This sets the default jquery ajax headers to include our csrf token, we
         // need to user the beforeSend method because our token changes per user/login so
@@ -12,7 +8,8 @@ app.run(['userService', '$q', '$log', '$rootScope', '$location', 'queryStrings',
         $.ajaxSetup({
             beforeSend: function (xhr) {
                 xhr.setRequestHeader("X-UMB-XSRF-TOKEN", $cookies["UMB-XSRF-TOKEN"]);
-                if (queryStrings.getParams().umbDebug === "true" || queryStrings.getParams().umbdebug === "true") {
+                var queryStrings = urlHelper.getQueryStringParams();
+                if (queryStrings.umbDebug === "true" || queryStrings.umbdebug === "true") {
                     xhr.setRequestHeader("X-UMB-DEBUG", "true");
                 }
             }
@@ -45,8 +42,13 @@ app.run(['userService', '$q', '$log', '$rootScope', '$location', 'queryStrings',
             returnToPath = null, returnToSearch = null;
         }
 
+        var currentRoute = null;
+        var globalQueryStrings = ["mculture"];
+
         /** execute code on each successful route */
         $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
+
+            currentRoute = current; //store this so we can reference it in $routeUpdate
 
             var deployConfig = Umbraco.Sys.ServerVariables.deploy;
             var deployEnv, deployEnvTitle;
@@ -92,19 +94,61 @@ app.run(['userService', '$q', '$log', '$rootScope', '$location', 'queryStrings',
         /** When the route change is rejected - based on checkAuth - we'll prevent the rejected route from executing including
             wiring up it's controller, etc... and then redirect to the rejected URL.   */
         $rootScope.$on('$routeChangeError', function (event, current, previous, rejection) {
-            event.preventDefault();
 
-            var returnPath = null;
-            if (rejection.path == "/login" || rejection.path.startsWith("/login/")) {
-                //Set the current path before redirecting so we know where to redirect back to
-                returnPath = encodeURIComponent($location.url());
+            if (rejection.path) {
+                event.preventDefault();
+
+                var returnPath = null;
+                if (rejection.path == "/login" || rejection.path.startsWith("/login/")) {
+                    //Set the current path before redirecting so we know where to redirect back to
+                    returnPath = encodeURIComponent($location.url());
+                }
+
+                $location.path(rejection.path)
+                if (returnPath) {
+                    $location.search("returnPath", returnPath);
+                }
             }
 
-            $location.path(rejection.path)
-            if (returnPath) {
-                $location.search("returnPath", returnPath);
-            }
+        });
 
+        //Bind to $routeUpdate which will execute anytime a location changes but the route is not triggered.
+        //This is the case when a route uses reloadOnSearch: false which is the case for many or our routes so that we are able to maintain
+        //global state query strings without force re-loading views.
+        //We can then detect if it's a location change that should force a route or not programatically.
+        $rootScope.$on('$routeUpdate', function (event, next) {
+
+            if (!currentRoute) {
+                //if there is no current route then always route which is done with reload
+                $route.reload();
+            }
+            else {
+                //check if the location being changed is only the mculture query string, if so, cancel the routing since this is just
+                //used as a global persistent query string that does not change routes.
+
+                var currUrlParts = currentRoute.params;
+                var nextUrlParts = next.params;
+
+                var allowRoute = false;
+
+                if (_.keys(currUrlParts).length == _.keys(nextUrlParts).length) {  //the number of parts are the same
+
+                    //check if any route parameter is not the same (excluding our special global query strings), in that case
+                    //we should allow the route.
+                    _.each(currUrlParts, function (value, key) {
+                        if (globalQueryStrings.indexOf(key) === -1) {
+                            if (value.toLowerCase() !== nextUrlParts[key].toLowerCase()) {
+                                allowRoute = true;
+                            }
+                        }
+                    });
+                }
+
+                if (allowRoute) {
+                    //continue the route
+                    $route.reload();
+                }
+            }
         });
 
         //check for touch device, add to global appState

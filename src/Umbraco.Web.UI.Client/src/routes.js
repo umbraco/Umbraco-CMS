@@ -1,5 +1,5 @@
 app.config(function ($routeProvider) {
-
+    
     /**
      * This determines if the route can continue depending on authentication and initialization requirements
      * @param {boolean} authRequired If true, it checks if the user is authenticated and will resolve successfully
@@ -127,6 +127,7 @@ app.config(function ($routeProvider) {
                     }
                 });
             },
+            reloadOnSearch: false,
             resolve: canRoute(true)
         })
         .when('/:section/framed/:url', {
@@ -137,6 +138,7 @@ app.config(function ($routeProvider) {
 
                 return 'views/common/legacy.html';
             },
+            reloadOnSearch: false,
             resolve: canRoute(true)
         })
         .when('/:section/:tree/:method', {
@@ -148,6 +150,7 @@ app.config(function ($routeProvider) {
                 
                 return ('views/' + rp.tree + '/' + rp.method + '.html');
             },
+            reloadOnSearch: false,
             resolve: canRoute(true)
         })
         .when('/:section/:tree/:method/:id', {
@@ -179,6 +182,7 @@ app.config(function ($routeProvider) {
                 }
 
             },
+            reloadOnSearch: false,
             resolve: canRoute(true)
         })
         .otherwise({ redirectTo: '/login' });

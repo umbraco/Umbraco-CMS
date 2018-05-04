@@ -334,7 +334,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                     });
                 }
                 if (!currCulture) {
-                    navigationService.setMainCulture(defaultLang ? defaultLang.culture : null);
+                    $location.search("mculture", defaultLang ? defaultLang.culture : null);
                 }
             }
 
@@ -369,10 +369,8 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     $scope.selectLanguage = function (language) {
 
-        navigationService.setMainCulture(language.culture);
-
-        //$scope.selectedLanguage = language;
-
+        $location.search("mculture", language.culture);
+        
         // close the language selector
         $scope.page.languageSelectorIsOpen = false;
 

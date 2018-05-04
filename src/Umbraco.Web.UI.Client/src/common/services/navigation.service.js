@@ -15,7 +15,7 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, $injector, eventsService, dialogService, umbModelMapper, treeService, notificationsService, historyService, appState, angularHelper) {
+function navigationService($rootScope, $route, $routeParams, $log, $location, $q, $timeout, $injector, urlHelper, eventsService, dialogService, umbModelMapper, treeService, notificationsService, historyService, appState, angularHelper) {
 
     //the promise that will be resolved when the navigation is ready
     var navReadyPromise = $q.defer();
@@ -27,6 +27,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         mainTreeApi = args.treeApi;
         navReadyPromise.resolve(mainTreeApi);
     });
+
 
     //used to track the current dialog object
     var currentDialog = null;
@@ -106,25 +107,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
         /**
          * @ngdoc method
-         * @name umbraco.services.navigationService#setMainCulture
-         * @methodOf umbraco.services.navigationService
-         *
-         * @description
-         * Utility to set the mculture query string without changing the route. This is a hack to work around angular's limitations
-         */
-        setMainCulture: function (culture) {
-            
-            $location.search("mculture", culture);
-
-            //fixme: This can work but interferes with our other $locationChangeStart
-            //var un = $rootScope.$on('$locationChangeStart', function (event) {
-            //    event.preventDefault();
-            //    un();
-            //});
-        },
-
-        /**
-         * @ngdoc method
          * @name umbraco.services.navigationService#clearSearch
          * @methodOf umbraco.services.navigationService
          *
@@ -132,10 +114,10 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * utility to clear the querystring/search params while maintaining a known list of parameters that should be maintained throughout the app
          */
         clearSearch: function () {
-            var retainKeys = ["mculture"];
+            var toRetain = ["mculture"];
             var currentSearch = $location.search();
             $location.search('');
-            _.each(retainKeys, function (k) {
+            _.each(toRetain, function (k) {
                 if (currentSearch[k]) {
                     $location.search(k, currentSearch[k]);
                 }
