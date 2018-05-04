@@ -72,7 +72,7 @@
     <PackageReference Include="Microsoft.Win32.Registry" Version="4.4.0" />
     <PackageReference Include="Moq" Version="4.8.2" />
     <PackageReference Include="NPoco" Version="3.9.3" />
-    <PackageReference Include="SqlServerCE" Version="4.0.0.1" />
+    <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
     <PackageReference Include="System.AppContext" Version="4.3.0" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
@@ -162,12 +162,5 @@
   </PropertyGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild">
-    <ItemGroup>
-      <SqlCE64 Include="$(NuGetPackages)SqlServerCE\4.0.0.1\amd64\*.*" />
-      <SqlCE86 Include="$(NuGetPackages)SqlServerCE\4.0.0.1\x86\*.*" />
-    </ItemGroup>
-    <Message Text="Copy SqlCe files to $(TargetDir)" Importance="high" />
-    <Copy SourceFiles="@(SqlCe64)" DestinationFolder="$(TargetDir)amd64" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(SqlCe86)" DestinationFolder="$(TargetDir)x86" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
   </Target>
 </Project>

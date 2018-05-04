@@ -112,6 +112,13 @@
     <PackageReference Include="MySql.Data" Version="6.10.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="SqlServerCE" Version="4.0.0.1" />
+    <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
+    <PackageReference Include="System.Reflection.Metadata" Version="1.5.0" />
+    <PackageReference Include="System.Reflection.Primitives" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Handles" Version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
+    <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
     <PackageReference Include="Umbraco.ModelsBuilder" Version="8.0.0-alpha.17" />
   </ItemGroup>
@@ -607,14 +614,6 @@
     <Message Text="WebPublishingTasks:    $(WebPublishingTasks)" Importance="high" />
     <Message Text="NuGetPackageFolders:   $(NuGetPackageFolders)" Importance="high" />
     <Message Text="NuGetPackages:         $(NuGetPackages)" Importance="high" />
-    <!-- copy SqlCe -->
-    <ItemGroup>
-      <SqlCE64 Include="$(NuGetPackages)SqlServerCE\4.0.0.1\amd64\*.*" />
-      <SqlCE86 Include="$(NuGetPackages)SqlServerCE\4.0.0.1\x86\*.*" />
-    </ItemGroup>
-    <Message Text="Copy SqlCe files to $(TargetDir)" Importance="high" />
-    <Copy SourceFiles="@(SqlCe64)" DestinationFolder="$(TargetDir)amd64" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(SqlCe86)" DestinationFolder="$(TargetDir)x86" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
     <!-- Create web.config file from Template if it doesn't exist -->
     <Message Text="Copy Web.Template.config to Web.config" Importance="high" Condition="!Exists('$(ProjectDir)Web.config')" />
     <Copy SourceFiles="$(ProjectDir)web.Template.config" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Web.config')" />
@@ -642,7 +641,7 @@
     <ItemGroup>
       <BelleLib Include="$(ProjectDir)Umbraco\lib" />
     </ItemGroup>
-    <RemoveDir Directories="@(BelleLib)" Condition="Exists('$(ProjectDir)Umbraco\lib') and !Exists('$(SolutionDir)preserve.belle')"/>
+    <RemoveDir Directories="@(BelleLib)" Condition="Exists('$(ProjectDir)Umbraco\lib') and !Exists('$(SolutionDir)preserve.belle')" />
   </Target>
   <Target Name="AfterBuild">
     <Message Text="-AfterBuild-" Importance="high" />
