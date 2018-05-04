@@ -304,7 +304,6 @@
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
                     var dialog = {
-                        title: "Ready to Publish?", //TODO: localize
                         view: "publish",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
@@ -400,7 +399,7 @@
                 var target = null;
                 var error = { headline: "Cannot automatically restore this item", content: "Use the Move menu item to move it manually" };
 
-                if (data.length == 0) {
+                if (data.length === 0) {
                     notificationsService.error(error.headline, "There is no 'restore' relation found for this node. Use the Move menu item to move it manually.");
                     $scope.page.buttonRestore = "error";
                     return;
@@ -408,7 +407,7 @@
 
                 relation = data[0];
 
-                if (relation.parentId == -1) {
+                if (relation.parentId === -1) {
                     target = { id: -1, name: "Root" };
                     moveNode(content, target);
                 } else {
@@ -465,7 +464,6 @@
                 $scope.editors[editorIndex].content = angular.copy($scope.content);
                 $scope.editors[editorIndex].content.name = "What a variant";
                 // set selected variant on split view content
-                console.log($scope.editors[editorIndex].content.variants);
                 angular.forEach($scope.editors[editorIndex].content.variants, function (variant) {
                     if (variant.culture === selectedVariant.culture) {
                         variant.current = true;
