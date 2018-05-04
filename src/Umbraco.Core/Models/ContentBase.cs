@@ -56,7 +56,7 @@ namespace Umbraco.Core.Models
             Id = 0; // no identity
             VersionId = 0; // no versions
 
-            SetName(culture, name);
+            SetName(name, culture);
 
             _contentTypeId = contentType.Id;
             _properties = properties ?? throw new ArgumentNullException(nameof(properties));

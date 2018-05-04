@@ -978,7 +978,7 @@ namespace Umbraco.Tests.Services
             var content = new Content(string.Empty, -1, ServiceContext.ContentTypeService.Get("umbTextpage"));
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => contentService.Save(content));
+            Assert.Throws<InvalidOperationException>(() => contentService.Save(content));
         }
 
         [Test]
@@ -2562,7 +2562,11 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual("name-fr", content2.GetName(langFr.IsoCode));
             Assert.AreEqual("name-uk", content2.GetName(langUk.IsoCode));
 
-            Assert.IsNull(content2.PublishName); // we haven't published InvariantNeutral
+            // we haven't published InvariantNeutral, but a document cannot be published without an invariant name,
+            // so when we tried and published for the first time above the french culture, the french name was used
+            // to populate the invariant name
+            Assert.AreEqual("name-fr", content2.PublishName);
+
             Assert.AreEqual("name-fr", content2.GetPublishName(langFr.IsoCode));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
 

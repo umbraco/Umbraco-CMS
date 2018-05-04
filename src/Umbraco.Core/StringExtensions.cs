@@ -1163,7 +1163,6 @@ namespace Umbraco.Core
         public static string ToUrlSegment(this string text, string culture)
         {
             if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullOrEmptyException(nameof(text));
-            if (culture == null) throw new ArgumentNullException(nameof(culture));
 
             return Current.ShortStringHelper.CleanStringForUrlSegment(text, culture);
         }
