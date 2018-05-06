@@ -1,3 +1,18 @@
+<style>
+    .button {
+        border: none;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        margin: 4px 2px;
+        border-radius: 8px;
+    }
+
+
+
+</style>
 <div ng-controller="Umbraco.Overlays.IconPickerOverlay">
 
     <div class="umb-control-group">
@@ -13,11 +28,32 @@
                    no-dirty-check />
         </div>
     </div>
-
     <div class="umb-control-group">
+        <button class="button color-blue-grey" value="color-blue-grey" title="Blue Grey" ng-click="IconPickerOverlay()"></button>
+        <button class="button color-grey" value="color-grey" title="Grey" ng-color="color"></button>
+        <button class="button color-brown" value="color-brown" title="Brown" ng-model="color"></button>
+        <button class="button color-blue" value="color-blue" title="Blue" ng-model="color"></button>
+        <button class="button color-light-blue" title="Light Blue" ng-model="color"></button>
+        <button class="button color-cyan" title="Cyan" ng-model="color"></button>
+        <button class="button color-green" title="Green" ng-model="color"></button>
+        <button class="button color-light-green" title="Light Green" ng-model="color"></button>
+        <button class="button color-yellow" title="Yellow" ng-model="color"></button>
+        <button class="button color-lime" title="Lime" ng-model="color"></button>
+        <button class="button color-amber" title="Amber" ng-model="color"></button>
+        <button class="button color-orange" title="Orange" ng-model="color"></button>
+        <button class="button color-deep-orange" title="Deep Orange" ng-model="color"></button>
+        <button class="button color-red" title="Red" ng-model="color"></button>
+        <button class="button color-pink" title="Pink" ng-model="color"></button>
+        <button class="button color-purple" title="Purple" ng-model="color"></button>
+        <button class="button color-deep-purple" title="Deep Purple" ng-model="color"></button>
+        <button class="button color-indigo" title="Indigo" ng-model="color"></button>
+    </div>
+    {{color}}
+    <!--<div class="umb-control-group">
         <select ng-model="color" class="input-block-level">
+<<<<<<< HEAD
             <option value=""><localize key="colors_black">Black</localize></option>
-            <option value="color-blue-grey"><localize key="colors_bluegrey">Blue Grey</localize></option>
+            <option value="color-blue-grey" class="color-blue-grey"><localize key="colors_bluegrey">Blue Grey</localize></option>
             <option value="color-grey"><localize key="colors_grey">Grey</localize></option>
             <option value="color-brown"><localize key="colors_brown">Brown</localize></option>
             <option value="color-blue"><localize key="colors_blue">Blue</localize></option>
@@ -29,14 +65,35 @@
             <option value="color-lime"><localize key="colors_lime">Lime</localize></option>
             <option value="color-amber"><localize key="colors_amber">Amber</localize></option>
             <option value="color-orange"><localize key="colors_orange">Orange</localize></option>
-            <option value="color-deep-orange"><localize key="colors_deeporange">Deep Orange</localize></option>
+            <option value="color-deep-orange" class="color-deep-orange"><localize key="colors_deeporange">Deep Orange</localize></option>
             <option value="color-red"><localize key="colors_red">Red</localize></option>
             <option value="color-pink"><localize key="colors_pink">Pink</localize></option>
             <option value="color-purple"><localize key="colors_purple">Purple</localize></option>
             <option value="color-deep-purple"><localize key="colors_deeppurple">Deep Purple</localize></option>
             <option value="color-indigo"><localize key="colors_indigo">Indigo</localize></option>
+=======
+              <option value=""><localize key="colors_black">Black</localize></option>
+            <option value="color-blue-grey" class="color-blue-grey"><localize key="colors_bluegrey">Blue Grey</localize></option>
+            <option value="color-grey" class="color-grey"><localize key="colors_grey">Grey</localize></option>
+            <option value="color-brown" class="color-brown"><localize key="colors_brown">Brown</localize></option>
+            <option value="color-blue" class="color-blue"><localize key="colors_blue">Blue</localize></option>
+            <option value="color-light-blue" class="color-light-blue"><localize key="colors_lightblue">Light Blue</localize></option>
+            <option value="color-cyan" class="color-cyan"><localize key="colors_cyan">Cyan</localize></option>
+            <option value="color-green" class="color-green"><localize key="colors_green">Green</localize></option>
+            <option value="color-light-green" class="color-light-green"><localize key="colors_lightgreen">Light Green</localize></option>
+            <option value="color-yellow" class="color-yellow"><localize key="colors_yellow">Yellow</localize></option>
+            <option value="color-lime" class="color-lime"><localize key="colors_lime">Lime</localize></option>
+            <option value="color-amber" class="color-amber"><localize key="colors_amber">Amber</localize></option>
+            <option value="color-orange" class="color-orange"><localize key="colors_orange">Orange</localize></option>
+            <option value="color-deep-orange" class="color-deep-orange"><localize key="colors_deeporange">Deep Orange</localize></option>
+            <option value="color-red" class="color-red"><localize key="colors_red">Red</localize></option>
+            <option value="color-pink" class="color-pink"><localize key="colors_pink">Pink</localize></option>
+            <option value="color-purple" class="color-purple"><localize key="colors_purple">Purple</localize></option>
+            <option value="color-deep-purple" class="color-deep-purple"><localize key="colors_deeppurple">Deep Purple</localize></option>
+            <option value="color-indigo" class="color-indigo"><localize key="colors_indigo">Indigo</localize></option>
+>>>>>>> temp-U4-11168
         </select>
-    </div>
+    </div>-->
 
     <umb-load-indicator ng-if="loading"></umb-load-indicator>
 
