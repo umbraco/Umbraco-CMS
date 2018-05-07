@@ -36,6 +36,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private CacheValues _cacheValues;
 
         private string _valuesCacheKey;
+        private string _recurseCacheKey;
 
         // initializes a published content property with no value
         public Property(PublishedPropertyType propertyType, PublishedContent content, IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
