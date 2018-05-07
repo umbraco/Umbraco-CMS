@@ -1,7 +1,7 @@
 (function() {
   'use strict';
 
-  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, localizationService) {
+  function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, localizationService, editorService) {
 
     function link(scope, el, attr, ctrl) {
 
@@ -491,77 +491,79 @@
 
         if (!property.inherited) {
 
-          scope.propertySettingsDialogModel = {};
-          scope.propertySettingsDialogModel.title = "Property settings";
-          scope.propertySettingsDialogModel.property = property;
-          scope.propertySettingsDialogModel.contentType = scope.contentType;
-          scope.propertySettingsDialogModel.contentTypeName = scope.model.name;
-          scope.propertySettingsDialogModel.view = "views/common/overlays/contenttypeeditor/propertysettings/propertysettings.html";
-          scope.propertySettingsDialogModel.show = true;
+          var oldPropertyModel = angular.copy(property);
+
+          var propertySettings = {
+            title: "Property settings",
+            property: property,
+            contentType: scope.contentType,
+            contentTypeName: scope.model.name,
+            view: "views/common/infiniteeditors/propertysettings/propertysettings.html",
+            size: "small",
+            submit: function(model) {
+
+              property.inherited = false;
+              property.dialogIsOpen = false;
+  
+              // update existing data types
+              if(model.updateSameDataTypes) {
+                updateSameDataTypes(property);
+              }
+  
+              // close the editor
+              editorService.close();
+  
+              // push new init property to group
+              addInitProperty(group);
+  
+              // set focus on init property
+              var numberOfProperties = group.properties.length;
+              group.properties[numberOfProperties - 1].focus = true;
+  
+              // push new init tab to the scope
+              addInitGroup(scope.model.groups);
+
+            },
+            close: function() {
+
+              // reset all property changes
+              property.label = oldPropertyModel.label;
+              property.alias = oldPropertyModel.alias;
+              property.description = oldPropertyModel.description;
+              property.config = oldPropertyModel.config;
+              property.editor = oldPropertyModel.editor;
+              property.view = oldPropertyModel.view;
+              property.dataTypeId = oldPropertyModel.dataTypeId;
+              property.dataTypeIcon = oldPropertyModel.dataTypeIcon;
+              property.dataTypeName = oldPropertyModel.dataTypeName;
+              property.validation.mandatory = oldPropertyModel.validation.mandatory;
+              property.validation.pattern = oldPropertyModel.validation.pattern;
+              property.showOnMemberProfile = oldPropertyModel.showOnMemberProfile;
+              property.memberCanEdit = oldPropertyModel.memberCanEdit;
+              property.isSensitiveValue = oldPropertyModel.isSensitiveValue;
+
+              // because we set state to active, to show a preview, we have to check if has been filled out
+              // label is required so if it is not filled we know it is a placeholder
+              if(oldPropertyModel.editor === undefined || oldPropertyModel.editor === null || oldPropertyModel.editor === "") {
+                property.propertyState = "init";
+              } else {
+                property.propertyState = oldPropertyModel.propertyState;
+              }
+
+              // remove the editor
+              editorService.close();
+              
+            }
+          };
+
+          // open property settings editor
+          editorService.open(propertySettings);
 
           // set state to active to access the preview
           property.propertyState = "active";
 
           // set property states
           property.dialogIsOpen = true;
-
-          scope.propertySettingsDialogModel.submit = function(model) {
-
-            property.inherited = false;
-            property.dialogIsOpen = false;
-
-            // update existing data types
-            if(model.updateSameDataTypes) {
-              updateSameDataTypes(property);
-            }
-
-            // remove dialog
-            scope.propertySettingsDialogModel.show = false;
-            scope.propertySettingsDialogModel = null;
-
-            // push new init property to group
-            addInitProperty(group);
-
-            // set focus on init property
-            var numberOfProperties = group.properties.length;
-            group.properties[numberOfProperties - 1].focus = true;
-
-            // push new init tab to the scope
-            addInitGroup(scope.model.groups);
-
-          };
-
-          scope.propertySettingsDialogModel.close = function(oldModel) {
-
-            // reset all property changes
-            property.label = oldModel.property.label;
-            property.alias = oldModel.property.alias;
-            property.description = oldModel.property.description;
-            property.config = oldModel.property.config;
-            property.editor = oldModel.property.editor;
-            property.view = oldModel.property.view;
-            property.dataTypeId = oldModel.property.dataTypeId;
-            property.dataTypeIcon = oldModel.property.dataTypeIcon;
-            property.dataTypeName = oldModel.property.dataTypeName;
-            property.validation.mandatory = oldModel.property.validation.mandatory;
-            property.validation.pattern = oldModel.property.validation.pattern;
-            property.showOnMemberProfile = oldModel.property.showOnMemberProfile;
-            property.memberCanEdit = oldModel.property.memberCanEdit;
-            property.isSensitiveValue = oldModel.property.isSensitiveValue;
-
-            // because we set state to active, to show a preview, we have to check if has been filled out
-            // label is required so if it is not filled we know it is a placeholder
-            if(oldModel.property.editor === undefined || oldModel.property.editor === null || oldModel.property.editor === "") {
-              property.propertyState = "init";
-            } else {
-              property.propertyState = oldModel.property.propertyState;
-            }
-
-            // remove dialog
-            scope.propertySettingsDialogModel.show = false;
-            scope.propertySettingsDialogModel = null;
-
-          };
 
         }
       };

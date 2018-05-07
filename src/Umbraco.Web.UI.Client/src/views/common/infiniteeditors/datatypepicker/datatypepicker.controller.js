@@ -1,16 +1,16 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.DocumentType.PropertyController
+ * @name Umbraco.Editors.DataTypePickerController
  * @function
  *
  * @description
- * The controller for the content type editor property dialog
+ * The controller for the content type editor data type picker dialog
  */
 
 (function() {
     "use strict";
 
-    function EditorPickerOverlay($scope, dataTypeResource, dataTypeHelper, contentTypeResource, localizationService) {
+    function DataTypePicker($scope, dataTypeResource, dataTypeHelper, contentTypeResource, localizationService, editorService) {
 
         var vm = this;
 
@@ -43,6 +43,7 @@
         vm.hideDetailsOverlay = hideDetailsOverlay;
         vm.pickEditor = pickEditor;
         vm.pickDataType = pickDataType;
+        vm.close = close;
 
         function activate() {
 
@@ -141,11 +142,8 @@
 
                 // get pre values
                 dataTypeResource.getPreValues(dataType.selectedEditor).then(function(preValues) {
-
                     dataType.preValues = preValues;
-
-                    openEditorSettingsOverlay(dataType, true);
-
+                    openDataTypeEditor(dataType, true);
                 });
 
             });
@@ -156,40 +154,38 @@
 
             dataTypeResource.getById(selectedDataType.id).then(function(dataType) {
                 contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType) {
-                    submitOverlay(dataType, propertyType, false);
+                    submit(dataType, propertyType, false);
                 });
             });
 
         }
 
-        function openEditorSettingsOverlay(dataType, isNew) {
-            vm.editorSettingsOverlay = {
+        function openDataTypeEditor(dataType, isNew) {
+
+            var dataTypeSettings = {
                 title: localizationService.localize("contentTypeEditor_editorSettings"),
                 dataType: dataType,
-                view: "views/common/overlays/contenttypeeditor/editorsettings/editorsettings.html",
-                show: true,
+                create: isNew,
+                view: "views/common/infiniteeditors/datatypesettings/datatypesettings.html",
                 submit: function(model) {
                     var preValues = dataTypeHelper.createPreValueProps(model.dataType.preValues);
-
                     dataTypeResource.save(model.dataType, preValues, isNew).then(function(newDataType) {
-
                         contentTypeResource.getPropertyTypeScaffold(newDataType.id).then(function(propertyType) {
-
-                            submitOverlay(newDataType, propertyType, true);
-
-                            vm.editorSettingsOverlay.show = false;
-                            vm.editorSettingsOverlay = null;
-
+                            submit(newDataType, propertyType, true);
+                            editorService.close();
                         });
-
                     });
+                },
+                close: function() {
+                    editorService.close();
                 }
             };
 
+            editorService.open(dataTypeSettings);
+
         }
 
-        function submitOverlay(dataType, propertyType, isNew) {
-
+        function submit(dataType, propertyType, isNew) {
             // update property
             $scope.model.property.config = propertyType.config;
             $scope.model.property.editor = propertyType.editor;
@@ -201,13 +197,18 @@
             $scope.model.updateSameDataTypes = isNew;
 
             $scope.model.submit($scope.model);
+        }
 
+        function close() {
+            if($scope.model.close) {
+                $scope.model.close();
+            }
         }
 
         activate();
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Overlays.EditorPickerOverlay", EditorPickerOverlay);
+    angular.module("umbraco").controller("Umbraco.Editors.DataTypePickerController", DataTypePicker);
 
 })();

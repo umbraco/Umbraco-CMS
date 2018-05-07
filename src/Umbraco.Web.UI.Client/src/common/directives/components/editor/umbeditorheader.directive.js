@@ -204,7 +204,7 @@ Use this directive to construct a header inside the main editor window.
 (function() {
     'use strict';
 
-    function EditorHeaderDirective(iconHelper, $location) {
+    function EditorHeaderDirective(iconHelper, $location, editorService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -252,30 +252,24 @@ Use this directive to construct a header inside the main editor window.
             };
 
             scope.openIconPicker = function() {
-                scope.dialogModel = {
-                    view: "iconpicker",
-                    show: true,
-                    submit: function (model) {
-
-                        /* ensure an icon is selected, because on focus on close button
-                           or an element in background no icon is submitted. So don't clear/update existing icon/preview.
-                        */
+                var iconPicker = {
+                    submit: function(model) {
                         if (model.icon) {
-
                             if (model.color) {
                                 scope.icon = model.icon + " " + model.color;
                             } else {
                                 scope.icon = model.icon;
                             }
-
                             // set the icon form to dirty
                             scope.iconForm.$setDirty();
                         }
-
-                        scope.dialogModel.show = false;
-                        scope.dialogModel = null;
+                        editorService.close();
+                    },
+                    close: function() {
+                        editorService.close();
                     }
                 };
+                editorService.iconPicker(iconPicker);
             };
 
             scope.closeSplitView = function() {
