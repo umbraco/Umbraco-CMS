@@ -14,6 +14,11 @@
                    no-dirty-check />
         </div>
     </div>
+
+    <div class="umb-control-group">
+        <umb-color-swatches colors="colors" on-select="setColor()"></umb-color-swatches>
+    </div>
+
     <div class="umb-control-group">
         <button ng-repeat="c in colors" class="button btn-{{c.value}}" ng-class="{ active: c.value === color }" title="{{c.name}}" ng-click="setColor(c.value)">
             <div class="check_circle" ng-class="{active:c.value === color}">
