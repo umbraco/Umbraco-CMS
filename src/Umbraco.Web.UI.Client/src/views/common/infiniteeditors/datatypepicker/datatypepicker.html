@@ -61,6 +61,9 @@
                                             ng-mouseover="vm.showDetailsOverlay(dataType)"
                                             ng-click="vm.pickDataType(dataType)"
                                             class="-four-in-row">
+                                            <div ng-if="dataType.loading" class="umb-card-grid-item__loading">
+                                                <div class="umb-button__progress"></div>
+                                            </div>
                                             <a class="umb-card-grid-item" href="" title="{{ dataType.name }}">
                                                 <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
                                                 {{ dataType.name }}
@@ -83,6 +86,9 @@
                                     ng-mouseover="vm.showDetailsOverlay(dataType)"
                                     ng-click="vm.pickDataType(dataType)"
                                     class="-four-in-row">
+                                    <div ng-if="dataType.loading" class="umb-card-grid-item__loading">
+                                        <div class="umb-button__progress"></div>
+                                    </div>
                                     <a class="umb-card-grid-item" href="" title="{{ dataType.name }}">
                                         <i class="{{ dataType.icon }}" ng-class="{'icon-autofill': dataType.icon == null}"></i>
                                         {{ dataType.name }}

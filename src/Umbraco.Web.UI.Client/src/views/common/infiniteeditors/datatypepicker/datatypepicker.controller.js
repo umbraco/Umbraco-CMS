@@ -113,67 +113,19 @@
             $scope.model.itemDetails = null;
         }
 
-        function pickEditor(editor) {
-
-            var parentId = -1;
-
-            dataTypeResource.getScaffold(parentId).then(function(dataType) {
-
-                // set alias
-                dataType.selectedEditor = editor.alias;
-
-                // set name
-                var nameArray = [];
-
-                if ($scope.model.contentTypeName) {
-                    nameArray.push($scope.model.contentTypeName);
-                }
-
-                if ($scope.model.property.label) {
-                    nameArray.push($scope.model.property.label);
-                }
-
-                if (editor.name) {
-                    nameArray.push(editor.name);
-                }
-
-                // make name
-                dataType.name = nameArray.join(" - ");
-
-                // get pre values
-                dataTypeResource.getPreValues(dataType.selectedEditor).then(function(preValues) {
-                    dataType.preValues = preValues;
-                    openDataTypeEditor(dataType, true);
-                });
-
-            });
-
-        }
-
-        function pickDataType(selectedDataType) {
-
-            dataTypeResource.getById(selectedDataType.id).then(function(dataType) {
-                contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType) {
-                    submit(dataType, propertyType, false);
-                });
-            });
-
-        }
-
-        function openDataTypeEditor(dataType, isNew) {
+        function pickEditor(propertyEditor) {
 
             var dataTypeSettings = {
                 title: localizationService.localize("contentTypeEditor_editorSettings"),
-                dataType: dataType,
-                create: isNew,
+                propertyEditor: propertyEditor,
+                property: $scope.model.property,
+                contentTypeName: $scope.model.contentTypeName,
+                create: true,
                 view: "views/common/infiniteeditors/datatypesettings/datatypesettings.html",
                 submit: function(model) {
-                    var preValues = dataTypeHelper.createPreValueProps(model.dataType.preValues);
-                    dataTypeResource.save(model.dataType, preValues, isNew).then(function(newDataType) {
-                        contentTypeResource.getPropertyTypeScaffold(newDataType.id).then(function(propertyType) {
-                            submit(newDataType, propertyType, true);
-                            editorService.close();
-                        });
+                    contentTypeResource.getPropertyTypeScaffold(model.dataType.id).then(function(propertyType) {
+                        submit(model.dataType, propertyType, true);
+                        editorService.close();
                     });
                 },
                 close: function() {
@@ -183,6 +135,16 @@
 
             editorService.open(dataTypeSettings);
 
+        }
+
+        function pickDataType(selectedDataType) {
+            selectedDataType.loading = true;
+            dataTypeResource.getById(selectedDataType.id).then(function(dataType) {
+                contentTypeResource.getPropertyTypeScaffold(dataType.id).then(function(propertyType) {
+                    selectedDataType.loading = false;
+                    submit(dataType, propertyType, false);
+                });
+            });
         }
 
         function submit(dataType, propertyType, isNew) {

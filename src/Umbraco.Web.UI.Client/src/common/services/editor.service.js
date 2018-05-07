@@ -34,9 +34,6 @@
          */
         function open(editor) {
 
-            // set unique id
-            editor.id = editors.length + 1;
-
             // set flag so we know when the editor is open in "infinie mode"
             editor.infiniteMode = true;
 
