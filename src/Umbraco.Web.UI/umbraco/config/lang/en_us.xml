@@ -235,7 +235,7 @@
         <key alias="languagesToPublish">What languages would you like to publish?</key>
         <key alias="noLanguagesToPublish">No languages available to be published.</key>
         <key alias="publishedLanguages">Published Languages.</key>
-
+        <key alias="readyToPublish">Ready to Publish?</key>
     </area>
     <area alias="blueprints">
         <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
