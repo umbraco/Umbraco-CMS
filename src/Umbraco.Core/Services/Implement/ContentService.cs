@@ -26,7 +26,7 @@ namespace Umbraco.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly IDocumentBlueprintRepository _documentBlueprintRepository;
-
+        private readonly ILanguageRepository _languageRepository;
         private readonly MediaFileSystem _mediaFileSystem;
         private IQuery<IContent> _queryNotTrashed;
 
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Services.Implement
         public ContentService(IScopeProvider provider, ILogger logger,
             IEventMessagesFactory eventMessagesFactory, MediaFileSystem mediaFileSystem,
             IDocumentRepository documentRepository, IEntityRepository entityRepository, IAuditRepository auditRepository,
-            IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository)
+            IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository, ILanguageRepository languageRepository)
             : base(provider, logger, eventMessagesFactory)
         {
             _mediaFileSystem = mediaFileSystem;
@@ -44,6 +44,7 @@ namespace Umbraco.Core.Services.Implement
             _auditRepository = auditRepository;
             _contentTypeRepository = contentTypeRepository;
             _documentBlueprintRepository = documentBlueprintRepository;
+            _languageRepository = languageRepository;
         }
 
         #endregion
@@ -1025,7 +1026,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public PublishResult Unpublish(IContent content, string culture = null, string segment = null, int userId = 0)
+        public UnpublishResult Unpublish(IContent content, string culture = null, string segment = null, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -1038,7 +1039,13 @@ namespace Umbraco.Core.Services.Implement
                 if (tryUnpublishVariation) return tryUnpublishVariation.Result;
 
                 //continue the normal Unpublish operation to unpublish the entire content item
-                return UnpublishInternal(scope, content, evtMsgs, userId);
+                var result = UnpublishInternal(scope, content, evtMsgs, userId);
+
+                //not succesful, so return it
+                if (!result.Success) return result;
+
+                //else check if there was a status returned from TryUnpublishVariationInternal and if so use that
+                return tryUnpublishVariation.Result ?? result;
             }
         }
 
@@ -1055,7 +1062,7 @@ namespace Umbraco.Core.Services.Implement
         /// A successful attempt if a variant was unpublished and it wasn't the last, else a failed result if it's an invariant document or if it's the last.
         /// A failed result indicates that a normal unpublish operation will need to be performed.
         /// </returns>
-        private Attempt<PublishResult> TryUnpublishVariationInternal(IScope scope, IContent content, EventMessages evtMsgs, string culture, string segment, int userId)
+        private Attempt<UnpublishResult> TryUnpublishVariationInternal(IScope scope, IContent content, EventMessages evtMsgs, string culture, string segment, int userId)
         {
             if (!culture.IsNullOrWhiteSpace() || !segment.IsNullOrWhiteSpace())
             {
@@ -1064,16 +1071,27 @@ namespace Umbraco.Core.Services.Implement
                 {
                     //capture before we clear the values
                     var publishedCultureCount = content.PublishedCultures.Count();
+
+                    //we need to unpublish everything if this is a mandatory language
+                    var unpublishAll = _languageRepository.GetMany().Where(x => x.Mandatory).Select(x => x.IsoCode).Contains(culture, StringComparer.InvariantCultureIgnoreCase);
+
                     //fixme - this needs to be changed when 11227 is merged!
                     content.ClearPublishedValues(culture, segment);
                     //now we just publish with the name cleared
                     SaveAndPublish(content, userId);
                     Audit(AuditType.UnPublish, $"UnPublish variation culture: {culture ?? string.Empty}, segment: {segment ?? string.Empty} performed by user", userId, content.Id);
-                    //This is not the last one, so complete the scope and return
-                    if (publishedCultureCount > 1)
+
+                    //We don't need to unpublish all and this is not the last one, so complete the scope and return
+                    if (!unpublishAll && publishedCultureCount > 1)
                     {
                         scope.Complete();
-                        return Attempt.Succeed(new PublishResult(PublishResultType.SuccessVariant, evtMsgs, content));
+                        return Attempt.Succeed(new UnpublishResult(UnpublishResultType.SuccessVariant, evtMsgs, content));
+                    }
+
+                    if (unpublishAll)
+                    {
+                        //return a fail with a custom status here so the normal unpublish operation takes place but the result will be this flag
+                        return Attempt.Fail(new UnpublishResult(UnpublishResultType.SuccessMandatoryCulture, evtMsgs, content));
                     }
                 }
 
@@ -1085,8 +1103,8 @@ namespace Umbraco.Core.Services.Implement
                 }
             }
 
-            //This is either a non variant document or this is the last one, so return a failed result which indicates that a normal unpublish operation needs to also take place
-            return Attempt.Fail<PublishResult>();
+            //This is either a non variant document or this is the last one or this was a mandatory variant, so return a failed result which indicates that a normal unpublish operation needs to also take place
+            return Attempt.Fail<UnpublishResult>();
         }
 
         /// <summary>
@@ -1097,7 +1115,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="evtMsgs"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        private PublishResult UnpublishInternal(IScope scope, IContent content, EventMessages evtMsgs, int userId)
+        private UnpublishResult UnpublishInternal(IScope scope, IContent content, EventMessages evtMsgs, int userId)
         {
             var newest = GetById(content.Id); // ensure we have the newest version
             if (content.VersionId != newest.VersionId) // but use the original object if it's already the newest version
@@ -1105,7 +1123,7 @@ namespace Umbraco.Core.Services.Implement
             if (content.Published == false)
             {
                 scope.Complete();
-                return new PublishResult(PublishResultType.SuccessAlready, evtMsgs, content); // already unpublished
+                return new UnpublishResult(UnpublishResultType.SuccessAlready, evtMsgs, content); // already unpublished
             }
 
             // strategy
@@ -1123,7 +1141,7 @@ namespace Umbraco.Core.Services.Implement
             Audit(AuditType.UnPublish, "UnPublish performed by user", userId, content.Id);
 
             scope.Complete();
-            return new PublishResult(PublishResultType.Success, evtMsgs, content);
+            return new UnpublishResult(evtMsgs, content);
         }
 
         /// <inheritdoc />
@@ -2142,23 +2160,23 @@ namespace Umbraco.Core.Services.Implement
         }
 
         // ensures that a document can be unpublished
-        internal PublishResult StrategyCanUnpublish(IScope scope, IContent content, int userId, EventMessages evtMsgs)
+        internal UnpublishResult StrategyCanUnpublish(IScope scope, IContent content, int userId, EventMessages evtMsgs)
         {
             // raise UnPublishing event
             if (scope.Events.DispatchCancelable(UnPublishing, this, new PublishEventArgs<IContent>(content, evtMsgs)))
             {
                 Logger.Info<ContentService>($"Document \"{content.Name}\" (id={content.Id}) cannot be unpublished: unpublishing was cancelled.");
-                return new PublishResult(PublishResultType.FailedCancelledByEvent, evtMsgs, content);
+                return new UnpublishResult(UnpublishResultType.FailedCancelledByEvent, evtMsgs, content);
             }
 
-            return new PublishResult(evtMsgs, content);
+            return new UnpublishResult(evtMsgs, content);
         }
 
         // unpublishes a document
-        internal PublishResult StrategyUnpublish(IScope scope, IContent content, bool canUnpublish, int userId, EventMessages evtMsgs)
+        internal UnpublishResult StrategyUnpublish(IScope scope, IContent content, bool canUnpublish, int userId, EventMessages evtMsgs)
         {
             var attempt = canUnpublish
-                ? new PublishResult(evtMsgs, content) // already know we can
+                ? new UnpublishResult(evtMsgs, content) // already know we can
                 : StrategyCanUnpublish(scope, content, userId, evtMsgs); // else check
 
             if (attempt.Success == false)

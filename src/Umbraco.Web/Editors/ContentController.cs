@@ -243,10 +243,10 @@ namespace Umbraco.Web.Editors
             //set a custom path since the tree that renders this has the content type id as the parent
             content.Path = string.Format("-1,{0},{1}", persistedContent.ContentTypeId, content.Id);
 
-            content.AllowedActions = new[] {"A"};
+            content.AllowedActions = new[] { "A" };
             content.IsBlueprint = true;
 
-            var excludeProps = new[] {"_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template"};
+            var excludeProps = new[] { "_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template" };
             var propsTab = content.Tabs.Last();
             propsTab.Properties = propsTab.Properties
                 .Where(p => excludeProps.Contains(p.Alias) == false);
@@ -300,7 +300,7 @@ namespace Umbraco.Web.Editors
 
             //Remove all variants except for the default since currently the default must be saved before other variants can be edited
             //TODO: Allow for editing all variants at once ... this will be a future task
-            mapped.Variants = new[] {mapped.Variants.First(x => x.IsCurrent)};
+            mapped.Variants = new[] { mapped.Variants.First(x => x.IsCurrent) };
 
             return mapped;
         }
@@ -515,7 +515,7 @@ namespace Umbraco.Web.Editors
             var notificationModel = new SimpleNotificationModel();
             notificationModel.AddSuccessNotification(
                 Services.TextService.Localize("blueprints/createdBlueprintHeading"),
-                Services.TextService.Localize("blueprints/createdBlueprintMessage", new[]{ content.Name})
+                Services.TextService.Localize("blueprints/createdBlueprintMessage", new[] { content.Name })
             );
 
             return notificationModel;
@@ -944,23 +944,30 @@ namespace Umbraco.Web.Editors
 
             if (foundContent == null)
                 HandleContentNotFound(id);
-
-            var unpublishResult = Services.ContentService.Unpublish(foundContent, culture:culture, userId: Security.CurrentUser.Id);
+           
+            var unpublishResult = Services.ContentService.Unpublish(foundContent, culture: culture, userId: Security.CurrentUser.Id);
 
             var content = MapToDisplay(foundContent, culture);
 
-            if (unpublishResult.Success == false)
+            if (!unpublishResult.Success)
             {
                 AddCancelMessage(content);
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(content));
             }
             else
             {
-                content.AddSuccessNotification(Services.TextService.Localize("content/unPublish"), Services.TextService.Localize("speechBubbles/contentUnpublished"));
+                //fixme should have a better localized method for when we have the UnpublishResultType.SuccessMandatoryCulture status
+
+                content.AddSuccessNotification(
+                    Services.TextService.Localize("content/unPublish"),
+                    unpublishResult.Result == UnpublishResultType.SuccessVariant
+                        ? Services.TextService.Localize("speechBubbles/contentVariationUnpublished", new[] { culture })
+                        : Services.TextService.Localize("speechBubbles/contentUnpublished"));
+
                 return content;
             }
         }
-        
+
         /// <summary>
         /// Maps the dto property values to the persisted model
         /// </summary>
@@ -1216,6 +1223,6 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
-        
+
     }
 }
