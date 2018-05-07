@@ -25,6 +25,9 @@ namespace Umbraco.Web.Models.Mapping
 
         public IEnumerable<ContentVariation> Resolve(IContent source, ContentItemDisplay destination, IEnumerable<ContentVariation> destMember, ResolutionContext context)
         {
+            if (!source.ContentType.Variations.Has(Core.Models.ContentVariation.CultureNeutral))
+                return Enumerable.Empty<ContentVariation>();
+
             var allLanguages = _localizationService.GetAllLanguages().OrderBy(x => x.Id).ToList();
             if (allLanguages.Count == 0) return Enumerable.Empty<ContentVariation>();
 
