@@ -141,7 +141,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public virtual IReadOnlyDictionary<string, string> Names => _cultureInfos?.ToDictionary(x => x.Key, x => x.Value.Name) ?? NoNames;
+        public virtual IReadOnlyDictionary<string, string> Names => _cultureInfos?.ToDictionary(x => x.Key, x => x.Value.Name, StringComparer.OrdinalIgnoreCase) ?? NoNames;
 
         // sets culture infos
         // internal for repositories

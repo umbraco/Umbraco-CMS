@@ -232,7 +232,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc/>
         [IgnoreDataMember]
-        public IReadOnlyDictionary<string, string> PublishNames => _publishInfos?.ToDictionary(x => x.Key, x => x.Value.Name) ?? NoNames;
+        public IReadOnlyDictionary<string, string> PublishNames => _publishInfos?.ToDictionary(x => x.Key, x => x.Value.Name, StringComparer.OrdinalIgnoreCase) ?? NoNames;
 
         /// <inheritdoc/>
         public string GetPublishName(string culture)

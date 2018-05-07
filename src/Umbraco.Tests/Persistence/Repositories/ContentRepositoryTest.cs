@@ -685,40 +685,40 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             //2x content types, one invariant, one variant
 
-            var invariantCT = MockedContentTypes.CreateSimpleContentType("umbInvariantTextpage", "Invariant Textpage");
-            invariantCT.Variations = ContentVariation.InvariantNeutral;
-            foreach (var p in invariantCT.PropertyTypes) p.Variations = ContentVariation.InvariantNeutral;
-            ServiceContext.FileService.SaveTemplate(invariantCT.DefaultTemplate); // else, FK violation on contentType!
-            ServiceContext.ContentTypeService.Save(invariantCT);
+            var invariantCt = MockedContentTypes.CreateSimpleContentType("umbInvariantTextpage", "Invariant Textpage");
+            invariantCt.Variations = ContentVariation.InvariantNeutral;
+            foreach (var p in invariantCt.PropertyTypes) p.Variations = ContentVariation.InvariantNeutral;
+            ServiceContext.FileService.SaveTemplate(invariantCt.DefaultTemplate); // else, FK violation on contentType!
+            ServiceContext.ContentTypeService.Save(invariantCt);
 
-            var variantCT = MockedContentTypes.CreateSimpleContentType("umbVariantTextpage", "Variant Textpage");
-            variantCT.Variations = ContentVariation.CultureNeutral;
-            var propTypes = variantCT.PropertyTypes.ToList();
-            for (int i = 0; i < propTypes.Count; i++)
+            var variantCt = MockedContentTypes.CreateSimpleContentType("umbVariantTextpage", "Variant Textpage");
+            variantCt.Variations = ContentVariation.CultureNeutral;
+            var propTypes = variantCt.PropertyTypes.ToList();
+            for (var i = 0; i < propTypes.Count; i++)
             {
                 var p = propTypes[i];
                 //every 2nd one is variant
                 p.Variations = i % 2 == 0 ? ContentVariation.CultureNeutral : ContentVariation.InvariantNeutral;
             }
-            ServiceContext.FileService.SaveTemplate(variantCT.DefaultTemplate); // else, FK violation on contentType!
-            ServiceContext.ContentTypeService.Save(variantCT);
+            ServiceContext.FileService.SaveTemplate(variantCt.DefaultTemplate); // else, FK violation on contentType!
+            ServiceContext.ContentTypeService.Save(variantCt);
 
-            invariantCT.AllowedContentTypes = new[] { new ContentTypeSort(invariantCT.Id, 0), new ContentTypeSort(variantCT.Id, 1) };
-            ServiceContext.ContentTypeService.Save(invariantCT);
+            invariantCt.AllowedContentTypes = new[] { new ContentTypeSort(invariantCt.Id, 0), new ContentTypeSort(variantCt.Id, 1) };
+            ServiceContext.ContentTypeService.Save(invariantCt);
 
             //create content
 
-            var root = MockedContent.CreateSimpleContent(invariantCT);
+            var root = MockedContent.CreateSimpleContent(invariantCt);
             ServiceContext.ContentService.Save(root);
 
-            for (int i = 0; i < 25; i++)
+            for (var i = 0; i < 25; i++)
             {
                 var isInvariant = i % 2 == 0;
-                var name = (isInvariant ? "INV" : "VAR") + "_" + Guid.NewGuid().ToString();
+                var name = (isInvariant ? "INV" : "VAR") + "_" + Guid.NewGuid();
                 var culture = isInvariant ? null : "en-US";
 
                 var child = MockedContent.CreateSimpleContent(
-                    isInvariant ? invariantCT : variantCT,
+                    isInvariant ? invariantCt : variantCt,
                     name, root,
                     culture,
                     setPropertyValues: isInvariant);
@@ -753,7 +753,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     {
                         var isInvariant = r.ContentType.Alias == "umbInvariantTextpage";
                         var name = isInvariant ? r.Name : r.Names["en-US"];
-                        var namePrefix = (isInvariant ? "INV" : "VAR");
+                        var namePrefix = isInvariant ? "INV" : "VAR";
 
                         //ensure the correct name (invariant vs variant) is in the result
                         Assert.IsTrue(name.StartsWith(namePrefix));
