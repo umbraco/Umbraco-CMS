@@ -7,7 +7,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class EmailAddressConfiguration
     {
-        [ConfigurationField("Required?", "boolean")]
+        [ConfigurationField("IsRequired", "Required?", "boolean")]
         public bool IsRequired { get; set; }
     }
 }
