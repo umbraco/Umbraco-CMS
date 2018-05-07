@@ -28,7 +28,6 @@ namespace Umbraco.Core.IO
         private ShadowWrapper _scriptsFileSystem;
         private ShadowWrapper _masterPagesFileSystem;
         private ShadowWrapper _mvcViewsFileSystem;
-        private ShadowWrapper _javaScriptLibraryFileSystem;
         
         // well-known file systems lazy initialization
         private object _wkfsLock = new object();

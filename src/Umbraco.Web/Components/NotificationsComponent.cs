@@ -19,7 +19,10 @@ namespace Umbraco.Web.Components
 
             //Send notifications for the published action
             ContentService.Published += (sender, args) =>
-                args.PublishedEntities.ForEach(content => notificationService.SendNotification(content, ActionPublish.Instance));
+            {
+                foreach (var content in args.PublishedEntities)
+                    notificationService.SendNotification(content, ActionPublish.Instance);
+            };
 
             //Send notifications for the update and created actions
             ContentService.Saved += (sender, args) =>
@@ -48,11 +51,17 @@ namespace Umbraco.Web.Components
 
             //Send notifications for the delete action
             ContentService.Deleted += (sender, args) =>
-                args.DeletedEntities.ForEach(content => notificationService.SendNotification(content, ActionDelete.Instance));
+            {
+                foreach (var content in args.DeletedEntities)
+                    notificationService.SendNotification(content, ActionDelete.Instance);
+            };
 
             //Send notifications for the unpublish action
             ContentService.UnPublished += (sender, args) =>
-                args.PublishedEntities.ForEach(content => notificationService.SendNotification(content, ActionUnPublish.Instance));
+            {
+                foreach (var content in args.PublishedEntities)
+                    notificationService.SendNotification(content, ActionUnPublish.Instance);
+            };
         }
     }
 }

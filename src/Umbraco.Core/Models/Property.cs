@@ -271,6 +271,10 @@ namespace Umbraco.Core.Models
         /// </summary>
         public void SetValue(object value, string culture = null, string segment = null)
         {
+            if (PropertyType.Variations == ContentVariation.InvariantNeutral)
+            {
+                culture = null;
+            }
             PropertyType.ValidateVariation(culture, segment, true);
             (var pvalue, var change) = GetPValue(culture, segment, true);
 

@@ -17,7 +17,6 @@ using Umbraco.Web._Legacy.Actions;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Trees
 {

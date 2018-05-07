@@ -26,8 +26,6 @@ namespace Umbraco.Core.Security
     validation=""HMACSHA256"" decryption=""AES""
     />";
 
-            var Xxx = 3;
-
             return string.Format(c, GenerateAESDecryptionKey(), GenerateHMACSHA256ValidationKey());
         }
 

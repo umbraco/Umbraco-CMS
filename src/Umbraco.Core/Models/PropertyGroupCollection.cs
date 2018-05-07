@@ -67,8 +67,10 @@ namespace Umbraco.Core.Models
 
         internal new void Add(PropertyGroup item)
         {
-            using (new WriteLock(_addLocker))
+            try
             {
+                _addLocker.EnterWriteLock();
+
                 //Note this is done to ensure existig groups can be renamed
                 if (item.HasIdentity && item.Id > 0)
                 {
@@ -101,6 +103,11 @@ namespace Umbraco.Core.Models
                 OnAdd?.Invoke();
 
                 OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+            }
+            finally
+            {
+                if (_addLocker.IsWriteLockHeld)
+                    _addLocker.ExitWriteLock();
             }
         }
 

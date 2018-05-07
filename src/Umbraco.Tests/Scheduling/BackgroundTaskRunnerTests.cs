@@ -441,7 +441,7 @@ namespace Umbraco.Tests.Scheduling
                 tManager.TaskCompleted += (sender, task) => tasks[task.Task].Set();
 
                 //execute first batch
-                tasks.ForEach(t => tManager.Add(t.Key));
+                foreach (var t in tasks) tManager.Add(t.Key);
 
                 //wait for all ITasks to complete
                 WaitHandle.WaitAll(tasks.Values.Select(x => (WaitHandle)x).ToArray());
@@ -455,7 +455,7 @@ namespace Umbraco.Tests.Scheduling
                 Thread.Sleep(2000);
 
                 tasks = getTasks();
-                tasks.ForEach(t => tManager.Add(t.Key));
+                foreach (var t in tasks) tManager.Add(t.Key);
 
                 //wait for all ITasks to complete
                 WaitHandle.WaitAll(tasks.Values.Select(x => (WaitHandle)x).ToArray());

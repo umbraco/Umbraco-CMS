@@ -92,21 +92,6 @@ namespace Umbraco.Core
             }
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use a normal foreach loop instead, this adds more allocations than necessary")]
-        public static IEnumerable<TItem> ForEach<TItem>(this IEnumerable<TItem> items, Action<TItem> action)
-        {
-            if (items != null)
-            {
-                foreach (TItem item in items)
-                {
-                    action(item);
-                }
-            }
-
-            return items;
-        }
-
         /// <summary>The flatten list.</summary>
         /// <param name="e">The items.</param>
         /// <param name="f">The select child.</param>
