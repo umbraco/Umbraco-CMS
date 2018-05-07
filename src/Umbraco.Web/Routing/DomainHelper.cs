@@ -147,8 +147,10 @@ namespace Umbraco.Web.Routing
             // else we have a uri,
             // try to match that uri, else filter
 
-            // pick domains for cultures
-            var cultureDomains = SelectByCulture(domainsAndUris, culture, defaultCulture);
+            // if a culture is specified, then try to get domains for that culture
+            // (else cultureDomains will be null)
+            // do NOT specify a default culture, else it would pick those domains
+            var cultureDomains = SelectByCulture(domainsAndUris, culture, defaultCulture: null);
             IReadOnlyCollection<DomainAndUri> considerForBaseDomains = domainsAndUris;
             if (cultureDomains != null)
             {

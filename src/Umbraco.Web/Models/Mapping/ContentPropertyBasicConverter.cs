@@ -53,6 +53,11 @@ namespace Umbraco.Web.Models.Mapping
                 //a language Id needs to be set for a property type that can be varried by language
                 throw new InvalidOperationException($"No languageId found in mapping operation when one is required for the culture neutral property type {property.PropertyType.Alias}");
             }
+            if (property.PropertyType.Variations == ContentVariation.InvariantNeutral)
+            {
+                culture = null;
+
+            }
 
             var result = new TDestination
                 {
