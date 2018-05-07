@@ -441,6 +441,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             [ResultColumn, Reference(ReferenceType.Many)]
             public List<ContentEntityVariationInfoDto> VariationInfo { get; set; }
+
+            public bool Published { get; set; }
+            public bool Edited { get; set; }
         }
 
         /// <summary>
@@ -477,8 +480,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             public DateTime CreateDate { get; set; }
             public int Children { get; set; }
             public int VersionId { get; set; }
-            public bool Published { get; set; }
-            public bool Edited { get; set; }
             public string Alias { get; set; }
             public string Icon { get; set; }
             public string Thumbnail { get; set; }
@@ -826,7 +827,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Factory
 
-        private static EntitySlim BuildEntity(bool isContent, bool isMedia, BaseDto dto)
+        private EntitySlim BuildEntity(bool isContent, bool isMedia, BaseDto dto)
         {
             if (isContent)
                 return BuildDocumentEntity(dto);
@@ -867,8 +868,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private static void BuildDocumentEntity(DocumentEntitySlim entity, BaseDto dto)
         {
             BuildContentEntity(entity, dto);
-            entity.Published = dto.Published;
-            entity.Edited = dto.Edited;
         }
 
         private static EntitySlim BuildContentEntity(BaseDto dto)
@@ -879,8 +878,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return entity;
         }
 
-        private static EntitySlim BuildDocumentEntity(BaseDto dto)
+        private DocumentEntitySlim BuildDocumentEntity(BaseDto dto)
         {
+            if (dto is ContentEntityDto contentDto)
+            {
+                return BuildDocumentEntity(contentDto);
+            }
+
             // EntitySlim does not track changes
             var entity = new DocumentEntitySlim();
             BuildDocumentEntity(entity, dto);
@@ -892,11 +896,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        private EntitySlim BuildDocumentEntity(ContentEntityDto dto)
+        private DocumentEntitySlim BuildDocumentEntity(ContentEntityDto dto)
         {
             // EntitySlim does not track changes
             var entity = new DocumentEntitySlim();
             BuildDocumentEntity(entity, dto);
+
+            //fixme we need to set these statuses for each variant, see notes in IDocumentEntitySlim
+            entity.Edited = dto.Edited;
+            entity.Published = dto.Published;
+
             var variantInfo = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
             if (dto.VariationInfo != null)
             {
@@ -906,7 +915,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     if (isoCode != null)
                         variantInfo[isoCode] = info.Name;
                 }
-                entity.AdditionalData["CultureNames"] = variantInfo;
+                entity.CultureNames = variantInfo;
             }
             return entity;
         }

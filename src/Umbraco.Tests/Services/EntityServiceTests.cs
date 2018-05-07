@@ -463,10 +463,11 @@ namespace Umbraco.Tests.Services
 
             var result = service.Get(c1.Id, UmbracoObjectTypes.Document);
             Assert.AreEqual("Test", result.Name);
-            Assert.IsTrue(result.AdditionalData.ContainsKey("CultureNames"));
-            var cultureNames = (IDictionary<int, string>)result.AdditionalData["CultureNames"];
-            Assert.AreEqual("Test - FR", cultureNames[_langFr.Id]);
-            Assert.AreEqual("Test - ES", cultureNames[_langEs.Id]);
+            Assert.IsNotNull(result as IDocumentEntitySlim);
+            var doc = (IDocumentEntitySlim)result;
+            var cultureNames = doc.CultureNames;
+            Assert.AreEqual("Test - FR", cultureNames[_langFr.IsoCode]);
+            Assert.AreEqual("Test - ES", cultureNames[_langEs.IsoCode]);
         }
 
         [Test]
@@ -501,11 +502,9 @@ namespace Umbraco.Tests.Services
                 if (i % 2 == 0)
                 {
                     Assert.AreEqual(1, entities[i].AdditionalData.Count);
-                    Assert.AreEqual("CultureNames", entities[i].AdditionalData.Keys.First());
-                    var variantInfo = entities[i].AdditionalData.First().Value as IDictionary<int, string>;
-                    Assert.IsNotNull(variantInfo);
-                    var keys = variantInfo.Keys.ToList();
-                    var vals = variantInfo.Values.ToList();
+                    var doc = (IDocumentEntitySlim)entities[i];
+                    var keys = doc.CultureNames.Keys.ToList();
+                    var vals = doc.CultureNames.Values.ToList();
                     Assert.AreEqual(_langFr.Id, keys[0]);
                     Assert.AreEqual("Test " + i + " - FR", vals[0]);
                     Assert.AreEqual(_langEs.Id, keys[1]);

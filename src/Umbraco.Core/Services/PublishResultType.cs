@@ -19,6 +19,11 @@
         SuccessAlready = 1,
 
         /// <summary>
+        /// The specified variant was unpublished, the content item itself remains published.
+        /// </summary>
+        SuccessVariant = 2,
+
+        /// <summary>
         /// The operation failed.
         /// </summary>
         /// <remarks>All values above this value indicate a failure.</remarks>

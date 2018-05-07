@@ -223,10 +223,9 @@ namespace Umbraco.Web.Trees
             {
                 foreach (var e in result)
                 {
-                    if (e.AdditionalData.TryGetValue("CultureNames", out var cultureNames)
-                        && cultureNames is IDictionary<string, string> cnd)
+                    if (e is IDocumentEntitySlim doc)
                     {
-                        if (cnd.TryGetValue(culture, out var name))
+                        if (doc.CultureNames.TryGetValue(culture, out var name))
                         {
                             e.Name = name;
                         }

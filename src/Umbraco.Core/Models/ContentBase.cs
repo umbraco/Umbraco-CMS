@@ -195,7 +195,12 @@ namespace Umbraco.Core.Models
                 return;
             }
 
+            if (!ContentTypeBase.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment))
+                throw new NotSupportedException("Content type does not support varying name by culture.");
+
             if (_names == null) return;
+            if (!_names.ContainsKey(culture))
+                throw new InvalidOperationException($"Cannot unpublish culture {culture}, the document contains only cultures {string.Join(", ", _names.Keys)}");
             _names.Remove(culture);
             if (_names.Count == 0)
                 _names = null;
@@ -203,6 +208,9 @@ namespace Umbraco.Core.Models
 
         protected virtual void ClearNames()
         {
+            if (!ContentTypeBase.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment))
+                throw new NotSupportedException("Content type does not support varying name by culture.");
+
             _names = null;
             OnPropertyChanged(Ps.Value.NamesSelector);
         }

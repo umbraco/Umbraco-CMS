@@ -71,10 +71,13 @@ namespace Umbraco.Web.Trees
                 else
                 {
                     var documentEntity = (IDocumentEntitySlim) entity;
+
+                    //fixme we need these statuses per variant but to do that we need to fix the issues listed in IDocumentEntitySlim
                     if (!documentEntity.Published)
                         node.SetNotPublishedStyle();
-                    if (documentEntity.Edited)
-                        node.SetHasUnpublishedVersionStyle();
+                    //if (documentEntity.Edited)
+                    //    node.SetHasUnpublishedVersionStyle();
+
                     node.AdditionalData.Add("contentType", documentEntity.ContentTypeAlias);
                 }
 

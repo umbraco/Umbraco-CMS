@@ -632,20 +632,11 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                //publish the item and check if it worked, if not we will show a diff msg below
-                contentItem.PersistedContent.TryPublishValues(contentItem.Culture); //we are not checking for a return value here because we've already pre-validated the property values
-
                 //check if we are publishing other variants and validate them
                 var allLangs = Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase);
                 var variantsToValidate = contentItem.PublishVariations.Where(x => !x.Culture.InvariantEquals(contentItem.Culture)).ToList();
-                foreach (var publishVariation in variantsToValidate)
-                {
-                    if (!contentItem.PersistedContent.TryPublishValues(publishVariation.Culture))
-                    {
-                        var errMsg = Services.TextService.Localize("speechBubbles/contentLangValidationError", new[] {allLangs[publishVariation.Culture].CultureName});
-                        ModelState.AddModelError("publish_variant_" + publishVariation.Culture + "_", errMsg);
-                    }
-                }
+
+                var canPublish = true;
 
                 //validate any mandatory variants that are not in the list
                 var mandatoryLangs = Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLangs.Values)
@@ -654,15 +645,50 @@ namespace Umbraco.Web.Editors
                     .Where(x => x.Mandatory);
                 foreach (var lang in mandatoryLangs)
                 {
-                    if (contentItem.PersistedContent.Validate(lang.IsoCode).Length > 0)
+                    //cannot continue publishing since a required language that is not currently being published isn't published
+                    if (!contentItem.PersistedContent.IsCulturePublished(lang.IsoCode))
                     {
-                        var errMsg = Services.TextService.Localize("speechBubbles/contentReqLangValidationError", new[]{allLangs[lang.IsoCode].CultureName});
+                        var errMsg = Services.TextService.Localize("speechBubbles/contentReqCulturePublishError", new[] { allLangs[lang.IsoCode].CultureName });
                         ModelState.AddModelError("publish_variant_" + lang.Id + "_", errMsg);
+                        canPublish = false;
                     }
                 }
 
-                publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, Security.CurrentUser.Id);
-                wasCancelled = publishStatus.Result == PublishResultType.FailedCancelledByEvent;
+                if (canPublish)
+                {
+                    //validate all variants to be published
+                    foreach (var publishVariation in variantsToValidate)
+                    {
+                        var invalid = contentItem.PersistedContent.Validate(publishVariation.Culture).Any();
+                        if (invalid)
+                        {
+                            var errMsg = Services.TextService.Localize("speechBubbles/contentCultureValidationError", new[] { allLangs[publishVariation.Culture].CultureName });
+                            ModelState.AddModelError("publish_variant_" + publishVariation.Culture + "_", errMsg);
+                            canPublish = false;
+                        }
+                    }
+                }
+
+                if (canPublish)
+                {
+                    //set all publish values for the variant we are publishing and those variants flagged for publishing
+                    //we are not checking for a return value here because we've already pre-validated the property values.
+                    contentItem.PersistedContent.TryPublishValues(contentItem.Culture);
+                    foreach (var publishVariation in variantsToValidate)
+                    {
+                        contentItem.PersistedContent.TryPublishValues(publishVariation.Culture);
+                    }
+
+                    publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, Security.CurrentUser.Id);
+                    wasCancelled = publishStatus.Result == PublishResultType.FailedCancelledByEvent;
+                }
+                else
+                {
+                    //can only save
+                    var saveResult = Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id);
+                    publishStatus = new PublishResult(PublishResultType.Failed, null, contentItem.PersistedContent);
+                    wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
+                }
             }
 
             //get the updated model
@@ -907,20 +933,21 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Unpublishes a node with a given Id and returns the unpublished entity
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">The content id to unpublish</param>
+        /// <param name="id">The culture variant for the content id to unpublish, if none specified will unpublish all variants of the content</param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("id", 'U')]
         [OutgoingEditorModelEvent]
-        public ContentItemDisplay PostUnPublish(int id)
+        public ContentItemDisplay PostUnPublish(int id, string culture = null)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
 
             if (foundContent == null)
                 HandleContentNotFound(id);
 
-            var unpublishResult = Services.ContentService.Unpublish(foundContent, Security.CurrentUser.Id);
+            var unpublishResult = Services.ContentService.Unpublish(foundContent, culture:culture, userId: Security.CurrentUser.Id);
 
-            var content = MapToDisplay(foundContent);
+            var content = MapToDisplay(foundContent, culture);
 
             if (unpublishResult.Success == false)
             {

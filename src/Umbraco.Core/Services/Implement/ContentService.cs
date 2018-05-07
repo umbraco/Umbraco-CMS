@@ -859,7 +859,7 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public OperationResult Save(IContent content, int userId = 0, bool raiseEvents = true)
         {
-            var publishedState = ((Content) content).PublishedState;
+            var publishedState = content.PublishedState;
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
                 throw new InvalidOperationException("Cannot save a (un)publishing, use the dedicated (un)publish method.");
 
@@ -1025,7 +1025,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public PublishResult Unpublish(IContent content, int userId = 0)
+        public PublishResult Unpublish(IContent content, string culture = null, string segment = null, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -1033,32 +1033,96 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
 
-                var newest = GetById(content.Id); // ensure we have the newest version
-                if (content.VersionId != newest.VersionId) // but use the original object if it's already the newest version
-                    content = newest;
-                if (content.Published == false)
+                var tryUnpublishVariation = TryUnpublishVariationInternal(scope, content, evtMsgs, culture, segment, userId);
+
+                if (tryUnpublishVariation) return tryUnpublishVariation.Result;
+
+                //continue the normal Unpublish operation to unpublish the entire content item
+                return UnpublishInternal(scope, content, evtMsgs, userId);
+            }
+        }
+
+        /// <summary>
+        /// Used to unpublish the requested variant if possible
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="content"></param>
+        /// <param name="evtMsgs"></param>
+        /// <param name="culture"></param>
+        /// <param name="segment"></param>
+        /// <param name="userId"></param>
+        /// <returns>
+        /// A successful attempt if a variant was unpublished and it wasn't the last, else a failed result if it's an invariant document or if it's the last.
+        /// A failed result indicates that a normal unpublish operation will need to be performed.
+        /// </returns>
+        private Attempt<PublishResult> TryUnpublishVariationInternal(IScope scope, IContent content, EventMessages evtMsgs, string culture, string segment, int userId)
+        {
+            if (!culture.IsNullOrWhiteSpace() || !segment.IsNullOrWhiteSpace())
+            {
+                //now we need to check if this is not the last culture/segment that is published
+                if (!culture.IsNullOrWhiteSpace())
                 {
-                    scope.Complete();
-                    return new PublishResult(PublishResultType.SuccessAlready, evtMsgs, content); // already unpublished
+                    //capture before we clear the values
+                    var publishedCultureCount = content.PublishedCultures.Count();
+                    //fixme - this needs to be changed when 11227 is merged!
+                    content.ClearPublishedValues(culture, segment);
+                    //now we just publish with the name cleared
+                    SaveAndPublish(content, userId);
+                    Audit(AuditType.UnPublish, $"UnPublish variation culture: {culture ?? string.Empty}, segment: {segment ?? string.Empty} performed by user", userId, content.Id);
+                    //This is not the last one, so complete the scope and return
+                    if (publishedCultureCount > 1)
+                    {
+                        scope.Complete();
+                        return Attempt.Succeed(new PublishResult(PublishResultType.SuccessVariant, evtMsgs, content));
+                    }
                 }
 
-                // strategy
-                // fixme should we still complete the uow? don't want to rollback here!
-                var attempt = StrategyCanUnpublish(scope, content, userId, evtMsgs);
-                if (attempt.Success == false) return attempt; // causes rollback
-                attempt = StrategyUnpublish(scope, content, true, userId, evtMsgs);
-                if (attempt.Success == false) return attempt; // causes rollback
-
-                content.WriterId = userId;
-                _documentRepository.Save(content);
-
-                scope.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
-                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
-                Audit(AuditType.UnPublish, "UnPublish performed by user", userId, content.Id);
-
-                scope.Complete();
+                if (!segment.IsNullOrWhiteSpace())
+                {
+                    //TODO: When segments are supported, implement this, a discussion needs to happen about what how a segment is 'published' or not
+                    // since currently this is very different from a culture.
+                    throw new NotImplementedException("Segments are currently not supported in Umbraco");
+                }
             }
 
+            //This is either a non variant document or this is the last one, so return a failed result which indicates that a normal unpublish operation needs to also take place
+            return Attempt.Fail<PublishResult>();
+        }
+
+        /// <summary>
+        /// Performs the logic to unpublish an entire document
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="content"></param>
+        /// <param name="evtMsgs"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        private PublishResult UnpublishInternal(IScope scope, IContent content, EventMessages evtMsgs, int userId)
+        {
+            var newest = GetById(content.Id); // ensure we have the newest version
+            if (content.VersionId != newest.VersionId) // but use the original object if it's already the newest version
+                content = newest;
+            if (content.Published == false)
+            {
+                scope.Complete();
+                return new PublishResult(PublishResultType.SuccessAlready, evtMsgs, content); // already unpublished
+            }
+
+            // strategy
+            // fixme should we still complete the uow? don't want to rollback here!
+            var attempt = StrategyCanUnpublish(scope, content, userId, evtMsgs);
+            if (attempt.Success == false) return attempt; // causes rollback
+            attempt = StrategyUnpublish(scope, content, true, userId, evtMsgs);
+            if (attempt.Success == false) return attempt; // causes rollback
+
+            content.WriterId = userId;
+            _documentRepository.Save(content);
+
+            scope.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
+            scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
+            Audit(AuditType.UnPublish, "UnPublish performed by user", userId, content.Id);
+
+            scope.Complete();
             return new PublishResult(PublishResultType.Success, evtMsgs, content);
         }
 
@@ -1092,7 +1156,7 @@ namespace Umbraco.Core.Services.Implement
                     try
                     {
                         d.ExpireDate = null;
-                        var result = Unpublish(d, d.WriterId);
+                        var result = Unpublish(d, userId: d.WriterId);
                         if (result.Success == false)
                             Logger.Error<ContentService>($"Failed to unpublish document id={d.Id}, reason={result.Result}.");
                     }

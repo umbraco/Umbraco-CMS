@@ -35,7 +35,7 @@ namespace Umbraco.Web.Models.Mapping
                 Mandatory = x.Mandatory,
                 Name = source.GetName(x.IsoCode),
                 Exists = source.IsCultureAvailable(x.IsoCode), // segments ??
-                PublishedState = source.PublishedState.ToString(),
+                PublishedState = (source.IsCulturePublished(x.IsoCode) ? PublishedState.Published : PublishedState.Unpublished).ToString(),
                 IsEdited = source.IsCultureEdited(x.IsoCode)
                 //Segment = ?? We'll need to populate this one day when we support segments
             }).ToList();

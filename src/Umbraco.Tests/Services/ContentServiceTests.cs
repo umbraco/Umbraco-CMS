@@ -1214,7 +1214,7 @@ namespace Umbraco.Tests.Services
             }
 
             // Act
-            var unpublished = contentService.Unpublish(content, 0);
+            var unpublished = contentService.Unpublish(content, userId: 0);
 
             // Assert
             Assert.That(published.Success, Is.True);
