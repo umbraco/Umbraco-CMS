@@ -4,7 +4,7 @@
     function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location,
         appState, contentResource, entityResource, navigationService, notificationsService, angularHelper,
         serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper,
-        keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource, overlayService) {
+        keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource, overlayService, localizationService) {
 
         var evts = [];
 
@@ -304,6 +304,7 @@
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
                     var dialog = {
+                        title: localizationService.localize("content_readyToPublish"),
                         view: "publish",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
