@@ -147,7 +147,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var hasDomains = _domainHelper.NodeHasDomains(n.Id);
             while (hasDomains == false && n != null) // n is null at root
             {
-                var urlSegment = n.GetCulture(culture).UrlSegment;
+                var varies = n.ContentType.Variations.Has(ContentVariation.CultureNeutral);
+                var urlSegment = varies ? n.GetCulture(culture)?.UrlSegment : n.UrlSegment;
+
+                // at that point we should have an urlSegment, unless something weird is happening
+                // at content level, such as n.GetCulture() returning null for some (weird) reason,
+                // and then what? fallback to the invariant segment... far from perfect but eh...
+                if (string.IsNullOrWhiteSpace(urlSegment)) urlSegment = n.UrlSegment;
 
                 pathParts.Add(urlSegment);
 

@@ -321,7 +321,7 @@ namespace Umbraco.Examine
         {
             foreach (var c in content)
             {
-                var urlValue = c.GetUrlSegment(urlSegmentProviders, ""); // for now, index with invariant culture
+                var urlValue = c.GetUrlSegment(urlSegmentProviders); // for now, index with invariant culture
                 var values = new Dictionary<string, object[]>
                 {
                     {"icon", new object[] {c.ContentType.Icon}},

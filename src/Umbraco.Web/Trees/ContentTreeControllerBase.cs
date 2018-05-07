@@ -210,31 +210,45 @@ namespace Umbraco.Web.Trees
                 result = Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToArray();
             }
 
-            //This should really never be null, but we'll error check anyways
+            // should really never be null, but we'll error check anyways
             culture = culture ?? Services.LocalizationService.GetDefaultLanguageIsoCode();
 
-            //Try to see if there is a variant name for the current language for the item and set the name accordingly.
-            //If any of this fails, the tree node name will remain the default invariant culture name.
-
-            //fixme - what if there is no name found at all ? This could occur if the doc type is variant and the user fills in all language values, then creates a new lang and sets it as the default
-            //fixme - what if the user changes this document type to not allow culture variants after it's already been created with culture variants, this means we'll be displaying the culture variant name when in fact we should be displaying the invariant name... but that would be null
-
+            // set names according to variations
             if (!culture.IsNullOrWhiteSpace())
-            {
-                foreach (var e in result)
-                {
-                    if (e.AdditionalData.TryGetValue("CultureNames", out var cultureNames)
-                        && cultureNames is IDictionary<string, string> cnd)
-                    {
-                        if (cnd.TryGetValue(culture, out var name))
-                        {
-                            e.Name = name;
-                        }
-                    }
-                }
-            }
+                foreach (var entity in result)
+                    EnsureName(entity, culture);
 
             return result;
+        }
+
+        // set name according to variations
+        //
+        private void EnsureName(IEntitySlim entity, string culture)
+        {
+            if (culture == null)
+            {
+                if (string.IsNullOrWhiteSpace(entity.Name))
+                    entity.Name = "[[" + entity.Id + "]]";
+                return;
+            }
+
+            // we are getting the tree for a given culture,
+            // for those items that DO support cultures, we need to get the proper name, IF it exists
+            // otherwise, invariant is fine
+
+            if (entity.AdditionalData.TryGetValue(EntitySlim.AdditionalVariations, out var variationsObject) &&
+                variationsObject is ContentVariation variations &&
+                variations.Has(ContentVariation.CultureNeutral) &&
+                entity.AdditionalData.TryGetValue(EntitySlim.AdditionalCultureNames, out var namesObject) &&
+                namesObject is IDictionary<string, string> names &&
+                names.TryGetValue(culture, out var name) &&
+                !string.IsNullOrWhiteSpace(name))
+            {
+                entity.Name = name;
+            }
+
+            if (string.IsNullOrWhiteSpace(entity.Name))
+                entity.Name = "[[" + entity.Id + "]]";        
         }
 
         /// <summary>
