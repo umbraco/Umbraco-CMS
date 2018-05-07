@@ -126,8 +126,10 @@ namespace Umbraco.Core.Persistence
         /// <inheritdoc />
         public void Configure(string connectionString, string providerName)
         {
-            using (new WriteLock(_lock))
+            try
             {
+                _lock.EnterWriteLock();
+
                 _logger.Debug<UmbracoDatabaseFactory>("Configuring.");
 
                 if (Configured) throw new InvalidOperationException("Already configured.");
@@ -172,6 +174,11 @@ namespace Umbraco.Core.Persistence
 
                 _logger.Debug<UmbracoDatabaseFactory>("Configured.");
                 Configured = true;
+            }
+            finally
+            {
+                if (_lock.IsWriteLockHeld)
+                    _lock.ExitWriteLock();
             }
         }
 

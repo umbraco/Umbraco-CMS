@@ -204,10 +204,10 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Validates that a variation is valid for the content type.
         /// </summary>
-        public bool ValidateVariation(int? languageId, string segment, bool throwIfInvalid)
+        public bool ValidateVariation(string culture, string segment, bool throwIfInvalid)
         {
             ContentVariation variation;
-            if (languageId.HasValue)
+            if (culture != null)
             {
                 variation = segment != null
                     ? ContentVariation.CultureSegment
@@ -221,7 +221,7 @@ namespace Umbraco.Core.Models
             {
                 variation = ContentVariation.InvariantNeutral;
             }
-            if ((Variations & variation) == 0)
+            if (!Variations.Has(variation))
             {
                 if (throwIfInvalid)
                     throw new NotSupportedException($"Variation {variation} is invalid for content type \"{Alias}\".");

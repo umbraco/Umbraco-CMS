@@ -106,7 +106,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             var httpContext = Mock.Of<HttpContextBase>();
 
-            var publishedSnapshotMock = new Mock<IPublishedShapshot>();
+            var publishedSnapshotMock = new Mock<IPublishedSnapshot>();
             publishedSnapshotMock.Setup(x => x.Members).Returns(Mock.Of<IPublishedMemberCache>());
             var publishedSnapshot = publishedSnapshotMock.Object;
             var publishedSnapshotServiceMock = new Mock<IPublishedSnapshotService>();
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.TestHelpers
             var urlProviders = Enumerable.Empty<IUrlProvider>();
 
             if (accessor == null) accessor = new TestUmbracoContextAccessor();
-            return UmbracoContext.EnsureContext(accessor, httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings, true);
+            return UmbracoContext.EnsureContext(accessor, httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings, Mock.Of<IEntityService>(), true);
         }
 
         public IUmbracoSettingsSection GetUmbracoSettings()

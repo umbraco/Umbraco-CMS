@@ -149,7 +149,7 @@ namespace umbraco
 
         void populatePageData(XmlNode node)
         {
-            String s;
+            string s;
             DateTime dt;
             Guid guid;
             int i;
@@ -201,7 +201,7 @@ namespace umbraco
         /// <param name="node"></param>
         void PopulateElementData(IPublishedContent node)
         {
-            foreach(var p in node.Properties)
+            foreach (var p in node.Properties)
             {
                 if (_elements.ContainsKey(p.Alias) == false)
                 {
@@ -250,21 +250,6 @@ namespace umbraco
                     Current.Logger.Debug<page>(
                         string.Format("Load element \"{0}\"", alias));
                 }
-            }
-        }
-
-        #endregion
-
-        #region Wtf?
-
-        public void RenderPage(int templateId)
-        {
-            if (templateId != 0)
-            {
-                template templateDesign = new template(templateId);
-
-                _pageContentControl = templateDesign.ParseWithControls(this);
-                _pageContent.Append(templateDesign.TemplateContent);
             }
         }
 
@@ -374,17 +359,17 @@ namespace umbraco
                 _content = content;
             }
 
-            public override bool HasValue(int? languageId = null, string segment = null)
+            public override bool HasValue(string culture = null, string segment = null)
             {
                 return _sourceValue != null && ((_sourceValue is string) == false || string.IsNullOrWhiteSpace((string)_sourceValue) == false);
             }
 
-            public override object GetSourceValue(int? languageId = null, string segment = null)
+            public override object GetSourceValue(string culture = null, string segment = null)
             {
                 return _sourceValue;
             }
 
-            public override object GetValue(int? languageId = null, string segment = null)
+            public override object GetValue(string culture = null, string segment = null)
             {
                 // isPreviewing is true here since we want to preview anyway...
                 const bool isPreviewing = true;
@@ -392,7 +377,7 @@ namespace umbraco
                 return PropertyType.ConvertInterToObject(_content, PropertyCacheLevel.Unknown, source, isPreviewing);
             }
 
-            public override object GetXPathValue(int? languageId = null, string segment = null)
+            public override object GetXPathValue(string culture = null, string segment = null)
             {
                 throw new NotImplementedException();
             }
@@ -408,6 +393,7 @@ namespace umbraco
             private readonly PublishedContentType _contentType;
             private readonly IPublishedProperty[] _properties;
             private readonly IPublishedContent _parent;
+            private IReadOnlyDictionary<string, PublishedCultureName> _cultureNames;
 
             private PagePublishedContent(int id)
             {
@@ -469,6 +455,26 @@ namespace umbraco
             public string Name
             {
                 get { return _inner.Name; }
+            }
+
+            public IReadOnlyDictionary<string, PublishedCultureName> CultureNames
+            {
+                get
+                {
+                    if (!_inner.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
+                        return null;
+
+                    if (_cultureNames == null)
+                    {
+                        var d = new Dictionary<string, PublishedCultureName>(StringComparer.InvariantCultureIgnoreCase);
+                        foreach (var c in _inner.Names)
+                        {
+                            d[c.Key] = new PublishedCultureName(c.Value, c.Value.ToUrlSegment());
+                        }
+                        _cultureNames = d;
+                    }
+                    return _cultureNames;
+                }
             }
 
             public string UrlName

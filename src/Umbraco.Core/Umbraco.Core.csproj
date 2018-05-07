@@ -47,7 +47,6 @@
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Transactions" />
-    <Reference Include="System.ValueTuple" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.Web.Extensions" />
@@ -74,7 +73,7 @@
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.0" />
     <PackageReference Include="Microsoft.Web.Xdt" Version="2.1.2" />
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
-    <PackageReference Include="MySql.Data" Version="6.10.6" />
+    <PackageReference Include="MySql.Data" Version="6.10.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NPoco" Version="3.9.3" />
     <PackageReference Include="NuGet.Core" Version="2.14.0" />
@@ -137,6 +136,7 @@
     <Compile Include="CodeAnnotations\UmbracoProposedPublicAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoUdiTypeAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoWillObsoleteAttribute.cs" />
+    <Compile Include="Collections\CompositeStringStringKey.cs" />
     <Compile Include="Collections\CompositeIntStringKey.cs" />
     <Compile Include="Collections\CompositeTypeTypeKey.cs" />
     <Compile Include="Collections\ConcurrentHashSet.cs" />
@@ -249,32 +249,24 @@
     <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentScriptEditorElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentSectionExtensions.cs" />
-    <Compile Include="Configuration\UmbracoSettings\DeveloperElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\DisabledLogTypesCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\DistributedCallElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ExternalLoggerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\FileExtensionElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\IBackOfficeSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IChar.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentErrorPage.cs" />
     <Compile Include="Configuration\UmbracoSettings\IContentSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IDeveloperSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IDistributedCallSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IFileExtension.cs" />
     <Compile Include="Configuration\UmbracoSettings\IImagingAutoFillUploadField.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ILink.cs" />
     <Compile Include="Configuration\UmbracoSettings\ILoggingSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ILogType.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillPropertiesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillUploadFieldElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\IProvidersSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IRepositoriesSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IRepository.cs" />
     <Compile Include="Configuration\UmbracoSettings\IRequestHandlerSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IScheduledTask.cs" />
     <Compile Include="Configuration\UmbracoSettings\IScheduledTasksSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ISecuritySection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IServer.cs" />
     <Compile Include="Configuration\UmbracoSettings\ITemplatesSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ITourSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUmbracoSettingsSection.cs" />
@@ -283,17 +275,11 @@
     <Compile Include="Configuration\UmbracoSettings\LogTypeElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\NotificationsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ProvidersElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoriesCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoriesElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoryConfigExtensions.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoryElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RequestHandlerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ScheduledTaskElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ScheduledTasksCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ScheduledTasksElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\SecurityElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ServerCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ServerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\TemplatesElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\TourConfigElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\UmbracoConfigurationElement.cs" />
@@ -311,6 +297,7 @@
     <Compile Include="Constants-Examine.cs" />
     <Compile Include="Constants-Icons.cs" />
     <Compile Include="Constants-ObjectTypes.cs" />
+    <Compile Include="Constants-PackageRepository.cs" />
     <Compile Include="Constants-Packaging.cs" />
     <Compile Include="Constants-PropertyEditors.cs" />
     <Compile Include="Constants-PropertyTypeGroups.cs" />
@@ -319,6 +306,7 @@
     <Compile Include="Constants-Web.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="DisposableObjectSlim.cs" />
+    <Compile Include="EnumExtensions.cs" />
     <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Events\UserGroupWithUsers.cs" />
@@ -335,10 +323,12 @@
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoAuditTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoConsentTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\CreateSensitiveDataUserGroup.cs" />
-    <Compile Include="Migrations\Upgrade\V_8_0_0\AddContentVariationTable.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\AddVariationTables1A.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\AddVariationTables2.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypeMigration.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\LanguageColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\PropertyEditorsMigration.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\RefactorMacroColumns.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\SuperZero.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\TagsMigration.cs" />
     <Compile Include="Models\AuditEntry.cs" />
@@ -365,9 +355,11 @@
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
+    <Compile Include="Models\PublishedContent\PublishedCultureName.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
     <Compile Include="Persistence\Dtos\ContentVersionCultureVariationDto.cs" />
+    <Compile Include="Persistence\Dtos\DocumentCultureVariationDto.cs" />
     <Compile Include="Persistence\Dtos\MediaDto.cs" />
     <Compile Include="Persistence\Dtos\MediaVersionDto.cs" />
     <Compile Include="Persistence\Dtos\UserLoginDto.cs" />
@@ -402,6 +394,7 @@
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueTypeConverter.cs" />
     <Compile Include="PropertyEditors\ValueListConfiguration.cs" />
     <Compile Include="PropertyEditors\VoidEditor.cs" />
+    <Compile Include="ReadLock.cs" />
     <Compile Include="ReflectionUtilities-Unused.cs" />
     <Compile Include="Runtime\CoreRuntime.cs" />
     <Compile Include="Runtime\CoreRuntimeComponent.cs" />
@@ -552,7 +545,6 @@
     <Compile Include="Logging\LogProfiler.cs" />
     <Compile Include="Logging\OwinLogger.cs" />
     <Compile Include="Logging\OwinLoggerFactory.cs" />
-    <Compile Include="Logging\ParallelForwardingAppender.cs" />
     <Compile Include="Logging\ProfilerExtensions.cs" />
     <Compile Include="Logging\ProfilingLogger.cs" />
     <Compile Include="Logging\RingBuffer.cs" />
@@ -562,10 +554,6 @@
     <Compile Include="Logging\WebProfilerProvider.cs" />
     <Compile Include="Macros\MacroErrorBehaviour.cs" />
     <Compile Include="Macros\MacroTagParser.cs" />
-    <Compile Include="Macros\XsltExtension.cs" />
-    <Compile Include="Macros\XsltExtensionAttribute.cs" />
-    <Compile Include="Macros\XsltExtensionCollection.cs" />
-    <Compile Include="Macros\XsltExtensionCollectionBuilder.cs" />
     <Compile Include="MainDom.cs" />
     <Compile Include="Manifest\ManifestParser.cs" />
     <Compile Include="Manifest\ValueValidatorConverter.cs" />
@@ -603,9 +591,7 @@
     <Compile Include="Media\Exif\Utility.cs" />
     <Compile Include="Media\IEmbedProvider.cs" />
     <Compile Include="Media\IEmbedSettingProvider.cs" />
-    <Compile Include="Media\IImageUrlProvider.cs" />
     <Compile Include="Media\ImageExtensions.cs" />
-    <Compile Include="Media\IThumbnailProvider.cs" />
     <Compile Include="Media\ProviderSetting.cs" />
     <Compile Include="Media\Result.cs" />
     <Compile Include="Media\Status.cs" />
@@ -690,7 +676,6 @@
     <Compile Include="Models\IServerRegistration.cs" />
     <Compile Include="Models\ITag.cs" />
     <Compile Include="Models\ITemplate.cs" />
-    <Compile Include="Models\IXsltFile.cs" />
     <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Macro.cs" />
     <Compile Include="Models\MacroProperty.cs" />
@@ -710,7 +695,6 @@
     <Compile Include="Models\Membership\IReadOnlyUserGroup.cs" />
     <Compile Include="Models\Membership\IUser.cs" />
     <Compile Include="Models\Membership\IUserGroup.cs" />
-    <Compile Include="Models\Membership\IUserType.cs" />
     <Compile Include="Models\Membership\MemberCountType.cs" />
     <Compile Include="Models\Membership\MembershipScenario.cs" />
     <Compile Include="Models\Membership\MembershipUserExtensions.cs" />
@@ -722,7 +706,6 @@
     <Compile Include="Models\Membership\UserGroupExtensions.cs" />
     <Compile Include="Models\Membership\UserProfile.cs" />
     <Compile Include="Models\Membership\UserState.cs" />
-    <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\MemberType.cs" />
     <Compile Include="Models\MemberTypePropertyProfileAccess.cs" />
     <Compile Include="Models\MigrationEntry.cs" />
@@ -810,8 +793,6 @@
     <Compile Include="Persistence\Dtos\RelationDto.cs" />
     <Compile Include="Persistence\Dtos\RelationTypeDto.cs" />
     <Compile Include="Persistence\Dtos\ServerRegistrationDto.cs" />
-    <Compile Include="Persistence\Dtos\StylesheetDto.cs" />
-    <Compile Include="Persistence\Dtos\StylesheetPropertyDto.cs" />
     <Compile Include="Persistence\Dtos\TagDto.cs" />
     <Compile Include="Persistence\Dtos\TagRelationshipDto.cs" />
     <Compile Include="Persistence\Dtos\TaskDto.cs" />
@@ -848,7 +829,6 @@
     <Compile Include="Models\ObjectTypes.cs" />
     <Compile Include="Models\UserExtensions.cs" />
     <Compile Include="Models\Validation\RequiredForPersistenceAttribute.cs" />
-    <Compile Include="Models\XsltFile.cs" />
     <Compile Include="MonitorLock.cs" />
     <Compile Include="NamedUdiRange.cs" />
     <Compile Include="NameValueCollectionExtensions.cs" />
@@ -856,9 +836,7 @@
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Collections\OrderedHashSet.cs" />
     <Compile Include="Packaging\ConflictingPackageData.cs" />
-    <Compile Include="Packaging\DefaultPackageContext.cs" />
     <Compile Include="Packaging\IConflictingPackageData.cs" />
-    <Compile Include="Packaging\IPackageContext.cs" />
     <Compile Include="Packaging\IPackageExtraction.cs" />
     <Compile Include="Packaging\IPackageInstallation.cs" />
     <Compile Include="Packaging\Models\UninstallationSummary.cs" />
@@ -1182,7 +1160,6 @@
     <Compile Include="Persistence\Repositories\IUserGroupRepository.cs" />
     <Compile Include="Persistence\Repositories\IUserRepository.cs" />
     <Compile Include="Persistence\IWriteRepository.cs" />
-    <Compile Include="Persistence\Repositories\IXsltFileRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\LanguageRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\MacroRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\MediaRepository.cs" />
@@ -1217,7 +1194,6 @@
     <Compile Include="Persistence\Repositories\Implement\UserRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentRepositoryBase.cs" />
     <Compile Include="Persistence\Repositories\Implement\VersionableRepositoryBaseAliasRegex.cs" />
-    <Compile Include="Persistence\Repositories\Implement\XsltFileRepository.cs" />
     <Compile Include="Persistence\SqlContext.cs" />
     <Compile Include="Persistence\SqlSyntax\ColumnInfo.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
@@ -1287,7 +1263,6 @@
     <Compile Include="PropertyEditors\ValueConverters\UploadPropertyConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\YesNoValueConverter.cs" />
     <Compile Include="Publishing\ScheduledPublisher.cs" />
-    <Compile Include="ReadLock.cs" />
     <Compile Include="ReflectionUtilities.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="RuntimeLevel.cs" />
@@ -1414,7 +1389,6 @@
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\Implement\LocalizationService.cs" />
     <Compile Include="Services\Implement\LocalizedTextService.cs" />
-    <Compile Include="Services\LocalizationServiceExtensions.cs" />
     <Compile Include="Services\LocalizedTextServiceExtensions.cs" />
     <Compile Include="Services\Implement\LocalizedTextServiceFileSources.cs" />
     <Compile Include="Services\Implement\LocalizedTextServiceSupplementaryFileSource.cs" />
@@ -1466,9 +1440,6 @@
     <Compile Include="Strings\Utf8ToAsciiConverter.cs" />
     <Compile Include="StringUdi.cs" />
     <Compile Include="Sync\ApplicationUrlHelper.cs" />
-    <Compile Include="Sync\BatchedWebServiceServerMessenger.cs" />
-    <Compile Include="Sync\ConfigServerAddress.cs" />
-    <Compile Include="Sync\ConfigServerRegistrar.cs" />
     <Compile Include="Sync\DatabaseServerMessenger.cs" />
     <Compile Include="Sync\DatabaseServerMessengerOptions.cs" />
     <Compile Include="Sync\DatabaseServerRegistrar.cs" />
@@ -1483,7 +1454,6 @@
     <Compile Include="Sync\ServerMessengerBase.cs" />
     <Compile Include="Sync\ServerRole.cs" />
     <Compile Include="Sync\SingleServerRegistrar.cs" />
-    <Compile Include="Sync\WebServiceServerMessenger.cs" />
     <Compile Include="SystemUtilities.cs" />
     <Compile Include="ThreadExtensions.cs" />
     <Compile Include="Collections\TopoGraph.cs" />

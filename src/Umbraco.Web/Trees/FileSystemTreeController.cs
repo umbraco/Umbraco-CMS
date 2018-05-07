@@ -18,30 +18,28 @@ namespace Umbraco.Web.Trees
         protected abstract IFileSystem FileSystem { get; }
         protected abstract string[] Extensions { get; }
         protected abstract string FileIcon { get; }
-        protected abstract bool EnableCreateOnFolder { get; }
 
         /// <summary>
         /// Inheritors can override this method to modify the file node that is created.
         /// </summary>
-        protected virtual void OnRenderFileNode(ref TreeNode treeNode)
-        { }
+        /// <param name="treeNode"></param>
+        protected virtual void OnRenderFileNode(ref TreeNode treeNode) { }
 
         /// <summary>
         /// Inheritors can override this method to modify the folder node that is created.
         /// </summary>
-        protected virtual void OnRenderFolderNode(ref TreeNode treeNode)
-        { }
+        /// <param name="treeNode"></param>
+        protected virtual void OnRenderFolderNode(ref TreeNode treeNode) { }
 
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
-            var nodes = new TreeNodeCollection();
-
             var path = string.IsNullOrEmpty(id) == false && id != Constants.System.Root.ToInvariantString()
                 ? HttpUtility.UrlDecode(id).TrimStart("/")
                 : "";
 
             var directories = FileSystem.GetDirectories(path);
 
+            var nodes = new TreeNodeCollection();
             foreach (var directory in directories)
             {
                 var hasChildren = FileSystem.GetFiles(directory).Any() || FileSystem.GetDirectories(directory).Any();
@@ -53,24 +51,22 @@ namespace Umbraco.Web.Trees
                     nodes.Add(node);
             }
 
+            //this is a hack to enable file system tree to support multiple file extension look-up
+            //so the pattern both support *.* *.xml and xml,js,vb for lookups
             var files = FileSystem.GetFiles(path).Where(x =>
             {
                 var extension = Path.GetExtension(x);
                 return extension != null && Extensions.Contains(extension.Trim('.'), StringComparer.InvariantCultureIgnoreCase);
-
-                // fixme - should we filter out hidden files? but then, FileSystem does not support attributes!
             });
 
             foreach (var file in files)
             {
                 var withoutExt = Path.GetFileNameWithoutExtension(file);
-                if (string.IsNullOrWhiteSpace(withoutExt)) continue;
+                if (withoutExt.IsNullOrWhiteSpace()) continue;
 
                 var name = Path.GetFileName(file);
                 var node = CreateTreeNode(HttpUtility.UrlEncode(file), path, queryStrings, name, FileIcon, false);
-
                 OnRenderFileNode(ref node);
-
                 if (node != null)
                     nodes.Add(node);
             }
@@ -78,89 +74,77 @@ namespace Umbraco.Web.Trees
             return nodes;
         }
 
-        protected virtual TreeNodeCollection GetTreeNodesForFile(string path, string id, FormDataCollection queryStrings)
-        {
-            return new TreeNodeCollection();
-        }
-
-        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        protected virtual MenuItemCollection GetMenuForRootNode(FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
 
-            OnBeforeRenderMenu(menu, id, queryStrings);
-
-            // if root node no need to visit the filesystem so lets just create the menu and return it
-            if (id == Constants.System.Root.ToInvariantString())
-            {
-                GetMenuForRootNode(menu, queryStrings);
-            }
-            else
-            {
-                var path = string.IsNullOrEmpty(id) == false && id != Constants.System.Root.ToInvariantString()
-                    ? HttpUtility.UrlDecode(id).TrimStart("/")
-                    : "";
-                var isFile = FileSystem.FileExists(path);
-                var isDirectory = FileSystem.DirectoryExists(path);
-
-                if (isDirectory)
-                    GetMenuForFolder(menu, path, id, queryStrings);
-                else if (isFile)
-                    GetMenuForFile(menu, path, id, queryStrings);
-            }
-
-            OnAfterRenderMenu(menu, id, queryStrings);
+            //set the default to create
+            menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+            //create action
+            menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
+            //refresh action
+            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
 
             return menu;
         }
 
-        protected virtual void GetMenuForRootNode(MenuItemCollection menu, FormDataCollection queryStrings)
+        protected virtual MenuItemCollection GetMenuForFolder(string path, FormDataCollection queryStrings)
         {
-            // default create
+            var menu = new MenuItemCollection();
+
+            //set the default to create
             menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+            //create action
+            menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
 
-            // create action
-            //Since we haven't implemented anything for file systems in angular, this needs to be converted to
-            //use the legacy format
-            menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                .ConvertLegacyFileSystemMenuItem("", "init" + TreeAlias, queryStrings.GetValue<string>("application"));
+            var hasChildren = FileSystem.GetFiles(path).Any() || FileSystem.GetDirectories(path).Any();
 
-            // refresh action
-            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
-        }
-
-        protected virtual void GetMenuForFolder(MenuItemCollection menu, string path, string id, FormDataCollection queryStrings)
-        {
-            if (EnableCreateOnFolder)
+            //We can only delete folders if it doesn't have any children (folders or files)
+            if (hasChildren == false)
             {
-                // default create
-                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
-
-                // create action
-                //Since we haven't implemented anything for file systems in angular, this needs to be converted to
-                //use the legacy format
-                menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                    .ConvertLegacyFileSystemMenuItem(id, TreeAlias + "Folder", queryStrings.GetValue<string>("application"));
+                //delete action
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)), true);
             }
 
-            // delete action
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias), true)
-                .ConvertLegacyFileSystemMenuItem(id, TreeAlias + "Folder", queryStrings.GetValue<string>("application"));
+            //refresh action
+            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
 
-            // refresh action
-            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
+            return menu;
         }
 
-        protected virtual void GetMenuForFile(MenuItemCollection menu, string path, string id, FormDataCollection queryStrings)
+        protected virtual MenuItemCollection GetMenuForFile(string path, FormDataCollection queryStrings)
         {
-            // delete action
-            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias), true)
-                .ConvertLegacyFileSystemMenuItem(id, TreeAlias, queryStrings.GetValue<string>("application"));
+            var menu = new MenuItemCollection();
+
+            //if it's not a directory then we only allow to delete the item
+            menu.Items.Add<ActionDelete>(Services.TextService.Localize(string.Format("actions/{0}", ActionDelete.Instance.Alias)));
+
+            return menu;
         }
 
-        protected virtual void OnBeforeRenderMenu(MenuItemCollection menu, string id, FormDataCollection queryStrings)
-        { }
+        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        {
+            //if root node no need to visit the filesystem so lets just create the menu and return it
+            if (id == Constants.System.Root.ToInvariantString())
+            {
+                return GetMenuForRootNode(queryStrings);
+            }
 
-        protected virtual void OnAfterRenderMenu(MenuItemCollection menu, string id, FormDataCollection queryStrings)
-        { }
+            var menu = new MenuItemCollection();
+
+            var path = string.IsNullOrEmpty(id) == false && id != Constants.System.Root.ToInvariantString()
+                ? HttpUtility.UrlDecode(id).TrimStart("/")
+                : "";
+
+            var isFile = FileSystem.FileExists(path);
+            var isDirectory = FileSystem.DirectoryExists(path);
+
+            if (isDirectory)
+            {
+                return GetMenuForFolder(path, queryStrings);
+            }
+
+            return isFile ? GetMenuForFile(path, queryStrings) : menu;
+        }
     }
 }

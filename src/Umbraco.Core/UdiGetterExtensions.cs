@@ -206,18 +206,7 @@ namespace Umbraco.Core
 
             return new StringUdi(entityType, entity.Path.TrimStart('/')).EnsureClosed();
         }
-
-        /// <summary>
-        /// Gets the entity identifier of the entity.
-        /// </summary>
-        /// <param name="entity">The entity.</param>
-        /// <returns>The entity identifier of the entity.</returns>
-        public static StringUdi GetUdi(this IXsltFile entity)
-        {
-            if (entity == null) throw new ArgumentNullException("entity");
-            return new StringUdi(Constants.UdiEntityType.Xslt, entity.Path.TrimStart('/')).EnsureClosed();
-        }
-
+        
         /// <summary>
         /// Gets the entity identifier of the entity.
         /// </summary>
@@ -316,9 +305,6 @@ namespace Umbraco.Core
 
             var partialView = entity as IPartialView;
             if (partialView != null) return partialView.GetUdi();
-
-            var xsltFile = entity as IXsltFile;
-            if (xsltFile != null) return xsltFile.GetUdi();
 
             var contentBase = entity as IContentBase;
             if (contentBase != null) return contentBase.GetUdi();

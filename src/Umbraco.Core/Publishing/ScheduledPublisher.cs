@@ -39,7 +39,7 @@ namespace Umbraco.Core.Publishing
                 try
                 {
                     d.ReleaseDate = null;
-                    d.PublishValues(); // fixme variants?
+                    d.TryPublishValues(); // fixme variants?
                     var result = _contentService.SaveAndPublish(d, d.GetWriterProfile().Id);
                     _logger.Debug<ContentService>($"Result of publish attempt: {result.Result}");
                     if (result.Success == false)

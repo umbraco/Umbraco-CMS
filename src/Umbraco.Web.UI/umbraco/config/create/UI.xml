@@ -68,13 +68,6 @@
       <delete assembly="Umbraco.Web" type="StylesheetTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="initxslt">
-    <header>XSLT file</header>
-    <usercontrol>/create/xslt.ascx</usercontrol>
-    <tasks>
-      <create assembly="Umbraco.Web" type="XsltTasks" />
-    </tasks>
-  </nodeType>      
   <nodeType alias="memberGroups">
     <header>membergroup</header>
     <usercontrol>/create/simple.ascx</usercontrol>
@@ -103,20 +96,6 @@
     <tasks>
       <create assembly="Umbraco.Web" type="dictionaryTasks" />
       <delete assembly="Umbraco.Web" type="dictionaryTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="initlanguages">
-    <header>Language</header>
-    <usercontrol>/create/language.ascx</usercontrol>
-    <tasks>
-      <create assembly="Umbraco.Web" type="languageTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="languages">
-    <header>Language</header>
-    <usercontrol>/create/language.ascx</usercontrol>
-    <tasks>
-      <delete assembly="Umbraco.Web" type="languageTasks" />
     </tasks>
   </nodeType>
   <nodeType alias="cache">

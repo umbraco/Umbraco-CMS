@@ -46,9 +46,7 @@ namespace Umbraco.Web.Macros
         {
             var id = new StringBuilder();
 
-            var alias = string.IsNullOrEmpty(model.ScriptCode)
-                ? model.Alias
-                : GenerateCacheKeyFromCode(model.ScriptCode);
+            var alias = model.Alias;
             id.AppendFormat("{0}-", alias);
 
             if (model.CacheByPage)
@@ -145,12 +143,7 @@ namespace Umbraco.Web.Macros
                 var key = member?.ProviderUserKey;
                 if (key == null) return;
             }
-
-            // scripts and xslt can be cached as strings but not controls
-            // as page events (Page_Load) wouldn't be hit -- yet caching
-            // controls is a bad idea, it can lead to plenty of issues ?!
-            // eg with IDs...
-
+            
             // this is legacy and I'm not sure what exactly it is supposed to do
             if (macroContent.Control != null)
                 macroContent.ControlId = macroContent.Control.ID;
@@ -177,22 +170,10 @@ namespace Umbraco.Web.Macros
 
             switch (model.MacroType)
             {
-                case MacroTypes.Xslt:
-                    filename = SystemDirectories.Xslt.EnsureEndsWith('/') + model.Xslt;
-                    break;
-                //case MacroTypes.Script:
-                //    // was "~/macroScripts/"
-                //    filename = SystemDirectories.MacroScripts.EnsureEndsWith('/') + model.ScriptName;
-                //    break;
                 case MacroTypes.PartialView:
-                    filename = model.ScriptName; //partial views are saved with their full virtual path
-                    break;
                 case MacroTypes.UserControl:
-                    filename = model.TypeName; //user controls are saved with their full virtual path
+                    filename = model.MacroSource; //user controls & partial views are saved with their full virtual path
                     break;
-                //case MacroTypes.Script:
-                //case MacroTypes.CustomControl:
-                //case MacroTypes.Unknown:
                 default:
                     // not file-based, or not supported
                     filename = null;
@@ -329,7 +310,7 @@ namespace Umbraco.Web.Macros
                 {
                     Name = macro.Name,
                     Alias = macro.Alias,
-                    ItemKey = macro.ScriptName,
+                    MacroSource = macro.MacroSource,
                     Exception = e,
                     Behaviour = UmbracoConfig.For.UmbracoSettings().Content.MacroErrorBehaviour
                 };
@@ -377,34 +358,17 @@ namespace Umbraco.Web.Macros
             {
                 case MacroTypes.PartialView:
                     return ExecuteMacroWithErrorWrapper(model,
-                        $"Executing PartialView: TypeName=\"{model.TypeName}\", ScriptName=\"{model.ScriptName}\".",
+                        $"Executing PartialView: MacroSource=\"{model.MacroSource}\".",
                         "Executed PartialView.",
                         () => ExecutePartialView(model),
-                        () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.ScriptName }));
-
-                //case MacroTypes.Script:
-                //    return ExecuteMacroWithErrorWrapper(model,
-                //        "Executing Script: " + (string.IsNullOrWhiteSpace(model.ScriptCode)
-                //            ? "ScriptName=\"" + model.ScriptName + "\""
-                //            : "Inline, Language=\"" + model.ScriptLanguage + "\""),
-                //        "Executed Script.",
-                //        () => ExecuteScript(model),
-                //        () => textService.Localize("errors/macroErrorLoadingMacroEngineScript", new[] { model.ScriptName }));
-
-                case MacroTypes.Xslt:
-                    return ExecuteMacroWithErrorWrapper(model,
-                        $"Executing Xslt: TypeName=\"{model.TypeName}\", ScriptName=\"{model.Xslt}\".",
-                        "Executed Xslt.",
-                        () => ExecuteXslt(model, _plogger),
-                        // cannot diff. between reading & parsing... bah
-                        () => textService.Localize("errors/macroErrorParsingXSLTFile", new[] { model.Xslt }));
-
+                        () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
+                    
                 case MacroTypes.UserControl:
                     return ExecuteMacroWithErrorWrapper(model,
-                        $"Loading UserControl: TypeName=\"{model.TypeName}\".",
+                        $"Loading UserControl: MacroSource=\"{model.MacroSource}\".",
                         "Loaded UserControl.",
                         () => ExecuteUserControl(model),
-                        () => textService.Localize("errors/macroErrorLoadingUsercontrol", new[] { model.TypeName }));
+                        () => textService.Localize("errors/macroErrorLoadingUsercontrol", new[] { model.MacroSource }));
 
                 //case MacroTypes.Script:
                 default:
@@ -447,22 +411,12 @@ namespace Umbraco.Web.Macros
             return engine.Execute(macro, content);
         }
 
-        /// <summary>
-        /// Renders an Xslt Macro.
-        /// </summary>
-        /// <returns>The text output of the macro execution.</returns>
-        public static MacroContent ExecuteXslt(MacroModel macro, ProfilingLogger plogger)
-        {
-            var engine = new XsltMacroEngine(plogger);
-            return engine.Execute(macro);
-        }
-
         public static MacroContent ExecuteUserControl(MacroModel macro)
         {
             // add tilde for v4 defined macros
-            if (string.IsNullOrEmpty(macro.TypeName) == false
-                && macro.TypeName.StartsWith("~") == false)
-                macro.TypeName = "~/" + macro.TypeName;
+            if (string.IsNullOrEmpty(macro.MacroSource) == false
+                && macro.MacroSource.StartsWith("~") == false)
+                macro.MacroSource = "~/" + macro.MacroSource;
 
             var engine = new UserControlMacroEngine();
             return engine.Execute(macro);

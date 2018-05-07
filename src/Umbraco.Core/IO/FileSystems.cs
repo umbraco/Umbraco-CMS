@@ -26,10 +26,8 @@ namespace Umbraco.Core.IO
         private ShadowWrapper _partialViewsFileSystem;
         private ShadowWrapper _stylesheetsFileSystem;
         private ShadowWrapper _scriptsFileSystem;
-        private ShadowWrapper _xsltFileSystem;
         private ShadowWrapper _masterPagesFileSystem;
         private ShadowWrapper _mvcViewsFileSystem;
-        private ShadowWrapper _javaScriptLibraryFileSystem;
         
         // well-known file systems lazy initialization
         private object _wkfsLock = new object();
@@ -103,16 +101,7 @@ namespace Umbraco.Core.IO
                 return _scriptsFileSystem;
             }
         }
-
-        public IFileSystem XsltFileSystem
-        {
-            get
-            {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-                return _xsltFileSystem;
-            }
-        }
-
+        
         public IFileSystem MasterPagesFileSystem
         {
             get
@@ -163,7 +152,6 @@ namespace Umbraco.Core.IO
             var partialViewsFileSystem = new PhysicalFileSystem(SystemDirectories.PartialViews);
             var stylesheetsFileSystem = new PhysicalFileSystem(SystemDirectories.Css);
             var scriptsFileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
-            var xsltFileSystem = new PhysicalFileSystem(SystemDirectories.Xslt);
             var masterPagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
             var javaScriptLibraryFileSystem = new PhysicalFileSystem(SystemDirectories.JavaScriptLibrary);
@@ -172,7 +160,6 @@ namespace Umbraco.Core.IO
             _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", () => IsScoped());
             _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, "css", () => IsScoped());
             _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", () => IsScoped());
-            _xsltFileSystem = new ShadowWrapper(xsltFileSystem, "xslt", () => IsScoped());
             _masterPagesFileSystem = new ShadowWrapper(masterPagesFileSystem, "masterpages", () => IsScoped());
             _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", () => IsScoped());
             _javascriptLibraryFileSystem = new ShadowWrapper(javaScriptLibraryFileSystem, "Lib", () => IsScoped());
@@ -366,14 +353,13 @@ namespace Umbraco.Core.IO
             if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
 
             var typed = _wrappers.ToArray();
-            var wrappers = new ShadowWrapper[typed.Length + 7];
+            var wrappers = new ShadowWrapper[typed.Length + 6];
             var i = 0;
             while (i < typed.Length) wrappers[i] = typed[i++];
             wrappers[i++] = _macroPartialFileSystem;
             wrappers[i++] = _partialViewsFileSystem;
             wrappers[i++] = _stylesheetsFileSystem;
             wrappers[i++] = _scriptsFileSystem;
-            wrappers[i++] = _xsltFileSystem;
             wrappers[i++] = _masterPagesFileSystem;
             wrappers[i] = _mvcViewsFileSystem;
 

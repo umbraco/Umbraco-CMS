@@ -123,10 +123,10 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                item.PublishValues();
+                item.TryPublishValues();
                 Current.Services.ContentService.SaveAndPublish(item); // should create an xml clone
                 item.Name = "changed";
-                item.PublishValues();
+                item.TryPublishValues();
                 Current.Services.ContentService.SaveAndPublish(item); // should re-use the xml clone
 
                 // this should never change
@@ -230,13 +230,13 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                item.PublishValues();
+                item.TryPublishValues();
                 Current.Services.ContentService.SaveAndPublish(item);
 
                 for (var i = 0; i < count; i++)
                 {
                     var temp = new Content("content_" + i, -1, contentType);
-                    temp.PublishValues();
+                    temp.TryPublishValues();
                     Current.Services.ContentService.SaveAndPublish(temp);
                     ids[i] = temp.Id;
                 }
@@ -299,7 +299,7 @@ namespace Umbraco.Tests.Scoping
                 : base(false)
             { }
 
-            protected override void DeliverRemote(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
+            protected override void DeliverRemote(ICacheRefresher refresher, MessageType messageType, IEnumerable<object> ids = null, string json = null)
             {
                 throw new NotImplementedException();
             }

@@ -9,14 +9,12 @@ namespace Umbraco.Core.Sync
     /// </summary>
     public sealed class RefreshInstructionEnvelope
     {
-        public RefreshInstructionEnvelope(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, IEnumerable<RefreshInstruction> instructions)
+        public RefreshInstructionEnvelope(ICacheRefresher refresher, IEnumerable<RefreshInstruction> instructions)
         {
-            Servers = servers;
             Refresher = refresher;
             Instructions = instructions;
         }
 
-        public IEnumerable<IServerAddress> Servers { get; set; }
         public ICacheRefresher Refresher { get; set; }
         public IEnumerable<RefreshInstruction> Instructions { get; set; }
     }

@@ -57,6 +57,15 @@ namespace Umbraco.Web.Models.ContentEditing
             Groups = new List<PropertyGroupBasic<TPropertyType>>();
         }
 
+        /// <summary>
+        /// A rule for defining how a content type can be varied
+        /// </summary>
+        /// <remarks>
+        /// This is only supported on document types right now but in the future it could be media types too
+        /// </remarks>
+        [DataMember(Name = "allowCultureVariant")]
+        public bool AllowCultureVariant { get; set; }
+
         //Tabs
         [DataMember(Name = "groups")]
         public IEnumerable<PropertyGroupBasic<TPropertyType>> Groups { get; set; }

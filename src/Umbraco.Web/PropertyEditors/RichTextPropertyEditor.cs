@@ -61,12 +61,12 @@ namespace Umbraco.Web.PropertyEditors
             /// </summary>
             /// <param name="property"></param>
             /// <param name="dataTypeService"></param>
-            /// <param name="languageId"></param>
+            /// <param name="culture"></param>
             /// <param name="segment"></param>
             /// <returns></returns>
-            public override object ToEditor(Property property, IDataTypeService dataTypeService, int? languageId = null, string segment = null)
+            public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
             {
-                var val = property.GetValue(languageId, segment);
+                var val = property.GetValue(culture, segment);
                 if (val == null)
                     return null;
 

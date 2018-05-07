@@ -31,7 +31,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <returns></returns>
         public override IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (AllowedTemplates.Any(x => StringExtensions.IsNullOrWhiteSpace(x)))
+            if (AllowedTemplates.Any(x => x.IsNullOrWhiteSpace()))
                 yield return new ValidationResult("Template value cannot be null", new[] { "AllowedTemplates" });
 
             foreach (var v in base.Validate(validationContext))

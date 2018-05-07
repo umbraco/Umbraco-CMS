@@ -16,10 +16,6 @@ namespace umbraco.cms.businesslogic.packager
 
         public bool HasUpdate { get; set; }
 
-        public bool EnableSkins { get; set; }
-
-        public Guid SkinRepoGuid { get; set; }
-
         public string Name { get; set; }
 
         public string Url { get; set; }
@@ -73,7 +69,6 @@ namespace umbraco.cms.businesslogic.packager
 
         public PackageInstance()
         {
-            SkinRepoGuid = Guid.Empty;
             Name = string.Empty;
             Url = string.Empty;
             Folder = string.Empty;
@@ -96,7 +91,6 @@ namespace umbraco.cms.businesslogic.packager
             Files = new List<string>();
             LoadControl = string.Empty;
             DataTypes = new List<string>();
-            EnableSkins = false;
             ContentLoadChildNodes = false;
         }
     }

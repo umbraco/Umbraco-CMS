@@ -37,7 +37,7 @@
                 var saveModel = _.pick(displayModel,
                     'compositeContentTypes', 'isContainer', 'allowAsRoot', 'allowedTemplates', 'allowedContentTypes',
                     'alias', 'description', 'thumbnail', 'name', 'id', 'icon', 'trashed',
-                    'key', 'parentId', 'alias', 'path');
+                    'key', 'parentId', 'alias', 'path', 'allowCultureVariant');
 
                 //TODO: Map these
                 saveModel.allowedTemplates = _.map(displayModel.allowedTemplates, function (t) { return t.alias; });
@@ -56,7 +56,7 @@
                     });
 
                     var saveProperties = _.map(realProperties, function (p) {
-                        var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile', 'isSensitiveData');
+                        var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile', 'isSensitiveData', 'allowCultureVariant');
                         return saveProperty;
                     });
 
@@ -326,19 +326,23 @@
 
                 //get the selected variant and build the additional published variants
                 saveModel.publishVariations = [];
-                _.each(displayModel.variants,
-                    function (d) {
-                        //set the selected variant if this is current
-                        if (d.current === true) {
-                            saveModel.languageId = d.language.id;
-                        }
-                        if (d.publish === true) {
-                            saveModel.publishVariations.push({
-                                languageId: d.language.id,
-                                segment: d.segment
-                            });
-                        }
-                    });
+
+                //if there's any variants than we need to set the language and include the variants to publish
+                if (displayModel.variants.length > 0) {
+                    _.each(displayModel.variants,
+                        function (d) {
+                            //set the selected variant if this is current
+                            if (d.current === true) {
+                                saveModel.culture = d.language.culture;
+                            }
+                            if (d.publish === true) {
+                                saveModel.publishVariations.push({
+                                    culture: d.language.culture,
+                                    segment: d.segment
+                                });
+                            }
+                        });
+                }
 
                 var propExpireDate = displayModel.removeDate;
                 var propReleaseDate = displayModel.releaseDate;

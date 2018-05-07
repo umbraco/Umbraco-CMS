@@ -748,6 +748,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             public override string Name => _name;
 
+            public override IReadOnlyDictionary<string, PublishedCultureName> CultureNames => throw new NotSupportedException();
+
             public override string UrlName => _urlName;
 
             public override string DocumentTypeAlias => _documentTypeAlias;

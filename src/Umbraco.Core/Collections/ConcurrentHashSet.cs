@@ -50,9 +50,15 @@ namespace Umbraco.Core.Collections
         /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.</exception>
         public bool Remove(T item)
         {
-            using (new WriteLock(_instanceLocker))
+            try
             {
+                _instanceLocker.EnterWriteLock();
                 return _innerSet.Remove(item);
+            }
+            finally
+            {
+                if (_instanceLocker.IsWriteLockHeld)
+                    _instanceLocker.ExitWriteLock();
             }
         }
 
@@ -86,9 +92,15 @@ namespace Umbraco.Core.Collections
         /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.</exception>
         public void Add(T item)
         {
-            using (new WriteLock(_instanceLocker))
+            try
             {
+                _instanceLocker.EnterWriteLock();
                 _innerSet.Add(item);
+            }
+            finally
+            {
+                if (_instanceLocker.IsWriteLockHeld)
+                    _instanceLocker.ExitWriteLock();
             }
         }
 
@@ -101,12 +113,19 @@ namespace Umbraco.Core.Collections
         {
             var clone = GetThreadSafeClone();
             if (clone.Contains(item)) return false;
-            using (new WriteLock(_instanceLocker))
+            try
             {
+                _instanceLocker.EnterWriteLock();
+
                 //double check
                 if (_innerSet.Contains(item)) return false;
                 _innerSet.Add(item);
                 return true;
+            }
+            finally
+            {
+                if (_instanceLocker.IsWriteLockHeld)
+                    _instanceLocker.ExitWriteLock();
             }
         }
 
@@ -116,9 +135,15 @@ namespace Umbraco.Core.Collections
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only. </exception>
         public void Clear()
         {
-            using (new WriteLock(_instanceLocker))
+            try
             {
+                _instanceLocker.EnterWriteLock();
                 _innerSet.Clear();
+            }
+            finally
+            {
+                if (_instanceLocker.IsWriteLockHeld)
+                    _instanceLocker.ExitWriteLock();
             }
         }
 
@@ -147,9 +172,15 @@ namespace Umbraco.Core.Collections
         private HashSet<T> GetThreadSafeClone()
         {
             HashSet<T> clone = null;
-            using (new WriteLock(_instanceLocker))
+            try
             {
+                _instanceLocker.EnterWriteLock();
                 clone = new HashSet<T>(_innerSet, _innerSet.Comparer);
+            }
+            finally
+            {
+                if (_instanceLocker.IsWriteLockHeld)
+                    _instanceLocker.ExitWriteLock();
             }
             return clone;
         }

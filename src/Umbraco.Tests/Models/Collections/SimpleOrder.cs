@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Models.Collections
         internal void Reset(IEnumerable<OrderItem> properties)
         {
             Clear();
-            properties.ForEach(Add);
+            foreach (var property in properties) Add(property);
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 

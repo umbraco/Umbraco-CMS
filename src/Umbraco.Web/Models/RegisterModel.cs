@@ -25,7 +25,6 @@ namespace Umbraco.Web.Models
         private RegisterModel(bool doLookup)
         {
             MemberTypeAlias = Constants.Conventions.MemberTypes.DefaultAlias;
-            RedirectOnSucces = false;
             UsernameIsEmail = true;
             MemberProperties = new List<UmbracoProperty>();
             LoginOnSuccess = true;
@@ -69,11 +68,7 @@ namespace Umbraco.Web.Models
         /// </summary>
         [Required]
         public string Password { get; set; }
-
-        [ReadOnly(true)]
-        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
-        public bool RedirectOnSucces { get; set; }
-
+        
         /// <summary>
         /// The username of the model, if UsernameIsEmail is true then this is ignored.
         /// </summary>

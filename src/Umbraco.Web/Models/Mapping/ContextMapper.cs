@@ -11,7 +11,7 @@ namespace Umbraco.Web.Models.Mapping
     internal static class ContextMapper
     {
         public const string UmbracoContextKey = "ContextMapper.UmbracoContext";
-        public const string LanguageKey = "ContextMapper.LanguageId";
+        public const string CultureKey = "ContextMapper.Culture";
 
         public static TDestination Map<TSource, TDestination>(TSource obj, UmbracoContext umbracoContext)
             => Mapper.Map<TSource, TDestination>(obj, opt => opt.Items[UmbracoContextKey] = umbracoContext);
@@ -77,12 +77,12 @@ namespace Umbraco.Web.Models.Mapping
         /// </summary>
         /// <param name="resolutionContext"></param>
         /// <returns></returns>
-        public static int? GetLanguageId(this ResolutionContext resolutionContext)
+        public static string GetCulture(this ResolutionContext resolutionContext)
         {
-            if (!resolutionContext.Options.Items.TryGetValue(LanguageKey, out var obj)) return null;
+            if (!resolutionContext.Options.Items.TryGetValue(CultureKey, out var obj)) return null;
 
-            if (obj is int i)
-                return i;
+            if (obj is string s)
+                return s;
 
             return null;
         }

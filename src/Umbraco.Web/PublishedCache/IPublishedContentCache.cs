@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models;
+﻿using System.Globalization;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.PublishedCache
@@ -17,7 +18,7 @@ namespace Umbraco.Web.PublishedCache
         /// <para>If <param name="hideTopLevelNode" /> is <c>null</c> then the settings value is used.</para>
         /// <para>The value of <paramref name="preview"/> overrides defaults.</para>
         /// </remarks>
-        IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null);
+        IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string culture = null);
 
         /// <summary>
         /// Gets content identified by a route.
@@ -30,7 +31,7 @@ namespace Umbraco.Web.PublishedCache
         /// <para>If <param name="hideTopLevelNode" /> is <c>null</c> then the settings value is used.</para>
         /// <para>Considers published or unpublished content depending on defaults.</para>
         /// </remarks>
-        IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null);
+        IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string culture = null);
 
         /// <summary>
         /// Gets the route for a content identified by its unique identifier.
@@ -39,7 +40,7 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The route.</returns>
         /// <remarks>The value of <paramref name="preview"/> overrides defaults.</remarks>
-        string GetRouteById(bool preview, int contentId);
+        string GetRouteById(bool preview, int contentId, string culture = null);
 
         /// <summary>
         /// Gets the route for a content identified by its unique identifier.
@@ -47,6 +48,6 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The route.</returns>
         /// <remarks>Considers published or unpublished content depending on defaults.</remarks>
-        string GetRouteById(int contentId);
+        string GetRouteById(int contentId, string culture = null);
     }
 }

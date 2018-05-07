@@ -23,7 +23,6 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Media;
-using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -98,7 +97,7 @@ namespace Umbraco.Web.Composing
         public static DistributedCache DistributedCache
             => Container.GetInstance<DistributedCache>();
 
-        public static IPublishedShapshot PublishedSnapshot
+        public static IPublishedSnapshot PublishedSnapshot
             => Container.GetInstance<IPublishedSnapshotAccessor>().PublishedSnapshot;
 
         public static EventMessages EventMessages
@@ -124,10 +123,7 @@ namespace Umbraco.Web.Composing
 
         internal static EditorValidatorCollection EditorValidators
             => Container.GetInstance<EditorValidatorCollection>();
-
-        internal static XsltExtensionCollection XsltExtensions
-            => Container.GetInstance<XsltExtensionCollection>();
-
+        
         internal static UmbracoApiControllerTypeCollection UmbracoApiControllerTypes
             => Container.GetInstance<UmbracoApiControllerTypeCollection>();
 
@@ -137,18 +133,9 @@ namespace Umbraco.Web.Composing
         public static FilteredControllerFactoryCollection FilteredControllerFactories
             => Container.GetInstance<FilteredControllerFactoryCollection>();
 
-        internal static ImageUrlProviderCollection ImageUrlProviders
-            => Container.GetInstance<ImageUrlProviderCollection>();
-
         internal static IPublishedSnapshotService PublishedSnapshotService
             => Container.GetInstance<IPublishedSnapshotService>();
-
-        public static ISiteDomainHelper SiteDomainHelper
-            => Container.GetInstance<ISiteDomainHelper>();
-
-        public static ThumbnailProviderCollection ThumbnailProviders
-            => Container.GetInstance<ThumbnailProviderCollection>();
-
+        
         #endregion
 
         #region Web Constants

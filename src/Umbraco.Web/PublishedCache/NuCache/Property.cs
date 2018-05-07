@@ -28,7 +28,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private object _interValue;
 
         // the variant source and inter values
-        private Dictionary<CompositeIntStringKey, SourceInterValue> _sourceValues;
+        private Dictionary<CompositeStringStringKey, SourceInterValue> _sourceValues;
 
         // the variant and non-variant object values
         private CacheValues _cacheValues;
@@ -49,16 +49,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 foreach (var sourceValue in sourceValues)
                 {
-                    if (sourceValue.LanguageId == null && sourceValue.Segment == null)
+                    if (sourceValue.Culture == null && sourceValue.Segment == null)
                     {
                         _sourceValue = sourceValue.Value;
                     }
                     else
                     {
                         if (_sourceValues == null)
-                            _sourceValues = new Dictionary<CompositeIntStringKey, SourceInterValue>();
-                        _sourceValues[new CompositeIntStringKey(sourceValue.LanguageId, sourceValue.Segment)]
-                            = new SourceInterValue { LanguageId = sourceValue.LanguageId, Segment = sourceValue.Segment, SourceValue = sourceValue.Value };
+                            _sourceValues = new Dictionary<CompositeStringStringKey, SourceInterValue>();
+                        _sourceValues[new CompositeStringStringKey(sourceValue.Culture, sourceValue.Segment)]
+                            = new SourceInterValue { Culture = sourceValue.Culture, Segment = sourceValue.Segment, SourceValue = sourceValue.Value };
                     }
                 }
             }
@@ -84,7 +84,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
         }
 
-        public override bool HasValue(int? languageId = null, string segment = null) => _sourceValue != null
+        public override bool HasValue(string culture = null, string segment = null) => _sourceValue != null
             && (!(_sourceValue is string) || string.IsNullOrWhiteSpace((string) _sourceValue) == false);
 
         // used to cache the recursive *property* for this property
@@ -98,7 +98,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private CacheValues GetCacheValues(PropertyCacheLevel cacheLevel)
         {
             CacheValues cacheValues;
-            PublishedShapshot publishedSnapshot;
+            PublishedSnapshot publishedSnapshot;
             ICacheProvider cache;
             switch (cacheLevel)
             {
@@ -115,7 +115,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // elements cache (if we don't want to pollute the elements cache with short-lived
                     // data) depending on settings
                     // for members, always cache in the snapshot cache - never pollute elements cache
-                    publishedSnapshot = (PublishedShapshot) _publishedSnapshotAccessor.PublishedSnapshot;
+                    publishedSnapshot = (PublishedSnapshot) _publishedSnapshotAccessor.PublishedSnapshot;
                     cache = publishedSnapshot == null
                         ? null
                         : ((_isPreviewing == false || PublishedSnapshotService.FullCacheWhenPreviewing) && (_isMember == false)
@@ -125,7 +125,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     break;
                 case PropertyCacheLevel.Snapshot:
                     // cache within the snapshot cache
-                    publishedSnapshot = (PublishedShapshot) _publishedSnapshotAccessor.PublishedSnapshot;
+                    publishedSnapshot = (PublishedSnapshot) _publishedSnapshotAccessor.PublishedSnapshot;
                     cache = publishedSnapshot?.SnapshotCache;
                     cacheValues = GetCacheValues(cache);
                     break;
@@ -143,9 +143,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         // this is always invoked from within a lock, so does not require its own lock
-        private object GetInterValue(int? languageId, string segment)
+        private object GetInterValue(string culture, string segment)
         {
-            if (languageId == null && segment == null)
+            if (culture == null && segment == null)
             {
                 if (_interInitialized) return _interValue;
                 _interValue = PropertyType.ConvertSourceToInter(_content, _sourceValue, _isPreviewing);
@@ -154,11 +154,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
 
             if (_sourceValues == null)
-                _sourceValues = new Dictionary<CompositeIntStringKey, SourceInterValue>();
+                _sourceValues = new Dictionary<CompositeStringStringKey, SourceInterValue>();
 
-            var k = new CompositeIntStringKey(languageId, segment);
+            var k = new CompositeStringStringKey(culture, segment);
             if (!_sourceValues.TryGetValue(k, out var vvalue))
-                _sourceValues[k] = vvalue = new SourceInterValue { LanguageId = languageId, Segment = segment };
+                _sourceValues[k] = vvalue = new SourceInterValue { Culture = culture, Segment = segment };
 
             if (vvalue.InterInitialized) return vvalue.InterValue;
             vvalue.InterValue = PropertyType.ConvertSourceToInter(_content, vvalue.SourceValue, _isPreviewing);
@@ -166,45 +166,45 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return vvalue.InterValue;
         }
 
-        public override object GetSourceValue(int? languageId = null, string segment = null)
+        public override object GetSourceValue(string culture = null, string segment = null)
         {
-            if (languageId == null && segment == null)
+            if (culture == null && segment == null)
                 return _sourceValue;
 
             lock (_locko)
             {
                 if (_sourceValues == null) return null;
-                return _sourceValues.TryGetValue(new CompositeIntStringKey(languageId, segment), out var sourceValue) ? sourceValue.SourceValue : null;
+                return _sourceValues.TryGetValue(new CompositeStringStringKey(culture, segment), out var sourceValue) ? sourceValue.SourceValue : null;
             }
         }
 
-        public override object GetValue(int? languageId = null, string segment = null)
+        public override object GetValue(string culture = null, string segment = null)
         {
             lock (_locko)
             {
-                var cacheValues = GetCacheValues(PropertyType.CacheLevel).For(languageId, segment);
+                var cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
 
                 // initial reference cache level always is .Content
                 const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
 
                 if (cacheValues.ObjectInitialized) return cacheValues.ObjectValue;
-                cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, initialCacheLevel, GetInterValue(languageId, segment), _isPreviewing);
+                cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
                 cacheValues.ObjectInitialized = true;
                 return cacheValues.ObjectValue;
             }
         }
 
-        public override object GetXPathValue(int? languageId = null, string segment = null)
+        public override object GetXPathValue(string culture = null, string segment = null)
         {
             lock (_locko)
             {
-                var cacheValues = GetCacheValues(PropertyType.CacheLevel).For(languageId, segment);
+                var cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
 
                 // initial reference cache level always is .Content
                 const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
 
                 if (cacheValues.XPathInitialized) return cacheValues.XPathValue;
-                cacheValues.XPathValue = PropertyType.ConvertInterToXPath(_content, initialCacheLevel, GetInterValue(languageId, segment), _isPreviewing);
+                cacheValues.XPathValue = PropertyType.ConvertInterToXPath(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
                 cacheValues.XPathInitialized = true;
                 return cacheValues.XPathValue;
             }
@@ -222,18 +222,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private class CacheValues : CacheValue
         {
-            private Dictionary<CompositeIntStringKey, CacheValue> _values;
+            private Dictionary<CompositeStringStringKey, CacheValue> _values;
 
             // this is always invoked from within a lock, so does not require its own lock
-            public CacheValue For(int? languageId, string segment)
+            public CacheValue For(string culture, string segment)
             {
-                if (languageId == null && segment == null)
+                if (culture == null && segment == null)
                     return this;
 
                 if (_values == null)
-                    _values = new Dictionary<CompositeIntStringKey, CacheValue>();
+                    _values = new Dictionary<CompositeStringStringKey, CacheValue>();
 
-                var k = new CompositeIntStringKey(languageId, segment);
+                var k = new CompositeStringStringKey(culture, segment);
                 if (!_values.TryGetValue(k, out var value))
                     _values[k] = value = new CacheValue();
 
@@ -243,9 +243,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         private class SourceInterValue
         {
+            private string _culture;
             private string _segment;
 
-            public int? LanguageId { get; set; }
+            public string Culture
+            {
+                get => _culture;
+                internal set => _culture = value?.ToLowerInvariant();
+            }
             public string Segment
             {
                 get => _segment;

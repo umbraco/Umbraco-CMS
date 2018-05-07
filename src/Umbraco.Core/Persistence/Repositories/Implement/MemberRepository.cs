@@ -23,8 +23,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly ITagRepository _tagRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
 
-        public MemberRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository)
-            : base(scopeAccessor, cache, logger)
+        public MemberRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, ILanguageRepository languageRepository)
+            : base(scopeAccessor, cache, languageRepository, logger)
         {
             _memberTypeRepository = memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
@@ -306,7 +306,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Insert(dto);
 
             // persist the property data
-            var propertyDataDtos = PropertyFactory.BuildDtos(member.VersionId, 0, entity.Properties, out _);
+            var propertyDataDtos = PropertyFactory.BuildDtos(member.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
@@ -371,7 +371,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // replace the property data
             var deletePropertyDataSql = SqlContext.Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == member.VersionId);
             Database.Execute(deletePropertyDataSql);
-            var propertyDataDtos = PropertyFactory.BuildDtos(member.VersionId, 0, entity.Properties, out _);
+            var propertyDataDtos = PropertyFactory.BuildDtos(member.VersionId, 0, entity.Properties, LanguageRepository, out _, out _);
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 

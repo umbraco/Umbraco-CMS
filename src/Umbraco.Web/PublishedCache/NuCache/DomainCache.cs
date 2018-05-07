@@ -8,9 +8,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
     {
         private readonly SnapDictionary<int, Domain>.Snapshot _snapshot;
 
-        public DomainCache(SnapDictionary<int, Domain>.Snapshot snapshot)
+        public DomainCache(SnapDictionary<int, Domain>.Snapshot snapshot, string defaultCulture)
         {
             _snapshot = snapshot;
+            DefaultCulture = defaultCulture; // capture - fast
         }
 
         public IEnumerable<Domain> GetAll(bool includeWildcards)
@@ -30,5 +31,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (includeWildcards == false) list = list.Where(x => x.IsWildcard == false);
             return list;
         }
+
+        public string DefaultCulture { get; }
     }
 }

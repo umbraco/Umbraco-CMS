@@ -85,7 +85,8 @@ namespace Umbraco.Tests.TestHelpers
                 var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
                 var preserve = preserves.ContainsKey(directory) ? preserves[directory] : null;
                 if (directoryInfo.Exists)
-                    directoryInfo.GetFiles().Where(x => preserve == null || preserve.Contains(x.Name) == false).ForEach(x => x.Delete());
+                    foreach (var x in directoryInfo.GetFiles().Where(x => preserve == null || preserve.Contains(x.Name) == false))
+                        x.Delete();
             }
         }
 
@@ -140,8 +141,8 @@ namespace Umbraco.Tests.TestHelpers
             {
                 // compare values
                 var actualProperty = (Property) actual;
-                var expectedPropertyValues = expectedProperty.Values.OrderBy(x => x.LanguageId).ThenBy(x => x.Segment).ToArray();
-                var actualPropertyValues = actualProperty.Values.OrderBy(x => x.LanguageId).ThenBy(x => x.Segment).ToArray();
+                var expectedPropertyValues = expectedProperty.Values.OrderBy(x => x.Culture).ThenBy(x => x.Segment).ToArray();
+                var actualPropertyValues = actualProperty.Values.OrderBy(x => x.Culture).ThenBy(x => x.Segment).ToArray();
                 if (expectedPropertyValues.Length != actualPropertyValues.Length)
                     Assert.Fail($"{property.DeclaringType.Name}.{property.Name}: Expected {expectedPropertyValues.Length} but got {actualPropertyValues.Length}.");
                 for (var i = 0; i < expectedPropertyValues.Length; i++)

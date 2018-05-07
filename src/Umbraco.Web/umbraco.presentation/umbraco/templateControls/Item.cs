@@ -82,42 +82,7 @@ namespace umbraco.presentation.templateControls
             get { return (string)ViewState["TextIfEmpty"] ?? String.Empty; }
             set { ViewState["TextIfEmpty"] = value; }
         }
-
-        /// <summary>
-        /// Gets or sets the XPath expression used for the inline XSLT transformation.
-        /// </summary>
-        /// <value>
-        /// The XPath expression, or an empty string to disable XSLT transformation.
-        /// The code <c>{0}</c> is used as a placeholder for the rendered field contents.
-        /// </value>
-        [Bindable(true)]
-        [Category("Umbraco")]
-        [DefaultValue("")]
-        [Localizable(true)]
-        public string Xslt
-        {
-            get { return (string)ViewState["Xslt"] ?? String.Empty; }
-            set { ViewState["Xslt"] = value; }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether XML entity escaping of the XSLT transformation output is disabled.
-        /// </summary>
-        /// <value><c>true</c> HTML escaping is disabled; otherwise, <c>false</c> (default).</value>
-        /// <remarks>
-        ///     This corresponds value to the <c>disable-output-escaping</c> parameter
-        ///     of the XSLT <c>value-of</c> element.
-        /// </remarks>
-        [Bindable(true)]
-        [Category("Umbraco")]
-        [DefaultValue(false)]
-        [Localizable(true)]
-        public bool XsltDisableEscaping
-        {
-            get { return ViewState["XsltEscape"] == null ? false : (bool)ViewState["XsltEscape"]; }
-            set { ViewState["XsltEscape"] = value; }
-        }
-
+        
         [Bindable(true)]
         [Category("Umbraco")]
         [DefaultValue("")]

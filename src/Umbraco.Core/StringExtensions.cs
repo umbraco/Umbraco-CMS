@@ -164,7 +164,7 @@ namespace Umbraco.Core
                 var obj = JsonConvert.DeserializeObject(input);
                 return obj;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return input;
             }
@@ -622,7 +622,7 @@ namespace Umbraco.Core
                 byte[] decodedBytes = UrlTokenDecode(input);
                 return decodedBytes != null ? Encoding.UTF8.GetString(decodedBytes) : null;
             }
-            catch (FormatException ex)
+            catch (FormatException)
             {
                 return null;
             }
@@ -1051,7 +1051,14 @@ namespace Umbraco.Core
         /// <returns>The filtered string.</returns>
         public static string ReplaceMany(this string text, IDictionary<string, string> replacements)
         {
-            return Current.ShortStringHelper.ReplaceMany(text, replacements);
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (replacements == null) throw new ArgumentNullException(nameof(replacements));
+
+
+            foreach (KeyValuePair<string, string> item in replacements)
+                text = text.Replace(item.Key, item.Value);
+
+            return text;
         }
 
         /// <summary>
@@ -1063,7 +1070,14 @@ namespace Umbraco.Core
         /// <returns>The filtered string.</returns>
         public static string ReplaceMany(this string text, char[] chars, char replacement)
         {
-            return Current.ShortStringHelper.ReplaceMany(text, chars, replacement);
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (chars == null) throw new ArgumentNullException(nameof(chars));
+
+
+            for (int i = 0; i < chars.Length; i++)
+                text = text.Replace(chars[i], replacement);
+
+            return text;
         }
 
         // FORMAT STRINGS
@@ -1134,6 +1148,7 @@ namespace Umbraco.Core
         /// <returns>The safe url segment.</returns>
         public static string ToUrlSegment(this string text)
         {
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("message", nameof(text));
             return Current.ShortStringHelper.CleanStringForUrlSegment(text);
         }
 
@@ -1145,6 +1160,9 @@ namespace Umbraco.Core
         /// <returns>The safe url segment.</returns>
         public static string ToUrlSegment(this string text, CultureInfo culture)
         {
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("message", nameof(text));
+            if (culture == null) throw new ArgumentNullException(nameof(culture));
+
             return Current.ShortStringHelper.CleanStringForUrlSegment(text, culture);
         }
 
@@ -1473,5 +1491,11 @@ namespace Umbraco.Core
             guid[left] = guid[right];
             guid[right] = temp;
         }
+
+        /// <summary>
+        /// Turns an null-or-whitespace string into a null string.
+        /// </summary>
+        public static string NullEmpty(this string text)
+            => string.IsNullOrWhiteSpace(text) ? null : text;
     }
 }

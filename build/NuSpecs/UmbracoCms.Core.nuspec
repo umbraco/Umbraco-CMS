@@ -43,7 +43,7 @@
         <dependency id="Microsoft.Owin.Security.OAuth" version="[4.0.0,4.666666)" />
         <dependency id="Microsoft.Web.Xdt" version="[2.1.2,2.666666)" />
         <dependency id="MiniProfiler" version="[3.2.0.157,3.666666)" />
-        <dependency id="MySql.Data" version="[6.10.6,6.666666)" />
+        <dependency id="MySql.Data" version="[6.10.7,6.666666)" />
         <dependency id="Newtonsoft.Json" version="[11.0.2,11.666666)" />
         <dependency id="NPoco" version="[3.9.3,3.666666)" />
         <dependency id="NuGet.Core" version="[2.14.0,2.666666)" />

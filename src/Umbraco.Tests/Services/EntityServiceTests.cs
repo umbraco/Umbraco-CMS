@@ -20,6 +20,22 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class EntityServiceTests : TestWithSomeContentBase
     {
+        private Language _langFr;
+        private Language _langEs;
+
+        public override void SetUp()
+        {
+            base.SetUp();
+
+            if (_langFr == null && _langEs == null)
+            {
+                _langFr = new Language("fr-FR");
+                _langEs = new Language("es-ES");
+                ServiceContext.LocalizationService.Save(_langFr);
+                ServiceContext.LocalizationService.Save(_langEs);
+            }
+        }
+
         [Test]
         public void EntityService_Can_Get_Paged_Content_Children()
         {
@@ -430,6 +446,79 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void EntityService_Can_Get_Content_By_UmbracoObjectType_With_Variant_Names()
+        {
+            var service = ServiceContext.EntityService;
+
+
+            var alias = "test" + Guid.NewGuid();
+            var contentType = MockedContentTypes.CreateSimpleContentType(alias, alias, false);
+            contentType.Variations = ContentVariation.CultureNeutral;
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var c1 = MockedContent.CreateSimpleContent(contentType, "Test", -1);
+            c1.SetName(_langFr.IsoCode, "Test - FR");
+            c1.SetName(_langEs.IsoCode, "Test - ES");
+            ServiceContext.ContentService.Save(c1);
+
+            var result = service.Get(c1.Id, UmbracoObjectTypes.Document);
+            Assert.AreEqual("Test", result.Name);
+            Assert.IsTrue(result.AdditionalData.ContainsKey("CultureNames"));
+            var cultureNames = (IDictionary<int, string>)result.AdditionalData["CultureNames"];
+            Assert.AreEqual("Test - FR", cultureNames[_langFr.Id]);
+            Assert.AreEqual("Test - ES", cultureNames[_langEs.Id]);
+        }
+
+        [Test]
+        public void EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
+        {
+            var service = ServiceContext.EntityService;
+            
+            var contentType = MockedContentTypes.CreateSimpleContentType("test1", "Test1", false);
+            contentType.Variations = ContentVariation.CultureNeutral;
+            ServiceContext.ContentTypeService.Save(contentType);
+
+            var root = MockedContent.CreateSimpleContent(contentType);
+            ServiceContext.ContentService.Save(root);
+
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
+                if (i % 2 == 0)
+                {
+                    c1.SetName(_langFr.IsoCode, "Test " + i + " - FR");
+                    c1.SetName(_langEs.IsoCode, "Test " + i + " - ES");
+                }
+                ServiceContext.ContentService.Save(c1);
+            }
+
+            var entities = service.GetChildren(root.Id, UmbracoObjectTypes.Document).ToArray();
+
+            Assert.AreEqual(10, entities.Length);
+
+            for (int i = 0; i < entities.Length; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    Assert.AreEqual(1, entities[i].AdditionalData.Count);
+                    Assert.AreEqual("CultureNames", entities[i].AdditionalData.Keys.First());
+                    var variantInfo = entities[i].AdditionalData.First().Value as IDictionary<int, string>;
+                    Assert.IsNotNull(variantInfo);
+                    var keys = variantInfo.Keys.ToList();
+                    var vals = variantInfo.Values.ToList();
+                    Assert.AreEqual(_langFr.Id, keys[0]);
+                    Assert.AreEqual("Test " + i + " - FR", vals[0]);
+                    Assert.AreEqual(_langEs.Id, keys[1]);
+                    Assert.AreEqual("Test " + i + " - ES", vals[1]);
+                }
+                else
+                {
+                    Assert.AreEqual(0, entities[i].AdditionalData.Count);
+                }
+            }
+        }
+
+        [Test]
         public void EntityService_Can_Get_Children_By_ParentId()
         {
             var service = ServiceContext.EntityService;
@@ -460,7 +549,6 @@ namespace Umbraco.Tests.Services
             var objectTypeId = Constants.ObjectTypes.ContentItem;
 
             Assert.Throws<NotSupportedException>(() => service.GetAll<IContentBase>());
-            Assert.Throws<NotSupportedException>(() => service.GetAll(UmbracoObjectTypes.ContentItem));
             Assert.Throws<NotSupportedException>(() => service.GetAll(objectTypeId));
         }
 
@@ -518,7 +606,7 @@ namespace Umbraco.Tests.Services
             }
 
             Assert.That(entities.Any(x =>
-                x.AdditionalData.Any(y => y.Value is EntitySlim.PropertySlim && ((EntitySlim.PropertySlim) y.Value).PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField)), Is.True);
+                x.AdditionalData.Any(y => y.Value is EntitySlim.PropertySlim && ((EntitySlim.PropertySlim)y.Value).PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField)), Is.True);
         }
 
         [Test]

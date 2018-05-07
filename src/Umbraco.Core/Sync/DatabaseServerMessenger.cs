@@ -71,7 +71,7 @@ namespace Umbraco.Core.Sync
 
         #region Messenger
 
-        protected override bool RequiresDistributed(IEnumerable<IServerAddress> servers, ICacheRefresher refresher, MessageType dispatchType)
+        protected override bool RequiresDistributed(ICacheRefresher refresher, MessageType dispatchType)
         {
             // we don't care if there's servers listed or not,
             // if distributed call is enabled we will make the call
@@ -79,7 +79,6 @@ namespace Umbraco.Core.Sync
         }
 
         protected override void DeliverRemote(
-            IEnumerable<IServerAddress> servers,
             ICacheRefresher refresher,
             MessageType messageType,
             IEnumerable<object> ids = null,

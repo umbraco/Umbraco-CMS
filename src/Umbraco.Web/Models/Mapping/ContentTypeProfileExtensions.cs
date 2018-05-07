@@ -163,7 +163,7 @@ namespace Umbraco.Web.Models.Mapping
             // fixme not so clean really
             var isPublishing = typeof(IContentType).IsAssignableFrom(typeof(TDestination));
 
-            return mapping
+            mapping = mapping
                 //only map id if set to something higher then zero
                 .ForMember(dest => dest.Id, opt => opt.Condition(src => (Convert.ToInt32(src.Id) > 0)))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => Convert.ToInt32(src.Id)))
@@ -179,10 +179,14 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.PropertyGroups, opt => opt.Ignore())
                 .ForMember(dest => dest.NoGroupPropertyTypes, opt => opt.Ignore())
                 // ignore, composition is managed in AfterMapContentTypeSaveToEntity
-                .ForMember(dest => dest.ContentTypeComposition, opt => opt.Ignore())
+                .ForMember(dest => dest.ContentTypeComposition, opt => opt.Ignore());
 
-                .ForMember(dto => dto.Variations, opt => opt.Ignore()) // fixme - change when UI supports it!
+            // ignore for members
+            mapping = typeof(TDestination) == typeof(IMemberType)
+                ? mapping.ForMember(dto => dto.Variations, opt => opt.Ignore())
+                : mapping.ForMember(dto => dto.Variations, opt => opt.ResolveUsing<ContentTypeVariationsResolver<TSource, TSourcePropertyType, TDestination>>());
 
+            mapping = mapping
                 .ForMember(
                     dest => dest.AllowedContentTypes,
                     opt => opt.MapFrom(src => src.AllowedContentTypes.Select((t, i) => new ContentTypeSort(t, i))))
@@ -257,6 +261,8 @@ namespace Umbraco.Web.Models.Mapping
                     // because all property collections were rebuilt, there is no need to remove
                     // some old properties, they are just gone and will be cleared by the repository
                 });
+
+            return mapping;
         }
 
         private static PropertyGroup MapSaveGroup<TPropertyType>(PropertyGroupBasic<TPropertyType> sourceGroup, IEnumerable<PropertyGroup> destOrigGroups)

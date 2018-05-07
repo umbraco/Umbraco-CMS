@@ -9,9 +9,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Xml;
 using umbraco.cms.businesslogic.packager;
-using umbraco.cms.businesslogic.packager.repositories;
 using umbraco.cms.presentation.Trees;
-using umbraco.presentation.developer.packages;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -91,8 +89,6 @@ namespace Umbraco.Web.Editors
         {
             if (pack == null) throw new ArgumentNullException("pack");
 
-            var refreshCache = false;
-
             var removedTemplates = new List<ITemplate>();
             var removedMacros = new List<IMacro>();
             var removedContentTypes = new List<IContentType>();
@@ -139,8 +135,6 @@ namespace Umbraco.Web.Editors
                 if (contentType == null) continue;
                 contentTypes.Add(contentType);
                 pack.Data.Documenttypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
-                // refresh content cache when document types are removed
-                refreshCache = true;
             }
 
             //Order the DocumentTypes before removing them

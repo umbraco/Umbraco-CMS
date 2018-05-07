@@ -249,7 +249,7 @@ namespace Umbraco.Tests.Services
             var result = new List<IContent>();
             ServiceContext.ContentTypeService.Save(contentType1);
             IContent lastParent = MockedContent.CreateSimpleContent(contentType1);
-            lastParent.PublishValues();
+            lastParent.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(lastParent);
             result.Add(lastParent);
             //create 20 deep
@@ -263,7 +263,7 @@ namespace Umbraco.Tests.Services
                     //only publish evens
                     if (j % 2 == 0)
                     {
-                        content.PublishValues();
+                        content.TryPublishValues();
                         ServiceContext.ContentService.SaveAndPublish(content);
                     }
                     else

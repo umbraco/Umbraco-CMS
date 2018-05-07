@@ -35,7 +35,7 @@ namespace umbraco
         #endregion
 
         #region public properties
-        public String TemplateContent
+        public string TemplateContent
         {
             set
             {
@@ -118,103 +118,6 @@ namespace umbraco
             return this._templateName;
         }
 
-        public Control ParseWithControls(page umbPage)
-        {
-            System.Web.HttpContext.Current.Trace.Write("umbracoTemplate", "Start parsing");
-
-            if (System.Web.HttpContext.Current.Items["macrosAdded"] == null)
-                System.Web.HttpContext.Current.Items.Add("macrosAdded", 0);
-
-            StringBuilder tempOutput = _templateOutput;
-
-            Control pageLayout = new Control();
-            Control pageHeader = new Control();
-            Control pageFooter = new Control();
-            Control pageContent = new Control();
-            System.Web.UI.HtmlControls.HtmlForm pageForm = new System.Web.UI.HtmlControls.HtmlForm();
-            System.Web.UI.HtmlControls.HtmlHead pageAspNetHead = new System.Web.UI.HtmlControls.HtmlHead();
-
-            // Find header and footer of page if there is an aspnet-form on page
-            if (_templateOutput.ToString().ToLower().IndexOf("<?aspnet_form>") > 0 ||
-                _templateOutput.ToString().ToLower().IndexOf("<?aspnet_form disablescriptmanager=\"true\">") > 0)
-            {
-                pageForm.Attributes.Add("method", "post");
-                pageForm.Attributes.Add("action", Convert.ToString(System.Web.HttpContext.Current.Items["VirtualUrl"]));
-
-                // Find header and footer from tempOutput
-                int aspnetFormTagBegin = tempOutput.ToString().ToLower().IndexOf("<?aspnet_form>");
-                int aspnetFormTagLength = 14;
-                int aspnetFormTagEnd = tempOutput.ToString().ToLower().IndexOf("</?aspnet_form>") + 15;
-
-                // check if we should disable the script manager
-                if (aspnetFormTagBegin == -1)
-                {
-                    aspnetFormTagBegin =
-                        _templateOutput.ToString().ToLower().IndexOf("<?aspnet_form disablescriptmanager=\"true\">");
-                    aspnetFormTagLength = 42;
-                }
-                else
-                {
-                    ScriptManager sm = new ScriptManager();
-                    sm.ID = "umbracoScriptManager";
-                    pageForm.Controls.Add(sm);
-                }
-
-
-                StringBuilder header = new StringBuilder(tempOutput.ToString().Substring(0, aspnetFormTagBegin));
-
-                // Check if there's an asp.net head element in the header
-                if (header.ToString().ToLower().Contains("<?aspnet_head>"))
-                {
-                    StringBuilder beforeHeader = new StringBuilder(header.ToString().Substring(0, header.ToString().ToLower().IndexOf("<?aspnet_head>")));
-                    header.Remove(0, header.ToString().ToLower().IndexOf("<?aspnet_head>") + 14);
-                    StringBuilder afterHeader = new StringBuilder(header.ToString().Substring(header.ToString().ToLower().IndexOf("</?aspnet_head>") + 15, header.Length - header.ToString().ToLower().IndexOf("</?aspnet_head>") - 15));
-                    header.Remove(header.ToString().ToLower().IndexOf("</?aspnet_head>"), header.Length - header.ToString().ToLower().IndexOf("</?aspnet_head>"));
-
-                    // Find the title from head
-                    MatchCollection matches = Regex.Matches(header.ToString(), @"<title>(.*?)</title>", RegexOptions.IgnoreCase | RegexOptions.Multiline);
-                    if (matches.Count > 0)
-                    {
-                        StringBuilder titleText = new StringBuilder();
-                        HtmlTextWriter titleTextTw = new HtmlTextWriter(new System.IO.StringWriter(titleText));
-                        parseStringBuilder(new StringBuilder(matches[0].Groups[1].Value), umbPage).RenderControl(titleTextTw);
-                        pageAspNetHead.Title = titleText.ToString();
-                        header = new StringBuilder(header.ToString().Replace(matches[0].Value, ""));
-                    }
-
-                    pageAspNetHead.Controls.Add(parseStringBuilder(header, umbPage));
-                    pageAspNetHead.ID = "head1";
-
-                    // build the whole header part
-                    pageHeader.Controls.Add(parseStringBuilder(beforeHeader, umbPage));
-                    pageHeader.Controls.Add(pageAspNetHead);
-                    pageHeader.Controls.Add(parseStringBuilder(afterHeader, umbPage));
-
-                }
-                else
-                    pageHeader.Controls.Add(parseStringBuilder(header, umbPage));
-
-
-                pageFooter.Controls.Add(parseStringBuilder(new StringBuilder(tempOutput.ToString().Substring(aspnetFormTagEnd, tempOutput.Length - aspnetFormTagEnd)), umbPage));
-                tempOutput.Remove(0, aspnetFormTagBegin + aspnetFormTagLength);
-                aspnetFormTagEnd = tempOutput.ToString().ToLower().IndexOf("</?aspnet_form>");
-                tempOutput.Remove(aspnetFormTagEnd, tempOutput.Length - aspnetFormTagEnd);
-
-
-                //throw new ArgumentException(tempOutput.ToString());
-                pageForm.Controls.Add(parseStringBuilder(tempOutput, umbPage));
-
-                pageContent.Controls.Add(pageHeader);
-                pageContent.Controls.Add(pageForm);
-                pageContent.Controls.Add(pageFooter);
-                return pageContent;
-
-            }
-            else
-                return parseStringBuilder(tempOutput, umbPage);
-
-        }
-
         public Control parseStringBuilder(StringBuilder tempOutput, page umbPage)
         {
 
@@ -229,18 +132,18 @@ namespace umbraco
                 int tagIndex = tempOutput.ToString().ToLower().IndexOf("<?umbraco");
                 if (tagIndex > -1)
                 {
-                    String tempElementContent = "";
+                    string tempElementContent = "";
                     pageContent.Controls.Add(new LiteralControl(tempOutput.ToString().Substring(0, tagIndex)));
 
                     tempOutput.Remove(0, tagIndex);
 
-                    String tag = tempOutput.ToString().Substring(0, tempOutput.ToString().IndexOf(">") + 1);
+                    string tag = tempOutput.ToString().Substring(0, tempOutput.ToString().IndexOf(">") + 1);
                     Hashtable attributes = new Hashtable(XmlHelper.GetAttributesFromElement(tag));
 
                     // Check whether it's a single tag (<?.../>) or a tag with children (<?..>...</?...>)
                     if (tag.Substring(tag.Length - 2, 1) != "/" && tag.IndexOf(" ") > -1)
                     {
-                        String closingTag = "</" + (tag.Substring(1, tag.IndexOf(" ") - 1)) + ">";
+                        string closingTag = "</" + (tag.Substring(1, tag.IndexOf(" ") - 1)) + ">";
                         // Tag with children are only used when a macro is inserted by the umbraco-editor, in the
                         // following format: "<?UMBRACO_MACRO ...><IMG SRC="..."..></?UMBRACO_MACRO>", so we
                         // need to delete extra information inserted which is the image-tag and the closing
@@ -261,41 +164,14 @@ namespace umbraco
                         if (debugMode)
                             pageContent.Controls.Add(new LiteralControl("<div title=\"Macro Tag: '" + System.Web.HttpContext.Current.Server.HtmlEncode(tag) + "'\" style=\"border: 1px solid #009;\">"));
 
-                        // NH: Switching to custom controls for macros
-                        if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
-                        {
-                            umbraco.presentation.templateControls.Macro macroControl = new umbraco.presentation.templateControls.Macro();
-                            macroControl.Alias = helper.FindAttribute(attributes, "macroalias");
-                            IDictionaryEnumerator ide = attributes.GetEnumerator();
-                            while (ide.MoveNext())
-                                if (macroControl.Attributes[ide.Key.ToString()] == null)
-                                    macroControl.Attributes.Add(ide.Key.ToString(), ide.Value.ToString());
-                            pageContent.Controls.Add(macroControl);
-                        }
-                        else
-                        {
-                            var macroId = helper.FindAttribute(attributes, "macroid");
-                            if (macroId == string.Empty) macroId = helper.FindAttribute(attributes, "macroalias");
-                            var tempMacro = GetMacro(macroId);
-                            if (tempMacro != null)
-                            {
+                        umbraco.presentation.templateControls.Macro macroControl = new umbraco.presentation.templateControls.Macro();
+                        macroControl.Alias = helper.FindAttribute(attributes, "macroalias");
+                        IDictionaryEnumerator ide = attributes.GetEnumerator();
+                        while (ide.MoveNext())
+                            if (macroControl.Attributes[ide.Key.ToString()] == null)
+                                macroControl.Attributes.Add(ide.Key.ToString(), ide.Value.ToString());
+                        pageContent.Controls.Add(macroControl);
 
-                                try
-                                {
-                                    var renderer = new MacroRenderer(Current.ProfilingLogger);
-                                    var c = renderer.Render(tempMacro, umbPage.Elements, umbPage.PageID, attributes).GetAsControl();
-                                    if (c != null)
-                                        pageContent.Controls.Add(c);
-                                    else
-                                        System.Web.HttpContext.Current.Trace.Warn("Template", "Result of macro " + tempMacro.Name + " is null");
-
-                                }
-                                catch (Exception e)
-                                {
-                                    System.Web.HttpContext.Current.Trace.Warn("Template", "Error adding macro " + tempMacro.Name, e);
-                                }
-                            }
-                        }
                         if (debugMode)
                             pageContent.Controls.Add(new LiteralControl("</div>"));
                     }
@@ -303,60 +179,14 @@ namespace umbraco
                     {
                         if (tag.ToLower().IndexOf("umbraco_getitem") > -1)
                         {
+                            umbraco.presentation.templateControls.Item itemControl = new umbraco.presentation.templateControls.Item();
+                            itemControl.Field = helper.FindAttribute(attributes, "field");
+                            IDictionaryEnumerator ide = attributes.GetEnumerator();
+                            while (ide.MoveNext())
+                                if (itemControl.Attributes[ide.Key.ToString()] == null)
+                                    itemControl.Attributes.Add(ide.Key.ToString(), ide.Value.ToString());
+                            pageContent.Controls.Add(itemControl);
 
-                            // NH: Switching to custom controls for items
-                            if (UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
-                            {
-                                umbraco.presentation.templateControls.Item itemControl = new umbraco.presentation.templateControls.Item();
-                                itemControl.Field = helper.FindAttribute(attributes, "field");
-                                IDictionaryEnumerator ide = attributes.GetEnumerator();
-                                while (ide.MoveNext())
-                                    if (itemControl.Attributes[ide.Key.ToString()] == null)
-                                        itemControl.Attributes.Add(ide.Key.ToString(), ide.Value.ToString());
-                                pageContent.Controls.Add(itemControl);
-                            }
-                            else
-                            {
-                                try
-                                {
-                                    //TODO: Make this work again - but let's make sure this whole class is overhauled and useful
-
-                                    //if (helper.FindAttribute(attributes, "nodeId") != "" && int.Parse(helper.FindAttribute(attributes, "nodeId")) != 0)
-                                    //{
-                                    //    cms.businesslogic.Content c = new umbraco.cms.businesslogic.Content(int.Parse(helper.FindAttribute(attributes, "nodeId")));
-                                    //    item umbItem = new item(c.getProperty(helper.FindAttribute(attributes, "field")).Value.ToString(), attributes);
-                                    //    tempElementContent = umbItem.FieldContent;
-
-                                    //    // Check if the content is published
-                                    //    if (c.nodeObjectType == cms.businesslogic.web.Document._objectType)
-                                    //    {
-                                    //        try
-                                    //        {
-                                    //            cms.businesslogic.web.Document d = (cms.businesslogic.web.Document)c;
-                                    //            if (!d.Published)
-                                    //                tempElementContent = "";
-                                    //        }
-                                    //        catch { }
-                                    //    }
-
-                                    //}
-                                    //else
-                                    //{
-                                    //    // NH adds Live Editing test stuff
-                                    //    item umbItem = new item(umbPage.Elements, attributes);
-                                    //    //                                item umbItem = new item(umbPage.PageElements[helper.FindAttribute(attributes, "field")].ToString(), attributes);
-                                    //    tempElementContent = umbItem.FieldContent;
-                                    //}
-
-                                    if (debugMode)
-                                        tempElementContent =
-                                            "<div title=\"Field Tag: '" + System.Web.HttpContext.Current.Server.HtmlEncode(tag) + "'\" style=\"border: 1px solid #fc6;\">" + tempElementContent + "</div>";
-                                }
-                                catch (Exception e)
-                                {
-                                    System.Web.HttpContext.Current.Trace.Warn("umbracoTemplate", "Error reading element (" + helper.FindAttribute(attributes, "field") + ")", e);
-                                }
-                            }
                         }
                     }
                     tempOutput.Remove(0, tempOutput.ToString().IndexOf(">") + 1);
@@ -504,12 +334,6 @@ where nodeId = @templateID",
             this._masterTemplate = t._masterTemplate;
             this._templateName = t._templateName;
 
-            // Only check for master on legacy templates - can show error when using master pages.
-            if (!UmbracoConfig.For.UmbracoSettings().Templates.UseAspNetMasterPages)
-            {
-                checkForMaster(tId);
-            }
-
         }
 
         private void checkForMaster(int templateID) {
@@ -556,7 +380,7 @@ where nodeId = @templateID",
             Current.DistributedCache.RefreshTemplateCache(templateID);
         }
 
-        public template(String templateContent)
+        public template(string templateContent)
         {
             _templateOutput.Append(templateContent);
             _masterTemplate = 0;

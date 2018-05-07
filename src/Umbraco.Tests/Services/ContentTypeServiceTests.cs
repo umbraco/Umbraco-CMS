@@ -88,7 +88,7 @@ namespace Umbraco.Tests.Services
                     var contentType = contentTypes[index];
                     var contentItem = MockedContent.CreateSimpleContent(contentType, "MyName_" + index + "_" + i, parentId);
                     ServiceContext.ContentService.Save(contentItem);
-                    contentItem.PublishValues();
+                    contentItem.TryPublishValues();
                     ServiceContext.ContentService.SaveAndPublish(contentItem);
                     parentId = contentItem.Id;
 
@@ -189,7 +189,7 @@ namespace Umbraco.Tests.Services
                         var contentType = contentTypes[index];
                         var contentItem = MockedContent.CreateSimpleContent(contentType, "MyName_" + index + "_" + i, parentId);
                         ServiceContext.ContentService.Save(contentItem);
-                        contentItem.PublishValues();
+                        contentItem.TryPublishValues();
                         ServiceContext.ContentService.SaveAndPublish(contentItem);
                         parentId = contentItem.Id;
                     }
@@ -225,19 +225,19 @@ namespace Umbraco.Tests.Services
 
                 var root = MockedContent.CreateSimpleContent(contentType1, "Root", -1);
                 ServiceContext.ContentService.Save(root);
-                root.PublishValues();
+                root.TryPublishValues();
                 ServiceContext.ContentService.SaveAndPublish(root);
 
                 var level1 = MockedContent.CreateSimpleContent(contentType2, "L1", root.Id);
                 ServiceContext.ContentService.Save(level1);
-                level1.PublishValues();
+                level1.TryPublishValues();
                 ServiceContext.ContentService.SaveAndPublish(level1);
 
                 for (int i = 0; i < 2; i++)
                 {
                     var level3 = MockedContent.CreateSimpleContent(contentType3, "L2" + i, level1.Id);
                     ServiceContext.ContentService.Save(level3);
-                    level3.PublishValues();
+                    level3.TryPublishValues();
                     ServiceContext.ContentService.SaveAndPublish(level3);
                 }
 
@@ -267,7 +267,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.FileService.SaveTemplate(contentType1.DefaultTemplate);
             ServiceContext.ContentTypeService.Save(contentType1);
             IContent contentItem = MockedContent.CreateTextpageContent(contentType1, "Testing", -1);
-            contentItem.PublishValues();
+            contentItem.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(contentItem);
             var initProps = contentItem.Properties.Count;
             var initPropTypes = contentItem.PropertyTypes.Count();
@@ -297,14 +297,14 @@ namespace Umbraco.Tests.Services
             var contentItems1 = MockedContent.CreateTextpageContent(contentType1, -1, 10).ToArray();
             foreach (var x in contentItems1)
             {
-                x.PublishValues();
+                x.TryPublishValues();
                 ServiceContext.ContentService.SaveAndPublish(x);
             }
 
             var contentItems2 = MockedContent.CreateTextpageContent(contentType2, -1, 5).ToArray();
             foreach (var x in contentItems2)
             {
-                x.PublishValues();
+                x.TryPublishValues();
                 ServiceContext.ContentService.SaveAndPublish(x);
             }
 
@@ -362,7 +362,7 @@ namespace Umbraco.Tests.Services
             var contentItems1 = MockedContent.CreateTextpageContent(contentType1, -1, 10).ToArray();
             foreach (var x in contentItems1)
             {
-                x.PublishValues();
+                x.TryPublishValues();
                 ServiceContext.ContentService.SaveAndPublish(x);
             }
             var alias = contentType1.PropertyTypes.First().Alias;
@@ -496,7 +496,7 @@ namespace Umbraco.Tests.Services
 
             // Act
             var homeDoc = cs.Create("Home Page", -1, contentTypeAlias);
-            homeDoc.PublishValues();
+            homeDoc.TryPublishValues();
             cs.SaveAndPublish(homeDoc);
 
             // Assert

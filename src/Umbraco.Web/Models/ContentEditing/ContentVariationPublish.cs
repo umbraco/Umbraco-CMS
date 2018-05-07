@@ -8,9 +8,9 @@ namespace Umbraco.Web.Models.ContentEditing
     /// </summary>
     public class ContentVariationPublish
     {
-        [DataMember(Name = "languageId", IsRequired = true)]
+        [DataMember(Name = "culture", IsRequired = true)]
         [Required]
-        public int LanguageId { get; set; }
+        public string Culture { get; set; }
 
         [DataMember(Name = "segment")]
         public string Segment { get; set; }

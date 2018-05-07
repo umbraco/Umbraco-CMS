@@ -17,10 +17,10 @@ namespace Umbraco.Core
                 public const string NodeXml = /*TableNamePrefix*/ "cms" + "ContentXml";
                 public const string NodePreviewXml = /*TableNamePrefix*/ "cms" + "PreviewXml"; // fixme dbfix kill merge with ContentXml
 
-                public const string ContentType = /*TableNamePrefix*/ "cms" + "ContentType"; // fixme dbfixrename and split uElementType, uDocumentType
+                public const string ContentType = /*TableNamePrefix*/ "cms" + "ContentType"; // fixme dbfix rename and split uElementType, uDocumentType
                 public const string ContentChildType = /*TableNamePrefix*/ "cms" + "ContentTypeAllowedContentType";
-                public const string DocumentType = /*TableNamePrefix*/ "cms" + "DocumentType"; // fixme dbfixmust rename corresponding DTO
-                public const string ElementTypeTree = /*TableNamePrefix*/ "cms" + "ContentType2ContentType"; // fixme dbfixwhy can't we just use uNode for this?
+                public const string DocumentType = /*TableNamePrefix*/ "cms" + "DocumentType"; // fixme dbfix must rename corresponding DTO
+                public const string ElementTypeTree = /*TableNamePrefix*/ "cms" + "ContentType2ContentType"; // fixme dbfix why can't we just use uNode for this?
                 public const string DataType = TableNamePrefix + "DataType";
                 public const string Template = /*TableNamePrefix*/ "cms" + "Template";
 
@@ -28,6 +28,7 @@ namespace Umbraco.Core
                 public const string ContentVersion = TableNamePrefix + "ContentVersion";
                 public const string ContentVersionCultureVariation = TableNamePrefix + "ContentVersionCultureVariation";
                 public const string Document = TableNamePrefix + "Document";
+                public const string DocumentCultureVariation = TableNamePrefix + "DocumentCultureVariation";
                 public const string DocumentVersion = TableNamePrefix + "DocumentVersion";
                 public const string MediaVersion = TableNamePrefix + "MediaVersion";
 

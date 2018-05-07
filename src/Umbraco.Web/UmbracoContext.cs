@@ -4,6 +4,7 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Runtime;
@@ -17,7 +18,8 @@ namespace Umbraco.Web
     public class UmbracoContext : DisposableObject, IDisposeOnRequestEnd
     {
         private readonly IGlobalSettings _globalSettings;
-        private readonly Lazy<IPublishedShapshot> _publishedSnapshot;
+        private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
+        private DomainHelper _domainHelper;
         private string _previewToken;
         private bool? _previewing;
 
@@ -28,25 +30,25 @@ namespace Umbraco.Web
         ///  </summary>
         /// <param name="umbracoContextAccessor"></param>
         /// <param name="httpContext">An http context.</param>
-        ///  <param name="publishedSnapshotService">A published snapshot service.</param>
-        ///  <param name="webSecurity">A security helper.</param>
-        ///  <param name="umbracoSettings">The umbraco settings.</param>
-        ///  <param name="urlProviders">Some url providers.</param>
+        /// <param name="publishedSnapshotService">A published snapshot service.</param>
+        /// <param name="webSecurity">A security helper.</param>
+        /// <param name="umbracoSettings">The umbraco settings.</param>
+        /// <param name="urlProviders">Some url providers.</param>
         /// <param name="globalSettings"></param>
         /// <param name="replace">A value indicating whether to replace the existing context.</param>
         ///  <returns>The "current" UmbracoContext.</returns>
         ///  <remarks>
         ///  fixme - this needs to be clarified
-        /// 
+        ///
         ///  If <paramref name="replace"/> is true then the "current" UmbracoContext is replaced
         ///  with a new one even if there is one already. See <see cref="WebRuntimeComponent"/>. Has to do with
         ///  creating a context at startup and not being able to access httpContext.Request at that time, so
         ///  the OriginalRequestUrl remains unspecified until <see cref="UmbracoModule"/> replaces the context.
-        /// 
+        ///
         ///  This *has* to be done differently!
-        /// 
+        ///
         ///  See http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
-        /// 
+        ///
         ///  </remarks>
         // used by
         // UmbracoModule BeginRequest (since it's a request it has an UmbracoContext)
@@ -67,6 +69,7 @@ namespace Umbraco.Web
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
             IGlobalSettings globalSettings,
+            IEntityService entityService,
             bool replace = false)
         {
             if (umbracoContextAccessor == null) throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -84,7 +87,7 @@ namespace Umbraco.Web
 
             // create & assign to accessor, dispose existing if any
             umbracoContextAccessor.UmbracoContext?.Dispose();
-            return umbracoContextAccessor.UmbracoContext = new UmbracoContext(httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings);
+            return umbracoContextAccessor.UmbracoContext = new UmbracoContext(httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings, entityService);
         }
 
         // initializes a new instance of the UmbracoContext class
@@ -96,7 +99,8 @@ namespace Umbraco.Web
             WebSecurity webSecurity,
             IUmbracoSettingsSection umbracoSettings,
             IEnumerable<IUrlProvider> urlProviders,
-            IGlobalSettings globalSettings)
+            IGlobalSettings globalSettings,
+            IEntityService entityService)
         {
             if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -121,7 +125,7 @@ namespace Umbraco.Web
             Security = webSecurity;
 
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
-            _publishedSnapshot = new Lazy<IPublishedShapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
+            _publishedSnapshot = new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
 
             // set the urls...
             // NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
@@ -132,7 +136,7 @@ namespace Umbraco.Web
             //
             OriginalRequestUrl = GetRequestFromContext()?.Url ?? new Uri("http://localhost");
             CleanedUmbracoUrl = UriUtility.UriToUmbraco(OriginalRequestUrl);
-            UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders);
+            UrlProvider = new UrlProvider(this, umbracoSettings.WebRouting, urlProviders, entityService);
         }
 
         #endregion
@@ -174,7 +178,7 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the published snapshot.
         /// </summary>
-        public IPublishedShapshot PublishedShapshot => _publishedSnapshot.Value;
+        public IPublishedSnapshot PublishedSnapshot => _publishedSnapshot.Value;
 
         // for unit tests
         internal bool HasPublishedSnapshot => _publishedSnapshot.IsValueCreated;
@@ -182,12 +186,12 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets the published content cache.
         /// </summary>
-        public IPublishedContentCache ContentCache => PublishedShapshot.Content;
+        public IPublishedContentCache ContentCache => PublishedSnapshot.Content;
 
         /// <summary>
         /// Gets the published media cache.
         /// </summary>
-        public IPublishedMediaCache MediaCache => PublishedShapshot.Media;
+        public IPublishedMediaCache MediaCache => PublishedSnapshot.Media;
 
         /// <summary>
         /// Boolean value indicating whether the current request is a front-end umbraco request
@@ -208,6 +212,20 @@ namespace Umbraco.Web
         /// Exposes the HttpContext for the current request
         /// </summary>
         public HttpContextBase HttpContext { get; }
+
+        /// <summary>
+        /// Creates and caches an instance of a DomainHelper
+        /// </summary>
+        /// <remarks>
+        /// We keep creating new instances of DomainHelper, it would be better if we didn't have to do that so instead we can
+        /// have one attached to the UmbracoContext. This method accepts an external ISiteDomainHelper otherwise the UmbracoContext
+        /// ctor will have to have another parameter added only for this one method which is annoying and doesn't make a ton of sense
+        /// since the UmbracoContext itself doesn't use this.
+        ///
+        /// TODO The alternative is to have a IDomainHelperAccessor singleton which is cached per UmbracoContext
+        /// </remarks>
+        internal DomainHelper GetDomainHelper(ISiteDomainHelper siteDomainHelper)
+            => _domainHelper ?? (_domainHelper = new DomainHelper(PublishedSnapshot.Domains, siteDomainHelper));
 
         /// <summary>
         /// Gets a value indicating whether the request has debugging enabled
@@ -292,7 +310,7 @@ namespace Umbraco.Web
         internal IDisposable ForcedPreview(bool preview)
         {
             InPreviewMode = preview;
-            return PublishedShapshot.ForcedPreview(preview, orig => InPreviewMode = orig);
+            return PublishedSnapshot.ForcedPreview(preview, orig => InPreviewMode = orig);
         }
 
         private HttpRequestBase GetRequestFromContext()

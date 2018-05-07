@@ -2,7 +2,7 @@
   'use strict';
 
   function GroupsBuilderDirective(contentTypeHelper, contentTypeResource, mediaTypeResource, dataTypeHelper, dataTypeResource, $filter, iconHelper, $q, $timeout, notificationsService, localizationService, editorService) {
-
+    
     function link(scope, el, attr, ctrl) {
 
         var validationTranslated = "";
@@ -498,6 +498,7 @@
             property: property,
             contentType: scope.contentType,
             contentTypeName: scope.model.name,
+            contentTypeAllowCultureVariant: scope.model.allowCultureVariant,
             view: "views/common/infiniteeditors/propertysettings/propertysettings.html",
             size: "small",
             submit: function(model) {

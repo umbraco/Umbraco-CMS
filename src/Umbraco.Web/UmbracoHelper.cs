@@ -331,19 +331,9 @@ namespace Umbraco.Web
 
         #endregion
 
-        #region NiceUrls
+        #region Urls
 
-        /// <summary>
-        /// Returns a string with a friendly url from a node.
-        /// IE.: Instead of having /482 (id) as an url, you can have
-        /// /screenshots/developer/macros (spoken url)
-        /// </summary>
-        /// <param name="nodeId">Identifier for the node that should be returned</param>
-        /// <returns>String with a friendly url from a node</returns>
-        public string NiceUrl(int nodeId)
-        {
-            return Url(nodeId);
-        }
+        //TODO: We will need an optional culture parameter, by default it will be the current thread culture
 
         /// <summary>
         /// Gets the url of a content identified by its identifier.
@@ -366,15 +356,7 @@ namespace Umbraco.Web
             return UrlProvider.GetUrl(contentId, mode);
         }
 
-        /// <summary>
-        /// This method will always add the domain to the path if the hostnames are set up correctly.
-        /// </summary>
-        /// <param name="nodeId">Identifier for the node that should be returned</param>
-        /// <returns>String with a friendly url with full domain from a node</returns>
-        public string NiceUrlWithDomain(int nodeId)
-        {
-            return UrlAbsolute(nodeId);
-        }
+        //TODO: We will need an optional culture parameter, by default it will be the current thread culture
 
         /// <summary>
         /// Gets the absolute url of a content identified by its identifier.
@@ -908,19 +890,7 @@ namespace Umbraco.Web
         {
             return StringUtilities.ReplaceLineBreaksForHtml(text);
         }
-
-        /// <summary>
-        /// Returns an MD5 hash of the string specified
-        /// </summary>
-        /// <param name="text">The text to create a hash from</param>
-        /// <returns>Md5 has of the string</returns>
-        [Obsolete("Please use the CreateHash method instead. This may be removed in future versions")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public string CreateMd5Hash(string text)
-        {
-            return text.ToMd5();
-        }
-
+        
         /// <summary>
         /// Generates a hash based on the text string passed in.  This method will detect the
         /// security requirements (is FIPS enabled) and return an appropriate hash.

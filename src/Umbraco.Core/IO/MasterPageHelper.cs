@@ -27,13 +27,7 @@ namespace Umbraco.Core.IO
         {
             return _masterPageFileSystem.FileExists(GetFilePath(t));
         }
-
-        [Obsolete("This is only used for legacy purposes and will be removed in future versions")]
-        internal string GetPhysicalFilePath(ITemplate t)
-        {
-            return _masterPageFileSystem.GetFullPath(GetFilePath(t.Alias));
-        }
-
+        
         private string GetFilePath(ITemplate t)
         {
             return GetFilePath(t.Alias);

@@ -311,15 +311,15 @@ namespace Umbraco.Core.Composing
             // we HAVE to let LightInject throw - and catch at THE OUTERMOST if InvalidOperationException in LightInject.Anything!
 
             return factory.GetInstance(tService, serviceName, args);
-            try
-            {
-                return factory.GetInstance(tService, serviceName, args);
-            }
-            catch (Exception e)
-            {
-                LightInjectException.TryThrow(e, implementingType);
-                throw;
-            }
+            //try
+            //{
+            //    return factory.GetInstance(tService, serviceName, args);
+            //}
+            //catch (Exception e)
+            //{
+            //    LightInjectException.TryThrow(e, implementingType);
+            //    throw;
+            //}
         }
 
         /// <summary>

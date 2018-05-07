@@ -373,7 +373,6 @@ namespace Umbraco.Web.Editors
                     //    Services.TextService.Localize("speechBubbles/partialViewErrorHeader"),
                     //    Services.TextService.Localize("speechBubbles/partialViewErrorText"));
 
-                    break;
 
 
 

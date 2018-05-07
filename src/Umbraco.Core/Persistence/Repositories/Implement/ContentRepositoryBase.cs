@@ -20,6 +20,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -35,11 +36,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         where TEntity : class, IUmbracoEntity
         where TRepository : class, IRepository
     {
-        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, CacheHelper cache, ILanguageRepository languageRepository, ILogger logger)
             : base(scopeAccessor, cache, logger)
-        { }
+        {
+            LanguageRepository = languageRepository;
+        }
 
         protected abstract TRepository This { get; }
+
+        protected ILanguageRepository LanguageRepository { get; }
 
         protected PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // fixme inject
 
@@ -464,11 +469,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     propertyDataDtos.AddRange(propertyDataDtos1);
                     if (temp.VersionId == temp.PublishedVersionId) // dirty corner case
-                        propertyDataDtos.AddRange(propertyDataDtos1.Select(x => x.Clone(-1)));                    
+                        propertyDataDtos.AddRange(propertyDataDtos1.Select(x => x.Clone(-1)));
                 }
                 if (temp.VersionId != temp.PublishedVersionId && indexedPropertyDataDtos.TryGetValue(temp.PublishedVersionId, out var propertyDataDtos2))
                     propertyDataDtos.AddRange(propertyDataDtos2);
-                var properties = PropertyFactory.BuildEntities(compositionProperties, propertyDataDtos, temp.PublishedVersionId).ToList();
+                var properties = PropertyFactory.BuildEntities(compositionProperties, propertyDataDtos, temp.PublishedVersionId, LanguageRepository).ToList();
 
                 // deal with tags
                 foreach (var property in properties)
@@ -852,7 +857,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected virtual string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
         {
             var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.EnsureUniqueNodeName", tsql => tsql
-                .Select<NodeDto>(x => NPocoSqlExtensions.Statics.Alias(x.NodeId, "id"), x => NPocoSqlExtensions.Statics.Alias(x.Text, "name"))
+                .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text, "name"))
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId")));
 

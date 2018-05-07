@@ -218,6 +218,7 @@ Use this directive to construct a header inside the main editor window.
             }
 
             function setCurrentVariant(variants) {
+
                 angular.forEach(variants, function (variant) {
                     if(variant.current) {
                         scope.vm.currentVariant = variant;
@@ -225,30 +226,35 @@ Use this directive to construct a header inside the main editor window.
                 });
             }
 
+            //TODO: This doesn't really affect any UI currently, need some feedback from mads
             function setVariantStatusColor(variants) {
                 angular.forEach(variants, function (variant) {
-                    angular.forEach(variant.states, function(state){
-                        switch (state.name) {
-                            case "Published":
-                            case "Published +":
-                                state.stateColor = "success";
-                                break;
-                            default:
-                                state.stateColor = "gray";
-                        }
-                    });
+
+                    //TODO: What about variant.exists? If we are applying colors/styles, this should be one of them
+
+                    switch (variant.state) {
+                        case "Published":
+                            variant.stateColor = "success";
+                            break;
+                        case "Unpublished":
+                        //TODO: Not sure if these statuses will ever bubble up to the UI?
+                        case "Publishing":
+                        case "Unpublishing":
+                        default:
+                            variant.stateColor = "gray";
+                    }
                 });
             }
 
-            scope.goBack = function() {
-                if(scope.onBack) {
+            scope.goBack = function () {
+                if (scope.onBack) {
                     scope.onBack();
                 }
             };
 
             scope.selectVariant = function (event, variant) {
                 scope.vm.dropdownOpen = false;
-                $location.search({ languageId: variant.language.id });
+                $location.search("cculture", variant.language.culture);
             };
 
             scope.openIconPicker = function() {

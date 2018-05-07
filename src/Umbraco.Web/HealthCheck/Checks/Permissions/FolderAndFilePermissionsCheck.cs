@@ -71,8 +71,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Permissions
                 { SystemDirectories.Umbraco, PermissionCheckRequirement.Optional },
                 { SystemDirectories.UmbracoClient, PermissionCheckRequirement.Optional },
                 { SystemDirectories.UserControls, PermissionCheckRequirement.Optional },
-                { SystemDirectories.MvcViews, PermissionCheckRequirement.Optional },
-                { SystemDirectories.Xslt, PermissionCheckRequirement.Optional },
+                { SystemDirectories.MvcViews, PermissionCheckRequirement.Optional }
             };
 
             //These are special paths to check that will restart an app domain if a file is written to them,

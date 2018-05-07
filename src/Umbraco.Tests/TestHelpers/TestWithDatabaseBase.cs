@@ -32,6 +32,7 @@ using LightInject;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Tests.Testing.Objects.AccessorsAndProviders;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -77,6 +78,7 @@ namespace Umbraco.Tests.TestHelpers
 
             Container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
             Container.Register(factory => PublishedSnapshotService);
+            Container.Register(factory => SystemDefaultCultureProvider);
 
             Container.GetInstance<DataEditorCollectionBuilder>()
                 .Clear()
@@ -229,11 +231,15 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
+        protected ISystemDefaultCultureProvider SystemDefaultCultureProvider { get; set; }
+
         protected IPublishedSnapshotService PublishedSnapshotService { get; set; }
 
         protected override void Initialize() // fixme - should NOT be here!
         {
             base.Initialize();
+
+            SystemDefaultCultureProvider = new TestSystemDefaultCultureProvider();
 
             CreateAndInitializeDatabase();
 
@@ -264,8 +270,9 @@ namespace Umbraco.Tests.TestHelpers
                 ScopeProvider,
                 cache, publishedSnapshotAccessor,
                 Container.GetInstance<IDocumentRepository>(), Container.GetInstance<IMediaRepository>(), Container.GetInstance<IMemberRepository>(),
+                SystemDefaultCultureProvider,
                 Logger,
-                Container.GetInstance<IGlobalSettings>(),
+                Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
                 ContentTypesCache,
                 null, true, Options.PublishedRepositoryEvents);
 
@@ -343,30 +350,35 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected UmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null, IGlobalSettings globalSettings = null)
+        protected UmbracoContext GetUmbracoContext(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null, IGlobalSettings globalSettings = null, IPublishedSnapshotService snapshotService = null)
         {
             // ensure we have a PublishedCachesService
-            var service = PublishedSnapshotService as PublishedSnapshotService;
+            var service = snapshotService ?? PublishedSnapshotService as PublishedSnapshotService;
             if (service == null)
                 throw new Exception("Not a proper XmlPublishedCache.PublishedCachesService.");
 
-            // re-initialize PublishedCacheService content with an Xml source with proper template id
-            service.XmlStore.GetXmlDocument = () =>
+            if (service is PublishedSnapshotService)
             {
-                var doc = new XmlDocument();
-                doc.LoadXml(GetXmlContent(templateId));
-                return doc;
-            };
+                // re-initialize PublishedCacheService content with an Xml source with proper template id
+                ((PublishedSnapshotService)service).XmlStore.GetXmlDocument = () =>
+                {
+                    var doc = new XmlDocument();
+                    doc.LoadXml(GetXmlContent(templateId));
+                    return doc;
+                };
+            }
 
             var httpContext = GetHttpContextFactory(url, routeData).HttpContext;
 
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 service,
-                new WebSecurity(httpContext, Container.GetInstance<IUserService>(), Container.GetInstance<IGlobalSettings>()),
+                new WebSecurity(httpContext, Container.GetInstance<IUserService>(),
+                Container.GetInstance<IGlobalSettings>()),
                 umbracoSettings ?? Container.GetInstance<IUmbracoSettingsSection>(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
-                globalSettings ?? Container.GetInstance<IGlobalSettings>());
+                globalSettings ?? Container.GetInstance<IGlobalSettings>(),
+                ServiceContext.EntityService);
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

@@ -591,6 +591,15 @@ namespace Umbraco.Web.Editors
             contentItem.PersistedContent.Username = providedUserName;
         }
 
+        private static void UpdateName(MemberSave memberSave)
+        {
+            //Don't update the name if it is empty
+            if (memberSave.Name.IsNullOrWhiteSpace() == false)
+            {
+                memberSave.PersistedContent.Name = memberSave.Name;
+            }
+        }
+
         /// <summary>
         /// This is going to create the user with the membership provider and check for validation
         /// </summary>

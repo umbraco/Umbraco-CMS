@@ -434,8 +434,6 @@
         <key alias="macroErrorLoadingUsercontrol">Error loading userControl '%0%'</key>
         <key alias="macroErrorLoadingCustomControl">Error loading customControl (Assembly: %0%, Type: '%1%')</key>
         <key alias="macroErrorLoadingMacroEngineScript">Error loading MacroEngine script (file: %0%)</key>
-        <key alias="macroErrorParsingXSLTFile">"Error parsing XSLT file: %0%</key>
-        <key alias="macroErrorReadingXSLTFile">"Error reading XSLT file: %0%</key>
         <key alias="missingTitle">Please enter a title</key>
         <key alias="missingType">Please choose a type</key>
         <key alias="pictureResizeBiggerThanOrg">You're about to make the picture larger than the original size. Are you sure that you want to proceed?</key>
@@ -446,8 +444,6 @@
         <key alias="stylesNoStylesOnPage">No active styles available</key>
         <key alias="tableColMergeLeft">Please place cursor at the left of the two cells you wish to merge</key>
         <key alias="tableSplitNotSplittable">You cannot split a cell that hasn't been merged.</key>
-        <key alias="xsltErrorHeader">Error in XSLT source</key>
-        <key alias="xsltErrorText">The XSLT has not been saved, because it contained error(s)</key>
         <key alias="missingPropertyEditorErrorMessage">There is a configuration error with the data type used for this property, please check the data type</key>
     </area>
     <area alias="general">
@@ -1262,11 +1258,6 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="templateErrorText">Please make sure that you do not have 2 templates with the same alias</key>
         <key alias="templateSavedHeader">Template saved</key>
         <key alias="templateSavedText">Template saved without any errors!</key>
-        <key alias="xsltErrorHeader">XSLT not saved</key>
-        <key alias="xsltErrorText">XSLT contained an error</key>
-        <key alias="xsltPermissionErrorText">XSLT could not be saved, check file permissions</key>
-        <key alias="xsltSavedHeader">XSLT saved</key>
-        <key alias="xsltSavedText">No errors in XSLT</key>
         <key alias="contentUnpublished">Content unpublished</key>
         <key alias="partialViewSavedHeader">Partial view saved</key>
         <key alias="partialViewSavedText">Partial view saved without any errors!</key>
@@ -1668,7 +1659,6 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="scripts">Scripts</key>
         <key alias="stylesheets">Stylesheets</key>
         <key alias="templates">Templates</key>
-        <key alias="xslt">XSLT Files</key>
         <key alias="analytics">Analytics</key>
         <key alias="users">Users</key>
     </area>

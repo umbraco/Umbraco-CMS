@@ -65,6 +65,8 @@ namespace Umbraco.Tests.Models
             var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop" };
             var prop = new Property(propertyType);
 
+            const string langFr = "fr-FR";
+
             // can set value
             // and get edited and published value
             // because non-publishing
@@ -84,8 +86,8 @@ namespace Umbraco.Tests.Models
             Assert.IsNull(prop.GetValue(published: true));
 
             // cannot set non-supported variation value
-            Assert.Throws<NotSupportedException>(() => prop.SetValue("x", 1));
-            Assert.IsNull(prop.GetValue(1));
+            Assert.Throws<NotSupportedException>(() => prop.SetValue("x", langFr));
+            Assert.IsNull(prop.GetValue(langFr));
 
             // can publish value
             // and get edited and published values
@@ -109,41 +111,41 @@ namespace Umbraco.Tests.Models
 
             // can set value
             // and get values
-            prop.SetValue("c", 1);
+            prop.SetValue("c", langFr);
             Assert.AreEqual("b", prop.GetValue());
             Assert.IsNull(prop.GetValue(published: true));
-            Assert.AreEqual("c", prop.GetValue(1));
-            Assert.IsNull(prop.GetValue(1, published: true));
+            Assert.AreEqual("c", prop.GetValue(langFr));
+            Assert.IsNull(prop.GetValue(langFr, published: true));
 
             // can publish value
             // and get edited and published values
-            prop.PublishValue(1);
+            prop.PublishValue(langFr);
             Assert.AreEqual("b", prop.GetValue());
             Assert.IsNull(prop.GetValue(published: true));
-            Assert.AreEqual("c", prop.GetValue(1));
-            Assert.AreEqual("c", prop.GetValue(1, published: true));
+            Assert.AreEqual("c", prop.GetValue(langFr));
+            Assert.AreEqual("c", prop.GetValue(langFr, published: true));
 
             // can clear all
             prop.ClearPublishedAllValues();
             Assert.AreEqual("b", prop.GetValue());
             Assert.IsNull(prop.GetValue(published: true));
-            Assert.AreEqual("c", prop.GetValue(1));
-            Assert.IsNull(prop.GetValue(1, published: true));
+            Assert.AreEqual("c", prop.GetValue(langFr));
+            Assert.IsNull(prop.GetValue(langFr, published: true));
 
             // can publish all
             prop.PublishAllValues();
             Assert.AreEqual("b", prop.GetValue());
             Assert.AreEqual("b", prop.GetValue(published: true));
-            Assert.AreEqual("c", prop.GetValue(1));
-            Assert.AreEqual("c", prop.GetValue(1, published: true));
+            Assert.AreEqual("c", prop.GetValue(langFr));
+            Assert.AreEqual("c", prop.GetValue(langFr, published: true));
 
             // same for culture
-            prop.ClearPublishedCultureValues(1);
-            Assert.AreEqual("c", prop.GetValue(1));
-            Assert.IsNull(prop.GetValue(1, published: true));
-            prop.PublishCultureValues(1);
-            Assert.AreEqual("c", prop.GetValue(1));
-            Assert.AreEqual("c", prop.GetValue(1, published: true));
+            prop.ClearPublishedCultureValues(langFr);
+            Assert.AreEqual("c", prop.GetValue(langFr));
+            Assert.IsNull(prop.GetValue(langFr, published: true));
+            prop.PublishCultureValues(langFr);
+            Assert.AreEqual("c", prop.GetValue(langFr));
+            Assert.AreEqual("c", prop.GetValue(langFr, published: true));
 
             prop.ClearPublishedCultureValues();
             Assert.AreEqual("b", prop.GetValue());
@@ -159,25 +161,29 @@ namespace Umbraco.Tests.Models
             var contentType = new ContentType(-1) { Alias = "contentType" };
             var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
 
-            const int langFr = 1;
-            const int langUk = 2;
+            const string langFr = "fr-FR";
+            const string langUk = "en-UK";
 
+            // throws if the content type does not support the variation
             Assert.Throws<NotSupportedException>(() => content.SetName(langFr, "name-fr"));
 
+            // now it will work
             contentType.Variations = ContentVariation.CultureNeutral;
 
+            // invariant name works
             content.Name = "name";
             Assert.AreEqual("name", content.GetName(null));
             content.SetName(null, "name2");
             Assert.AreEqual("name2", content.Name);
             Assert.AreEqual("name2", content.GetName(null));
 
+            // variant names work
             content.SetName(langFr, "name-fr");
             content.SetName(langUk, "name-uk");
-
             Assert.AreEqual("name-fr", content.GetName(langFr));
             Assert.AreEqual("name-uk", content.GetName(langUk));
 
+            // variant dictionary of names work
             Assert.AreEqual(2, content.Names.Count);
             Assert.IsTrue(content.Names.ContainsKey(langFr));
             Assert.AreEqual("name-fr", content.Names[langFr]);
@@ -186,8 +192,10 @@ namespace Umbraco.Tests.Models
         }
 
         [Test]
-        public void ContentTests()
+        public void ContentPublishValues()
         {
+            const string langFr = "fr-FR";
+
             var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop" };
             var contentType = new ContentType(-1) { Alias = "contentType" };
             contentType.AddPropertyType(propertyType);
@@ -202,12 +210,12 @@ namespace Umbraco.Tests.Models
             Assert.IsNull(content.GetValue("prop", published: true));
 
             // cannot set non-supported variation value
-            Assert.Throws<NotSupportedException>(() => content.SetValue("prop", "x", 1));
-            Assert.IsNull(content.GetValue("prop", 1));
+            Assert.Throws<NotSupportedException>(() => content.SetValue("prop", "x", langFr));
+            Assert.IsNull(content.GetValue("prop", langFr));
 
             // can publish value
             // and get edited and published values
-            content.PublishValues();
+            content.TryPublishValues();
             Assert.AreEqual("a", content.GetValue("prop"));
             Assert.AreEqual("a", content.GetValue("prop", published: true));
 
@@ -228,41 +236,43 @@ namespace Umbraco.Tests.Models
 
             // can set value
             // and get values
-            content.SetValue("prop", "c", 1);
+            content.SetValue("prop", "c", langFr);
             Assert.AreEqual("b", content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
-            Assert.AreEqual("c", content.GetValue("prop", 1));
-            Assert.IsNull(content.GetValue("prop", 1, published: true));
+            Assert.AreEqual("c", content.GetValue("prop", langFr));
+            Assert.IsNull(content.GetValue("prop", langFr, published: true));
 
             // can publish value
             // and get edited and published values
-            content.PublishValues(1);
+            Assert.IsFalse(content.TryPublishValues(langFr)); // no name
+            content.SetName(langFr, "name-fr");
+            content.TryPublishValues(langFr);
             Assert.AreEqual("b", content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
-            Assert.AreEqual("c", content.GetValue("prop", 1));
-            Assert.AreEqual("c", content.GetValue("prop", 1, published: true));
+            Assert.AreEqual("c", content.GetValue("prop", langFr));
+            Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
 
             // can clear all
             content.ClearAllPublishedValues();
             Assert.AreEqual("b", content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
-            Assert.AreEqual("c", content.GetValue("prop", 1));
-            Assert.IsNull(content.GetValue("prop", 1, published: true));
+            Assert.AreEqual("c", content.GetValue("prop", langFr));
+            Assert.IsNull(content.GetValue("prop", langFr, published: true));
 
             // can publish all
-            content.PublishAllValues();
+            content.TryPublishAllValues();
             Assert.AreEqual("b", content.GetValue("prop"));
             Assert.AreEqual("b", content.GetValue("prop", published: true));
-            Assert.AreEqual("c", content.GetValue("prop", 1));
-            Assert.AreEqual("c", content.GetValue("prop", 1, published: true));
+            Assert.AreEqual("c", content.GetValue("prop", langFr));
+            Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
 
             // same for culture
-            content.ClearCulturePublishedValues(1);
-            Assert.AreEqual("c", content.GetValue("prop", 1));
-            Assert.IsNull(content.GetValue("prop", 1, published: true));
-            content.PublishCultureValues(1);
-            Assert.AreEqual("c", content.GetValue("prop", 1));
-            Assert.AreEqual("c", content.GetValue("prop", 1, published: true));
+            content.ClearCulturePublishedValues(langFr);
+            Assert.AreEqual("c", content.GetValue("prop", langFr));
+            Assert.IsNull(content.GetValue("prop", langFr, published: true));
+            content.PublishCultureValues(langFr);
+            Assert.AreEqual("c", content.GetValue("prop", langFr));
+            Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
 
             content.ClearCulturePublishedValues();
             Assert.AreEqual("b", content.GetValue("prop"));
@@ -273,21 +283,76 @@ namespace Umbraco.Tests.Models
 
             var other = new Content("other", -1, contentType) { Id = 2, VersionId = 1 };
             other.SetValue("prop", "o");
-            other.SetValue("prop", "o1", 1);
+            other.SetValue("prop", "o1", langFr);
 
             // can copy other's edited value
             content.CopyAllValues(other);
             Assert.AreEqual("o", content.GetValue("prop"));
             Assert.AreEqual("b", content.GetValue("prop", published: true));
-            Assert.AreEqual("o1", content.GetValue("prop", 1));
-            Assert.AreEqual("c", content.GetValue("prop", 1, published: true));
+            Assert.AreEqual("o1", content.GetValue("prop", langFr));
+            Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
 
             // can copy self's published value
             content.CopyAllValues(content);
             Assert.AreEqual("b", content.GetValue("prop"));
             Assert.AreEqual("b", content.GetValue("prop", published: true));
-            Assert.AreEqual("c", content.GetValue("prop", 1));
-            Assert.AreEqual("c", content.GetValue("prop", 1, published: true));
+            Assert.AreEqual("c", content.GetValue("prop", langFr));
+            Assert.AreEqual("c", content.GetValue("prop", langFr, published: true));
+        }
+
+        [Test]
+        public void ContentPublishVariations()
+        {
+            const string langFr = "fr-FR";
+            const string langUk = "en-UK";
+            const string langEs = "es-ES";
+
+            var propertyType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop" };
+            var contentType = new ContentType(-1) { Alias = "contentType" };
+            contentType.AddPropertyType(propertyType);
+
+            var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
+
+            contentType.Variations |= ContentVariation.CultureNeutral;
+            propertyType.Variations |= ContentVariation.CultureNeutral;
+
+            content.SetValue("prop", "a");
+            content.SetValue("prop", "a-fr", langFr);
+            content.SetValue("prop", "a-uk", langUk);
+            content.SetValue("prop", "a-es", langEs);
+
+            // cannot publish without a name
+            Assert.IsFalse(content.TryPublishValues(langFr));
+
+            // works with a name
+            // and then FR is available, and published
+            content.SetName(langFr, "name-fr");
+            content.TryPublishValues(langFr);
+
+            // now UK is available too
+            content.SetName(langUk, "name-uk");
+
+            // test available, published
+            Assert.IsTrue(content.IsCultureAvailable(langFr));
+            Assert.IsTrue(content.IsCulturePublished(langFr));
+            Assert.AreEqual("name-fr", content.GetPublishName(langFr));
+            Assert.AreNotEqual(DateTime.MinValue, content.GetDateCulturePublished(langFr));
+            Assert.IsFalse(content.IsCultureEdited(langFr)); // once published, edited is *wrong* until saved
+
+            Assert.IsTrue(content.IsCultureAvailable(langUk));
+            Assert.IsFalse(content.IsCulturePublished(langUk));
+            Assert.IsNull(content.GetPublishName(langUk));
+            Assert.Throws<InvalidOperationException>(() => content.GetDateCulturePublished(langUk)); // not published!
+            Assert.IsTrue(content.IsCultureEdited(langEs)); // not published, so... edited
+
+            Assert.IsFalse(content.IsCultureAvailable(langEs));
+            Assert.IsFalse(content.IsCulturePublished(langEs));
+            Assert.IsNull(content.GetPublishName(langEs));
+            Assert.Throws<InvalidOperationException>(() => content.GetDateCulturePublished(langEs)); // not published!
+            Assert.IsTrue(content.IsCultureEdited(langEs)); // not published, so... edited
+
+            // cannot test IsCultureEdited here - as that requires the content service and repository
+            // see: ContentServiceTests.Can_SaveRead_Variations
         }
 
         [Test]

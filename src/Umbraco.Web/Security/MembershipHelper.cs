@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -19,7 +18,6 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Security.Providers;
-using Umbraco.Core.Services;
 using Umbraco.Web.Routing;
 using MPE = global::Umbraco.Core.Security.MembershipProviderExtensions;
 
@@ -94,7 +92,7 @@ namespace Umbraco.Web.Security
             _umbracoContext = umbracoContext;
             _membershipProvider = membershipProvider;
             _roleProvider = roleProvider;
-            _memberCache = umbracoContext.PublishedShapshot.Members;
+            _memberCache = umbracoContext.PublishedSnapshot.Members;
 
             // helpers are *not* instanciated by the container so we have to
             // get our dependencies injected manually, through properties.

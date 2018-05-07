@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -232,18 +234,31 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual("SPLIT-PASCAL-CASING::JUST-ANYTHING", output);
         }
 
-        [Test]
+        [Test] // can't do cases with an IDictionary
         public void ReplaceManyWithCharMap()
         {
-            var output = "JUST-ANYTHING".ReplaceMany(null);
-            Assert.AreEqual("REPLACE-MANY-A::JUST-ANYTHING", output);
+            const string input = "télévisiön tzvâr ßup &nbsp; pof";
+            const string expected = "television tzvar ssup   pof";
+            IDictionary<string, string> replacements = new Dictionary<string, string>
+                {
+                    { "é", "e" },
+                    { "ö", "o" },
+                    { "â", "a" },
+                    { "ß", "ss" },
+                    { "&nbsp;", " " },
+                };
+            var output = input.ReplaceMany(replacements);
+            Assert.AreEqual(expected, output);
         }
 
-        [Test]
-        public void ReplaceManyByOneChar()
+        #region Cases
+        [TestCase("val$id!ate|this|str'ing", "$!'", '-', "val-id-ate|this|str-ing")]
+        [TestCase("val$id!ate|this|str'ing", "$!'", '*', "val*id*ate|this|str*ing")]
+        #endregion
+        public void ReplaceManyByOneChar(string input, string toReplace, char replacement, string expected)
         {
-            var output = "JUST-ANYTHING".ReplaceMany(new char[] {}, '*');
-            Assert.AreEqual("REPLACE-MANY-B::JUST-ANYTHING", output);
+            var output = input.ReplaceMany(toReplace.ToArray(), replacement);
+            Assert.AreEqual(expected, output);
         }
     }
 }

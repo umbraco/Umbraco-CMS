@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -13,7 +14,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentMapperProfile : Profile
     {
-        public ContentMapperProfile(IUserService userService, ILocalizedTextService textService, IContentService contentService, IContentTypeService contentTypeService, IDataTypeService dataTypeService, ILocalizationService localizationService)
+        public ContentMapperProfile(IUserService userService, ILocalizedTextService textService, IContentService contentService, IContentTypeService contentTypeService, IDataTypeService dataTypeService, ILocalizationService localizationService, ILogger logger)
         {
             // create, capture, cache
             var contentOwnerResolver = new OwnerResolver<IContent>(userService);
@@ -24,14 +25,15 @@ namespace Umbraco.Web.Models.Mapping
             var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>();
             var contentTreeNodeUrlResolver = new ContentTreeNodeUrlResolver<IContent, ContentTreeController>();
             var defaultTemplateResolver = new DefaultTemplateResolver();
-            var contentUrlResolver = new ContentUrlResolver();
-            var variantResolver = new VariationResolver(localizationService);
+            var contentUrlResolver = new ContentUrlResolver(textService, contentService, logger);
+            var variantResolver = new ContentItemDisplayVariationResolver(localizationService);
 
             //FROM IContent TO ContentItemDisplay
             CreateMap<IContent, ContentItemDisplay>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(src.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, src.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Updater, opt => opt.ResolveUsing(src => creatorResolver.Resolve(src)))
+                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<ContentItemDisplayNameResolver>())
                 .ForMember(dest => dest.Variants, opt => opt.ResolveUsing(variantResolver))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentType.Icon))
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))

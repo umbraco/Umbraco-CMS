@@ -58,6 +58,9 @@
         <cc1:PropertyPanel runat="server" Text="Alias">
             <asp:TextBox ID="macroAlias" runat="server" CssClass="guiInputText"></asp:TextBox>
         </cc1:PropertyPanel>
+        <cc1:PropertyPanel runat="server" Text="Key">
+            <asp:Label ID="macroKey" runat="server" CssClass="guiLabel"></asp:Label>
+        </cc1:PropertyPanel>
     </cc1:Pane>
 
 
@@ -68,27 +71,12 @@
                     <asp:DropDownList ID="PartialViewList" runat="server" >
                     </asp:DropDownList>
         </cc1:PropertyPanel>
-
-        <cc1:PropertyPanel runat="server" Text="XSLT">
-            <asp:TextBox ID="macroXslt" runat="server" CssClass="guiInputText"></asp:TextBox>
-                    <asp:DropDownList ID="xsltFiles" runat="server">
-                    </asp:DropDownList>
-        </cc1:PropertyPanel>
-
+        
         <cc1:PropertyPanel runat="server" Text="usercontrol">
              <asp:TextBox ID="macroUserControl" runat="server" CssClass="guiInputText"></asp:TextBox>
                     <asp:DropDownList ID="userControlList" runat="server">
                     </asp:DropDownList>
-                    <asp:PlaceHolder ID="assemblyBrowserUserControl" runat="server"></asp:PlaceHolder>
         </cc1:PropertyPanel>
-
-        <asp:PlaceHolder runat="server" Visible="false">
-              <asp:TextBox ID="macroAssembly" runat="server" CssClass="guiInputText"></asp:TextBox>
-                    (Assembly)<br />
-                    <asp:TextBox ID="macroType" runat="server" CssClass="guiInputText"></asp:TextBox>
-                    (Type)
-                    <asp:PlaceHolder ID="assemblyBrowser" runat="server"></asp:PlaceHolder>
-        </asp:PlaceHolder>
     </cc1:Pane>
 
     <cc1:Pane ID="Pane1_3" runat="server" Title="Editor settings">
@@ -164,7 +152,7 @@
                         <asp:TextBox runat="server" ID="macroPropertySortOrder" CLASS="-full-width-input" Text='<%#Eval("SortOrder")%>' />
                     </td>
                     <td>
-                        <asp:Button OnClick="deleteMacroProperty" ID="delete" Text="Delete" runat="server" CssClass="btn btn-default delete-button" />
+                        <asp:Button OnClick="DeleteMacroProperty" ID="delete" Text="Delete" runat="server" CssClass="btn btn-default delete-button" />
                     </td>
                 </tr>
             </ItemTemplate>

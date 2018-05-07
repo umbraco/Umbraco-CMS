@@ -149,8 +149,8 @@ namespace Umbraco.Web.Trees
 
             // get child entities - if id is root, but user's start nodes do not contain the
             // root node, this returns the start nodes instead of root's children
-            var langId = queryStrings["languageId"].TryConvertTo<int?>();
-            var entities = GetChildEntities(id, langId.Success ? langId.Result : null).ToList();
+            var culture = queryStrings["culture"].TryConvertTo<string>();
+            var entities = GetChildEntities(id, culture.Success ? culture.Result : null).ToList();
             nodes.AddRange(entities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings)).Where(x => x != null));
 
             // if the user does not have access to the root node, what we have is the start nodes,
@@ -182,7 +182,7 @@ namespace Umbraco.Web.Trees
 
         protected abstract UmbracoObjectTypes UmbracoObjectType { get; }
 
-        protected IEnumerable<IEntitySlim> GetChildEntities(string id, int? langId)
+        protected IEnumerable<IEntitySlim> GetChildEntities(string id, string culture)
         {
             // try to parse id as an integer else use GetEntityFromId
             // which will grok Guids, Udis, etc and let use obtain the id
@@ -210,21 +210,26 @@ namespace Umbraco.Web.Trees
                 result = Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToArray();
             }
 
-            if (langId.HasValue)
+            //This should really never be null, but we'll error check anyways
+            culture = culture ?? Services.LocalizationService.GetDefaultLanguageIsoCode();
+
+            //Try to see if there is a variant name for the current language for the item and set the name accordingly.
+            //If any of this fails, the tree node name will remain the default invariant culture name.
+
+            //fixme - what if there is no name found at all ? This could occur if the doc type is variant and the user fills in all language values, then creates a new lang and sets it as the default
+            //fixme - what if the user changes this document type to not allow culture variants after it's already been created with culture variants, this means we'll be displaying the culture variant name when in fact we should be displaying the invariant name... but that would be null
+
+            if (!culture.IsNullOrWhiteSpace())
             {
-                //need to update all node names
-                //TODO: This is not currently stored, we need to wait until U4-11128 is complete for this to work, in the meantime
-                // we'll mock using this and it will just be some mock data
-                foreach(var e in result)
+                foreach (var e in result)
                 {
-                    if (e.AdditionalData.TryGetValue("VariantNames", out var variantNames))
+                    if (e.AdditionalData.TryGetValue("CultureNames", out var cultureNames)
+                        && cultureNames is IDictionary<string, string> cnd)
                     {
-                        var casted = (IDictionary<int, string>)variantNames;
-                        e.Name = casted[langId.Value];
-                    }
-                    else
-                    {
-                        e.Name = e.Name + " (lang: " + langId.Value + ")";
+                        if (cnd.TryGetValue(culture, out var name))
+                        {
+                            e.Name = name;
+                        }
                     }
                 }
             }
@@ -388,9 +393,9 @@ namespace Umbraco.Web.Trees
         /// <param name="allowedUserOptions">A list of MenuItems that the user has permissions to execute on the current document</param>
         /// <remarks>By default the user must have Browse permissions to see the node in the Content tree</remarks>
         /// <returns></returns>
-        internal bool CanUserAccessNode(IUmbracoEntity doc, IEnumerable<MenuItem> allowedUserOptions, int? langId)
+        internal bool CanUserAccessNode(IUmbracoEntity doc, IEnumerable<MenuItem> allowedUserOptions, string culture)
         {
-            //TODO: At some stage when we implement permissions on languages we'll need to take care of langId
+            //TODO: At some stage when we implement permissions on languages we'll need to take care of culture
             return allowedUserOptions.Select(x => x.Action).OfType<ActionBrowse>().Any();
         }
 

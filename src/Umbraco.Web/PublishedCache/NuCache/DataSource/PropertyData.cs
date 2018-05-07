@@ -4,8 +4,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     internal class PropertyData
     {
-        [JsonProperty("lang")]
-        public int? LanguageId { get; set; }
+        [JsonProperty("culture")]
+        public string Culture { get; set; }
 
         [JsonProperty("seg")]
         public string Segment { get; set; }

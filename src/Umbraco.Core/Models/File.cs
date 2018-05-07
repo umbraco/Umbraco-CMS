@@ -146,13 +146,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the file's virtual path (i.e. the file path relative to the root of the website)
         /// </summary>
         public string VirtualPath { get; set; }
-
-        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
-        public virtual bool IsValid()
-        {
-            return true;
-        }
-
+        
         // this exists so that class that manage name and alias differently, eg Template,
         // can implement their own cloning - (though really, not sure it's even needed)
         protected virtual void DeepCloneNameAndAlias(File clone)

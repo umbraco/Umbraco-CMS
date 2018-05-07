@@ -32,6 +32,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             IDomainCache domainCache, // an IDomainCache implementation
             ICacheProvider cacheProvider, // an ICacheProvider that should be at request-level
             IGlobalSettings globalSettings,
+            ISiteDomainHelper siteDomainHelper,
             PublishedContentTypeCache contentTypeCache, // a PublishedContentType cache
             RoutesCache routesCache, // a RoutesCache
             string previewToken) // a preview token string (or null if not previewing)
@@ -42,7 +43,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             _routesCache = routesCache; // may be null for unit-testing
             _contentTypeCache = contentTypeCache;
             _domainCache = domainCache;
-            _domainHelper = new DomainHelper(_domainCache);
+            _domainHelper = new DomainHelper(_domainCache, siteDomainHelper);
 
             _xmlStore = xmlStore;
             _xml = _xmlStore.Xml; // capture - because the cache has to remain consistent
@@ -63,7 +64,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         #region Routes
 
-        public virtual IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null)
+        public virtual IPublishedContent GetByRoute(bool preview, string route, bool? hideTopLevelNode = null, string culture = null)
         {
             if (route == null) throw new ArgumentNullException(nameof(route));
 
@@ -107,12 +108,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 _routesCache.Store(content.Id, route, true); // trusted route
         }
 
-        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null)
+        public IPublishedContent GetByRoute(string route, bool? hideTopLevelNode = null, string culture = null)
         {
             return GetByRoute(PreviewDefault, route, hideTopLevelNode);
         }
 
-        public virtual string GetRouteById(bool preview, int contentId)
+        public virtual string GetRouteById(bool preview, int contentId, string culture = null)
         {
             // try to get from cache if not previewing
             var route = preview || _routesCache == null ? null : _routesCache.GetRoute(contentId);
@@ -137,9 +138,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return route;
         }
 
-        public string GetRouteById(int contentId)
+        public string GetRouteById(int contentId, string culture = null)
         {
-            return GetRouteById(PreviewDefault, contentId);
+            return GetRouteById(PreviewDefault, contentId, culture);
         }
 
         IPublishedContent DetermineIdByRoute(bool preview, string route, bool hideTopLevelNode)
