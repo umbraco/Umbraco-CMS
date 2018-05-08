@@ -285,7 +285,7 @@ namespace Umbraco.Web.Routing
                 if (!contentForDomain.ContentType.Variations.Has(ContentVariation.CultureNeutral))
                     return true;
                 //variant so ensure the culture name exists
-                return contentForDomain.CultureNames.ContainsKey(x.Culture.Name);
+                return contentForDomain.Cultures.ContainsKey(x.Culture.Name);
             }).ToList();
 
             var defaultCulture = domainsCache.DefaultCulture;
@@ -554,7 +554,7 @@ namespace Umbraco.Web.Routing
             var redirect = false;
             var valid = false;
             IPublishedContent internalRedirectNode = null;
-            var internalRedirectId = request.PublishedContent.Value(Constants.Conventions.Content.InternalRedirectId, -1);
+            var internalRedirectId = request.PublishedContent.Value(Constants.Conventions.Content.InternalRedirectId, defaultValue: -1);
 
             if (internalRedirectId > 0)
             {
@@ -760,7 +760,7 @@ namespace Umbraco.Web.Routing
             if (request.PublishedContent.HasProperty(Constants.Conventions.Content.Redirect) == false)
                 return;
 
-            var redirectId = request.PublishedContent.Value(Constants.Conventions.Content.Redirect, -1);
+            var redirectId = request.PublishedContent.Value(Constants.Conventions.Content.Redirect, defaultValue: -1);
             var redirectUrl = "#";
             if (redirectId > 0)
             {

@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 using Umbraco.Tests.Testing;
+using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -33,7 +34,7 @@ namespace Umbraco.Tests.Security
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, globalSettings),
                 TestObjects.GetUmbracoSettings(), new List<IUrlProvider>(),globalSettings,
-                Mock.Of<IEntityService>());
+                new TestVariationContextAccessor());
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Install);
             var mgr = new BackOfficeCookieManager(
@@ -53,7 +54,7 @@ namespace Umbraco.Tests.Security
                 Mock.Of<IPublishedSnapshotService>(),
                 new WebSecurity(Mock.Of<HttpContextBase>(), Current.Services.UserService, globalSettings),
                 TestObjects.GetUmbracoSettings(), new List<IUrlProvider>(), globalSettings,
-                Mock.Of<IEntityService>());
+                new TestVariationContextAccessor());
 
             var runtime = Mock.Of<IRuntimeState>(x => x.Level == RuntimeLevel.Run);
             var mgr = new BackOfficeCookieManager(Mock.Of<IUmbracoContextAccessor>(accessor => accessor.UmbracoContext == umbCtx), runtime, TestObjects.GetGlobalSettings());

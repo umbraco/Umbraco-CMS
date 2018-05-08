@@ -23,7 +23,6 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Rebuild_Index()
         {
-
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext, options: new UmbracoContentIndexerOptions(true, false, null)))
             using (indexer.ProcessNonAsync())
@@ -46,7 +45,6 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Index_Protected_Content_Not_Indexed()
         {
-
             using (var luceneDir = new RandomIdRamDirectory())
             using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, luceneDir, ScopeProvider.SqlContext))
             using (indexer.ProcessNonAsync())
@@ -178,7 +176,7 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 //create the whole thing
                 indexer.RebuildIndex();
-                
+
 
                 var result = searcher.Search(searcher.CreateCriteria().Field(LuceneIndexer.CategoryFieldName, IndexTypes.Content).Compile());
                 Assert.AreEqual(21, result.TotalItemCount);
@@ -188,7 +186,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 {
                     indexer.DeleteFromIndex(r.Id);
                 }
-                
+
 
                 //ensure it's all gone
                 result = searcher.Search(searcher.CreateCriteria().Field(LuceneIndexer.CategoryFieldName, IndexTypes.Content).Compile());
@@ -197,14 +195,11 @@ namespace Umbraco.Tests.UmbracoExamine
                 //call our indexing methods
                 indexer.IndexAll(IndexTypes.Content);
 
-                
+
 
                 result = searcher.Search(searcher.CreateCriteria().Field(LuceneIndexer.CategoryFieldName, IndexTypes.Content).Compile());
                 Assert.AreEqual(21, result.TotalItemCount);
-
             }
-
-
         }
 
         /// <summary>
@@ -221,14 +216,12 @@ namespace Umbraco.Tests.UmbracoExamine
 
                 //create the whole thing
                 indexer.RebuildIndex();
-                
+
 
                 //now delete a node that has children
 
                 indexer.DeleteFromIndex(1140.ToString());
                 //this node had children: 1141 & 1142, let's ensure they are also removed
-
-                
 
                 var results = searcher.Search(searcher.CreateCriteria().Id(1141).Compile());
                 Assert.AreEqual(0, results.Count());
@@ -240,6 +233,5 @@ namespace Umbraco.Tests.UmbracoExamine
         }
 
         private readonly ExamineDemoDataMediaService _mediaService = new ExamineDemoDataMediaService();
-
     }
 }

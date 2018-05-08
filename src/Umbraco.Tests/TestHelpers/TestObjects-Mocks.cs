@@ -15,6 +15,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Stubs;
+using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -119,7 +120,7 @@ namespace Umbraco.Tests.TestHelpers
             var urlProviders = Enumerable.Empty<IUrlProvider>();
 
             if (accessor == null) accessor = new TestUmbracoContextAccessor();
-            return UmbracoContext.EnsureContext(accessor, httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings, Mock.Of<IEntityService>(), true);
+            return UmbracoContext.EnsureContext(accessor, httpContext, publishedSnapshotService, webSecurity, umbracoSettings, urlProviders, globalSettings, new TestVariationContextAccessor(), true);
         }
 
         public IUmbracoSettingsSection GetUmbracoSettings()

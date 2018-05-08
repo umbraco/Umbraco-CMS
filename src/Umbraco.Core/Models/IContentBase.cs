@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -34,7 +35,7 @@ namespace Umbraco.Core.Models
         /// <para>When <paramref name="culture"/> is <c>null</c>, sets the invariant
         /// language, which sets the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        void SetName(string culture, string value);
+        void SetName(string value, string culture);
 
         /// <summary>
         /// Gets the name of the content item for a specified language.
@@ -46,13 +47,13 @@ namespace Umbraco.Core.Models
         string GetName(string culture);
 
         /// <summary>
-        /// Gets or sets the names of the content item.
+        /// Gets the names of the content item.
         /// </summary>
         /// <remarks>
-        /// <para>Because a dictionary key cannot be <c>null</c> this cannot get nor set the invariant
+        /// <para>Because a dictionary key cannot be <c>null</c> this cannot get the invariant
         /// name, which must be get or set via the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        IReadOnlyDictionary<string, string> Names { get; set; }
+        IReadOnlyDictionary<string, string> Names { get; }
 
         /// <summary>
         /// Gets a value indicating whether a given culture is available.
@@ -62,6 +63,11 @@ namespace Umbraco.Core.Models
         /// non-null, and it becomes unavailable whenever the content name is null.</para>
         /// </remarks>
         bool IsCultureAvailable(string culture);
+
+        /// <summary>
+        /// Gets the date a culture was created.
+        /// </summary>
+        DateTime GetCultureDate(string culture);
 
         /// <summary>
         /// List of properties, which make up all the data available for this Content object

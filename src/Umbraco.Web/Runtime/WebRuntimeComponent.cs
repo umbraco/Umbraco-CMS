@@ -24,6 +24,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
@@ -38,6 +39,7 @@ using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Install;
 using Umbraco.Web.Media;
+using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -68,8 +70,9 @@ namespace Umbraco.Web.Runtime
             //it still needs to use the install controller so we can't do that
             composition.Container.RegisterFrom<InstallerCompositionRoot>();
 
-            // register the system culture provider
-            composition.Container.RegisterSingleton<ISystemDefaultCultureProvider, SystemDefaultCultureProvider>();
+            // register accessors for cultures
+            composition.Container.RegisterSingleton<IDefaultCultureAccessor, DefaultCultureAccessor>();
+            composition.Container.RegisterSingleton<IVariationContextAccessor, ThreadCultureVariationContextAccessor>();
 
             var typeLoader = composition.Container.GetInstance<TypeLoader>();
             var logger = composition.Container.GetInstance<ILogger>();
@@ -194,6 +197,9 @@ namespace Umbraco.Web.Runtime
 
             // register preview SignalR hub
             composition.Container.Register(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>(), new PerContainerLifetime());
+
+            // register properties fallback
+            composition.Container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
         }
 
         internal void Initialize(
@@ -206,6 +212,7 @@ namespace Umbraco.Web.Runtime
             IUmbracoSettingsSection umbracoSettings,
             IGlobalSettings globalSettings,
             IEntityService entityService,
+            IVariationContextAccessor variationContextAccessor,
             UrlProviderCollection urlProviders)
         {
             // setup mvc and webapi services
@@ -243,7 +250,7 @@ namespace Umbraco.Web.Runtime
                 umbracoSettings,
                 urlProviders,
                 globalSettings,
-                entityService);
+                variationContextAccessor);
 
             // ensure WebAPI is initialized, after everything
             GlobalConfiguration.Configuration.EnsureInitialized();
@@ -395,7 +402,7 @@ namespace Umbraco.Web.Runtime
                     // to worker A again, in theory the %temp%  folder should already be empty but we really want to make sure that its not
                     // utilizing an old path
                     appDomainHash);
-                
+
                 //set the file map and composite file default location to the %temp% location
                 BaseCompositeFileProcessingProvider.CompositeFilePathDefaultFolder
                     = XmlFileMapper.FileMapDefaultFolder

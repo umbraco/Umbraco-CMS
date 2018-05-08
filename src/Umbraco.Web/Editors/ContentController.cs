@@ -1008,7 +1008,7 @@ namespace Umbraco.Web.Editors
                 if (contentItem.PersistedContent.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
                 {
                     if (contentItem.Culture.IsNullOrWhiteSpace()) throw new InvalidOperationException($"Cannot save a content item that is {ContentVariation.CultureNeutral} with a culture specified");
-                    contentItem.PersistedContent.SetName(contentItem.Culture, contentItem.Name);
+                    contentItem.PersistedContent.SetName(contentItem.Name, contentItem.Culture);
                 }
                 else
                 {

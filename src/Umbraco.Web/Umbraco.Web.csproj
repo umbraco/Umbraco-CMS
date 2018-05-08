@@ -260,6 +260,7 @@
     <Compile Include="Models\Mapping\TemplateMapperProfile.cs" />
     <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
     <Compile Include="Models\Mapping\ContentItemDisplayVariationResolver.cs" />
+    <Compile Include="Models\PublishedContent\PublishedValueFallback.cs" />
     <Compile Include="Models\RelatedLink.cs" />
     <Compile Include="Models\RelatedLinkBase.cs" />
     <Compile Include="Models\RelatedLinks.cs" />
@@ -336,13 +337,14 @@
     <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueListUniqueValueValidator.cs" />
     <Compile Include="PublishedCache\IPublishedSnapshot.cs" />
-    <Compile Include="PublishedCache\ISystemDefaultCultureProvider.cs" />
+    <Compile Include="PublishedCache\IDefaultCultureAccessor.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentNodeKitSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfCultureVariationSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfPropertyDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentNestedData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\CultureVariation.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IDataSource.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\PropertyData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\SerializerBase.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheComponent.cs" />
@@ -364,7 +366,7 @@
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentSourceDto.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\Database.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\DatabaseDataSource.cs" />
     <Compile Include="PublishedCache\NuCache\DomainCache.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotService.cs" />
     <Compile Include="PublishedCache\NuCache\MediaCache.cs" />
@@ -381,8 +383,9 @@
     <Compile Include="PublishedCache\NuCache\SnapDictionary.cs" />
     <Compile Include="PublishedCache\PublishedCacheBase.cs" />
     <Compile Include="PublishedCache\PublishedContentTypeCache.cs" />
-    <Compile Include="PublishedCache\SystemDefaultCultureProvider.cs" />
+    <Compile Include="PublishedCache\DefaultCultureAccessor.cs" />
     <Compile Include="PublishedCache\UmbracoContextPublishedSnapshotAccessor.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\DictionaryPublishedContent.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\DomainCache.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedSnapshot.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedSnapshotService.cs" />

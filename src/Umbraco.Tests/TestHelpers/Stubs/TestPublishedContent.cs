@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
 
@@ -10,19 +7,32 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 {
     internal class TestPublishedContent : PublishedElement, IPublishedContent
     {
-        public TestPublishedContent(PublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing, Dictionary<string, PublishedCultureName> cultureNames = null)
+        public TestPublishedContent(PublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing, Dictionary<string, PublishedCultureInfos> cultures = null)
             : base(contentType, key, values, previewing)
         {
             Id = id;
-            CultureNames = cultureNames;
+            Cultures = cultures;
         }
 
         public int Id { get; }
         public int TemplateId { get; set; }
         public int SortOrder { get; set; }
         public string Name { get; set; }
-        public IReadOnlyDictionary<string, PublishedCultureName> CultureNames { get; set; }
-        public string UrlName { get; set; }
+        public IVariationContextAccessor VariationContextAccessor { get; set; }
+        public PublishedCultureInfos GetCulture(string culture = null)
+        {
+            // handle context culture
+            if (culture == null)
+                culture = VariationContextAccessor?.VariationContext.Culture;
+
+            // no invariant culture infos
+            if (culture == "" || Cultures == null) return null;
+
+            // get
+            return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;
+        }
+        public IReadOnlyDictionary<string, PublishedCultureInfos> Cultures { get; set; }
+        public string UrlSegment { get; set; }
         public string DocumentTypeAlias => ContentType.Alias;
         public int DocumentTypeId { get; set; }
         public string WriterName { get; set; }
@@ -35,6 +45,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         public Guid Version { get; set; }
         public int Level { get; set; }
         public string Url { get; set; }
+        public string GetUrl(string culture = null) => throw new NotSupportedException();
         public PublishedItemType ItemType => ContentType.ItemType;
         public bool IsDraft { get; set; }
         public IPublishedContent Parent { get; set; }

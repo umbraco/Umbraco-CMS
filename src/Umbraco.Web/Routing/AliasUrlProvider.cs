@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Routing
 {
@@ -18,14 +15,12 @@ namespace Umbraco.Web.Routing
     {
         private readonly IGlobalSettings _globalSettings;
         private readonly IRequestHandlerSection _requestConfig;
-        private readonly ILocalizationService _localizationService;
         private readonly ISiteDomainHelper _siteDomainHelper;
 
-        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ILocalizationService localizationService, ISiteDomainHelper siteDomainHelper)
+        public AliasUrlProvider(IGlobalSettings globalSettings, IRequestHandlerSection requestConfig, ISiteDomainHelper siteDomainHelper)
         {
             _globalSettings = globalSettings;
             _requestConfig = requestConfig;
-            _localizationService = localizationService;
             _siteDomainHelper = siteDomainHelper;
         }
 
@@ -35,20 +30,8 @@ namespace Umbraco.Web.Routing
 
         #region GetUrl
 
-        /// <summary>
-        /// Gets the nice url of a published content.
-        /// </summary>
-        /// <param name="umbracoContext">The Umbraco context.</param>
-        /// <param name="id">The published content id.</param>
-        /// <param name="current">The current absolute url.</param>
-        /// <param name="mode">The url mode.</param>
-        /// <returns>The url for the published content.</returns>
-        /// <remarks>
-        /// <para>The url is absolute or relative depending on url indicated by <c>current</c> and settings, unless
-        /// <c>absolute</c> is true, in which case the url is always absolute.</para>
-        /// <para>If the provider is unable to provide a url, it should return <c>null</c>.</para>
-        /// </remarks>
-        public string GetUrl(UmbracoContext umbracoContext, int id, Uri current, UrlProviderMode mode, string culture = null)
+        /// <inheritdoc />
+        public string GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlProviderMode mode, string culture, Uri current)
         {
             return null; // we have nothing to say
         }

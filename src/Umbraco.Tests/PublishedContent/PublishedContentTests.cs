@@ -16,6 +16,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PublishedContent
@@ -33,6 +34,7 @@ namespace Umbraco.Tests.PublishedContent
 
             Container.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
             Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
+            Container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
 
             var logger = Mock.Of<ILogger>();
             var dataTypeService = new TestObjects.TestDataTypeService(
@@ -324,8 +326,8 @@ namespace Umbraco.Tests.PublishedContent
         public void GetPropertyValueRecursiveTest()
         {
             var doc = GetNode(1174);
-            var rVal = doc.Value("testRecursive", true);
-            var nullVal = doc.Value("DoNotFindThis", true);
+            var rVal = doc.Value("testRecursive", recurse: true);
+            var nullVal = doc.Value("DoNotFindThis", recurse: true);
             Assert.AreEqual("This is the recursive val", rVal);
             Assert.AreEqual(null, nullVal);
         }
@@ -364,9 +366,18 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Children_GroupBy_DocumentTypeAlias()
         {
+            var home = new AutoPublishedContentType(22, "Home", new PublishedPropertyType[] { });
+            var custom = new AutoPublishedContentType(23, "CustomDocument", new PublishedPropertyType[] { });
+            var contentTypes = new Dictionary<string, PublishedContentType>
+            {
+                { home.Alias, home },
+                { custom.Alias, custom }
+            };
+            ContentTypesCache.GetPublishedContentTypeByAlias = alias => contentTypes[alias];
+
             var doc = GetNode(1046);
 
-            var found1 = doc.Children.GroupBy(x => x.DocumentTypeAlias).ToArray();
+            var found1 = doc.Children.GroupBy(x => x.ContentType.Alias).ToArray();
 
             Assert.AreEqual(2, found1.Length);
             Assert.AreEqual(2, found1.Single(x => x.Key.ToString() == "Home").Count());
@@ -376,10 +387,19 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Children_Where_DocumentTypeAlias()
         {
+            var home = new AutoPublishedContentType(22, "Home", new PublishedPropertyType[] { });
+            var custom = new AutoPublishedContentType(23, "CustomDocument", new PublishedPropertyType[] { });
+            var contentTypes = new Dictionary<string, PublishedContentType>
+            {
+                { home.Alias, home },
+                { custom.Alias, custom }
+            };
+            ContentTypesCache.GetPublishedContentTypeByAlias = alias => contentTypes[alias];
+
             var doc = GetNode(1046);
 
-            var found1 = doc.Children.Where(x => x.DocumentTypeAlias == "CustomDocument");
-            var found2 = doc.Children.Where(x => x.DocumentTypeAlias == "Home");
+            var found1 = doc.Children.Where(x => x.ContentType.Alias == "CustomDocument");
+            var found2 = doc.Children.Where(x => x.ContentType.Alias == "Home");
 
             Assert.AreEqual(1, found1.Count());
             Assert.AreEqual(2, found2.Count());

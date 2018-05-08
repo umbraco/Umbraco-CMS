@@ -21,16 +21,19 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Services;
 using Umbraco.Examine;
+using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Composing.CompositionRoots;
 using Umbraco.Web._Legacy.Actions;
 using Current = Umbraco.Core.Composing.Current;
@@ -385,6 +388,14 @@ namespace Umbraco.Tests.Testing
             SettingsForTests.Reset(); // fixme - should it be optional?
 
             Mapper.Reset();
+
+            // clear static events
+            DocumentRepository.ClearScopeEvents();
+            MediaRepository.ClearScopeEvents();
+            MemberRepository.ClearScopeEvents();
+            ContentTypeService.ClearScopeEvents();
+            MediaTypeService.ClearScopeEvents();
+            MemberTypeService.ClearScopeEvents();
         }
 
         #endregion

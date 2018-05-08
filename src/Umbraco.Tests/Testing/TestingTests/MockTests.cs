@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Web.Security;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
+using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
@@ -74,13 +77,18 @@ namespace Umbraco.Tests.Testing.TestingTests
             var umbracoContext = TestObjects.GetUmbracoContextMock();
 
             var urlProviderMock = new Mock<IUrlProvider>();
-            urlProviderMock.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>()))
+            urlProviderMock.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns("/hello/world/1234");
             var urlProvider = urlProviderMock.Object;
 
-            var theUrlProvider = new UrlProvider(umbracoContext, new [] { urlProvider });
+            var theUrlProvider = new UrlProvider(umbracoContext, new [] { urlProvider }, umbracoContext.VariationContextAccessor);
 
-            Assert.AreEqual("/hello/world/1234", theUrlProvider.GetUrl(1234));
+            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(),
+                ContentVariation.InvariantNeutral);
+            var publishedContent = Mock.Of<IPublishedContent>();
+            Mock.Get(publishedContent).Setup(x => x.ContentType).Returns(contentType);
+
+            Assert.AreEqual("/hello/world/1234", theUrlProvider.GetUrl(publishedContent));
         }
     }
 }

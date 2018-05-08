@@ -300,7 +300,7 @@ namespace Umbraco.Web.Mvc
             }
 
             //check if there's a custom controller assigned, base on the document type alias.
-            var controllerType = _controllerFactory.GetControllerTypeInternal(requestContext, request.PublishedContent.DocumentTypeAlias);
+            var controllerType = _controllerFactory.GetControllerTypeInternal(requestContext, request.PublishedContent.ContentType.Alias);
 
             //check if that controller exists
             if (controllerType != null)
@@ -320,7 +320,7 @@ namespace Umbraco.Web.Mvc
                 else
                 {
                     Current.Logger.Warn<RenderRouteHandler>(() =>
-                        $"The current Document Type {request.PublishedContent.DocumentTypeAlias} matches a locally declared controller of type {controllerType.FullName}. Custom Controllers for Umbraco routing must implement '{typeof(IRenderController).FullName}' and inherit from '{typeof(ControllerBase).FullName}'.");
+                        $"The current Document Type {request.PublishedContent.ContentType.Alias} matches a locally declared controller of type {controllerType.FullName}. Custom Controllers for Umbraco routing must implement '{typeof(IRenderController).FullName}' and inherit from '{typeof(ControllerBase).FullName}'.");
 
                     //we cannot route to this custom controller since it is not of the correct type so we'll continue with the defaults
                     // that have already been set above.

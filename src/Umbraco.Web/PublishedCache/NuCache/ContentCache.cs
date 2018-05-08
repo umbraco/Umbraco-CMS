@@ -104,8 +104,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // hideTopLevelNode = support legacy stuff, look for /*/path/to/node
                 // else normal, look for /path/to/node
                 content = hideTopLevelNode.Value
-                    ? GetAtRoot(preview).SelectMany(x => x.Children).FirstOrDefault(x => x.GetUrlName(_localizationService, culture) == parts[0])
-                    : GetAtRoot(preview).FirstOrDefault(x => x.GetUrlName(_localizationService, culture) == parts[0]);
+                    ? GetAtRoot(preview).SelectMany(x => x.Children).FirstOrDefault(x => x.GetCulture(culture).UrlSegment == parts[0])
+                    : GetAtRoot(preview).FirstOrDefault(x => x.GetCulture(culture).UrlSegment == parts[0]);
                 content = FollowRoute(content, parts, 1, culture);
             }
 
@@ -114,7 +114,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // have to look for /foo (see note in ApplyHideTopLevelNodeFromPath).
             if (content == null && hideTopLevelNode.Value && parts.Length == 1)
             {
-                content = GetAtRoot(preview).FirstOrDefault(x => x.GetUrlName(_localizationService, culture) == parts[0]);
+                content = GetAtRoot(preview).FirstOrDefault(x => x.GetCulture(culture).UrlSegment == parts[0]);
             }
 
             return content;
@@ -147,14 +147,20 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var hasDomains = _domainHelper.NodeHasDomains(n.Id);
             while (hasDomains == false && n != null) // n is null at root
             {
-                var urlName = n.GetUrlName(_localizationService, culture);
-                if (urlName == null)
+                var varies = n.ContentType.Variations.Has(ContentVariation.CultureNeutral);
+                var urlSegment = varies ? n.GetCulture(culture)?.UrlSegment : n.UrlSegment;
+                if (urlSegment.IsNullOrWhiteSpace())
                 {
                     //we cannot continue, it will be null if the item is not published
                     return null;
                 }
+                
+                //// at that point we should have an urlSegment, unless something weird is happening
+                //// at content level, such as n.GetCulture() returning null for some (weird) reason,
+                //// and then what? fallback to the invariant segment... far from perfect but eh...
+                //if (string.IsNullOrWhiteSpace(urlSegment)) urlSegment = n.UrlSegment;
 
-                pathParts.Add(urlName);
+                pathParts.Add(urlSegment);
 
                 // move to parent node
                 n = n.Parent;
@@ -183,8 +189,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var part = parts[i++];
                 content = content.Children.FirstOrDefault(x =>
                 {
-                    var urlName = x.GetUrlName(_localizationService, culture);
-                    return urlName == part;
+                    var urlSegment = x.GetCulture(culture).UrlSegment;
+                    return urlSegment == part;
                 });
             }
             return content;

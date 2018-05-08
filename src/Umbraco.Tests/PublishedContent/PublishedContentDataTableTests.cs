@@ -97,7 +97,8 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetContent(true, 1);
             //change a doc type alias
-            ((TestPublishedContent) doc.Children.ElementAt(0)).DocumentTypeAlias = "DontMatch";
+            var c = (TestPublishedContent) doc.Children.ElementAt(0);
+            c.ContentType = new PublishedContentType(22, "DontMatch", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.InvariantNeutral);
 
             var dt = doc.ChildrenAsTable(Current.Services, "Child");
 
@@ -133,14 +134,12 @@ namespace Umbraco.Tests.PublishedContent
                     CreateDate = DateTime.Now,
                     CreatorId = 1,
                     CreatorName = "Shannon",
-                    DocumentTypeAlias = contentTypeAlias,
-                    DocumentTypeId = 2,
                     Id = 3,
                     SortOrder = 4,
                     TemplateId = 5,
                     UpdateDate = DateTime.Now,
                     Path = "-1,3",
-                    UrlName = "home-page",
+                    UrlSegment = "home-page",
                     Name = "Page" + Guid.NewGuid().ToString(),
                     Version = Guid.NewGuid(),
                     WriterId = 1,
@@ -175,6 +174,8 @@ namespace Umbraco.Tests.PublishedContent
                 ((Collection<IPublishedProperty>) d.Properties).Add(
                     new RawValueProperty(factory.CreatePropertyType("property3", 1), d, "value" + (indexVals + 2)));
             }
+
+            d.ContentType = new PublishedContentType(22, contentTypeAlias, PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.InvariantNeutral);
             return d;
         }
 
@@ -183,6 +184,8 @@ namespace Umbraco.Tests.PublishedContent
         private class TestPublishedContent : IPublishedContent
         {
             public string Url { get; set; }
+            public string GetUrl(string culture = null) => throw new NotSupportedException();
+
             public PublishedItemType ItemType { get; set; }
 
             IPublishedContent IPublishedContent.Parent
@@ -201,10 +204,9 @@ namespace Umbraco.Tests.PublishedContent
             public int TemplateId { get; set; }
             public int SortOrder { get; set; }
             public string Name { get; set; }
-            public IReadOnlyDictionary<string, PublishedCultureName> CultureNames => throw new NotSupportedException();
-            public string UrlName { get; set; }
-            public string DocumentTypeAlias { get; set; }
-            public int DocumentTypeId { get; set; }
+            public PublishedCultureInfos GetCulture(string culture = null) => throw new NotSupportedException();
+            public IReadOnlyDictionary<string, PublishedCultureInfos> Cultures => throw new NotSupportedException();
+            public string UrlSegment { get; set; }
             public string WriterName { get; set; }
             public string CreatorName { get; set; }
             public int WriterId { get; set; }
@@ -240,10 +242,7 @@ namespace Umbraco.Tests.PublishedContent
                 return property;
             }
 
-            public PublishedContentType ContentType
-            {
-                get { throw new NotImplementedException(); }
-            }
+            public PublishedContentType ContentType { get; set; }
         }
     }
 }

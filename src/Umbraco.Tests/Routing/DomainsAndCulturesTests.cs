@@ -277,7 +277,7 @@ namespace Umbraco.Tests.Routing
             publishedRouter.FindDomain(frequest);
 
             Assert.AreEqual(expectedCulture, frequest.Culture.Name);
-            
+
             var finder = new ContentFinderByUrl(Logger);
             var result = finder.TryFindContent(frequest);
 
@@ -304,7 +304,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("http://domain1.com/fr", "fr-FR", 10012)] // domain takes over local wildcard at 10012
         [TestCase("http://domain1.com/fr/1001-2-1", "fr-FR", 100121)] // domain takes over local wildcard at 10012
 
-        [TestCase("/1003", null, 1003)] // default culture (no domain)
+        [TestCase("/1003", "", 1003)] // default culture (no domain)
         [TestCase("/1003/1003-1", "nl-NL", 10031)] // wildcard on 10031 applies
         [TestCase("/1003/1003-1/1003-1-1", "nl-NL", 100311)] // wildcard on 10031 applies
         #endregion
@@ -338,8 +338,60 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual(frequest.PublishedContent.Id, expectedNode);
         }
 
+        // domains such as "/en" are natively supported, and when instanciating
+        // DomainAndUri for them, the host will come from the current request
+        //
+        private void SetDomains3()
+        {
+            SetupDomainServiceMock(new[]
+            {
+                new UmbracoDomain("/en")
+                {
+                    Id = 1,
+                    LanguageId = LangEngId,
+                    RootContentId = 10011,
+                    LanguageIsoCode = "en-US"
+                },
+                new UmbracoDomain("/fr")
+                {
+                    Id = 1,
+                    LanguageId = LangFrId,
+                    RootContentId = 10012,
+                    LanguageIsoCode = "fr-FR"
+                }
+            });
+        }
 
-        
+        #region Cases
+        [TestCase("http://domain1.com/en", "en-US", 10011)]
+        [TestCase("http://domain1.com/en/1001-1-1", "en-US", 100111)]
+        [TestCase("http://domain1.com/fr", "fr-FR", 10012)]
+        [TestCase("http://domain1.com/fr/1001-2-1", "fr-FR", 100121)]
+        #endregion
+        public void DomainGeneric(string inputUrl, string expectedCulture, int expectedNode)
+        {
+            SetDomains3();
+
+            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
+            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
+            SettingsForTests.ConfigureSettings(globalSettings.Object);
+
+            var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings.Object);
+            var publishedRouter = CreatePublishedRouter(Container);
+            var frequest = publishedRouter.CreateRequest(umbracoContext);
+
+            // lookup domain
+            publishedRouter.FindDomain(frequest);
+            Assert.IsNotNull(frequest.Domain);
+
+            Assert.AreEqual(expectedCulture, frequest.Culture.Name);
+
+            var finder = new ContentFinderByUrl(Logger);
+            var result = finder.TryFindContent(frequest);
+
+            Assert.IsTrue(result);
+            Assert.AreEqual(frequest.PublishedContent.Id, expectedNode);
+        }
 
         [Test]
         public void WithDefaultCulture()

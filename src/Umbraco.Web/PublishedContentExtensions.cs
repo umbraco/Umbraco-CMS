@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Globalization;
 using System.Linq;
 using System.Web;
 using Examine;
@@ -21,6 +20,10 @@ namespace Umbraco.Web
     /// </summary>
     public static class PublishedContentExtensions
     {
+        // see notes in PublishedElementExtensions
+        //
+        private static IPublishedValueFallback PublishedValueFallback => Current.PublishedValueFallback;
+
         #region Urls
 
         /// <summary>
@@ -85,6 +88,8 @@ namespace Umbraco.Web
 
         #endregion
 
+        // fixme - .HasValue() and .Value() refactoring - in progress - see exceptions below
+
         #region HasValue
 
         /// <summary>
@@ -97,8 +102,10 @@ namespace Umbraco.Web
         /// <remarks>Returns true if <c>GetProperty(alias, recurse)</c> is not <c>null</c> and <c>GetProperty(alias, recurse).HasValue</c> is <c>true</c>.</remarks>
         public static bool HasValue(this IPublishedContent content, string alias, bool recurse)
         {
-            var prop = content.GetProperty(alias, recurse);
-            return prop != null && prop.HasValue();
+            throw new NotImplementedException("WorkInProgress");
+
+            //var prop = content.GetProperty(alias, recurse);
+            //return prop != null && prop.HasValue();
         }
 
         /// <summary>
@@ -114,9 +121,11 @@ namespace Umbraco.Web
         public static IHtmlString HasValue(this IPublishedContent content, string alias, bool recurse,
             string valueIfTrue, string valueIfFalse = null)
         {
-            return content.HasValue(alias, recurse)
-                ? new HtmlString(valueIfTrue)
-                : new HtmlString(valueIfFalse ?? string.Empty);
+            throw new NotImplementedException("WorkInProgress");
+
+            //return content.HasValue(alias, recurse)
+            //    ? new HtmlString(valueIfTrue)
+            //    : new HtmlString(valueIfFalse ?? string.Empty);
         }
 
         #endregion
@@ -124,30 +133,12 @@ namespace Umbraco.Web
         #region Value
 
         /// <summary>
-        /// Recursively gets the value of a content's property identified by its alias.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <param name="recurse">A value indicating whether to recurse.</param>
-        /// <returns>The recursive value of the content's property identified by the alias.</returns>
-        /// <remarks>
-        /// <para>Recursively means: walking up the tree from <paramref name="content"/>, get the first value that can be found.</para>
-        /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
-        /// <para>If no property with the specified alias exists, or if the property has no value, returns <c>null</c>.</para>
-        /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        public static object Value(this IPublishedContent content, string alias, bool recurse)
-        {
-            var property = content.GetProperty(alias, recurse);
-            return property?.GetValue();
-        }
-
-        /// <summary>
         /// Recursively the value of a content's property identified by its alias, if it exists, otherwise a default value.
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="alias">The property alias.</param>
+        /// <param name="culture">The variation language.</param>
+        /// <param name="segment">The variation segment.</param>
         /// <param name="recurse">A value indicating whether to recurse.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
@@ -158,10 +149,14 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(this IPublishedContent content, string alias, bool recurse, object defaultValue)
+        public static object Value(this IPublishedContent content, string alias,  string culture = null, string segment = null,  object defaultValue = default, bool recurse = false)
         {
-            var property = content.GetProperty(alias, recurse);
-            return property == null || property.HasValue() == false ? defaultValue : property.GetValue();
+            var property = content.GetProperty(alias);
+
+            if (property != null && property.HasValue(culture, segment))
+                return property.GetValue(culture, segment);
+
+            return PublishedValueFallback.GetValue(content, alias, culture, segment, defaultValue, recurse);
         }
 
         #endregion
@@ -174,6 +169,9 @@ namespace Umbraco.Web
         /// <typeparam name="T">The target property type.</typeparam>
         /// <param name="content">The content.</param>
         /// <param name="alias">The property alias.</param>
+        /// <param name="culture">The variation language.</param>
+        /// <param name="segment">The variation segment.</param>
+        /// <param name="defaultValue">The default value.</param>
         /// <param name="recurse">A value indicating whether to recurse.</param>
         /// <returns>The value of the content's property identified by the alias, converted to the specified type.</returns>
         /// <remarks>
@@ -183,38 +181,37 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T Value<T>(this IPublishedContent content, string alias, bool recurse)
+        public static T Value<T>(this IPublishedContent content, string alias, string culture = null, string segment = null, T defaultValue = default, bool recurse = false)
         {
-            return content.Value(alias, recurse, false, default(T));
+            var property = content.GetProperty(alias);
+
+            if (property != null && property.HasValue(culture, segment))
+                return property.Value<T>(culture, segment);
+
+            return PublishedValueFallback.GetValue<T>(content, alias, culture, segment, defaultValue, recurse);
         }
 
-        /// <summary>
-        /// Recursively gets the value of a content's property identified by its alias, converted to a specified type, if it exists, otherwise a default value.
-        /// </summary>
-        /// <typeparam name="T">The target property type.</typeparam>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <param name="recurse">A value indicating whether to recurse.</param>
-        /// <param name="defaultValue">The default value.</param>
-        /// <returns>The value of the content's property identified by the alias, converted to the specified type, if it exists, otherwise a default value.</returns>
-        /// <remarks>
-        /// <para>Recursively means: walking up the tree from <paramref name="content"/>, get the first value that can be found.</para>
-        /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
-        /// <para>If no property with the specified alias exists, or if the property has no value, or if it could not be converted, returns <paramref name="defaultValue"/>.</para>
-        /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        public static T Value<T>(this IPublishedContent content, string alias, bool recurse, T defaultValue)
+        // fixme - .Value() refactoring - in progress
+        public static IHtmlString Value<T>(this IPublishedContent content, string aliases, Func<T, string> format, string alt = "", bool recurse = false)
         {
-            return content.Value(alias, recurse, true, defaultValue);
-        }
+            var aliasesA = aliases.Split(',');
+            if (aliasesA.Length == 0)
+                return new HtmlString(string.Empty);
 
-        internal static T Value<T>(this IPublishedContent content, string alias, bool recurse, bool withDefaultValue, T defaultValue)
-        {
-            var property = content.GetProperty(alias, recurse);
-            if (property == null) return defaultValue;
+            throw new NotImplementedException("WorkInProgress");
 
-            return property.Value(withDefaultValue, defaultValue);
+            var property = content.GetProperty(aliasesA[0]);
+
+            //var property = aliases.Split(',')
+            //    .Where(x => string.IsNullOrWhiteSpace(x) == false)
+            //    .Select(x => content.GetProperty(x.Trim(), recurse))
+            //    .FirstOrDefault(x => x != null);
+
+            //if (format == null) format = x => x.ToString();
+
+            //return property != null
+            //    ? new HtmlString(format(property.Value<T>()))
+            //    : new HtmlString(alt);
         }
 
         #endregion
@@ -226,8 +223,8 @@ namespace Umbraco.Web
             //TODO: we should pass in the IExamineManager?
 
             var searcher = string.IsNullOrEmpty(indexName)
-                ? Examine.ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer)
-                : Examine.ExamineManager.Instance.GetSearcher(indexName);
+                ? ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer)
+                : ExamineManager.Instance.GetSearcher(indexName);
 
             if (searcher == null)
                 throw new InvalidOperationException("No searcher found for index " + indexName);
@@ -252,8 +249,8 @@ namespace Umbraco.Web
             //TODO: we should pass in the IExamineManager?
 
             var searcher = string.IsNullOrEmpty(indexName)
-                ? Examine.ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer)
-                : Examine.ExamineManager.Instance.GetSearcher(indexName);
+                ? ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer)
+                : ExamineManager.Instance.GetSearcher(indexName);
 
             if (searcher == null)
                 throw new InvalidOperationException("No searcher found for index " + indexName);
@@ -272,7 +269,7 @@ namespace Umbraco.Web
         {
             //TODO: we should pass in the IExamineManager?
 
-            var s = searchProvider ?? Examine.ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer);
+            var s = searchProvider ?? ExamineManager.Instance.GetSearcher(Constants.Examine.ExternalIndexer);
 
             var results = s.Search(criteria);
             return results.ToPublishedSearchResults(UmbracoContext.Current.ContentCache);
@@ -307,7 +304,7 @@ namespace Umbraco.Web
         /// <returns>True if the content is of the specified content type; otherwise false.</returns>
         public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias)
         {
-            return content.DocumentTypeAlias.InvariantEquals(docTypeAlias);
+            return content.ContentType.Alias.InvariantEquals(docTypeAlias);
         }
 
         /// <summary>
@@ -494,7 +491,7 @@ namespace Umbraco.Web
         /// <remarks>Does not consider the content itself. Returns all ancestors, of the specified content type.</remarks>
         public static IEnumerable<IPublishedContent> Ancestors(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.AncestorsOrSelf(false, n => n.DocumentTypeAlias == contentTypeAlias);
+            return content.AncestorsOrSelf(false, n => n.ContentType.Alias == contentTypeAlias);
         }
 
         /// <summary>
@@ -559,7 +556,7 @@ namespace Umbraco.Web
         /// <remarks>May or may not begin with the content itself, depending on its content type.</remarks>
         public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.AncestorsOrSelf(true, n => n.DocumentTypeAlias == contentTypeAlias);
+            return content.AncestorsOrSelf(true, n => n.ContentType.Alias == contentTypeAlias);
         }
 
         /// <summary>
@@ -622,7 +619,7 @@ namespace Umbraco.Web
         /// <remarks>Does not consider the content itself. May return <c>null</c>.</remarks>
         public static IPublishedContent Ancestor(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.EnumerateAncestors(false).FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAlias);
+            return content.EnumerateAncestors(false).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
         }
 
         /// <summary>
@@ -685,7 +682,7 @@ namespace Umbraco.Web
         /// <remarks>May or may not return the content itself depending on its content type. May return <c>null</c>.</remarks>
         public static IPublishedContent AncestorOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.EnumerateAncestors(true).FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAlias);
+            return content.EnumerateAncestors(true).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
         }
 
         /// <summary>
@@ -798,7 +795,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<IPublishedContent> Descendants(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.DescendantsOrSelf(false, p => p.DocumentTypeAlias == contentTypeAlias);
+            return content.DescendantsOrSelf(false, p => p.ContentType.Alias == contentTypeAlias);
         }
 
         public static IEnumerable<T> Descendants<T>(this IPublishedContent content)
@@ -825,7 +822,7 @@ namespace Umbraco.Web
 
         public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.DescendantsOrSelf(true, p => p.DocumentTypeAlias == contentTypeAlias);
+            return content.DescendantsOrSelf(true, p => p.ContentType.Alias == contentTypeAlias);
         }
 
         public static IEnumerable<T> DescendantsOrSelf<T>(this IPublishedContent content)
@@ -852,7 +849,7 @@ namespace Umbraco.Web
 
         public static IPublishedContent Descendant(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.EnumerateDescendants(false).FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAlias);
+            return content.EnumerateDescendants(false).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
         }
 
         public static T Descendant<T>(this IPublishedContent content)
@@ -879,7 +876,7 @@ namespace Umbraco.Web
 
         public static IPublishedContent DescendantOrSelf(this IPublishedContent content, string contentTypeAlias)
         {
-            return content.EnumerateDescendants(true).FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAlias);
+            return content.EnumerateDescendants(true).FirstOrDefault(x => x.ContentType.Alias == contentTypeAlias);
         }
 
         public static T DescendantOrSelf<T>(this IPublishedContent content)
@@ -1035,7 +1032,7 @@ namespace Umbraco.Web
         /// <returns>The children of the content, of any of the specified types.</returns>
         public static IEnumerable<IPublishedContent> Children(this IPublishedContent content, params string[] alias)
         {
-            return content.Children(x => alias.InvariantContains(x.DocumentTypeAlias));
+            return content.Children(x => alias.InvariantContains(x.ContentType.Alias));
         }
 
         /// <summary>
@@ -1111,14 +1108,14 @@ namespace Umbraco.Web
                                 ? content.Children.Any()
                                     ? content.Children.ElementAt(0)
                                     : null
-                                : content.Children.FirstOrDefault(x => x.DocumentTypeAlias == contentTypeAliasFilter);
+                                : content.Children.FirstOrDefault(x => x.ContentType.Alias == contentTypeAliasFilter);
             if (firstNode == null)
                 return new DataTable(); //no children found
 
             //use new utility class to create table so that we don't have to maintain code in many places, just one
             var dt = Core.DataTableExtensions.GenerateDataTable(
                 //pass in the alias of the first child node since this is the node type we're rendering headers for
-                firstNode.DocumentTypeAlias,
+                firstNode.ContentType.Alias,
                 //pass in the callback to extract the Dictionary<string, string> of all defined aliases to their names
                 alias => GetPropertyAliasesAndNames(services, alias),
                 //pass in a callback to populate the datatable, yup its a bit ugly but it's already legacy and we just want to maintain code in one place.
@@ -1131,7 +1128,7 @@ namespace Umbraco.Web
                     {
                         if (contentTypeAliasFilter.IsNullOrWhiteSpace() == false)
                         {
-                            if (n.DocumentTypeAlias != contentTypeAliasFilter)
+                            if (n.ContentType.Alias != contentTypeAliasFilter)
                                 continue; //skip this one, it doesn't match the filter
                         }
 
@@ -1139,7 +1136,7 @@ namespace Umbraco.Web
                             {
                                     { "Id", n.Id },
                                     { "NodeName", n.Name },
-                                    { "NodeTypeAlias", n.DocumentTypeAlias },
+                                    { "NodeTypeAlias", n.ContentType.Alias },
                                     { "CreateDate", n.CreateDate },
                                     { "UpdateDate", n.UpdateDate },
                                     { "CreatorName", n.CreatorName },
@@ -1187,8 +1184,8 @@ namespace Umbraco.Web
         /// </summary>
         internal static Func<ServiceContext, string, Dictionary<string, string>> GetPropertyAliasesAndNames
         {
-            get { return _getPropertyAliasesAndNames ?? GetAliasesAndNames; }
-            set { _getPropertyAliasesAndNames = value; }
+            get => _getPropertyAliasesAndNames ?? GetAliasesAndNames;
+            set => _getPropertyAliasesAndNames = value;
         }
 
         private static Dictionary<string, string> GetAliasesAndNames(ServiceContext services, string alias)
@@ -1222,36 +1219,6 @@ namespace Umbraco.Web
         private static Dictionary<string, string> GetAliasesAndNames(IContentTypeBase contentType)
         {
             return contentType.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
-        }
-
-        #endregion
-
-        #region Culture
-
-        /// <summary>
-        /// Return the URL name for the <see cref="IPublishedContent"/> based on the culture specified or default culture defined
-        /// </summary>
-        /// <param name="content"></param>
-        /// <param name="localizationService"></param>
-        /// <param name="culture"></param>
-        /// <returns></returns>
-        public static string GetUrlName(this IPublishedContent content, ILocalizationService localizationService, string culture = null)
-        {
-            if (content.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
-            {
-                var cultureCode = culture ?? localizationService.GetDefaultLanguageIsoCode();
-                if (cultureCode != null && content.CultureNames.TryGetValue(cultureCode, out var cultureName))
-                {
-                    return cultureName.UrlName;
-                }
-                //there is no name for the specified culture (unpublished perhaps)
-                return null;
-            }
-            else
-            {
-                //the content type is invariant
-                return content.UrlName;
-            }
         }
 
         #endregion

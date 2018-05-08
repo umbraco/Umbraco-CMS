@@ -5,6 +5,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -166,9 +167,15 @@ namespace Umbraco.Tests.Routing
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
+            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(),
+                ContentVariation.CultureNeutral);
+            var publishedContent = new TestPublishedContent(contentType, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
+
             var publishedContentCache = new Mock<IPublishedContentCache>();
             publishedContentCache.Setup(x => x.GetRouteById(1234, "fr-FR"))
                 .Returns("9876/home/test-fr"); //prefix with the root id node with the domain assigned as per the umbraco standard
+            publishedContentCache.Setup(x => x.GetById(It.IsAny<int>()))
+                .Returns<int>(id => id == 1234 ? publishedContent : null);
 
             var domainCache = new Mock<IDomainCache>();
             domainCache.Setup(x => x.GetAssigned(It.IsAny<int>(), false))
@@ -209,9 +216,15 @@ namespace Umbraco.Tests.Routing
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
+            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(),
+                ContentVariation.CultureNeutral);
+            var publishedContent = new TestPublishedContent(contentType, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
+
             var publishedContentCache = new Mock<IPublishedContentCache>();
             publishedContentCache.Setup(x => x.GetRouteById(1234, "fr-FR"))
                 .Returns("9876/home/test-fr"); //prefix with the root id node with the domain assigned as per the umbraco standard
+            publishedContentCache.Setup(x => x.GetById(It.IsAny<int>()))
+                .Returns<int>(id => id == 1234 ? publishedContent : null);
 
             var domainCache = new Mock<IDomainCache>();
             domainCache.Setup(x => x.GetAssigned(It.IsAny<int>(), false))
@@ -261,9 +274,15 @@ namespace Umbraco.Tests.Routing
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
+            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(),
+                ContentVariation.CultureNeutral);
+            var publishedContent = new TestPublishedContent(contentType, 1234, Guid.NewGuid(), new Dictionary<string, object>(), false);
+
             var publishedContentCache = new Mock<IPublishedContentCache>();
             publishedContentCache.Setup(x => x.GetRouteById(1234, "fr-FR"))
                 .Returns("9876/home/test-fr"); //prefix with the root id node with the domain assigned as per the umbraco standard
+            publishedContentCache.Setup(x => x.GetById(It.IsAny<int>()))
+                .Returns<int>(id => id == 1234 ? publishedContent : null);
 
             var domainCache = new Mock<IDomainCache>();
             domainCache.Setup(x => x.GetAssigned(It.IsAny<int>(), false))
@@ -305,7 +324,6 @@ namespace Umbraco.Tests.Routing
             globalSettings.Setup(x => x.UseDirectoryUrls).Returns(true);
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
             SettingsForTests.ConfigureSettings(globalSettings.Object);
-
 
             var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);

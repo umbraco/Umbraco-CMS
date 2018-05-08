@@ -23,7 +23,6 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Test_Sort_Order_Sorting()
         {
-
             long totalRecs;
             var demoData = new ExamineDemoDataContentService(TestFiles.umbraco_sort);
             var allRecs = demoData.GetLatestContentByXPath("//*[@isDoc]")
@@ -39,6 +38,7 @@ namespace Umbraco.Tests.UmbracoExamine
                         m.CreateDate == (DateTime)x.Attribute("createDate") &&
                         m.UpdateDate == (DateTime)x.Attribute("updateDate") &&
                         m.Name == (string)x.Attribute("nodeName") &&
+                        m.GetName(It.IsAny<string>()) == (string)x.Attribute("nodeName") &&
                         m.Path == (string)x.Attribute("path") &&
                         m.Properties == new PropertyCollection() &&
                         m.Published == true &&

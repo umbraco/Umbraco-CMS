@@ -457,8 +457,8 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(contentType);
 
             var c1 = MockedContent.CreateSimpleContent(contentType, "Test", -1);
-            c1.SetName(_langFr.IsoCode, "Test - FR");
-            c1.SetName(_langEs.IsoCode, "Test - ES");
+            c1.SetName("Test - FR", _langFr.IsoCode);
+            c1.SetName("Test - ES", _langEs.IsoCode);
             ServiceContext.ContentService.Save(c1);
 
             var result = service.Get(c1.Id, UmbracoObjectTypes.Document);
@@ -474,7 +474,7 @@ namespace Umbraco.Tests.Services
         public void EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
         {
             var service = ServiceContext.EntityService;
-            
+
             var contentType = MockedContentTypes.CreateSimpleContentType("test1", "Test1", false);
             contentType.Variations = ContentVariation.CultureNeutral;
             ServiceContext.ContentTypeService.Save(contentType);
@@ -487,8 +487,8 @@ namespace Umbraco.Tests.Services
                 var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
                 if (i % 2 == 0)
                 {
-                    c1.SetName(_langFr.IsoCode, "Test " + i + " - FR");
-                    c1.SetName(_langEs.IsoCode, "Test " + i + " - ES");
+                    c1.SetName("Test " + i + " - FR", _langFr.IsoCode);
+                    c1.SetName("Test " + i + " - ES", _langEs.IsoCode);
                 }
                 ServiceContext.ContentService.Save(c1);
             }
@@ -505,9 +505,9 @@ namespace Umbraco.Tests.Services
                     var doc = (IDocumentEntitySlim)entities[i];
                     var keys = doc.CultureNames.Keys.ToList();
                     var vals = doc.CultureNames.Values.ToList();
-                    Assert.AreEqual(_langFr.Id, keys[0]);
+                    Assert.AreEqual(_langFr.IsoCode.ToLowerInvariant(), keys[0].ToLowerInvariant());
                     Assert.AreEqual("Test " + i + " - FR", vals[0]);
-                    Assert.AreEqual(_langEs.Id, keys[1]);
+                    Assert.AreEqual(_langEs.IsoCode.ToLowerInvariant(), keys[1].ToLowerInvariant());
                     Assert.AreEqual("Test " + i + " - ES", vals[1]);
                 }
                 else

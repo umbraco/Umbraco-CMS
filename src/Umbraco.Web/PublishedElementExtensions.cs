@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web
@@ -11,6 +12,19 @@ namespace Umbraco.Web
     /// </summary>
     public static class PublishedElementExtensions
     {
+        // lots of debates about accessing dependencies (IPublishedValueFallback) from extension methods, ranging
+        // from "don't do it" i.e. if an extension method is relying on dependencies, a proper service should be
+        // created instead, to discussing method injection vs service locator vs other subtleties, see for example
+        // this post http://marisks.net/2016/12/19/dependency-injection-with-extension-methods/
+        //
+        // point is, we do NOT want a service, we DO want to write model.Value<int>("alias", "fr-FR") and hit
+        // fallback somehow - which pretty much rules out method injection, and basically anything but service
+        // locator - bah, let's face it, it works
+        //
+        // besides, for tests, Current support setting a fallback without even a container
+        //
+        private static IPublishedValueFallback PublishedValueFallback => Current.PublishedValueFallback;
+
         #region IsComposedOf
 
         /// <summary>
@@ -54,6 +68,9 @@ namespace Umbraco.Web
             return prop != null && prop.HasValue(culture, segment);
         }
 
+        // fixme - .Value() refactoring - in progress
+        // missing variations...
+
         /// <summary>
         /// Returns one of two strings depending on whether the content has a value for a property identified by its alias.
         /// </summary>
@@ -63,7 +80,7 @@ namespace Umbraco.Web
         /// <param name="valueIfFalse">The value to return if the content has no value for the property.</param>
         /// <returns>Either <paramref name="valueIfTrue"/> or <paramref name="valueIfFalse"/> depending on whether the content
         /// has a value for the property identified by the alias.</returns>
-        public static IHtmlString IfHasValue(this IPublishedElement content, string alias, string valueIfTrue, string valueIfFalse = null)
+        public static IHtmlString IfValue(this IPublishedElement content, string alias, string valueIfTrue, string valueIfFalse = null)
         {
             return content.HasValue(alias)
                 ? new HtmlString(valueIfTrue)
@@ -81,27 +98,7 @@ namespace Umbraco.Web
         /// <param name="alias">The property alias.</param>
         /// <param name="culture">The variation language.</param>
         /// <param name="segment">The variation segment.</param>
-        /// <returns>The value of the content's property identified by the alias.</returns>
-        /// <remarks>
-        /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
-        /// <para>If no property with the specified alias exists, or if the property has no value, returns <c>null</c>.</para>
-        /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        public static object Value(this IPublishedElement content, string alias, string culture = null, string segment = null)
-        {
-            var property = content.GetProperty(alias);
-            return property?.GetValue(culture, segment);
-        }
-
-        /// <summary>
-        /// Gets the value of a content's property identified by its alias, if it exists, otherwise a default value.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
         /// <param name="defaultValue">The default value.</param>
-        /// <param name="culture">The variation language.</param>
-        /// <param name="segment">The variation segment.</param>
         /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
         /// <remarks>
         /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
@@ -109,31 +106,14 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(this IPublishedElement content, string alias, string defaultValue, string culture = null, string segment = null) // fixme - kill
+        public static object Value(this IPublishedElement content, string alias, string culture = null, string segment = null, object defaultValue = default)
         {
             var property = content.GetProperty(alias);
-            return property == null || property.HasValue(culture, segment) == false ? defaultValue : property.GetValue(culture, segment);
-        }
 
-        /// <summary>
-        /// Gets the value of a content's property identified by its alias, if it exists, otherwise a default value.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <param name="defaultValue">The default value.</param>
-        /// <param name="languageId">The variation language.</param>
-        /// <param name="segment">The variation segment.</param>
-        /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
-        /// <remarks>
-        /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
-        /// <para>If no property with the specified alias exists, or if the property has no value, returns <paramref name="defaultValue"/>.</para>
-        /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        public static object Value(this IPublishedElement content, string alias, object defaultValue, string culture = null, string segment = null)
-        {
-            var property = content.GetProperty(alias);
-            return property == null || property.HasValue(culture, segment) == false ? defaultValue : property.GetValue(culture, segment);
+            if (property != null && property.HasValue(culture, segment))
+                return property.GetValue(culture, segment);
+
+            return PublishedValueFallback.GetValue(content, alias, culture, segment, defaultValue);
         }
 
         #endregion
@@ -148,6 +128,7 @@ namespace Umbraco.Web
         /// <param name="alias">The property alias.</param>
         /// <param name="culture">The variation language.</param>
         /// <param name="segment">The variation segment.</param>
+        /// <param name="defaultValue">The default value.</param>
         /// <returns>The value of the content's property identified by the alias, converted to the specified type.</returns>
         /// <remarks>
         /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
@@ -155,44 +136,21 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T Value<T>(this IPublishedElement content, string alias, string culture = null, string segment = null)
-        {
-            return content.Value(alias, false, default(T), culture, segment);
-        }
-
-        /// <summary>
-        /// Gets the value of a content's property identified by its alias, converted to a specified type, if it exists, otherwise a default value.
-        /// </summary>
-        /// <typeparam name="T">The target property type.</typeparam>
-        /// <param name="content">The content.</param>
-        /// <param name="alias">The property alias.</param>
-        /// <param name="defaultValue">The default value.</param>
-        /// <param name="culture">The variation language.</param>
-        /// <param name="segment">The variation segment.</param>
-        /// <returns>The value of the content's property identified by the alias, converted to the specified type, if it exists, otherwise a default value.</returns>
-        /// <remarks>
-        /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
-        /// <para>If no property with the specified alias exists, or if the property has no value, or if it could not be converted, returns <paramref name="defaultValue"/>.</para>
-        /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
-        /// <para>The alias is case-insensitive.</para>
-        /// </remarks>
-        public static T Value<T>(this IPublishedElement content, string alias, T defaultValue, string culture = null, string segment = null)
-        {
-            return content.Value(alias, true, defaultValue, culture, segment);
-        }
-
-        internal static T Value<T>(this IPublishedElement content, string alias, bool withDefaultValue, T defaultValue, string culture = null, string segment = null) // fixme uh?
+        public static T Value<T>(this IPublishedElement content, string alias, string culture = null, string segment = null, T defaultValue = default)
         {
             var property = content.GetProperty(alias);
-            if (property == null) return defaultValue;
 
-            return property.Value(withDefaultValue, defaultValue, culture, segment);
+            if (property != null && property.HasValue(culture, segment))
+                return property.Value<T>(culture, segment);
+
+            return PublishedValueFallback.GetValue<T>(content, alias, culture, segment, defaultValue);
         }
 
         #endregion
 
         #region Value or Umbraco.Field - WORK IN PROGRESS
 
+        // fixme - .Value() refactoring - in progress
         // trying to reproduce Umbraco.Field so we can get rid of it
         //
         // what we want:
@@ -208,9 +166,23 @@ namespace Umbraco.Web
         // see UmbracoComponentRenderer.Field - which is ugly ;-(
 
         // recurse first, on each alias (that's how it's done in Field)
-        // TODO: strongly typed properties howto?
+        //
         // there is no strongly typed recurse, etc => needs to be in ModelsBuilder?
 
+        // that one can only happen in ModelsBuilder as that's where the attributes are defined
+        // the attribute that carries the alias is in ModelsBuilder!
+        //public static TValue Value<TModel, TValue>(this TModel content, Expression<Func<TModel, TValue>> propertySelector, ...)
+        //    where TModel : IPublishedElement
+        //{
+        //    PropertyInfo pi = GetPropertyFromExpression(propertySelector);
+        //    var attr = pi.GetCustomAttribute<ImplementPropertyAttribute>();
+        //    var alias = attr.Alias;
+        //    return content.Value<TValue>(alias, ...)
+        //}
+
+        // recurse should be implemented via fallback
+
+        // todo - that one should be refactored, missing culture and so many things
         public static IHtmlString Value<T>(this IPublishedElement content, string aliases, Func<T, string> format, string alt = "")
         {
             if (format == null) format = x => x.ToString();
@@ -218,21 +190,6 @@ namespace Umbraco.Web
             var property = aliases.Split(',')
                 .Where(x => string.IsNullOrWhiteSpace(x) == false)
                 .Select(x => content.GetProperty(x.Trim()))
-                .FirstOrDefault(x => x != null);
-
-            return property != null
-                ? new HtmlString(format(property.Value<T>()))
-                : new HtmlString(alt);
-        }
-
-        // fixme - move that one!
-        public static IHtmlString Value<T>(this IPublishedContent content, string aliases, Func<T, string> format, string alt = "", bool recurse = false)
-        {
-            if (format == null) format = x => x.ToString();
-
-            var property = aliases.Split(',')
-                .Where(x => string.IsNullOrWhiteSpace(x) == false)
-                .Select(x => content.GetProperty(x.Trim(), recurse))
                 .FirstOrDefault(x => x != null);
 
             return property != null

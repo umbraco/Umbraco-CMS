@@ -87,15 +87,6 @@ namespace Umbraco.Web.PublishedCache
 
         public override IEnumerable<IPublishedProperty> Properties => _properties;
 
-        public override IPublishedProperty GetProperty(string alias, bool recurse)
-        {
-            if (recurse)
-            {
-                throw new NotSupportedException();
-            }
-            return GetProperty(alias);
-        }
-
         public override IPublishedProperty GetProperty(string alias)
         {
             return _properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
@@ -144,13 +135,11 @@ namespace Umbraco.Web.PublishedCache
 
         public override string Name => _member.Name;
 
-        public override IReadOnlyDictionary<string, PublishedCultureName> CultureNames => throw new NotSupportedException();
+        public override PublishedCultureInfos GetCulture(string culture = null) => throw new NotSupportedException();
 
-        public override string UrlName => throw new NotSupportedException();
+        public override IReadOnlyDictionary<string, PublishedCultureInfos> Cultures => throw new NotSupportedException();
 
-        public override string DocumentTypeAlias => _member.ContentTypeAlias;
-
-        public override int DocumentTypeId => _member.ContentType.Id;
+        public override string UrlSegment => throw new NotSupportedException();
 
         //TODO: ARGH! need to fix this - this is not good because it uses ApplicationContext.Current
         public override string WriterName => _member.GetCreatorProfile().Name;
