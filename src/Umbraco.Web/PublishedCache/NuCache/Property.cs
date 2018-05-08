@@ -91,8 +91,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             ContextualizeVariation(ref culture, ref segment);
 
-            return _sourceValue != null &&
-                   (!(_sourceValue is string) || string.IsNullOrWhiteSpace((string) _sourceValue) == false);
+            var sourceValue = GetSourceValue(culture, segment);
+
+            return sourceValue != null &&
+                   (!(sourceValue is string) || string.IsNullOrWhiteSpace((string) sourceValue) == false);
         }
 
         // used to cache the CacheValues of this property

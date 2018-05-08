@@ -1155,9 +1155,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var pdatas = new List<PropertyData>();
                 foreach (var pvalue in prop.Values)
                 {
+                    // note: at service level, invariant is 'null', but here invariant becomes 'string.Empty'
                     var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
                     if (value != null)
-                        pdatas.Add(new PropertyData { Culture = pvalue.Culture, Segment = pvalue.Segment, Value = value });
+                        pdatas.Add(new PropertyData { Culture = pvalue.Culture ?? string.Empty, Segment = pvalue.Segment ?? string.Empty, Value = value });
 
                     //Core.Composing.Current.Logger.Debug<PublishedSnapshotService>($"{content.Id} {prop.Alias} [{pvalue.LanguageId},{pvalue.Segment}] {value} {(published?"pub":"edit")}");
 

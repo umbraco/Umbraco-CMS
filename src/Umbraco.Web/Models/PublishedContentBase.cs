@@ -89,7 +89,7 @@ namespace Umbraco.Web.Models
                             throw new InvalidOperationException("Cannot compute Url for a content item when UmbracoContext.Current is null.");
                         if (UmbracoContext.Current.UrlProvider == null)
                             throw new InvalidOperationException("Cannot compute Url for a content item when UmbracoContext.Current.UrlProvider is null.");
-                        return UmbracoContext.Current.UrlProvider.GetUrl(this);
+                        return UmbracoContext.Current.UrlProvider.GetUrl(this, culture);
 
                     case PublishedItemType.Media:
                         if (_url != null) return _url; // assume it will not depend on current uri/culture
