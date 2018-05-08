@@ -1039,10 +1039,12 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            base.MapPropertyValues<IContent, ContentItemSave>(
+            bool Varies(Property property) => property.PropertyType.Variations.Has(ContentVariation.CultureNeutral);
+
+            MapPropertyValues<IContent, ContentItemSave>(
                 contentItem,
-                (save, property) => property.GetValue(save.Culture),         //get prop val
-                (save, property, v) => property.SetValue(v, save.Culture));  //set prop val
+                (save, property) => Varies(property) ? property.GetValue(save.Culture) : property.GetValue(),         //get prop val
+                (save, property, v) => { if (Varies(property)) property.SetValue(v, save.Culture); else property.SetValue(v); });  //set prop val
         }
 
         /// <summary>
