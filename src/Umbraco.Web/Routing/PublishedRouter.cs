@@ -266,10 +266,27 @@ namespace Umbraco.Web.Routing
             _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Uri=\"{request.Uri}\"");
 
             var domainsCache = request.UmbracoContext.PublishedSnapshot.Domains;
+            var domains = domainsCache.GetAll(includeWildcards: false).ToList();
+            var contentForDomains = new Dictionary<int, IPublishedContent>();
+            //filter the domains to ensure that any referenced content is actually published
+            domains = domains.Where(x =>
+            {
+                //get or look up the content assigned
+                if (!contentForDomains.TryGetValue(x.ContentId, out var contentForDomain))
+                {
+                    contentForDomain = request.UmbracoContext.PublishedSnapshot.Content.GetById(x.ContentId);
+                    contentForDomains[x.ContentId] = contentForDomain;
+                }
 
-            //get the domains but filter to ensure that any referenced content is actually published
-            var domains = domainsCache.GetAll(includeWildcards: false)
-                .Where(x => request.UmbracoContext.PublishedSnapshot.Content.GetById(x.ContentId) != null);
+                //definitely not published
+                if (contentForDomain == null)
+                    return false;
+                //invariant so no need to check variations
+                if (!contentForDomain.ContentType.Variations.Has(ContentVariation.CultureNeutral))
+                    return true;
+                //variant so ensure the culture name exists
+                return contentForDomain.CultureNames.ContainsKey(x.Culture.Name);
+            }).ToList();
 
             var defaultCulture = domainsCache.DefaultCulture;
 

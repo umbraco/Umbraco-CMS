@@ -148,6 +148,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             while (hasDomains == false && n != null) // n is null at root
             {
                 var urlName = n.GetUrlName(_localizationService, culture);
+                if (urlName == null)
+                {
+                    //we cannot continue, it will be null if the item is not published
+                    return null;
+                }
 
                 pathParts.Add(urlName);
 

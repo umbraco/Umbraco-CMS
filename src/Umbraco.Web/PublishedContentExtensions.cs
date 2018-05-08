@@ -1244,10 +1244,14 @@ namespace Umbraco.Web
                 {
                     return cultureName.UrlName;
                 }
+                //there is no name for the specified culture (unpublished perhaps)
+                return null;
             }
-
-            //if we get here, the content type is invariant or we don't have access to a usable culture code
-            return content.UrlName;
+            else
+            {
+                //the content type is invariant
+                return content.UrlName;
+            }
         }
 
         #endregion
