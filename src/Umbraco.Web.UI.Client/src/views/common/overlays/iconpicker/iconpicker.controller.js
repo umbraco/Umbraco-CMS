@@ -33,11 +33,6 @@ function IconPickerOverlay($scope, iconHelper, localizationService) {
        { name: 'Indigo', value: 'color-indigo' }
    ];
 
-    $scope.setNewColor = function (color) {
-        $scope.color = color;
-        console.log(color);
-    };
-
    $scope.setColor = function (color) {   
        $scope.color = color;
        //console.log(color);    
