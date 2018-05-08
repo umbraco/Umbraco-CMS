@@ -19,12 +19,12 @@ namespace Umbraco.Core.Collections
         /// </summary>
         public CompositeStringStringKey(string key1, string key2)
         {
-            _key1 = key1?.ToLowerInvariant() ?? "NULL";
+            // fixme temp - debugging
+            if (key1 == null) throw new Exception("Getting null culture in CompositeStringStringKey constructor, fix!");
+            if (key2 == null) throw new Exception("Getting null segment in CompositeStringStringKey constructor, fix!");
 
-            //fixme - we are changing this to null if it is an empty string, this is because if we don't do this than this key will not match
-            // anything see comments http://issues.umbraco.org/issue/U4-11227#comment=67-46399
-            // since we're not dealing with segments right now and I just need to get something working, this is the 'fix'
-            _key2 = !key2.IsNullOrWhiteSpace() ? key2.ToLowerInvariant() : "NULL";
+            _key1 = key1?.ToLowerInvariant() ?? "NULL";
+            _key2 = key2?.ToLowerInvariant() ?? "NULL";
         }
 
         public bool Equals(CompositeStringStringKey other)

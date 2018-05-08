@@ -267,26 +267,29 @@ namespace Umbraco.Web.Routing
 
             var domainsCache = request.UmbracoContext.PublishedSnapshot.Domains;
             var domains = domainsCache.GetAll(includeWildcards: false).ToList();
-            var contentForDomains = new Dictionary<int, IPublishedContent>();
-            //filter the domains to ensure that any referenced content is actually published
-            domains = domains.Where(x =>
-            {
-                //get or look up the content assigned
-                if (!contentForDomains.TryGetValue(x.ContentId, out var contentForDomain))
-                {
-                    contentForDomain = request.UmbracoContext.PublishedSnapshot.Content.GetById(x.ContentId);
-                    contentForDomains[x.ContentId] = contentForDomain;
-                }
 
-                //definitely not published
-                if (contentForDomain == null)
+            // determines whether a domain corresponds to a published document, since some
+            // domains may exist but on a document that has been unpublished - as a whole - or
+            // that is not published for the domain's culture - in which case the domain does
+            // not apply
+            bool IsPublishedContentDomain(Domain domain)
+            {
+                // just get it from content cache - optimize there, not here
+                var domainDocument = request.UmbracoContext.PublishedSnapshot.Content.GetById(domain.ContentId);
+
+                // not published - at all
+                if (domainDocument == null)
                     return false;
-                //invariant so no need to check variations
-                if (!contentForDomain.ContentType.Variations.Has(ContentVariation.CultureNeutral))
+
+                // invariant - always published
+                if (!domainDocument.ContentType.Variations.Has(ContentVariation.CultureNeutral))
                     return true;
-                //variant so ensure the culture name exists
-                return contentForDomain.Cultures.ContainsKey(x.Culture.Name);
-            }).ToList();
+
+                // variant, ensure that the culture corresponding to the domain's language is published
+                return domainDocument.Cultures.ContainsKey(domain.Culture.Name);
+            }
+
+            domains = domains.Where(IsPublishedContentDomain).ToList();
 
             var defaultCulture = domainsCache.DefaultCulture;
 

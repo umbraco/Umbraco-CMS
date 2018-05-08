@@ -87,8 +87,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _variations = origin._variations;
         }
 
-        public override bool HasValue(string culture = null, string segment = null) => _sourceValue != null
-            && (!(_sourceValue is string) || string.IsNullOrWhiteSpace((string) _sourceValue) == false);
+        public override bool HasValue(string culture = null, string segment = null)
+        {
+            ContextualizeVariation(ref culture, ref segment);
+
+            return _sourceValue != null &&
+                   (!(_sourceValue is string) || string.IsNullOrWhiteSpace((string) _sourceValue) == false);
+        }
 
         // used to cache the CacheValues of this property
         internal string ValuesCacheKey => _valuesCacheKey

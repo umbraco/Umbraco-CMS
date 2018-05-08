@@ -266,7 +266,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (_contentData.CultureInfos == null)
                     throw new Exception("oops: _contentDate.CultureInfos is null.");
                 return _cultureInfos = _contentData.CultureInfos
-                    .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.Date), StringComparer.InvariantCultureIgnoreCase);
+                    .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.Date), StringComparer.OrdinalIgnoreCase);
             }
         }
 
