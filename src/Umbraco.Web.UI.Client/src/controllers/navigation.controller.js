@@ -202,8 +202,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             $scope.showSearchResults = args.value;
         }
 
-        $scope.authenticated = true;
-
         //load languages if doc types allow variations
         if ($scope.currentSection === "content") {
             contentTypeHelper.allowsVariation().then(function (b) {
@@ -248,6 +246,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
     //when the application is ready and the user is authorized setup the data
     evts.push(eventsService.on("app.ready", function (evt, data) {
+        $scope.authenticated = true;
     }));
 
     function loadLanguages() {
