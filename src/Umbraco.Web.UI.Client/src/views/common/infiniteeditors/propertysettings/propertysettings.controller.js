@@ -108,49 +108,34 @@
 
             vm.focusOnMandatoryField = false;
 
-            // get data type
-            dataTypeResource.getById(property.dataTypeId).then(function (dataType) {
+            var dataTypeSettings = {
+                title: "Data type settings",
+                view: "views/common/infiniteeditors/datatypesettings/datatypesettings.html",
+                id: property.dataTypeId,
+                submit: function(model) {
+                    contentTypeResource.getPropertyTypeScaffold(model.dataType.id).then(function (propertyType) {
+                        // update editor
+                        property.config = propertyType.config;
+                        property.editor = propertyType.editor;
+                        property.view = propertyType.view;
+                        property.dataTypeId = model.dataType.id;
+                        property.dataTypeIcon = model.dataType.icon;
+                        property.dataTypeName = model.dataType.name;
 
-                var dataTypeSettings = {
-                    title: "Data type settings",
-                    view: "views/common/infiniteeditors/datatypesettings/datatypesettings.html",
-                    dataType: dataType,
-                    submit: function(model) {
+                        // set flag to update same data types
+                        $scope.model.updateSameDataTypes = true;
 
-                        var preValues = dataTypeHelper.createPreValueProps(model.dataType.preValues);
+                        vm.focusOnMandatoryField = true;
 
-                        dataTypeResource.save(model.dataType, preValues, false).then(function (newDataType) {
-
-                            contentTypeResource.getPropertyTypeScaffold(newDataType.id).then(function (propertyType) {
-
-                                // update editor
-                                property.config = propertyType.config;
-                                property.editor = propertyType.editor;
-                                property.view = propertyType.view;
-                                property.dataTypeId = newDataType.id;
-                                property.dataTypeIcon = newDataType.icon;
-                                property.dataTypeName = newDataType.name;
-
-                                // set flag to update same data types
-                                $scope.model.updateSameDataTypes = true;
-
-                                vm.focusOnMandatoryField = true;
-
-                                editorService.close();
-
-                            });
-
-                        });
-
-                    },
-                    close: function() {
                         editorService.close();
-                    }
-                };
+                    });
+                },
+                close: function() {
+                    editorService.close();
+                }
+            };
 
-                editorService.open(dataTypeSettings);
-
-            });
+            editorService.open(dataTypeSettings);
 
         }
 
@@ -161,8 +146,6 @@
         } 
 
         function submit() {
-            console.log($scope);
-            console.log(vm.propertySettingsForm);
             if($scope.model.submit) {
                 if (formHelper.submitForm({scope: $scope})) {
                     $scope.model.submit($scope.model);
