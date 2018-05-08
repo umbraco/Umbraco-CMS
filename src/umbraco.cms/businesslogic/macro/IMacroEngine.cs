@@ -6,7 +6,8 @@ using umbraco.interfaces;
 
 namespace umbraco.cms.businesslogic.macro
 {
-    public interface IMacroEngine {
+    public interface IMacroEngine : IDiscoverable
+    {
         string Name { get; }
         IEnumerable<string> SupportedExtensions { get; }
         IEnumerable<string> SupportedUIExtensions { get; }

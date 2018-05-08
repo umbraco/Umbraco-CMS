@@ -42,7 +42,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 var typeName = attribute == null ? type.Name : attribute.ContentTypeAlias;
 
                 if (constructors.ContainsKey(typeName))
-                    throw new InvalidOperationException(string.Format("More that one type want to be a model for content type {0}.", typeName));
+                    throw new InvalidOperationException(string.Format("More than one type wants to be a model for content type {0}.", typeName));
 
                 // should work everywhere, but slow
                 //_constructors[typeName] = constructor;

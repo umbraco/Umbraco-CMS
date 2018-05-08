@@ -88,6 +88,12 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo PropertyGroupCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, PropertyGroupCollection>(x => x.PropertyGroups);
             public readonly PropertyInfo PropertyTypeCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, IEnumerable<PropertyType>>(x => x.PropertyTypes);
             public readonly PropertyInfo HasPropertyTypeBeenRemovedSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, bool>(x => x.HasPropertyTypeBeenRemoved);
+
+            //Custom comparer for enumerable
+            public readonly DelegateEqualityComparer<IEnumerable<ContentTypeSort>> ContentTypeSortComparer =
+                new DelegateEqualityComparer<IEnumerable<ContentTypeSort>>(
+                    (sorts, enumerable) => sorts.UnsortedSequenceEqual(enumerable),
+                    sorts => sorts.GetHashCode());
         }
 
 
@@ -254,7 +260,7 @@ namespace Umbraco.Core.Models
             set { SetPropertyValueAndDetectChanges(value, ref _trashed, Ps.Value.TrashedSelector); }
         }
 
-        private IDictionary<string, object> _additionalData;
+        private readonly IDictionary<string, object> _additionalData;
         /// <summary>
         /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
         /// </summary>
@@ -273,11 +279,8 @@ namespace Umbraco.Core.Models
             get { return _allowedContentTypes; }
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, Ps.Value.AllowedContentTypesSelector,
-                    //Custom comparer for enumerable
-                    new DelegateEqualityComparer<IEnumerable<ContentTypeSort>>(
-                        (sorts, enumerable) => sorts.UnsortedSequenceEqual(enumerable),
-                        sorts => sorts.GetHashCode()));                
+                SetPropertyValueAndDetectChanges(value, ref _allowedContentTypes, Ps.Value.AllowedContentTypesSelector, 
+                    Ps.Value.ContentTypeSortComparer);                
             }
         }
 

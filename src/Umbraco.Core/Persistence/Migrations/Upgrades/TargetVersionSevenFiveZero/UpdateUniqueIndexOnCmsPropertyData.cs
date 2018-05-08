@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenFiveZer
     /// <summary>
     /// See: http://issues.umbraco.org/issue/U4-8522
     /// </summary>
-    [Migration("7.5.0", 2, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.5.0", 2, Constants.System.UmbracoMigrationName)]
     public class UpdateUniqueIndexOnCmsPropertyData : MigrationBase
     {
         public UpdateUniqueIndexOnCmsPropertyData(ISqlSyntaxProvider sqlSyntax, ILogger logger)

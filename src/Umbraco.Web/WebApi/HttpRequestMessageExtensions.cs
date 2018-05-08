@@ -28,9 +28,17 @@ namespace Umbraco.Web.WebApi
         internal static Attempt<IOwinContext> TryGetOwinContext(this HttpRequestMessage request)
         {
             var httpContext = request.TryGetHttpContext();
-            return httpContext 
-                ? Attempt.Succeed(httpContext.Result.GetOwinContext()) 
-                : Attempt<IOwinContext>.Fail();
+            try
+            {
+                return httpContext
+                        ? Attempt.Succeed(httpContext.Result.GetOwinContext())
+                        : Attempt<IOwinContext>.Fail();
+            }
+            catch (InvalidOperationException)
+            {
+                //this will occur if there is no OWIN environment which generally would only be in things like unit tests
+                return Attempt<IOwinContext>.Fail();
+            }
         }
 
         /// <summary>

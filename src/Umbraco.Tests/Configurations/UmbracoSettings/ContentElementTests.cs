@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -177,6 +178,39 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         public void DisallowedUploadFiles()
         {
             Assert.IsTrue(SettingsSection.Content.DisallowedUploadFiles.All(x => "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd".Split(',').Contains(x)));
+        }
+
+        [Test]
+        public void AllowedUploadFiles()
+        {
+            Assert.IsTrue(SettingsSection.Content.AllowedUploadFiles.All(x => "jpg,gif,png".Split(',').Contains(x)));
+        }
+
+        [Test]
+        [TestCase("png", true)]
+        [TestCase("jpg", true)]
+        [TestCase("gif", true)]
+        // TODO: Why does it flip to TestingDefaults=true for these two tests on AppVeyor. WHY?
+        //[TestCase("bmp", false)]
+        //[TestCase("php", false)]
+        [TestCase("ashx", false)]
+        [TestCase("config", false)]
+        public void IsFileAllowedForUpload_WithWhitelist(string extension, bool expected)
+        {
+            // Make really sure that defaults are NOT used
+            TestingDefaults = false;
+
+            Debug.WriteLine("Extension being tested", extension);
+            Debug.WriteLine("AllowedUploadFiles: {0}", SettingsSection.Content.AllowedUploadFiles);
+            Debug.WriteLine("DisallowedUploadFiles: {0}", SettingsSection.Content.DisallowedUploadFiles);
+
+            var allowedContainsExtension = SettingsSection.Content.AllowedUploadFiles.Any(x => x.InvariantEquals(extension));
+            var disallowedContainsExtension = SettingsSection.Content.DisallowedUploadFiles.Any(x => x.InvariantEquals(extension));
+
+            Debug.WriteLine("AllowedContainsExtension: {0}", allowedContainsExtension);
+            Debug.WriteLine("DisallowedContainsExtension: {0}", disallowedContainsExtension);
+
+            Assert.AreEqual(SettingsSection.Content.IsFileAllowedForUpload(extension), expected);
         }
     }
 }

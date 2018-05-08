@@ -87,14 +87,19 @@ namespace Umbraco.Web
         /// Add a serialised date of the last edit of the item to ensure client cache refresh when updated
         /// </param>
         /// <param name="furtherOptions">
-        /// The further options.
+        /// These are any query string parameters (formatted as query strings) that ImageProcessor supports. For example:
+        /// <example>
+        /// <![CDATA[
+        /// furtherOptions: "&bgcolor=fff"
+        /// ]]>
+        /// </example>
         /// </param>
         /// <param name="ratioMode">
         /// Use a dimension as a ratio
-        /// </param>  
+        /// </param>
         /// <param name="upScale">
         /// If the image should be upscaled to requested dimensions
-        /// </param>         
+        /// </param>        
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -190,14 +195,19 @@ namespace Umbraco.Web
         /// Add a serialised date of the last edit of the item to ensure client cache refresh when updated
         /// </param>
         /// <param name="furtherOptions">
-        /// The further options.
+        /// These are any query string parameters (formatted as query strings) that ImageProcessor supports. For example:
+        /// <example>
+        /// <![CDATA[
+        /// furtherOptions: "&bgcolor=fff"
+        /// ]]>
+        /// </example>
         /// </param>
         /// <param name="ratioMode">
         /// Use a dimension as a ratio
         /// </param>
         /// <param name="upScale">
         /// If the image should be upscaled to requested dimensions
-        /// </param>
+        /// </param>        
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
@@ -222,13 +232,64 @@ namespace Umbraco.Web
             ImageCropDataSet cropDataSet = null;
             if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson() && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
             {
-                cropDataSet = imageCropperValue.SerializeToCropDataSet();                    
+                cropDataSet = imageCropperValue.DeserializeToCropDataSet();                    
             }
             return GetCropUrl(
                 imageUrl, cropDataSet, width, height, cropAlias, quality, imageCropMode,
                 imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale);
         }
 
+        /// <summary>
+        /// Gets the ImageProcessor Url from the image path.
+        /// </summary>
+        /// <param name="imageUrl">
+        /// The image url.
+        /// </param>
+        /// <param name="cropDataSet"></param>
+        /// <param name="width">
+        /// The width of the output image.
+        /// </param>
+        /// <param name="height">
+        /// The height of the output image.
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias.
+        /// </param>
+        /// <param name="quality">
+        /// Quality percentage of the output image.
+        /// </param>
+        /// <param name="imageCropMode">
+        /// The image crop mode.
+        /// </param>
+        /// <param name="imageCropAnchor">
+        /// The image crop anchor.
+        /// </param>
+        /// <param name="preferFocalPoint">
+        /// Use focal point to generate an output image using the focal point instead of the predefined crop if there is one
+        /// </param>
+        /// <param name="useCropDimensions">
+        /// Use crop dimensions to have the output image sized according to the predefined crop sizes, this will override the width and height parameters
+        /// </param>
+        /// <param name="cacheBusterValue">
+        /// Add a serialised date of the last edit of the item to ensure client cache refresh when updated
+        /// </param>
+        /// <param name="furtherOptions">
+        /// These are any query string parameters (formatted as query strings) that ImageProcessor supports. For example:
+        /// <example>
+        /// <![CDATA[
+        /// furtherOptions: "&bgcolor=fff"
+        /// ]]>
+        /// </example>
+        /// </param>
+        /// <param name="ratioMode">
+        /// Use a dimension as a ratio
+        /// </param>
+        /// <param name="upScale">
+        /// If the image should be upscaled to requested dimensions
+        /// </param>        
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         public static string GetCropUrl(
             this string imageUrl,
             ImageCropDataSet cropDataSet,

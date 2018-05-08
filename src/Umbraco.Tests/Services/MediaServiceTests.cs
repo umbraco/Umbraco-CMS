@@ -133,10 +133,10 @@ namespace Umbraco.Tests.Services
             mediaService.Save(media);
 
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
-            var uow = provider.GetUnitOfWork();
-
-            Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(media.Id));
-
+            using (var uow = provider.GetUnitOfWork())
+            {
+                Assert.IsTrue(uow.Database.Exists<ContentXmlDto>(media.Id));
+            }
         }
 
         [Test]
@@ -171,6 +171,70 @@ namespace Umbraco.Tests.Services
 
             Assert.IsNotNull(resolvedMedia);
             Assert.That(resolvedMedia.GetValue(Constants.Conventions.Media.File).ToString().Contains(mediaPath));
+        }
+
+        [Test]
+        public void Can_Get_Paged_Children()
+        {
+            var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
+            ServiceContext.ContentTypeService.Save(mediaType);
+            for (int i = 0; i < 10; i++)
+            {
+                var c1 = MockedMedia.CreateMediaImage(mediaType, -1);
+                ServiceContext.MediaService.Save(c1);
+            }
+
+            var service = ServiceContext.MediaService;
+
+            long total;
+            var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(6));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(total, Is.EqualTo(10));
+        }
+
+        [Test]
+        public void Can_Get_Paged_Children_Dont_Get_Descendants()
+        {
+            var mediaType = MockedContentTypes.CreateImageMediaType("Image2");
+            ServiceContext.ContentTypeService.Save(mediaType);
+            // only add 9 as we also add a folder with children
+            for (int i = 0; i < 9; i++)
+            {
+                var m1 = MockedMedia.CreateMediaImage(mediaType, -1);
+                ServiceContext.MediaService.Save(m1);
+            }
+
+            var mediaTypeForFolder = MockedContentTypes.CreateImageMediaType("Folder2");
+            ServiceContext.ContentTypeService.Save(mediaTypeForFolder);
+            var mediaFolder = MockedMedia.CreateMediaFolder(mediaTypeForFolder, -1);
+            ServiceContext.MediaService.Save(mediaFolder);
+            for (int i = 0; i < 10; i++)
+            {
+                var m1 = MockedMedia.CreateMediaImage(mediaType, mediaFolder.Id);
+                ServiceContext.MediaService.Save(m1);
+            }
+
+            var service = ServiceContext.MediaService;
+
+            long total;
+            // children in root including the folder - not the descendants in the folder
+            var entities = service.GetPagedChildren(-1, 0, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(6));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedChildren(-1, 1, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(total, Is.EqualTo(10));
+
+            // children in folder
+            entities = service.GetPagedChildren(mediaFolder.Id, 0, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(6));
+            Assert.That(total, Is.EqualTo(10));
+            entities = service.GetPagedChildren(mediaFolder.Id, 1, 6, out total).ToArray();
+            Assert.That(entities.Length, Is.EqualTo(4));
+            Assert.That(total, Is.EqualTo(10));
         }
 
         private Tuple<IMedia, IMedia, IMedia, IMedia, IMedia> CreateTrashedTestMedia()

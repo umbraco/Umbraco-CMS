@@ -7,15 +7,19 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
 
     $scope.macros = [];
     $scope.model.selectedMacro = null;
-    $scope.wizardStep = "macroSelect";
     $scope.model.macroParams = [];
+
+    $scope.wizardStep = "macroSelect";
     $scope.noMacroParams = false;
 
-    $scope.changeMacro = function() {
+    $scope.selectMacro = function (macro) {
+
+        $scope.model.selectedMacro = macro;
+
         if ($scope.wizardStep === "macroSelect") {
             editParams();
         } else {
-            submitForm();
+            $scope.model.submit($scope.model);
         }
     };
 
@@ -25,12 +29,15 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
         macroResource.getMacroParameters($scope.model.selectedMacro.id)
             .then(function (data) {
 
+                
+
                 //go to next page if there are params otherwise we can just exit
                 if (!angular.isArray(data) || data.length === 0) {
 
-                    $scope.noMacroParams = true;
+                    $scope.model.submit($scope.model);
 
                 } else {
+                    
                     $scope.wizardStep = "paramSelect";
                     $scope.model.macroParams = data;
 
@@ -82,6 +89,10 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
     //get the macro list - pass in a filter if it is only for rte
     entityResource.getAll("Macro", ($scope.model.dialogData && $scope.model.dialogData.richTextEditor && $scope.model.dialogData.richTextEditor === true) ? "UseInEditor=true" : null)
         .then(function (data) {
+
+            if (angular.isArray(data) && data.length == 0) {
+                $scope.nomacros = true;
+            }
 
             //if 'allowedMacros' is specified, we need to filter
             if (angular.isArray($scope.model.dialogData.allowedMacros) && $scope.model.dialogData.allowedMacros.length > 0) {

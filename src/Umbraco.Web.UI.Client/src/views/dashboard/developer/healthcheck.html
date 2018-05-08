@@ -2,14 +2,14 @@
 
     <div ng-if="vm.viewState === 'list'">
 
-        <h3 class="bold">Health Check</h3>
-        <div class="umb-healthcheck-help-text faded">
-            <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
-            You can add your own health checks, have a look at <a href="https://our.umbraco.org/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
+        <div class="flex justify-between items-center">
+            <h3 class="bold">Health Check</h3>
+            <button class="umb-era-button -green" type="button" ng-click="vm.checkAllGroups(vm.groups);">Check All Groups</button>
         </div>
 
-        <div class="umb-healthcheck-action-bar">
-            <button class="umb-era-button -blue" type="button" ng-click="vm.checkAllGroups(vm.groups);">Check All Groups</button>
+        <div class="umb-healthcheck-help-text">
+            <p>The health checker evaluates various areas of your site for best practice settings, configuration, potential problems, etc. You can easily fix problems by pressing a button.
+            You can add your own health checks, have a look at <a href="https://our.umbraco.org/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">the documentation for more information</a> about custom health checks.</p>
         </div>
 
         <div class="umb-healthcheck">
@@ -106,7 +106,7 @@
 
                                         <button
                                             type="button"
-                                            class="umb-era-button -blue"
+                                            class="umb-era-button umb-button--s -green"
                                             ng-class="{ '-inactive': healthCheckAction.providedValue.$invalid}"
                                             ng-click="vm.executeAction(check, $parent.$index, action);"
                                             ng-disabled="healthCheckAction.providedValue.$invalid">

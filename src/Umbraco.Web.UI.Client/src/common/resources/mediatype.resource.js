@@ -122,6 +122,18 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                'Failed to delete content type contaier');
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaTypeResource#save
+         * @methodOf umbraco.resources.mediaTypeResource
+         *
+         * @description
+         * Saves or update a media type
+         *
+         * @param {Object} content data type object to create/update
+         * @returns {Promise} resourcePromise object.
+         *
+         */
         save: function (contentType) {
 
             var saveModel = umbDataFormatter.formatContentTypePostData(contentType);
@@ -203,6 +215,17 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                        "PostCreateContainer",
                        { parentId: parentId, name: name })),
                 'Failed to create a folder under parent id ' + parentId);
+        },
+
+        renameContainer: function (id, name) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("mediaTypeApiBaseUrl",
+                    "PostRenameContainer",
+                    { id: id, name: name })),
+                "Failed to rename the folder with id " + id
+            );
+
         }
 
     };

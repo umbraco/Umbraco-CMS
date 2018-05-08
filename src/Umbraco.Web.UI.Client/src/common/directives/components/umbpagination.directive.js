@@ -86,7 +86,7 @@ Use this directive to generate a pagination.
 (function() {
    'use strict';
 
-   function PaginationDirective() {
+   function PaginationDirective(localizationService) {
 
       function link(scope, el, attr, ctrl) {
 
@@ -123,36 +123,51 @@ Use this directive to generate a pagination.
 
                 //now, if the start is greater than 0 then '1' will not be displayed, so do the elipses thing
                 if (start > 0) {
-                    scope.pagination.unshift({ name: "First", val: 1, isActive: false }, {val: "...",isActive: false});
+                    scope.pagination.unshift({ name: localizationService.localize("general_first"), val: 1, isActive: false }, {val: "...",isActive: false});
                 }
 
                 //same for the end
                 if (start < maxIndex) {
-                    scope.pagination.push({ val: "...", isActive: false }, { name: "Last", val: scope.totalPages, isActive: false });
+                    scope.pagination.push({ val: "...", isActive: false }, { name: localizationService.localize("general_last"), val: scope.totalPages, isActive: false });
                 }
             }
 
          }
 
-         scope.next = function() {
-            if (scope.onNext && scope.pageNumber < scope.totalPages) {
-               scope.pageNumber++;
-               scope.onNext(scope.pageNumber);
-            }
+         scope.next = function () {
+             if (scope.pageNumber < scope.totalPages) {
+                 scope.pageNumber++;
+                 if (scope.onNext) {
+                     scope.onNext(scope.pageNumber);
+                 }
+                 if (scope.onChange) {
+                     scope.onChange({ "pageNumber": scope.pageNumber });
+                 }
+             }
          };
 
-         scope.prev = function(pageNumber) {
-            if (scope.onPrev && scope.pageNumber > 1) {
-                scope.pageNumber--;
-                scope.onPrev(scope.pageNumber);
-            }
+         scope.prev = function (pageNumber) {
+             if (scope.pageNumber > 1) {
+                 scope.pageNumber--;
+                 if (scope.onPrev) {
+                     scope.onPrev(scope.pageNumber);
+                 }
+                 if (scope.onChange) {
+                     scope.onChange({ "pageNumber": scope.pageNumber });
+                 }
+             }
          };
 
-         scope.goToPage = function(pageNumber) {
-            if(scope.onGoToPage) {
-               scope.pageNumber = pageNumber + 1;
-               scope.onGoToPage(scope.pageNumber);
-            }
+         scope.goToPage = function (pageNumber) {
+             scope.pageNumber = pageNumber + 1;
+             if (scope.onGoToPage) {
+                 scope.onGoToPage(scope.pageNumber);
+             }
+             if (scope.onChange) {
+                 if (scope.onChange) {
+                     scope.onChange({ "pageNumber": scope.pageNumber });
+                 }
+             }
          };
 
          var unbindPageNumberWatcher = scope.$watch('pageNumber', function(newValue, oldValue){
@@ -176,7 +191,8 @@ Use this directive to generate a pagination.
             totalPages: "=",
             onNext: "=",
             onPrev: "=",
-            onGoToPage: "="
+            onGoToPage: "=",
+            onChange: "&"
          },
          link: link
       };

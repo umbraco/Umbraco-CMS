@@ -24,7 +24,7 @@
 
                         <!-- Drag and drop illustration -->
                         <i class="icon-box" draggable="false"></i>
-                        <small class="faded" draggable="false"><strong>Drop to upload</strong></small>
+                        <small class="faded" draggable="false"><strong><localize key="packager_dropHere">Drop to upload</localize></strong></small>
 
                         <!-- Select files -->
                         <div class="umb-upload-local__select-file"
@@ -34,7 +34,7 @@
                              ngf-multiple="true"
                              ngf-pattern="*.zip"
                              ngf-max-size="{{ maxFileSize }}">
-                            - <localize key="media_orClickHereToUpload">or click here to choose files</localize>
+                            - <localize key="packager_orClickHereToUpload">or click here to choose files</localize>
                         </div>
                         
                     </div>
@@ -42,9 +42,9 @@
                 </div>
 
 
-                <h3><strong>Upload package</strong></h3>
+                <h3><strong><localize key="packager_uploadPackage">Upload package</localize></strong></h3>
                 <p class="faded">
-                    Install a local package by selecting it from your machine. Only install packages from sources you know and trust.
+                    <localize key="packager_localPackageDescription">Install a local package by selecting it from your machine. Only install packages from sources you know and trust</localize>.
                 </p>
 
             </form>
@@ -55,7 +55,7 @@
 
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
-                <a class="umb-package-details__back-link" href="" ng-click="vm.state = 'upload'">&larr; Upload another package</a>
+                <a class="umb-package-details__back-link" href="" ng-click="vm.state = 'upload'">&larr; <localize key="packager_uploadAnother">Upload another package</localize></a>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
 
@@ -68,7 +68,7 @@
                     </div>
                     <div class="umb-package-info">
 
-                        <h4 class="umb-info-local-item"><strong>Uploading package</strong></h4>
+                        <h4 class="umb-info-local-item"><strong><localize key="packager_installStateUploading">Uploading package...</localize></strong></h4>
 
                         <umb-progress-bar
                             percentage="{{vm.zipFile.uploadProgress}}">
@@ -90,7 +90,7 @@
 
         <umb-editor-sub-header>
             <umb-editor-sub-header-content-left>
-                <a class="umb-package-details__back-link" href="" ng-click="vm.state = 'upload'">&larr; Cancel and upload another package</a>
+                <a class="umb-package-details__back-link" href="" ng-click="vm.state = 'upload'">&larr; <localize key="packager_cancelAndUploadAnother">Cancel and upload another package</localize></a>
             </umb-editor-sub-header-content-left>
         </umb-editor-sub-header>
 
@@ -111,22 +111,22 @@
                             <h4 class="umb-info-local-item"><strong>{{ vm.localPackage.name }}</strong></h4>
 
                             <div class="umb-info-local-item">
-                                <strong>Author</strong>
+                                <strong><localize key="packager_packageAuthor">Author</localize></strong>
                                 <a href="{{ vm.localPackage.authorUrl }}" target="_blank">{{ vm.localPackage.author }}</a>
                             </div>
 
                             <div class="umb-info-local-item">
-                                <strong>Version</strong>
+                                <strong><localize key="packager_packageVersion">Version</localize></strong>
                                 {{ vm.localPackage.version }}
                             </div>
 
                             <div class="umb-info-local-item">
-                                <strong>License</strong>
+                                <strong><localize key="packager_packageLicense">License</localize></strong>
                                 <a href="{{ vm.localPackage.licenseUrl }}" target="_blank">{{ vm.localPackage.license }}</a>
                             </div>
 
                             <div class="umb-info-local-item">
-                                <strong>Read me</strong>
+                                <strong><localize key="packager_packageReadme">Read me</localize></strong>
                                 <br>
                                 <small ng-bind-html-unsafe="vm.localPackage.readMe"></small>
                             </div>
@@ -134,14 +134,14 @@
                             <div class="umb-info-local-item mt4 flex items-center flex-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
                                 <label for="license-accepts" class="umb-package-installer-label">
                                     <input type="checkbox" id="license-accepts" ng-model="vm.localPackage.packageLicenseAccept" required no-dirty-check>
-                                    <strong class="label-text">I accept <a href="{{ vm.localPackage.licenseUrl }}" target="_blank">terms of use</a></strong>
+                                    <strong class="label-text"><localize key="packager_accept">I accept</localize> <a href="{{ vm.localPackage.licenseUrl }}" target="_blank"><localize key="packager_termsOfUse">terms of use</localize></a></strong>
                                 </label>
                                 <button type="button"
                                         ng-class="{'-inactive' : localPackageForm.$invalid}"
                                         ng-disabled="localPackageForm.$invalid"
-                                        class="umb-era-button -blue flex-inline mt3"
+                                        class="umb-era-button -green flex-inline mt3"
                                         ng-click="vm.installPackage()">
-                                        Install package
+                                        <localize key="packager_packageInstall">Install package</localize>
                                 </button>
                             </div>
 
@@ -153,7 +153,7 @@
                             </div>
 
                             <div class="umb-info-local-item text-error" ng-if="!vm.localPackage.isCompatible">
-                                This package cannot be installed, it requires a minimum Umbraco version of {{vm.localPackage.umbracoVersion}}
+                                <localize key="packager_targetVersionMismatch">This package cannot be installed, it requires a minimum Umbraco version of</localize> {{vm.localPackage.umbracoVersion}}
                             </div>
                             <div class="umb-info-local-item text-info">
                                 <p>{{vm.installState.status}}</p>
@@ -168,7 +168,7 @@
                                        
                                         class="btn btn-success flex-inline mt3"
                                         ng-click="vm.reloadPage()">
-                                    Finish
+                                    <localize key="packager_installFinish">Finish</localize>
                                 </button>
                             </div>
 

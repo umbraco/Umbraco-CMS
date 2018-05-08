@@ -137,12 +137,16 @@ namespace umbraco
                                     attributeValue = StateHelper.GetCookieValue(keyName);
                                 break;
                             case "#":
+                                if (pageElements == null)
+                                    pageElements = GetPageElements();
                                 if (pageElements[keyName] != null)
                                     attributeValue = pageElements[keyName].ToString();
                                 else
                                     attributeValue = "";
                                 break;
                             case "$":
+                                if (pageElements == null)
+                                    pageElements = GetPageElements();
                                 if (pageElements[keyName] != null && pageElements[keyName].ToString() != string.Empty)
                                 {
                                     attributeValue = pageElements[keyName].ToString();
@@ -188,6 +192,14 @@ namespace umbraco
             }
 
             return attributeValue;
+        }
+
+        private static IDictionary GetPageElements()
+        {
+            IDictionary pageElements = null;
+            if (HttpContext.Current.Items["pageElements"] != null)
+                pageElements = (IDictionary)HttpContext.Current.Items["pageElements"];
+            return pageElements;
         }
 
         [UmbracoWillObsolete("We should really obsolete that one.")]

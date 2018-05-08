@@ -611,18 +611,16 @@ namespace umbraco.cms.businesslogic
                         //its own + inherited property types, which is wrong. Once we are able to fully switch to the new api
                         //this should no longer be a problem as the composition always contains a correct list of property types.
                         var result = new Dictionary<int, PropertyType>();
-                        using (var sqlHelper = Application.SqlHelper)
-                        using (IRecordsReader dr = sqlHelper.ExecuteReader(
-                                "select id from cmsPropertyType where contentTypeId = @ctId order by sortOrder",
-                                sqlHelper.CreateParameter("@ctId", Id)))
+
+                        var ids = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                            "select id from cmsPropertyType where contentTypeId = @ctId order by sortOrder",
+                            new {ctId = Id});
+
+                        foreach (var id in ids)
                         {
-                            while (dr.Read())
-                            {
-                                int id = dr.GetInt("id");
-                                PropertyType pt = PropertyType.GetPropertyType(id);
-                                if (pt != null)
-                                    result.Add(pt.Id, pt);
-                            }
+                            var pt = PropertyType.GetPropertyType(id);
+                            if (pt != null)
+                                result.Add(pt.Id, pt);
                         }
 
                         // Get Property Types from the master content type

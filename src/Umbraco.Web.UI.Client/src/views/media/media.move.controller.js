@@ -1,14 +1,24 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
-	function ($scope, eventsService, mediaResource, appState, treeService, navigationService) {
+    function ($scope, userService, eventsService, mediaResource, appState, treeService, navigationService) {
 	    var dialogOptions = $scope.dialogOptions;
 
 	    $scope.dialogTreeEventHandler = $({});
 	    var node = dialogOptions.currentNode;
 
+        $scope.treeModel = {
+            hideHeader: false
+        }
+        userService.getCurrentUser().then(function (userData) {
+            $scope.treeModel.hideHeader = userData.startMediaIds.length > 0 && userData.startMediaIds.indexOf(-1) == -1;
+        });
+
 	    function nodeSelectHandler(ev, args) {
-	        args.event.preventDefault();
-	        args.event.stopPropagation();
+
+			if(args && args.event) {
+				args.event.preventDefault();
+				args.event.stopPropagation();
+			}
 
 	        eventsService.emit("editors.media.moveController.select", args);
 
@@ -21,8 +31,15 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
 	        $scope.target.selected = true;
 	    }
 
-	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
+		function nodeExpandedHandler(ev, args) {
+			// open mini list view for list views
+        	if (args.node.metaData.isContainer) {
+				openMiniListView(args.node);
+			}
+	    }
 
+	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
+	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
 
 	    $scope.move = function () {
 	        mediaResource.move({ parentId: $scope.target.id, id: node.id })
@@ -55,5 +72,21 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
 
 	    $scope.$on('$destroy', function () {
 	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
+			$scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
 	    });
+
+		// Mini list view
+		$scope.selectListViewNode = function (node) {
+			node.selected = node.selected === true ? false : true;
+			nodeSelectHandler({}, { node: node });
+		};
+
+		$scope.closeMiniListView = function () {
+			$scope.miniListView = undefined;
+		};
+
+		function openMiniListView(node) {
+			$scope.miniListView = node;
+		}
+
 	});

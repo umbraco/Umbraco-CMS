@@ -21,7 +21,13 @@ function mediaTypeHelper(mediaTypeResource, $q) {
         },
 
         getAllowedImagetypes: function (mediaId){
-				
+
+            //TODO: This is horribly inneficient - why make one request per type!?
+            //This should make a call to c# to get exactly what it's looking for instead of returning every single media type and doing 
+            //some filtering on the client side.
+            //This is also called multiple times when it's not needed! Example, when launching the media picker, this will be called twice 
+            //which means we'll be making at least 6 REST calls to fetch each media type
+
             // Get All allowedTypes
             return mediaTypeResource.getAllowedTypes(mediaId)
                 .then(function(types){

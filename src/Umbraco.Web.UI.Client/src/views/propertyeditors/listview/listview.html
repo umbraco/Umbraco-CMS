@@ -17,7 +17,7 @@
                            <span class="caret"></span>
                        </a>
                        <ul class="dropdown-menu">
-                           <li ng-repeat="contentType in listViewAllowedTypes">
+                           <li ng-repeat="contentType in listViewAllowedTypes | orderBy:'name':false">
                                <a href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
                                    <i class="icon-{{contentType.cssClass}}"></i>
                                    {{contentType.name}}
@@ -157,7 +157,7 @@
          selection="selection"
          options="options"
          entity-type="{{entityType}}"
-         on-get-content="reloadView">
+         on-get-content="getContent">
       </umb-list-view-layout>
 
       <umb-load-indicator ng-show="!viewLoaded"></umb-load-indicator>

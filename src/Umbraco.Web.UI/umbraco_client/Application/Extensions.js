@@ -27,6 +27,23 @@
         };
     }
 
+    if (!window.location.getParams) {
+      var pl = /\+/g;  // Regex for replacing addition symbol with a space
+      var search = /([^&=]+)=?([^&]*)/g;
+      var decode = function(s) { return decodeURIComponent(s.replace(pl, " ")); };
+      
+      window.location.getParams = function() {
+        var match;
+        var query = window.location.search.substring(1);
+
+        var urlParams = {};
+        while (match = search.exec(query))
+          urlParams[decode(match[1])] = decode(match[2]); 
+
+        return urlParams;
+      }
+    }
+    
     if (!String.prototype.startsWith) {
         String.prototype.startsWith = function (str) {
             ///<summary>startsWith extension method for string</summary>
@@ -366,10 +383,20 @@
             function getCookie(name) {
                 var value = "; " + document.cookie;
                 var parts = value.split("; " + name + "=");
-                if (parts.length === 2) return parts.pop().split(";").shift();
+                if (parts.length === 2)
+                  return parts.pop().split(";").shift();
+                return null;
             }
 
-            xhr.setRequestHeader("X-XSRF-TOKEN", getCookie("XSRF-TOKEN"));
+            var cookieVal = getCookie("UMB-XSRF-TOKEN");
+            if (cookieVal) {
+              xhr.setRequestHeader("X-UMB-XSRF-TOKEN", cookieVal);  
+            }
+
+            var queryString = window.location.getParams();
+            if (queryString.umbDebug === "true") {
+              xhr.setRequestHeader("X-UMB-DEBUG", cookieVal);  
+            }
         }
     });
 

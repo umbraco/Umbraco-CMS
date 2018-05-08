@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
-	function ($scope, eventsService, contentResource, navigationService, appState, treeService, localizationService, notificationsService) {
+    function ($scope, userService, eventsService, contentResource, navigationService, appState, treeService, localizationService, notificationsService) {
 
 	    var dialogOptions = $scope.dialogOptions;
 	    var searchText = "Search...";
@@ -18,58 +18,39 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 	        results: [],
 	        selectedSearchResults: []
 	    }
+	    $scope.treeModel = {
+	        hideHeader: false
+	    }
+	    userService.getCurrentUser().then(function (userData) {
+            $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;	     
+	    });
 
 	    var node = dialogOptions.currentNode;
 
 	    function nodeSelectHandler(ev, args) {
-	        args.event.preventDefault();
-	        args.event.stopPropagation();
 
-	        if (args.node.metaData.listViewNode) {
-	            //check if list view 'search' node was selected
+			if(args && args.event) {
+	        	args.event.preventDefault();
+	        	args.event.stopPropagation();
+			}
 
-	            $scope.searchInfo.showSearch = true;
-	            $scope.searchInfo.searchFromId = args.node.metaData.listViewNode.id;
-	            $scope.searchInfo.searchFromName = args.node.metaData.listViewNode.name;
-	        }
-	        else {
-	            eventsService.emit("editors.content.copyController.select", args);
+			eventsService.emit("editors.content.copyController.select", args);
 
-	            if ($scope.target) {
-	                //un-select if there's a current one selected
-	                $scope.target.selected = false;
-	            }
+			if ($scope.target) {
+				//un-select if there's a current one selected
+				$scope.target.selected = false;
+			}
 
-	            $scope.target = args.node;
-	            $scope.target.selected = true;
-	        }
+			$scope.target = args.node;
+			$scope.target.selected = true;
 
 	    }
 
 	    function nodeExpandedHandler(ev, args) {
-	        if (angular.isArray(args.children)) {
-
-	            //iterate children
-	            _.each(args.children, function (child) {
-	                //check if any of the items are list views, if so we need to add a custom
-	                // child: A node to activate the search
-	                if (child.metaData.isContainer) {
-	                    child.hasChildren = true;
-	                    child.children = [
-	                        {
-	                            level: child.level + 1,
-	                            hasChildren: false,
-	                            name: searchText,
-	                            metaData: {
-	                                listViewNode: child,
-	                            },
-	                            cssClass: "icon umb-tree-icon sprTree icon-search",
-	                            cssClasses: ["not-published"]
-	                        }
-	                    ];
-	                }
-	            });
-	        }
+			// open mini list view for list views
+          	if (args.node.metaData.isContainer) {
+				openMiniListView(args.node);
+			}
 	    }
 
 	    $scope.hideSearch = function () {
@@ -136,4 +117,19 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
 	        $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
 	    });
+
+		// Mini list view
+		$scope.selectListViewNode = function (node) {
+			node.selected = node.selected === true ? false : true;
+			nodeSelectHandler({}, { node: node });
+		};
+
+		$scope.closeMiniListView = function () {
+			$scope.miniListView = undefined;
+		};
+
+		function openMiniListView(node) {
+			$scope.miniListView = node;
+		}
+		
 	});

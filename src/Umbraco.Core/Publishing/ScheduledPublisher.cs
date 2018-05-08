@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -26,12 +27,16 @@ namespace Umbraco.Core.Publishing
         public int CheckPendingAndProcess()
         {
             var counter = 0;
-            foreach (var d in _contentService.GetContentForRelease())
+            var contentForRelease = _contentService.GetContentForRelease().ToArray();
+            if (contentForRelease.Length > 0)
+                LogHelper.Debug<ScheduledPublisher>(string.Format("There's {0} item(s) of content to be published", contentForRelease.Length));
+            foreach (var d in contentForRelease)
             {
                 try
                 {
                     d.ReleaseDate = null;
                     var result = _contentService.SaveAndPublishWithStatus(d, (int)d.GetWriterProfile().Id);
+                    LogHelper.Debug<ContentService>(string.Format("Result of publish attempt: {0}", result.Result.StatusType));
                     if (result.Success == false)
                     {
                         if (result.Exception != null)
@@ -54,7 +59,11 @@ namespace Umbraco.Core.Publishing
                     throw;
                 }
             }
-            foreach (var d in _contentService.GetContentForExpiration())
+
+            var contentForExpiration = _contentService.GetContentForExpiration().ToArray();
+            if (contentForExpiration.Length > 0)
+                LogHelper.Debug<ScheduledPublisher>(string.Format("There's {0} item(s) of content to be unpublished", contentForExpiration.Length));
+            foreach (var d in contentForExpiration)
             {
                 try
                 {

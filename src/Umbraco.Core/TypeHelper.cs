@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 
@@ -13,10 +14,53 @@ namespace Umbraco.Core
 	/// </summary>
 	internal static class TypeHelper
 	{
-		
-		private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache = new ConcurrentDictionary<Type, FieldInfo[]>();
-		private static readonly ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]> GetPropertiesCache = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
-        
+	    private static readonly ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]> GetPropertiesCache
+            = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
+		private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache
+            = new ConcurrentDictionary<Type, FieldInfo[]>();
+
+        private static readonly Assembly[] EmptyAssemblies  = new Assembly[0];
+
+        /// <summary>
+        /// Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also deal with array types and return List{T} for those too.
+        /// If it cannot be done, null is returned.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+	    internal static IList CreateGenericEnumerableFromObject(object obj)
+        {
+            var type = obj.GetType();
+
+            if (type.IsGenericType)
+            {
+                var genericTypeDef = type.GetGenericTypeDefinition();
+
+                if (genericTypeDef == typeof(IEnumerable<>)
+                    || genericTypeDef == typeof(ICollection<>)
+                    || genericTypeDef == typeof(Collection<>)
+                    || genericTypeDef == typeof(IList<>)
+                    || genericTypeDef == typeof(List<>)
+                    //this will occur when Linq is used and we get the odd WhereIterator or DistinctIterators since those are special iterator types
+                    || obj is IEnumerable)
+                {
+                    //if it is a IEnumerable<>, IList<T> or ICollection<> we'll use a List<>
+                    var genericType = typeof(List<>).MakeGenericType(type.GetGenericArguments());
+                    //pass in obj to fill the list
+                    return (IList)Activator.CreateInstance(genericType, obj);
+                }
+	        }
+
+	        if (type.IsArray)
+	        {
+                //if its an array, we'll use a List<>
+	            var genericType = typeof(List<>).MakeGenericType(type.GetElementType());
+                //pass in obj to fill the list
+	            return (IList)Activator.CreateInstance(genericType, obj);
+            }
+
+            return null;
+	    }
+
         /// <summary>
         /// Checks if the method is actually overriding a base method
         /// </summary>
@@ -30,44 +74,40 @@ namespace Umbraco.Core
         /// <summary>
         /// Find all assembly references that are referencing the assignTypeFrom Type's assembly found in the assemblyList
         /// </summary>
-        /// <param name="assignTypeFrom"></param>
-        /// <param name="assemblies"></param>
+        /// <param name="assembly">The referenced assembly.</param>
+        /// <param name="assemblies">A list of assemblies.</param>
         /// <returns></returns>
         /// <remarks>
         /// If the assembly of the assignTypeFrom Type is in the App_Code assembly, then we return nothing since things cannot
         /// reference that assembly, same with the global.asax assembly.
         /// </remarks>
-        public static Assembly[] GetReferencedAssemblies(Type assignTypeFrom, IEnumerable<Assembly> assemblies)
+        public static Assembly[] GetReferencingAssemblies(Assembly assembly, IEnumerable<Assembly> assemblies)
         {
-            //check if it is the app_code assembly.
-            //check if it is App_global.asax assembly
-            if (assignTypeFrom.Assembly.IsAppCodeAssembly() || assignTypeFrom.Assembly.IsGlobalAsaxAssembly())
-            {
-                return Enumerable.Empty<Assembly>().ToArray();
-            }
-            
-            //find all assembly references that are referencing the current type's assembly since we 
-            //should only be scanning those assemblies because any other assembly will definitely not
-            //contain sub type's of the one we're currently looking for
-            return assemblies
-                .Where(assembly =>
-                       assembly == assignTypeFrom.Assembly 
-                        || HasReferenceToAssemblyWithName(assembly, assignTypeFrom.Assembly.GetName().Name))
-                .ToArray();
+            if (assembly.IsAppCodeAssembly() || assembly.IsGlobalAsaxAssembly())
+                return EmptyAssemblies;
+
+
+            // find all assembly references that are referencing the current type's assembly since we
+            // should only be scanning those assemblies because any other assembly will definitely not
+            // contain sub type's of the one we're currently looking for
+            var name = assembly.GetName().Name;
+            return assemblies.Where(x => x == assembly || HasReference(x, name)).ToArray();
         }
 
 	    /// <summary>
-	    /// checks if the assembly has a reference with the same name as the expected assembly name.
+	    /// Determines if an assembly references another assembly.
 	    /// </summary>
 	    /// <param name="assembly"></param>
-	    /// <param name="expectedAssemblyName"></param>
+	    /// <param name="name"></param>
 	    /// <returns></returns>
-        private static bool HasReferenceToAssemblyWithName(Assembly assembly, string expectedAssemblyName)
-        {           
-            return assembly
-                .GetReferencedAssemblies()                
-                .Select(a => a.Name)
-                .Contains(expectedAssemblyName, StringComparer.Ordinal);
+        public static bool HasReference(Assembly assembly, string name)
+        {
+            // ReSharper disable once LoopCanBeConvertedToQuery - no!
+            foreach (var a in assembly.GetReferencedAssemblies())
+            {
+                if (string.Equals(a.Name, name, StringComparison.Ordinal)) return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -106,13 +146,10 @@ namespace Umbraco.Core
         public static Attempt<Type> GetLowestBaseType(params Type[] types)
 	    {
 	        if (types.Length == 0)
-	        {
 	            return Attempt<Type>.Fail();
-	        }
-	        if (types.Length == 1)
-	        {
+
+            if (types.Length == 1)
                 return Attempt.Succeed(types[0]);
-	        }
 
 	        foreach (var curr in types)
 	        {
@@ -196,20 +233,15 @@ namespace Umbraco.Core
 		/// <param name="includeIndexed"></param>
 		/// <param name="caseSensitive"> </param>
 		/// <returns></returns>
-		public static PropertyInfo GetProperty(Type type, string name, 
-			bool mustRead = true, 
-			bool mustWrite = true, 
+		public static PropertyInfo GetProperty(Type type, string name,
+			bool mustRead = true,
+			bool mustWrite = true,
 			bool includeIndexed = false,
 			bool caseSensitive = true)
 		{
-			return CachedDiscoverableProperties(type, mustRead, mustWrite, includeIndexed)
-				.FirstOrDefault(x =>
-					{
-						if (caseSensitive)
-							return x.Name == name;
-						return x.Name.InvariantEquals(name);
-					});
-		}        
+            return CachedDiscoverableProperties(type, mustRead, mustWrite, includeIndexed)
+		        .FirstOrDefault(x => caseSensitive ? (x.Name == name) : x.Name.InvariantEquals(name));
+        }
 
 		/// <summary>
 		/// Gets (and caches) <see cref="FieldInfo"/> discoverable in the current <see cref="AppDomain"/> for a given <paramref name="type"/>.
@@ -222,7 +254,7 @@ namespace Umbraco.Core
 				type,
 				x => type
 				     	.GetFields(BindingFlags.Public | BindingFlags.Instance)
-				     	.Where(y => !y.IsInitOnly)
+				     	.Where(y => y.IsInitOnly == false)
 				     	.ToArray());
 		}
 
@@ -240,12 +272,11 @@ namespace Umbraco.Core
 				new Tuple<Type, bool, bool, bool>(type, mustRead, mustWrite, includeIndexed),
 				x => type
 				     	.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-				     	.Where(y => (!mustRead || y.CanRead)
-				     	            && (!mustWrite || y.CanWrite)
-				     	            && (includeIndexed || !y.GetIndexParameters().Any()))
+				     	.Where(y => (mustRead == false || y.CanRead)
+				     	            && (mustWrite == false || y.CanWrite)
+				     	            && (includeIndexed || y.GetIndexParameters().Any() == false))
 				     	.ToArray());
 		}
-
 
         #region Match Type
 
@@ -337,9 +368,9 @@ namespace Umbraco.Core
 
             // not a generic type, not a generic parameter
             // so normal class or interface
-            // fixme structs? enums? array types?
             // about primitive types, value types, etc:
             // http://stackoverflow.com/questions/1827425/how-to-check-programatically-if-a-type-is-a-struct-or-a-class
+            // if it's a primitive type... it needs to be ==
 
             if (implementation == contract) return true;
             if (contract.IsClass && implementation.IsClass && implementation.IsSubclassOf(contract)) return true;

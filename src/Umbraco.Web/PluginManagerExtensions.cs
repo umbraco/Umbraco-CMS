@@ -9,6 +9,7 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using umbraco;
 using umbraco.interfaces;
+using Umbraco.Web.Search;
 
 namespace Umbraco.Web
 {
@@ -48,12 +49,22 @@ namespace Umbraco.Web
 			return resolver.ResolveTypes<ITree>();
 		}
 
-		/// <summary>
-		/// Returns all classes attributed with RestExtensionAttribute attribute
-		/// </summary>
-		/// <param name="resolver"></param>
-		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveRestExtensions(this PluginManager resolver)
+	    /// <summary>
+	    /// Returns all available <see cref="ISearchableTree"/> in application
+	    /// </summary>
+	    /// <param name="resolver"></param>
+	    /// <returns></returns>
+	    internal static IEnumerable<Type> ResolveSearchableTrees(this PluginManager resolver)
+	    {
+	        return resolver.ResolveTypes<ISearchableTree>();
+	    }
+
+        /// <summary>
+        /// Returns all classes attributed with RestExtensionAttribute attribute
+        /// </summary>
+        /// <param name="resolver"></param>
+        /// <returns></returns>
+        internal static IEnumerable<Type> ResolveRestExtensions(this PluginManager resolver)
 		{
 			return resolver.ResolveAttributedTypes<Umbraco.Web.BaseRest.RestExtensionAttribute>();
 		}

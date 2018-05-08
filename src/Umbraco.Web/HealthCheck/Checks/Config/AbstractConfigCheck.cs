@@ -7,7 +7,6 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.Config
 {
-
     public abstract class AbstractConfigCheck : HealthCheck
     {
         private readonly ConfigurationService _configurationService;
@@ -43,10 +42,18 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
         /// </summary>
         public abstract ValueComparisonType ValueComparisonType { get; }
 
+        /// <summary>
+        /// Gets the flag indicating if the check is considered successful if the config value is missing (defaults to false - an error - if missing)
+        /// </summary>
+        public virtual bool ValidIfConfigMissing
+        {
+            get { return false; }
+        }
+
         protected AbstractConfigCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
             _textService = healthCheckContext.ApplicationContext.Services.TextService;
-            _configurationService = new ConfigurationService(AbsoluteFilePath, XPath);
+            _configurationService = new ConfigurationService(AbsoluteFilePath, XPath, _textService);
         }
 
         /// <summary>
@@ -132,20 +139,29 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
 
         public override IEnumerable<HealthCheckStatus> GetStatus()
         {
+            var successMessage = string.Format(CheckSuccessMessage, FileName, XPath, Values);
+
             var configValue = _configurationService.GetConfigurationValue();
             if (configValue.Success == false)
             {
-                var message = configValue.Result;
-                return new[] { new HealthCheckStatus(message) { ResultType = StatusResultType.Error } };
+                if (ValidIfConfigMissing)
+                {
+                    return new[] { new HealthCheckStatus(successMessage) { ResultType = StatusResultType.Success } };
+                }
+
+                var errorMessage = configValue.Result;
+                return new[] { new HealthCheckStatus(errorMessage) { ResultType = StatusResultType.Error } };
             }
 
             CurrentValue = configValue.Result;
 
+            // need to update the successMessage with the CurrentValue
+            successMessage = string.Format(CheckSuccessMessage, FileName, XPath, Values, CurrentValue);
+
             var valueFound = Values.Any(value => string.Equals(CurrentValue, value.Value, StringComparison.InvariantCultureIgnoreCase));
             if (ValueComparisonType == ValueComparisonType.ShouldEqual && valueFound || ValueComparisonType == ValueComparisonType.ShouldNotEqual && valueFound == false)
             {
-                var message = string.Format(CheckSuccessMessage, FileName, XPath, Values, CurrentValue);
-                return new[] { new HealthCheckStatus(message) { ResultType = StatusResultType.Success } };
+                return new[] { new HealthCheckStatus(successMessage) { ResultType = StatusResultType.Success } };
             }
 
             // Declare the action for rectifying the config value

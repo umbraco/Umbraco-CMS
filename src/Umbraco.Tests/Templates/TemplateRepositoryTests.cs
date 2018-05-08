@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Templates
     [TestFixture]
     public class TemplateRepositoryTests
     {
-        private readonly Mock<IDatabaseUnitOfWork> _unitOfWorkMock = new Mock<IDatabaseUnitOfWork>();
+        private readonly Mock<IScopeUnitOfWork> _unitOfWorkMock = new Mock<IScopeUnitOfWork>();
         private readonly Mock<CacheHelper> _cacheMock = new Mock<CacheHelper>();
         private TemplateRepository _templateRepository;
         private readonly Mock<IFileSystem> _viewFileSystemMock = new Mock<IFileSystem>();

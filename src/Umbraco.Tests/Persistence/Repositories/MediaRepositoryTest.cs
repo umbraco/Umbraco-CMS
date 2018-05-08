@@ -5,6 +5,7 @@ using System.Xml.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -35,12 +36,60 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData();
         }
 
-        private MediaRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MediaTypeRepository mediaTypeRepository)
+        private MediaRepository CreateRepository(IScopeUnitOfWork unitOfWork, out MediaTypeRepository mediaTypeRepository, CacheHelper cacheHelper = null)
         {
-            mediaTypeRepository = new MediaTypeRepository(unitOfWork, CacheHelper, Mock.Of<ILogger>(), SqlSyntax);
-            var tagRepository = new TagRepository(unitOfWork, CacheHelper, Mock.Of<ILogger>(), SqlSyntax);
-            var repository = new MediaRepository(unitOfWork, CacheHelper, Mock.Of<ILogger>(), SqlSyntax, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>());
+            cacheHelper = cacheHelper ?? CacheHelper;
+
+            mediaTypeRepository = new MediaTypeRepository(unitOfWork, cacheHelper, Mock.Of<ILogger>(), SqlSyntax);
+            var tagRepository = new TagRepository(unitOfWork, cacheHelper, Mock.Of<ILogger>(), SqlSyntax);
+            var repository = new MediaRepository(unitOfWork, cacheHelper, Mock.Of<ILogger>(), SqlSyntax, mediaTypeRepository, tagRepository, Mock.Of<IContentSection>());
             return repository;
+        }
+
+        [Test]
+        public void Cache_Active_By_Int_And_Guid()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider(Logger);
+            var unitOfWork = provider.GetUnitOfWork();
+            MediaTypeRepository mediaTypeRepository;
+
+            var realCache = new CacheHelper(
+                new ObjectCacheRuntimeCacheProvider(),
+                new StaticCacheProvider(),
+                new StaticCacheProvider(),
+                new IsolatedRuntimeCache(t => new ObjectCacheRuntimeCacheProvider()));
+
+            using (var repository = CreateRepository(unitOfWork, out mediaTypeRepository, cacheHelper: realCache))
+            {
+                DatabaseContext.Database.DisableSqlCount();
+
+                var mediaType = MockedContentTypes.CreateSimpleMediaType("umbTextpage1", "Textpage");
+                var media = MockedMedia.CreateSimpleMedia(mediaType, "hello", -1);
+                mediaTypeRepository.AddOrUpdate(mediaType);
+                repository.AddOrUpdate(media);
+                unitOfWork.Commit();
+
+                DatabaseContext.Database.EnableSqlCount();
+
+                //go get it, this should already be cached since the default repository key is the INT
+                var found = repository.Get(media.Id);
+                Assert.AreEqual(0, DatabaseContext.Database.SqlCount);
+                //retrieve again, this should use cache
+                found = repository.Get(media.Id);
+                Assert.AreEqual(0, DatabaseContext.Database.SqlCount);
+
+                //reset counter
+                DatabaseContext.Database.DisableSqlCount();
+                DatabaseContext.Database.EnableSqlCount();
+
+                //now get by GUID, this won't be cached yet because the default repo key is not a GUID 
+                found = repository.Get(media.Key);
+                var sqlCount = DatabaseContext.Database.SqlCount;
+                Assert.Greater(sqlCount, 0);
+                //retrieve again, this should use cache now
+                found = repository.Get(media.Key);
+                Assert.AreEqual(sqlCount, DatabaseContext.Database.SqlCount);
+            }
         }
 
         [Test]
@@ -555,8 +604,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var query = Query<IMedia>.Builder.Where(x => x.Level == 2);
+                var filterQuery = Query<IMedia>.Builder.Where(x => x.Name.Contains("File"));
+
                 long totalRecords;
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true, "File");
+                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true, filterQuery);
 
                 // Assert
                 Assert.That(totalRecords, Is.EqualTo(1));
@@ -576,8 +627,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 // Act
                 var query = Query<IMedia>.Builder.Where(x => x.Level == 2);
+                var filterQuery = Query<IMedia>.Builder.Where(x => x.Name.Contains("Test"));
+
                 long totalRecords;
-                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true, "Test");
+                var result = repository.GetPagedResultsByQuery(query, 0, 1, out totalRecords, "SortOrder", Direction.Ascending, true, filterQuery);
 
                 // Assert
                 Assert.That(totalRecords, Is.EqualTo(2));
@@ -620,6 +673,16 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var medias = repository.GetAll();
 
                 // Assert
+                Assert.That(medias, Is.Not.Null);
+                Assert.That(medias.Any(), Is.True);
+                Assert.That(medias.Count(), Is.GreaterThanOrEqualTo(3));
+
+                medias = repository.GetAll(medias.Select(x => x.Id).ToArray());
+                Assert.That(medias, Is.Not.Null);
+                Assert.That(medias.Any(), Is.True);
+                Assert.That(medias.Count(), Is.GreaterThanOrEqualTo(3));
+
+                medias = ((IReadRepository<Guid, IMedia>)repository).GetAll(medias.Select(x => x.Key).ToArray());
                 Assert.That(medias, Is.Not.Null);
                 Assert.That(medias.Any(), Is.True);
                 Assert.That(medias.Count(), Is.GreaterThanOrEqualTo(3));

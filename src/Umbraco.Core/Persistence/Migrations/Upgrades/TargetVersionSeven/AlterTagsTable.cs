@@ -8,7 +8,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
-    [Migration("7.0.0", 9, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.0.0", 9, Constants.System.UmbracoMigrationName)]
     public class AlterTagsTable : MigrationBase
     {
         public AlterTagsTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)

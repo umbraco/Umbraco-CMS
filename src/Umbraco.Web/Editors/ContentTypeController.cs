@@ -103,19 +103,24 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Gets all the standard fields.
+        /// </summary>
+        /// <returns></returns>
+        [UmbracoTreeAuthorize(
+            Constants.Trees.DocumentTypes, Constants.Trees.Content,
+            Constants.Trees.MediaTypes, Constants.Trees.Media,
+            Constants.Trees.MemberTypes, Constants.Trees.Members)]
+        public IEnumerable<string> GetAllStandardFields()
+        {
+            string[] preValuesSource = { "createDate", "creatorName", "level", "nodeType", "nodeTypeAlias", "pageID", "pageName", "parentID", "path", "template", "updateDate", "writerID", "writerName" };
+            return preValuesSource;
+        }
+
+        /// <summary>
         /// Returns the avilable compositions for this content type
         /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
         /// </summary>
-        /// <param name="contentTypeId"></param>
-        /// <param name="filterContentTypes">
-        /// This is normally an empty list but if additional content type aliases are passed in, any content types containing those aliases will be filtered out
-        /// along with any content types that have matching property types that are included in the filtered content types
-        /// </param>
-        /// <param name="filterPropertyTypes">
-        /// This is normally an empty list but if additional property type aliases are passed in, any content types that have these aliases will be filtered out.
-        /// This is required because in the case of creating/modifying a content type because new property types being added to it are not yet persisted so cannot
-        /// be looked up via the db, they need to be passed in.
-        /// </param>
+        /// <param name="filter"></param>
         /// <returns></returns>
         [HttpPost]
         public HttpResponseMessage GetAvailableCompositeContentTypes(GetAvailableCompositionsFilter filter)
@@ -171,6 +176,15 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage PostCreateContainer(int parentId, string name)
         {
             var result = Services.ContentTypeService.CreateContentTypeContainer(parentId, name, Security.CurrentUser.Id);
+
+            return result
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
+                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+        }
+
+        public HttpResponseMessage PostRenameContainer(int id, string name)
+        {
+            var result = Services.ContentTypeService.RenameContentTypeContainer(id, name, Security.CurrentUser.Id);
 
             return result
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
@@ -297,6 +311,17 @@ namespace Umbraco.Web.Editors
             {
                 basic.Name = localizedTextService.UmbracoDictionaryTranslate(basic.Name);
                 basic.Description = localizedTextService.UmbracoDictionaryTranslate(basic.Description);
+            }
+
+            //map the blueprints
+            var blueprints = Services.ContentService.GetBlueprintsForContentTypes(types.Select(x => x.Id).ToArray()).ToArray();
+            foreach (var basic in basics)
+            {
+                var docTypeBluePrints = blueprints.Where(x => x.ContentTypeId == (int) basic.Id).ToArray();
+                foreach (var blueprint in docTypeBluePrints)
+                {
+                    basic.Blueprints[blueprint.Id] = blueprint.Name;
+                }
             }
 
             return basics;

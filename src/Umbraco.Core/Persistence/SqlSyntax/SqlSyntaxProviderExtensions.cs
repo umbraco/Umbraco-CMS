@@ -1,7 +1,23 @@
-﻿namespace Umbraco.Core.Persistence.SqlSyntax
+﻿using System.Collections.Generic;
+using System.Linq;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+
+namespace Umbraco.Core.Persistence.SqlSyntax
 {
     internal static class SqlSyntaxProviderExtensions
     {
+        public static IEnumerable<DbIndexDefinition> GetDefinedIndexesDefinitions(this ISqlSyntaxProvider sql, Database db)
+        {
+            return sql.GetDefinedIndexes(db)
+                .Select(x => new DbIndexDefinition()
+                {
+                    TableName = x.Item1,
+                    IndexName = x.Item2,
+                    ColumnName = x.Item3,
+                    IsUnique = x.Item4
+                }).ToArray();
+        }
+
         /// <summary>
         /// Returns the quotes tableName.columnName combo
         /// </summary>

@@ -25,6 +25,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
+using Umbraco.Core.Media;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -38,7 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         internal static bool ThrowOnWarning = false;
 
-        protected VersionableRepositoryBase(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentSection contentSection)
+        protected VersionableRepositoryBase(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, IContentSection contentSection)
             : base(work, cache, logger, sqlSyntax)
         {
             _contentSection = contentSection;
@@ -51,25 +52,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="id">Id of the <see cref="TEntity"/> to retrieve versions from</param>
         /// <returns>An enumerable list of the same <see cref="TEntity"/> object with different versions</returns>
-        public virtual IEnumerable<TEntity> GetAllVersions(int id)
-        {
-            var sql = new Sql();
-            sql.Select("*")
-                .From<ContentVersionDto>(SqlSyntax)
-                .InnerJoin<ContentDto>(SqlSyntax)
-                .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .InnerJoin<NodeDto>(SqlSyntax)
-                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                .Where<NodeDto>(x => x.NodeId == id)
-                .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
-
-            var dtos = Database.Fetch<ContentVersionDto, ContentDto, NodeDto>(sql);
-            foreach (var dto in dtos)
-            {
-                yield return GetByVersion(dto.VersionId);
-            }
-        }
+        public abstract IEnumerable<TEntity> GetAllVersions(int id);
 
         /// <summary>
         /// Gets a list of all version Ids for the given content item ordered so latest is first
@@ -663,9 +646,7 @@ ORDER BY contentNodeId, versionId, propertytypeid
 
                             var preVals = new PreValueCollection(asDictionary);
 
-                            var contentPropData = new ContentPropertyData(property.Value,
-                                preVals,
-                                new Dictionary<string, object>());
+                            var contentPropData = new ContentPropertyData(property.Value, preVals);
 
                             TagExtractor.SetPropertyTags(property, contentPropData, property.Value, tagSupport);
                         }
@@ -706,8 +687,8 @@ ORDER BY contentNodeId, versionId, propertytypeid
                 case "NAME":
                     return "umbracoNode.text";
                 case "PUBLISHED":
-                case "OWNER":
                     return "cmsDocument.published";
+                case "OWNER":
                     //TODO: This isn't going to work very nicely because it's going to order by ID, not by letter
                     return "umbracoNode.nodeUser";
                 // Members only
@@ -751,7 +732,7 @@ ORDER BY contentNodeId, versionId, propertytypeid
 
             var allsuccess = true;
 
-            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+            var fs = FileSystemProviderManager.Current.MediaFileSystem;
             Parallel.ForEach(files, file =>
             {
                 try

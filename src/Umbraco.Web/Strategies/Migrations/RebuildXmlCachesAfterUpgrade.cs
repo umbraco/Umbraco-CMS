@@ -23,7 +23,7 @@ namespace Umbraco.Web.Strategies.Migrations
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {
-            if (e.ProductName != GlobalSettings.UmbracoMigrationName) return;
+            if (e.ProductName != Constants.System.UmbracoMigrationName) return;
 
             var v730 = new Semver.SemVersion(new Version(7, 3, 0));
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Umbraco.Core.Models;
+using Umbraco.Web.PublishedCache.XmlPublishedCache;
 
 namespace Umbraco.Web.PublishedCache
 {
@@ -19,5 +20,13 @@ namespace Umbraco.Web.PublishedCache
         internal ContextualPublishedMediaCache(IPublishedMediaCache cache, UmbracoContext umbracoContext)
             : base(umbracoContext, cache)
         { }
+
+        public override IPublishedContent GetById(bool preview, Guid contentKey)
+        {
+            if (InnerCache is PublishedMediaCache cc)
+                return cc.GetById(UmbracoContext, preview, contentKey);
+
+            return base.GetById(preview, contentKey);
+        }
     }
 }

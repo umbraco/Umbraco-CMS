@@ -92,6 +92,16 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                'Failed to retrieve property type aliases');
         },
 
+        getAllStandardFields: function () {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentTypeApiBaseUrl",
+                       "GetAllStandardFields")),
+               'Failed to retrieve standard fields');
+        },
+
         getPropertyTypeScaffold : function (id) {
               return umbRequestHelper.resourcePromise(
                $http.get(
@@ -255,6 +265,17 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
             return umbRequestHelper.resourcePromise(
                  $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateContainer", { parentId: parentId, name: name })),
                 'Failed to create a folder under parent id ' + parentId);
+
+        },
+
+        renameContainer: function(id, name) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl",
+                    "PostRenameContainer",
+                    { id: id, name: name })),
+                "Failed to rename the folder with id " + id
+            );
 
         }
 

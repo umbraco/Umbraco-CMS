@@ -18,6 +18,8 @@ using Umbraco.Web;
 using Umbraco.Web.Models.Mapping;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -42,7 +44,7 @@ namespace Umbraco.Tests.TestHelpers
 
             TestHelper.InitializeContentDirectories();
 
-            SetupCacheHelper();
+            CacheHelper = CreateCacheHelper();
 
             InitializeLegacyMappingsForCoreEditors();
 
@@ -50,7 +52,10 @@ namespace Umbraco.Tests.TestHelpers
 
             SetupApplicationContext();
 
-            InitializeMappers();
+            if (GetType().GetCustomAttribute<RequiresAutoMapperMappingsAttribute>(false) != null)
+            {
+                InitializeMappers(ApplicationContext);
+            }            
 
             FreezeResolution();
 
@@ -60,7 +65,7 @@ namespace Umbraco.Tests.TestHelpers
         public override void TearDown()
         {
             base.TearDown();
-            
+
             // reset settings
             SettingsForTests.Reset();
             UmbracoContext.Current = null;
@@ -96,34 +101,22 @@ namespace Umbraco.Tests.TestHelpers
         /// This is an opt-in option because initializing the mappers takes about 500ms which equates to quite a lot
         /// of time with every test.
         /// </remarks>
-        private void InitializeMappers()
+        protected virtual void InitializeMappers(ApplicationContext applicationContext)
         {
-            if (GetType().GetCustomAttribute<RequiresAutoMapperMappingsAttribute>(false) != null)
+            Mapper.Initialize(configuration =>
             {
-                Mapper.Initialize(configuration =>
-                {
-                    var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>(
-                        specificAssemblies: new[]
-                        {
-                            typeof(ContentModelMapper).Assembly,
-                            typeof(ApplicationRegistrar).Assembly
-                        });
-                    foreach (var mapper in mappers)
+                var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>(
+                    specificAssemblies: new[]
                     {
-                        mapper.ConfigureMappings(configuration, ApplicationContext);
-                    }
-                });
-            }
-        }
-
-        /// <summary>
-        /// By default this returns false which means the plugin manager will not be reset so it doesn't need to re-scan 
-        /// all of the assemblies. Inheritors can override this if plugin manager resetting is required, generally needs
-        /// to be set to true if the SetupPluginManager has been overridden.
-        /// </summary>
-        protected virtual bool PluginManagerResetRequired
-        {
-            get { return false; }
+                        typeof(ApplicationContext).Assembly,    //Umbraco.Core
+                        typeof(ContentModelMapper).Assembly,    //Umbraco.Web
+                        typeof(ApplicationRegistrar).Assembly   //umbraco.businesslogic
+                    });
+                foreach (var mapper in mappers)
+                {
+                    mapper.ConfigureMappings(configuration, applicationContext);
+                }
+            });            
         }
 
         /// <summary>
@@ -131,15 +124,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void ResetPluginManager()
         {
-            if (PluginManagerResetRequired)
-            {
-                PluginManager.Current = null;
-            }
-        }
-
-        protected virtual void SetupCacheHelper()
-        {
-            CacheHelper = CreateCacheHelper();
+            PluginManager.Current = null;
         }
 
         protected virtual CacheHelper CreateCacheHelper()
@@ -154,6 +139,11 @@ namespace Umbraco.Tests.TestHelpers
         {
             var applicationContext = CreateApplicationContext();
             ApplicationContext.Current = applicationContext;
+
+            // FileSystemProviderManager captures the current ApplicationContext ScopeProvider
+            // in its current static instance (yea...) so we need to reset it here to ensure
+            // it is using the proper ScopeProvider
+            FileSystemProviderManager.ResetCurrent();
         }
 
         protected virtual ApplicationContext CreateApplicationContext()
@@ -161,17 +151,20 @@ namespace Umbraco.Tests.TestHelpers
             var sqlSyntax = new SqlCeSyntaxProvider();
             var repoFactory = new RepositoryFactory(CacheHelper, Logger, sqlSyntax, SettingsForTests.GenerateMockSettings());
 
+            var dbFactory = new DefaultDatabaseFactory(Constants.System.UmbracoConnectionName, Logger);
+            var scopeProvider = new ScopeProvider(dbFactory);
             var evtMsgs = new TransientMessagesFactory();
             var applicationContext = new ApplicationContext(
                 //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory(Core.Configuration.GlobalSettings.UmbracoConnectionName, Logger), Logger, sqlSyntax, Constants.DatabaseProviders.SqlCe),
+                new DatabaseContext(scopeProvider, Logger, sqlSyntax, Constants.DatabaseProviders.SqlCe),
                 //assign the service context
-                new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(Logger), new FileUnitOfWorkProvider(), new PublishingStrategy(evtMsgs, Logger), CacheHelper, Logger, evtMsgs),
+                new ServiceContext(repoFactory, new PetaPocoUnitOfWorkProvider(scopeProvider), CacheHelper, Logger, evtMsgs),
                 CacheHelper,
                 ProfilingLogger)
             {
                 IsReady = true
             };
+
             return applicationContext;
         }
 
@@ -180,26 +173,23 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void SetupPluginManager()
         {
-            if (PluginManager.Current == null || PluginManagerResetRequired)
+            PluginManager.Current = new PluginManager(
+                new ActivatorServiceProvider(),
+                CacheHelper.RuntimeCache, ProfilingLogger, false)
             {
-                PluginManager.Current = new PluginManager(
-                    new ActivatorServiceProvider(),
-                    CacheHelper.RuntimeCache, ProfilingLogger, false)
+                AssembliesToScan = new[]
                 {
-                    AssembliesToScan = new[]
-                    {
-                        Assembly.Load("Umbraco.Core"),
-                        Assembly.Load("umbraco"),
-                        Assembly.Load("Umbraco.Tests"),
-                        Assembly.Load("businesslogic"),
-                        Assembly.Load("cms"),
-                        Assembly.Load("controls"),
-                        Assembly.Load("umbraco.editorControls"),
-                        Assembly.Load("umbraco.MacroEngines"),
-                        Assembly.Load("umbraco.providers"),
-                    }
-                };
-            }
+                    Assembly.Load("Umbraco.Core"),
+                    Assembly.Load("umbraco"),
+                    Assembly.Load("Umbraco.Tests"),
+                    Assembly.Load("businesslogic"),
+                    Assembly.Load("cms"),
+                    Assembly.Load("controls"),
+                    Assembly.Load("umbraco.editorControls"),
+                    Assembly.Load("umbraco.MacroEngines"),
+                    Assembly.Load("umbraco.providers"),
+                }
+            };
         }
 
         /// <summary>
@@ -208,6 +198,11 @@ namespace Umbraco.Tests.TestHelpers
         protected virtual void FreezeResolution()
         {
             Resolution.Freeze();
+        }
+
+        protected ServiceContext ServiceContext
+        {
+            get { return ApplicationContext.Services; }
         }
 
         protected ApplicationContext ApplicationContext

@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web.Mvc;
-using System.Web.Routing;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Web
@@ -38,6 +37,7 @@ namespace Umbraco.Web
         private MembershipHelper _membershipHelper;
         private TagQuery _tag;
         private IDataTypeService _dataTypeService;
+        private IEntityService _entityService;
         private UrlProvider _urlProvider;
         private ICultureDictionary _cultureDictionary;
 
@@ -111,6 +111,14 @@ namespace Umbraco.Web
         public IDataTypeService DataTypeService
         {
             get { return _dataTypeService ?? (_dataTypeService = UmbracoContext.Application.Services.DataTypeService); }
+        }
+
+        /// <summary>
+        /// Lazy instantiates the IEntityService
+        /// </summary>
+        private IEntityService EntityService
+        {
+            get { return _entityService ?? (_entityService = UmbracoContext.Application.Services.EntityService); }
         }
 
         /// <summary>
@@ -425,7 +433,7 @@ namespace Umbraco.Web
         /// <returns>True if the document object is protected</returns>
         public bool IsProtected(string path)
         {
-            return UmbracoContext.Application.Services.PublicAccessService.IsProtected(path);
+            return MembershipHelper.IsProtected(path);
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
@@ -442,25 +450,7 @@ namespace Umbraco.Web
         /// <returns>True if the current user has access or if the current document isn't protected</returns>
         public bool MemberHasAccess(string path)
         {
-            if (IsProtected(path))
-            {
-                return MembershipHelper.IsLoggedIn()
-                       && UmbracoContext.Application.Services.PublicAccessService.HasAccess(path, GetCurrentMember(), Roles.Provider);
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Gets (or adds) the current member from the current request cache
-        /// </summary>
-        private MembershipUser GetCurrentMember()
-        {
-            return UmbracoContext.Application.ApplicationCache.RequestCache
-                .GetCacheItem<MembershipUser>("UmbracoHelper.GetCurrentMember", () =>
-                {
-                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
-                    return provider.GetCurrentUser();
-                });
+            return MembershipHelper.MemberHasAccess(path);
         }
 
 		/// <summary>
@@ -529,14 +519,34 @@ namespace Umbraco.Web
             return UrlProvider.GetUrl(contentId, true);
         }
 
-		#endregion
+        #endregion
 
         #region Members
 
+        public IPublishedContent TypedMember(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null) return null;
+            return TypedMember(guidUdi.Guid);
+        }
+
+        public IPublishedContent TypedMember(Guid id)
+        {
+            return MembershipHelper.GetByProviderKey(id);
+        }
+
         public IPublishedContent TypedMember(object id)
         {
-            var asInt = id.TryConvertTo<int>();
-            return asInt ? MembershipHelper.GetById(asInt.Result) : MembershipHelper.GetByProviderKey(id);
+            int intId;
+            if (ConvertIdObjectToInt(id, out intId))
+                return MembershipHelper.GetById(intId);
+            Guid guidId;
+            if (ConvertIdObjectToGuid(id, out guidId))
+                return TypedMember(guidId);
+            Udi udiId;
+            if (ConvertIdObjectToUdi(id, out udiId))
+                return TypedMember(udiId);
+            return null;
         }
 
         public IPublishedContent TypedMember(int id)
@@ -593,6 +603,9 @@ namespace Umbraco.Web
             Guid guidId;
             if (ConvertIdObjectToGuid(id, out guidId))
                 return ContentQuery.TypedContent(guidId);
+            Udi udiId;
+            if (ConvertIdObjectToUdi(id, out udiId))
+                return ContentQuery.TypedContent(udiId);
             return null;
         }
 
@@ -612,6 +625,16 @@ namespace Umbraco.Web
         /// <param name="id">The key of the content item.</param>
         /// <returns>The content, or null of the content item is not in the cache.</returns>
         public IPublishedContent TypedContent(Guid id)
+        {
+            return ContentQuery.TypedContent(id);
+        }
+
+        /// <summary>
+        /// Gets a content item from the cache
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public IPublishedContent TypedContent(Udi id)
         {
             return ContentQuery.TypedContent(id);
         }
@@ -907,6 +930,22 @@ namespace Umbraco.Web
             return false;
         }
 
+        private static bool ConvertIdObjectToUdi(object id, out Udi guidId)
+        {
+            var s = id as string;
+            if (s != null)
+            {
+                return Udi.TryParse(s, out guidId);
+            }
+            if (id is Udi)
+            {
+                guidId = (Udi)id;
+                return true;
+            }
+            guidId = null;
+            return false;
+        }
+
         private static bool ConvertIdsObjectToInts(IEnumerable<object> ids, out IEnumerable<int> intIds)
         {
             var list = new List<int>();
@@ -939,27 +978,57 @@ namespace Umbraco.Web
             return true;
         }
 
-		#endregion
+        #endregion
 
-		#region Media
+        #region Media
 
-		/// <summary>
-		/// Overloaded method accepting an 'object' type
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass
-		/// this result in to this method.
-		/// This method will throw an exception if the value is not of type int or string.
-		/// </remarks>
-		public IPublishedContent TypedMedia(object id)
-		{
+        public IPublishedContent TypedMedia(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null) return null;
+            return TypedMedia(guidUdi.Guid);
+        }
+
+        public IPublishedContent TypedMedia(Guid id)
+        {
+            //TODO: This is horrible but until the media cache properly supports GUIDs we have no choice here and 
+            // currently there won't be any way to add this method correctly to `ITypedPublishedContentQuery` without breaking an interface and adding GUID support for media
+
+            var entityService = UmbracoContext.Application.Services.EntityService;
+            var mediaAttempt = entityService.GetIdForKey(id, UmbracoObjectTypes.Media);
+            return mediaAttempt.Success ? ContentQuery.TypedMedia(mediaAttempt.Result) : null;
+        }
+
+        /// <summary>
+        /// Overloaded method accepting an 'object' type
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass
+        /// this result in to this method.
+        /// This method will throw an exception if the value is not of type int or string.
+        /// </remarks>
+        public IPublishedContent TypedMedia(object id)
+        {
+            return TypedMediaForObject(id);
+        }
+
+        private IPublishedContent TypedMediaForObject(object id)
+        {
             int intId;
-            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.TypedMedia(intId) : null;
-		}
+            if (ConvertIdObjectToInt(id, out intId))
+                return ContentQuery.TypedMedia(intId);
+            Guid guidId;
+            if (ConvertIdObjectToGuid(id, out guidId))
+                return TypedMedia(guidId);
+            Udi udiId;
+            if (ConvertIdObjectToUdi(id, out udiId))
+                return TypedMedia(udiId);
+            return null;
+        }
 
-		public IPublishedContent TypedMedia(int id)
+        public IPublishedContent TypedMedia(int id)
 		{
             return ContentQuery.TypedMedia(id);
 		}
@@ -1192,22 +1261,51 @@ namespace Umbraco.Web
             return ContentQuery.TypedSearch(term, useWildCards, searchProvider);
 		}
 
-		/// <summary>
-		/// Searhes content
+        /// <summary>
+		/// Searches content
 		/// </summary>
-		/// <param name="criteria"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="totalRecords"></param>
+		/// <param name="term"></param>
+		/// <param name="useWildCards"></param>
 		/// <param name="searchProvider"></param>
 		/// <returns></returns>
-		public IEnumerable<IPublishedContent> TypedSearch(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+		public IEnumerable<IPublishedContent> TypedSearch(int skip, int take, out int totalRecords, string term, bool useWildCards = true, string searchProvider = null)
+        {
+            return ContentQuery.TypedSearch(skip, take, out totalRecords, term, useWildCards, searchProvider);
+        }
+
+        /// <summary>
+        /// Searhes content
+        /// </summary>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="criteria"></param>
+        /// <param name="searchProvider"></param>
+        /// <returns></returns>
+        public IEnumerable<IPublishedContent> TypedSearch(int skip, int take, out int totalRecords, Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
 		{
-            return ContentQuery.TypedSearch(criteria, searchProvider);
+            return ContentQuery.TypedSearch(skip, take, out totalRecords, criteria, searchProvider);
 		}
 
-		#endregion
+        /// <summary>
+        /// Searhes content
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <param name="searchProvider"></param>
+        /// <returns></returns>
+        public IEnumerable<IPublishedContent> TypedSearch(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        {
+            return ContentQuery.TypedSearch(criteria, searchProvider);
+        }
 
-		#region Xml
+        #endregion
 
-		public dynamic ToDynamicXml(string xml)
+        #region Xml
+
+        public dynamic ToDynamicXml(string xml)
 		{
 			if (string.IsNullOrWhiteSpace(xml)) return null;
 			var xElement = XElement.Parse(xml);
@@ -1238,20 +1336,33 @@ namespace Umbraco.Web
             return _stringUtilities.ReplaceLineBreaksForHtml(text);
 		}
 
-		/// <summary>
-		/// Returns an MD5 hash of the string specified
-		/// </summary>
-		/// <param name="text">The text to create a hash from</param>
-		/// <returns>Md5 has of the string</returns>
-		public string CreateMd5Hash(string text)
-		{
-			return text.ToMd5();
-		}
+        /// <summary>
+        /// Returns an MD5 hash of the string specified
+        /// </summary>
+        /// <param name="text">The text to create a hash from</param>
+        /// <returns>Md5 hash of the string</returns>
+        [Obsolete("Please use the CreateHash method instead. This may be removed in future versions")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public string CreateMd5Hash(string text)
+        {
+            return text.ToMd5();
+        }
 
-		/// <summary>
-		/// Strips all html tags from a given string, all contents of the tags will remain.
-		/// </summary>
-		public HtmlString StripHtml(IHtmlString html, params string[] tags)
+        /// <summary>
+        /// Generates a hash based on the text string passed in.  This method will detect the 
+        /// security requirements (is FIPS enabled) and return an appropriate hash.
+        /// </summary>
+        /// <param name="text">The text to create a hash from</param>
+        /// <returns>Hash of the text string</returns>
+        public string CreateHash(string text)
+        {
+            return text.GenerateHash();
+        }
+
+        /// <summary>
+        /// Strips all html tags from a given string, all contents of the tags will remain.
+        /// </summary>
+        public HtmlString StripHtml(IHtmlString html, params string[] tags)
 		{
 			return StripHtml(html.ToHtmlString(), tags);
 		}
@@ -1366,17 +1477,57 @@ namespace Umbraco.Web
 		public IHtmlString Truncate(string html, int length, bool addElipsis, bool treatTagsAsContent)
 		{
             return _stringUtilities.Truncate(html, length, addElipsis, treatTagsAsContent);
-		}
+        }
+        #region Truncate by Words
 
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(string html, int words)
+        {
+            int length = _stringUtilities.WordsToLength(html, words);
 
-		#endregion
+            return Truncate(html, length, true, false);
+        }
 
-		#region If
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(string html, int words, bool addElipsis)
+        {
+            int length = _stringUtilities.WordsToLength(html, words);
 
-		/// <summary>
-		/// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
-		/// </summary>
-		public HtmlString If(bool test, string valueIfTrue, string valueIfFalse)
+            return Truncate(html, length, addElipsis, false);
+        }
+
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(IHtmlString html, int words)
+        {
+            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words);
+
+            return Truncate(html, length, true, false);
+        }
+
+        /// <summary>
+        /// Truncates a string to a given amount of words, can add a elipsis at the end (...). Method checks for open html tags, and makes sure to close them
+        /// </summary>
+        public IHtmlString TruncateByWords(IHtmlString html, int words, bool addElipsis)
+        {
+            int length = _stringUtilities.WordsToLength(html.ToHtmlString(), words);
+
+            return Truncate(html, length, addElipsis, false);
+        }
+        #endregion
+        #endregion
+
+        #region If
+
+        /// <summary>
+        /// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
+        /// </summary>
+        public HtmlString If(bool test, string valueIfTrue, string valueIfFalse)
 		{
 			return test ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
 		}
@@ -1389,10 +1540,15 @@ namespace Umbraco.Web
 			return test ? new HtmlString(valueIfTrue) : new HtmlString(string.Empty);
 		}
 
-		#endregion
+        #endregion
 
         #region Prevalues
 
+        /// <summary>
+        /// Gets a specific PreValue by its Id
+        /// </summary>
+        /// <param name="id">Id of the PreValue to retrieve the value from</param>
+        /// <returns>PreValue as a string</returns>
         public string GetPreValueAsString(int id)
         {
             return DataTypeService.GetPreValueAsString(id);
@@ -1484,5 +1640,10 @@ namespace Umbraco.Web
             return surfaceRouteParams.EncryptWithMachineKey();
         }
 
+        public int GetIdForUdi(Udi udi)
+        {
+            var udiToIdAttempt = EntityService.GetIdForUdi(udi);
+            return udiToIdAttempt.Success ? udiToIdAttempt.Result : -1;
+        }
 	}
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Reflection;
-using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Running;
 
 namespace Umbraco.Tests.Benchmarks
 {
@@ -8,17 +6,7 @@ namespace Umbraco.Tests.Benchmarks
     {
         public static void Main(string[] args)
         {
-            var switcher = new BenchmarkSwitcher(new[]
-            {
-                typeof(BulkInsertBenchmarks),
-                typeof(ModelToSqlExpressionHelperBenchmarks),
-                typeof(XmlBenchmarks),
-                typeof(LinqCastBenchmarks),
-                //typeof(DeepCloneBenchmarks),
-                typeof(XmlPublishedContentInitBenchmarks),
-
-            });
-            switcher.Run(args);            
+            new BenchmarkSwitcher(typeof(Program).Assembly).Run(args);
         }
     }
 }

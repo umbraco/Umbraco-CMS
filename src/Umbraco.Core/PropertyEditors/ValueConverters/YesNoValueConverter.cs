@@ -3,6 +3,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
+    [DefaultPropertyValueConverter]
     [PropertyValueType(typeof(bool))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class YesNoValueConverter : PropertyValueConverterBase

@@ -31,15 +31,17 @@
   display: block;
   padding: 4px;
   line-height: @baseLineHeight;
-  border: 1px solid #ddd;
+  border: 1px solid @gray-8;
   .border-radius(@baseBorderRadius);
   .box-shadow(0 1px 3px rgba(0,0,0,.055));
   .transition(all .2s ease-in-out);
 }
-// Add a hover/focus state for linked versions only
-a.thumbnail:hover,
-a.thumbnail:focus {
-  border-color: @linkColor;
+// Add a hover/focus state for linked versions only.
+a.thumbnail:hover, 
+a.thumbnail:focus,
+a div.thumbnail:hover,
+a div.thumbnail:focus {
+  border-color: @turquoise;
   .box-shadow(0 1px 4px rgba(0,105,214,.25));
 }
 

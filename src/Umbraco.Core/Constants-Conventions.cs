@@ -4,13 +4,22 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core
 {
-	public static partial class Constants
+   
+    public static partial class Constants
 	{
 		/// <summary>
 		/// Defines the identifiers for property-type alias conventions that are used within the Umbraco core.
 		/// </summary>
 		public static class Conventions
 		{
+		    internal static class PermissionCategories
+		    {
+		        public const string ContentCategory = "content";
+		        public const string AdministrationCategory = "administration";
+		        public const string StructureCategory = "structure";
+		        public const string OtherCategory = "other";
+		    }
+
 		    public static class PublicAccess
 		    {
                 public const string MemberUsernameRuleType = "MemberUsername";               

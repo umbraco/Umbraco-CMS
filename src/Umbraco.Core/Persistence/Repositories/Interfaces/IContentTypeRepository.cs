@@ -9,6 +9,13 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface IContentTypeRepository : IContentTypeCompositionRepository<IContentType>
     {
         /// <summary>
+        /// Given the path of a content item, this will return true if the content item exists underneath a list view content item
+        /// </summary>
+        /// <param name="contentPath"></param>
+        /// <returns></returns>
+        bool HasContainerInPath(string contentPath);
+
+        /// <summary>
         /// Gets all entities of the specified <see cref="PropertyType"/> query
         /// </summary>
         /// <param name="query"></param>
@@ -40,5 +47,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns>The original alias with a number appended to it, so that it is unique.</returns>
         /// /// <remarks>Unique accross all content, media and member types.</remarks>
         string GetUniqueAlias(string alias);
+
+        IEnumerable<int> GetAllContentTypeIds(string[] aliases);
     }
 }

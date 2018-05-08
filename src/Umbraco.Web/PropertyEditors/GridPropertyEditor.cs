@@ -31,6 +31,8 @@ namespace Umbraco.Web.PropertyEditors
                     {
                         try
                         {
+                            //TODO: We should deserialize this to Umbraco.Core.Models.GridValue instead of doing the below
+
                             var json = JsonConvert.DeserializeObject<JObject>(e.Fields[field.Name]);
 
                             //check if this is formatted for grid json

@@ -48,7 +48,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Services
             var message = string.Empty;
             var success = false;
 
-            var config = WebConfigurationManager.OpenWebConfiguration(HealthCheckContext.HttpContext.Request.ApplicationPath);
+            var config = WebConfigurationManager.OpenWebConfiguration(HealthCheckContext.ApplicationPath);
             var settings = (MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
             if (settings == null)
             {

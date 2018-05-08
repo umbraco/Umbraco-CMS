@@ -1,6 +1,6 @@
 describe('edit media controller tests', function () {
     var scope, controller, routeParams, httpBackend;
-    routeParams = {id: 1234, create: false};
+    routeParams = { id: 1234, create: false };
 
     beforeEach(module('umbraco'));
 
@@ -11,7 +11,7 @@ describe('edit media controller tests', function () {
 
         httpBackend = $httpBackend;
         scope = $rootScope.$new();
-        
+
         //have the contentMocks register its expect urls on the httpbackend
         //see /mocks/content.mocks.js for how its setup
         mediaMocks.register();
@@ -20,7 +20,7 @@ describe('edit media controller tests', function () {
 
         //this controller requires an angular form controller applied to it
         scope.contentForm = angularHelper.getNullForm("contentForm");
-        
+
         controller = $controller('Umbraco.Editors.Media.EditController', {
             $scope: scope,
             $routeParams: routeParams
@@ -37,33 +37,40 @@ describe('edit media controller tests', function () {
     }));
 
     describe('media edit controller save', function () {
-        
-        it('it should have an media object', function() {
+
+        it('it should have an media object', function () {
 
             //controller should have a content object
-            expect(scope.content).toNotBe(undefined);
+            expect(scope.content).not.toBeUndefined();
 
             //if should be the same as the routeParams defined one
             expect(scope.content.id).toBe(1234);
         });
 
         it('it should have a tabs collection', function () {
-          expect(scope.content.tabs.length).toBe(1);
+            expect(scope.content.tabs.length).toBe(2);
         });
 
-        it('it should have a properties collection on each tab', function () {
-              $(scope.content.tabs).each(function(i, tab){
-                  expect(tab.properties.length).toBeGreaterThan(0);
-              });
+        it('it should have added an info tab', function () {
+            expect(scope.content.tabs[1].id).toBe(-1);
+            expect(scope.content.tabs[1].alias).toBe("_umb_infoTab");
+        });
+
+        it('all other tabs than the info tab should have a properties collection', function () {
+            $(scope.content.tabs).each(function (i, tab) {
+                if (tab.id !== -1 && tab.alias !== '_umb_infoTab') {
+                    expect(tab.properties.length).toBeGreaterThan(0);
+                }
+            });
         });
 
         it('it should change updateDate on save', function () {
-          var currentUpdateDate = scope.content.updateDate;
+            var currentUpdateDate = scope.content.updateDate;
 
-          setTimeout(function(){
-              scope.save(scope.content);
-              expect(scope.content.updateDate).toBeGreaterThan(currentUpdateDate);
-              }, 1000);
+            setTimeout(function () {
+                scope.save(scope.content);
+                expect(scope.content.updateDate).toBeGreaterThan(currentUpdateDate);
+            }, 1000);
         });
 
     });

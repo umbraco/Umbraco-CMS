@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using umbraco.cms.presentation.create.controls;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -181,6 +179,22 @@ namespace Umbraco.Tests.Services
             
             // Act & Assert
             Assert.Throws<ArgumentException>(() => ServiceContext.MemberTypeService.Save(memberType));
+        }
+
+        [Test]
+        public void Empty_Description_Is_Always_Null_After_Saving_Member_Type()
+        {
+            var service = ServiceContext.MemberTypeService;
+            var memberType = MockedContentTypes.CreateSimpleMemberType();
+            memberType.Description = null;
+            service.Save(memberType);
+
+            var memberType2 = MockedContentTypes.CreateSimpleMemberType("memberType2", "Member Type 2");
+            memberType2.Description = string.Empty;
+            service.Save(memberType2);
+
+            Assert.IsNull(memberType.Description);
+            Assert.IsNull(memberType2.Description);
         }
 
         //[Test]

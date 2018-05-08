@@ -15,6 +15,28 @@ namespace Umbraco.Web.Search
     /// </summary>
     internal static class ExamineExtensions
     {
+        /// <summary>
+        /// Checks if the index can be read/opened
+        /// </summary>
+        /// <param name="indexer"></param>
+        /// <param name="ex">The exception returned if there was an error</param>
+        /// <returns></returns>
+        public static bool IsHealthy(this LuceneIndexer indexer, out Exception ex)
+        {
+            try
+            {
+                using (indexer.GetIndexWriter().GetReader())
+                {
+                    ex = null;
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                ex = e;
+                return false;
+            }
+        }
 
         /// <summary>
         /// Return the number of indexed documents in Lucene
