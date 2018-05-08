@@ -1,6 +1,6 @@
 ﻿.umb-color-swatches {
 
-    .color-box {
+    .umb-color-box {
         border: none;
         color: white;
         cursor: pointer;
@@ -20,23 +20,41 @@
 
         .check_circle {
             display: none;
+            visibility: hidden;
             width: 20px;
             height: 20px;
+            margin: 0 auto;
 
             .icon {
-                font-size: 14px;
-                display: inline-block;
-                width: 20px;
-                height: 20px;
+                font-size: 1em;
+                display: flex;
+                width: 100%;
+                height: 100%;
+                align-items: center;
+                justify-content: center;
                 border-radius: 50%;
                 background-color: rgba(0,0,0,.15);
-                float: right;
+                float: left;
             }
         }
 
         &.active {
             .check_circle {
-                display: inline-block;
+                display: flex;
+                visibility: visible;
+            }
+        }
+
+        &.umb-color-box--s {
+        }
+
+        &.umb-color-box--m {
+            width: 40px;
+            height: 40px;
+
+            .check_circle {
+                width: 25px;
+                height: 25px;
             }
         }
     }
