@@ -220,13 +220,29 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     // Listen for language updates
     evts.push(eventsService.on("editors.languages.languageDeleted", function (e, args) {
         languageResource.getAll().then(function (languages) {
-            $scope.languages = languages;
+            contentTypeHelper.allowsVariation().then(function (b) {
+
+                if (b === "true") {
+                    $scope.languages = languages;
+                } else {
+                    $scope.languages = [];
+                }
+
+            });
         });
     }));
 
     evts.push(eventsService.on("editors.languages.languageCreated", function(e, args) {
         languageResource.getAll().then(function(languages) {
-            $scope.languages = languages;
+            contentTypeHelper.allowsVariation().then(function (b) {
+
+                if (b === "true") {
+                    $scope.languages = languages;
+                } else {
+                    $scope.languages = [];
+                }
+
+            });
         });
     }));
 
