@@ -18,18 +18,18 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // ReSharper disable once InconsistentNaming
         internal readonly ContentData _contentData; // internal for ContentNode cloning
 
-        private readonly string _urlName;
-        private IReadOnlyDictionary<string, PublishedCultureName> _cultureNames;
+        private readonly string _urlSegment;
 
         #region Constructors
 
-        public PublishedContent(ContentNode contentNode, ContentData contentData, IPublishedSnapshotAccessor publishedSnapshotAccessor)
+        public PublishedContent(ContentNode contentNode, ContentData contentData, IPublishedSnapshotAccessor publishedSnapshotAccessor, IVariationContextAccessor variationContextAccessor)
         {
             _contentNode = contentNode;
             _contentData = contentData;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
+            VariationContextAccessor = variationContextAccessor;
 
-            _urlName = _contentData.Name.ToUrlSegment();
+            _urlSegment = _contentData.Name.ToUrlSegment();
             IsPreviewing = _contentData.Published == false;
 
             var properties = new List<IPublishedProperty>();
@@ -70,9 +70,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             _contentNode = contentNode;
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
+            VariationContextAccessor = origin.VariationContextAccessor;
             _contentData = origin._contentData;
 
-            _urlName = origin._urlName;
+            _urlSegment = origin._urlSegment;
             IsPreviewing = origin.IsPreviewing;
 
             // here is the main benefit: we do not re-create properties so if anything
@@ -85,10 +86,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private PublishedContent(PublishedContent origin)
         {
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
+            VariationContextAccessor = origin.VariationContextAccessor;
             _contentNode = origin._contentNode;
             _contentData = origin._contentData;
 
-            _urlName = origin._urlName;
+            _urlSegment = origin._urlSegment;
             IsPreviewing = true;
 
             // clone properties so _isPreviewing is true
@@ -152,51 +154,133 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #endregion
 
-        #region IPublishedContent
+        #region Content Type
 
-        public override int Id => _contentNode.Id;
+        /// <inheritdoc />
+        public override PublishedContentType ContentType => _contentNode.ContentType;
+
+        #endregion
+
+        #region PublishedElement
+
+        /// <inheritdoc />
         public override Guid Key => _contentNode.Uid;
-        public override int DocumentTypeId => _contentNode.ContentType.Id;
-        public override string DocumentTypeAlias => _contentNode.ContentType.Alias;
-        public override PublishedItemType ItemType => _contentNode.ContentType.ItemType;
 
-        public override string Name => _contentData.Name;
-        public override IReadOnlyDictionary<string, PublishedCultureName> CultureNames
+        #endregion
+
+        #region PublishedContent
+
+        /// <inheritdoc />
+        public override int Id => _contentNode.Id;
+
+        /// <inheritdoc />
+        public override string Name
         {
             get
             {
-                if (!ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
-                    return null;
+                if (!ContentType.Variations.Has(ContentVariation.CultureNeutral)) // fixme CultureSegment?
+                    return _contentData.Name;
 
-                if (_cultureNames == null)
-                {
-                    var d = new Dictionary<string, PublishedCultureName>(StringComparer.InvariantCultureIgnoreCase);
-                    foreach(var c in _contentData.CultureInfos)
-                    {
-                        d[c.Key] = new PublishedCultureName(c.Value.Name, c.Value.Name.ToUrlSegment());
-                    }
-                    _cultureNames = d;
-                }
-                return _cultureNames;
+                var culture = VariationContextAccessor.VariationContext.Culture;
+                if (culture == "")
+                    return _contentData.Name;
+
+                return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos.Name : null;
             }
         }
-        public override int Level => _contentNode.Level;
-        public override string Path => _contentNode.Path;
+
+        /// <inheritdoc />
+        public override string UrlSegment
+        {
+            get
+            {
+                if (!ContentType.Variations.Has(ContentVariation.CultureNeutral)) // fixme CultureSegment?
+                    return _urlSegment;
+
+                var culture = VariationContextAccessor.VariationContext.Culture;
+                if (culture == "")
+                    return _urlSegment;
+
+                return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos.UrlSegment : null;
+            }
+        }
+
+        /// <inheritdoc />
         public override int SortOrder => _contentNode.SortOrder;
+
+        /// <inheritdoc />
+        public override int Level => _contentNode.Level;
+
+        /// <inheritdoc />
+        public override string Path => _contentNode.Path;
+
+        /// <inheritdoc />
         public override int TemplateId => _contentData.TemplateId;
 
-        public override string UrlName => _urlName;
-
-        public override DateTime CreateDate => _contentNode.CreateDate;
-        public override DateTime UpdateDate => _contentData.VersionDate;
-
+        /// <inheritdoc />
         public override int CreatorId => _contentNode.CreatorId;
+
+        /// <inheritdoc />
         public override string CreatorName => GetProfileNameById(_contentNode.CreatorId);
+
+        /// <inheritdoc />
+        public override DateTime CreateDate => _contentNode.CreateDate;
+
+        /// <inheritdoc />
         public override int WriterId => _contentData.WriterId;
+
+        /// <inheritdoc />
         public override string WriterName => GetProfileNameById(_contentData.WriterId);
 
+        /// <inheritdoc />
+        public override DateTime UpdateDate => _contentData.VersionDate;
+
+        private IReadOnlyDictionary<string, PublishedCultureInfos> _cultureInfos;
+
+        private static readonly IReadOnlyDictionary<string, PublishedCultureInfos> NoCultureInfos = new Dictionary<string, PublishedCultureInfos>();
+
+        /// <inheritdoc />
+        public override PublishedCultureInfos GetCulture(string culture = null)
+        {
+            // handle context culture
+            if (culture == null)
+                culture = VariationContextAccessor.VariationContext.Culture;
+
+            // no invariant culture infos
+            if (culture == "") return null;
+
+            // get
+            return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;
+        }
+
+        /// <inheritdoc />
+        public override IReadOnlyDictionary<string, PublishedCultureInfos> Cultures
+        {
+            get
+            {
+                if (!ContentType.Variations.Has(ContentVariation.CultureNeutral)) // fixme CultureSegment?
+                    return NoCultureInfos;
+
+                if (_cultureInfos != null) return _cultureInfos;
+
+                if (_contentData.CultureInfos == null)
+                    throw new Exception("oops: _contentDate.CultureInfos is null.");
+                return _cultureInfos = _contentData.CultureInfos
+                    .ToDictionary(x => x.Key, x => new PublishedCultureInfos(x.Key, x.Value.Name, x.Value.Date));
+            }
+        }
+
+        /// <inheritdoc />
+        public override PublishedItemType ItemType => _contentNode.ContentType.ItemType;
+
+        /// <inheritdoc />
         public override bool IsDraft => _contentData.Published == false;
 
+        #endregion
+
+        #region Tree
+
+        /// <inheritdoc />
         public override IPublishedContent Parent
         {
             get
@@ -215,10 +299,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
-        private string _childrenCacheKey;
-
-        private string ChildrenCacheKey => _childrenCacheKey ?? (_childrenCacheKey = CacheKeys.PublishedContentChildren(Key, IsPreviewing));
-
+        /// <inheritdoc />
         public override IEnumerable<IPublishedContent> Children
         {
             get
@@ -231,6 +312,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return (IEnumerable<IPublishedContent>)cache.GetCacheItem(ChildrenCacheKey, () => GetChildren().ToArray());
             }
         }
+
+        private string _childrenCacheKey;
+
+        private string ChildrenCacheKey => _childrenCacheKey ?? (_childrenCacheKey = CacheKeys.PublishedContentChildren(Key, IsPreviewing));
 
         private IEnumerable<IPublishedContent> GetChildren()
         {
@@ -255,8 +340,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // Q: perfs-wise, is it better than having the store managed an ordered list
         }
 
+        #endregion
+
+        #region Properties
+
+
+        /// <inheritdoc cref="IPublishedElement.Properties"/>
         public override IEnumerable<IPublishedProperty> Properties => PropertiesArray;
 
+        /// <inheritdoc cref="IPublishedElement.GetProperty(string)"/>
         public override IPublishedProperty GetProperty(string alias)
         {
             var index = _contentNode.ContentType.GetPropertyIndex(alias);
@@ -266,21 +358,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var property = PropertiesArray[index];
             return property;
         }
-
-        public override IPublishedProperty GetProperty(string alias, bool recurse)
-        {
-            var property = GetProperty(alias);
-            if (recurse == false) return property;
-
-            var cache = GetAppropriateCache();
-            if (cache == null)
-                return base.GetProperty(alias, true);
-
-            var key = ((Property)property).RecurseCacheKey;
-            return (Property)cache.GetCacheItem(key, () => base.GetProperty(alias, true));
-        }
-
-        public override PublishedContentType ContentType => _contentNode.ContentType;
 
         #endregion
 
@@ -307,6 +384,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         #endregion
 
         #region Internal
+
+        // used by property
+        internal IVariationContextAccessor VariationContextAccessor { get; }
 
         // used by navigable content
         internal IPublishedProperty[] PropertiesArray { get; }

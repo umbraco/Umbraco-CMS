@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
@@ -8,7 +7,7 @@ namespace Umbraco.Core.Strings
 {
     public class DefaultShortStringHelperConfig
     {
-        private readonly Dictionary<CultureInfo, Dictionary<CleanStringType, Config>> _configs = new Dictionary<CultureInfo, Dictionary<CleanStringType, Config>>();
+        private readonly Dictionary<string, Dictionary<CleanStringType, Config>> _configs = new Dictionary<string, Dictionary<CleanStringType, Config>>();
 
         public DefaultShortStringHelperConfig Clone()
         {
@@ -29,7 +28,7 @@ namespace Umbraco.Core.Strings
             return config;
         }
 
-        public CultureInfo DefaultCulture { get; set; } = CultureInfo.InvariantCulture;
+        public string DefaultCulture { get; set; } = ""; // invariant
 
         public Dictionary<string, string> UrlReplaceCharacters { get; set; }
 
@@ -45,9 +44,11 @@ namespace Umbraco.Core.Strings
             return WithConfig(DefaultCulture, stringRole, config);
         }
 
-        public DefaultShortStringHelperConfig WithConfig(CultureInfo culture, CleanStringType stringRole, Config config)
+        public DefaultShortStringHelperConfig WithConfig(string culture, CleanStringType stringRole, Config config)
         {
             if (config == null) throw new ArgumentNullException(nameof(config));
+
+            culture = culture ?? "";
 
             if (_configs.ContainsKey(culture) == false)
                 _configs[culture] = new Dictionary<CleanStringType, Config>();
@@ -112,8 +113,9 @@ namespace Umbraco.Core.Strings
 
         // internal: we don't want ppl to retrieve a config and modify it
         // (the helper uses a private clone to prevent modifications)
-        internal Config For(CleanStringType stringType, CultureInfo culture)
+        internal Config For(CleanStringType stringType, string culture)
         {
+            culture = culture ?? "";
             stringType = stringType & CleanStringType.RoleMask;
 
             Dictionary<CleanStringType, Config> config;

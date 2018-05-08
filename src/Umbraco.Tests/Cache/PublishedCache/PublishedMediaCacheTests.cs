@@ -16,6 +16,7 @@ using Current = Umbraco.Web.Composing.Current;
 using LightInject;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Tests.PublishedContent;
 
 namespace Umbraco.Tests.Cache.PublishedCache
 {
@@ -23,6 +24,8 @@ namespace Umbraco.Tests.Cache.PublishedCache
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class PublishMediaCacheTests : BaseWebTest
     {
+        private Dictionary<string, PublishedContentType> _mediaTypes;
+
         protected override void Compose()
         {
             base.Compose();
@@ -30,6 +33,21 @@ namespace Umbraco.Tests.Cache.PublishedCache
             Container.GetInstance<UrlSegmentProviderCollectionBuilder>()
                 .Clear()
                 .Append<DefaultUrlSegmentProvider>();
+        }
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+            var type = new AutoPublishedContentType(22, "myType", new PublishedPropertyType[] { });
+            var image = new AutoPublishedContentType(23, "Image", new PublishedPropertyType[] { });
+            var testMediaType = new AutoPublishedContentType(24, "TestMediaType", new PublishedPropertyType[] { });
+            _mediaTypes = new Dictionary<string, PublishedContentType>
+            {
+                { type.Alias, type },
+                { image.Alias, image },
+                { testMediaType.Alias, testMediaType }
+            };
+            ContentTypesCache.GetPublishedContentTypeByAlias = alias => _mediaTypes[alias];
         }
 
         private IMediaType MakeNewMediaType(IUser user, string text, int parentId = -1)
@@ -69,6 +87,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
         {
             var user = ServiceContext.UserService.GetUserById(0);
             var mType = MakeNewMediaType(user, "TestMediaType");
+            _mediaTypes[mType.Alias] = new PublishedContentType(mType, null);
             var mRoot = MakeNewMedia("MediaRoot", mType, user, -1);
             var mChild1 = MakeNewMedia("Child1", mType, user, mRoot.Id);
 
@@ -82,8 +101,8 @@ namespace Umbraco.Tests.Cache.PublishedCache
             Assert.AreEqual(mRoot.CreateDate.ToString("dd/MM/yyyy HH:mm:ss"), publishedMedia.CreateDate.ToString("dd/MM/yyyy HH:mm:ss"));
             Assert.AreEqual(mRoot.CreatorId, publishedMedia.CreatorId);
             //Assert.AreEqual(mRoot.User.Name, publishedMedia.CreatorName);
-            Assert.AreEqual(mRoot.ContentType.Alias, publishedMedia.DocumentTypeAlias);
-            Assert.AreEqual(mRoot.ContentType.Id, publishedMedia.DocumentTypeId);
+            Assert.AreEqual(mRoot.ContentType.Alias, publishedMedia.ContentType.Alias);
+            Assert.AreEqual(mRoot.ContentType.Id, publishedMedia.ContentType.Id);
             Assert.AreEqual(mRoot.Level, publishedMedia.Level);
             Assert.AreEqual(mRoot.Name, publishedMedia.Name);
             Assert.AreEqual(mRoot.Path, publishedMedia.Path);
@@ -186,11 +205,11 @@ namespace Umbraco.Tests.Cache.PublishedCache
             };
 
             var result = new SearchResult("1234", 1, 1, () => fields.ToDictionary(x => x.Key, x => new List<string> { x.Value }));
-            
+
             var store = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null), ServiceContext.MediaService, ServiceContext.UserService, new StaticCacheProvider(), ContentTypesCache);
             var doc = store.CreateFromCacheValues(store.ConvertFromSearchResult(result));
 
-            DoAssert(doc, 1234, key, 0, 0, "/media/test.jpg", "Image", 0, "Shannon", "Shannon", 0, 0, "-1,1234", DateTime.Parse("2012-07-17T10:34:09"), DateTime.Parse("2012-07-16T10:34:09"), 2);
+            DoAssert(doc, 1234, key, 0, 0, "/media/test.jpg", "Image", 23, "Shannon", "Shannon", 0, 0, "-1,1234", DateTime.Parse("2012-07-17T10:34:09"), DateTime.Parse("2012-07-16T10:34:09"), 2);
             Assert.AreEqual(null, doc.Parent);
         }
 
@@ -206,7 +225,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var cache = new PublishedMediaCache(new XmlStore((XmlDocument)null, null, null, null), ServiceContext.MediaService, ServiceContext.UserService, new StaticCacheProvider(), ContentTypesCache);
             var doc = cache.CreateFromCacheValues(cache.ConvertFromXPathNavigator(navigator, true));
 
-            DoAssert(doc, 2000, key, 0, 2, "image1", "Image", 2044, "Shannon", "Shannon", 33, 33, "-1,2000", DateTime.Parse("2012-06-12T14:13:17"), DateTime.Parse("2012-07-20T18:50:43"), 1);
+            DoAssert(doc, 2000, key, 0, 2, "image1", "Image", 23, "Shannon", "Shannon", 33, 33, "-1,2000", DateTime.Parse("2012-06-12T14:13:17"), DateTime.Parse("2012-07-20T18:50:43"), 1);
             Assert.AreEqual(null, doc.Parent);
             Assert.AreEqual(2, doc.Children.Count());
             Assert.AreEqual(2001, doc.Children.ElementAt(0).Id);
@@ -271,7 +290,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
                 };
         }
 
-        private PublishedMediaCache.DictionaryPublishedContent GetDictionaryDocument(
+        private DictionaryPublishedContent GetDictionaryDocument(
             string idKey = "id",
             string templateKey = "template",
             string nodeNameKey = "nodeName",
@@ -284,11 +303,11 @@ namespace Umbraco.Tests.Cache.PublishedCache
         {
             if (children == null)
                 children = new List<IPublishedContent>();
-            var dicDoc = new PublishedMediaCache.DictionaryPublishedContent(
+            var dicDoc = new DictionaryPublishedContent(
             //the dictionary
             GetDictionary(idVal, keyVal, parentIdVal, idKey, templateKey, nodeNameKey, nodeTypeAliasKey, pathKey),
             //callback to get the parent
-            d => new PublishedMediaCache.DictionaryPublishedContent(
+            d => new DictionaryPublishedContent(
                 // the dictionary
                 GetDictionary(parentIdVal, default(Guid), -1, idKey, templateKey, nodeNameKey, nodeTypeAliasKey, pathKey),
                 // callback to get the parent: there is no parent
@@ -317,7 +336,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
         }
 
         private void DoAssert(
-            PublishedMediaCache.DictionaryPublishedContent dicDoc,
+            DictionaryPublishedContent dicDoc,
             int idVal = 1234,
             Guid keyVal = default(Guid),
             int templateIdVal = 0,
@@ -374,9 +393,9 @@ namespace Umbraco.Tests.Cache.PublishedCache
             Assert.AreEqual(keyVal, doc.Key);
             Assert.AreEqual(templateIdVal, doc.TemplateId);
             Assert.AreEqual(sortOrderVal, doc.SortOrder);
-            Assert.AreEqual(urlNameVal, doc.UrlName);
-            Assert.AreEqual(nodeTypeAliasVal, doc.DocumentTypeAlias);
-            Assert.AreEqual(nodeTypeIdVal, doc.DocumentTypeId);
+            Assert.AreEqual(urlNameVal, doc.UrlSegment);
+            Assert.AreEqual(nodeTypeAliasVal, doc.ContentType.Alias);
+            Assert.AreEqual(nodeTypeIdVal, doc.ContentType.Id);
             Assert.AreEqual(writerNameVal, doc.WriterName);
             Assert.AreEqual(creatorNameVal, doc.CreatorName);
             Assert.AreEqual(writerIdVal, doc.WriterId);

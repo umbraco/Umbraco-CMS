@@ -135,7 +135,7 @@ namespace Umbraco.Web.Composing
 
         internal static IPublishedSnapshotService PublishedSnapshotService
             => Container.GetInstance<IPublishedSnapshotService>();
-        
+
         #endregion
 
         #region Web Constants
@@ -246,6 +246,8 @@ namespace Umbraco.Web.Composing
         public static ISqlContext SqlContext=> CoreCurrent.SqlContext;
 
         public static IPublishedContentTypeFactory PublishedContentTypeFactory => CoreCurrent.PublishedContentTypeFactory;
+
+        public static IPublishedValueFallback PublishedValueFallback => CoreCurrent.PublishedValueFallback;
 
         #endregion
     }

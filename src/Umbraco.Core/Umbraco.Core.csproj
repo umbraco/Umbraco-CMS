@@ -355,7 +355,13 @@
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
-    <Compile Include="Models\PublishedContent\PublishedCultureName.cs" />
+    <Compile Include="Models\PublishedContent\NoopPublishedValueFallback.cs" />
+    <Compile Include="Models\PublishedContent\PublishedCultureInfos.cs" />
+    <Compile Include="Models\PublishedContent\IVariationContextAccessor.cs" />
+    <Compile Include="Models\PublishedContent\IPublishedValueFallback.cs" />
+    <Compile Include="Models\PublishedContent\VariationContext.cs" />
+    <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
+    <Compile Include="Models\PublishedContent\ThreadStaticVariationContextAccessor.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
     <Compile Include="Persistence\Dtos\ContentVersionCultureVariationDto.cs" />

@@ -15,6 +15,7 @@ using Umbraco.Core.Profiling;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
+using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
@@ -72,7 +73,7 @@ namespace Umbraco.Tests.Web.Mvc
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>(),
+                new TestVariationContextAccessor(),
                 true);
             var ctrl = new MatchesDefaultIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);
@@ -96,7 +97,7 @@ namespace Umbraco.Tests.Web.Mvc
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>(),
+                new TestVariationContextAccessor(),
                 true);
             var ctrl = new MatchesOverriddenIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);
@@ -120,7 +121,7 @@ namespace Umbraco.Tests.Web.Mvc
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>(),
+                new TestVariationContextAccessor(),
                 true);
             var ctrl = new MatchesCustomIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);
@@ -144,7 +145,7 @@ namespace Umbraco.Tests.Web.Mvc
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>(),
+                new TestVariationContextAccessor(),
                 true);
             var ctrl = new MatchesAsyncIndexController { UmbracoContext = umbCtx };
             var controllerCtx = new ControllerContext(req, ctrl);

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Xml.Serialization;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Collections;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
@@ -18,7 +19,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly Guid _contentUid;
         private readonly bool _isPreviewing;
         private readonly bool _isMember;
-        private readonly IPublishedContent _content;
+        private readonly PublishedContent _content;
+        private readonly ContentVariation _variations;
 
         private readonly object _locko = new object();
 
@@ -34,7 +36,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private CacheValues _cacheValues;
 
         private string _valuesCacheKey;
-        private string _recurseCacheKey;
 
         // initializes a published content property with no value
         public Property(PublishedPropertyType propertyType, PublishedContent content, IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
@@ -49,7 +50,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 foreach (var sourceValue in sourceValues)
                 {
-                    if (sourceValue.Culture == null && sourceValue.Segment == null)
+                    if (sourceValue.Culture == "" && sourceValue.Segment == "")
                     {
                         _sourceValue = sourceValue.Value;
                     }
@@ -68,10 +69,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _isPreviewing = content.IsPreviewing;
             _isMember = content.ContentType.ItemType == PublishedItemType.Member;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
+            _variations = propertyType.Variations;
         }
 
         // clone for previewing as draft a published content that is published and has no draft
-        public Property(Property origin, IPublishedContent content)
+        public Property(Property origin, PublishedContent content)
             : base(origin.PropertyType, origin.ReferenceCacheLevel)
         {
             _sourceValue = origin._sourceValue;
@@ -82,14 +84,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _isPreviewing = true;
             _isMember = origin._isMember;
             _publishedSnapshotAccessor = origin._publishedSnapshotAccessor;
+            _variations = origin._variations;
         }
 
         public override bool HasValue(string culture = null, string segment = null) => _sourceValue != null
             && (!(_sourceValue is string) || string.IsNullOrWhiteSpace((string) _sourceValue) == false);
-
-        // used to cache the recursive *property* for this property
-        internal string RecurseCacheKey => _recurseCacheKey
-            ?? (_recurseCacheKey = CacheKeys.PropertyRecurse(_contentUid, Alias, _isPreviewing));
 
         // used to cache the CacheValues of this property
         internal string ValuesCacheKey => _valuesCacheKey
@@ -145,7 +144,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // this is always invoked from within a lock, so does not require its own lock
         private object GetInterValue(string culture, string segment)
         {
-            if (culture == null && segment == null)
+            if (culture == "" && segment == "")
             {
                 if (_interInitialized) return _interValue;
                 _interValue = PropertyType.ConvertSourceToInter(_content, _sourceValue, _isPreviewing);
@@ -158,7 +157,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var k = new CompositeStringStringKey(culture, segment);
             if (!_sourceValues.TryGetValue(k, out var vvalue))
-                _sourceValues[k] = vvalue = new SourceInterValue { Culture = culture, Segment = segment };
+                _sourceValues[k] = vvalue = new SourceInterValue { Culture = culture, Segment = segment, SourceValue = GetSourceValue(culture, segment) };
 
             if (vvalue.InterInitialized) return vvalue.InterValue;
             vvalue.InterValue = PropertyType.ConvertSourceToInter(_content, vvalue.SourceValue, _isPreviewing);
@@ -168,7 +167,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override object GetSourceValue(string culture = null, string segment = null)
         {
-            if (culture == null && segment == null)
+            ContextualizeVariation(ref culture, ref segment);
+
+            if (culture == "" && segment == "")
                 return _sourceValue;
 
             lock (_locko)
@@ -178,8 +179,22 @@ namespace Umbraco.Web.PublishedCache.NuCache
             }
         }
 
+        private void ContextualizeVariation(ref string culture, ref string segment)
+        {
+            if (culture != null && segment != null) return;
+
+            // use context values
+            // fixme CultureSegment?
+            var publishedVariationContext = _content.VariationContextAccessor?.VariationContext;
+            if (culture == null) culture = _variations.Has(ContentVariation.CultureNeutral) ? publishedVariationContext?.Culture : "";
+            if (segment == null) segment = _variations.Has(ContentVariation.CultureNeutral) ? publishedVariationContext?.Segment : "";
+        }
+
         public override object GetValue(string culture = null, string segment = null)
         {
+            ContextualizeVariation(ref culture, ref segment);
+
+            object value;
             lock (_locko)
             {
                 var cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
@@ -190,12 +205,16 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (cacheValues.ObjectInitialized) return cacheValues.ObjectValue;
                 cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, initialCacheLevel, GetInterValue(culture, segment), _isPreviewing);
                 cacheValues.ObjectInitialized = true;
-                return cacheValues.ObjectValue;
+                value = cacheValues.ObjectValue;
             }
+
+            return value;
         }
 
         public override object GetXPathValue(string culture = null, string segment = null)
         {
+            ContextualizeVariation(ref culture, ref segment);
+
             lock (_locko)
             {
                 var cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
@@ -227,7 +246,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // this is always invoked from within a lock, so does not require its own lock
             public CacheValue For(string culture, string segment)
             {
-                if (culture == null && segment == null)
+                if (culture == "" && segment == "")
                     return this;
 
                 if (_values == null)

@@ -14,6 +14,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
+using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
@@ -45,7 +46,7 @@ namespace Umbraco.Tests.Web.Mvc
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>(),
+                new TestVariationContextAccessor(),
                 true);
 
             var ctrl = new TestSurfaceController { UmbracoContext = umbracoContext };
@@ -67,7 +68,7 @@ namespace Umbraco.Tests.Web.Mvc
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>(),
+                new TestVariationContextAccessor(),
                 true);
 
             var ctrl = new TestSurfaceController { UmbracoContext = umbCtx };
@@ -87,7 +88,7 @@ namespace Umbraco.Tests.Web.Mvc
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>(),
+                new TestVariationContextAccessor(),
                 true);
 
             var controller = new TestSurfaceController { UmbracoContext = umbracoContext };
@@ -114,7 +115,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>(),
+                new TestVariationContextAccessor(),
                 true);
 
             var helper = new UmbracoHelper(
@@ -152,7 +153,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == webRoutingSettings),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>(),
+                new TestVariationContextAccessor(),
                 true);
 
             var content = Mock.Of<IPublishedContent>(publishedContent => publishedContent.Id == 12345);
