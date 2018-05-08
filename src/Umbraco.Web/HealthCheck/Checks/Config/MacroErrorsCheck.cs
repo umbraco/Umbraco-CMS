@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using Umbraco.Core.Services;
 
@@ -13,12 +14,16 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
 
         public MacroErrorsCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
+            
             _textService = healthCheckContext.ApplicationContext.Services.TextService;
         }
 
         public override string FilePath
         {
-            get { return "~/Config/umbracoSettings.config"; }
+            get {
+                System.Configuration.Configuration config = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration("~");
+                return config.SectionGroups["umbracoConfiguration"].Sections["settings"].ElementInformation.Source;
+            }
         }
 
         public override string XPath
