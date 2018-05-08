@@ -393,10 +393,10 @@ namespace umbraco
             private readonly PublishedContentType _contentType;
             private readonly IPublishedProperty[] _properties;
             private readonly IPublishedContent _parent;
-            private IReadOnlyDictionary<string, PublishedCultureInfos> _cultureInfos;
+            private IReadOnlyDictionary<string, PublishedCultureInfo> _cultureInfos;
             private readonly IVariationContextAccessor _variationContextAccessor;
 
-            private static readonly IReadOnlyDictionary<string, PublishedCultureInfos> NoCultureInfos = new Dictionary<string, PublishedCultureInfos>();
+            private static readonly IReadOnlyDictionary<string, PublishedCultureInfo> NoCultureInfos = new Dictionary<string, PublishedCultureInfo>();
 
             private PagePublishedContent(int id)
             {
@@ -461,7 +461,7 @@ namespace umbraco
                 get { return _inner.Name; }
             }
 
-            public PublishedCultureInfos GetCulture(string culture = null)
+            public PublishedCultureInfo GetCulture(string culture = null)
             {
                 // handle context culture
                 if (culture == null)
@@ -474,7 +474,7 @@ namespace umbraco
                 return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;
             }
 
-            public IReadOnlyDictionary<string, PublishedCultureInfos> Cultures
+            public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
             {
                 get
                 {
@@ -485,7 +485,7 @@ namespace umbraco
                         return _cultureInfos;
 
                     return _cultureInfos = _inner.PublishNames
-                        .ToDictionary(x => x.Key, x => new PublishedCultureInfos(x.Key, x.Value, _inner.GetCulturePublishDate(x.Key)));
+                        .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value, _inner.GetCulturePublishDate(x.Key)));
                 }
             }
 

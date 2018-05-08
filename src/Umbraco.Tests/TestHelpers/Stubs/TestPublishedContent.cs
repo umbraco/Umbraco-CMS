@@ -7,7 +7,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
 {
     internal class TestPublishedContent : PublishedElement, IPublishedContent
     {
-        public TestPublishedContent(PublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing, Dictionary<string, PublishedCultureInfos> cultures = null)
+        public TestPublishedContent(PublishedContentType contentType, int id, Guid key, Dictionary<string, object> values, bool previewing, Dictionary<string, PublishedCultureInfo> cultures = null)
             : base(contentType, key, values, previewing)
         {
             Id = id;
@@ -19,7 +19,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
         public int SortOrder { get; set; }
         public string Name { get; set; }
         public IVariationContextAccessor VariationContextAccessor { get; set; }
-        public PublishedCultureInfos GetCulture(string culture = null)
+        public PublishedCultureInfo GetCulture(string culture = null)
         {
             // handle context culture
             if (culture == null)
@@ -31,7 +31,7 @@ namespace Umbraco.Tests.TestHelpers.Stubs
             // get
             return Cultures.TryGetValue(culture, out var cultureInfos) ? cultureInfos : null;
         }
-        public IReadOnlyDictionary<string, PublishedCultureInfos> Cultures { get; set; }
+        public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; set; }
         public string UrlSegment { get; set; }
         public string DocumentTypeAlias => ContentType.Alias;
         public int DocumentTypeId { get; set; }

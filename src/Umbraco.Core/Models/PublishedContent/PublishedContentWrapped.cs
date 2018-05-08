@@ -100,10 +100,10 @@ namespace Umbraco.Core.Models.PublishedContent
         public virtual string GetUrl(string culture = null) => _content.GetUrl(culture);
 
         /// <inheritdoc />
-        public PublishedCultureInfos GetCulture(string culture = null) => _content.GetCulture(culture);
+        public PublishedCultureInfo GetCulture(string culture = null) => _content.GetCulture(culture);
 
         /// <inheritdoc />
-        public IReadOnlyDictionary<string, PublishedCultureInfos> Cultures => _content.Cultures;
+        public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => _content.Cultures;
 
         /// <inheritdoc />
         public virtual PublishedItemType ItemType => _content.ItemType;

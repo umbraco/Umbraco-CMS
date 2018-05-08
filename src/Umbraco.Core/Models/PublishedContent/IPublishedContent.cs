@@ -122,7 +122,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <summary>
         /// Gets culture infos for a culture.
         /// </summary>
-        PublishedCultureInfos GetCulture(string culture = null);
+        PublishedCultureInfo GetCulture(string culture = null);
 
         /// <summary>
         /// Gets culture infos.
@@ -132,7 +132,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// the cultures that are published. For a draft content, those that are 'available' ie
         /// have a non-empty content name.</para>
         /// </remarks>
-        IReadOnlyDictionary<string, PublishedCultureInfos> Cultures { get; }
+        IReadOnlyDictionary<string, PublishedCultureInfo> Cultures { get; }
 
         /// <summary>
         /// Gets the type of the content item (document, media...).

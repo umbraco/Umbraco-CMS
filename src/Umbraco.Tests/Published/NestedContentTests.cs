@@ -273,8 +273,8 @@ namespace Umbraco.Tests.Published
             public override int TemplateId { get; }
             public override int SortOrder { get; }
             public override string Name { get; }
-            public override PublishedCultureInfos GetCulture(string culture = ".") => throw new NotSupportedException();
-            public override IReadOnlyDictionary<string, PublishedCultureInfos> Cultures => throw new NotSupportedException();
+            public override PublishedCultureInfo GetCulture(string culture = ".") => throw new NotSupportedException();
+            public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
             public override string UrlSegment { get; }
             public override string WriterName { get; }
             public override string CreatorName { get; }

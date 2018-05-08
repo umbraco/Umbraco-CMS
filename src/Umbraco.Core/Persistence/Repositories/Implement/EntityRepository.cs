@@ -439,6 +439,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// </summary>
         private class ContentEntityDto : BaseDto
         {
+            public ContentVariation Variations { get; set; }
+
             [ResultColumn, Reference(ReferenceType.Many)]
             public List<ContentEntityVariationInfoDto> VariationInfo { get; set; }
 
@@ -484,7 +486,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             public string Icon { get; set; }
             public string Thumbnail { get; set; }
             public bool IsContainer { get; set; }
-            public ContentVariation Variations { get; set; }
+            
             // ReSharper restore UnusedAutoPropertyAccessor.Local
             // ReSharper restore UnusedMember.Local
         }
@@ -866,12 +868,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.ContentTypeThumbnail = dto.Thumbnail;
         }
 
-        private static void BuildDocumentEntity(DocumentEntitySlim entity, BaseDto dto)
-        {
-            BuildContentEntity(entity, dto);
-            entity.AdditionalData[EntitySlim.AdditionalVariations] = dto.Variations;
-        }
-
         private static EntitySlim BuildContentEntity(BaseDto dto)
         {
             // EntitySlim does not track changes
@@ -889,7 +885,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // EntitySlim does not track changes
             var entity = new DocumentEntitySlim();
-            BuildDocumentEntity(entity, dto);
+            BuildContentEntity(entity, dto);
             return entity;
         }
 
@@ -902,7 +898,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             // EntitySlim does not track changes
             var entity = new DocumentEntitySlim();
-            BuildDocumentEntity(entity, dto);
+            BuildContentEntity(entity, dto);
             
             //fixme we need to set these statuses for each variant, see notes in IDocumentEntitySlim
             entity.Edited = dto.Edited;
@@ -918,7 +914,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         variantInfo[isoCode] = info.Name;
                 }
                 entity.CultureNames = variantInfo;
-                entity.AdditionalData[EntitySlim.AdditionalCultureNames] = variantInfo;
+                entity.Variations = dto.Variations;
             }
             return entity;
         }

@@ -15,6 +15,8 @@ namespace Umbraco.Core.Models.Entities
             set => _cultureNames = value;
         }
 
+        public ContentVariation Variations { get; set; }
+
         /// <inheritdoc />
         public bool Published { get; set; }
 

@@ -235,12 +235,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <inheritdoc />
         public override DateTime UpdateDate => _contentData.VersionDate;
 
-        private IReadOnlyDictionary<string, PublishedCultureInfos> _cultureInfos;
+        private IReadOnlyDictionary<string, PublishedCultureInfo> _cultureInfos;
 
-        private static readonly IReadOnlyDictionary<string, PublishedCultureInfos> NoCultureInfos = new Dictionary<string, PublishedCultureInfos>();
+        private static readonly IReadOnlyDictionary<string, PublishedCultureInfo> NoCultureInfos = new Dictionary<string, PublishedCultureInfo>();
 
         /// <inheritdoc />
-        public override PublishedCultureInfos GetCulture(string culture = null)
+        public override PublishedCultureInfo GetCulture(string culture = null)
         {
             // handle context culture
             if (culture == null)
@@ -254,7 +254,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         /// <inheritdoc />
-        public override IReadOnlyDictionary<string, PublishedCultureInfos> Cultures
+        public override IReadOnlyDictionary<string, PublishedCultureInfo> Cultures
         {
             get
             {
@@ -266,7 +266,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (_contentData.CultureInfos == null)
                     throw new Exception("oops: _contentDate.CultureInfos is null.");
                 return _cultureInfos = _contentData.CultureInfos
-                    .ToDictionary(x => x.Key, x => new PublishedCultureInfos(x.Key, x.Value.Name, x.Value.Date));
+                    .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value.Name, x.Value.Date));
             }
         }
 

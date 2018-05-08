@@ -25,18 +25,7 @@ namespace Umbraco.Core.Models.Entities
         /// Gets an entity representing "root".
         /// </summary>
         public static readonly IEntitySlim Root = new EntitySlim { Path = "-1", Name = "root", HasChildren = true };
-
-        /// <summary>
-        /// Gets the AdditionalData key for culture names.
-        /// </summary>
-        public const string AdditionalCultureNames = "CultureNames";
-
-        /// <summary>
-        /// Gets the AdditionalData key for variations.
-        /// </summary>
-        public const string AdditionalVariations = "Variations";
-
-
+        
         // implement IEntity
 
         /// <inheritdoc />

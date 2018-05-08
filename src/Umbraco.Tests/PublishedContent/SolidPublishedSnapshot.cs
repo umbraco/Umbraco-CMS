@@ -176,8 +176,8 @@ namespace Umbraco.Tests.PublishedContent
         public int TemplateId { get; set; }
         public int SortOrder { get; set; }
         public string Name { get; set; }
-        public PublishedCultureInfos GetCulture(string culture = null) => throw new NotSupportedException();
-        public IReadOnlyDictionary<string, PublishedCultureInfos> Cultures => throw new NotSupportedException();
+        public PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();
+        public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
         public string UrlSegment { get; set; }
         public string WriterName { get; set; }
         public string CreatorName { get; set; }

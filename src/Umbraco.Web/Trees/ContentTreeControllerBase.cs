@@ -216,14 +216,14 @@ namespace Umbraco.Web.Trees
             // set names according to variations
             if (!culture.IsNullOrWhiteSpace())
                 foreach (var entity in result)
-                    EnsureName(entity, culture);
+                    EnsureName((IDocumentEntitySlim)entity, culture);
 
             return result;
         }
 
         // set name according to variations
         //
-        private void EnsureName(IEntitySlim entity, string culture)
+        private void EnsureName(IDocumentEntitySlim entity, string culture)
         {
             if (culture == null)
             {
@@ -236,12 +236,8 @@ namespace Umbraco.Web.Trees
             // for those items that DO support cultures, we need to get the proper name, IF it exists
             // otherwise, invariant is fine
 
-            if (entity.AdditionalData.TryGetValue(EntitySlim.AdditionalVariations, out var variationsObject) &&
-                variationsObject is ContentVariation variations &&
-                variations.Has(ContentVariation.CultureNeutral) &&
-                entity.AdditionalData.TryGetValue(EntitySlim.AdditionalCultureNames, out var namesObject) &&
-                namesObject is IDictionary<string, string> names &&
-                names.TryGetValue(culture, out var name) &&
+            if (entity.Variations.Has(ContentVariation.CultureNeutral) &&
+                entity.CultureNames.TryGetValue(culture, out var name) &&
                 !string.IsNullOrWhiteSpace(name))
             {
                 entity.Name = name;

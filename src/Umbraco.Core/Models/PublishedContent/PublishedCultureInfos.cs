@@ -6,12 +6,12 @@ namespace Umbraco.Core.Models.PublishedContent
     /// <summary>
     /// Contains culture specific values for <see cref="IPublishedContent"/>.
     /// </summary>
-    public class PublishedCultureInfos
+    public class PublishedCultureInfo
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PublishedCultureInfos"/> class.
+        /// Initializes a new instance of the <see cref="PublishedCultureInfo"/> class.
         /// </summary>
-        public PublishedCultureInfos(string culture, string name, DateTime date)
+        public PublishedCultureInfo(string culture, string name, DateTime date)
         {
             if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentNullOrEmptyException(nameof(culture));
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));

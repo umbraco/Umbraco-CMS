@@ -10,6 +10,8 @@ namespace Umbraco.Core.Models.Entities
         //fixme we need to supply more information than this and change this property name. This will need to include Published/Editor per variation since we need this information for the tree
         IReadOnlyDictionary<string, string> CultureNames { get; }
 
+        ContentVariation Variations { get; }
+
         /// <summary>
         /// At least one variation is published
         /// </summary>
