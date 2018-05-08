@@ -7,7 +7,7 @@ namespace Umbraco.Core.Collections
     /// </summary>
     /// <remarks>
     /// <para>The string parts of the key are case-insensitive.</para>
-    /// <para>Null is a valid value for both parts.</para>
+    /// <para>Null is NOT a valid value for neither parts.</para>
     /// </remarks>
     public struct CompositeStringStringKey : IEquatable<CompositeStringStringKey>
     {
@@ -19,12 +19,8 @@ namespace Umbraco.Core.Collections
         /// </summary>
         public CompositeStringStringKey(string key1, string key2)
         {
-            // fixme temp - debugging
-            if (key1 == null) throw new Exception("Getting null culture in CompositeStringStringKey constructor, fix!");
-            if (key2 == null) throw new Exception("Getting null segment in CompositeStringStringKey constructor, fix!");
-
-            _key1 = key1?.ToLowerInvariant() ?? "NULL";
-            _key2 = key2?.ToLowerInvariant() ?? "NULL";
+            _key1 = key1?.ToLowerInvariant() ?? throw new ArgumentNullException(nameof(key1));
+            _key2 = key2?.ToLowerInvariant() ?? throw new ArgumentNullException(nameof(key2));
         }
 
         public bool Equals(CompositeStringStringKey other)

@@ -18,7 +18,7 @@ namespace Umbraco.Core.Models
     {
         private List<PropertyValue> _values = new List<PropertyValue>();
         private PropertyValue _pvalue;
-        private Dictionary<CompositeStringStringKey, PropertyValue> _vvalues;
+        private Dictionary<CompositeNStringNStringKey, PropertyValue> _vvalues;
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
@@ -77,8 +77,8 @@ namespace Umbraco.Core.Models
 
                     // custom comparer for enumerable
                     // ReSharper disable once MergeCastWithTypeCheck
-                    if (o is IEnumerable && o1 is IEnumerable)
-                        return ((IEnumerable) o).Cast<object>().UnsortedSequenceEqual(((IEnumerable) o1).Cast<object>());
+                    if (o is IEnumerable && o1 is IEnumerable enumerable)
+                        return ((IEnumerable) o).Cast<object>().UnsortedSequenceEqual(enumerable.Cast<object>());
 
                     return o.Equals(o1);
                 }, o => o.GetHashCode());
@@ -104,7 +104,7 @@ namespace Umbraco.Core.Models
                 _values = value.Where(x => PropertyType.ValidateVariation(x.Culture, x.Segment, false)).ToList();
                 _pvalue = _values.FirstOrDefault(x => x.Culture == null && x.Segment == null);
                 _vvalues = _values.Count > (_pvalue == null ? 0 : 1)
-                    ? _values.Where(x => x != _pvalue).ToDictionary(x => new CompositeStringStringKey(x.Culture, x.Segment), x => x)
+                    ? _values.Where(x => x != _pvalue).ToDictionary(x => new CompositeNStringNStringKey(x.Culture, x.Segment), x => x)
                     : null;
             }
         }
@@ -138,7 +138,7 @@ namespace Umbraco.Core.Models
             if (!PropertyType.ValidateVariation(culture, segment, false)) return null;
             if (culture == null && segment == null) return GetPropertyValue(_pvalue, published);
             if (_vvalues == null) return null;
-            return _vvalues.TryGetValue(new CompositeStringStringKey(culture, segment), out var pvalue)
+            return _vvalues.TryGetValue(new CompositeNStringNStringKey(culture, segment), out var pvalue)
                 ? GetPropertyValue(pvalue, published)
                 : null;
         }
@@ -177,7 +177,7 @@ namespace Umbraco.Core.Models
         {
             PropertyType.ValidateVariation(culture, segment, true);
 
-            (var pvalue, _) = GetPValue(culture, segment, false);
+            var (pvalue, _) = GetPValue(culture, segment, false);
             if (pvalue == null) return;
             PublishPropertyValue(pvalue);
         }
@@ -222,7 +222,7 @@ namespace Umbraco.Core.Models
         internal void ClearPublishedValue(string culture = null, string segment = null)
         {
             PropertyType.ValidateVariation(culture, segment, true);
-            (var pvalue, _) = GetPValue(culture, segment, false);
+            var (pvalue, _) = GetPValue(culture, segment, false);
             if (pvalue == null) return;
             ClearPublishedPropertyValue(pvalue);
         }
@@ -271,12 +271,8 @@ namespace Umbraco.Core.Models
         /// </summary>
         public void SetValue(object value, string culture = null, string segment = null)
         {
-            if (PropertyType.Variations == ContentVariation.InvariantNeutral)
-            {
-                culture = null;
-            }
             PropertyType.ValidateVariation(culture, segment, true);
-            (var pvalue, var change) = GetPValue(culture, segment, true);
+            var (pvalue, change) = GetPValue(culture, segment, true);
 
             var origValue = pvalue.EditedValue;
             var setValue = PropertyType.ConvertAssignedValue(value);
@@ -289,7 +285,7 @@ namespace Umbraco.Core.Models
         // bypasses all changes detection and is the *only* way to set the published value
         internal void FactorySetValue(string culture, string segment, bool published, object value)
         {
-            (var pvalue, _) = GetPValue(culture, segment, true);
+            var (pvalue, _) = GetPValue(culture, segment, true);
 
             if (published && PropertyType.IsPublishing)
                 pvalue.PublishedValue = value;
@@ -319,10 +315,10 @@ namespace Umbraco.Core.Models
             if (_vvalues == null)
             {
                 if (!create) return (null, false);
-                _vvalues = new Dictionary<CompositeStringStringKey, PropertyValue>();
+                _vvalues = new Dictionary<CompositeNStringNStringKey, PropertyValue>();
                 change = true;
             }
-            var k = new CompositeStringStringKey(culture, segment);
+            var k = new CompositeNStringNStringKey(culture, segment);
             if (!_vvalues.TryGetValue(k, out var pvalue))
             {
                 if (!create) return (null, false);

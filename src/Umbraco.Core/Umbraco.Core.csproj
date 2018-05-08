@@ -136,6 +136,7 @@
     <Compile Include="CodeAnnotations\UmbracoProposedPublicAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoUdiTypeAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoWillObsoleteAttribute.cs" />
+    <Compile Include="Collections\CompositeNStringNStringKey.cs" />
     <Compile Include="Collections\CompositeStringStringKey.cs" />
     <Compile Include="Collections\CompositeIntStringKey.cs" />
     <Compile Include="Collections\CompositeTypeTypeKey.cs" />

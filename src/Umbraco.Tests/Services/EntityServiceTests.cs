@@ -499,9 +499,10 @@ namespace Umbraco.Tests.Services
 
             for (int i = 0; i < entities.Length; i++)
             {
+                Assert.AreEqual(0, entities[i].AdditionalData.Count);
+
                 if (i % 2 == 0)
                 {
-                    Assert.AreEqual(1, entities[i].AdditionalData.Count);
                     var doc = (IDocumentEntitySlim)entities[i];
                     var keys = doc.CultureNames.Keys.ToList();
                     var vals = doc.CultureNames.Values.ToList();
