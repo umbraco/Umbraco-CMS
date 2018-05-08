@@ -1075,7 +1075,6 @@ namespace Umbraco.Core.Services.Implement
                     //we need to unpublish everything if this is a mandatory language
                     var unpublishAll = _languageRepository.GetMany().Where(x => x.Mandatory).Select(x => x.IsoCode).Contains(culture, StringComparer.InvariantCultureIgnoreCase);
 
-                    //fixme - this needs to be changed when 11227 is merged!
                     content.ClearPublishedValues(culture, segment);
                     //now we just publish with the name cleared
                     SaveAndPublish(content, userId);
