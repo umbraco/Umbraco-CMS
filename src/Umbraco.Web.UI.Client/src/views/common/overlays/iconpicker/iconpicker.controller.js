@@ -33,6 +33,10 @@ function IconPickerOverlay($scope, iconHelper, localizationService) {
        { name: 'Indigo', value: 'color-indigo'}
    ]
 
+   if (!$scope.model.title) {
+       $scope.model.title = localizationService.localize("defaultdialogs_selectIcon");
+   }
+
    $scope.setColor = function (color) {   
        $scope.color = color;
        console.log(color);    

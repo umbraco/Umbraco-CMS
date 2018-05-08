@@ -39,19 +39,38 @@
 .umb-iconpicker-item i {
     font-size: 30px;
 }
-    
+ 
+// Color swatch
  .button {
         border: none;
         color: white;
-        padding: 15px;
+        padding: 5px;
         text-align: center;
         text-decoration: none;
         display: inline-block;
-        margin: 4px 2px;
+        margin: 5px;
         border-radius: 3px;
     }
-    .button.active {
-       -webkit-box-shadow:inset 0px 0px 0px 2px #808080;
-    -moz-box-shadow:inset 0px 0px 0px 2px #808080;
-    box-shadow:inset 0px 0px 0px 2px #808080;
+ 
+  
+    .check_circle{
+        width: 20px;
+        height: 20px;
+       
+    }
+ 
+    // Hide Circle when not active
+    i.small{
+    display: none;
+    }
+ 
+    // Circle behind the checkmark
+    i.small.active{
+    font-size: 14px;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: rgba(0,0,0,.15);
+    float: right;
     }
