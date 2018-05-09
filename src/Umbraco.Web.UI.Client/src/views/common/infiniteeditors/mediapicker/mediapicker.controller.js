@@ -388,7 +388,7 @@ angular.module("umbraco")
 
             $scope.editMediaItem = function(item) {
                 var mediaEditor = {
-                    "node": item,
+                    id: item.id,
                     submit: function(model) {
                         editorService.close()
                         // update the media picker item in the picker so it matched the saved media item

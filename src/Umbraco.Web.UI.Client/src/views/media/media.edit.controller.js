@@ -14,8 +14,8 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
 
     // when opening the editor through infinite editing get the 
     // node id from the model instead of the route param
-    if(infiniteMode && $scope.model.node && $scope.model.node.id) {
-        nodeId = $scope.model.node.id;
+    if(infiniteMode && $scope.model.id) {
+        nodeId = $scope.model.id;
     } else {
         nodeId = $routeParams.id;
     }
