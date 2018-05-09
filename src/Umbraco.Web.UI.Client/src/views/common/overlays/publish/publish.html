@@ -1,15 +1,14 @@
 <div ng-controller="Umbraco.Overlays.PublishController as vm">
 
     <div style="margin-bottom: 15px;">
-        <p ng-if="vm.hasDirtyVariants"><localize key="content_languagesToPublish"></localize></p>
-        <p ng-if="!vm.hasDirtyVariants"><localize key="content_noLanguagesToPublish"></localize></p>
+        <p><localize key="content_languagesToPublish"></localize></p>
     </div>
 
     <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
         <umb-load-indicator></umb-load-indicator>
     </div>
 
-    <div class="umb-list umb-list--condensed" ng-if="!vm.loading && vm.hasDirtyVariants">
+    <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
 
         <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter">
             <ng-form name="publishVariantSelectorForm">

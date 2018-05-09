@@ -9,7 +9,6 @@
         vm.loading = true;
         vm.dirtyVariantFilter = dirtyVariantFilter;
         vm.pristineVariantFilter = pristineVariantFilter;
-        vm.hasDirtyVariants = false;
         vm.hasPristineVariants = false;
 
         //watch this model, if it's reset, then re init
@@ -40,15 +39,14 @@
         }
 
         function dirtyVariantFilter(variant) {
-            return (variant.isEdited === true || (variant.isEdited === false && variant.state === "Unpublished"));
+            return (variant.current || variant.isEdited === true || (variant.isEdited === false && variant.state === "Unpublished"));
         }
 
         function pristineVariantFilter(variant) {
-            return !(variant.isEdited === true || (variant.isEdited === false && variant.state === "Unpublished"));
+            return !(dirtyVariantFilter(variant));
         }
 
         function onInit() {
-            vm.hasDirtyVariants = false;
             vm.hasPristineVariants = false;
 
             _.each(vm.variants,
@@ -56,13 +54,8 @@
                     variant.compositeId = variant.language.id + "_" + (variant.segment ? variant.segment : "");
                     variant.htmlId = "publish_variant_" + variant.compositeId;
 
-                    //check for dirty variants
-                    if (variant.isEdited === true || (variant.isEdited === false && variant.state === "Unpublished")) {
-                        vm.hasDirtyVariants = true;
-                    }
-                    else {
-                        vm.hasPristineVariants = true;
-                    }
+                    //check for pristine variants
+                    vm.hasPristineVariants = !(dirtyVariantFilter(variant));
                 });
 
             if (vm.variants.length !== 0) {

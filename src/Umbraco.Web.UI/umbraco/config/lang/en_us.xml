@@ -233,7 +233,6 @@
         <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
         <key alias="isSensitiveValue_short">This value is hidden.</key>
         <key alias="languagesToPublish">What languages would you like to publish?</key>
-        <key alias="noLanguagesToPublish">No languages available to be published.</key>
         <key alias="publishedLanguages">Published Languages.</key>
         <key alias="readyToPublish">Ready to Publish?</key>
     </area>

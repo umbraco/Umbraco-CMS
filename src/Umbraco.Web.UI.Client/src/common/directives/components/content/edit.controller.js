@@ -318,18 +318,7 @@
             // TODO: Add "..." to publish button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
             if ($scope.content.variants.length > 1) {
                 //before we launch the dialog we want to execute all client side validations first
-                if (formHelper.submitForm({ scope: $scope, action: "publish", formCtrl: $scope.contentForm })) {
-
-                    //we need to check if the current form is dirty and if so we need to update the current variant's isEdited property to true
-                    //so that the publish dialog knows that it's a dirty culture and that it should be allowed to be published
-                    if ($scope.contentForm.$dirty) {
-                        _.each($scope.content.variants, function (d) {
-                            //set the isEdited flag if it's the current one
-                            if (d.current === true) {
-                                d.isEdited = true;
-                            }
-                        });
-                    }
+                if (formHelper.submitForm({ scope: $scope, action: "publish"})) {
 
                     var dialog = {
                         title: localizationService.localize("content_readyToPublish"),
