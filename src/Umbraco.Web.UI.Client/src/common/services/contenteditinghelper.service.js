@@ -44,6 +44,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 throw "args.saveMethod is not defined";
             }
 
+            var redirectOnSuccess = args.redirectOnSuccess !== undefined ? args.redirectOnSuccess : true;
             var redirectOnFailure = args.redirectOnFailure !== undefined ? args.redirectOnFailure : true;
 
             var self = this;
@@ -63,6 +64,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         self.handleSuccessfulSave({
                             scope: args.scope,
                             savedContent: data,
+                            redirectOnSuccess: redirectOnSuccess,
                             rebindCallback: function() {
                                 rebindCallback.apply(self, [args.content, data]);
                             }
@@ -562,7 +564,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 throw "args.savedContent cannot be null";
             }
 
-            if (!this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.savedContent.id)) {
+            // the default behaviour is to redirect on success. This adds option to prevent when false
+            args.redirectOnSuccess = args.redirectOnSuccess !== undefined ? args.redirectOnSuccess : true;
+            
+            if (!args.redirectOnSuccess || !this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.savedContent.id)) {
 
                 //we are not redirecting because this is not new content, it is existing content. In this case
                 // we need to detect what properties have changed and re-bind them with the server data.
@@ -586,7 +591,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          */
         redirectToCreatedContent: function (id, modelState) {
 
-            //only continue if we are currently in create mode and if there is no 'Name' modelstate errors
+            //only continue if we are currently in create mode and not in infinite mode and if there is no 'Name' modelstate errors
             // since we need at least a name to create content.
             if ($routeParams.create && (isValidIdentifier(id) && (!modelState || !modelState["Name"]))) {
 
