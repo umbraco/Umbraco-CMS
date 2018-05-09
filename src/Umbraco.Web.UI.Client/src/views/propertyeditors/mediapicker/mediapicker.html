@@ -21,7 +21,7 @@
                 </span>
 
                 <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
-                    <a class="umb-sortable-thumbnails__action" data-element="action-edit" href="" ng-click="editItem(image)">
+                    <a ng-if="allowEditMedia" class="umb-sortable-thumbnails__action" data-element="action-edit" href="" ng-click="editItem(image)">
                         <i class="icon icon-edit"></i>
                     </a>
                     <a class="umb-sortable-thumbnails__action -red" data-element="action-remove" href="" ng-click="remove($index)">
@@ -29,7 +29,7 @@
                     </a>
                 </div>
             </li>
-            <li style="border: none;" class="add-wrapper unsortable" ng-if="showAdd()">
+            <li style="border: none;" class="add-wrapper unsortable" ng-if="showAdd() && allowAddMedia">
                 <a data-element="sortable-thumbnails-add" href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': (images.length === 0 || isMultiPicker)}" prevent-default>
                     <i class="icon icon-add large"></i>
                 </a>
