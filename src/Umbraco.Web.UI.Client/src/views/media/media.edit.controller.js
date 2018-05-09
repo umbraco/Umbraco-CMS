@@ -10,10 +10,11 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
     
     var nodeId = null;
     var create = false;
+    var infiniteMode = $scope.model && $scope.model.infiniteMode;
 
     // when opening the editor through infinite editing get the 
     // node id from the model instead of the route param
-    if($scope.model && $scope.model.node && $scope.model.node.id) {
+    if(infiniteMode && $scope.model.node && $scope.model.node.id) {
         nodeId = $scope.model.node.id;
     } else {
         nodeId = $routeParams.id;
@@ -21,7 +22,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
     
     // when opening the editor through infinite editing get the 
     // create option from the model instead of the route param
-    if($scope.model && $scope.model.infiniteMode) {
+    if(infiniteMode) {
         create = $scope.model.create;
     } else {
         create = $routeParams.create;
@@ -105,7 +106,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
 
-                if($scope.model && !$scope.model.infiniteMode) {
+                if(!infiniteMode) {
                     syncTreeNode($scope.content, data.path, true); 
                 }
                
@@ -174,7 +175,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
         $scope.content.apps[0].active = true;
 
         // setup infinite mode
-        if($scope.model && $scope.model.infiniteMode === true) {
+        if(infiniteMode) {
             $scope.page.submitButtonLabel = "Save and Close";
         }
 
@@ -195,13 +196,15 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,
                         savedContent: data,
+                        redirectOnSuccess: !infiniteMode,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
 
                     editorState.set($scope.content);
                     $scope.busy = false;
 
-                    if($scope.model && !$scope.model.infiniteMode) {
+                    // when don't want to sync the tree when the editor is open in infinite mode
+                    if(!infiniteMode) {
                         syncTreeNode($scope.content, data.path);
                     }
 
@@ -210,7 +213,8 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                     $scope.page.saveButtonState = "success";
 
                     // close the editor if it's infinite mode
-                    if($scope.model && $scope.model.infiniteMode && $scope.model.submit) {
+                    if(infiniteMode && $scope.model.submit) {
+                        $scope.model.mediaNode = $scope.content;
                         $scope.model.submit($scope.model);
                     }
 
@@ -218,7 +222,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
 
                     contentEditingHelper.handleSaveError({
                         err: err,
-                        redirectOnFailure: true,
+                        redirectOnError: !infiniteMode,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
                     });
                     
