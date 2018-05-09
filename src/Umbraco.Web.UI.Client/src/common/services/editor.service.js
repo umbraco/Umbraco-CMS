@@ -81,8 +81,8 @@
          * @returns {Object} editor object
          */
         function contentEditor(editor) {
-            editor.view = "views/content/edit.html",
-            open(editor)
+            editor.view = "views/content/edit.html";
+            open(editor);
         }
 
         /**
@@ -99,8 +99,8 @@
          * @returns {Object} editor object
          */
         function mediaEditor(editor) {
-            editor.view = "views/media/edit.html",
-            open(editor)
+            editor.view = "views/media/edit.html";
+            open(editor);
         }
 
         /**
@@ -118,9 +118,9 @@
          * @returns {Object} editor object
          */
         function mediaPicker(editor) {
-            editor.view = "views/common/infiniteeditors/mediapicker/mediapicker.html",
-            editor.size = "small",
-            open(editor)
+            editor.view = "views/common/infiniteeditors/mediapicker/mediapicker.html";
+            editor.size = "small";
+            open(editor);
         }
 
         /**
@@ -135,8 +135,8 @@
          * @returns {Object} editor object
          */
         function iconPicker(editor) {
-            editor.view = "views/common/infiniteeditors/iconpicker/iconpicker.html",
-            editor.size = "small"
+            editor.view = "views/common/infiniteeditors/iconpicker/iconpicker.html";
+            editor.size = "small";
             open(editor);
         }
 
