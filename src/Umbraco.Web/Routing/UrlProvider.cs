@@ -94,20 +94,9 @@ namespace Umbraco.Web.Routing
         /// <para>The url is absolute or relative depending on <c>Mode</c> and on <c>current</c>, unless
         /// <c>absolute</c> is true, in which case the url is always absolute.</para>
         /// </remarks>
-        public string GetUrl(IPublishedContent content, bool absolute, Uri current = null, string culture = null)
+        public string GetUrl(IPublishedContent content, bool absolute, string culture = null, Uri current = null)
             => GetUrl(content, GetMode(absolute), culture, current);
-
-        /// <summary>
-        /// Gets the nice url of a published content.
-        /// </summary>
-        /// <param name="content">The published content.</param>
-        /// <param name="mode">The url mode.</param>
-        /// <param name="culture">A culture.</param>
-        /// <param name="current">The current absolute url.</param>
-        /// <returns>The url for the published content.</returns>
-        public string GetUrl(IPublishedContent content, UrlProviderMode mode, Uri current = null, string culture = null)
-            => GetUrl(content, mode, culture, current);
-
+        
         /// <summary>
         /// Gets the url of a published content.
         /// </summary>
