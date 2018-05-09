@@ -336,8 +336,5 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual(expectedCulture, frequest.Culture.Name);
             Assert.AreEqual(frequest.PublishedContent.Id, expectedNode);
         }
-
-
-        
     }
 }

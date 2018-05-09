@@ -14,6 +14,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Composing;
+using ContentVariation = Umbraco.Core.Models.ContentVariation;
 
 namespace Umbraco.Web.Editors
 {
@@ -33,6 +34,12 @@ namespace Umbraco.Web.Editors
         public int GetCount()
         {
             return Services.ContentTypeService.Count();
+        }
+        [HttpGet]
+        public bool AllowsVariation()
+        {
+            var contentTypes = Services.ContentTypeService.GetAll();
+            return contentTypes.Any(contentType => contentType.Variations.HasFlag(ContentVariation.CultureNeutral));
         }
 
         public DocumentTypeDisplay GetById(int id)

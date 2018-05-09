@@ -86,7 +86,7 @@
             /// <summary>
             /// alias for the packages tree
             /// </summary>
-            public const string Packages = "packager";
+            public const string Packages = "packages";
 
             /// <summary>
             /// alias for the dictionary tree.

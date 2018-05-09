@@ -7,6 +7,10 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
     var contentTypeHelperService = {
 
+        allowsVariation: function() {
+            return contentTypeResource.allowsVariation();
+        },
+
         createIdArray: function(array) {
 
           var newArray = [];

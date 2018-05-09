@@ -9,7 +9,7 @@
  *
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource) {
+function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource, contentTypeHelper) {
 
     $scope.treeApi = {};
 
@@ -201,18 +201,48 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         if (args.key === "showSearchResults") {
             $scope.showSearchResults = args.value;
         }
+
+        //load languages if doc types allow variations
+        if ($scope.currentSection === "content") {
+            contentTypeHelper.allowsVariation().then(function (b) {
+                if (b === "true") {
+                    //load languages if there are more than 1
+                    loadLanguages();
+                } else {
+                    $scope.languages = [];
+                    init();
+                }
+
+            });
+        }
     }));
 
     // Listen for language updates
-    evts.push(eventsService.on("editors.languages.languageDeleted", function(e, args) {
-        languageResource.getAll().then(function(languages) {
-            $scope.languages = languages;
+    evts.push(eventsService.on("editors.languages.languageDeleted", function (e, args) {
+        languageResource.getAll().then(function (languages) {
+            contentTypeHelper.allowsVariation().then(function (b) {
+
+                if (b === "true") {
+                    $scope.languages = languages;
+                } else {
+                    $scope.languages = [];
+                }
+
+            });
         });
     }));
 
     evts.push(eventsService.on("editors.languages.languageCreated", function(e, args) {
         languageResource.getAll().then(function(languages) {
-            $scope.languages = languages;
+            contentTypeHelper.allowsVariation().then(function (b) {
+
+                if (b === "true") {
+                    $scope.languages = languages;
+                } else {
+                    $scope.languages = [];
+                }
+
+            });
         });
     }));
 
@@ -231,11 +261,12 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     }));
 
     //when the application is ready and the user is authorized setup the data
-    evts.push(eventsService.on("app.ready", function(evt, data) {
+    evts.push(eventsService.on("app.ready", function (evt, data) {
         $scope.authenticated = true;
-        
-        // load languages
-        languageResource.getAll().then(function(languages) {
+    }));
+
+    function loadLanguages() {
+        languageResource.getAll().then(function (languages) {
             $scope.languages = languages;
 
             if ($scope.languages.length > 1) {
@@ -250,7 +281,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
             init();
         });
-    }));
+    }
 
     function init() {
         //select the current language if set in the query string
@@ -281,7 +312,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         }
     }
 
-
     function nodeExpandedHandler(args) {
         //store the reference to the expanded node path
         if (args.node) {
@@ -289,7 +319,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         }
     }
 
-    $scope.selectLanguage = function(language) {
+    $scope.selectLanguage = function (language) {
 
         $location.search("mculture", language.culture);
 
@@ -322,7 +352,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 angularHelper.executeSequentialPromises(promises);
             });
         });
-        
+
     };
 
     //this reacts to the options item in the tree

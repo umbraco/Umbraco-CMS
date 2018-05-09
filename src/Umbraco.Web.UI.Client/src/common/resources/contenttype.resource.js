@@ -166,6 +166,15 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                'Failed to retrieve all content types');
         },
 
+        allowsVariation: function() {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentTypeApiBaseUrl",
+                        "AllowsVariation")),
+                'Failed to retrieve variant content types');
+        },
+
         getScaffold: function (parentId) {
 
             return umbRequestHelper.resourcePromise(
