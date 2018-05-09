@@ -138,6 +138,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 disableFolderSelect: disableFolderSelect,
                 submit: function(model) {
 
+                    editorService.close();
+                    
                     _.each(model.selectedImages, function(media, i) {
                         // if there is no thumbnail, try getting one if the media is not a placeholder item
                         if (!media.thumbnail && media.id && media.metaData) {
@@ -154,22 +156,36 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                         }
 
                     });
- 
                     $scope.sync();
-
-                    setupViewModel();
- 
-                    editorService.close();
-
+                    reloadUpdatedMediaItems(model.updatedMediaNodes);
                 },
                 close: function(model) {
                     editorService.close();
+                    reloadUpdatedMediaItems(model.updatedMediaNodes);
                 }
             }
 
             editorService.mediaPicker(mediaPicker);
 
        };
+
+       function reloadUpdatedMediaItems(updatedMediaNodes) {
+            // because the images can be edited through the media picker we need to 
+            // reload. We only reload the images that is already picked but has been updated.
+            // We have to get the entities from the server because the media 
+            // can be edited without being selected
+            _.each($scope.images, function(image, i) {
+                if(updatedMediaNodes.indexOf(image.udi) !== -1) {
+                    image.loading = true;
+                    entityResource.getById(image.udi, "media")
+                        .then(function (mediaEntity) {
+                            angular.extend(image, mediaEntity);
+                            image.thumbnail = mediaHelper.resolveFileFromEntity(image, true);
+                            image.loading = false;
+                        });
+                }
+            })
+       }
 
        $scope.sortableOptions = {
            disabled: !$scope.isMultiPicker,

@@ -7,6 +7,10 @@
         <ul ui-sortable="sortableOptions" ng-model="images" class="umb-sortable-thumbnails">
             <li data-element="sortable-thumbnail-{{$index}}" class="umb-sortable-thumbnails__wrapper" ng-repeat="image in images track by $index">
 
+                <div ng-if="image.loading" class="umb-sortable-thumbnails__loading">
+                    <div class="umb-button__progress"></div>
+                </div>
+
                 <!-- IMAGE -->
                 <img ng-class="{'trashed': image.trashed}" ng-src="{{image.thumbnail}}" alt="" ng-show="image.thumbnail" title="{{image.trashed ? 'Trashed: ' + image.name : image.name}}" />
 

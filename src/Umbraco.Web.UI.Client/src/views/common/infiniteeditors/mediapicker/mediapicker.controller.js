@@ -399,15 +399,24 @@ angular.module("umbraco")
                                 .then(function (mediaEntity) {
                                     angular.extend(item, mediaEntity);
                                     setMediaMetaData(item);
+                                    setUpdatedMediaNodes(item);
                                 });
                         }
                     },
                     close: function(model) {
+                        setUpdatedMediaNodes(item);
                         editorService.close();
                     }
                 };
                 editorService.mediaEditor(mediaEditor);
             };
+
+            function setUpdatedMediaNodes(item) {
+                // add udi to list of updated media items so we easily can update them in other editors
+                if($scope.model.updatedMediaNodes.indexOf(item.udi) === -1) {
+                    $scope.model.updatedMediaNodes.push(item.udi);
+                }
+            }
 
             $scope.submit = function() {
                 if($scope.model.submit) {
