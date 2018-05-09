@@ -95,21 +95,32 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         };
 
         $scope.editItem = function(item) {
-
             var mediaEditor = {
                 "node": item,
                 submit: function(model) {
-                    console.log("submitted", model);
-                    editorService.close(model.id);
+                    editorService.close();
+                    // update the selected media item to match the saved media item
+                    // the media picker is using media entities so we get the
+                    // entity so we easily can format it for use in the media grid
+                    if(model && model.mediaNode) {
+                        entityResource.getById(model.mediaNode.id, "media")
+                            .then(function (mediaEntity) {
+                                // if an image is selecting more than once 
+                                // we need to update all the media items
+                                angular.forEach($scope.images, function(image){
+                                    if(image.id === model.mediaNode.id) {
+                                        angular.extend(image, mediaEntity);
+                                        image.thumbnail = mediaHelper.resolveFileFromEntity(image, true);
+                                    }
+                                });
+                            });
+                    }
                 },
                 close: function(model) {
-                    console.log("closed", model);
-                    editorService.close(model.id);
+                    editorService.close();
                 }
             };
-
             editorService.mediaEditor(mediaEditor);
-            
         };
 
         $scope.add = function() {
@@ -135,15 +146,18 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                         else {
                             $scope.ids.push(media.id);
                         }
+
                     });
  
                     $scope.sync();
+
+                    setupViewModel();
  
-                    editorService.close(model.id);
+                    editorService.close();
 
                 },
                 close: function(model) {
-                    editorService.close(model.id);
+                    editorService.close();
                 }
             }
 
