@@ -55,7 +55,9 @@
                     variant.htmlId = "publish_variant_" + variant.compositeId;
 
                     //check for pristine variants
-                    vm.hasPristineVariants = !(dirtyVariantFilter(variant));
+                    if (!vm.hasPristineVariants) {
+                        vm.hasPristineVariants = pristineVariantFilter(variant);
+                    }
                 });
 
             if (vm.variants.length !== 0) {
