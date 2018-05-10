@@ -3,7 +3,6 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
@@ -337,7 +336,6 @@ namespace Umbraco.Tests.Routing
             Assert.AreEqual(expectedCulture, frequest.Culture.Name);
             Assert.AreEqual(frequest.PublishedContent.Id, expectedNode);
         }
-
         // domains such as "/en" are natively supported, and when instanciating
         // DomainAndUri for them, the host will come from the current request
         //
@@ -375,7 +373,6 @@ namespace Umbraco.Tests.Routing
             var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
             globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
             SettingsForTests.ConfigureSettings(globalSettings.Object);
-
             var umbracoContext = GetUmbracoContext(inputUrl, globalSettings:globalSettings.Object);
             var publishedRouter = CreatePublishedRouter(Container);
             var frequest = publishedRouter.CreateRequest(umbracoContext);
@@ -391,44 +388,6 @@ namespace Umbraco.Tests.Routing
 
             Assert.IsTrue(result);
             Assert.AreEqual(frequest.PublishedContent.Id, expectedNode);
-        }
-
-        [Test]
-        public void WithDefaultCulture()
-        {
-            SetupDomainServiceMock(new[]
-            {
-                new UmbracoDomain("localhost:9000/en")
-                {
-                    Id = 1,
-                    LanguageId = LangEngId,
-                    RootContentId = 10011,
-                    LanguageIsoCode = "en-US"
-                },
-                new UmbracoDomain("localhost:9000/fr")
-                {
-                    Id = 1,
-                    LanguageId = LangFrId,
-                    RootContentId = 10012,
-                    LanguageIsoCode = "fr-FR"
-                }
-            });
-
-            var requestUrl = "http://localhost:9000/fr/1001-2-2";
-
-            var defaultCultureAccessor = (TestDefaultCultureAccessor) DefaultCultureAccessor;
-            defaultCultureAccessor.DefaultCulture = "en-US";
-
-            var globalSettings = Mock.Get(TestObjects.GetGlobalSettings()); //this will modify the IGlobalSettings instance stored in the container
-            globalSettings.Setup(x => x.HideTopLevelNodeFromPath).Returns(false);
-            SettingsForTests.ConfigureSettings(globalSettings.Object);
-
-            var umbracoContext = GetUmbracoContext(requestUrl, globalSettings:globalSettings.Object);
-            var publishedRouter = CreatePublishedRouter(Container);
-            var publishedRequest = publishedRouter.CreateRequest(umbracoContext);
-
-            var domain = publishedRouter.FindDomain(publishedRequest);
-            Assert.AreEqual("fr-FR", publishedRequest.Culture.Name);
         }
     }
 }

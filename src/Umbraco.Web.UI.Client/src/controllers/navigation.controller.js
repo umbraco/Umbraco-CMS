@@ -9,7 +9,7 @@
  *
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource) {
+function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource, contentTypeHelper) {
 
     //this is used to trigger the tree to start loading once everything is ready
     var treeInitPromise = $q.defer();
@@ -209,18 +209,47 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             $scope.showSearchResults = args.value;
         }
 
+        //load languages if doc types allow variations
+        if ($scope.currentSection === "content") {
+            contentTypeHelper.allowsVariation().then(function (b) {
+                if (b === "true") {
+                    //load languages if there are more than 1
+                    loadLanguages();
+                } else {
+                    $scope.languages = [];
+                    init();
+                }
+
+            });
+        }
     }));
 
     // Listen for language updates
     evts.push(eventsService.on("editors.languages.languageDeleted", function (e, args) {
         languageResource.getAll().then(function (languages) {
-            $scope.languages = languages;
+            contentTypeHelper.allowsVariation().then(function (b) {
+
+                if (b === "true") {
+                    $scope.languages = languages;
+                } else {
+                    $scope.languages = [];
+                }
+
+            });
         });
     }));
 
     evts.push(eventsService.on("editors.languages.languageCreated", function (e, args) {
         languageResource.getAll().then(function (languages) {
-            $scope.languages = languages;
+            contentTypeHelper.allowsVariation().then(function (b) {
+
+                if (b === "true") {
+                    $scope.languages = languages;
+                } else {
+                    $scope.languages = [];
+                }
+
+            });
         });
     }));
 
@@ -359,7 +388,6 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             });
         });
     }
-
     function nodeExpandedHandler(args) {
         //store the reference to the expanded node path
         if (args.node) {
