@@ -144,21 +144,23 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // or we reach the content root, collecting urls in the way
             var pathParts = new List<string>();
             var n = node;
+            var urlSegment = n.GetUrlSegment(culture);
             var hasDomains = _domainHelper.NodeHasDomains(n.Id);
             while (hasDomains == false && n != null) // n is null at root
-            {
-                var urlSegment = n.GetUrlSegment(culture);
-
-                // without a segment, we cannot continue, really
-                if (urlSegment.IsNullOrWhiteSpace())
-                    return null;
+            {   
+                // no segment indicates this is not published when this is a variant
+                if (urlSegment.IsNullOrWhiteSpace()) return null;
 
                 pathParts.Add(urlSegment);
 
                 // move to parent node
                 n = n.Parent;
+                urlSegment = n.GetUrlSegment(culture);
                 hasDomains = n != null && _domainHelper.NodeHasDomains(n.Id);
             }
+
+            // at this point this will be the urlSegment of the root, no segment indicates this is not published when this is a variant
+            if (urlSegment.IsNullOrWhiteSpace()) return null;
 
             // no domain, respect HideTopLevelNodeFromPath for legacy purposes
             if (hasDomains == false && hideTopLevelNode.Value)

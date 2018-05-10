@@ -17,11 +17,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             DefaultCulture = defaultCultureAccessor.DefaultCulture;
         }
 
-        /// <summary>
-        /// Returns all <see cref="Domain"/> in the current domain cache including any domains that may be referenced by content items that are no longer published
-        /// </summary>
-        /// <param name="includeWildcards"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public IEnumerable<Domain> GetAll(bool includeWildcards)
         {
             return _domainService.GetAll(includeWildcards)
@@ -29,12 +25,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 .Select(x => new Domain(x.Id, x.DomainName, x.RootContentId.Value, CultureInfo.GetCultureInfo(x.LanguageIsoCode), x.IsWildcard));
         }
 
-        /// <summary>
-        /// Returns all assigned <see cref="Domain"/> for the content id specified even if the content item is not published
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="includeWildcards"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public IEnumerable<Domain> GetAssigned(int contentId, bool includeWildcards)
         {
             return _domainService.GetAssignedDomains(contentId, includeWildcards)
