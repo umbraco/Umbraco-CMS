@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
 using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.Editors
@@ -81,6 +82,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Deletes a language with a given ID
         /// </summary>
+        [UmbracoTreeAuthorize(Core.Constants.Trees.Languages)]
         [HttpDelete]
         [HttpPost]
         public IHttpActionResult DeleteLanguage(int id)
@@ -104,6 +106,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Creates or saves a language
         /// </summary>
+        [UmbracoTreeAuthorize(Core.Constants.Trees.Languages)]
         [HttpPost]
         public Language SaveLanguage(Language language)
         {

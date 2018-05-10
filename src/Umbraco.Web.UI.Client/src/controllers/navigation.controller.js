@@ -9,7 +9,7 @@
  *
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource, contentTypeHelper) {
+function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource, contentResource) {
 
     //this is used to trigger the tree to start loading once everything is ready
     var treeInitPromise = $q.defer();
@@ -209,47 +209,18 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             $scope.showSearchResults = args.value;
         }
 
-        //load languages if doc types allow variations
-        if ($scope.currentSection === "content") {
-            contentTypeHelper.allowsVariation().then(function (b) {
-                if (b === "true") {
-                    //load languages if there are more than 1
-                    loadLanguages();
-                } else {
-                    $scope.languages = [];
-                    init();
-                }
-
-            });
-        }
     }));
 
     // Listen for language updates
     evts.push(eventsService.on("editors.languages.languageDeleted", function (e, args) {
-        languageResource.getAll().then(function (languages) {
-            contentTypeHelper.allowsVariation().then(function (b) {
-
-                if (b === "true") {
-                    $scope.languages = languages;
-                } else {
-                    $scope.languages = [];
-                }
-
-            });
+        loadLanguages().then(function (languages) {
+            $scope.languages = languages;
         });
     }));
 
     evts.push(eventsService.on("editors.languages.languageCreated", function (e, args) {
-        languageResource.getAll().then(function (languages) {
-            contentTypeHelper.allowsVariation().then(function (b) {
-
-                if (b === "true") {
-                    $scope.languages = languages;
-                } else {
-                    $scope.languages = [];
-                }
-
-            });
+        loadLanguages().then(function (languages) {
+            $scope.languages = languages;
         });
     }));
 
@@ -342,11 +313,25 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     }
 
     /**
+     * This loads the language data, if the are no variant content types configured this will return no languages
+     */
+    function loadLanguages() {
+
+        return contentResource.allowsCultureVariation().then(function (b) {
+            if (b === "true") {
+                return languageResource.getAll()
+            } else {
+                return $q.when([]); //resolve an empty collection
+            }
+        });
+    }
+
+    /**
      * Called once during init to initialize the navigation/tree/languages
      */
     function initNav() {
         // load languages
-        languageResource.getAll().then(function (languages) {
+        loadLanguages().then(function (languages) {
 
             $scope.languages = languages;
 
@@ -398,7 +383,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     $scope.selectLanguage = function (language) {
 
         $location.search("mculture", language.culture);
-        
+
         // close the language selector
         $scope.page.languageSelectorIsOpen = false;
 

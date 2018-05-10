@@ -26,9 +26,9 @@
 function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     /** internal method process the saving of data and post processing the result */
-  function saveContentItem(content, action, files, restApiUrl) {
+    function saveContentItem(content, action, files, restApiUrl) {
         return umbRequestHelper.postSaveContent({
-          restApiUrl: restApiUrl,
+            restApiUrl: restApiUrl,
             content: content,
             action: action,
             files: files,
@@ -40,32 +40,40 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     return {
 
+        allowsCultureVariation: function () {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "AllowsCultureVariation")),
+                'Failed to retrieve variant content types');
+        },
 
-      savePermissions: function (saveModel) {
-        if (!saveModel) {
-          throw "saveModel cannot be null";
-        }
-        if (!saveModel.contentId) {
-          throw "saveModel.contentId cannot be null";
-        }
-        if (!saveModel.permissions) {
-          throw "saveModel.permissions cannot be null";
-        }
+        savePermissions: function (saveModel) {
+            if (!saveModel) {
+                throw "saveModel cannot be null";
+            }
+            if (!saveModel.contentId) {
+                throw "saveModel.contentId cannot be null";
+            }
+            if (!saveModel.permissions) {
+                throw "saveModel.permissions cannot be null";
+            }
 
-        return umbRequestHelper.resourcePromise(
-          $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostSaveUserGroupPermissions"),
-            saveModel),
-          'Failed to save permissions');
-      },
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostSaveUserGroupPermissions"),
+                    saveModel),
+                'Failed to save permissions');
+        },
 
 
         getRecycleBin: function () {
             return umbRequestHelper.resourcePromise(
-                  $http.get(
-                        umbRequestHelper.getApiUrl(
-                              "contentApiBaseUrl",
-                              "GetRecycleBin")),
-                  'Failed to retrieve data for content recycle bin');
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetRecycleBin")),
+                'Failed to retrieve data for content recycle bin');
         },
 
         /**
@@ -102,12 +110,12 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             }
 
             return umbRequestHelper.resourcePromise(
-                   $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostSort"),
-                         {
-                             parentId: args.parentId,
-                             idSortOrder: args.sortedIds
-                         }),
-                   'Failed to sort content');
+                $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostSort"),
+                    {
+                        parentId: args.parentId,
+                        idSortOrder: args.sortedIds
+                    }),
+                'Failed to sort content');
         },
 
         /**
@@ -145,12 +153,12 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             }
 
             return umbRequestHelper.resourcePromise(
-                   $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostMove"),
-                         {
-                             parentId: args.parentId,
-                             id: args.id
-                         }),
-                   'Failed to move content');
+                $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostMove"),
+                    {
+                        parentId: args.parentId,
+                        id: args.id
+                    }),
+                'Failed to move content');
         },
 
         /**
@@ -189,9 +197,9 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             }
 
             return umbRequestHelper.resourcePromise(
-                   $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostCopy"),
-                         args),
-                   'Failed to copy content');
+                $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostCopy"),
+                    args),
+                'Failed to copy content');
         },
 
         /**
@@ -225,12 +233,12 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             }
 
             return umbRequestHelper.resourcePromise(
-                                    $http.post(
-                                          umbRequestHelper.getApiUrl(
-                                                "contentApiBaseUrl",
-                                                "PostUnPublish",
-                                        { id: id, culture: culture })),
-                                    'Failed to publish content with id ' + id);
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "PostUnPublish",
+                        { id: id, culture: culture })),
+                'Failed to publish content with id ' + id);
         },
         /**
           * @ngdoc method
@@ -253,11 +261,11 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           */
         emptyRecycleBin: function () {
             return umbRequestHelper.resourcePromise(
-                   $http.post(
-                         umbRequestHelper.getApiUrl(
-                               "contentApiBaseUrl",
-                               "EmptyRecycleBin")),
-                   'Failed to empty the recycle bin');
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "EmptyRecycleBin")),
+                'Failed to empty the recycle bin');
         },
 
         /**
@@ -282,22 +290,22 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           */
         deleteById: function (id) {
             return umbRequestHelper.resourcePromise(
-                   $http.post(
-                         umbRequestHelper.getApiUrl(
-                               "contentApiBaseUrl",
-                               "DeleteById",
-                               [{ id: id }])),
-                   'Failed to delete item ' + id);
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "DeleteById",
+                        [{ id: id }])),
+                'Failed to delete item ' + id);
         },
 
         deleteBlueprint: function (id) {
-          return umbRequestHelper.resourcePromise(
-            $http.post(
-              umbRequestHelper.getApiUrl(
-                "contentApiBaseUrl",
-                "DeleteBlueprint",
-                [{ id: id }])),
-            'Failed to delete blueprint ' + id);
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "DeleteBlueprint",
+                        [{ id: id }])),
+                'Failed to delete blueprint ' + id);
         },
 
         /**
@@ -324,22 +332,22 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           */
         getById: function (id, culture) {
             return umbRequestHelper.resourcePromise(
-                  $http.get(
-                        umbRequestHelper.getApiUrl(
-                              "contentApiBaseUrl",
-                              "GetById",
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetById",
                         { id: id, culture: culture })),
-                  'Failed to retrieve data for content id ' + id);
+                'Failed to retrieve data for content id ' + id);
         },
 
         getBlueprintById: function (id) {
-          return umbRequestHelper.resourcePromise(
-            $http.get(
-              umbRequestHelper.getApiUrl(
-                "contentApiBaseUrl",
-                "GetBlueprintById",
-                [{ id: id }])),
-            'Failed to retrieve data for content id ' + id);
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetBlueprintById",
+                        [{ id: id }])),
+                'Failed to retrieve data for content id ' + id);
         },
 
         /**
@@ -371,12 +379,12 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             });
 
             return umbRequestHelper.resourcePromise(
-                  $http.get(
-                        umbRequestHelper.getApiUrl(
-                              "contentApiBaseUrl",
-                              "GetByIds",
-                              idQuery)),
-                  'Failed to retrieve data for content with multiple ids');
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetByIds",
+                        idQuery)),
+                'Failed to retrieve data for content with multiple ids');
         },
 
 
@@ -415,23 +423,23 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getScaffold: function (parentId, alias) {
 
             return umbRequestHelper.resourcePromise(
-                  $http.get(
-                        umbRequestHelper.getApiUrl(
-                              "contentApiBaseUrl",
-                              "GetEmpty",
-                              [{ contentTypeAlias: alias }, { parentId: parentId }])),
-                  'Failed to retrieve data for empty content item type ' + alias);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetEmpty",
+                        [{ contentTypeAlias: alias }, { parentId: parentId }])),
+                'Failed to retrieve data for empty content item type ' + alias);
         },
 
         getBlueprintScaffold: function (parentId, blueprintId) {
 
-          return umbRequestHelper.resourcePromise(
-            $http.get(
-              umbRequestHelper.getApiUrl(
-                "contentApiBaseUrl",
-                      "GetEmpty",
-                      [{ blueprintId: blueprintId }, { parentId: parentId}])),
-            'Failed to retrieve blueprint for id ' + blueprintId);
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetEmpty",
+                        [{ blueprintId: blueprintId }, { parentId: parentId }])),
+                'Failed to retrieve blueprint for id ' + blueprintId);
         },
 
         /**
@@ -456,11 +464,11 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           */
         getNiceUrl: function (id) {
             return umbRequestHelper.resourcePromise(
-                  $http.get(
-                        umbRequestHelper.getApiUrl(
-                              "contentApiBaseUrl",
-                              "GetNiceUrl", [{ id: id }])),
-                  'Failed to retrieve url for id:' + id);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetNiceUrl", [{ id: id }])),
+                'Failed to retrieve url for id:' + id);
         },
 
         /**
@@ -572,21 +580,21 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           */
         checkPermission: function (permission, id) {
             return umbRequestHelper.resourcePromise(
-                   $http.get(
-                         umbRequestHelper.getApiUrl(
-                               "contentApiBaseUrl",
-                               "HasPermission",
-                               [{ permissionToCheck: permission }, { nodeId: id }])),
-                   'Failed to check permission for item ' + id);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "HasPermission",
+                        [{ permissionToCheck: permission }, { nodeId: id }])),
+                'Failed to check permission for item ' + id);
         },
 
         getDetailedPermissions: function (contentId) {
-          return umbRequestHelper.resourcePromise(
-            $http.get(
-              umbRequestHelper.getApiUrl(
-                "contentApiBaseUrl",
-                "GetDetailedPermissions", { contentId: contentId })),
-            'Failed to retrieve permissions for content item ' + contentId);
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetDetailedPermissions", { contentId: contentId })),
+                'Failed to retrieve permissions for content item ' + contentId);
         },
 
         getPermissions: function (nodeIds) {
@@ -628,17 +636,17 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           */
         save: function (content, isNew, files) {
-          var endpoint = umbRequestHelper.getApiUrl(
-            "contentApiBaseUrl",
-            "PostSave");
-          return saveContentItem(content, "save" + (isNew ? "New" : ""), files, endpoint);
+            var endpoint = umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "PostSave");
+            return saveContentItem(content, "save" + (isNew ? "New" : ""), files, endpoint);
         },
 
         saveBlueprint: function (content, isNew, files) {
-          var endpoint = umbRequestHelper.getApiUrl(
-            "contentApiBaseUrl",
-            "PostSaveBlueprint");
-          return saveContentItem(content, "save" + (isNew ? "New" : ""), files, endpoint);
+            var endpoint = umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "PostSaveBlueprint");
+            return saveContentItem(content, "save" + (isNew ? "New" : ""), files, endpoint);
         },
 
         /**
@@ -670,10 +678,10 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           */
         publish: function (content, isNew, files) {
-          var endpoint = umbRequestHelper.getApiUrl(
-            "contentApiBaseUrl",
-            "PostSave");
-          return saveContentItem(content, "publish" + (isNew ? "New" : ""), files, endpoint);
+            var endpoint = umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "PostSave");
+            return saveContentItem(content, "publish" + (isNew ? "New" : ""), files, endpoint);
         },
 
 
@@ -704,10 +712,10 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           */
         sendToPublish: function (content, isNew, files) {
-          var endpoint = umbRequestHelper.getApiUrl(
-            "contentApiBaseUrl",
-            "PostSave");
-          return saveContentItem(content, "sendPublish" + (isNew ? "New" : ""), files, endpoint);
+            var endpoint = umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "PostSave");
+            return saveContentItem(content, "sendPublish" + (isNew ? "New" : ""), files, endpoint);
         },
 
         /**
@@ -737,12 +745,12 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             }
 
             return umbRequestHelper.resourcePromise(
-                                    $http.post(
-                                          umbRequestHelper.getApiUrl(
-                                                "contentApiBaseUrl",
-                                                "PostPublishById",
-                                                [{ id: id }])),
-                                    'Failed to publish content with id ' + id);
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "PostPublishById",
+                        [{ id: id }])),
+                'Failed to publish content with id ' + id);
 
         },
 

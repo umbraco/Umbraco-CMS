@@ -35,12 +35,6 @@ namespace Umbraco.Web.Editors
         {
             return Services.ContentTypeService.Count();
         }
-        [HttpGet]
-        public bool AllowsVariation()
-        {
-            var contentTypes = Services.ContentTypeService.GetAll();
-            return contentTypes.Any(contentType => contentType.Variations.HasFlag(ContentVariation.CultureNeutral));
-        }
 
         public DocumentTypeDisplay GetById(int id)
         {

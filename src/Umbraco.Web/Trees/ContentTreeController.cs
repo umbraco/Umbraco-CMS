@@ -257,24 +257,22 @@ namespace Umbraco.Web.Trees
                 return;
             }
 
-            if (entity is IDocumentEntitySlim docEntity)
+            if (!(entity is IDocumentEntitySlim docEntity))
+                throw new InvalidOperationException($"Cannot render a tree node for a culture when the entity isn't {typeof(IDocumentEntitySlim)}, instead it is {entity.GetType()}");
+
+            // we are getting the tree for a given culture,
+            // for those items that DO support cultures, we need to get the proper name, IF it exists
+            // otherwise, invariant is fine
+
+            if (docEntity.Variations.Has(Core.Models.ContentVariation.CultureNeutral) &&
+                docEntity.CultureNames.TryGetValue(culture, out var name) &&
+                !string.IsNullOrWhiteSpace(name))
             {
-                // we are getting the tree for a given culture,
-                // for those items that DO support cultures, we need to get the proper name, IF it exists
-                // otherwise, invariant is fine
-
-                if (docEntity.Variations.Has(Core.Models.ContentVariation.CultureNeutral) &&
-                    docEntity.CultureNames.TryGetValue(culture, out var name) &&
-                    !string.IsNullOrWhiteSpace(name))
-                {
-                    entity.Name = name;
-                }
-
-                if (string.IsNullOrWhiteSpace(entity.Name))
-                    entity.Name = "[[" + entity.Id + "]]";
+                entity.Name = name;
             }
 
-            throw new InvalidOperationException($"Cannot render a tree node for a culture when the entity isn't {typeof(IDocumentEntitySlim)}, instead it is {entity.GetType()}");
+            if (string.IsNullOrWhiteSpace(entity.Name))
+                entity.Name = "[[" + entity.Id + "]]";
         }
 
         private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool convert = false)

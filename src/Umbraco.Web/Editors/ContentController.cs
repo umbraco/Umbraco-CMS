@@ -66,6 +66,18 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Returns true if any content types have culture variation enabled
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [WebApi.UmbracoAuthorize, OverrideAuthorization]
+        public bool AllowsCultureVariation()
+        {
+            var contentTypes = Services.ContentTypeService.GetAll();
+            return contentTypes.Any(contentType => contentType.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment));
+        }
+
+        /// <summary>
         /// Return content for the specified ids
         /// </summary>
         /// <param name="ids"></param>
