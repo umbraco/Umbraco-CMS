@@ -186,7 +186,7 @@ namespace Umbraco.Core.Models
             if (_cultureInfos == null)
                 _cultureInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
 
-            _cultureInfos[culture] = (name, DateTime.Now) ;
+            _cultureInfos[culture] = (name, DateTime.Now);
             OnPropertyChanged(Ps.Value.NamesSelector);
         }
 
@@ -312,9 +312,29 @@ namespace Umbraco.Core.Models
             return Properties.Where(x => !x.IsAllValid()).ToArray();
         }
 
+        /// <summary>
+        /// Validates the content item's properties for the provided culture/segment
+        /// </summary>
+        /// <param name="culture"></param>
+        /// <param name="segment"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This will not perform validation for properties that do not match the required ContentVariation based on the culture/segment values provided
+        /// </remarks>
         public virtual Property[] Validate(string culture = null, string segment = null)
         {
-            return Properties.Where(x => !x.IsValid(culture, segment)).ToArray();
+            return Properties.Where(x =>
+            {
+                if (!culture.IsNullOrWhiteSpace() && !x.PropertyType.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment))
+                    return false; //has a culture, this prop is only culture invariant, ignore
+                if (culture.IsNullOrWhiteSpace() && !x.PropertyType.Variations.HasAny(ContentVariation.InvariantNeutral | ContentVariation.InvariantSegment))
+                    return false; //no culture, this prop is only culture variant, ignore
+                if (!segment.IsNullOrWhiteSpace() && !x.PropertyType.Variations.HasAny(ContentVariation.InvariantSegment | ContentVariation.CultureSegment))
+                    return false; //has segment, this prop is only segment neutral, ignore
+                if (segment.IsNullOrWhiteSpace() && !x.PropertyType.Variations.HasAny(ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral))
+                    return false; //no segment, this prop is only non segment neutral, ignore
+                return !x.IsValid(culture, segment);
+            }).ToArray();
         }
 
         public virtual Property[] ValidateCulture(string culture = null)

@@ -167,7 +167,7 @@ namespace Umbraco.Core.Models
         /// <returns>A value indicating whether the values could be published.</returns>
         /// <remarks>
         /// <para>The document must then be published via the content service.</para>
-        /// <para>Values are not published if they are not valie.</para>
+        /// <para>Values are not published if they are not valid.</para>
         /// </remarks>
         //fixme return an Attempt with some error results if it doesn't work
         bool TryPublishAllValues();
