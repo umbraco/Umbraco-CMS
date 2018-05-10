@@ -40,7 +40,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters // fixme MOVE TO MODELS O
         /// <inheritdoc />
         public override string ToString()
         {
-            return Crops.Any() ? JsonConvert.SerializeObject(this) : Src;
+            return Crops != null ? (Crops.Any() ? JsonConvert.SerializeObject(this) : Src) : string.Empty;
         }
 
         /// <inheritdoc />
