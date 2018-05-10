@@ -35,6 +35,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.Navigable
 
         private string XmlString(int index, object value)
         {
+            if (value == null) return string.Empty;
             var field = Type.FieldTypes[index];
             return field.XmlStringConverter == null ? value.ToString() : field.XmlStringConverter(value);
         }
