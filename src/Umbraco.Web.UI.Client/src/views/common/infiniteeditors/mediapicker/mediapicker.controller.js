@@ -311,28 +311,9 @@ angular.module("umbraco")
                 entityResource.getPagedDescendants($scope.startNodeId, "Media", $scope.searchOptions)
                     .then(function(data) {
                         // update image data to work with image grid
-                        angular.forEach(data.items,
-                            function(mediaItem) {
-                                // set thumbnail and src
-                                mediaItem.thumbnail = mediaHelper.resolveFileFromEntity(mediaItem, true);
-                                mediaItem.image = mediaHelper.resolveFileFromEntity(mediaItem, false);
-                                // set properties to match a media object
-                                if (mediaItem.metaData &&
-                                    mediaItem.metaData.umbracoWidth &&
-                                    mediaItem.metaData.umbracoHeight) {
-
-                                    mediaItem.properties = [
-                                        {
-                                            alias: "umbracoWidth",
-                                            value: mediaItem.metaData.umbracoWidth.Value
-                                        },
-                                        {
-                                            alias: "umbracoHeight",
-                                            value: mediaItem.metaData.umbracoHeight.Value
-                                        }
-                                    ];
-                                }
-                            });
+                        angular.forEach(data.items, function(mediaItem) {
+                            setMediaMetaData(mediaItem);
+                        });
                         // update images
                         $scope.images = data.items ? data.items : [];
                         // update pagination
@@ -346,6 +327,28 @@ angular.module("umbraco")
                         preSelectImages();
                         $scope.loading = false;
                     });
+            }
+
+            function setMediaMetaData(mediaItem) {
+                // set thumbnail and src
+                mediaItem.thumbnail = mediaHelper.resolveFileFromEntity(mediaItem, true);
+                mediaItem.image = mediaHelper.resolveFileFromEntity(mediaItem, false);
+                // set properties to match a media object
+                if (mediaItem.metaData &&
+                    mediaItem.metaData.umbracoWidth &&
+                    mediaItem.metaData.umbracoHeight) {
+
+                    mediaItem.properties = [
+                        {
+                            alias: "umbracoWidth",
+                            value: mediaItem.metaData.umbracoWidth.Value
+                        },
+                        {
+                            alias: "umbracoHeight",
+                            value: mediaItem.metaData.umbracoHeight.Value
+                        }
+                    ];
+                }
             }
 
             function getChildren(id) {
@@ -384,20 +387,36 @@ angular.module("umbraco")
             }
 
             $scope.editMediaItem = function(item) {
-                
                 var mediaEditor = {
-                    "node": item,
+                    id: item.id,
                     submit: function(model) {
-                        editorService.close(model.id);
+                        editorService.close()
+                        // update the media picker item in the picker so it matched the saved media item
+                        // the media picker is using media entities so we get the 
+                        // entity so we easily can format it for use in the media grid
+                        if(model && model.mediaNode) {
+                            entityResource.getById(model.mediaNode.id, "media")
+                                .then(function (mediaEntity) {
+                                    angular.extend(item, mediaEntity);
+                                    setMediaMetaData(item);
+                                    setUpdatedMediaNodes(item);
+                                });
+                        }
                     },
                     close: function(model) {
-                        editorService.close(model.id);
+                        setUpdatedMediaNodes(item);
+                        editorService.close();
                     }
                 };
-
                 editorService.mediaEditor(mediaEditor);
-
             };
+
+            function setUpdatedMediaNodes(item) {
+                // add udi to list of updated media items so we easily can update them in other editors
+                if($scope.model.updatedMediaNodes.indexOf(item.udi) === -1) {
+                    $scope.model.updatedMediaNodes.push(item.udi);
+                }
+            }
 
             $scope.submit = function() {
                 if($scope.model.submit) {

@@ -7,6 +7,10 @@
         <ul ui-sortable="sortableOptions" ng-model="images" class="umb-sortable-thumbnails">
             <li data-element="sortable-thumbnail-{{$index}}" class="umb-sortable-thumbnails__wrapper" ng-repeat="image in images track by $index">
 
+                <div ng-if="image.loading" class="umb-sortable-thumbnails__loading">
+                    <div class="umb-button__progress"></div>
+                </div>
+
                 <!-- IMAGE -->
                 <img ng-class="{'trashed': image.trashed}" ng-src="{{image.thumbnail}}" alt="" ng-show="image.thumbnail" title="{{image.trashed ? 'Trashed: ' + image.name : image.name}}" />
 
@@ -21,7 +25,7 @@
                 </span>
 
                 <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
-                    <a class="umb-sortable-thumbnails__action" data-element="action-edit" href="" ng-click="editItem(image)">
+                    <a ng-if="allowEditMedia" class="umb-sortable-thumbnails__action" data-element="action-edit" href="" ng-click="editItem(image)">
                         <i class="icon icon-edit"></i>
                     </a>
                     <a class="umb-sortable-thumbnails__action -red" data-element="action-remove" href="" ng-click="remove($index)">
@@ -29,7 +33,7 @@
                     </a>
                 </div>
             </li>
-            <li style="border: none;" class="add-wrapper unsortable" ng-if="showAdd()">
+            <li style="border: none;" class="add-wrapper unsortable" ng-if="showAdd() && allowAddMedia">
                 <a data-element="sortable-thumbnails-add" href="#" class="add-link" ng-click="add()" ng-class="{'add-link-square': (images.length === 0 || isMultiPicker)}" prevent-default>
                     <i class="icon icon-add large"></i>
                 </a>

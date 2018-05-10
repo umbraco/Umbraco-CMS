@@ -81,8 +81,8 @@
          * @returns {Object} editor object
          */
         function contentEditor(editor) {
-            editor.view = "views/content/edit.html",
-            open(editor)
+            editor.view = "views/content/edit.html";
+            open(editor);
         }
 
         /**
@@ -99,8 +99,8 @@
          * @returns {Object} editor object
          */
         function mediaEditor(editor) {
-            editor.view = "views/media/edit.html",
-            open(editor)
+            editor.view = "views/media/edit.html";
+            open(editor);
         }
 
         /**
@@ -113,14 +113,16 @@
          * @param {Boolean} editor.multiPicker Pick one or multiple items
          * @param {Boolean} editor.onlyImages Only display files that have an image file-extension
          * @param {Boolean} editor.disableFolderSelect Disable folder selection
+         * @param {Array} editor.updatedMediaNodes A list of ids for media items that have been updated through the media picker
          * @param {Callback} editor.submit Submits the editor
          * @param {Callback} editor.close Closes the editor
          * @returns {Object} editor object
          */
         function mediaPicker(editor) {
-            editor.view = "views/common/infiniteeditors/mediapicker/mediapicker.html",
-            editor.size = "small",
-            open(editor)
+            editor.view = "views/common/infiniteeditors/mediapicker/mediapicker.html";
+            editor.size = "small";
+            editor.updatedMediaNodes = [];
+            open(editor);
         }
 
         /**
@@ -135,8 +137,8 @@
          * @returns {Object} editor object
          */
         function iconPicker(editor) {
-            editor.view = "views/common/infiniteeditors/iconpicker/iconpicker.html",
-            editor.size = "small"
+            editor.view = "views/common/infiniteeditors/iconpicker/iconpicker.html";
+            editor.size = "small";
             open(editor);
         }
 
