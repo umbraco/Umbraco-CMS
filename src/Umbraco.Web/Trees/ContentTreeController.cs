@@ -193,6 +193,21 @@ namespace Umbraco.Web.Trees
             return HasPathAccess(entity, queryStrings);
         }
 
+        protected override IEnumerable<IEntitySlim> GetChildEntities(string id, FormDataCollection queryStrings)
+        {
+            var result = base.GetChildEntities(id, queryStrings);
+            var culture = queryStrings["culture"].TryConvertTo<string>();
+
+            //if this is null we'll set it to the default.
+            var cultureVal = (culture.Success ? culture.Result : null) ?? Services.LocalizationService.GetDefaultLanguageIsoCode();
+
+            // set names according to variations
+            foreach (var entity in result)
+                EnsureName(entity, cultureVal);
+
+            return result; 
+        }
+
         /// <summary>
         /// Returns a collection of all menu items that can be on a content node
         /// </summary>
@@ -226,6 +241,40 @@ namespace Umbraco.Web.Trees
             AddActionNode<RefreshNode, ActionRefresh>(item, menu, true);
 
             return menu;
+        }
+
+        /// <summary>
+        /// set name according to variations
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="culture"></param>
+        private void EnsureName(IEntitySlim entity, string culture)
+        {
+            if (culture == null)
+            {
+                if (string.IsNullOrWhiteSpace(entity.Name))
+                    entity.Name = "[[" + entity.Id + "]]";
+                return;
+            }
+
+            if (entity is IDocumentEntitySlim docEntity)
+            {
+                // we are getting the tree for a given culture,
+                // for those items that DO support cultures, we need to get the proper name, IF it exists
+                // otherwise, invariant is fine
+
+                if (docEntity.Variations.Has(Core.Models.ContentVariation.CultureNeutral) &&
+                    docEntity.CultureNames.TryGetValue(culture, out var name) &&
+                    !string.IsNullOrWhiteSpace(name))
+                {
+                    entity.Name = name;
+                }
+
+                if (string.IsNullOrWhiteSpace(entity.Name))
+                    entity.Name = "[[" + entity.Id + "]]";
+            }
+
+            throw new InvalidOperationException($"Cannot render a tree node for a culture when the entity isn't {typeof(IDocumentEntitySlim)}, instead it is {entity.GetType()}");
         }
 
         private void AddActionNode<TAction>(IUmbracoEntity item, MenuItemCollection menu, bool hasSeparator = false, bool convert = false)

@@ -149,8 +149,7 @@ namespace Umbraco.Web.Trees
 
             // get child entities - if id is root, but user's start nodes do not contain the
             // root node, this returns the start nodes instead of root's children
-            var culture = queryStrings["culture"].TryConvertTo<string>();
-            var entities = GetChildEntities(id, culture.Success ? culture.Result : null).ToList();
+            var entities = GetChildEntities(id, queryStrings).ToList();
             nodes.AddRange(entities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings)).Where(x => x != null));
 
             // if the user does not have access to the root node, what we have is the start nodes,
@@ -182,7 +181,7 @@ namespace Umbraco.Web.Trees
 
         protected abstract UmbracoObjectTypes UmbracoObjectType { get; }
 
-        protected IEnumerable<IEntitySlim> GetChildEntities(string id, string culture)
+        protected virtual IEnumerable<IEntitySlim> GetChildEntities(string id, FormDataCollection queryStrings)
         {
             // try to parse id as an integer else use GetEntityFromId
             // which will grok Guids, Udis, etc and let use obtain the id
@@ -210,41 +209,7 @@ namespace Umbraco.Web.Trees
                 result = Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToArray();
             }
 
-            // should really never be null, but we'll error check anyways
-            culture = culture ?? Services.LocalizationService.GetDefaultLanguageIsoCode();
-
-            // set names according to variations
-            if (!culture.IsNullOrWhiteSpace())
-                foreach (var entity in result)
-                    EnsureName((IDocumentEntitySlim)entity, culture);
-
             return result;
-        }
-
-        // set name according to variations
-        //
-        private void EnsureName(IDocumentEntitySlim entity, string culture)
-        {
-            if (culture == null)
-            {
-                if (string.IsNullOrWhiteSpace(entity.Name))
-                    entity.Name = "[[" + entity.Id + "]]";
-                return;
-            }
-
-            // we are getting the tree for a given culture,
-            // for those items that DO support cultures, we need to get the proper name, IF it exists
-            // otherwise, invariant is fine
-
-            if (entity.Variations.Has(ContentVariation.CultureNeutral) &&
-                entity.CultureNames.TryGetValue(culture, out var name) &&
-                !string.IsNullOrWhiteSpace(name))
-            {
-                entity.Name = name;
-            }
-
-            if (string.IsNullOrWhiteSpace(entity.Name))
-                entity.Name = "[[" + entity.Id + "]]";        
         }
 
         /// <summary>
