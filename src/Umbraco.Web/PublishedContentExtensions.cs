@@ -1797,24 +1797,42 @@ namespace Umbraco.Web
         /// <returns>The first child of content, of the given content type.</returns>
         public static IPublishedContent FirstChild(this IPublishedContent content, string alias)
         {
-            return content.Children( alias ).FirstOrDefault();
+            return content.Children(alias).FirstOrDefault();
         }
 
+        /// <summary>
+        /// Gets the first child of the content, of a given content type.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="predicate">The matching predicate func.</param>
+        /// <returns>The first child of content that matches the predicate.</returns>
         public static IPublishedContent FirstChild(this IPublishedContent content, Func<IPublishedContent, bool> predicate)
         {
             return content.Children(predicate).FirstOrDefault();
         }
 
-        public static IPublishedContent FirstChild<T>(this IPublishedContent content)
+        /// <summary>
+        /// Gets the first child of the content, of a given content type and returns it as a strongly-typed model
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="alias">The content type alias.</param>
+        /// <returns>The first child of content, of the given content type as type T.</returns>
+        public static T FirstChild<T>(this IPublishedContent content)
             where T : class, IPublishedContent
         {
             return content.Children<T>().FirstOrDefault();
         }
 
-        public static IPublishedContent FirstChild<T>(this IPublishedContent content, Func<IPublishedContent, bool> predicate)
+        /// <summary>
+        /// Gets the first child of the content, of a given content type and returns it as a strongly-typed model
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="predicate">The matching predicate func.</param>
+        /// <returns>The first child of content that matches the predicate as type T.</returns>
+        public static T FirstChild<T>(this IPublishedContent content, Func<T, bool> predicate)
             where T : class, IPublishedContent
         {
-            return content.Children<T>().FirstOrDefault(predicate);
+            return content.Children<T>().FirstOrDefault(predicate).OfType<T>();
         }
 
         /// <summary>
