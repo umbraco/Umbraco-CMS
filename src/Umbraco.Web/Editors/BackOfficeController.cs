@@ -372,7 +372,7 @@ namespace Umbraco.Web.Editors
         {
             if (loginInfo == null) throw new ArgumentNullException("loginInfo");
             if (response == null) throw new ArgumentNullException("response");
-
+            ExternalSignInAutoLinkOptions autoLinkOptions = null;
 
             //Here we can check if the provider associated with the request has been configured to allow
             // new users (auto-linked external accounts). This would never be used with public providers such as 
@@ -383,8 +383,10 @@ namespace Umbraco.Web.Editors
             {
                 Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: " + loginInfo.Login.LoginProvider);
             }
-
-            var autoLinkOptions = authType.GetExternalAuthenticationOptions();
+            else
+            {
+                autoLinkOptions = authType.GetExternalAuthenticationOptions();
+            }
 
             // Sign in the user with this external login provider if the user already has a login
             var user = await UserManager.FindAsync(loginInfo.Login);
