@@ -85,6 +85,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{5B03EF4E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Benchmarks", "Umbraco.Tests.Benchmarks\Umbraco.Tests.Benchmarks.csproj", "{86DEB346-089F-4106-89C8-D852B9CF2A33}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "About", "About", "{420D2458-E404-4181-B05A-0FE99EC5C504}"
+	ProjectSection(SolutionItems) = preProject
+		..\BUILD.md = ..\BUILD.md
+		..\CODE_OF_CONDUCT.md = ..\CODE_OF_CONDUCT.md
+		..\CONTRIBUTING.md = ..\CONTRIBUTING.md
+		..\LICENSE.md = ..\LICENSE.md
+		..\PULL_REQUEST_TEMPLATE.md = ..\PULL_REQUEST_TEMPLATE.md
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

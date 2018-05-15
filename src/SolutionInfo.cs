@@ -11,6 +11,8 @@ using System.Resources;
 // versions
 // read https://stackoverflow.com/questions/64602/what-are-differences-between-assemblyversion-assemblyfileversion-and-assemblyin
 
+// note: do NOT change anything here manually, use the build scripts
+
 // this is the ONLY ONE the CLR cares about for compatibility
 // should change ONLY when "hard" breaking compatibility (manual change)
 [assembly: AssemblyVersion("8.0.0")]
