@@ -188,7 +188,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void ToSafeAliasWithCulture()
         {
-            var output = "JUST-ANYTHING".ToSafeAlias(CultureInfo.InvariantCulture);
+            var output = "JUST-ANYTHING".ToSafeAlias(null);
             Assert.AreEqual("SAFE-ALIAS-CULTURE::JUST-ANYTHING", output);
         }
 
@@ -202,7 +202,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void ToUrlSegmentWithCulture()
         {
-            var output = "JUST-ANYTHING".ToUrlSegment(CultureInfo.InvariantCulture);
+            var output = "JUST-ANYTHING".ToUrlSegment(null);
             Assert.AreEqual("URL-SEGMENT-CULTURE::JUST-ANYTHING", output);
         }
 
@@ -216,7 +216,7 @@ namespace Umbraco.Tests.Strings
         [Test]
         public void ToSafeFileNameWithCulture()
         {
-            var output = "JUST-ANYTHING".ToSafeFileName(CultureInfo.InvariantCulture);
+            var output = "JUST-ANYTHING".ToSafeFileName(null);
             Assert.AreEqual("SAFE-FILE-NAME-CULTURE::JUST-ANYTHING", output);
         }
 

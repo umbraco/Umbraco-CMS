@@ -1,7 +1,12 @@
 ﻿(function () {
     "use strict";
 
-    function javascriptLibraryService($q, $http, umbRequestHelper) {
+    /**
+      * @ngdoc service
+      * @name umbraco.resources.javascriptLibraryResource
+      * @description Handles retrieving data for javascript libraries on the server
+      **/
+    function javascriptLibraryResource($q, $http, umbRequestHelper) {
 
         var existingLocales = [];
 
@@ -32,6 +37,6 @@
         return service;
     }
 
-    angular.module("umbraco.services").factory("javascriptLibraryService", javascriptLibraryService);
+    angular.module("umbraco.resources").factory("javascriptLibraryResource", javascriptLibraryResource);
 
 })();

@@ -14,11 +14,13 @@ namespace Umbraco.Core.Publishing
     {
         private readonly IContentService _contentService;
         private readonly ILogger _logger;
+        private readonly IUserService _userService;
 
-        public ScheduledPublisher(IContentService contentService, ILogger logger)
+        public ScheduledPublisher(IContentService contentService, ILogger logger, IUserService userService)
         {
             _contentService = contentService;
             _logger = logger;
+            _userService = userService;
         }
 
         /// <summary>
@@ -40,7 +42,7 @@ namespace Umbraco.Core.Publishing
                 {
                     d.ReleaseDate = null;
                     d.TryPublishValues(); // fixme variants?
-                    var result = _contentService.SaveAndPublish(d, d.GetWriterProfile().Id);
+                    var result = _contentService.SaveAndPublish(d, _userService.GetProfileById(d.WriterId).Id);
                     _logger.Debug<ContentService>($"Result of publish attempt: {result.Result}");
                     if (result.Success == false)
                     {
@@ -66,7 +68,7 @@ namespace Umbraco.Core.Publishing
                 try
                 {
                     d.ExpireDate = null;
-                    var result = _contentService.Unpublish(d, d.GetWriterProfile().Id);
+                    var result = _contentService.Unpublish(d, userId: _userService.GetProfileById(d.WriterId).Id);
                     if (result.Success)
                     {
                         counter++;

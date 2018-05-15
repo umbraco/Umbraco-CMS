@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Integration
         {
             base.TearDown();
 
-            _h1.Unbind();
+            _h1?.Unbind();
 
             // clear ALL events
 

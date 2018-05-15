@@ -104,8 +104,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // hideTopLevelNode = support legacy stuff, look for /*/path/to/node
                 // else normal, look for /path/to/node
                 content = hideTopLevelNode.Value
-                    ? GetAtRoot(preview).SelectMany(x => x.Children).FirstOrDefault(x => x.GetUrlName(_localizationService, culture) == parts[0])
-                    : GetAtRoot(preview).FirstOrDefault(x => x.GetUrlName(_localizationService, culture) == parts[0]);
+                    ? GetAtRoot(preview).SelectMany(x => x.Children).FirstOrDefault(x => x.GetUrlSegment(culture) == parts[0])
+                    : GetAtRoot(preview).FirstOrDefault(x => x.GetUrlSegment(culture) == parts[0]);
                 content = FollowRoute(content, parts, 1, culture);
             }
 
@@ -114,7 +114,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // have to look for /foo (see note in ApplyHideTopLevelNodeFromPath).
             if (content == null && hideTopLevelNode.Value && parts.Length == 1)
             {
-                content = GetAtRoot(preview).FirstOrDefault(x => x.GetUrlName(_localizationService, culture) == parts[0]);
+                content = GetAtRoot(preview).FirstOrDefault(x => x.GetUrlSegment(culture) == parts[0]);
             }
 
             return content;
@@ -144,17 +144,23 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // or we reach the content root, collecting urls in the way
             var pathParts = new List<string>();
             var n = node;
+            var urlSegment = n.GetUrlSegment(culture);
             var hasDomains = _domainHelper.NodeHasDomains(n.Id);
             while (hasDomains == false && n != null) // n is null at root
-            {
-                var urlName = n.GetUrlName(_localizationService, culture);
+            {   
+                // no segment indicates this is not published when this is a variant
+                if (urlSegment.IsNullOrWhiteSpace()) return null;
 
-                pathParts.Add(urlName);
+                pathParts.Add(urlSegment);
 
                 // move to parent node
                 n = n.Parent;
+                urlSegment = n.GetUrlSegment(culture);
                 hasDomains = n != null && _domainHelper.NodeHasDomains(n.Id);
             }
+
+            // at this point this will be the urlSegment of the root, no segment indicates this is not published when this is a variant
+            if (urlSegment.IsNullOrWhiteSpace()) return null;
 
             // no domain, respect HideTopLevelNodeFromPath for legacy purposes
             if (hasDomains == false && hideTopLevelNode.Value)
@@ -178,8 +184,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 var part = parts[i++];
                 content = content.Children.FirstOrDefault(x =>
                 {
-                    var urlName = x.GetUrlName(_localizationService, culture);
-                    return urlName == part;
+                    var urlSegment = x.GetUrlSegment(culture);
+                    return urlSegment == part;
                 });
             }
             return content;

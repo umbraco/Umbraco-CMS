@@ -58,7 +58,5 @@ namespace Umbraco.Tests.UmbracoExamine
         }
 
         private readonly XDocument _xContent;
-
-
     }
 }

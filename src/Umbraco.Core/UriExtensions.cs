@@ -322,5 +322,16 @@ namespace Umbraco.Core
         {
             return new Uri(uri.GetComponents(UriComponents.AbsoluteUri & ~UriComponents.Port, UriFormat.UriEscaped));
         }
+
+        /// <summary>
+        /// Replaces the host of a uri.
+        /// </summary>
+        /// <param name="uri">The uri.</param>
+        /// <param name="host">A replacement host.</param>
+        /// <returns>The same uri, with its host replaced.</returns>
+        public static Uri ReplaceHost(this Uri uri, string host)
+        {
+            return new UriBuilder(uri) { Host = host }.Uri;
+        }
     }
 }

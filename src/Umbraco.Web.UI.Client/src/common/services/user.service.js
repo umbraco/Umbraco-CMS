@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, assetsService, dialogService, $timeout, angularHelper, $http, javascriptLibraryService) {
+    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, dialogService, $timeout, angularHelper, $http) {
 
         var currentUser = null;
         var lastUserId = null;
@@ -271,42 +271,6 @@ angular.module('umbraco.services')
                 else {
                     return $q.when(currentUser);
                 }
-            },
-
-            /** Loads the Moment.js Locale for the current user. */
-            loadMomentLocaleForCurrentUser: function () {
-
-                function loadLocales(currentUser, supportedLocales) {
-                    var locale = currentUser.locale.toLowerCase();
-                    if (locale !== 'en-us') {
-                        var localeUrls = [];
-                        if (supportedLocales.indexOf(locale + '.js') > -1) {
-                            localeUrls.push('lib/moment/' + locale + '.js');
-                        }
-                        if (locale.indexOf('-') > -1) {
-                            var majorLocale = locale.split('-')[0] + '.js';
-                            if (supportedLocales.indexOf(majorLocale) > -1) {
-                                localeUrls.push('lib/moment/' + majorLocale);
-                            }
-                        }
-                        return assetsService.load(localeUrls, $rootScope);
-                    }
-                    else {
-                        $q.when(true);
-                    }
-                }
-
-                var promises = {
-                    currentUser: this.getCurrentUser(),
-                    supportedLocales: javascriptLibraryService.getSupportedLocalesForMoment()
-                }
-
-                return $q.all(promises).then(function (values) {
-                    return loadLocales(values.currentUser, values.supportedLocales);
-                });
-                
-                
-
             },
 
             /** Called whenever a server request is made that contains a x-umb-user-seconds response header for which we can update the user's remaining timeout seconds */

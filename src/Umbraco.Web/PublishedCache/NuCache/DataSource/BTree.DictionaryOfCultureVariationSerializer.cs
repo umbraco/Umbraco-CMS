@@ -9,16 +9,16 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     {
         public IReadOnlyDictionary<string, CultureVariation> ReadFrom(Stream stream)
         {
-            var dict = new Dictionary<string, CultureVariation>();
-
             // read variations count
             var pcount = PrimitiveSerializer.Int32.ReadFrom(stream);
+            if (pcount == 0) return Empty;
 
             // read each variation
+            var dict = new Dictionary<string, CultureVariation>();
             for (var i = 0; i < pcount; i++)
             {
                 var languageId = PrimitiveSerializer.String.ReadFrom(stream);
-                var cultureVariation = new CultureVariation { Name = ReadStringObject(stream) };
+                var cultureVariation = new CultureVariation { Name = ReadStringObject(stream), Date = ReadDateTime(stream) };
                 dict[languageId] = cultureVariation;
             }
             return dict;
@@ -40,6 +40,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 
                 PrimitiveSerializer.String.WriteTo(culture, stream); // should never be null
                 WriteObject(variation.Name, stream); // write an object in case it's null (though... should not happen)
+                PrimitiveSerializer.DateTime.WriteTo(variation.Date, stream);
             }
         }
     }

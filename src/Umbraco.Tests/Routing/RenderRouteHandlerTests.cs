@@ -17,7 +17,10 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.Testing;
+using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Runtime;
 using Current = Umbraco.Web.Composing.Current;
 
@@ -139,6 +142,9 @@ namespace Umbraco.Tests.Routing
             var frequest = publishedRouter.CreateRequest(umbracoContext);
             frequest.PublishedContent = umbracoContext.ContentCache.GetById(1172);
             frequest.TemplateModel = template;
+
+            var type = new AutoPublishedContentType(22, "CustomDocument", new PublishedPropertyType[] { });
+            ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
 
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContext, Mock.Of<ILogger>()));
 

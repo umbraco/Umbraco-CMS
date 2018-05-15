@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Strings
                     StringType = CleanStringType.LowerCase | CleanStringType.Ascii,
                     Separator = '-'
                 })
-                .WithConfig(new CultureInfo("fr-FR"), CleanStringType.UrlSegment, new DefaultShortStringHelperConfig.Config
+                .WithConfig("fr-FR", CleanStringType.UrlSegment, new DefaultShortStringHelperConfig.Config
                 {
                     PreFilter = FilterFrenchElisions,
                     IsTerm = (c, leading) => leading ? char.IsLetter(c) : (char.IsLetterOrDigit(c) || c == '_'),
@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Strings
                     IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c),
                     StringType = CleanStringType.UmbracoCase | CleanStringType.Ascii
                 })
-                .WithConfig(new CultureInfo("fr-FR"), CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
+                .WithConfig("fr-FR", CleanStringType.Alias, new DefaultShortStringHelperConfig.Config
                 {
                     PreFilter = WhiteQuotes,
                     IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c),
@@ -588,15 +588,11 @@ namespace Umbraco.Tests.Strings
         #endregion
         public void CleanStringWithTypeAndCulture(string input, string expected, string culture, CleanStringType stringType)
         {
-            var cinfo = culture == null ? CultureInfo.InvariantCulture : new CultureInfo(culture);
-
             // picks the proper config per culture
             // and overrides some stringType params (ascii...)
-            var output = _helper.CleanString(input, stringType, cinfo);
+            var output = _helper.CleanString(input, stringType, culture);
             Assert.AreEqual(expected, output);
         }
-
-        
 
         #region Cases
         [TestCase("foo.txt", "foo.txt")]

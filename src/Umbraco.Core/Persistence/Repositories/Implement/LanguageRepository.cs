@@ -108,6 +108,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                                // but we still need to remove them
                                "DELETE FROM cmsLanguageText WHERE languageId = @id",
                                "DELETE FROM umbracoPropertyData WHERE languageId = @id",
+                               "DELETE FROM umbracoContentVersionCultureVariation WHERE languageId = @id",
+                               "DELETE FROM umbracoDocumentCultureVariation WHERE languageId = @id",
                                "DELETE FROM umbracoLanguage WHERE id = @id"
                            };
             return list;

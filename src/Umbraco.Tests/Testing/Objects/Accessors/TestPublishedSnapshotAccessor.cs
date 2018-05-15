@@ -1,6 +1,6 @@
 ﻿using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.Tests.TestHelpers.Stubs
+namespace Umbraco.Tests.Testing.Objects.Accessors
 {
     public class TestPublishedSnapshotAccessor : IPublishedSnapshotAccessor
     {

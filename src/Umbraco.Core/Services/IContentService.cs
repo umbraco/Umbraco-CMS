@@ -362,9 +362,9 @@ namespace Umbraco.Core.Services
         IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, Func<IContent, bool> editing, Func<IContent, bool> publishValues, int userId = 0);
 
         /// <summary>
-        /// Unpublishes a document.
+        /// Unpublishes a document or optionally unpublishes a culture and/or segment for the document.
         /// </summary>
-        PublishResult Unpublish(IContent content, int userId = 0);
+        UnpublishResult Unpublish(IContent content, string culture = null, string segment = null, int userId = 0);
 
         /// <summary>
         /// Gets a value indicating whether a document is path-publishable.

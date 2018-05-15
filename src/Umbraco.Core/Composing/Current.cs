@@ -33,6 +33,7 @@ namespace Umbraco.Core.Composing
         private static ILogger _logger;
         private static IProfiler _profiler;
         private static ProfilingLogger _profilingLogger;
+        private static IPublishedValueFallback _publishedValueFallback;
 
         /// <summary>
         /// Gets or sets the DI container.
@@ -63,6 +64,7 @@ namespace Umbraco.Core.Composing
             _logger = null;
             _profiler = null;
             _profilingLogger = null;
+            _publishedValueFallback = null;
 
             Resetted?.Invoke(null, EventArgs.Empty);
         }
@@ -152,6 +154,9 @@ namespace Umbraco.Core.Composing
 
         public static IPublishedContentTypeFactory PublishedContentTypeFactory
             => Container.GetInstance<IPublishedContentTypeFactory>();
+
+        public static IPublishedValueFallback PublishedValueFallback
+            => _publishedValueFallback ?? Container.GetInstance<IPublishedValueFallback>() ?? new NoopPublishedValueFallback();
 
         #endregion
     }

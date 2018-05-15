@@ -1,7 +1,8 @@
 ﻿namespace Umbraco.Core.Services
 {
+
     /// <summary>
-    /// A value indicating the result of (un)publishing a content item.
+    /// A value indicating the result of publishing a content item.
     /// </summary>
     public enum PublishResultType : byte
     {
@@ -9,15 +10,15 @@
         // every failure codes as >128 - see OperationResult and OperationResultType for details.
 
         /// <summary>
-        /// The (un)publishing was successful.
+        /// The publishing was successful.
         /// </summary>
         Success = 0,
 
         /// <summary>
-        /// The item was already (un)published.
+        /// The item was already published.
         /// </summary>
         SuccessAlready = 1,
-
+        
         /// <summary>
         /// The operation failed.
         /// </summary>

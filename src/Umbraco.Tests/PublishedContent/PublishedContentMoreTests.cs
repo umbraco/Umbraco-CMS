@@ -18,6 +18,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Tests.Testing.Objects.Accessors;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -75,7 +76,7 @@ namespace Umbraco.Tests.PublishedContent
                 TestObjects.GetUmbracoSettings(),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                ServiceContext.EntityService);
+                new TestVariationContextAccessor());
 
             return umbracoContext;
         }
@@ -220,7 +221,7 @@ namespace Umbraco.Tests.PublishedContent
                     Id = 1,
                     SortOrder = 0,
                     Name = "Content 1",
-                    UrlName = "content-1",
+                    UrlSegment = "content-1",
                     Path = "/1",
                     Level = 1,
                     Url = "/content-1",
@@ -243,7 +244,7 @@ namespace Umbraco.Tests.PublishedContent
                     Id = 2,
                     SortOrder = 1,
                     Name = "Content 2",
-                    UrlName = "content-2",
+                    UrlSegment = "content-2",
                     Path = "/2",
                     Level = 1,
                     Url = "/content-2",
@@ -266,7 +267,7 @@ namespace Umbraco.Tests.PublishedContent
                 Id = 3,
                 SortOrder = 2,
                 Name = "Content 2Sub",
-                UrlName = "content-2sub",
+                UrlSegment = "content-2sub",
                 Path = "/3",
                 Level = 1,
                 Url = "/content-2sub",

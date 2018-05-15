@@ -46,19 +46,6 @@ namespace Umbraco.Web.Models.Mapping
                 editor = _propertyEditors[Constants.PropertyEditors.Aliases.NoEdit];
             }
 
-            var culture = context.GetCulture();
-            
-            if (culture == null && property.PropertyType.Variations == ContentVariation.CultureNeutral)
-            {
-                //a language Id needs to be set for a property type that can be varried by language
-                throw new InvalidOperationException($"No languageId found in mapping operation when one is required for the culture neutral property type {property.PropertyType.Alias}");
-            }
-            if (property.PropertyType.Variations == ContentVariation.InvariantNeutral)
-            {
-                culture = null;
-
-            }
-
             var result = new TDestination
                 {
                     Id = property.Id,
@@ -77,6 +64,15 @@ namespace Umbraco.Web.Models.Mapping
                     return result;
                 }
             }
+
+            var culture = context.GetCulture();
+
+            //a culture needs to be in the context for a property type that can vary
+            if (culture == null && property.PropertyType.Variations.Has(ContentVariation.CultureNeutral))
+                throw new InvalidOperationException($"No languageId found in mapping operation when one is required for the culture neutral property type {property.PropertyType.Alias}");
+
+            //set the culture to null if it's an invariant property type
+            culture = !property.PropertyType.Variations.Has(ContentVariation.CultureNeutral) ? null : culture;
 
             // if no 'IncludeProperties' were specified or this property is set to be included - we will map the value and return.
             result.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, culture);
