@@ -165,7 +165,7 @@ namespace Umbraco.Tests.Models
             const string langUk = "en-UK";
 
             // throws if the content type does not support the variation
-            Assert.Throws<NotSupportedException>(() => content.SetName(langFr, "name-fr"));
+            Assert.Throws<NotSupportedException>(() => content.SetName("name-fr", langFr));
 
             // now it will work
             contentType.Variations = ContentVariation.CultureNeutral;
@@ -173,13 +173,13 @@ namespace Umbraco.Tests.Models
             // invariant name works
             content.Name = "name";
             Assert.AreEqual("name", content.GetName(null));
-            content.SetName(null, "name2");
+            content.SetName("name2", null);
             Assert.AreEqual("name2", content.Name);
             Assert.AreEqual("name2", content.GetName(null));
 
             // variant names work
-            content.SetName(langFr, "name-fr");
-            content.SetName(langUk, "name-uk");
+            content.SetName("name-fr", langFr);
+            content.SetName("name-uk", langUk);
             Assert.AreEqual("name-fr", content.GetName(langFr));
             Assert.AreEqual("name-uk", content.GetName(langUk));
 
@@ -215,7 +215,7 @@ namespace Umbraco.Tests.Models
 
             // can publish value
             // and get edited and published values
-            content.TryPublishValues();
+            Assert.IsTrue(content.TryPublishValues());
             Assert.AreEqual("a", content.GetValue("prop"));
             Assert.AreEqual("a", content.GetValue("prop", published: true));
 
@@ -245,8 +245,8 @@ namespace Umbraco.Tests.Models
             // can publish value
             // and get edited and published values
             Assert.IsFalse(content.TryPublishValues(langFr)); // no name
-            content.SetName(langFr, "name-fr");
-            content.TryPublishValues(langFr);
+            content.SetName("name-fr", langFr);
+            Assert.IsTrue(content.TryPublishValues(langFr));
             Assert.AreEqual("b", content.GetValue("prop"));
             Assert.IsNull(content.GetValue("prop", published: true));
             Assert.AreEqual("c", content.GetValue("prop", langFr));
@@ -260,7 +260,7 @@ namespace Umbraco.Tests.Models
             Assert.IsNull(content.GetValue("prop", langFr, published: true));
 
             // can publish all
-            content.TryPublishAllValues();
+            Assert.IsTrue(content.TryPublishAllValues());
             Assert.AreEqual("b", content.GetValue("prop"));
             Assert.AreEqual("b", content.GetValue("prop", published: true));
             Assert.AreEqual("c", content.GetValue("prop", langFr));
@@ -301,6 +301,39 @@ namespace Umbraco.Tests.Models
         }
 
         [Test]
+        public void ContentPublishValuesWithMixedPropertyTypeVariations()
+        {
+            const string langFr = "fr-FR";
+
+            var contentType = new ContentType(-1) { Alias = "contentType" };
+            contentType.Variations |= ContentVariation.CultureNeutral; //supports both variant/invariant
+
+            //In real life, a property cannot be both invariant + variant and be mandatory. If this happens validation will always fail when doing TryPublishValues since the invariant value will always be empty.
+            //so here we are only setting properties to one or the other, not both
+            var variantPropType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop1", Variations = ContentVariation.CultureNeutral, Mandatory = true };
+            var invariantPropType = new PropertyType("editor", ValueStorageType.Nvarchar) { Alias = "prop2", Variations = ContentVariation.InvariantNeutral, Mandatory = true};
+            
+            contentType.AddPropertyType(variantPropType);
+            contentType.AddPropertyType(invariantPropType);
+
+            var content = new Content("content", -1, contentType) { Id = 1, VersionId = 1 };
+
+            content.SetName("hello", langFr);
+
+            Assert.IsFalse(content.TryPublishValues(langFr)); //will fail because prop1 is mandatory
+            content.SetValue("prop1", "a", langFr);
+            Assert.IsTrue(content.TryPublishValues(langFr));
+            Assert.AreEqual("a", content.GetValue("prop1", langFr, published: true));
+            //this will be null because we tried to publish values for a specific culture but this property is invariant
+            Assert.IsNull(content.GetValue("prop2", published: true));
+
+            Assert.IsFalse(content.TryPublishValues()); //will fail because prop2 is mandatory
+            content.SetValue("prop2", "b");
+            Assert.IsTrue(content.TryPublishValues());
+            Assert.AreEqual("b", content.GetValue("prop2", published: true));
+        }
+
+        [Test]
         public void ContentPublishVariations()
         {
             const string langFr = "fr-FR";
@@ -326,29 +359,29 @@ namespace Umbraco.Tests.Models
 
             // works with a name
             // and then FR is available, and published
-            content.SetName(langFr, "name-fr");
-            content.TryPublishValues(langFr);
+            content.SetName("name-fr", langFr);
+            Assert.IsTrue(content.TryPublishValues(langFr));
 
             // now UK is available too
-            content.SetName(langUk, "name-uk");
+            content.SetName("name-uk", langUk);
 
             // test available, published
             Assert.IsTrue(content.IsCultureAvailable(langFr));
             Assert.IsTrue(content.IsCulturePublished(langFr));
             Assert.AreEqual("name-fr", content.GetPublishName(langFr));
-            Assert.AreNotEqual(DateTime.MinValue, content.GetDateCulturePublished(langFr));
+            Assert.AreNotEqual(DateTime.MinValue, content.GetCulturePublishDate(langFr));
             Assert.IsFalse(content.IsCultureEdited(langFr)); // once published, edited is *wrong* until saved
 
             Assert.IsTrue(content.IsCultureAvailable(langUk));
             Assert.IsFalse(content.IsCulturePublished(langUk));
             Assert.IsNull(content.GetPublishName(langUk));
-            Assert.Throws<InvalidOperationException>(() => content.GetDateCulturePublished(langUk)); // not published!
+            Assert.Throws<InvalidOperationException>(() => content.GetCulturePublishDate(langUk)); // not published!
             Assert.IsTrue(content.IsCultureEdited(langEs)); // not published, so... edited
 
             Assert.IsFalse(content.IsCultureAvailable(langEs));
             Assert.IsFalse(content.IsCulturePublished(langEs));
             Assert.IsNull(content.GetPublishName(langEs));
-            Assert.Throws<InvalidOperationException>(() => content.GetDateCulturePublished(langEs)); // not published!
+            Assert.Throws<InvalidOperationException>(() => content.GetCulturePublishDate(langEs)); // not published!
             Assert.IsTrue(content.IsCultureEdited(langEs)); // not published, so... edited
 
             // cannot test IsCultureEdited here - as that requires the content service and repository

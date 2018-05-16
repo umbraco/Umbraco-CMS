@@ -2,6 +2,7 @@
 
 namespace Umbraco.Core.Models
 {
+
     /// <summary>
     /// The states of a content item.
     /// </summary>

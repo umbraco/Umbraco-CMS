@@ -1,6 +1,8 @@
-﻿using NUnit.Framework;
+﻿using System.Collections.Generic;
+using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 
@@ -10,13 +12,14 @@ namespace Umbraco.Tests.PublishedContent
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class PublishedContentExtensionTests : PublishedContentTestBase
     {
-        private UmbracoContext ctx;
-        private string xmlContent = "";
-        private bool createContentTypes = true;
+        private UmbracoContext _ctx;
+        private string _xmlContent = "";
+        private bool _createContentTypes = true;
+        private Dictionary<string, PublishedContentType> _contentTypes;
 
         protected override string GetXmlContent(int templateId)
         {
-            return xmlContent;
+            return _xmlContent;
         }
 
         [Test]
@@ -24,7 +27,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             InitializeInheritedContentTypes();
 
-            var publishedContent = ctx.ContentCache.GetById(1100);
+            var publishedContent = _ctx.ContentCache.GetById(1100);
             Assert.That(publishedContent.IsDocumentType("inherited", false));
         }
 
@@ -33,7 +36,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             InitializeInheritedContentTypes();
 
-            var publishedContent = ctx.ContentCache.GetById(1100);
+            var publishedContent = _ctx.ContentCache.GetById(1100);
             Assert.That(publishedContent.IsDocumentType("base", false), Is.False);
         }
 
@@ -42,17 +45,17 @@ namespace Umbraco.Tests.PublishedContent
         {
             InitializeInheritedContentTypes();
 
-            var publishedContent = ctx.ContentCache.GetById(1100);
+            var publishedContent = _ctx.ContentCache.GetById(1100);
             Assert.That(publishedContent.IsDocumentType("inherited", true));
         }
 
         [Test]
         public void IsDocumentType_Recursive_BaseType_ReturnsTrue()
         {
-            ContentTypesCache.GetPublishedContentTypeByAlias = null; // fixme this is not pretty
             InitializeInheritedContentTypes();
+            ContentTypesCache.GetPublishedContentTypeByAlias = null;
 
-            var publishedContent = ctx.ContentCache.GetById(1100);
+            var publishedContent = _ctx.ContentCache.GetById(1100);
             Assert.That(publishedContent.IsDocumentType("base", true));
         }
 
@@ -61,14 +64,14 @@ namespace Umbraco.Tests.PublishedContent
         {
             InitializeInheritedContentTypes();
 
-            var publishedContent = ctx.ContentCache.GetById(1100);
+            var publishedContent = _ctx.ContentCache.GetById(1100);
             Assert.That(publishedContent.IsDocumentType("invalidbase", true), Is.False);
         }
 
         private void InitializeInheritedContentTypes()
         {
-            ctx = GetUmbracoContext("/", 1, null, true);
-            if (createContentTypes)
+            _ctx = GetUmbracoContext("/", 1, null, true);
+            if (_createContentTypes)
             {
                 var contentTypeService = Current.Services.ContentTypeService;
                 var baseType = new ContentType(-1) { Alias = "base", Name = "Base" };
@@ -76,10 +79,18 @@ namespace Umbraco.Tests.PublishedContent
                 var inheritedType = new ContentType(baseType, contentTypeAlias) { Alias = contentTypeAlias, Name = "Inherited" };
                 contentTypeService.Save(baseType);
                 contentTypeService.Save(inheritedType);
-                createContentTypes = false;
+                _contentTypes = new Dictionary<string, PublishedContentType>
+                {
+                    { baseType.Alias, new PublishedContentType(baseType, null) },
+                    { inheritedType.Alias, new PublishedContentType(inheritedType, null) }
+                };
+                ContentTypesCache.GetPublishedContentTypeByAlias = alias => _contentTypes[alias];
+                _createContentTypes = false;
             }
 
-            xmlContent = @"<?xml version=""1.0"" encoding=""utf-8""?>
+            ContentTypesCache.GetPublishedContentTypeByAlias = alias => _contentTypes[alias];
+
+            _xmlContent = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[
 <!ELEMENT inherited ANY>
 <!ATTLIST inherited id ID #REQUIRED>

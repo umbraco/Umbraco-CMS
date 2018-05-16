@@ -16,6 +16,7 @@ using System.Web.Security;
 using Umbraco.Core.Strings;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Core
@@ -1111,7 +1112,7 @@ namespace Umbraco.Core
         /// <param name="alias">The text to filter.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The safe alias.</returns>
-        public static string ToSafeAlias(this string alias, CultureInfo culture)
+        public static string ToSafeAlias(this string alias, string culture)
         {
             return Current.ShortStringHelper.CleanStringForSafeAlias(alias, culture);
         }
@@ -1134,7 +1135,7 @@ namespace Umbraco.Core
         /// <param name="culture">The culture.</param>
         /// <returns>The safe alias.</returns>
         /// <remarks>Checks <c>UmbracoSettings.ForceSafeAliases</c> to determine whether it should filter the text.</remarks>
-        public static string ToSafeAliasWithForcingCheck(this string alias, CultureInfo culture)
+        public static string ToSafeAliasWithForcingCheck(this string alias, string culture)
         {
             return UmbracoConfig.For.UmbracoSettings().Content.ForceSafeAliases ? alias.ToSafeAlias(culture) : alias;
         }
@@ -1148,7 +1149,8 @@ namespace Umbraco.Core
         /// <returns>The safe url segment.</returns>
         public static string ToUrlSegment(this string text)
         {
-            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("message", nameof(text));
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullOrEmptyException(nameof(text));
+
             return Current.ShortStringHelper.CleanStringForUrlSegment(text);
         }
 
@@ -1158,10 +1160,9 @@ namespace Umbraco.Core
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The safe url segment.</returns>
-        public static string ToUrlSegment(this string text, CultureInfo culture)
+        public static string ToUrlSegment(this string text, string culture)
         {
-            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("message", nameof(text));
-            if (culture == null) throw new ArgumentNullException(nameof(culture));
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullOrEmptyException(nameof(text));
 
             return Current.ShortStringHelper.CleanStringForUrlSegment(text, culture);
         }
@@ -1203,7 +1204,7 @@ namespace Umbraco.Core
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
-        public static string ToCleanString(this string text, CleanStringType stringType, CultureInfo culture)
+        public static string ToCleanString(this string text, CleanStringType stringType, string culture)
         {
             return Current.ShortStringHelper.CleanString(text, stringType, culture);
         }
@@ -1217,7 +1218,7 @@ namespace Umbraco.Core
         /// <param name="separator">The separator.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
-        public static string ToCleanString(this string text, CleanStringType stringType, char separator, CultureInfo culture)
+        public static string ToCleanString(this string text, CleanStringType stringType, char separator, string culture)
         {
             return Current.ShortStringHelper.CleanString(text, stringType, separator, culture);
         }
@@ -1263,7 +1264,7 @@ namespace Umbraco.Core
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The safe filename.</returns>
-        public static string ToSafeFileName(this string text, CultureInfo culture)
+        public static string ToSafeFileName(this string text, string culture)
         {
             return Current.ShortStringHelper.CleanStringForSafeFileName(text, culture);
         }

@@ -149,8 +149,7 @@ namespace Umbraco.Web.Trees
 
             // get child entities - if id is root, but user's start nodes do not contain the
             // root node, this returns the start nodes instead of root's children
-            var culture = queryStrings["culture"].TryConvertTo<string>();
-            var entities = GetChildEntities(id, culture.Success ? culture.Result : null).ToList();
+            var entities = GetChildEntities(id, queryStrings).ToList();
             nodes.AddRange(entities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings)).Where(x => x != null));
 
             // if the user does not have access to the root node, what we have is the start nodes,
@@ -182,7 +181,7 @@ namespace Umbraco.Web.Trees
 
         protected abstract UmbracoObjectTypes UmbracoObjectType { get; }
 
-        protected IEnumerable<IEntitySlim> GetChildEntities(string id, string culture)
+        protected virtual IEnumerable<IEntitySlim> GetChildEntities(string id, FormDataCollection queryStrings)
         {
             // try to parse id as an integer else use GetEntityFromId
             // which will grok Guids, Udis, etc and let use obtain the id
@@ -208,30 +207,6 @@ namespace Umbraco.Web.Trees
             else
             {
                 result = Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToArray();
-            }
-
-            //This should really never be null, but we'll error check anyways
-            culture = culture ?? Services.LocalizationService.GetDefaultLanguageIsoCode();
-
-            //Try to see if there is a variant name for the current language for the item and set the name accordingly.
-            //If any of this fails, the tree node name will remain the default invariant culture name.
-
-            //fixme - what if there is no name found at all ? This could occur if the doc type is variant and the user fills in all language values, then creates a new lang and sets it as the default
-            //fixme - what if the user changes this document type to not allow culture variants after it's already been created with culture variants, this means we'll be displaying the culture variant name when in fact we should be displaying the invariant name... but that would be null
-
-            if (!culture.IsNullOrWhiteSpace())
-            {
-                foreach (var e in result)
-                {
-                    if (e.AdditionalData.TryGetValue("CultureNames", out var cultureNames)
-                        && cultureNames is IDictionary<string, string> cnd)
-                    {
-                        if (cnd.TryGetValue(culture, out var name))
-                        {
-                            e.Name = name;
-                        }
-                    }
-                }
             }
 
             return result;

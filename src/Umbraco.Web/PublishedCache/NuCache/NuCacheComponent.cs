@@ -1,11 +1,5 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Components;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using LightInject;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Persistence.Repositories;
+﻿using Umbraco.Core.Components;
+using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -14,6 +8,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
+
+            // register the NuCache database data source
+            composition.Container.Register<IDataSource, DatabaseDataSource>();
 
             // register the NuCache published snapshot service
             // must register default options, required in the service ctor

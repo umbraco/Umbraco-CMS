@@ -232,8 +232,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc/>
         [IgnoreDataMember]
-        //public IReadOnlyDictionary<string, string> PublishNames => _publishNames ?? NoNames;
-        public IReadOnlyDictionary<string, string> PublishNames => _publishInfos?.ToDictionary(x => x.Key, x => x.Value.Name) ?? NoNames;
+        public IReadOnlyDictionary<string, string> PublishNames => _publishInfos?.ToDictionary(x => x.Key, x => x.Value.Name, StringComparer.OrdinalIgnoreCase) ?? NoNames;
 
         /// <inheritdoc/>
         public string GetPublishName(string culture)
@@ -270,7 +269,7 @@ namespace Umbraco.Core.Models
             => !string.IsNullOrWhiteSpace(GetPublishName(culture));
 
         /// <inheritdoc />
-        public DateTime GetDateCulturePublished(string culture)
+        public DateTime GetCulturePublishDate(string culture)
         {
             if (_publishInfos != null && _publishInfos.TryGetValue(culture, out var infos))
                 return infos.Date;
@@ -358,7 +357,7 @@ namespace Umbraco.Core.Models
                 var name = GetName(culture);
                 if (string.IsNullOrWhiteSpace(name))
                     return false; //fixme this should return an attempt with error results
-                
+
                 SetPublishInfos(culture, name, DateTime.Now);
             }
 
@@ -478,8 +477,8 @@ namespace Umbraco.Core.Models
 
             // copy names
             ClearNames();
-            foreach (var (languageId, name) in other.Names)
-                SetName(languageId, name);
+            foreach (var (culture, name) in other.Names)
+                SetName(name, culture);
             Name = other.Name;
         }
 
@@ -519,7 +518,7 @@ namespace Umbraco.Core.Models
             }
 
             // copy name
-            SetName(culture, other.GetName(culture));
+            SetName(other.GetName(culture), culture);
         }
 
         /// <inheritdoc />
@@ -553,7 +552,7 @@ namespace Umbraco.Core.Models
             }
 
             // copy name
-            SetName(culture, other.GetName(culture));
+            SetName(other.GetName(culture), culture);
         }
 
         /// <summary>

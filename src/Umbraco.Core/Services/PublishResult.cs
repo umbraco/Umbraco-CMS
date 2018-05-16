@@ -4,6 +4,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
 {
+
     /// <summary>
     /// Represents the result of publishing a document.
     /// </summary>

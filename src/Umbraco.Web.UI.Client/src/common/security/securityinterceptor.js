@@ -1,10 +1,10 @@
 angular.module('umbraco.security.interceptor')
     // This http interceptor listens for authentication successes and failures
     .factory('securityInterceptor', ['$injector', 'securityRetryQueue', 'notificationsService', 'eventsService', 'requestInterceptorFilter', function ($injector, queue, notifications, eventsService, requestInterceptorFilter) {
-        return function(promise) {
+        return function (promise) {
 
             return promise.then(
-                function(originalResponse) {
+                function (originalResponse) {
                     // Intercept successful requests
 
                     //Here we'll check if our custom header is in the response which indicates how many seconds the user's session has before it
@@ -23,12 +23,12 @@ angular.module('umbraco.security.interceptor')
                     }
 
                     return promise;
-                }, function(originalResponse) {
+                }, function (originalResponse) {
                     // Intercept failed requests
-                    
+
                     // Make sure we have the configuration of the request (don't we always?)
                     var config = originalResponse.config ? originalResponse.config : {};
-                    
+
                     // Make sure we have an object for the headers of the request
                     var headers = config.headers ? config.headers : {};
 
@@ -37,7 +37,7 @@ angular.module('umbraco.security.interceptor')
                         //exit/ignore
                         return promise;
                     }
-                    var filtered = _.find(requestInterceptorFilter(), function(val) {
+                    var filtered = _.find(requestInterceptorFilter(), function (val) {
                         return config.url.indexOf(val) > 0;
                     });
                     if (filtered) {
@@ -47,18 +47,18 @@ angular.module('umbraco.security.interceptor')
                     //A 401 means that the user is not logged in
                     if (originalResponse.status === 401 && !originalResponse.config.url.endsWith("umbraco/backoffice/UmbracoApi/Authentication/GetCurrentUser")) {
 
-                      var userService = $injector.get('userService'); // see above
+                        var userService = $injector.get('userService'); // see above
 
-                      //Associate the user name with the retry to ensure we retry for the right user
-                      promise = userService.getCurrentUser()
-                        .then(function (user) {
-                          var userName = user ? user.name : null;
-                          //The request bounced because it was not authorized - add a new request to the retry queue
-                          return queue.pushRetryFn('unauthorized-server', userName, function retryRequest() {
-                            // We must use $injector to get the $http service to prevent circular dependency
-                            return $injector.get('$http')(originalResponse.config);
-                          });
-                        });
+                        //Associate the user name with the retry to ensure we retry for the right user
+                        promise = userService.getCurrentUser()
+                            .then(function (user) {
+                                var userName = user ? user.name : null;
+                                //The request bounced because it was not authorized - add a new request to the retry queue
+                                return queue.pushRetryFn('unauthorized-server', userName, function retryRequest() {
+                                    // We must use $injector to get the $http service to prevent circular dependency
+                                    return $injector.get('$http')(originalResponse.config);
+                                });
+                            });
                     }
                     else if (originalResponse.status === 404) {
 
@@ -103,18 +103,19 @@ angular.module('umbraco.security.interceptor')
         };
     }])
     //used to set headers on all requests where necessary
-  .factory('umbracoRequestInterceptor', function ($q, queryStrings) {
-      return {
-        //dealing with requests:
-        'request': function(config) {
-          if (queryStrings.getParams().umbDebug === "true" || queryStrings.getParams().umbdebug === "true") {
-            config.headers["X-UMB-DEBUG"] = "true";
-          }
-          return config;
-        }
-      };
+    .factory('umbracoRequestInterceptor', function ($q, urlHelper) {
+        return {
+            //dealing with requests:
+            'request': function (config) {
+                var queryStrings = urlHelper.getQueryStringParams();
+                if (queryStrings.umbDebug === "true" || queryStrings.umbdebug === "true") {
+                    config.headers["X-UMB-DEBUG"] = "true";
+                }
+                return config;
+            }
+        };
     })
-    .value('requestInterceptorFilter', function() {
+    .value('requestInterceptorFilter', function () {
         return ["www.gravatar.com"];
     })
 

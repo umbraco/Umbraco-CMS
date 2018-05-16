@@ -387,7 +387,7 @@ namespace Umbraco.Examine
             //strip html of all users fields if we detect it has HTML in it.
             //if that is the case, we'll create a duplicate 'raw' copy of it so that we can return
             //the value of the field 'as-is'.
-            foreach (var value in e.IndexItem.ValueSet.Values)
+            foreach (var value in e.IndexItem.ValueSet.Values.ToList()) //ToList here to make a diff collection else we'll get collection modified errors
             {
                 if (value.Value.Count > 0)
                 {

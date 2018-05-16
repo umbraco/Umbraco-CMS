@@ -26,6 +26,7 @@ namespace Umbraco.Web.Scheduling
     {
         private IRuntimeState _runtime;
         private IContentService _contentService;
+        private IUserService _userService;
         private IAuditService _auditService;
         private ILogger _logger;
         private ProfilingLogger _proflog;
@@ -44,12 +45,13 @@ namespace Umbraco.Web.Scheduling
         private IBackgroundTask[] _tasks;
 
         public void Initialize(IRuntimeState runtime,
-            IContentService contentService, IAuditService auditService,
+            IContentService contentService, IAuditService auditService, IUserService userService,
             HealthCheckCollection healthChecks, HealthCheckNotificationMethodCollection notifications,
             IScopeProvider scopeProvider, ILogger logger, ProfilingLogger proflog)
         {
             _runtime = runtime;
             _contentService = contentService;
+            _userService = userService;
             _auditService = auditService;
             _scopeProvider = scopeProvider;
             _logger = logger;
@@ -116,7 +118,7 @@ namespace Umbraco.Web.Scheduling
         {
             // scheduled publishing/unpublishing
             // install on all, will only run on non-slaves servers
-            var task = new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _contentService, _logger);
+            var task = new ScheduledPublishing(_publishingRunner, 60000, 60000, _runtime, _contentService, _logger, _userService);
             _publishingRunner.TryAdd(task);
             return task;
         }

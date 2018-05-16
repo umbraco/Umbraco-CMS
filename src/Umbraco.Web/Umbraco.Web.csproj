@@ -2,7 +2,7 @@
 <Project ToolsVersion="15.0">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     <ProjectGuid>{651E1350-91B6-44B7-BD60-7207006D7003}</ProjectGuid>
@@ -40,13 +40,11 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.EnterpriseServices" />
-    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
@@ -54,12 +52,9 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.ApplicationServices" />
-    <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Web.Extensions.Design" />
     <Reference Include="System.Web.Services" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
@@ -67,7 +62,6 @@
     <PackageReference Include="AutoMapper" Version="6.2.2" />
     <PackageReference Include="ClientDependency" Version="1.9.6" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="dotless" Version="1.5.2" />
     <PackageReference Include="Examine" Version="1.0.0-beta025" />
     <PackageReference Include="HtmlAgilityPack" Version="1.7.2" />
     <PackageReference Include="LightInject" Version="5.1.2" />
@@ -89,8 +83,9 @@
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NPoco" Version="3.9.3" />
     <PackageReference Include="Semver" Version="2.0.4" />
-    <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.8.0" />
-    <PackageReference Include="xmlrpcnet" Version="3.0.0.266" />
+    <PackageReference Include="System.Threading.Tasks.Dataflow">
+      <Version>4.8.0</Version>
+    </PackageReference>
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
@@ -260,6 +255,7 @@
     <Compile Include="Models\Mapping\TemplateMapperProfile.cs" />
     <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
     <Compile Include="Models\Mapping\ContentItemDisplayVariationResolver.cs" />
+    <Compile Include="Models\PublishedContent\PublishedValueFallback.cs" />
     <Compile Include="Models\RelatedLink.cs" />
     <Compile Include="Models\RelatedLinkBase.cs" />
     <Compile Include="Models\RelatedLinks.cs" />
@@ -336,13 +332,14 @@
     <Compile Include="PropertyEditors\ValueConverters\MultiNodeTreePickerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueListUniqueValueValidator.cs" />
     <Compile Include="PublishedCache\IPublishedSnapshot.cs" />
-    <Compile Include="PublishedCache\ISystemDefaultCultureProvider.cs" />
+    <Compile Include="PublishedCache\IDefaultCultureAccessor.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.ContentNodeKitSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfCultureVariationSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.DictionaryOfPropertyDataSerializer.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentNestedData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\CultureVariation.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\IDataSource.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\PropertyData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\SerializerBase.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheComponent.cs" />
@@ -364,7 +361,7 @@
     <Compile Include="PublishedCache\NuCache\DataSource\BTree.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentSourceDto.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\Database.cs" />
+    <Compile Include="PublishedCache\NuCache\DataSource\DatabaseDataSource.cs" />
     <Compile Include="PublishedCache\NuCache\DomainCache.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotService.cs" />
     <Compile Include="PublishedCache\NuCache\MediaCache.cs" />
@@ -381,8 +378,9 @@
     <Compile Include="PublishedCache\NuCache\SnapDictionary.cs" />
     <Compile Include="PublishedCache\PublishedCacheBase.cs" />
     <Compile Include="PublishedCache\PublishedContentTypeCache.cs" />
-    <Compile Include="PublishedCache\SystemDefaultCultureProvider.cs" />
+    <Compile Include="PublishedCache\DefaultCultureAccessor.cs" />
     <Compile Include="PublishedCache\UmbracoContextPublishedSnapshotAccessor.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\DictionaryPublishedContent.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\DomainCache.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedSnapshot.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedSnapshotService.cs" />
@@ -604,7 +602,6 @@
     <Compile Include="Editors\ImagesController.cs" />
     <Compile Include="Editors\PackageInstallController.cs" />
     <Compile Include="Editors\RelationController.cs" />
-    <Compile Include="Editors\CanvasDesignerController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
     <Compile Include="Models\PackageInstallModel.cs" />
     <Compile Include="Models\ContentEditing\DataTypeBasic.cs" />
@@ -788,7 +785,6 @@
     <Compile Include="Models\Trees\MenuItemList.cs" />
     <Compile Include="Trees\TemplatesTreeController.cs" />
     <Compile Include="Trees\TreeControllerBase.cs" />
-    <Compile Include="CanvasDesignerUtility.cs" />
     <Compile Include="UI\JavaScript\AssetInitialization.cs" />
     <Compile Include="UI\JavaScript\CssInitialization.cs" />
     <Compile Include="UI\JavaScript\DependencyPathRenderer.cs" />
@@ -1526,6 +1522,7 @@
     <None Include="Web References\org.umbraco.update\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </None>
     <None Include="..\Umbraco.Web.UI\Views\web.config">
       <Link>Mvc\web.config</Link>

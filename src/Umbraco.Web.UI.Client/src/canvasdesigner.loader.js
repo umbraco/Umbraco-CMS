@@ -9,7 +9,6 @@ LazyLoad.js([
   '../js/umbraco.services.js',
   '../js/umbraco.security.js',
   '../ServerVariables',
-  '../lib/spectrum/spectrum.js',
   '../lib/signalr/jquery.signalR.js',
   '/umbraco/BackOffice/signalr/hubs',
   '../js/umbraco.canvasdesigner.js'

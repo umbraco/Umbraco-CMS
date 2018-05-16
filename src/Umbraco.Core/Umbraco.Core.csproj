@@ -2,7 +2,7 @@
 <Project ToolsVersion="15.0">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <ProjectGuid>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -76,7 +76,6 @@
     <PackageReference Include="MySql.Data" Version="6.10.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NPoco" Version="3.9.3" />
-    <PackageReference Include="NuGet.Core" Version="2.14.0" />
     <PackageReference Include="Semver" Version="2.0.4" />
     <PackageReference Include="SqlServerCE" Version="4.0.0.1" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
@@ -136,6 +135,7 @@
     <Compile Include="CodeAnnotations\UmbracoProposedPublicAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoUdiTypeAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoWillObsoleteAttribute.cs" />
+    <Compile Include="Collections\CompositeNStringNStringKey.cs" />
     <Compile Include="Collections\CompositeStringStringKey.cs" />
     <Compile Include="Collections\CompositeIntStringKey.cs" />
     <Compile Include="Collections\CompositeTypeTypeKey.cs" />
@@ -355,7 +355,12 @@
     <Compile Include="Models\PathValidationExtensions.cs" />
     <Compile Include="Models\Entities\TreeEntityBase.cs" />
     <Compile Include="Models\PropertyTagsExtensions.cs" />
-    <Compile Include="Models\PublishedContent\PublishedCultureName.cs" />
+    <Compile Include="Models\PublishedContent\NoopPublishedValueFallback.cs" />
+    <Compile Include="Models\PublishedContent\PublishedCultureInfos.cs" />
+    <Compile Include="Models\PublishedContent\IVariationContextAccessor.cs" />
+    <Compile Include="Models\PublishedContent\IPublishedValueFallback.cs" />
+    <Compile Include="Models\PublishedContent\VariationContext.cs" />
+    <Compile Include="Models\PublishedContent\ThreadCultureVariationContextAccessor.cs" />
     <Compile Include="Persistence\Dtos\AuditEntryDto.cs" />
     <Compile Include="Persistence\Dtos\ConsentDto.cs" />
     <Compile Include="Persistence\Dtos\ContentVersionCultureVariationDto.cs" />
@@ -1417,6 +1422,8 @@
     <Compile Include="Services\Implement\TagService.cs" />
     <Compile Include="Services\Implement\TaskService.cs" />
     <Compile Include="Services\Implement\UserService.cs" />
+    <Compile Include="Services\UnpublishResult.cs" />
+    <Compile Include="Services\UnpublishResultType.cs" />
     <Compile Include="Services\UserServiceExtensions.cs" />
     <Compile Include="Settable.cs" />
     <Compile Include="Strategies\ManifestWatcherComponent.cs" />

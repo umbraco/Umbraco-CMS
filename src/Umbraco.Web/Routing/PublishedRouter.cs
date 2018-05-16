@@ -266,10 +266,30 @@ namespace Umbraco.Web.Routing
             _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Uri=\"{request.Uri}\"");
 
             var domainsCache = request.UmbracoContext.PublishedSnapshot.Domains;
+            var domains = domainsCache.GetAll(includeWildcards: false).ToList();
 
-            //get the domains but filter to ensure that any referenced content is actually published
-            var domains = domainsCache.GetAll(includeWildcards: false)
-                .Where(x => request.UmbracoContext.PublishedSnapshot.Content.GetById(x.ContentId) != null);
+            // determines whether a domain corresponds to a published document, since some
+            // domains may exist but on a document that has been unpublished - as a whole - or
+            // that is not published for the domain's culture - in which case the domain does
+            // not apply
+            bool IsPublishedContentDomain(Domain domain)
+            {
+                // just get it from content cache - optimize there, not here
+                var domainDocument = request.UmbracoContext.PublishedSnapshot.Content.GetById(domain.ContentId);
+
+                // not published - at all
+                if (domainDocument == null)
+                    return false;
+
+                // invariant - always published
+                if (!domainDocument.ContentType.Variations.Has(ContentVariation.CultureNeutral))
+                    return true;
+
+                // variant, ensure that the culture corresponding to the domain's language is published
+                return domainDocument.Cultures.ContainsKey(domain.Culture.Name);
+            }
+
+            domains = domains.Where(IsPublishedContentDomain).ToList();
 
             var defaultCulture = domainsCache.DefaultCulture;
 
@@ -537,7 +557,7 @@ namespace Umbraco.Web.Routing
             var redirect = false;
             var valid = false;
             IPublishedContent internalRedirectNode = null;
-            var internalRedirectId = request.PublishedContent.Value(Constants.Conventions.Content.InternalRedirectId, -1);
+            var internalRedirectId = request.PublishedContent.Value(Constants.Conventions.Content.InternalRedirectId, defaultValue: -1);
 
             if (internalRedirectId > 0)
             {
@@ -743,7 +763,7 @@ namespace Umbraco.Web.Routing
             if (request.PublishedContent.HasProperty(Constants.Conventions.Content.Redirect) == false)
                 return;
 
-            var redirectId = request.PublishedContent.Value(Constants.Conventions.Content.Redirect, -1);
+            var redirectId = request.PublishedContent.Value(Constants.Conventions.Content.Redirect, defaultValue: -1);
             var redirectUrl = "#";
             if (redirectId > 0)
             {

@@ -157,7 +157,7 @@ namespace Umbraco.Web.Editors
 
             if (ModelState.IsValid == false)
             {
-                throw CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay, TContentType>(ctId, contentTypeSave, ct);
+                throw CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay>(ctId, contentTypeSave, ct);
             }
 
             //filter out empty properties
@@ -178,7 +178,7 @@ namespace Umbraco.Web.Editors
                 }
                 catch (Exception ex)
                 {
-                    var responseEx = CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentType, TContentTypeSave, TPropertyType>(ex, contentTypeSave, ct, ctId);
+                    var responseEx = CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentTypeSave, TPropertyType>(ex, contentTypeSave, ct, ctId);
                     if (responseEx != null) throw responseEx;
                 }
 
@@ -215,7 +215,7 @@ namespace Umbraco.Web.Editors
                 }
                 catch (Exception ex)
                 {
-                    var responseEx = CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentType, TContentTypeSave, TPropertyType>(ex, contentTypeSave, ct, ctId);
+                    var responseEx = CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentTypeSave, TPropertyType>(ex, contentTypeSave, ct, ctId);
                     if (responseEx != null) throw responseEx;
                 }
 
@@ -247,11 +247,10 @@ namespace Umbraco.Web.Editors
         /// <param name="getContentType"></param>
         /// <param name="doMove"></param>
         /// <returns></returns>
-        protected HttpResponseMessage PerformMove<TContentType>(
+        protected HttpResponseMessage PerformMove(
             MoveOrCopy move,
             Func<int, TContentType> getContentType,
             Func<TContentType, int, Attempt<OperationResult<MoveOperationStatusType>>> doMove)
-            where TContentType : IContentTypeComposition
         {
             var toMove = getContentType(move.Id);
             if (toMove == null)
@@ -382,7 +381,6 @@ namespace Umbraco.Web.Editors
         /// If the exception is an InvalidCompositionException create a response exception to be thrown for validation errors
         /// </summary>
         /// <typeparam name="TContentTypeDisplay"></typeparam>
-        /// <typeparam name="TContentType"></typeparam>
         /// <typeparam name="TContentTypeSave"></typeparam>
         /// <typeparam name="TPropertyType"></typeparam>
         /// <param name="ex"></param>
@@ -390,9 +388,8 @@ namespace Umbraco.Web.Editors
         /// <param name="ct"></param>
         /// <param name="ctId"></param>
         /// <returns></returns>
-        private HttpResponseException CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentType, TContentTypeSave, TPropertyType>(
+        private HttpResponseException CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentTypeSave, TPropertyType>(
             Exception ex, TContentTypeSave contentTypeSave, TContentType ct, int ctId)
-            where TContentType : class, IContentTypeComposition
             where TContentTypeDisplay : ContentTypeCompositionDisplay
             where TContentTypeSave : ContentTypeSave<TPropertyType>
             where TPropertyType : PropertyTypeBasic
@@ -409,7 +406,7 @@ namespace Umbraco.Web.Editors
             if (invalidCompositionException != null)
             {
                 AddCompositionValidationErrors<TContentTypeSave, TPropertyType>(contentTypeSave, invalidCompositionException.PropertyTypeAliases);
-                return CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay, TContentType>(ctId, contentTypeSave, ct);
+                return CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay>(ctId, contentTypeSave, ct);
             }
             return null;
         }
@@ -418,13 +415,11 @@ namespace Umbraco.Web.Editors
         /// Used to throw the ModelState validation results when the ModelState is invalid
         /// </summary>
         /// <typeparam name="TContentTypeDisplay"></typeparam>
-        /// <typeparam name="TContentType"></typeparam>
         /// <typeparam name="TContentTypeSave"></typeparam>
         /// <param name="ctId"></param>
         /// <param name="contentTypeSave"></param>
         /// <param name="ct"></param>
-        private HttpResponseException CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay, TContentType>(int ctId, TContentTypeSave contentTypeSave, TContentType ct)
-            where TContentType : class, IContentTypeComposition
+        private HttpResponseException CreateModelStateValidationException<TContentTypeSave, TContentTypeDisplay>(int ctId, TContentTypeSave contentTypeSave, TContentType ct)
             where TContentTypeDisplay : ContentTypeCompositionDisplay
             where TContentTypeSave : ContentTypeSave
         {

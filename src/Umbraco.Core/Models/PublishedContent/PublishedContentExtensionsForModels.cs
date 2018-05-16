@@ -18,6 +18,11 @@ namespace Umbraco.Core.Models.PublishedContent
             if (content == null)
                 return null;
 
+            // in order to provide a nice, "fluent" experience, this extension method
+            // needs to access Current, which is not always initialized in tests - not
+            // very elegant, but works
+            if (!Current.HasContainer) return content;
+
             // get model
             // if factory returns nothing, throw
             var model = Current.PublishedModelFactory.CreateModel(content);

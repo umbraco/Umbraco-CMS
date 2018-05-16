@@ -1,18 +1,32 @@
-﻿namespace Umbraco.Core.Models.Entities
+﻿using System.Collections.Generic;
+
+namespace Umbraco.Core.Models.Entities
 {
     /// <summary>
     /// Represents a lightweight document entity, managed by the entity service.
     /// </summary>
     public interface IDocumentEntitySlim : IContentEntitySlim
     {
-        /// <summary>
-        /// Gets a value indicating whether the document is published.
-        /// </summary>
-        bool Published { get; }
+        //fixme we need to supply more information than this and change this property name. This will need to include Published/Editor per variation since we need this information for the tree
+        IReadOnlyDictionary<string, string> CultureNames { get; }
+
+        ContentVariation Variations { get; }
 
         /// <summary>
-        /// Gets a value indicating whether the document has edited properties.
+        /// At least one variation is published
         /// </summary>
-        bool Edited { get; }
+        /// <remarks>
+        /// If the document is invariant, this simply means there is a published version
+        /// </remarks>
+        bool Published { get; set; }
+
+        /// <summary>
+        /// At least one variation has pending changes
+        /// </summary>
+        /// <remarks>
+        /// If the document is invariant, this simply means there is pending changes
+        /// </remarks>
+        bool Edited { get; set; }
+
     }
 }

@@ -1,8 +1,4 @@
-﻿/// <reference path="/umbraco_client/Application/NamespaceManager.js" />
-/// <reference path="/umbraco_client/ui/jquery.js" />
-/// <reference name="MicrosoftAjax.js"/>
-
-Umbraco.Sys.registerNamespace("Umbraco.Application");
+﻿Umbraco.Sys.registerNamespace("Umbraco.Application");
 
 (function($) {
     Umbraco.Application.ClientManager = function() {

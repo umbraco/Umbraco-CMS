@@ -333,16 +333,14 @@ namespace Umbraco.Web
 
         #region Urls
 
-        //TODO: We will need an optional culture parameter, by default it will be the current thread culture
-
         /// <summary>
         /// Gets the url of a content identified by its identifier.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
         /// <returns>The url for the content.</returns>
-        public string Url(int contentId)
+        public string Url(int contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId);
+            return UrlProvider.GetUrl(contentId, culture);
         }
 
         /// <summary>
@@ -351,21 +349,19 @@ namespace Umbraco.Web
         /// <param name="contentId">The content identifier.</param>
         /// <param name="mode">The mode.</param>
         /// <returns>The url for the content.</returns>
-        public string Url(int contentId, UrlProviderMode mode)
+        public string Url(int contentId, UrlProviderMode mode, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, mode);
+            return UrlProvider.GetUrl(contentId, mode, culture);
         }
-
-        //TODO: We will need an optional culture parameter, by default it will be the current thread culture
 
         /// <summary>
         /// Gets the absolute url of a content identified by its identifier.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
         /// <returns>The absolute url for the content.</returns>
-        public string UrlAbsolute(int contentId)
+        public string UrlAbsolute(int contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, true);
+            return UrlProvider.GetUrl(contentId, true, culture);
         }
 
         #endregion
@@ -1055,51 +1051,7 @@ namespace Umbraco.Web
         }
 
         #endregion
-
-        #region canvasdesigner
-
-        [Obsolete("Use EnableCanvasDesigner on the HtmlHelper extensions instead")]
-        public IHtmlString EnableCanvasDesigner()
-        {
-            return EnableCanvasDesigner(string.Empty, string.Empty);
-        }
-
-        [Obsolete("Use EnableCanvasDesigner on the HtmlHelper extensions instead")]
-        public IHtmlString EnableCanvasDesigner(string canvasdesignerConfigPath)
-        {
-            return EnableCanvasDesigner(canvasdesignerConfigPath, string.Empty);
-        }
-
-        [Obsolete("Use EnableCanvasDesigner on the HtmlHelper extensions instead")]
-        public IHtmlString EnableCanvasDesigner(string canvasdesignerConfigPath, string canvasdesignerPalettesPath)
-        {
-            var html = CreateHtmlHelper("");
-            var urlHelper = new UrlHelper(UmbracoContext.HttpContext.Request.RequestContext);
-            return html.EnableCanvasDesigner(urlHelper, UmbracoContext, canvasdesignerConfigPath, canvasdesignerPalettesPath);
-        }
-
-        [Obsolete("This shouldn't need to be used but because the obsolete extension methods above don't have access to the current HtmlHelper, we need to create a fake one, unfortunately however this will not pertain the current views viewdata, tempdata or model state so should not be used")]
-        private HtmlHelper CreateHtmlHelper(object model)
-        {
-            var cc = new ControllerContext
-            {
-                RequestContext = UmbracoContext.HttpContext.Request.RequestContext
-            };
-            var viewContext = new ViewContext(cc, new FakeView(), new ViewDataDictionary(model), new TempDataDictionary(), new StringWriter());
-            var htmlHelper = new HtmlHelper(viewContext, new ViewPage());
-            return htmlHelper;
-        }
-
-        [Obsolete("This shouldn't need to be used but because the obsolete extension methods above don't have access to the current HtmlHelper, we need to create a fake one, unfortunately however this will not pertain the current views viewdata, tempdata or model state so should not be used")]
-        private class FakeView : IView
-        {
-            public void Render(ViewContext viewContext, TextWriter writer)
-            {
-            }
-        }
-
-        #endregion
-
+        
         /// <summary>
         /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which
         /// Umbraco can decrypt during the routing process in order to delegate the request to a specific MVC Controller.

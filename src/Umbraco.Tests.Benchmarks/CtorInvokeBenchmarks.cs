@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Benchmarks
         private Func<IFoo, IFoo> _expressionMethod4;
         private Func<IFoo, IFoo> _emittedCtor;
 
-        [Setup]
+        [GlobalSetup]
         public void Setup()
         {
             var ctorArgTypes = new[] { typeof(IFoo) };
