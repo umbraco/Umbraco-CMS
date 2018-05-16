@@ -67,7 +67,6 @@
     <PackageReference Include="AutoMapper" Version="6.2.2" />
     <PackageReference Include="ClientDependency" Version="1.9.6" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="dotless" Version="1.5.2" />
     <PackageReference Include="Examine" Version="1.0.0-beta025" />
     <PackageReference Include="HtmlAgilityPack" Version="1.7.2" />
     <PackageReference Include="LightInject" Version="5.1.2" />
@@ -607,7 +606,6 @@
     <Compile Include="Editors\ImagesController.cs" />
     <Compile Include="Editors\PackageInstallController.cs" />
     <Compile Include="Editors\RelationController.cs" />
-    <Compile Include="Editors\CanvasDesignerController.cs" />
     <Compile Include="GridTemplateExtensions.cs" />
     <Compile Include="Models\PackageInstallModel.cs" />
     <Compile Include="Models\ContentEditing\DataTypeBasic.cs" />
@@ -791,7 +789,6 @@
     <Compile Include="Models\Trees\MenuItemList.cs" />
     <Compile Include="Trees\TemplatesTreeController.cs" />
     <Compile Include="Trees\TreeControllerBase.cs" />
-    <Compile Include="CanvasDesignerUtility.cs" />
     <Compile Include="UI\JavaScript\AssetInitialization.cs" />
     <Compile Include="UI\JavaScript\CssInitialization.cs" />
     <Compile Include="UI\JavaScript\DependencyPathRenderer.cs" />
