@@ -62,7 +62,7 @@
     <PackageReference Include="AutoMapper" Version="6.2.2" />
     <PackageReference Include="ClientDependency" Version="1.9.6" />
     <PackageReference Include="HtmlAgilityPack" Version="1.7.2" />
-    <PackageReference Include="ImageProcessor" Version="2.6.0" />
+    <PackageReference Include="ImageProcessor" Version="2.6.1.19" />
     <PackageReference Include="LightInject" Version="5.1.2" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Web" Version="2.0.0" />
