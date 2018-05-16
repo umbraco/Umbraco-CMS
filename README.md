@@ -1,3 +1,5 @@
+_Looking for Umbraco version 7? [Click here](https://github.com/umbraco/Umbraco-CMS) to go to the v7 branch_
+
 Umbraco CMS
 ===========
 The friendliest, most flexible and fastest growing ASP.NET CMS used by more than 443,000 websites worldwide: [https://umbraco.com](https://umbraco.com)
