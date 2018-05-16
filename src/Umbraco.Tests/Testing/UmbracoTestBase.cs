@@ -94,7 +94,7 @@ namespace Umbraco.Tests.Testing
 
         protected IProfiler Profiler => Container.GetInstance<IProfiler>();
 
-        protected ProfilingLogger ProfilingLogger => Container.GetInstance<ProfilingLogger>();
+        protected virtual ProfilingLogger ProfilingLogger => Container.GetInstance<ProfilingLogger>();
 
         protected CacheHelper CacheHelper => Container.GetInstance<CacheHelper>();
 

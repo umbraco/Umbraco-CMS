@@ -74,22 +74,22 @@ namespace Umbraco.Tests.Services
             // comment out to trace locks
             return done;
 
-            new Thread(() =>
-            {
-                using (var scope = ScopeProvider.CreateScope())
-                while (done.IsSet == false)
-                {
-                    var db = scope.Database;
-                    var info = db.Query<dynamic>("SELECT * FROM sys.lock_information;");
-                    Console.WriteLine("LOCKS:");
-                    foreach (var row in info)
-                    {
-                        Console.WriteLine("> " + row.request_spid + " " + row.resource_type + " " + row.resource_description + " " + row.request_mode + " " + row.resource_table + " " + row.resource_table_id + " " + row.request_status);
-                    }
-                    Thread.Sleep(50);
-                }
-            }).Start();
-            return done;
+            //new Thread(() =>
+            //{
+            //    using (var scope = ScopeProvider.CreateScope())
+            //    while (done.IsSet == false)
+            //    {
+            //        var db = scope.Database;
+            //        var info = db.Query<dynamic>("SELECT * FROM sys.lock_information;");
+            //        Console.WriteLine("LOCKS:");
+            //        foreach (var row in info)
+            //        {
+            //            Console.WriteLine("> " + row.request_spid + " " + row.resource_type + " " + row.resource_description + " " + row.request_mode + " " + row.resource_table + " " + row.resource_table_id + " " + row.request_status);
+            //        }
+            //        Thread.Sleep(50);
+            //    }
+            //}).Start();
+            //return done;
         }
 
         [Test]
