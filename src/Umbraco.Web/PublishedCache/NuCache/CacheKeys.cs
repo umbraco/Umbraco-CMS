@@ -43,11 +43,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return "NuCache.Profile.Name[" + userId + "]";
         }
 
-        public static string PropertyRecurse(Guid contentUid, string typeAlias, bool previewing)
-        {
-            return "NuCache.Property.Recurse[" + DraftOrPub(previewing) + contentUid + ":" + typeAlias + "]";
-        }
-
         public static string PropertyCacheValues(Guid contentUid, string typeAlias, bool previewing)
         {
             return "NuCache.Property.CacheValues[" + DraftOrPub(previewing) + contentUid + ":" + typeAlias + "]";

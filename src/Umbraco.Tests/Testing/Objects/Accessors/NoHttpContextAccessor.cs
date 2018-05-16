@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using Umbraco.Web;
 
-namespace Umbraco.Tests.TestHelpers
+namespace Umbraco.Tests.Testing.Objects.Accessors
 {
     public class NoHttpContextAccessor : IHttpContextAccessor
     {

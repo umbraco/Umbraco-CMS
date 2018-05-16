@@ -33,8 +33,12 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     pdatas.Add(pdata);
 
                     // everything that can be null is read/written as object
-                    pdata.Culture = ReadStringObject(stream);
-                    pdata.Segment = ReadStringObject(stream);
+                    //  even though - culture and segment should never be null here, as 'null' represents
+                    //  the 'current' value, and string.Empty should be used to represent the invariant or
+                    //  neutral values - PropertyData throws when getting nulls, so falling back to
+                    //  string.Empty here - what else?
+                    pdata.Culture = ReadStringObject(stream) ?? string.Empty;
+                    pdata.Segment = ReadStringObject(stream) ?? string.Empty;
                     pdata.Value = ReadObject(stream);
                 }
 
@@ -61,8 +65,10 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 foreach (var pdata in values)
                 {
                     // everything that can be null is read/written as object
-                    WriteObject(pdata.Culture, stream);
-                    WriteObject(pdata.Segment, stream);
+                    //  even though - culture and segment should never be null here,
+                    //  see note in ReadFrom() method above
+                    WriteObject(pdata.Culture ?? string.Empty, stream);
+                    WriteObject(pdata.Segment ?? string.Empty, stream);
                     WriteObject(pdata.Value, stream);
                 }
             }

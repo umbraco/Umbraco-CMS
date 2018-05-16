@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Threading;
 using System.Web;
 using System.Web.Routing;
 using LightInject;
@@ -17,12 +15,12 @@ using Umbraco.Web.Security;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
-using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Web
 {
@@ -56,9 +54,6 @@ namespace Umbraco.Web
         public IUserService UserService { get; set; }
 
         [Inject]
-        public IEntityService EntityService { get; set; }
-
-        [Inject]
         public UrlProviderCollection UrlProviders { get; set; }
 
         [Inject]
@@ -72,6 +67,9 @@ namespace Umbraco.Web
 
         [Inject]
         internal IUmbracoDatabaseFactory DatabaseFactory { get; set; }
+
+        [Inject]
+        internal IVariationContextAccessor VariationContextAccessor { get; set; }
 
         #endregion
 
@@ -115,7 +113,7 @@ namespace Umbraco.Web
                 UmbracoConfig.For.UmbracoSettings(),
                 UrlProviders,
                 GlobalSettings,
-                EntityService,
+                VariationContextAccessor,
                 true);
         }
 

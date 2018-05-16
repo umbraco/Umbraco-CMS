@@ -29,6 +29,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using LightInject;
 using System.Globalization;
+using Umbraco.Tests.Testing.Objects.Accessors;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {
@@ -149,11 +150,11 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == UrlProviderMode.Auto.ToString())),
                 Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                mockedEntityService,
+                new TestVariationContextAccessor(),
                 true); //replace it
 
             var urlHelper = new Mock<IUrlProvider>();
-            urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<int>(), It.IsAny<Uri>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>()))
+            urlHelper.Setup(provider => provider.GetUrl(It.IsAny<UmbracoContext>(), It.IsAny<IPublishedContent>(), It.IsAny<UrlProviderMode>(), It.IsAny<string>(), It.IsAny<Uri>()))
                 .Returns("/hello/world/1234");
 
             var membershipHelper = new MembershipHelper(umbCtx, Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>());

@@ -13,7 +13,6 @@ describe('macro service tests', function () {
 
             var result = macroService.parseMacroSyntax("<?UMBRACO_MACRO macroAlias='Map' test=\"asdf\" test2='hello' />");
 
-            console.log(result.macroParamsDictionary.test);
 
             expect(result).not.toBeNull();
             expect(result.macroAlias).toBe("Map");

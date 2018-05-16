@@ -131,8 +131,29 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 treeService.clearCache({ section: section });
             }
 
-            function load(section) {
-                $scope.section = section;
+            /**
+             * Re-loads the tree with the updated parameters
+             * @param {any} args either a string representing the 'section' or an object containing: 'section', 'treeAlias', 'customTreeParams', 'cacheKey'
+             */
+            function load(args) {
+                if (angular.isString(args)) {
+                    $scope.section = args;
+                }
+                else if (args) {
+                    if (args.section) {
+                        $scope.section = args.section;
+                    }
+                    if (args.customTreeParams) {
+                        $scope.customtreeparams = args.customTreeParams;
+                    }
+                    if (args.treeAlias) {
+                        $scope.treealias = args.treeAlias;
+                    }
+                    if (args.cacheKey) {
+                        $scope.cachekey = args.cacheKey;
+                    }
+                }
+                
                 return loadTree();
             }
 
@@ -400,32 +421,36 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             $scope.altSelect = function (n, ev) {
                 emitEvent("treeNodeAltSelect", { element: $element, tree: $scope.tree, node: n, event: ev });
             };
-
-            //watch for section changes
-            $scope.$watch("section", function (newVal, oldVal) {
-
-                if (!$scope.tree) {
-                    loadTree();
-                }
-
-                if (!newVal) {
-                    //store the last section loaded
-                    lastSection = oldVal;
-                }
-                else if (newVal !== oldVal && newVal !== lastSection) {
-                    //only reload the tree data and Dom if the newval is different from the old one
-                    // and if the last section loaded is different from the requested one.
-                    loadTree();
-
-                    //store the new section to be loaded as the last section
-                    //clear any active trees to reset lookups
-                    lastSection = newVal;
-                }
-            });
             
-            loadTree();
+            //call the onInit method, if the result is a promise then load the tree after that resolves (if it's not a promise this will just resolve automatically).
+            //NOTE: The promise cannot be rejected, else the tree won't be loaded and we'll get exceptions if some API calls syncTree or similar.
+            $q.when($scope.onInit(), function (args) {
 
-            $scope.onInit();
+                //the promise resolution can pass in parameters
+                if (args) {
+                    if (args.section) {
+                        $scope.section = args.section;
+                    }
+                    if (args.customTreeParams) {
+                        $scope.customtreeparams = args.customTreeParams;
+                    }
+                    if (args.treealias) {
+                        $scope.treealias = args.treealias;
+                    }
+                    if (args.cacheKey) {
+                        $scope.cachekey = args.cacheKey;
+                    }
+                }
+
+                //load the tree
+                loadTree().then(function () {
+                    //because angular doesn't return a promise for the resolve method, we need to resort to some hackery, else
+                    //like normal JS promises we could do resolve(...).then() 
+                    if (args.onLoaded && angular.isFunction(args.onLoaded)) {
+                        args.onLoaded();
+                    }
+                });
+            });
         }
     };
 }

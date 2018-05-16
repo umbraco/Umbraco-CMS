@@ -90,7 +90,7 @@ namespace Umbraco.Web.Editors
                     {
                         timer.Start();
 
-                        pointerNode = pointerNode.FirstChild(x => x.DocumentTypeAlias == contentTypeAlias);
+                        pointerNode = pointerNode.FirstChild(x => x.ContentType.Alias == contentTypeAlias);
 
                         if (pointerNode == null) break;
 
@@ -277,7 +277,7 @@ namespace Umbraco.Web.Editors
             if (targetNode == null || targetNode.Id == current.Id) return aliases;
             if (targetNode.Id != current.Id)
             {
-                aliases.Add(targetNode.DocumentTypeAlias);
+                aliases.Add(targetNode.ContentType.Alias);
 
             }
 

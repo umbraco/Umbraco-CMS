@@ -25,8 +25,7 @@ namespace Umbraco.Core.Models.Entities
         /// Gets an entity representing "root".
         /// </summary>
         public static readonly IEntitySlim Root = new EntitySlim { Path = "-1", Name = "root", HasChildren = true };
-
-
+        
         // implement IEntity
 
         /// <inheritdoc />

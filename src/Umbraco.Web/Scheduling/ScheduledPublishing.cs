@@ -12,14 +12,16 @@ namespace Umbraco.Web.Scheduling
         private readonly IRuntimeState _runtime;
         private readonly IContentService _contentService;
         private readonly ILogger _logger;
+        private readonly IUserService _userService;
 
         public ScheduledPublishing(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IContentService contentService, ILogger logger)
+            IRuntimeState runtime, IContentService contentService, ILogger logger, IUserService userService)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
             _contentService = contentService;
             _logger = logger;
+            _userService = userService;
         }
 
         public override bool PerformRun()
@@ -57,7 +59,7 @@ namespace Umbraco.Web.Scheduling
                 // fixme context & events during scheduled publishing?
                 // in v7 we create an UmbracoContext and an HttpContext, and cache instructions
                 // are batched, and we have to explicitely flush them, how is it going to work here?
-                var publisher = new ScheduledPublisher(_contentService, _logger);
+                var publisher = new ScheduledPublisher(_contentService, _logger, _userService);
                 var count = publisher.CheckPendingAndProcess();
             }
             catch (Exception e)

@@ -9,7 +9,10 @@
  *
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource, contentTypeHelper) {
+function NavigationController($scope, $rootScope, $location, $log, $q, $routeParams, $timeout, treeService, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper, languageResource, contentResource) {
+
+    //this is used to trigger the tree to start loading once everything is ready
+    var treeInitPromise = $q.defer();
 
     $scope.treeApi = {};
 
@@ -107,8 +110,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             navigationService.hideNavigation();
         });
 
-        //once this is wired up, the nav is ready
-        eventsService.emit("app.navigationReady", { treeApi: $scope.treeApi});
+        return treeInitPromise.promise;
     }
 
     //TODO: Remove this, this is not healthy
@@ -133,7 +135,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     $scope.page = {};
     $scope.page.languageSelectorIsOpen = false;
 
-    $scope.currentSection = appState.getSectionState("currentSection");
+    $scope.currentSection = null;
     $scope.customTreeParams = null;
     $scope.treeCacheKey = "_";
     $scope.showNavigation = appState.getGlobalState("showNavigation");
@@ -155,14 +157,14 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     var evts = [];
 
     //Listen for global state changes
-    evts.push(eventsService.on("appState.globalState.changed", function(e, args) {
+    evts.push(eventsService.on("appState.globalState.changed", function (e, args) {
         if (args.key === "showNavigation") {
             $scope.showNavigation = args.value;
         }
     }));
 
     //Listen for menu state changes
-    evts.push(eventsService.on("appState.menuState.changed", function(e, args) {
+    evts.push(eventsService.on("appState.menuState.changed", function (e, args) {
         if (args.key === "showMenuDialog") {
             $scope.showContextMenuDialog = args.value;
         }
@@ -181,7 +183,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     }));
 
     //Listen for section state changes
-    evts.push(eventsService.on("appState.treeState.changed", function(e, args) {
+    evts.push(eventsService.on("appState.treeState.changed", function (e, args) {
         var f = args;
         if (args.value.root && args.value.root.metaData.containsTrees === false) {
             $rootScope.emptySection = true;
@@ -192,62 +194,38 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     }));
 
     //Listen for section state changes
-    evts.push(eventsService.on("appState.sectionState.changed", function(e, args) {
+    evts.push(eventsService.on("appState.sectionState.changed", function (e, args) {
         //section changed
         if (args.key === "currentSection") {
             $scope.currentSection = args.value;
+
+            //load the tree
+            configureTreeAndLanguages();
+            $scope.treeApi.load({ section: $scope.currentSection, customTreeParams: $scope.customTreeParams, cacheKey: $scope.treeCacheKey });
+
         }
         //show/hide search results
         if (args.key === "showSearchResults") {
             $scope.showSearchResults = args.value;
         }
 
-        //load languages if doc types allow variations
-        if ($scope.currentSection === "content") {
-            contentTypeHelper.allowsVariation().then(function (b) {
-                if (b === "true") {
-                    //load languages if there are more than 1
-                    loadLanguages();
-                } else {
-                    $scope.languages = [];
-                    init();
-                }
-
-            });
-        }
     }));
 
     // Listen for language updates
     evts.push(eventsService.on("editors.languages.languageDeleted", function (e, args) {
-        languageResource.getAll().then(function (languages) {
-            contentTypeHelper.allowsVariation().then(function (b) {
-
-                if (b === "true") {
-                    $scope.languages = languages;
-                } else {
-                    $scope.languages = [];
-                }
-
-            });
+        loadLanguages().then(function (languages) {
+            $scope.languages = languages;
         });
     }));
 
-    evts.push(eventsService.on("editors.languages.languageCreated", function(e, args) {
-        languageResource.getAll().then(function(languages) {
-            contentTypeHelper.allowsVariation().then(function (b) {
-
-                if (b === "true") {
-                    $scope.languages = languages;
-                } else {
-                    $scope.languages = [];
-                }
-
-            });
+    evts.push(eventsService.on("editors.languages.languageCreated", function (e, args) {
+        loadLanguages().then(function (languages) {
+            $scope.languages = languages;
         });
     }));
 
     //This reacts to clicks passed to the body element which emits a global call to close all dialogs
-    evts.push(eventsService.on("app.closeDialogs", function(event) {
+    evts.push(eventsService.on("app.closeDialogs", function (event) {
         if (appState.getGlobalState("stickyNavigation")) {
             navigationService.hideNavigation();
             //TODO: don't know why we need this? - we are inside of an angular event listener.
@@ -256,52 +234,42 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     }));
 
     //when a user logs out or timesout
-    evts.push(eventsService.on("app.notAuthenticated", function() {
+    evts.push(eventsService.on("app.notAuthenticated", function () {
         $scope.authenticated = false;
     }));
 
     //when the application is ready and the user is authorized setup the data
     evts.push(eventsService.on("app.ready", function (evt, data) {
-        $scope.authenticated = true;
+        init();
     }));
 
-    function loadLanguages() {
-        languageResource.getAll().then(function (languages) {
-            $scope.languages = languages;
+    /**
+     * Based on the current state of the application, this configures the scope variables that control the main tree and language drop down
+     */
+    function configureTreeAndLanguages() {
 
-            if ($scope.languages.length > 1) {
-                var defaultLang = _.find($scope.languages, function (l) {
-                    return l.isDefault;
+        //create the custom query string param for this tree, this is currently only relevant for content
+        if ($scope.currentSection === "content") {
+
+            //must use $location here because $routeParams isn't available until after the route change
+            var mainCulture = $location.search().mculture;
+            //select the current language if set in the query string
+            if (mainCulture && $scope.languages && $scope.languages.length > 1) {
+                var found = _.find($scope.languages, function (l) {
+                    return l.culture.toLowerCase() === mainCulture.toLowerCase();
                 });
-                if (defaultLang) {
+                if (found) {
                     //set the route param
-                    $location.search("mculture", defaultLang.culture);
+                    $scope.selectedLanguage = found;
                 }
             }
 
-            init();
-        });
-    }
-
-    function init() {
-        //select the current language if set in the query string
-        var mainCulture = $location.search().mculture;
-        if (mainCulture && $scope.languages && $scope.languages.length > 1) {
-            var found = _.find($scope.languages, function (l) {
-                return l.culture === mainCulture;
-            });
-            if (found) {
-                //set the route param
-                $scope.selectedLanguage = found;
+            var queryParams = {};
+            if ($scope.selectedLanguage && $scope.selectedLanguage.culture) {
+                queryParams["culture"] = $scope.selectedLanguage.culture;
             }
+            var queryString = $.param(queryParams); //create the query string from the params object
         }
-
-        //create the custom query string param for this tree
-        var queryParams = {};
-        if ($scope.selectedLanguage && $scope.selectedLanguage.culture) {
-            queryParams["culture"] = $scope.selectedLanguage.culture;
-        }
-        var queryString = $.param(queryParams); //create the query string from the params object
 
         if (queryString) {
             $scope.customTreeParams = queryString;
@@ -310,8 +278,101 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
         else {
             $scope.treeCacheKey = "_"; // this tree uses caching, there's no lang selected so use the default
         }
+
     }
 
+    /**
+     * Called when the app is ready and sets up the navigation (should only be called once)
+     */
+    function init() {
+
+        $scope.authenticated = true;
+
+        var navInit = false;
+
+        //$routeParams will be populated after $routeChangeSuccess since this controller is used outside ng-view,
+        //* we listen for the first route change with a section to setup the navigation.
+        //* we listen for all route changes to track the current section.
+        $rootScope.$on('$routeChangeSuccess', function () {
+
+            //only continue if there's a section available
+            if ($routeParams.section) {
+
+                if (!navInit) {
+                    navInit = true;
+                    initNav();
+                }
+                else {
+                    //keep track of the current section, when it changes change the state, and we listen for that event change above
+                    if ($scope.currentSection != $routeParams.section) {
+                        appState.setSectionState("currentSection", $routeParams.section);
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * This loads the language data, if the are no variant content types configured this will return no languages
+     */
+    function loadLanguages() {
+
+        return contentResource.allowsCultureVariation().then(function (b) {
+            if (b === "true") {
+                return languageResource.getAll()
+            } else {
+                return $q.when([]); //resolve an empty collection
+            }
+        });
+    }
+
+    /**
+     * Called once during init to initialize the navigation/tree/languages
+     */
+    function initNav() {
+        // load languages
+        loadLanguages().then(function (languages) {
+
+            $scope.languages = languages;
+
+            if ($scope.languages.length > 1) {
+                var defaultLang = _.find($scope.languages, function (l) {
+                    return l.isDefault;
+                });
+                //if there's already one set, check if it exists
+                var currCulture = null;
+                var mainCulture = $location.search().mculture;
+                if (mainCulture) {
+                    currCulture = _.find($scope.languages, function (l) {
+                        return l.culture.toLowerCase() === mainCulture.toLowerCase();
+                    });
+                }
+                if (!currCulture) {
+                    $location.search("mculture", defaultLang ? defaultLang.culture : null);
+                }
+            }
+
+            $scope.currentSection = $routeParams.section;
+
+            configureTreeAndLanguages();
+
+            //resolve the tree promise, set it's property values for loading the tree which will make the tree load
+            treeInitPromise.resolve({
+                section: $scope.currentSection,
+                customTreeParams: $scope.customTreeParams,
+                cacheKey: $scope.treeCacheKey,
+
+                //because angular doesn't return a promise for the resolve method, we need to resort to some hackery, else
+                //like normal JS promises we could do resolve(...).then()
+                onLoaded: function () {
+                    //the nav is ready, let the app know
+                    eventsService.emit("app.navigationReady", { treeApi: $scope.treeApi });
+                    //finally set the section state
+                    appState.setSectionState("currentSection", $routeParams.section);
+                }
+            });
+        });
+    }
     function nodeExpandedHandler(args) {
         //store the reference to the expanded node path
         if (args.node) {
@@ -323,34 +384,29 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
 
         $location.search("mculture", language.culture);
 
-        //$scope.selectedLanguage = language;
-
         // close the language selector
         $scope.page.languageSelectorIsOpen = false;
 
-        init(); //re-bind language to the query string and update the tree params
+        configureTreeAndLanguages(); //re-bind language to the query string and update the tree params
 
-        //execute after next digest because the internal watch on the customtreeparams needs to be bound now that we've changed it
-        $timeout(function () {
-            //reload the tree with it's updated querystring args
-            $scope.treeApi.load($scope.currentSection).then(function () {
+        //reload the tree with it's updated querystring args
+        $scope.treeApi.load({ section: $scope.currentSection, customTreeParams: $scope.customTreeParams, cacheKey: $scope.treeCacheKey }).then(function () {
 
-                //re-sync to currently edited node
-                var currNode = appState.getTreeState("selectedNode");
-                //create the list of promises
-                var promises = [];
-                //starting with syncing to the currently selected node if there is one
-                if (currNode) {
-                    var path = treeService.getPath(currNode);
-                    promises.push($scope.treeApi.syncTree({ path: path, activate: true }));
-                }
-                //TODO: If we want to keep all paths expanded ... but we need more testing since we need to deal with unexpanding
-                //for (var i = 0; i < expandedPaths.length; i++) {
-                //    promises.push($scope.treeApi.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));
-                //}
-                //execute them sequentially
-                angularHelper.executeSequentialPromises(promises);
-            });
+            //re-sync to currently edited node
+            var currNode = appState.getTreeState("selectedNode");
+            //create the list of promises
+            var promises = [];
+            //starting with syncing to the currently selected node if there is one
+            if (currNode) {
+                var path = treeService.getPath(currNode);
+                promises.push($scope.treeApi.syncTree({ path: path, activate: true }));
+            }
+            //TODO: If we want to keep all paths expanded ... but we need more testing since we need to deal with unexpanding
+            //for (var i = 0; i < expandedPaths.length; i++) {
+            //    promises.push($scope.treeApi.syncTree({ path: expandedPaths[i], activate: false, forceReload: true }));
+            //}
+            //execute them sequentially
+            angularHelper.executeSequentialPromises(promises);
         });
 
     };
@@ -380,22 +436,22 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     };
 
     // Hides navigation tree, with a short delay, is cancelled if the user moves the mouse over the tree again
-    $scope.leaveTree = function(event) {
+    $scope.leaveTree = function (event) {
         //this is a hack to handle IE touch events which freaks out due to no mouse events so the tree instantly shuts down
         if (!event) {
             return;
         }
         if (!appState.getGlobalState("touchDevice")) {
             treeActive = false;
-            $timeout(function() {
+            $timeout(function () {
                 if (!treeActive) {
                     navigationService.hideTree();
                 }
             }, 300);
         }
     };
-    
-    $scope.toggleLanguageSelector = function() {
+
+    $scope.toggleLanguageSelector = function () {
         $scope.page.languageSelectorIsOpen = !$scope.page.languageSelectorIsOpen;
     };
 

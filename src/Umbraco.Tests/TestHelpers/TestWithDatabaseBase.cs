@@ -32,7 +32,7 @@ using LightInject;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Tests.Testing.Objects.AccessorsAndProviders;
+using Umbraco.Tests.Testing.Objects.Accessors;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.TestHelpers
 
             Container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
             Container.Register(factory => PublishedSnapshotService);
-            Container.Register(factory => SystemDefaultCultureProvider);
+            Container.Register(factory => DefaultCultureAccessor);
 
             Container.GetInstance<DataEditorCollectionBuilder>()
                 .Clear()
@@ -231,7 +231,7 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        protected ISystemDefaultCultureProvider SystemDefaultCultureProvider { get; set; }
+        protected IDefaultCultureAccessor DefaultCultureAccessor { get; set; }
 
         protected IPublishedSnapshotService PublishedSnapshotService { get; set; }
 
@@ -239,7 +239,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Initialize();
 
-            SystemDefaultCultureProvider = new TestSystemDefaultCultureProvider();
+            DefaultCultureAccessor = new TestDefaultCultureAccessor();
 
             CreateAndInitializeDatabase();
 
@@ -264,13 +264,14 @@ namespace Umbraco.Tests.TestHelpers
             // testing=true so XmlStore will not use the file nor the database
 
             var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
+            var variationContextAccessor = new TestVariationContextAccessor();
             var service = new PublishedSnapshotService(
                 ServiceContext,
                 Container.GetInstance<IPublishedContentTypeFactory>(),
                 ScopeProvider,
-                cache, publishedSnapshotAccessor,
+                cache, publishedSnapshotAccessor, variationContextAccessor,
                 Container.GetInstance<IDocumentRepository>(), Container.GetInstance<IMediaRepository>(), Container.GetInstance<IMemberRepository>(),
-                SystemDefaultCultureProvider,
+                DefaultCultureAccessor,
                 Logger,
                 Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
                 ContentTypesCache,
@@ -378,7 +379,7 @@ namespace Umbraco.Tests.TestHelpers
                 umbracoSettings ?? Container.GetInstance<IUmbracoSettingsSection>(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
                 globalSettings ?? Container.GetInstance<IGlobalSettings>(),
-                ServiceContext.EntityService);
+                new TestVariationContextAccessor());
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

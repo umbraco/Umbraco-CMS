@@ -25,6 +25,9 @@ namespace Umbraco.Web.Models.Mapping
 
         public IEnumerable<ContentVariation> Resolve(IContent source, ContentItemDisplay destination, IEnumerable<ContentVariation> destMember, ResolutionContext context)
         {
+            if (!source.ContentType.Variations.Has(Core.Models.ContentVariation.CultureNeutral))
+                return Enumerable.Empty<ContentVariation>();
+
             var allLanguages = _localizationService.GetAllLanguages().OrderBy(x => x.Id).ToList();
             if (allLanguages.Count == 0) return Enumerable.Empty<ContentVariation>();
 
@@ -35,7 +38,11 @@ namespace Umbraco.Web.Models.Mapping
                 Mandatory = x.Mandatory,
                 Name = source.GetName(x.IsoCode),
                 Exists = source.IsCultureAvailable(x.IsoCode), // segments ??
-                PublishedState = source.PublishedState.ToString(),
+                PublishedState = (source.PublishedState == PublishedState.Unpublished //if the entire document is unpublished, then flag every variant as unpublished
+                    ? PublishedState.Unpublished
+                    : source.IsCulturePublished(x.IsoCode)
+                        ? PublishedState.Published
+                        : PublishedState.Unpublished).ToString(),
                 IsEdited = source.IsCultureEdited(x.IsoCode)
                 //Segment = ?? We'll need to populate this one day when we support segments
             }).ToList();

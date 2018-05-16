@@ -2033,10 +2033,8 @@ e.g Mid-code Crisis
     <macro>
       <name>[uBlogsy] Show Some Love</name>
       <alias>uBlogsyShowSomeLove</alias>
-      <scriptType>
-      </scriptType>
-      <scriptAssembly>
-      </scriptAssembly>
+      <macroType>Unknown</macroType>
+      <macroSource />
       <xslt>
       </xslt>
       <useInEditor>True</useInEditor>

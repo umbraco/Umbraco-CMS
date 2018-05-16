@@ -457,23 +457,24 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(contentType);
 
             var c1 = MockedContent.CreateSimpleContent(contentType, "Test", -1);
-            c1.SetName(_langFr.IsoCode, "Test - FR");
-            c1.SetName(_langEs.IsoCode, "Test - ES");
+            c1.SetName("Test - FR", _langFr.IsoCode);
+            c1.SetName("Test - ES", _langEs.IsoCode);
             ServiceContext.ContentService.Save(c1);
 
             var result = service.Get(c1.Id, UmbracoObjectTypes.Document);
             Assert.AreEqual("Test", result.Name);
-            Assert.IsTrue(result.AdditionalData.ContainsKey("CultureNames"));
-            var cultureNames = (IDictionary<int, string>)result.AdditionalData["CultureNames"];
-            Assert.AreEqual("Test - FR", cultureNames[_langFr.Id]);
-            Assert.AreEqual("Test - ES", cultureNames[_langEs.Id]);
+            Assert.IsNotNull(result as IDocumentEntitySlim);
+            var doc = (IDocumentEntitySlim)result;
+            var cultureNames = doc.CultureNames;
+            Assert.AreEqual("Test - FR", cultureNames[_langFr.IsoCode]);
+            Assert.AreEqual("Test - ES", cultureNames[_langEs.IsoCode]);
         }
 
         [Test]
         public void EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
         {
             var service = ServiceContext.EntityService;
-            
+
             var contentType = MockedContentTypes.CreateSimpleContentType("test1", "Test1", false);
             contentType.Variations = ContentVariation.CultureNeutral;
             ServiceContext.ContentTypeService.Save(contentType);
@@ -486,8 +487,8 @@ namespace Umbraco.Tests.Services
                 var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
                 if (i % 2 == 0)
                 {
-                    c1.SetName(_langFr.IsoCode, "Test " + i + " - FR");
-                    c1.SetName(_langEs.IsoCode, "Test " + i + " - ES");
+                    c1.SetName("Test " + i + " - FR", _langFr.IsoCode);
+                    c1.SetName("Test " + i + " - ES", _langEs.IsoCode);
                 }
                 ServiceContext.ContentService.Save(c1);
             }
@@ -498,17 +499,16 @@ namespace Umbraco.Tests.Services
 
             for (int i = 0; i < entities.Length; i++)
             {
+                Assert.AreEqual(0, entities[i].AdditionalData.Count);
+
                 if (i % 2 == 0)
                 {
-                    Assert.AreEqual(1, entities[i].AdditionalData.Count);
-                    Assert.AreEqual("CultureNames", entities[i].AdditionalData.Keys.First());
-                    var variantInfo = entities[i].AdditionalData.First().Value as IDictionary<int, string>;
-                    Assert.IsNotNull(variantInfo);
-                    var keys = variantInfo.Keys.ToList();
-                    var vals = variantInfo.Values.ToList();
-                    Assert.AreEqual(_langFr.Id, keys[0]);
+                    var doc = (IDocumentEntitySlim)entities[i];
+                    var keys = doc.CultureNames.Keys.ToList();
+                    var vals = doc.CultureNames.Values.ToList();
+                    Assert.AreEqual(_langFr.IsoCode.ToLowerInvariant(), keys[0].ToLowerInvariant());
                     Assert.AreEqual("Test " + i + " - FR", vals[0]);
-                    Assert.AreEqual(_langEs.Id, keys[1]);
+                    Assert.AreEqual(_langEs.IsoCode.ToLowerInvariant(), keys[1].ToLowerInvariant());
                     Assert.AreEqual("Test " + i + " - ES", vals[1]);
                 }
                 else

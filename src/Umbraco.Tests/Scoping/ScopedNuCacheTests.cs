@@ -21,10 +21,12 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
+using Umbraco.Web.PublishedCache.NuCache.DataSource;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 
@@ -88,10 +90,12 @@ namespace Umbraco.Tests.Scoping
                 contentTypeFactory,
                 null,
                 publishedSnapshotAccessor,
+                Mock.Of<IVariationContextAccessor>(),
                 Logger,
                 ScopeProvider,
                 documentRepository, mediaRepository, memberRepository,
-                SystemDefaultCultureProvider,
+                DefaultCultureAccessor,
+                new DatabaseDataSource(),
                 Container.GetInstance<IGlobalSettings>(), new SiteDomainHelper());
         }
 
@@ -110,7 +114,7 @@ namespace Umbraco.Tests.Scoping
                 umbracoSettings ?? SettingsForTests.GetDefaultUmbracoSettings(),
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
                 globalSettings,
-                Mock.Of<IEntityService>());
+                new TestVariationContextAccessor());
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

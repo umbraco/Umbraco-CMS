@@ -165,8 +165,6 @@ namespace Umbraco.Tests.PublishedContent
             IsDraft = false;
 
             ContentType = contentType;
-            DocumentTypeAlias = contentType.Alias;
-            DocumentTypeId = contentType.Id;
         }
 
         #endregion
@@ -178,10 +176,9 @@ namespace Umbraco.Tests.PublishedContent
         public int TemplateId { get; set; }
         public int SortOrder { get; set; }
         public string Name { get; set; }
-        public IReadOnlyDictionary<string, PublishedCultureName> CultureNames => throw new NotSupportedException();
-        public string UrlName { get; set; }
-        public string DocumentTypeAlias { get; private set; }
-        public int DocumentTypeId { get; private set; }
+        public PublishedCultureInfo GetCulture(string culture = null) => throw new NotSupportedException();
+        public IReadOnlyDictionary<string, PublishedCultureInfo> Cultures => throw new NotSupportedException();
+        public string UrlSegment { get; set; }
         public string WriterName { get; set; }
         public string CreatorName { get; set; }
         public int WriterId { get; set; }
@@ -192,6 +189,7 @@ namespace Umbraco.Tests.PublishedContent
         public Guid Version { get; set; }
         public int Level { get; set; }
         public string Url { get; set; }
+        public string GetUrl(string culture = null) => throw new NotSupportedException();
 
         public PublishedItemType ItemType { get { return PublishedItemType.Content; } }
         public bool IsDraft { get; set; }

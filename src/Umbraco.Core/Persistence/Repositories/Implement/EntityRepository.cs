@@ -435,12 +435,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
 
         /// <summary>
-        /// The DTO used to fetch results for a content item with it's variation info
+        /// The DTO used to fetch results for a content item with its variation info
         /// </summary>
         private class ContentEntityDto : BaseDto
         {
+            public ContentVariation Variations { get; set; }
+
             [ResultColumn, Reference(ReferenceType.Many)]
             public List<ContentEntityVariationInfoDto> VariationInfo { get; set; }
+
+            public bool Published { get; set; }
+            public bool Edited { get; set; }
         }
 
         /// <summary>
@@ -477,12 +482,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             public DateTime CreateDate { get; set; }
             public int Children { get; set; }
             public int VersionId { get; set; }
-            public bool Published { get; set; }
-            public bool Edited { get; set; }
             public string Alias { get; set; }
             public string Icon { get; set; }
             public string Thumbnail { get; set; }
             public bool IsContainer { get; set; }
+            
             // ReSharper restore UnusedAutoPropertyAccessor.Local
             // ReSharper restore UnusedMember.Local
         }
@@ -506,8 +510,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 if (isContent || isMedia)
                     sql
-                        .AndSelect<ContentVersionDto>(x => NPocoSqlExtensions.Statics.Alias(x.Id, "versionId"))
-                        .AndSelect<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.Thumbnail, x => x.IsContainer);
+                        .AndSelect<ContentVersionDto>(x => Alias(x.Id, "versionId"))
+                        .AndSelect<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.Thumbnail, x => x.IsContainer, x => x.Variations);
 
                 if (isContent)
                 {
@@ -616,7 +620,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (isContent || isMedia)
                 sql
                     .AndBy<ContentVersionDto>(x => x.Id)
-                    .AndBy<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.Thumbnail, x => x.IsContainer);
+                    .AndBy<ContentTypeDto>(x => x.Alias, x => x.Icon, x => x.Thumbnail, x => x.IsContainer, x => x.Variations);
 
             if (sort)
                 sql.OrderBy<NodeDto>(x => x.SortOrder);
@@ -826,7 +830,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Factory
 
-        private static EntitySlim BuildEntity(bool isContent, bool isMedia, BaseDto dto)
+        private EntitySlim BuildEntity(bool isContent, bool isMedia, BaseDto dto)
         {
             if (isContent)
                 return BuildDocumentEntity(dto);
@@ -864,13 +868,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.ContentTypeThumbnail = dto.Thumbnail;
         }
 
-        private static void BuildDocumentEntity(DocumentEntitySlim entity, BaseDto dto)
-        {
-            BuildContentEntity(entity, dto);
-            entity.Published = dto.Published;
-            entity.Edited = dto.Edited;
-        }
-
         private static EntitySlim BuildContentEntity(BaseDto dto)
         {
             // EntitySlim does not track changes
@@ -879,11 +876,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return entity;
         }
 
-        private static EntitySlim BuildDocumentEntity(BaseDto dto)
+        private DocumentEntitySlim BuildDocumentEntity(BaseDto dto)
         {
+            if (dto is ContentEntityDto contentDto)
+            {
+                return BuildDocumentEntity(contentDto);
+            }
+
             // EntitySlim does not track changes
             var entity = new DocumentEntitySlim();
-            BuildDocumentEntity(entity, dto);
+            BuildContentEntity(entity, dto);
             return entity;
         }
 
@@ -892,21 +894,27 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        private EntitySlim BuildDocumentEntity(ContentEntityDto dto)
+        private DocumentEntitySlim BuildDocumentEntity(ContentEntityDto dto)
         {
             // EntitySlim does not track changes
             var entity = new DocumentEntitySlim();
-            BuildDocumentEntity(entity, dto);
-            var variantInfo = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
-            if (dto.VariationInfo != null)
+            BuildContentEntity(entity, dto);
+            
+            //fixme we need to set these statuses for each variant, see notes in IDocumentEntitySlim
+            entity.Edited = dto.Edited;
+            entity.Published = dto.Published;
+
+            if (dto.Variations.Has(ContentVariation.CultureNeutral) && dto.VariationInfo != null && dto.VariationInfo.Count > 0)
             {
+                var variantInfo = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
                 foreach (var info in dto.VariationInfo)
                 {
                     var isoCode = _langRepository.GetIsoCodeById(info.LanguageId);
                     if (isoCode != null)
                         variantInfo[isoCode] = info.Name;
                 }
-                entity.AdditionalData["CultureNames"] = variantInfo;
+                entity.CultureNames = variantInfo;
+                entity.Variations = dto.Variations;
             }
             return entity;
         }

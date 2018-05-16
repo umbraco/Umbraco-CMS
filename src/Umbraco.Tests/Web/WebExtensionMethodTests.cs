@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing;
+using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.Web
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
-                Mock.Of<IEntityService>());
+                new TestVariationContextAccessor());
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
 
@@ -49,7 +50,7 @@ namespace Umbraco.Tests.Web
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
-                Mock.Of<IEntityService>());
+                new TestVariationContextAccessor());
 
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
@@ -77,7 +78,7 @@ namespace Umbraco.Tests.Web
                 TestObjects.GetUmbracoSettings(),
                 new List<IUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
-                Mock.Of<IEntityService>());
+                new TestVariationContextAccessor());
 
             var httpContext = Mock.Of<HttpContextBase>();
 

@@ -15,14 +15,19 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, $injector, eventsService, dialogService, umbModelMapper, treeService, notificationsService, historyService, appState, angularHelper) {
+function navigationService($rootScope, $route, $routeParams, $log, $location, $q, $timeout, $injector, urlHelper, eventsService, dialogService, umbModelMapper, treeService, notificationsService, historyService, appState, angularHelper) {
+
+    //the promise that will be resolved when the navigation is ready
+    var navReadyPromise = $q.defer();
 
     //the main tree's API reference, this is acquired when the tree has initialized
     var mainTreeApi = null;
 
     eventsService.on("app.navigationReady", function (e, args) {
         mainTreeApi = args.treeApi;
+        navReadyPromise.resolve(mainTreeApi);
     });
+
 
     //used to track the current dialog object
     var currentDialog = null;
@@ -88,18 +93,16 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
     var service = {
 
-        /** initializes the navigation service */
-        init: function() {
-
-            //keep track of the current section - initially this will always be undefined so
-            // no point in setting it now until it changes.
-            $rootScope.$watch(function () {
-                return $routeParams.section;
-            }, function (newVal, oldVal) {
-                appState.setSectionState("currentSection", newVal);
-            });
-
-
+        /**
+         * @ngdoc method
+         * @name umbraco.services.navigationService#waitForNavReady
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * returns a promise that will resolve when the navigation is ready
+         */
+        waitForNavReady: function () {
+            return navReadyPromise.promise;
         },
 
         /**
@@ -111,10 +114,10 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * utility to clear the querystring/search params while maintaining a known list of parameters that should be maintained throughout the app
          */
         clearSearch: function () {
-            var retainKeys = ["mculture"];
+            var toRetain = ["mculture"];
             var currentSearch = $location.search();
             $location.search('');
-            _.each(retainKeys, function (k) {
+            _.each(toRetain, function (k) {
                 if (currentSearch[k]) {
                     $location.search(k, currentSearch[k]);
                 }
@@ -174,10 +177,12 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 appState.setSectionState("currentSection", sectionAlias);
 
                 if (syncArgs) {
-                    this.syncTree(syncArgs);
+                    return this.syncTree(syncArgs);
                 }
             }
             setMode("tree");
+
+            return $q.when(true);
         },
 
         showTray: function () {
@@ -217,13 +222,9 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 throw "args.tree cannot be null";
             }
 
-            if (mainTreeApi) {
-                //returns a promise,
+            return navReadyPromise.promise.then(function () {
                 return mainTreeApi.syncTree(args);
-            }
-
-            //couldn't sync
-            return $q.reject();
+            });
         },
 
         /**
@@ -231,28 +232,22 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             have to set an active tree and then sync, the new API does this in one method by using syncTree
         */
         _syncPath: function(path, forceReload) {
-            if (mainTreeApi) {
-                mainTreeApi.syncTree({ path: path, forceReload: forceReload });
-            }
+            return navReadyPromise.promise.then(function () {
+                return mainTreeApi.syncTree({ path: path, forceReload: forceReload });
+            });
         },
         
         reloadNode: function(node) {
-            if (mainTreeApi) {
+            return navReadyPromise.promise.then(function () {
                 return mainTreeApi.reloadNode(node);
-            }
-            else {
-                return $q.reject();
-            }
+            });
         },
         
         reloadSection: function(sectionAlias) {
-            if (mainTreeApi) {
+            return navReadyPromise.promise.then(function () {
                 mainTreeApi.clearCache({ section: sectionAlias });
                 return mainTreeApi.load(sectionAlias);
-            }
-            else {
-                return $q.reject();
-            }
+            });
         },
 
         /**
