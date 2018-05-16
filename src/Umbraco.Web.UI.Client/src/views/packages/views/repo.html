@@ -153,13 +153,25 @@
                 <div class="umb-package-details__sidebar">
 
                     <div class="umb-package-details__section">
-                        <button class="umb-era-button -green -full-width"
-                                ng-if="vm.package.isValid === true"
-                                ng-click="vm.downloadPackage(vm.package)"><localize key="packager_packageInstall">Install package</localize></button>
 
-                        <button class="umb-era-button -inactive -full-width" ng-if="vm.package.isValid === false" disabled>
-                            <localize key="packager_packageAlreadyInstalled">Package is already installed</localize>
-                        </button>
+                        <umb-button
+                            ng-if="vm.package.isValid === true"
+                            type="button"
+                            button-style="[success,block]"
+                            size="m"
+                            action="vm.downloadPackage(vm.package)"
+                            label-key="packager_packageInstall">
+                        </umb-button>
+
+                        <umb-button
+                            ng-if="vm.package.isValid === false"
+                            type="button"
+                            button-style="[block]"
+                            size="m"
+                            disabled="vm.package.isValid === false"
+                            label-key="packager_packageAlreadyInstalled">
+                        </umb-button>
+
                     </div>
 
                     <div class="umb-package-details__section">
@@ -315,14 +327,15 @@
                                     <input type="checkbox" id="license-accept" ng-model="vm.localPackage.packageLicenseAccept" required no-dirty-check>
                                     <strong class="label-text"><localize key="packager_accept">I accept</localize> <a href="{{ vm.localPackage.licenseUrl }}" target="_blank"><localize key="packager_termsOfUse">terms of use</localize></a></strong>
                                 </label>
-                                <button type="button"
-                                        ng-if="vm.installState.type !== 'error'"
-                                        ng-class="{'-inactive' : localPackageForm.$invalid}"
-                                        ng-disabled="localPackageForm.$invalid"
-                                        class="umb-era-button -green flex-inline mt3"
-                                        ng-click="vm.installPackage(vm.localPackage)">
-                                    <localize key="packager_packageInstall">Install package</localize>
-                                </button>
+                                <umb-button
+                                    ng-if="vm.installState.type !== 'error'"
+                                    class="mt3"
+                                    type="button"
+                                    button-style="success"
+                                    disabled="localPackageForm.$invalid"
+                                    action="vm.installPackage(vm.localPackage)"
+                                    label-key="packager_packageInstall">
+                                </umb-button>
                             </div>
 
                             <div class="umb-info-local-item">

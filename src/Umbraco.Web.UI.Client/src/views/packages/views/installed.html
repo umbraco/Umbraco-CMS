@@ -91,13 +91,15 @@
                                 <input type="checkbox" id="confirm-uninstall" ng-model="vm.package.confirmUninstall" required no-dirty-check>
                                 <strong class="label-text"><localize key="packager_packageUninstallConfirm">Confirm package uninstall</localize></strong>
                             </label>
-                            <button type="button"
-                                    ng-class="{'-inactive' : uninstallForm.$invalid}"
-                                    ng-disabled="uninstallForm.$invalid"
-                                    class="umb-era-button -green flex-inline mt3"
-                                    ng-click="vm.uninstallPackage(vm.package)">
-                                <localize key="packager_packageUninstallHeader">Uninstall package</localize>
-                            </button>
+                            <umb-button
+                                class="mt3"
+                                type="button"
+                                disabled="uninstallForm.$invalid"
+                                button-style="success"
+                                size="m"
+                                action="vm.uninstallPackage(vm.package)"
+                                label-key="packager_packageUninstallHeader">
+                            </umb-button>
                         </div>
 
                         <div class="umb-info-local-item">

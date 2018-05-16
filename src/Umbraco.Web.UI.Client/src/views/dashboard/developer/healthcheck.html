@@ -115,14 +115,14 @@
                                                 <input name="providedValue" type="text" ng-model="action.providedValue" required val-email/>
                                             </div>
 
-                                            <button
+                                            <umb-button
                                                 type="button"
-                                                class="umb-era-button umb-button--s -green"
-                                                ng-class="{ '-inactive': healthCheckAction.providedValue.$invalid}"
-                                                ng-click="vm.executeAction(check, $parent.$index, action);"
-                                                ng-disabled="healthCheckAction.providedValue.$invalid">
-                                                {{action.name}}
-                                            </button>
+                                                button-style="success"
+                                                size="s"
+                                                disabled="healthCheckAction.providedValue.$invalid"
+                                                action="vm.executeAction(check, $parent.$index, action)"
+                                                label="{{action.name}}">
+                                            </umb-button>
 
                                         </ng-form>
 
