@@ -20,10 +20,17 @@ namespace Umbraco.Tests.UmbracoExamine
         public void InitializeFixture()
         {
             var logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
-            ProfilingLogger = new ProfilingLogger(logger, new LogProfiler(logger));
+            _profilingLogger = new ProfilingLogger(logger, new LogProfiler(logger));
         }
 
-        protected ProfilingLogger ProfilingLogger { get; private set; }
+        private ProfilingLogger _profilingLogger;
+        protected override ProfilingLogger ProfilingLogger
+        {
+            get
+            {
+                return _profilingLogger;
+            }
+        }
 
         /// <summary>
         /// sets up resolvers before resolution is frozen
