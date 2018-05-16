@@ -2,7 +2,7 @@
 <Project ToolsVersion="15.0">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <ProjectGuid>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -76,7 +76,6 @@
     <PackageReference Include="MySql.Data" Version="6.10.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NPoco" Version="3.9.3" />
-    <PackageReference Include="NuGet.Core" Version="2.14.0" />
     <PackageReference Include="Semver" Version="2.0.4" />
     <PackageReference Include="SqlServerCE" Version="4.0.0.1" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
