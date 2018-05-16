@@ -22,6 +22,7 @@ namespace Umbraco.Web.Redirects
     /// <para>recycle bin = moving to and from does nothing: to = the node is gone, where would we redirect? from = same</para>
     /// </remarks>
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
+    [DisableComponent] // fixme - re-enable when we fix redirect tracking with variants
     public class RedirectTrackingComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         private const string ContextKey1 = "Umbraco.Web.Redirects.RedirectTrackingEventHandler.1";
