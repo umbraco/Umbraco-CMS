@@ -67,9 +67,7 @@
     <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="Log4Net.Async" Version="2.0.4" />
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.1" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client">
-      <Version>5.2.6</Version>
-    </PackageReference>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.0" />
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.0" />
     <PackageReference Include="Microsoft.Web.Xdt" Version="2.1.2" />
