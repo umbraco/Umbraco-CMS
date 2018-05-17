@@ -388,11 +388,6 @@
 
     Write-Host "Create NuGet packages"
 
-    # see https://docs.microsoft.com/en-us/nuget/schema/nuspec
-    # note - warnings about SqlCE native libs being outside of 'lib' folder,
-    # nothing much we can do about it as it's intentional yet there does not
-    # seem to be a way to disable the warning
-
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Core.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
