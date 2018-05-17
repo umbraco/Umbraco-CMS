@@ -116,7 +116,7 @@
     <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.2" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.4.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />
-    <PackageReference Include="Umbraco.ModelsBuilder" Version="8.0.0-alpha.17" />
+    <PackageReference Include="Umbraco.ModelsBuilder" Version="8.0.0-alpha.18" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">

@@ -16,7 +16,7 @@
     <tags>umbraco</tags>
     <dependencies>
       <dependency id="UmbracoCms.Core" version="[$version$]" />
-      <dependency id="Umbraco.ModelsBuilder" version="[8.0.0-alpha.17, 9.0.0)" />
+      <dependency id="Umbraco.ModelsBuilder" version="[8.0.0-alpha.18, 9.0.0)" />
       <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.2.3, 3.0.0)" />
     </dependencies>
   </metadata>
