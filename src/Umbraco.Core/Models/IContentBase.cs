@@ -110,18 +110,34 @@ namespace Umbraco.Core.Models
         void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null);
 
         /// <summary>
-        /// Gets a value indicating whether the content and all its properties values are valid.
+        /// Checks if the content and property values are valid in order to be persisted.
         /// </summary>
-        Property[] ValidateAll();
+        /// <param name="culture"></param>
+        /// <param name="segment"></param>
+        /// <returns></returns>
+        bool IsValid(string culture = null, string segment = null);
 
         /// <summary>
-        /// Gets a value indicating whether the content and its properties values are valid.
+        /// Gets a value indicating if all properties values are valid.
         /// </summary>
-        Property[] Validate(string culture = null, string segment = null);
+        //fixme - needs API review as this is not used apart from in tests
+        //Property[] ValidateAllProperties();
 
         /// <summary>
-        /// Gets a value indicating whether the content and its culture/any properties values are valid.
+        /// Validates the content item's properties for the provided culture/segment
         /// </summary>
-        Property[] ValidateCulture(string culture = null);
+        /// <param name="culture"></param>
+        /// <param name="segment"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This will not perform validation for properties that do not match the required ContentVariation based on the culture/segment values provided
+        /// </remarks>
+        Property[] ValidateProperties(string culture = null, string segment = null);
+
+        /// <summary>
+        /// Gets a value indicating if the culture properties values are valid.
+        /// </summary>
+        //fixme - needs API review as this is not used apart from in tests
+        //Property[] ValidatePropertiesForCulture(string culture = null);
     }
 }

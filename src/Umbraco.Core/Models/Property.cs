@@ -332,11 +332,13 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Gets a value indicating whether everything is valid.
+        /// Gets a value indicating whether all properties are valid.
         /// </summary>
         /// <returns></returns>
-        public bool IsAllValid()
+        internal bool IsAllValid()
         {
+            //fixme - needs API review as this is not used apart from in tests
+
             // invariant-neutral is supported, validate invariant-neutral
             // includes mandatory validation
             if (PropertyType.ValidateVariation(null, null, false) && !IsValidValue(_pvalue)) return false;
@@ -359,8 +361,10 @@ namespace Umbraco.Core.Models
         /// Gets a value indicating whether the culture/any values are valid.
         /// </summary>
         /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
-        public bool IsCultureValid(string culture)
+        internal bool IsCultureValid(string culture)
         {
+            //fixme - needs API review as this is not used apart from in tests
+
             // culture-neutral is supported, validate culture-neutral
             // includes mandatory validation
             if (PropertyType.ValidateVariation(culture, null, false) && !IsValidValue(GetValue(culture)))

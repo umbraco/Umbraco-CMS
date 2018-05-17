@@ -170,7 +170,8 @@ namespace Umbraco.Core.Models
         /// <para>Values are not published if they are not valid.</para>
         /// </remarks>
         //fixme return an Attempt with some error results if it doesn't work
-        bool TryPublishAllValues();
+        //fixme - needs API review as this is not used apart from in tests
+        //bool TryPublishAllValues();
 
         /// <summary>
         /// Publishes values.
@@ -191,7 +192,8 @@ namespace Umbraco.Core.Models
         /// <para>The document must then be published via the content service.</para>
         /// <para>Values are not published if they are not valie.</para>
         /// </remarks>
-        bool PublishCultureValues(string culture = null);
+        //fixme - needs API review as this is not used apart from in tests
+        //bool PublishCultureValues(string culture = null);
 
         /// <summary>
         /// Clears all published values.

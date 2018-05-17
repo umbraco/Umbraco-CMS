@@ -307,21 +307,23 @@ namespace Umbraco.Core.Models
 
         #region Validation
 
-        public virtual Property[] ValidateAll()
+        internal virtual Property[] ValidateAllProperties()
         {
+            //fixme - needs API review as this is not used apart from in tests
+
             return Properties.Where(x => !x.IsAllValid()).ToArray();
         }
 
-        /// <summary>
-        /// Validates the content item's properties for the provided culture/segment
-        /// </summary>
-        /// <param name="culture"></param>
-        /// <param name="segment"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This will not perform validation for properties that do not match the required ContentVariation based on the culture/segment values provided
-        /// </remarks>
-        public virtual Property[] Validate(string culture = null, string segment = null)
+        /// <inheritdoc />
+        public bool IsValid(string culture = null, string segment = null)
+        {
+            var name = GetName(culture);
+            if (name.IsNullOrWhiteSpace()) return false;
+            return ValidateProperties(culture, segment).Length == 0;
+        }
+
+        /// <inheritdoc />
+        public virtual Property[] ValidateProperties(string culture = null, string segment = null)
         {
             return Properties.Where(x =>
             {
@@ -337,8 +339,10 @@ namespace Umbraco.Core.Models
             }).ToArray();
         }
 
-        public virtual Property[] ValidateCulture(string culture = null)
+        internal virtual Property[] ValidatePropertiesForCulture(string culture = null)
         {
+            //fixme - needs API review as this is not used apart from in tests
+
             return Properties.Where(x => !x.IsCultureValid(culture)).ToArray();
         }
 
