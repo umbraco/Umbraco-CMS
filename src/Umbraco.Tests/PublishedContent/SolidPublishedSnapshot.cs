@@ -250,6 +250,7 @@ namespace Umbraco.Tests.PublishedContent
 
     class SolidPublishedProperty : IPublishedProperty
     {
+        public PublishedPropertyType PropertyType { get; set; }
         public string Alias { get; set; }
         public object SolidSourceValue { get; set; }
         public object SolidValue { get; set; }
