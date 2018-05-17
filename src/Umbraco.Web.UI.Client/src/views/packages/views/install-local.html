@@ -136,13 +136,15 @@
                                     <input type="checkbox" id="license-accepts" ng-model="vm.localPackage.packageLicenseAccept" required no-dirty-check>
                                     <strong class="label-text"><localize key="packager_accept">I accept</localize> <a href="{{ vm.localPackage.licenseUrl }}" target="_blank"><localize key="packager_termsOfUse">terms of use</localize></a></strong>
                                 </label>
-                                <button type="button"
-                                        ng-class="{'-inactive' : localPackageForm.$invalid}"
-                                        ng-disabled="localPackageForm.$invalid"
-                                        class="umb-era-button -green flex-inline mt3"
-                                        ng-click="vm.installPackage()">
-                                        <localize key="packager_packageInstall">Install package</localize>
-                                </button>
+                                <umb-button
+                                    class="mt3" 
+                                    type="button"
+                                    disabled="localPackageForm.$invalid"
+                                    size="m"
+                                    button-style="success"
+                                    action="vm.installPackage()"
+                                    label-key="packager_packageInstall">
+                                </umb-button>
                             </div>
 
                             <div class="umb-info-local-item">

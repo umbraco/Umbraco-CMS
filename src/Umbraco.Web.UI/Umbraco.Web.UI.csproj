@@ -88,8 +88,8 @@
     <PackageReference Include="ClientDependency" Version="1.9.6" />
     <PackageReference Include="ClientDependency-Mvc5" Version="1.8.0.0" />
     <PackageReference Include="Examine" Version="1.0.0-beta025" />
-    <PackageReference Include="ImageProcessor.Web" Version="4.9.1.2" />
-    <PackageReference Include="ImageProcessor.Web.Config" Version="2.4.0" />
+    <PackageReference Include="ImageProcessor.Web" Version="4.9.2.19" />
+    <PackageReference Include="ImageProcessor.Web.Config" Version="2.4.1.19" />
     <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="Log4Net.Async" Version="2.0.4" />
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />

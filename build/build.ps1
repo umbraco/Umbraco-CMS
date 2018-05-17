@@ -342,13 +342,13 @@
     $this.TempStoreFile("$($this.SolutionRoot)\src\Umbraco.Web.UI\web.config")
     Write-Host "Create clean web.config"
     $this.CopyFile("$($this.SolutionRoot)\src\Umbraco.Web.UI\web.Template.config", "$($this.SolutionRoot)\src\Umbraco.Web.UI\web.config")
-    
+
     Write-host "Set environment"
     $env:UMBRACO_VERSION=$this.Version.Semver.ToString()
     $env:UMBRACO_RELEASE=$this.Version.Release
     $env:UMBRACO_COMMENT=$this.Version.Comment
     $env:UMBRACO_BUILD=$this.Version.Build
-    
+
     if ($args -and $args[0] -eq "vso")
     {
       Write-host "Set VSO environment"
@@ -378,7 +378,7 @@
   {
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
-    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Umbraco.sln" -ConfigFile $this.BuildEnv.NuGetConfig > "$($this.BuildTemp)\nuget.restore.log"
+    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Umbraco.sln" > "$($this.BuildTemp)\nuget.restore.log"
     if (-not $?) { throw "Failed to restore NuGet packages." }
   })
 

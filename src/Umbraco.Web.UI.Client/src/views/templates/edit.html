@@ -20,7 +20,6 @@
             </umb-editor-header>
 
             <umb-editor-container>
-
                 <umb-box>
                     <umb-box-content>
 
@@ -28,14 +27,14 @@
 
                             <div class="flex">
 
-                                <div ng-class="{'btn-group umb-era-button-group': vm.template.masterTemplateAlias}" style="margin-right: 10px;">
-                                    
+                                <div ng-class="{'btn-group': vm.template.masterTemplateAlias}" style="margin-right: 10px;">
+
                                     <button
                                         data-element="button-masterTemplate"
                                         type="button"
-                                        class="umb-era-button umb-button--s"
-                                        ng-click="vm.openMasterTemplateOverlay()">
-                                        <i class="icon icon-layout"></i>
+                                        class="btn umb-button--xs"
+                                        ng-click="vm.openMasterTemplateOverlay()"
+                                        style="font-size: 14px;">
                                         <span class="bold"><localize key="template_mastertemplate">Master template</localize>:</span>
                                         <span style="margin-left: 5px;">
                                             <span ng-if="vm.template.masterTemplateAlias">{{ vm.getMasterTemplateName(vm.template.masterTemplateAlias, vm.templates) }}</span>
@@ -43,7 +42,7 @@
                                         </span>
                                     </button>
 
-                                    <a ng-if="vm.template.masterTemplateAlias" ng-click="vm.removeMasterTemplate()" class="umb-era-button umb-button--s dropdown-toggle umb-button-group__toggle">
+                                    <a ng-if="vm.template.masterTemplateAlias" ng-click="vm.removeMasterTemplate()" class="btn umb-button--xs dropdown-toggle umb-button-group__toggle">
                                         <span class="icon icon-wrong"></span>
                                     </a>
 
@@ -52,57 +51,43 @@
                             </div>
 
                             <div class="flex" style="margin-left: auto;">
-                                <div class="btn-group umb-era-button-group dropdown" style="margin-right: 10px;">
-                                    
-                                    <button
-                                        data-element="button-insert"
-                                        type="button"
-                                        class="umb-era-button umb-button--s"
-                                        ng-click="vm.openInsertOverlay()">
-                                        <i class="icon icon-add"></i> <localize key="general_insert">Insert</localize>
-                                    </button>
 
-                                    <a class="umb-era-button umb-button--s dropdown-toggle umb-button-group__toggle" data-toggle="dropdown">
-                                        <span class="caret"></span>
-                                    </a>
+                                <umb-button-group
+                                    style="margin-right: 5px;"
+                                    default-button="vm.page.insertDefaultButton"
+                                    sub-buttons="vm.page.insertSubButtons"
+                                    size="xs">
+                                </umb-button-group>
 
-                                    <ul aria-labelledby="dLabel" class="dropdown-menu bottom-up umb-button-group__sub-buttons" role="menu">
-                                        <li><a href="" ng-click="vm.openPageFieldOverlay()"><localize key="template_insertPageField">Value</localize></a></li>
-                                        <li><a href="" ng-click="vm.openPartialOverlay()"><localize key="template_insertPartialView">Partial view</localize></a></li>
-                                        <li><a href="" ng-click="vm.openDictionaryItemOverlay()"><localize key="template_insertDictionaryItem">Dictionary</localize></a></li>
-                                        <li><a href="" ng-click="vm.openMacroOverlay()"><localize key="template_insertMacro">Macro</localize></a></li>
-                                    </ul>
-
-                                </div>
-
-                                <button
-                                    data-element="button-queryBuilder"
+                                <umb-button
+                                    style="margin-right: 5px;"
+                                    alias="queryBuilder"
                                     type="button"
-                                    style="margin-right: 10px;"
-                                    class="umb-era-button umb-button--s"
-                                    ng-click="vm.openQueryBuilderOverlay()">
-                                    <i class="icon icon-wand"></i> <localize key="template_queryBuilder">Query builder</localize>
-                                </button>
+                                    size="xs"
+                                    action="vm.openQueryBuilderOverlay()"
+                                    icon="icon-wand"
+                                    label-key="template_queryBuilder">
+                                </umb-button>
 
-                                <button
-                                    data-element="button-sections"
+                                <umb-button
+                                    alias="sections"
                                     type="button"
-                                    class="umb-era-button umb-button--s"
-                                    ng-click="vm.openSectionsOverlay()">
-                                    <i class="icon icon-indent"></i> <localize key="template_insertSections">Sections</localize>
-                                </button>
+                                    size="xs"
+                                    action="vm.openSectionsOverlay()"
+                                    icon="icon-indent"
+                                    label-key="template_insertSections">
+                                </umb-button>
 
                             </div>
 
                         </div>
-                
+
                         <div
                             data-element="code-editor"
                             auto-scale="85"
                             umb-ace-editor="vm.aceOption"
                             model="vm.template.content">
                         </div>
-
                     </umb-box-content>
                 </umb-box>
 

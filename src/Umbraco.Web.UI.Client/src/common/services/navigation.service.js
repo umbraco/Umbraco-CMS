@@ -280,7 +280,7 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
          * @param {Event} event the click event triggering the method, passed from the DOM element
          */
         showMenu: function(args) {
-
+            
             var deferred = $q.defer();
             var self = this;
 
@@ -410,37 +410,7 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
                 });
             }
         },
-
-        /**
-         * @ngdoc method
-         * @name umbraco.services.navigationService#showUserDialog
-         * @methodOf umbraco.services.navigationService
-         *
-         * @description
-         * Opens the user dialog, next to the sections navigation
-         * template is located in views/common/dialogs/user.html
-         */
-        showUserDialog: function () {
-            // hide tray and close help dialog
-            if (service.helpDialog) {
-                service.helpDialog.close();
-            }
-            service.hideTray();
-
-            if (service.userDialog) {
-                service.userDialog.close();
-                service.userDialog = undefined;
-            }
-
-            service.userDialog = dialogService.open(
-            {
-                template: "views/common/dialogs/user.html",
-                modalClass: "umb-modal-left",
-                show: true
-            });
-
-            return service.userDialog;
-        },
+        
 
         /**
          * @ngdoc method

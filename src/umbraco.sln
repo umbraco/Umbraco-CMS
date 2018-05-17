@@ -6,9 +6,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Web.UI", "Umbraco.W
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}"
 	ProjectSection(SolutionItems) = preProject
+		..\build\build-bootstrap.ps1 = ..\build\build-bootstrap.ps1
 		..\build\build.ps1 = ..\build\build.ps1
 		..\build\BuildDocs.ps1 = ..\build\BuildDocs.ps1
-		NuGet.Config = NuGet.Config
+		..\NuGet.Config = ..\NuGet.Config
 		..\build\RevertToCleanInstall.bat = ..\build\RevertToCleanInstall.bat
 		..\build\RevertToEmptyInstall.bat = ..\build\RevertToEmptyInstall.bat
 		SolutionInfo.cs = SolutionInfo.cs
@@ -16,13 +17,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{FD962632-184C-4005-A5F3-E705D92FC645}"
 	ProjectSection(SolutionItems) = preProject
-		..\BUILD.md = ..\BUILD.md
-		..\apidocs\docfx.filter.yml = ..\apidocs\docfx.filter.yml
-		..\apidocs\docfx.json = ..\apidocs\docfx.json
-		..\apidocs\index.md = ..\apidocs\index.md
-		..\LICENSE.md = ..\LICENSE.md
-		..\README.md = ..\README.md
-		..\apidocs\toc.yml = ..\apidocs\toc.yml
+		ApiDocs\docfx.filter.yml = ApiDocs\docfx.filter.yml
+		ApiDocs\docfx.json = ApiDocs\docfx.json
+		ApiDocs\index.md = ApiDocs\index.md
+		ApiDocs\toc.yml = ApiDocs\toc.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5BD12C1-A454-435E-8A46-FF4A364C0382}"
@@ -84,6 +82,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{5B03EF4E
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbraco.Tests.Benchmarks", "Umbraco.Tests.Benchmarks\Umbraco.Tests.Benchmarks.csproj", "{86DEB346-089F-4106-89C8-D852B9CF2A33}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "About", "About", "{420D2458-E404-4181-B05A-0FE99EC5C504}"
+	ProjectSection(SolutionItems) = preProject
+		..\BUILD.md = ..\BUILD.md
+		..\CODE_OF_CONDUCT.md = ..\CODE_OF_CONDUCT.md
+		..\CONTRIBUTING.md = ..\CONTRIBUTING.md
+		..\LICENSE.md = ..\LICENSE.md
+		..\PULL_REQUEST_TEMPLATE.md = ..\PULL_REQUEST_TEMPLATE.md
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -15,6 +15,40 @@
         vm.page.menu.currentSection = appState.getSectionState("currentSection");
         vm.page.menu.currentNode = null;
 
+        // insert buttons
+        vm.page.insertDefaultButton = {
+            labelKey: "general_insert",
+            handler: function() {
+                vm.openInsertOverlay();
+            }
+        };
+        vm.page.insertSubButtons = [
+            {
+                labelKey: "template_insertPageField",
+                handler: function () {
+                    vm.openPageFieldOverlay();
+                }
+            },
+            {
+                labelKey: "template_insertPartialView",
+                handler: function () {
+                    vm.openPartialOverlay();
+                }
+            },
+            {
+                labelKey: "template_insertDictionaryItem",
+                handler: function () {
+                    vm.openDictionaryItemOverlay();
+                }
+            },
+            {
+                labelKey: "template_insertMacro",
+                handler: function () {
+                    vm.openMacroOverlay()
+                }
+            }
+        ];
+
         //Used to toggle the keyboard shortcut modal
         //From a custom keybinding in ace editor - that conflicts with our own to show the dialog
         vm.showKeyboardShortcut = false;
