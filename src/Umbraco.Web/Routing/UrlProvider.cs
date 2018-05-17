@@ -191,9 +191,7 @@ namespace Umbraco.Web.Routing
             // this the ONLY place where we deal with default culture - IUrlProvider always receive a culture
             if (culture == null)
             {
-                culture = content.ContentType.Variations.Has(ContentVariation.CultureNeutral) // fixme CultureSegment
-                    ? _variationContextAccessor.VariationContext.Culture
-                    : null;
+                culture = _variationContextAccessor.VariationContext.Culture;
             }
 
             if (current == null)

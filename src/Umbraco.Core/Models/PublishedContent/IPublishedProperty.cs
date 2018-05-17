@@ -5,6 +5,8 @@
     /// </summary>
     public interface IPublishedProperty
     {
+        PublishedPropertyType PropertyType { get; }
+
         /// <summary>
         /// Gets the alias of the property.
         /// </summary>
