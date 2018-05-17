@@ -17,10 +17,11 @@
     <dependencies>
         <dependency id="AutoMapper" version="[6.2.2,6.666666)" />
         <dependency id="ClientDependency" version="[1.9.6,1.666666)" />
-        <dependency id="ClientDependency-Mvc5" version="[1.8.0.0,1.666666)" />
+        <dependency id="ClientDependency-Mvc5" version="[1.8.0,1.666666)" />
         <dependency id="CSharpTest.Net.Collections" version="[14.906.1403.1082,14.666666)" />
         <dependency id="Examine" version="[1.0.0-beta025,1.666666)" />
         <dependency id="HtmlAgilityPack" version="[1.7.2,1.666666)" />
+        <dependency id="ImageProcessor" version="[2.6.1.19,2.666666)" />
         <dependency id="ImageProcessor.Web" version="[4.9.2.19,4.666666)" />
         <dependency id="ImageProcessor.Web.Config" version="[2.4.1.19,2.666666)" />
         <dependency id="LightInject" version="[5.1.2,5.666666)" />
@@ -35,7 +36,6 @@
         <dependency id="Microsoft.AspNet.Mvc" version="[5.2.4,5.666666)" />
         <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.2.3,2.666666)" />
         <dependency id="Microsoft.AspNet.WebApi" version="[5.2.4,5.666666)" />
-        <dependency id="Microsoft.CodeAnalysis.CSharp" version="[2.7.0,2.666666)" />
         <dependency id="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" version="[1.0.8,1.666666)" />
         <dependency id="Microsoft.Net.Compilers" version="[2.7.0,2.666666)" />
         <dependency id="Microsoft.Owin.Host.SystemWeb" version="[4.0.0,4.666666)" />
@@ -46,7 +46,6 @@
         <dependency id="MySql.Data" version="[6.10.7,6.666666)" />
         <dependency id="Newtonsoft.Json" version="[11.0.2,11.666666)" />
         <dependency id="NPoco" version="[3.9.3,3.666666)" />
-        <dependency id="NuGet.Core" version="[2.14.0,2.666666)" />
         <dependency id="Semver" version="[2.0.4,2.666666)" />
         <dependency id="System.Reflection.Metadata" version="[1.5.0,1.666666)" />
         <dependency id="System.Reflection.Primitives" version="[4.3.0,4.666666)" />
@@ -56,7 +55,6 @@
         <dependency id="System.Text.Encoding.CodePages" version="[4.4.0,4.666666)" />
         <dependency id="System.Threading.Tasks.Dataflow" version="[4.8.0,4.666666)" />
         <dependency id="System.ValueTuple" version="[4.4.0,4.666666)" />
-        <dependency id="System.Xml.ReaderWriter" version="[4.3.1,4.666666)" />
         <dependency id="Umbraco.ModelsBuilder" version="[8.0.0-alpha.17,8.666666)" />
         <dependency id="Umbraco.SqlServerCE" version="[4.0.0.1,4.666666)" />
     </dependencies>

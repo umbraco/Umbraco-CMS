@@ -91,6 +91,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "About", "About", "{420D2458
 		..\LICENSE.md = ..\LICENSE.md
 		..\PULL_REQUEST_TEMPLATE.md = ..\PULL_REQUEST_TEMPLATE.md
 		..\README.md = ..\README.md
+		..\V8_GETTING_STARTED.md = ..\V8_GETTING_STARTED.md
 	EndProjectSection
 EndProject
 Global
