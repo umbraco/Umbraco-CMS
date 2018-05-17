@@ -56,6 +56,14 @@
 
                 <umb-editor-footer-content-right>
 
+                    <umb-button
+                        ng-if="model.infiniteMode"
+                        action="close()"
+                        button-style="link"
+                        label="Close"
+                        type="button">
+                    </umb-button>
+
                     <umb-button 
                         alias="preview" 
                         ng-if="!page.isNew && content.allowPreview" 

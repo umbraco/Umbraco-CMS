@@ -1,23 +1,23 @@
 //
 // Container styles
 // --------------------------------------------------
-.umb-editor {
+.umb-property-editor {
   min-width:66.6%;
 }
 
-.umb-editor-tiny {
+.umb-property-editor-tiny {
   width: 60px;
 }
 
-.umb-editor-small {
+.umb-property-editor-small {
   width: 90px;
 }
 
-.umb-modal .umb-editor {
+.umb-modal .umb-property-editor {
   width: 95%;
 }
 
-.umb-dialog .umb-editor {
+.umb-dialog .umb-property-editor {
   width: 95%;
 }
 .umb-dialog .umb-control-group .help-block {
@@ -25,7 +25,7 @@
 }
 
 .umb-codeeditor{
-  width: 99%;
+  width: 99%; 
 }
 
 //
@@ -307,6 +307,16 @@ ul.color-picker li a  {
     width: 124px;
     height: 124px;
     overflow: hidden;
+    position: relative;
+}
+
+.umb-sortable-thumbnails .umb-sortable-thumbnails__loading {
+    position: absolute;
+    background-color: rgba(255,255,255,0.8);
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
 }
 
 .umb-sortable-thumbnails .umb-sortable-thumbnails__actions {
