@@ -155,7 +155,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 // move to parent node
                 n = n.Parent;
-                urlSegment = n.GetUrlSegment(culture);
+                if (n != null)
+                    urlSegment = n.GetUrlSegment(culture);
+
                 hasDomains = n != null && _domainHelper.NodeHasDomains(n.Id);
             }
 

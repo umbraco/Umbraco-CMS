@@ -2,7 +2,7 @@
 <Project ToolsVersion="15.0">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <ProjectGuid>{07FBC26B-2927-4A22-8D96-D644C667FECC}</ProjectGuid>
     <OutputType>Library</OutputType>
