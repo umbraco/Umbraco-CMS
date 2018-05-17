@@ -96,7 +96,6 @@
                         tab.hide = true;
                     }
                 });
-
             }
 
             $scope.content.apps.push(contentApp);
@@ -519,6 +518,13 @@
 
         }
 
+        // methods for infinite editing
+        $scope.close = function() {
+            if($scope.model.close) {
+                $scope.model.close($scope.model);
+            }
+        };
+
         //ensure to unregister from all events!
         $scope.$on('$destroy', function () {
             for (var e in evts) {
@@ -543,7 +549,8 @@
                 saveMethod: "&",
                 getMethod: "&",
                 getScaffoldMethod: "&?",
-                culture: "=?"
+                culture: "=?",
+                model: "=?"
             }
         };
 

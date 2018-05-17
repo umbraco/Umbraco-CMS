@@ -7,6 +7,26 @@
  * The controller for the media editor
  */
 function mediaEditController($scope, $routeParams, appState, mediaResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper, editorState, umbRequestHelper, $http) {
+    
+    var nodeId = null;
+    var create = false;
+    var infiniteMode = $scope.model && $scope.model.infiniteMode;
+
+    // when opening the editor through infinite editing get the 
+    // node id from the model instead of the route param
+    if(infiniteMode && $scope.model.id) {
+        nodeId = $scope.model.id;
+    } else {
+        nodeId = $routeParams.id;
+    }
+    
+    // when opening the editor through infinite editing get the 
+    // create option from the model instead of the route param
+    if(infiniteMode) {
+        create = $scope.model.create;
+    } else {
+        create = $routeParams.create;
+    }
 
     //setup scope vars
     $scope.currentSection = appState.getSectionState("currentSection");
@@ -19,6 +39,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
     $scope.page.menu.currentNode = null; //the editors affiliated node
     $scope.page.listViewPath = null;
     $scope.page.saveButtonState = "init";
+    $scope.page.submitButtonLabel = "Save";
 
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */
     function syncTreeNode(content, path, initialLoad) {
@@ -43,11 +64,11 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
         }
     }
 
-    if ($routeParams.create) {
+    if (create) {
 
         $scope.page.loading = true;
 
-        mediaResource.getScaffold($routeParams.id, $routeParams.doctype)
+        mediaResource.getScaffold(nodeId, $routeParams.doctype)
             .then(function (data) {
                 $scope.content = data;
 
@@ -66,7 +87,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
 
         $scope.page.loading = true;
 
-        mediaResource.getById($routeParams.id)
+        mediaResource.getById(nodeId)
             .then(function (data) {
 
                 $scope.content = data;
@@ -85,11 +106,13 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
 
-                syncTreeNode($scope.content, data.path, true);
+                if(!infiniteMode) {
+                    syncTreeNode($scope.content, data.path, true); 
+                }
                
                 if ($scope.content.parentId && $scope.content.parentId != -1) {
                     //We fetch all ancestors of the node to generate the footer breadcrump navigation
-                    entityResource.getAncestors($routeParams.id, "media")
+                    entityResource.getAncestors(nodeId, "media")
                         .then(function (anc) {
                             $scope.ancestors = anc;
                         });
@@ -151,6 +174,11 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
         // set first app to active
         $scope.content.apps[0].active = true;
 
+        // setup infinite mode
+        if(infiniteMode) {
+            $scope.page.submitButtonLabel = "Save and Close";
+        }
+
     }
     
     $scope.save = function () {
@@ -160,7 +188,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
             $scope.busy = true;
             $scope.page.saveButtonState = "busy";
 
-            mediaResource.save($scope.content, $routeParams.create, fileManager.getFiles())
+            mediaResource.save($scope.content, create, fileManager.getFiles())
                 .then(function(data) {
 
                     formHelper.resetForm({ scope: $scope, notifications: data.notifications });
@@ -168,21 +196,33 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,
                         savedContent: data,
+                        redirectOnSuccess: !infiniteMode,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
 
                     editorState.set($scope.content);
                     $scope.busy = false;
 
-                    syncTreeNode($scope.content, data.path);
+                    // when don't want to sync the tree when the editor is open in infinite mode
+                    if(!infiniteMode) {
+                        syncTreeNode($scope.content, data.path);
+                    }
+
+                    init($scope.content);
 
                     $scope.page.saveButtonState = "success";
+
+                    // close the editor if it's infinite mode
+                    if(infiniteMode && $scope.model.submit) {
+                        $scope.model.mediaNode = $scope.content;
+                        $scope.model.submit($scope.model);
+                    }
 
                 }, function(err) {
 
                     contentEditingHelper.handleSaveError({
                         err: err,
-                        redirectOnFailure: true,
+                        redirectOnError: !infiniteMode,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
                     });
                     
@@ -206,6 +246,12 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
 
     $scope.backToListView = function() {
         $location.path($scope.page.listViewPath);
+    };
+
+    $scope.close = function() {
+        if($scope.model.close) {
+            $scope.model.close($scope.model);
+        }
     };
 
 }

@@ -37,6 +37,4 @@ var _umbPropertyEditor = function (umbPropEditorHelper) {
         };
     };
 
-//Preffered is the umb-property-editor as its more explicit - but we keep umb-editor for backwards compat
 angular.module("umbraco.directives").directive('umbPropertyEditor', _umbPropertyEditor);
-angular.module("umbraco.directives").directive('umbEditor', _umbPropertyEditor);

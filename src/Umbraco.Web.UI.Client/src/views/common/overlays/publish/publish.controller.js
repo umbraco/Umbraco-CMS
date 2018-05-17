@@ -51,7 +51,7 @@
 
             _.each(vm.variants,
                 function (variant) {
-                    variant.compositeId = variant.language.id + "_" + (variant.segment ? variant.segment : "");
+                    variant.compositeId = variant.language.culture + "_" + (variant.segment ? variant.segment : "");
                     variant.htmlId = "publish_variant_" + variant.compositeId;
 
                     //check for pristine variants

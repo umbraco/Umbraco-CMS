@@ -1,19 +1,25 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
-    function ($rootScope, $scope, dialogService, entityResource, mediaResource, mediaHelper, $timeout, userService, $location, localizationService) {
+    function ($rootScope, $scope, dialogService, entityResource, mediaResource, mediaHelper, $timeout, userService, $location, localizationService, editorService) {
 
         //check the pre-values for multi-picker
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
         var onlyImages = $scope.model.config.onlyImages && $scope.model.config.onlyImages !== '0' ? true : false;
         var disableFolderSelect = $scope.model.config.disableFolderSelect && $scope.model.config.disableFolderSelect !== '0' ? true : false;
+        $scope.allowEditMedia = false;
+        $scope.allowAddMedia = false;
 
-        if (!$scope.model.config.startNodeId) {
-            userService.getCurrentUser().then(function(userData) {
+        userService.getCurrentUser().then(function(userData) {
+            if (!$scope.model.config.startNodeId) {
                 $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
                 $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
-            });
-        }
+            }
+            // only allow users to add and edit media if they have access to the media section
+            var hasAccessToMedia = userData.allowedSections.indexOf("media") !== -1;
+            $scope.allowEditMedia = hasAccessToMedia;
+            $scope.allowAddMedia = hasAccessToMedia;
+        });
 
         function setupViewModel() {
             $scope.images = [];
@@ -94,46 +100,92 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             $scope.sync();
         };
 
-        $scope.goToItem = function(item) {
-            $location.path('media/media/edit/' + item.id);
+        $scope.editItem = function(item) {
+            var mediaEditor = {
+                id: item.id,
+                submit: function(model) {
+                    editorService.close();
+                    // update the selected media item to match the saved media item
+                    // the media picker is using media entities so we get the
+                    // entity so we easily can format it for use in the media grid
+                    if(model && model.mediaNode) {
+                        entityResource.getById(model.mediaNode.id, "media")
+                            .then(function (mediaEntity) {
+                                // if an image is selecting more than once 
+                                // we need to update all the media items
+                                angular.forEach($scope.images, function(image){
+                                    if(image.id === model.mediaNode.id) {
+                                        angular.extend(image, mediaEntity);
+                                        image.thumbnail = mediaHelper.resolveFileFromEntity(image, true);
+                                    }
+                                });
+                            });
+                    }
+                },
+                close: function(model) {
+                    editorService.close();
+                }
+            };
+            editorService.mediaEditor(mediaEditor);
         };
 
-       $scope.add = function() {
+        $scope.add = function() {
+            var mediaPicker = {
+                startNodeId: $scope.model.config.startNodeId,
+                startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
+                multiPicker: multiPicker,
+                onlyImages: onlyImages,
+                disableFolderSelect: disableFolderSelect,
+                submit: function(model) {
 
-           $scope.mediaPickerOverlay = {
-               view: "mediapicker",
-               title: "Select media",
-               startNodeId: $scope.model.config.startNodeId,
-               startNodeIsVirtual: $scope.model.config.startNodeIsVirtual,
-               multiPicker: multiPicker,
-               onlyImages: onlyImages,
-               disableFolderSelect: disableFolderSelect,
-               show: true,
-               submit: function(model) {
+                    editorService.close();
+                    
+                    _.each(model.selectedImages, function(media, i) {
+                        // if there is no thumbnail, try getting one if the media is not a placeholder item
+                        if (!media.thumbnail && media.id && media.metaData) {
+                            media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
+                        }
+ 
+                        $scope.images.push(media);
+ 
+                        if ($scope.model.config.idType === "udi") {
+                            $scope.ids.push(media.udi);
+                        }
+                        else {
+                            $scope.ids.push(media.id);
+                        }
 
-                   _.each(model.selectedImages, function(media, i) {
-                       // if there is no thumbnail, try getting one if the media is not a placeholder item
-                       if (!media.thumbnail && media.id && media.metaData) {
-                           media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
-                       }
+                    });
+                    $scope.sync();
+                    reloadUpdatedMediaItems(model.updatedMediaNodes);
+                },
+                close: function(model) {
+                    editorService.close();
+                    reloadUpdatedMediaItems(model.updatedMediaNodes);
+                }
+            }
 
-                       $scope.images.push(media);
+            editorService.mediaPicker(mediaPicker);
 
-                       if ($scope.model.config.idType === "udi") {
-                           $scope.ids.push(media.udi);
-                       }
-                       else {
-                           $scope.ids.push(media.id);
-                       }
-                   });
-
-                   $scope.sync();
-
-                   $scope.mediaPickerOverlay.show = false;
-                   $scope.mediaPickerOverlay = null;
-               }
-           };
        };
+
+       function reloadUpdatedMediaItems(updatedMediaNodes) {
+            // because the images can be edited through the media picker we need to 
+            // reload. We only reload the images that is already picked but has been updated.
+            // We have to get the entities from the server because the media 
+            // can be edited without being selected
+            _.each($scope.images, function(image, i) {
+                if(updatedMediaNodes.indexOf(image.udi) !== -1) {
+                    image.loading = true;
+                    entityResource.getById(image.udi, "media")
+                        .then(function (mediaEntity) {
+                            angular.extend(image, mediaEntity);
+                            image.thumbnail = mediaHelper.resolveFileFromEntity(image, true);
+                            image.loading = false;
+                        });
+                }
+            })
+       }
 
        $scope.sortableOptions = {
            disabled: !$scope.isMultiPicker,

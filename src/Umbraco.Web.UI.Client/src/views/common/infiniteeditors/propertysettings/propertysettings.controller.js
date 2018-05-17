@@ -1,16 +1,16 @@
 /**
  * @ngdoc controller
- * @name Umbraco.Editors.DocumentType.PropertyController
+ * @name Umbraco.Editors.PropertySettingsController
  * @function
  *
  * @description
- * The controller for the content type editor property dialog
+ * The controller for the content type editor property settings dialog
  */
 
 (function () {
     "use strict";
 
-    function PropertySettingsOverlay($scope, contentTypeResource, dataTypeResource, dataTypeHelper, localizationService, userService) {
+    function PropertySettingsEditor($scope, contentTypeResource, dataTypeResource, dataTypeHelper, formHelper, localizationService, userService, editorService) {
 
         var vm = this;
 
@@ -47,20 +47,22 @@
 
         vm.changeValidationType = changeValidationType;
         vm.changeValidationPattern = changeValidationPattern;
-        vm.openEditorPickerOverlay = openEditorPickerOverlay;
-        vm.openEditorSettingsOverlay = openEditorSettingsOverlay;
+        vm.openDataTypePicker = openDataTypePicker;
+        vm.openDataTypeSettings = openDataTypeSettings;
+        vm.submitOnEnter = submitOnEnter;
+        vm.submit = submit;
+        vm.close = close;
 
         userService.getCurrentUser().then(function(user) {
             vm.showSensitiveData = user.userGroups.indexOf("sensitiveData") != -1;
         });
 
         function activate() {
-
             //make the default the same as the content type
             if (!$scope.model.property.id) {
                 $scope.model.property.allowCultureVariant = $scope.model.contentTypeAllowCultureVariant;
             }
-
+            
             matchValidationType();
         }
 
@@ -68,91 +70,93 @@
             matchValidationType();
         }
 
-        function openEditorPickerOverlay(property) {
+        function openDataTypePicker(property) {
 
             vm.focusOnMandatoryField = false;
 
-            vm.editorPickerOverlay = {};
-            vm.editorPickerOverlay.property = $scope.model.property;
-            vm.editorPickerOverlay.contentTypeName = $scope.model.contentTypeName;
-            vm.editorPickerOverlay.view = "views/common/overlays/contenttypeeditor/editorpicker/editorpicker.html";
-            vm.editorPickerOverlay.show = true;
+            var dataTypePicker = {
+                property: $scope.model.property,
+                contentTypeName: $scope.model.contentTypeName,
+                view: "views/common/infiniteeditors/datatypepicker/datatypepicker.html",
+                size: "small",
+                submit: function(model) {
 
-            vm.editorPickerOverlay.submit = function (model) {
+                    $scope.model.updateSameDataTypes = model.updateSameDataTypes;
 
-                $scope.model.updateSameDataTypes = model.updateSameDataTypes;
+                    vm.focusOnMandatoryField = true;
+    
+                    // update property
+                    property.config = model.property.config;
+                    property.editor = model.property.editor;
+                    property.view = model.property.view;
+                    property.dataTypeId = model.property.dataTypeId;
+                    property.dataTypeIcon = model.property.dataTypeIcon;
+                    property.dataTypeName = model.property.dataTypeName;
 
-                vm.focusOnMandatoryField = true;
-
-                // update property
-                property.config = model.property.config;
-                property.editor = model.property.editor;
-                property.view = model.property.view;
-                property.dataTypeId = model.property.dataTypeId;
-                property.dataTypeIcon = model.property.dataTypeIcon;
-                property.dataTypeName = model.property.dataTypeName;
-
-                vm.editorPickerOverlay.show = false;
-                vm.editorPickerOverlay = null;
+                    editorService.close();
+                },
+                close: function(model) {
+                    editorService.close();
+                }
             };
 
-            vm.editorPickerOverlay.close = function (model) {
-                vm.editorPickerOverlay.show = false;
-                vm.editorPickerOverlay = null;
-            };
+            editorService.open(dataTypePicker);
 
         }
 
-        function openEditorSettingsOverlay(property) {
+        function openDataTypeSettings(property) {
 
             vm.focusOnMandatoryField = false;
 
-            // get data type
-            dataTypeResource.getById(property.dataTypeId).then(function (dataType) {
+            var dataTypeSettings = {
+                title: "Data type settings",
+                view: "views/common/infiniteeditors/datatypesettings/datatypesettings.html",
+                id: property.dataTypeId,
+                submit: function(model) {
+                    contentTypeResource.getPropertyTypeScaffold(model.dataType.id).then(function (propertyType) {
+                        // update editor
+                        property.config = propertyType.config;
+                        property.editor = propertyType.editor;
+                        property.view = propertyType.view;
+                        property.dataTypeId = model.dataType.id;
+                        property.dataTypeIcon = model.dataType.icon;
+                        property.dataTypeName = model.dataType.name;
 
-                vm.editorSettingsOverlay = {};
-                vm.editorSettingsOverlay.title = "Editor settings";
-                vm.editorSettingsOverlay.view = "views/common/overlays/contenttypeeditor/editorsettings/editorsettings.html";
-                vm.editorSettingsOverlay.dataType = dataType;
-                vm.editorSettingsOverlay.show = true;
+                        // set flag to update same data types
+                        $scope.model.updateSameDataTypes = true;
 
-                vm.editorSettingsOverlay.submit = function (model) {
+                        vm.focusOnMandatoryField = true;
 
-                    var preValues = dataTypeHelper.createPreValueProps(model.dataType.preValues);
-
-                    dataTypeResource.save(model.dataType, preValues, false).then(function (newDataType) {
-
-                        contentTypeResource.getPropertyTypeScaffold(newDataType.id).then(function (propertyType) {
-
-                            // update editor
-                            property.config = propertyType.config;
-                            property.editor = propertyType.editor;
-                            property.view = propertyType.view;
-                            property.dataTypeId = newDataType.id;
-                            property.dataTypeIcon = newDataType.icon;
-                            property.dataTypeName = newDataType.name;
-
-                            // set flag to update same data types
-                            $scope.model.updateSameDataTypes = true;
-
-                            vm.focusOnMandatoryField = true;
-
-                            vm.editorSettingsOverlay.show = false;
-                            vm.editorSettingsOverlay = null;
-
-                        });
-
+                        editorService.close();
                     });
+                },
+                close: function() {
+                    editorService.close();
+                }
+            };
 
-                };
+            editorService.open(dataTypeSettings);
 
-                vm.editorSettingsOverlay.close = function (oldModel) {
-                    vm.editorSettingsOverlay.show = false;
-                    vm.editorSettingsOverlay = null;
-                };
+        }
 
-            });
+        function submitOnEnter(event) {
+            if(event && event.keyCode === 13) {
+                submit();
+            }
+        } 
 
+        function submit() {
+            if($scope.model.submit) {
+                if (formHelper.submitForm({scope: $scope})) {
+                    $scope.model.submit($scope.model);
+                }
+            }
+        }
+
+        function close() {
+            if($scope.model.close) {
+                $scope.model.close();
+            }
         }
 
         function matchValidationType() {
@@ -205,6 +209,6 @@
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Overlay.PropertySettingsOverlay", PropertySettingsOverlay);
+    angular.module("umbraco").controller("Umbraco.Editors.PropertySettingsController", PropertySettingsEditor);
 
 })();

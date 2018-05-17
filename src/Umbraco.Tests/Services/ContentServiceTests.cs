@@ -1330,7 +1330,7 @@ namespace Umbraco.Tests.Services
 
             // content cannot publish values because they are invalid
             Assert.IsFalse(contentCanPublishValues);
-            Assert.IsNotEmpty(content.Validate());
+            Assert.IsNotEmpty(content.ValidateProperties());
 
             // and therefore cannot be published,
             // because it did not have a published version at all

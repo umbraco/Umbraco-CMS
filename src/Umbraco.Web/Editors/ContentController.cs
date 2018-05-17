@@ -741,7 +741,7 @@ namespace Umbraco.Web.Editors
                     if (!contentItem.PersistedContent.IsCulturePublished(lang.IsoCode))
                     {
                         var errMsg = Services.TextService.Localize("speechBubbles/contentReqCulturePublishError", new[] { allLangs[lang.IsoCode].CultureName });
-                        ModelState.AddModelError("publish_variant_" + lang.Id + "_", errMsg);
+                        ModelState.AddModelError("publish_variant_" + lang.IsoCode + "_", errMsg);
                         canPublish = false;
                     }
                 }
@@ -751,10 +751,10 @@ namespace Umbraco.Web.Editors
                     //validate all other variants to be published
                     foreach (var publishVariation in otherVariantsToValidate)
                     {
-                        //validate the culture property values, we don't need to validate any invariant property values here because they will have
+                        //validate the content item and the culture property values, we don't need to validate any invariant property values here because they will have
                         //been validated in the post.
-                        var invalidProperties = contentItem.PersistedContent.Validate(publishVariation.Culture);
-                        if (invalidProperties.Length > 0)
+                        var valid = contentItem.PersistedContent.IsValid(publishVariation.Culture);
+                        if (!valid)
                         {
                             var errMsg = Services.TextService.Localize("speechBubbles/contentCultureValidationError", new[] { allLangs[publishVariation.Culture].CultureName });
                             ModelState.AddModelError("publish_variant_" + publishVariation.Culture + "_", errMsg);

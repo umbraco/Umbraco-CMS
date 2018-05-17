@@ -62,8 +62,6 @@
     <Reference Include="System.Data.Entity.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Text.Encoding" />
@@ -86,15 +84,12 @@
     <PackageReference Include="Lucene.Net" Version="3.0.3" />
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.1" />
-    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.4" />
-    <PackageReference Include="Microsoft.AspNet.Razor" Version="3.2.4" />
-    <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.4" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.4" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.4" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.2.4" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.SelfHost" Version="5.2.4" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.4" />
-    <PackageReference Include="Microsoft.AspNet.WebPages" Version="3.2.4" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Owin" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.SelfHost" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.6" />
     <PackageReference Include="Microsoft.Owin" Version="4.0.0" />
     <PackageReference Include="Microsoft.Owin.Hosting" Version="4.0.0" />
     <PackageReference Include="Microsoft.Owin.Security" Version="4.0.0" />

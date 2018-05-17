@@ -312,10 +312,10 @@ namespace Umbraco.Core.Models
         public bool Blueprint { get; internal set; }
 
         /// <inheritdoc />
-        public virtual bool TryPublishAllValues()
+        internal virtual bool TryPublishAllValues()
         {
             // the values we want to publish should be valid
-            if (ValidateAll().Any())
+            if (ValidateAllProperties().Any())
                 return false; //fixme this should return an attempt with error results
 
             // Name and PublishName are managed by the repository, but Names and PublishNames
@@ -347,7 +347,7 @@ namespace Umbraco.Core.Models
             ContentType.ValidateVariation(culture, segment, throwIfInvalid: true);
 
             // the values we want to publish should be valid
-            if (Validate(culture, segment).Any())
+            if (ValidateProperties(culture, segment).Any())
                 return false; //fixme this should return an attempt with error results
 
             // Name and PublishName are managed by the repository, but Names and PublishNames
@@ -370,10 +370,12 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public virtual bool PublishCultureValues(string culture = null)
+        internal virtual bool PublishCultureValues(string culture = null)
         {
+            //fixme - needs API review as this is not used apart from in tests
+
             // the values we want to publish should be valid
-            if (ValidateCulture(culture).Any())
+            if (ValidatePropertiesForCulture(culture).Any())
                 return false;
 
             // Name and PublishName are managed by the repository, but Names and PublishNames
