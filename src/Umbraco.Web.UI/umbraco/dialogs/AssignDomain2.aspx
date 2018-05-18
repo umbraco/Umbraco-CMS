@@ -31,9 +31,9 @@
     <cc1:Feedback ID="feedback" runat="server" />
     <div id="komask"></div>
 
-         <cc1:Pane runat="server" ID="pane_language">
+         <cc1:Pane runat="server" ID="pane_language" cssClass="hide">
             <cc1:PropertyPanel runat="server" ID="prop_language">
-                <select class="umb-editor umb-dropdown" name="language" data-bind="options: languages, optionsText: 'Code', optionsValue: 'Id', value: language, optionsCaption: '<%=Services.TextService.Localize("assignDomain/inherit") %>    '"></select>
+                <select class="umb-property-editor umb-dropdown" name="language" data-bind="options: languages, optionsText: 'Code', optionsValue: 'Id', value: language, optionsCaption: '<%=Services.TextService.Localize("assignDomain/inherit") %>    '"></select>
              <!--   <small class="help-inline"><%=Services.TextService.Localize("assignDomain/setLanguageHelp") %></small>-->
             </cc1:PropertyPanel>
         </cc1:Pane>
