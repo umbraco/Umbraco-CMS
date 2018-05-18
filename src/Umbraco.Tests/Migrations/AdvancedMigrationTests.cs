@@ -263,7 +263,7 @@ namespace Umbraco.Tests.Migrations
                 var table = DefinitionFactory.GetTableDefinition(typeof(NodeDto), SqlSyntax);
                 var column = table.Columns.First(x => x.Name == "id");
                 var create = SqlSyntax.Format(column); // returns [id] INTEGER NOT NULL IDENTITY(1060,1)
-                Database.Execute($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoNode")} ADD COLUMN " + create);
+                Database.Execute($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoNode")} ADD " + create);
             }
         }
     }
