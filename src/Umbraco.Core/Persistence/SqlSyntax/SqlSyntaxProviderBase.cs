@@ -560,7 +560,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public virtual string CreateTable => "CREATE TABLE {0} ({1})";
         public virtual string DropTable => "DROP TABLE {0}";
 
-        public virtual string AddColumn => "ALTER TABLE {0} ADD COLUMN {1}";
+        public virtual string AddColumn => "ALTER TABLE {0} ADD {1}";
         public virtual string DropColumn => "ALTER TABLE {0} DROP COLUMN {1}";
         public virtual string AlterColumn => "ALTER TABLE {0} ALTER COLUMN {1}";
         public virtual string RenameColumn => "ALTER TABLE {0} RENAME COLUMN {1} TO {2}";
