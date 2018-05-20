@@ -31,5 +31,8 @@ namespace Umbraco.Web.Models
 
         [DataMember(Name = "culture")]
         public string Culture { get; set; }
+
+        [DataMember(Name = "contentType")]
+        public string ContentType { get; set; }
     }
 }
