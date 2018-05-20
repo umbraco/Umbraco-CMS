@@ -298,7 +298,7 @@
     <Compile Include="PropertyEditors\MultiNodePickerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MultiNodePickerConfigurationTreeSource.cs" />
     <Compile Include="PropertyEditors\MultiNodeTreePickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MultipleTestStringConfiguration.cs" />
+    <Compile Include="PropertyEditors\MultipleTextStringConfiguration.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\NestedContentConfiguration.cs" />
     <Compile Include="PropertyEditors\NestedContentConfigurationEditor.cs" />
