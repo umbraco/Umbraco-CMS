@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource) {
+  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource, tourService) {
 
     var evts = [];
 
@@ -17,7 +17,7 @@
     $scope.page.listViewPath = null;
     $scope.page.isNew = $scope.isNew ? true : false;
       $scope.page.buttonGroupState = "init";
-      $scope.page.tour = '';
+      $scope.page.tour = null;
     $scope.allowOpen = true;
 
 
@@ -99,6 +99,14 @@
 
       $scope.defaultButton = buttons.defaultButton;
       $scope.subButtons = buttons.subButtons;
+
+        if (content.tour !== '') {
+            tourService.getTourByAlias(content.tour).then(function(data) {
+                if (data !== null) {
+                    $scope.page.tour = data;
+                }
+            });
+        }
 
     }
 
@@ -192,6 +200,9 @@
 
     }
 
+      $scope.startTour = function() {
+          tourService.startTour($scope.page.tour);
+      }
 
     $scope.unPublish = function () {
 
