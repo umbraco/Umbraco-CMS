@@ -57,5 +57,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "isBlueprint")]
         public bool IsBlueprint { get; set; }
+
+        [DataMember(Name = "tour")]
+        public string Tour { get; set; }
     }
 }
