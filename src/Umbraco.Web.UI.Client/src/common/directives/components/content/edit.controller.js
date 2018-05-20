@@ -16,7 +16,8 @@
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.listViewPath = null;
     $scope.page.isNew = $scope.isNew ? true : false;
-    $scope.page.buttonGroupState = "init";    
+      $scope.page.buttonGroupState = "init";
+      $scope.page.tour = '';
     $scope.allowOpen = true;
 
 
