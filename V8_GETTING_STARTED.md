@@ -28,4 +28,4 @@
 
 We are keeping track of [known issues and limitations here](http://issues.umbraco.org/issue/U4-11279). These line items will eventually be turned into actual tasks to be worked on. Feel free to help us keep this list updated if you find issues and even help fix some of these items. If there is a particular item you'd like to help fix please mention this on the task and we'll create a sub task for the item to continue discussion there.
 
-There's [a list of tasks for v8 that haven't been completed](http://issues.umbraco.org/issues/U4?q=Due+in+version%3A+8.0.0+%23Unresolved+). If you are interested in helping out with any of these please mention this on the task. This list will be constantly updated as we begin to document and design some of the other tasks that still need to get done.
+There is [a list of tasks for v8 that haven't been completed](http://issues.umbraco.org/issues/U4?q=Due+in+version%3A+8.0.0+%23Unresolved+). If you are interested in helping out with any of these please mention this on the task. This list will be constantly updated as we begin to document and design some of the other tasks that still need to get done.
