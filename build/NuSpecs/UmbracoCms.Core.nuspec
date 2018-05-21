@@ -48,14 +48,10 @@
       <dependency id="Newtonsoft.Json" version="[11.0.2,11.666666)" />
       <dependency id="NPoco" version="[3.9.3,3.666666)" />
       <dependency id="Semver" version="[2.0.4,2.666666)" />
-      <dependency id="System.Reflection.Metadata" version="[1.5.0,1.666666)" />
       <dependency id="System.Reflection.Primitives" version="[4.3.0,4.666666)" />
       <dependency id="System.Runtime.Handles" version="[4.3.0,4.666666)" />
-      <dependency id="System.Security.Cryptography.Algorithms" version="[4.3.1,4.666666)" />
       <dependency id="System.Security.Cryptography.X509Certificates" version="[4.3.2,4.666666)" />
-      <dependency id="System.Text.Encoding.CodePages" version="[4.4.0,4.666666)" />
       <dependency id="System.Threading.Tasks.Dataflow" version="[4.8.0,4.666666)" />
-      <dependency id="System.ValueTuple" version="[4.4.0,4.666666)" />
       <dependency id="Umbraco.SqlServerCE" version="[4.0.0.1,4.666666)" />
     </dependencies>
   </metadata>
