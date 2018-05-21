@@ -56,7 +56,6 @@
       <dependency id="System.Text.Encoding.CodePages" version="[4.4.0,4.666666)" />
       <dependency id="System.Threading.Tasks.Dataflow" version="[4.8.0,4.666666)" />
       <dependency id="System.ValueTuple" version="[4.4.0,4.666666)" />
-      <dependency id="Umbraco.ModelsBuilder" version="[8.0.0-alpha.18,8.666666)" />
       <dependency id="Umbraco.SqlServerCE" version="[4.0.0.1,4.666666)" />
     </dependencies>
   </metadata>
@@ -65,12 +64,14 @@
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.dll" target="lib\net472\Umbraco.Web.dll" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.dll" target="lib\net472\Umbraco.Web.UI.dll" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.dll" target="lib\net472\Umbraco.Examine.dll" />
+    <file src="$BuildTmp$\WebApp\bin\Umbraco.ModelsBuilder.dll" target="lib\net472\Umbraco.ModelsBuilder.dll" />
 
-    <!-- docs -->
+      <!-- docs -->
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Core.xml" target="lib\Umbraco.Core.xml" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.xml" target="lib\Umbraco.Web.xml" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.xml" target="lib\Umbraco.Web.UI.xml" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.xml" target="lib\Umbraco.Examine.xml" />
+    <file src="$BuildTmp$\WebApp\bin\Umbraco.ModelsBuilder.xml" target="lib\Umbraco.ModelsBuilder.xml" />
 
     <file src="tools\install.core.ps1" target="tools\install.ps1" />
 
@@ -83,5 +84,7 @@
     <file src="$BuildTmp$\..\src\Umbraco.Web.UI\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Web.UI" />
     <file src="$BuildTmp$\bin\Umbraco.Examine.pdb" target="lib" />
     <file src="$BuildTmp$\..\src\Umbraco.Examine\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Examine" />
+    <file src="$BuildTmp$\bin\Umbraco.ModelsBuilder.pdb" target="lib" />
+    <file src="$BuildTmp$\..\src\Umbraco.ModelsBuilder\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.ModelsBuilder" />
   </files>
 </package>

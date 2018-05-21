@@ -425,6 +425,8 @@
 
   $ubuild.DefineMethod("Build",
   {
+    $error.Clear()
+
     $this.PrepareBuild()
     if ($this.OnError()) { return }
     $this.RestoreNuGet()

@@ -277,19 +277,8 @@ namespace Umbraco.ModelsBuilder.Configuration
         /// <summary>
         /// Gets a value indicating whether the API is installed.
         /// </summary>
-        public bool ApiInstalled => _apiInstalled.Value;
-
-        private readonly Lazy<bool> _apiInstalled = new Lazy<bool>(() =>
-        {
-            try
-            {
-                return Assembly.Load("Umbraco.ModelsBuilder.Api") != null;
-            }
-            catch (FileNotFoundException)
-            {
-                return false;
-            }
-        });
+        // fixme - this is now always true as the API is part of Core
+        public bool ApiInstalled => true;
 
         /// <summary>
         /// Gets a value indicating whether system.web/compilation/@debug is true.
