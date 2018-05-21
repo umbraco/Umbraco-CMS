@@ -2,17 +2,15 @@
 <configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
   <configSections xdt:Transform="InsertIfMissing" />
   <configSections>
-    <section name="BaseRestExtensions" xdt:Locator="Match(name)" xdt:Transform="Remove" />
     <section name="FileSystemProviders" xdt:Locator="Match(name)" xdt:Transform="Remove" />
     <section name="ExamineLuceneIndexSets" type="Umbraco.Examine.Config.IndexSets, Umbraco.Examine" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="SetAttributes(type,requirePermission)" />
-	
+
     <sectionGroup name="applicationSettings" xdt:Locator="Match(name)">
       <section name="umbraco.presentation.Properties.Settings" xdt:Locator="Match(name)" xdt:Transform="Remove" />
     </sectionGroup>
     <sectionGroup name="system.web.webPages.razor" xdt:Locator="Match(name)" xdt:Transform="Remove" />
     <sectionGroup name="umbracoConfiguration" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing">
       <section name="settings" type="Umbraco.Core.Configuration.UmbracoSettings.UmbracoSettingsSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
-      <section name="BaseRestExtensions" type="Umbraco.Core.Configuration.BaseRest.BaseRestSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
       <section name="FileSystemProviders" type="Umbraco.Core.Configuration.FileSystemProvidersSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
       <section name="dashBoard" type="Umbraco.Core.Configuration.Dashboard.DashboardSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
       <section name="HealthChecks" type="Umbraco.Core.Configuration.HealthChecks.HealthChecksSection, Umbraco.Core" requirePermission="false" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
@@ -29,14 +27,12 @@
 
   <umbracoConfiguration xdt:Transform="InsertIfMissing">
     <settings configSource="config\umbracoSettings.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
-    <BaseRestExtensions configSource="config\BaseRestExtensions.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
     <FileSystemProviders configSource="config\FileSystemProviders.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
     <dashBoard configSource="config\Dashboard.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
     <HealthChecks configSource="config\HealthChecks.config" xdt:Locator="Match(configSource)" xdt:Transform="InsertIfMissing" />
   </umbracoConfiguration>
 
   <FileSystemProviders xdt:Transform="Remove" />
-  <BaseRestExtensions xdt:Transform="Remove" />
 
   <system.data xdt:Transform="InsertIfMissing">
     <DbProviderFactories xdt:Transform="InsertIfMissing">
@@ -61,7 +57,7 @@
     <httpRuntime xdt:Transform="InsertIfMissing" />
     <httpRuntime maxRequestLength="51200" fcnMode="Single" xdt:Transform="SetAttributes(fcnMode,maxRequestLength)" />
     <httpRuntime targetFramework="4.5" xdt:Locator="Condition(count(@targetFramework) != 1)" xdt:Transform="SetAttributes(targetFramework)" />
-    
+
     <membership defaultProvider="DefaultMembershipProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove" />
     <roleManager defaultProvider="DefaultRoleProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove"/>
     <profile defaultProvider="DefaultProfileProvider" xdt:Locator="Match(defaultProvider)" xdt:Transform="Remove"/>>
@@ -92,9 +88,6 @@
       <remove name="umbracoRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
       <remove name="viewstateMoverModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
       <remove name="umbracoBaseRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <remove name="WebDAVModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
-      <!-- Inserts it as the first element. Also see http://stackoverflow.com/a/19041487/5018 -->
-      <remove name="WebDAVModule" xdt:Locator="Match(name)" xdt:Transform="Insert" />
 
       <add name="umbracoRequestModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
       <add name="viewstateMoverModule" xdt:Locator="Match(name)" xdt:Transform="Remove" />
@@ -157,62 +150,42 @@
 
   <runtime>
     <assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
-      <dependentAssembly xdt:Transform="Insert">
-        <assemblyIdentity name="HtmlAgilityPack" publicKeyToken="bd319b19eaf3b43a" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-1.5.1.0" newVersion="1.5.1.0" />
-      </dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
-        <assemblyIdentity name="AutoMapper" publicKeyToken="be96cd2c38ef1005" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-3.3.1.0" newVersion="3.3.1.0" />
-      </dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
-        <assemblyIdentity name="System.Net.Http" publicKeyToken="b03f5f7f11d50a3a" culture="neutral"/>
-        <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0"/>
-      </dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
-        <assemblyIdentity name="Newtonsoft.Json" publicKeyToken="30ad4fe6b2a6aeed" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-10.0.0.0" newVersion="10.0.0.0" />
-      </dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
-        <assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-5.2.3.0" newVersion="5.2.3.0" />
-      </dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
-        <assemblyIdentity name="System.Web.WebPages.Razor" publicKeyToken="31bf3856ad364e35" />
-        <bindingRedirect oldVersion="0.0.0.0-3.0.0.0" newVersion="3.0.0.0" />
-      </dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
-        <assemblyIdentity name="System.Web.Http" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-5.2.3.0" newVersion="5.2.3.0" />
-      </dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
-        <assemblyIdentity name="Microsoft.Owin" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-3.1.0.0" newVersion="3.1.0.0" />
-      </dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
-        <assemblyIdentity name="Microsoft.Owin.Security.OAuth" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-3.1.0.0" newVersion="3.1.0.0" />
-      </dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
-        <assemblyIdentity name="Microsoft.Owin.Security" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-3.1.0.0" newVersion="3.1.0.0" />
-      </dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
-        <assemblyIdentity name="Microsoft.Owin.Security.Cookies" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-3.1.0.0" newVersion="3.1.0.0" />
-      </dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
-        <assemblyIdentity name="System.Net.Http.Formatting" publicKeyToken="31bf3856ad364e35" culture="neutral" />
-        <bindingRedirect oldVersion="0.0.0.0-5.2.3.0" newVersion="5.2.3.0" />
-      </dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
-        <assemblyIdentity name="log4net" publicKeyToken="669e0ddf0bb1aa2a" culture="neutral"/>
-        <bindingRedirect oldVersion="0.0.0.0-2.0.8.0" newVersion="2.0.8.0"/>
-      </dependentAssembly>
-      <dependentAssembly xdt:Transform="Insert">
-        <assemblyIdentity name="System.Data.SqlServerCe" publicKeyToken="89845DCD8080CC91" culture="neutral"/>
-        <bindingRedirect oldVersion="0.0.0.0-4.0.0.1" newVersion="4.0.0.1"/>
-      </dependentAssembly>
+        <dependentAssembly xdt:Transform="Insert">
+            <assemblyIdentity name="log4net" publicKeyToken="669e0ddf0bb1aa2a" culture="neutral" />
+            <bindingRedirect oldVersion="0.0.0.0-2.0.8.0" newVersion="2.0.8.0" />
+        </dependentAssembly>
+        <dependentAssembly xdt:Transform="Insert">
+            <assemblyIdentity name="Microsoft.Owin" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+            <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
+        </dependentAssembly>
+        <dependentAssembly xdt:Transform="Insert">
+            <assemblyIdentity name="Microsoft.Owin.Security" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+            <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
+        </dependentAssembly>
+        <dependentAssembly xdt:Transform="Insert">
+            <assemblyIdentity name="Microsoft.Owin.Security.Cookies" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+            <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
+        </dependentAssembly>
+        <dependentAssembly xdt:Transform="Insert">
+            <assemblyIdentity name="Microsoft.Owin.Security.OAuth" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+            <bindingRedirect oldVersion="0.0.0.0-4.0.0.0" newVersion="4.0.0.0" />
+        </dependentAssembly>
+        <dependentAssembly xdt:Transform="Insert">
+            <assemblyIdentity name="Newtonsoft.Json" publicKeyToken="30ad4fe6b2a6aeed" culture="neutral" />
+            <bindingRedirect oldVersion="0.0.0.0-11.0.0.0" newVersion="11.0.0.0" />
+        </dependentAssembly>
+        <dependentAssembly xdt:Transform="Insert">
+            <assemblyIdentity name="System.Collections.Immutable" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
+            <bindingRedirect oldVersion="0.0.0.0-1.2.1.0" newVersion="1.2.1.0" />
+        </dependentAssembly>
+        <dependentAssembly xdt:Transform="Insert">
+            <assemblyIdentity name="System.Web.Http" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+            <bindingRedirect oldVersion="0.0.0.0-5.2.6.0" newVersion="5.2.6.0" />
+        </dependentAssembly>
+        <dependentAssembly xdt:Transform="Insert">
+            <assemblyIdentity name="System.Web.Mvc" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+            <bindingRedirect oldVersion="0.0.0.0-5.2.6.0" newVersion="5.2.6.0" />
+        </dependentAssembly>
     </assemblyBinding>
   </runtime>
 
