@@ -17,11 +17,11 @@
 * When the website starts you'll see the Umbraco installer. Just follow the prompts.
 * You're all set!
 
-### Wan't to run from a zip instead?
+### Want to run from a zip instead?
 
-If you just want to try out a few things, you can run the site from a zip file which you can download from here https://github.com/umbraco/Umbraco-CMS/releases/tag/temp8-cg18. 
+If you just want to try out a few things, you can run the site from a zip file which you can download from here https://github.com/umbraco/Umbraco-CMS/releases/tag/temp8-cg18.
 
-We recommend running the site with the Visual Studio since you'll be able to remain up to date with the latest source code changes.
+We recommend running the site with Visual Studio since you'll be able to remain up to date with the latest source code changes.
 
 ### Making code changes
 
