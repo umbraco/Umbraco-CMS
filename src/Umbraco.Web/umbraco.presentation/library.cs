@@ -1605,6 +1605,34 @@ namespace umbraco
         /// <summary>
         /// Sends an e-mail using the System.Net.Mail.MailMessage object
         /// </summary>
+        /// <param name="toMail">The recipient(s) of the e-mail, add multiple email addresses by using a semicolon between them</param>
+        /// <param name="subject">E-mail subject</param>
+        /// <param name="body">The complete content of the e-mail</param>
+        /// <param name="isHtml">Set to true when using Html formatted mails</param>
+        public static void SendMail(string toMail, string subject, string body, bool isHtml)
+        {
+            try
+            {
+                var mailSender = new EmailSender();
+                using (var mail = new MailMessage())
+                {
+                    foreach (var mailAddress in toMail.Split(';'))
+                        mail.To.Add(new MailAddress(mailAddress.Trim()));
+                    mail.Subject = subject;
+                    mail.IsBodyHtml = isHtml;
+                    mail.Body = body;
+                    mailSender.Send(mail);
+                }
+            }
+            catch (Exception ee)
+            {
+                LogHelper.Error<library>("umbraco.library.SendMail: Error sending mail.", ee);
+            }
+        }
+        
+        /// <summary>
+        /// Sends an e-mail using the System.Net.Mail.MailMessage object
+        /// </summary>
         /// <param name="fromMail">The sender of the e-mail</param>
         /// <param name="toMail">The recipient(s) of the e-mail, add multiple email addresses by using a semicolon between them</param>
         /// <param name="subject">E-mail subject</param>
