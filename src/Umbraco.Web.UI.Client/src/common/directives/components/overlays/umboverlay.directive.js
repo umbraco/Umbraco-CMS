@@ -674,35 +674,21 @@ Opens an overlay to show a custom YSOD. </br>
 
             unregisterOverlay();
 
-            if (scope.model.close) {
-               scope.model = modelCopy;
+            if (scope.model && scope.model.close) {
+                scope.model = modelCopy;
                scope.model.close(scope.model);
             } else {
                 scope.model.show = false;
-               scope.model = null;
+                scope.model = null;
             }
 
          };
 
-         // angular does not support ng-show on custom directives
-         // width isolated scopes. So we have to make our own.
-         if (attr.hasOwnProperty("ngShow")) {
-            scope.$watch("ngShow", function(value) {
-               if (value) {
-                  el.show();
-                  activate();
-               } else {
-                  unregisterOverlay();
-                  el.hide();
-               }
-            });
-         } else {
-            activate();
-         }
-
-         scope.$on('$destroy', function(){
+        scope.$on('$destroy', function(){
             unregisterOverlay();
-         });
+        });
+
+        activate();
 
       }
 
