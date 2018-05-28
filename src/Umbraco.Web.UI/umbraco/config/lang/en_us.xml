@@ -102,6 +102,22 @@
     </area>
     <area alias="auditTrails">
         <key alias="atViewingFor">Viewing for</key>
+        <key alias="moveRecycleBin">Move Content to Recycle Bin performed by user</key>
+        <key alias="deleteContent">Delete Content performed by user</key>
+        <key alias="publishChildren">Publish with Children performed by user</key>
+        <key alias="unpublish">UnPublish performed by user</key>
+        <key alias="saveAndPublish">Save and Publish performed by user</key>
+        <key alias="save">Save Content performed by user</key>
+        <key alias="move">Move Content performed by user</key>
+        <key alias="emptyRecycleBin">Empty Content Recycle Bin performed by user</key>
+        <key alias="copy">Copy Content performed by user</key>
+        <key alias="sendToPublish">Send to Publish performed by user</key>
+        <key alias="contentRollback">Content rollback performed by user</key>
+        <key alias="sortContent">Sorting content performed by user</key>
+        <key alias="bulkSave">Bulk Save content performed by user</key>
+        <key alias="deleteByVersion">Delete Content by version performed by user</key>
+        <key alias="deleteByVersionDate">Delete Content by version date performed by user</key>
+        <key alias="deleteOfType">Delete Content of Types %1% performed by user</key>
     </area>
     <area alias="buttons">
         <key alias="clearSelection">Clear selection</key>
@@ -1642,7 +1658,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="isSensitiveDataDescription">Hide this property value from content editors that don't have access to view sensitive information</key>
         <key alias="showOnMemberProfile">Show on member profile</key>
         <key alias="showOnMemberProfileDescription">Allow this property value to be displayed on the member profile page</key>
-        
+
         <key alias="tabHasNoSortOrder">tab has no sort order</key>
     </area>
 
