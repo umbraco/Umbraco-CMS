@@ -50,7 +50,7 @@ app.config(function ($routeProvider) {
                                     }
                                 }
                                 else {
-                                    return $q.reject({ path: "/" });
+                                    return $q.when(true);
                                 }
                             });
 
@@ -103,7 +103,7 @@ app.config(function ($routeProvider) {
              redirectTo: '/login/false',
             resolve: doLogout()
         })
-        .when('/:section', {
+        .when('/:section?', {
             //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
             template: "<div ng-include='templateUrl'></div>",
             //This controller will execute for this route, then we can execute some code in order to set the template Url
@@ -141,7 +141,7 @@ app.config(function ($routeProvider) {
             reloadOnSearch: false,
             resolve: canRoute(true)
         })
-        .when('/:section/:tree/:method', {
+        .when('/:section/:tree/:method?', {
             templateUrl: function (rp) {
 
                 //if there is no method registered for this then show the dashboard
@@ -153,7 +153,7 @@ app.config(function ($routeProvider) {
             reloadOnSearch: false,
             resolve: canRoute(true)
         })
-        .when('/:section/:tree/:method/:id', {
+        .when('/:section/:tree/:method?/:id', {
             //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
             template: "<div ng-include='templateUrl'></div>",
             //This controller will execute for this route, then we replace the template dynamnically based on the current tree.
