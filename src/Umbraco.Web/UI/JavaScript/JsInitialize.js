@@ -1,6 +1,6 @@
 ﻿[
     'lib/jquery/jquery.min.js',
-    'lib/angular/1.1.5/angular.min.js',
+    'lib/angular/angular.js',
     'lib/underscore/underscore-min.js',
 
     'lib/moment/moment.min.js',
@@ -10,9 +10,11 @@
     'lib/jquery-ui/jquery-ui.min.js',
     'lib/jquery-ui-touch-punch/jquery.ui.touch-punch.js',
 
-    'lib/angular/1.1.5/angular-cookies.min.js',
-    'lib/angular/1.1.5/angular-mobile.js',
-    'lib/angular/1.1.5/angular-sanitize.min.js',
+    'lib/angular-route/angular-route.js',
+    'lib/angular-cookies/angular-cookies.js',
+    'lib/angular-touch/angular-touch.js',
+    'lib/angular-sanitize/angular-sanitize.js',
+    'lib/angular-animate/angular-animate.js',
 
     'lib/angular/angular-ui-sortable.js',
 

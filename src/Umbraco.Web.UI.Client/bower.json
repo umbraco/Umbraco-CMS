@@ -16,6 +16,12 @@
     "tests"
   ],
   "dependencies": {
+    "angular": "1.7.0",
+    "angular-cookies": "1.7.0",
+    "angular-sanitize": "1.7.0",
+    "angular-touch": "1.7.0",
+    "angular-route": "1.7.0",
+    "angular-animate": "1.7.0",
     "signalr": "^2.2.1",
     "typeahead.js": "~0.10.5",
     "underscore": "~1.7.0",
@@ -39,7 +45,6 @@
     "path": "lib-bower",
     "ignore": [
       "font-awesome",
-      "angular",
       "bootstrap",
       "codemirror"
     ],

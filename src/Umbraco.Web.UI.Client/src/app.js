@@ -6,9 +6,11 @@ var app = angular.module('umbraco', [
 	'umbraco.packages',
 	'umbraco.views',
 
+    'ngRoute',
+	'ngAnimate',
     'ngCookies',
     'ngSanitize',
-    'ngMobile',
+    'ngTouch',
     'tmh.dynamicLocale',
     'ngFileUpload',
     'LocalStorageModule'
