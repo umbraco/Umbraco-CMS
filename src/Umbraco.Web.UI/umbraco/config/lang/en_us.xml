@@ -121,6 +121,13 @@
         <key alias="trashedContent">Trashed content with Id: '%0%' related to original parent content with Id: '%1%'</key>
         <key alias="rollbackWithId">Version rolled back to revision '%0%'</key>
         <key alias="copyWithId">Copied content with Id: '%0%' related to original content with Id: '%1%'</key>
+        <key alias="smallCopy">Copy</key>
+        <key alias="smallPublish">Publish</key>
+        <key alias="smallMove">Move</key>
+        <key alias="smallSave">Save</key>
+        <key alias="smallDelete">Delete</key>
+        <key alias="smallUnPublish">Unpublish</key>
+        <key alias="smallRollBack">Rollback</key>
     </area>
     <area alias="buttons">
         <key alias="clearSelection">Clear selection</key>

@@ -116,6 +116,13 @@
         <key alias="trashedContent">Brugeren har slettet indholdet med id: '%0%' som har en relation til forældresiden med id: '%1%'</key>
         <key alias="rollbackWithId">Indhold returneret til revision '%0%'</key>
         <key alias="copyWithId">Brugeren har kopieret indholdet med id: '%0%' som har en relation til original siden med id: '%1%'</key>
+        <key alias="smallCopy">Kopieret</key>
+        <key alias="smallPublish">Udgivet</key>
+        <key alias="smallMove">Flyttet</key>
+        <key alias="smallSave">Gemt</key>
+        <key alias="smallDelete">Slettet</key>
+        <key alias="smallUnPublish">Afpubliceret</key>
+        <key alias="smallRollBack">Afpubliceret</key>
     </area>
     <area alias="buttons">
         <key alias="clearSelection">Ryd valg</key>
