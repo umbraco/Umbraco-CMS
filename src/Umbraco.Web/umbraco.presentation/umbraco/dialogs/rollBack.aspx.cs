@@ -12,6 +12,7 @@ using System.Web.UI.HtmlControls;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.property;
+using Umbraco.Core.Services;
 
 namespace umbraco.presentation.dialogs
 {
@@ -137,9 +138,11 @@ namespace umbraco.presentation.dialogs
             {
                 Document d = new Document(int.Parse(helper.Request("nodeId")));
                 d.RollBack(new Guid(allVersions.SelectedValue), base.getUser());
-                
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.RollBack, base.getUser(), d.Id, "Version rolled back to revision '" + allVersions.SelectedValue + "'");
-                
+
+                string[] tokens = new string[] { allVersions.SelectedValue };
+
+                BusinessLogic.Log.Add(BusinessLogic.LogTypes.RollBack, base.getUser(), d.Id, Services.TextService.Localize("auditTrails/rollbackWithId",tokens));
+
                 Document rollback = new Document(d.Id, new Guid(allVersions.SelectedValue));
                 feedBackMsg.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
                 string[] vars = {rollback.Text, rollback.VersionDate.ToLongDateString()};

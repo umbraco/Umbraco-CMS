@@ -117,7 +117,10 @@
         <key alias="bulkSave">Bulk Save content performed by user</key>
         <key alias="deleteByVersion">Delete Content by version performed by user</key>
         <key alias="deleteByVersionDate">Delete Content by version date performed by user</key>
-        <key alias="deleteOfType">Delete Content of Types %1% performed by user</key>
+        <key alias="deleteOfType">Delete Content of Types %0% performed by user</key>
+        <key alias="trashedContent">Trashed content with Id: '%0%' related to original parent content with Id: '%1%'</key>
+        <key alias="rollbackWithId">Version rolled back to revision '%0%'</key>
+        <key alias="copyWithId">Copied content with Id: '%0%' related to original content with Id: '%1%'</key>
     </area>
     <area alias="buttons">
         <key alias="clearSelection">Clear selection</key>

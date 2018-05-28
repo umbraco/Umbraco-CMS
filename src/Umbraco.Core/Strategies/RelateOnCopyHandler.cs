@@ -33,11 +33,11 @@ namespace Umbraco.Core.Strategies
 
                 var relation = new Relation(e.Original.Id, e.Copy.Id, relationType);
                 relationService.Save(relation);
+                string[] tokens = new string[] { e.Copy.Id.ToString(), e.Original.Id.ToString() };
 
                 ApplicationContext.Current.Services.AuditService.Add(
                     AuditType.Copy,
-                    string.Format("Copied content with Id: '{0}' related to original content with Id: '{1}'",
-                        e.Copy.Id, e.Original.Id), e.Copy.WriterId, e.Copy.Id);
+                    ApplicationContext.Current.Services.TextService.Localize("auditTrails/copyWithId", tokens), e.Copy.WriterId, e.Copy.Id);
             }
         }
     }
