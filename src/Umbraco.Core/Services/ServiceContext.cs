@@ -238,7 +238,7 @@ namespace Umbraco.Core.Services
                 _memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory, logger, eventMessagesFactory, _memberGroupService.Value, _dataTypeService.Value));
 
             if (_contentService == null)
-                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory, logger, eventMessagesFactory, _dataTypeService.Value, _userService.Value));
+                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory, logger, eventMessagesFactory, _dataTypeService.Value, _userService.Value, _localizedTextService.Value));
 
             if (_mediaService == null)
                 _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory, logger, eventMessagesFactory, _dataTypeService.Value, _userService.Value));

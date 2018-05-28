@@ -30,7 +30,7 @@ namespace Umbraco.Core.Services
         private readonly EntityXmlSerializer _entitySerializer = new EntityXmlSerializer();
         private readonly IDataTypeService _dataTypeService;
         private readonly IUserService _userService;
-
+        private readonly ILocalizedTextService _textService;
         //Support recursive locks because some of the methods that require locking call other methods that require locking.
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
@@ -41,7 +41,8 @@ namespace Umbraco.Core.Services
             ILogger logger,
             IEventMessagesFactory eventMessagesFactory,
             IDataTypeService dataTypeService,
-            IUserService userService)
+            IUserService userService,
+            ILocalizedTextService textService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
@@ -49,6 +50,7 @@ namespace Umbraco.Core.Services
             _publishingStrategy = new PublishingStrategy(UowProvider.ScopeProvider, eventMessagesFactory, logger);
             _dataTypeService = dataTypeService;
             _userService = userService;
+            _textService = textService;
         }
 
         #region Static Queries
@@ -694,7 +696,7 @@ namespace Umbraco.Core.Services
                     }
                     query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", contentPath[0].Path), TextColumnType.NVarchar));
                 }
-                    
+
 
                 // get filter
                 IQuery<IContent> filterQuery = null;
@@ -991,7 +993,7 @@ namespace Umbraco.Core.Services
                     FROM umbracoNode
                     JOIN cmsDocument ON umbracoNode.id=cmsDocument.nodeId AND cmsDocument.published=@0
                     WHERE umbracoNode.trashed=@1 AND umbracoNode.id IN (@2)",
-                    true, false, ids);                    
+                    true, false, ids);
                 var x = uow.Database.Fetch<int>(sql);
                 return ids.Length == x.Count;
             }
@@ -1152,8 +1154,7 @@ namespace Umbraco.Core.Services
                     moveEventArgs.CanCancel = false;
                     moveEventArgs.MoveInfoCollection = moveInfo;
                     uow.Events.Dispatch(Trashed, this, moveEventArgs, "Trashed");
-
-                    Audit(uow, AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
+                    Audit(uow, AuditType.Move, _textService.Localize("auditTrails/moveRecycleBin"), userId, content.Id);
                     uow.Commit();
                 }
 
@@ -1260,7 +1261,7 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
                 var blueprint = repository.Get(id);
                 if (blueprint != null)
-                    ((Content) blueprint).IsBlueprint = true;
+                    ((Content)blueprint).IsBlueprint = true;
                 return blueprint;
             }
         }
@@ -1283,7 +1284,7 @@ namespace Umbraco.Core.Services
             if (content.ParentId != -1)
                 content.ParentId = -1;
 
-            ((Content) content).IsBlueprint = true;
+            ((Content)content).IsBlueprint = true;
 
             using (new WriteLock(Locker))
             {
@@ -1357,7 +1358,7 @@ namespace Umbraco.Core.Services
                 }
                 var blueprints = repository.GetByQuery(query).Select(x =>
                 {
-                    ((Content) x).IsBlueprint = true;
+                    ((Content)x).IsBlueprint = true;
                     return x;
                 }).ToArray();
 
@@ -1373,7 +1374,7 @@ namespace Umbraco.Core.Services
 
         public void DeleteBlueprintsOfType(int contentTypeId, int userId = 0)
         {
-            DeleteBlueprintsOfTypes(new[] {contentTypeId}, userId);
+            DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
         }
 
         /// <summary>
@@ -1448,7 +1449,7 @@ namespace Umbraco.Core.Services
                     uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                 }
 
-                Audit(uow, AuditType.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
+                Audit(uow, AuditType.Save, _textService.Localize("auditTrails/sortContent"), userId == -1 ? 0 : userId, Constants.System.Root);
                 uow.Commit();
 
                 return OperationStatus.Success(evtMsgs);
@@ -1499,7 +1500,7 @@ namespace Umbraco.Core.Services
                     deleteEventArgs.CanCancel = false;
                     uow.Events.Dispatch(Deleted, this, deleteEventArgs, "Deleted");
 
-                    Audit(uow, AuditType.Delete, "Delete Content performed by user", userId, content.Id);
+                    Audit(uow, AuditType.Delete, _textService.Localize("auditTrails/deleteContent"), userId, content.Id);
                     uow.Commit();
                 }
 
@@ -1555,7 +1556,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateContentRepository(uow);
-
+                string[] tokens = new string[] { string.Join(",", contentTypeIds) };
                 //track the 'root' items of the collection of nodes discovered to delete, we need to use
                 //these items to lookup descendants that are not of this doc type so they can be transfered
                 //to the recycle bin
@@ -1583,7 +1584,7 @@ namespace Umbraco.Core.Services
                 }
 
                 Audit(uow, AuditType.Delete,
-                    string.Format("Delete Content of Types {0} performed by user", string.Join(",", contentTypeIds)),
+                    _textService.Localize("auditTrails/deleteOfType", tokens),
                     userId, Constants.System.Root);
                 uow.Commit();
             }
@@ -1597,7 +1598,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
         public void DeleteContentOfType(int contentTypeId, int userId = 0)
         {
-            DeleteContentOfTypes(new[] {contentTypeId}, userId);
+            DeleteContentOfTypes(new[] { contentTypeId }, userId);
         }
 
         /// <summary>
@@ -1637,7 +1638,7 @@ namespace Umbraco.Core.Services
                 deleteRevisionsEventArgs.CanCancel = false;
                 uow.Events.Dispatch(DeletedVersions, this, deleteRevisionsEventArgs, "DeletedVersions");
 
-                Audit(uow, AuditType.Delete, "Delete Content by version date performed by user", userId, Constants.System.Root);
+                Audit(uow, AuditType.Delete, _textService.Localize("auditTrails/deleteByVersionDate"), userId, Constants.System.Root);
                 uow.Commit();
             }
         }
@@ -1673,7 +1674,7 @@ namespace Umbraco.Core.Services
 
                     uow.Events.Dispatch(DeletedVersions, this, new DeleteRevisionsEventArgs(id, false, specificVersion: versionId), "DeletedVersions");
 
-                    Audit(uow, AuditType.Delete, "Delete Content by version performed by user", userId, Constants.System.Root);
+                    Audit(uow, AuditType.Delete, _textService.Localize("auditTrails/deleteByVersion"), userId, Constants.System.Root);
                     uow.Commit();
                 }
             }
@@ -1732,7 +1733,7 @@ namespace Umbraco.Core.Services
                     moveEventArgs.CanCancel = false;
                     uow.Events.Dispatch(Moved, this, moveEventArgs, "Moved");
 
-                    Audit(uow, AuditType.Move, "Move Content performed by user", userId, content.Id);
+                    Audit(uow, AuditType.Move, _textService.Localize("auditTrails/move"), userId, content.Id);
                     uow.Commit();
                 }
             }
@@ -1771,7 +1772,7 @@ namespace Umbraco.Core.Services
                     recycleBinEventArgs.RecycleBinEmptiedSuccessfully = success;
                     uow.Events.Dispatch(EmptiedRecycleBin, this, recycleBinEventArgs);
 
-                    Audit(uow, AuditType.Delete, "Empty Content Recycle Bin performed by user", 0, Constants.System.RecycleBinContent);
+                    Audit(uow, AuditType.Delete, _textService.Localize("auditTrails/emptyRecycleBin"), 0, Constants.System.RecycleBinContent);
                     uow.Commit();
                 }
             }
@@ -1854,7 +1855,9 @@ namespace Umbraco.Core.Services
                         foreach (var tag in tags)
                             uow.Database.Insert(new TagRelationshipDto
                             {
-                                NodeId = copy.Id, TagId = tag.TagId, PropertyTypeId = tag.PropertyTypeId
+                                NodeId = copy.Id,
+                                TagId = tag.TagId,
+                                PropertyTypeId = tag.PropertyTypeId
                             });
                     }
                     uow.Commit(); // todo - this should flush, not commit
@@ -1872,7 +1875,7 @@ namespace Umbraco.Core.Services
                     }
                     copyEventArgs.CanCancel = false;
                     uow.Events.Dispatch(Copied, this, copyEventArgs);
-                    Audit(uow, AuditType.Copy, "Copy Content performed by user", content.WriterId, content.Id);
+                    Audit(uow, AuditType.Copy, _textService.Localize("auditTrails/copy"), content.WriterId, content.Id);
                     uow.Commit();
                 }
 
@@ -1903,7 +1906,7 @@ namespace Umbraco.Core.Services
                 sendToPublishEventArgs.CanCancel = false;
                 uow.Events.Dispatch(SentToPublish, this, sendToPublishEventArgs);
 
-                Audit(uow, AuditType.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
+                Audit(uow, AuditType.SendToPublish, _textService.Localize("auditTrails/sendToPublish"), content.WriterId, content.Id);
                 uow.Commit();
 
                 return true;
@@ -1946,7 +1949,7 @@ namespace Umbraco.Core.Services
                 rollbackEventArgs.CanCancel = false;
                 uow.Events.Dispatch(RolledBack, this, rollbackEventArgs);
 
-                Audit(uow, AuditType.RollBack, "Content rollback performed by user", content.WriterId, content.Id);
+                Audit(uow, AuditType.RollBack, _textService.Localize("auditTrails/contentRollback"), content.WriterId, content.Id);
                 uow.Commit();
             }
 
@@ -2032,7 +2035,7 @@ namespace Umbraco.Core.Services
                         _publishingStrategy.PublishingFinalized(uow, shouldBePublished, false);
                     }
 
-                    Audit(uow, AuditType.Sort, "Sorting content performed by user", userId, 0);
+                    Audit(uow, AuditType.Sort, _textService.Localize("auditTrails/sortContent"), userId, 0);
                     uow.Commit();
                 }
             }
@@ -2122,7 +2125,7 @@ namespace Umbraco.Core.Services
                         _publishingStrategy.PublishingFinalized(uow, shouldBePublished, false);
                     }
 
-                    Audit(uow, AuditType.Sort, "Sorting content performed by user", userId, 0);
+                    Audit(uow, AuditType.Sort, _textService.Localize("auditTrails/sortContent"), userId, 0);
                     uow.Commit();
                 }
             }
@@ -2143,7 +2146,7 @@ namespace Umbraco.Core.Services
                 }
                 return repository.GetByQuery(query).Select(x =>
                 {
-                    ((Content) x).IsBlueprint = true;
+                    ((Content)x).IsBlueprint = true;
                     return x;
                 });
             }
@@ -2424,7 +2427,7 @@ namespace Umbraco.Core.Services
                     //Save xml to db and call following method to fire event:
                     _publishingStrategy.PublishingFinalized(uow, updated, false);
 
-                    Audit(uow, AuditType.Publish, "Publish with Children performed by user", userId, content.Id);
+                    Audit(uow, AuditType.Publish, _textService.Localize("auditTrails/publishChildren"), userId, content.Id);
                     uow.Commit();
 
                     return publishedOutcome;
@@ -2475,7 +2478,7 @@ namespace Umbraco.Core.Services
                 if (omitCacheRefresh == false)
                     _publishingStrategy.UnPublishingFinalized(uow, content);
 
-                Audit(uow, AuditType.UnPublish, "UnPublish performed by user", userId, content.Id);
+                Audit(uow, AuditType.UnPublish, _textService.Localize("auditTrails/unpublish"), userId, content.Id);
                 uow.Commit();
             }
 
@@ -2567,12 +2570,12 @@ namespace Umbraco.Core.Services
                     //We need to check if children and their publish state to ensure that we 'republish' content that was previously published
                     if (published && previouslyPublished == false && HasChildren(content.Id))
                     {
-                    //TODO: Horrible for performance if there are lots of descendents! We should page if anything but this is crazy
+                        //TODO: Horrible for performance if there are lots of descendents! We should page if anything but this is crazy
                         var descendants = GetPublishedDescendants(content);
                         _publishingStrategy.PublishingFinalized(uow, descendants, false);
                     }
 
-                    Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
+                    Audit(uow, AuditType.Publish, _textService.Localize("auditTrails/saveAndPublish"), userId, content.Id);
                     uow.Commit();
                     return Attempt.If(publishStatus.StatusType == PublishStatusType.Success, publishStatus);
                 }
@@ -2629,7 +2632,7 @@ namespace Umbraco.Core.Services
                         uow.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                     }
 
-                    Audit(uow, AuditType.Save, "Save Content performed by user", userId, content.Id);
+                    Audit(uow, AuditType.Save, _textService.Localize("auditTrails/save"), userId, content.Id);
                     uow.Commit();
                 }
 
