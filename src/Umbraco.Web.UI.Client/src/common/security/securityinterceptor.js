@@ -123,6 +123,7 @@ angular.module('umbraco.security.interceptor')
     .config(['$httpProvider', function ($httpProvider) {
         $httpProvider.defaults.xsrfHeaderName = 'X-UMB-XSRF-TOKEN';
         $httpProvider.defaults.xsrfCookieName = 'UMB-XSRF-TOKEN';
-        $httpProvider.responseInterceptors.push('securityInterceptor');
+        // Fixme: https://stackoverflow.com/questions/23804981/alternative-of-httpprovider-responseinterceptors
+        // $httpProvider.interceptors.push('securityInterceptor');
         $httpProvider.interceptors.push('umbracoRequestInterceptor');
     }]);
