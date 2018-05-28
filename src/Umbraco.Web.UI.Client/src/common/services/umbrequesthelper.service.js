@@ -121,6 +121,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
             /** The default success callback used if one is not supplied in the opts */
             function defaultSuccess(data, status, headers, config) {
                 //when it's successful, just return the data
+                console.log("succes promise", data);
                 return data;
             }
 
@@ -140,28 +141,28 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 error: ((!opts || !opts.error) ? defaultError : opts.error)
             };
 
-            httpPromise.success(function (data, status, headers, config) {
+            httpPromise.then(function (response) {
 
                 //invoke the callback 
-                var result = callbacks.success.apply(this, [data, status, headers, config]);
+                var result = callbacks.success.apply(this, [response.data, response.status, response.headers, response.config]);
 
                 //when it's successful, just return the data
                 deferred.resolve(result);
 
-            }).error(function (data, status, headers, config) {
+            }).catch(function (response) {
 
                 //invoke the callback
-                var result = callbacks.error.apply(this, [data, status, headers, config]);
+                var result = callbacks.error.apply(this, [response.data, response.status, response.headers, response.config]);
 
                 //when there's a 500 (unhandled) error show a YSOD overlay if debugging is enabled.
-                if (status >= 500 && status < 600) {
+                if (response.status >= 500 && response.status < 600) {
 
                     //show a ysod dialog
                     if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
                         eventsService.emit('app.ysod',
                         {
                             errorMsg: 'An error occured',
-                            data: data
+                            data: response.data
                         });
                     }
                     else {
