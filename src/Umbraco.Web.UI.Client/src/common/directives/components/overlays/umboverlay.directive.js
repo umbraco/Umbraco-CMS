@@ -464,12 +464,20 @@ Opens an overlay to show a custom YSOD. </br>
          }
 
          function setButtonText() {
-             if (!scope.model.closeButtonLabelKey && !scope.model.closeButtonLabel) {
-                 scope.model.closeButtonLabel = localizationService.localize("general_close");
-             }
-             if (!scope.model.submitButtonLabelKey && !scope.model.submitButtonLabel) {
-                 scope.model.submitButtonLabel = localizationService.localize("general_submit");
-             }
+
+            var labelKeys = [
+                "general_close",
+                "general_submit"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(function (values) {
+                if (!scope.model.closeButtonLabelKey && !scope.model.closeButtonLabel) {
+                    scope.model.closeButtonLabel = values[0];
+                }
+                if (!scope.model.submitButtonLabelKey && !scope.model.submitButtonLabel) {
+                    scope.model.submitButtonLabel = values[1];
+                }
+            });
          }
 
          function registerOverlay() {
