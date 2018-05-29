@@ -1,16 +1,10 @@
-# Contributing to Umbraco CMS
+# Contributing in detail
 
-👍🎉 First off, thanks for taking the time to contribute! 🎉👍
+There's more than one way to contribute to Umbraco, there's some more suggestions below.
 
-The following is a set of guidelines for contributing to Umbraco CMS.
-
-These are mostly guidelines, not rules. Use your best judgment, and feel free to propose changes to this document in a pull request.
-
-Remember, we're a friendly bunch and are happy with whatever contribution you might provide. Below are guidelines for success that we've gathered over the years. If you choose to ignore them then we still love you 💖. 
+When contributing code to Umbraco there's plenty of things you'll want to know, skip down to [What should I know before I get started](#what-should-i-know-before-i-get-started) for the answers to your burning questions.
 
 #### Table Of Contents
-
-[Code of Conduct](#code-of-conduct)
 
 [How Can I Contribute?](#how-can-i-contribute)
   * [Reporting Bugs](#reporting-bugs)
@@ -26,16 +20,6 @@ Remember, we're a friendly bunch and are happy with whatever contribution you mi
   * [Building Umbraco from source code](#building-umbraco-from-source-code)
   * [Keeping your Umbraco fork in sync with the main repository](#keeping-your-umbraco-fork-in-sync-with-the-main-repository)
   
-[How do I even begin?](#how-do-i-even-begin)
-
-[Problems?](#problems)
-
-[Credits](#credits)
-
-## Code of Conduct
-
-This project and everyone participating in it is governed by the [our Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [Sebastiaan Janssen - sj@umbraco.dk](mailto:sj@umbraco.dk).
-
 ## How Can I Contribute?
 
 ### Reporting Bugs
@@ -135,7 +119,7 @@ To find the general areas of something you're looking to fix or improve, have a 
 
 We like to use [Gitflow as much as possible](https://jeffkreeftmeijer.com/git-flow/), don't worry if you are not familiar with it. The most important thing you need to know is that when you fork the Umbraco repository, the default branch is set to something, usually `dev-v7`. Whatever the default is, that's where we'd like you to target your contributions.
 
-![What branch do you want me to target?](tools/contributing/defaultbranch.png)
+![What branch do you want me to target?](img/defaultbranch.png)
 
 ### Building Umbraco from source code
 
@@ -143,7 +127,7 @@ The easiest way to get started is to run `build.bat` which will build both the b
 
 Alternatively, you can open `src\umbraco.sln` in Visual Studio 2017 ([the community edition is free](https://www.visualstudio.com/thank-you-downloading-visual-studio/?sku=Community&rel=15) for you to use to contribute to Open Source projects). In Visual Studio, find the Task Runner Explorer (in the View menu under Other Windows) and run the build task under the gulpfile.
 
-![Gulp build in Visual Studio](tools/contributing/gulpbuild.png)
+![Gulp build in Visual Studio](img/gulpbuild.png)
 
 After this build completes, you should be able to hit `F5` in Visual Studio to build and run the project. A IISExpress webserver will start and the Umbraco installer will pop up in your browser, follow the directions there to get a working Umbraco install up and running.
 
@@ -169,39 +153,3 @@ git rebase upstream/dev-v7
 In this command we're syncing with the `dev-v7` branch, but you can of course choose another one if needed.
 
 (More info on how this works: [http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated](http://robots.thoughtbot.com/post/5133345960/keeping-a-git-fork-updated))
-
-## How do I even begin?
-
-Great question! The short version goes like this:
-
-  * **Fork** - create a fork of [`Umbraco-CMS` on GitHub](https://github.com/umbraco/Umbraco-CMS)
-
-  ![Fork the repository](tools/contributing/forkrepository.png)
-
-  * **Clone** - when GitHub has created your fork, you can clone it in your favorite Git tool
-  
-  ![Clone the fork](tools/contributing/clonefork.png)
-
-  * **Build** - build your fork of Umbraco locally as described in [building Umbraco from source code](#building-umbraco-from-source-code)
-  * **Change** - make your changes, experiment, have fun, explore and learn, and don't be afraid. We welcome all contributions and will happily give feedback
-  * **Commit** - done? Yay! 🎉 It is recommended to create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-U4-12345`. This means it's a temporary branch for the particular issue you're working on, in this case `U4-12345`
-  * **Push** - great, now you can push the changes up to your fork on GitHub
-  * **Create pull request** - exciting! You're ready to show us your changes (or not quite ready, you just need some feedback to progress). GitHub has picked up on the new branch you've pushed and will offer to create a Pull Request. Click that green button and away you go.
-
-  ![Create a pull request](tools/contributing/createpullrequest.png)
-
-The Umbraco development team can now start reviewing your proposed changes and give you feedback on them. If it's not perfect, we'll either fix up what we need or we can request you to make some additional changes.
-
-If you make the corrections we ask for in the same branch and push them to your fork again, the pull request automatically updates with the additional commit(s) so we can review it again. If all is well, we'll merge the code and your commits are forever part of Umbraco!
-
-Not all changes are wanted so on occassion we might close a PR without merging it. We will give you feedback why we can't accept your changes at this and we'll be nice about it, thanking you for spending your valueable time.
-
-Remember, if an issue is in the `Up for grabs` list or you've asked for some feedback before you send us a PR, your PR will not be closed as unwanted.
-
-## Problems?
-
-Did something not work as expected? Try leaving a note in the ["Contributing to Umbraco"](https://our.umbraco.org/forum/contributing-to-umbraco-cms/) forum, the team monitors that one closely!
-
-## Credits
-
-This contribution guide borrows heavily from the excellent work on [the Atom contribution guide](https://github.com/atom/atom/blob/master/CONTRIBUTING.md). A big [#h5yr](http://h5yr.com/) to them!
