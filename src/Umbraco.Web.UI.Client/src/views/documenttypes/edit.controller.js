@@ -15,34 +15,7 @@
         var evts = [];
 
         var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
-
-        var buttons = [
-            {
-                "name": localizationService.localize("general_design"),
-                "alias": "design",
-                "icon": "icon-document-dashed-line",
-                "view": "views/documenttypes/views/design/design.html",
-                "active": true
-            },
-            {
-                "name": localizationService.localize("general_listView"),
-                "alias": "listView",
-                "icon": "icon-list",
-                "view": "views/documenttypes/views/listview/listview.html"
-            },
-            {
-                "name": localizationService.localize("general_rights"),
-                "alias": "permissions",
-                "icon": "icon-keychain",
-                "view": "views/documenttypes/views/permissions/permissions.html"
-            },
-            {
-                "name": localizationService.localize("treeHeaders_templates"),
-                "alias": "templates",
-                "icon": "icon-layout",
-                "view": "views/documenttypes/views/templates/templates.html"
-            }
-        ];
+        vm.labels = {};
 
         vm.save = save;
 
@@ -54,7 +27,50 @@
         vm.page.saveButtonState = "init";
         vm.page.navigation = [];
 
-        loadButtons();
+        var labelKeys = [
+            "general_design",
+            "general_listView",
+            "general_rights",
+            "treeHeaders_templates"
+        ];
+
+        localizationService.localizeMany(labelKeys).then(function (values) {
+            vm.labels.design = values[0];
+            vm.labels.listview = values[1];
+            vm.labels.permissions = values[2];
+            vm.labels.templates = values[3];
+
+            var buttons = [
+                {
+                    "name": vm.labels.design,
+                    "alias": "design",
+                    "icon": "icon-document-dashed-line",
+                    "view": "views/documenttypes/views/design/design.html",
+                    "active": true
+                },
+                {
+                    "name": vm.labels.listview,
+                    "alias": "listView",
+                    "icon": "icon-list",
+                    "view": "views/documenttypes/views/listview/listview.html"
+                },
+                {
+                    "name": vm.labels.permissions,
+                    "alias": "permissions",
+                    "icon": "icon-keychain",
+                    "view": "views/documenttypes/views/permissions/permissions.html"
+                },
+                {
+                    "name": vm.labels.templates,
+                    "alias": "templates",
+                    "icon": "icon-layout",
+                    "view": "views/documenttypes/views/templates/templates.html"
+                }
+            ];
+
+            loadButtons(buttons);
+
+        });
 
         vm.page.keyboardShortcutsOverview = [
             {
@@ -212,7 +228,7 @@
             });
         }
 
-        function loadButtons() {
+        function loadButtons(buttons) {
 
             angular.forEach(buttons,
                 function (val, index) {
