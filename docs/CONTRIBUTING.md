@@ -33,7 +33,7 @@ Great question! The short version goes like this:
   
   ![Clone the fork](img/clonefork.png)
 
-  * **Build** - build your fork of Umbraco locally as described in [building Umbraco from source code](#building-umbraco-from-source-code)
+  * **Build** - build your fork of Umbraco locally as described in [building Umbraco from source code](BUILD.md)
   * **Change** - make your changes, experiment, have fun, explore and learn, and don't be afraid. We welcome all contributions and will [happily give feedback](#questions)
   * **Commit** - done? Yay! 🎉 It is recommended to create a new branch now and name it after the issue you're fixing, we usually follow the format: `temp-U4-12345`. This means it's a temporary branch for the particular issue you're working on, in this case `U4-12345`
   * **Push** - great, now you can push the changes up to your fork on GitHub
@@ -58,10 +58,6 @@ We have [a process in place which you can read all about](REVIEW_PROCESS.md). Th
 - The PR will be either merged or rejected within at most 4 weeks
 - Sometimes it is difficult to meet these timelines and we'll talk to you
 
-## Making changes
-
-If you make the corrections we ask for in the same branch and push them to your fork again, the pull request automatically updates with the additional commit(s) so we can review it again. If all is well, we'll merge the code and your commits are forever part of Umbraco!
-
 ## Styleguides
 
 To be honest, we don't like rules very much. We trust you have the best of intentions and we encourage you to create working code. If it doesn't look perfect then we'll happily help clean it up.
@@ -77,6 +73,8 @@ The pull request team consists of a member of Umbraco HQ, [Sebastiaan](https://g
 - [Emma Burstow](https://github.com/emaburst)
 - [Kyle Weems](https://github.com/cssquirrel)
 - [Poornima Nayar](https://github.com/poornimanayar)
+
+These wonderful volunteers will provide you with a first reply to your PR, review and test out your changes and might ask more questions. After that they'll let Umbraco HQ know if everything seems okay. 
 
 ## Questions?
 

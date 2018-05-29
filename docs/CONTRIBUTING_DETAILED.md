@@ -84,6 +84,10 @@ The most successful pull requests usually look a like this:
 
 Again, these are guidelines, not strict requirements. 
 
+## Making changes after the PR was opened
+
+If you make the corrections we ask for in the same branch and push them to your fork again, the pull request automatically updates with the additional commit(s) so we can review it again. If all is well, we'll merge the code and your commits are forever part of Umbraco!
+
 ## Styleguides
 
 To be honest, we don't like rules very much. We trust you have the best of intentions and we encourage you to create working code. If it doesn't look perfect then we'll happily help clean it up.
