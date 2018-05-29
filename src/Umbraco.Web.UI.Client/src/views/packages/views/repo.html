@@ -131,7 +131,7 @@
 
                     <div class="umb-packages-view-title">{{ vm.package.name }}</div>
 
-                    <div class="umb-package-details__description" ng-bind-html-unsafe="vm.package.description"></div>
+                    <div class="umb-package-details__description" ng-bind-html="vm.package.description"></div>
 
                     <div class="umb-gallery">
                         <div class="umb-gallery__thumbnails">
@@ -319,7 +319,7 @@
                             <div class="umb-info-local-item">
                                 <strong><localize key="packager_packageReadme">Read me</localize></strong>
                                 <br>
-                                <small  ng-bind-html-unsafe="vm.localPackage.readMe"></small>
+                                <small ng-bind-html="vm.localPackage.readMe"></small>
                             </div>
 
                             <div class="umb-info-local-item mt4 flex items-center flex-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
