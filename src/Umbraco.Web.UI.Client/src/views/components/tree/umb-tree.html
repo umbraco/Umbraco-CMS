@@ -3,7 +3,7 @@
         <div data-element="tree-root" ng-class="getNodeCssClass(tree.root)" ng-hide="hideheader" on-right-click="altSelect(tree.root, $event)">
             <h5>
                 <a href="#/{{section}}" ng-click="select(tree.root, $event)" class="root-link">
-                    <i ng-if="enablecheckboxes == \'true\'" ng-class="selectEnabledNodeClass(tree.root)"></i> 
+                    <i ng-if="enablecheckboxes === 'true'" ng-class="selectEnabledNodeClass(tree.root)"></i> 
                     {{tree.name}}
                 </a>
             </h5>
