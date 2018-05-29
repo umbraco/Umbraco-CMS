@@ -34,7 +34,7 @@
     "ng-file-upload": "~7.3.8",
     "tinymce": "~4.7.1",
     "codemirror": "~5.3.0",
-    "angular-local-storage": "~0.2.3",
+    "angular-local-storage": "~0.7.1",
     "moment": "~2.10.3",
     "ace-builds": "^1.2.3",
     "clipboard": "1.7.1",

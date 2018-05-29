@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService) {
+function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService) {
 
    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
    // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
