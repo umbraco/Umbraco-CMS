@@ -7,12 +7,13 @@ The process for both sizes is very similar, as [explained in the contribution do
 ## Small PRs
 Bug fixes and small improvements - can be recognized by seeing a small number of changes and possibly a small number of new files.
 
-We’re usually able to handle small PRs pretty quickly. A community volunteer will do the initial review and flag it for Umbraco HQ as “community tested”. If everything looks good, it will be merged pretty quickly. See the process above.
+We’re usually able to handle small PRs pretty quickly. A community volunteer will do the initial review and flag it for Umbraco HQ as “community tested”. If everything looks good, it will be merged pretty quickly [as per the described process](REVIEW_PROCESS.md).
 
 ### Up for grabs
 
 Umbraco HQ will regularly mark newly created issues on the issue tracker with the `Up for grabs` tag. This means that the proposed changes are wanted in Umbraco but the HQ does not have the time to make them at this time. These issues are usually small enough to fit in the "Small PRs" category and we encourage anyone to pick them up and help out.  
-Just leave a comment on the issue saying something like: "I'm working on this". That way other people stumbling upon the issue know they don't need to pick it up, someone already has.
+
+If you do start working on something, make sure leave a small comment on the issue saying something like: "I'm working on this". That way other people stumbling upon the issue know they don't need to pick it up, someone already has.
 
 ## Large PRs
 New features and large refactorings - can be recognized by seeing a large number of changes, plenty of new files, updates to package manager files (NuGet’s packages.config, NPM’s packages.json, etc.).  
