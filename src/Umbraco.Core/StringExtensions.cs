@@ -1363,14 +1363,25 @@ namespace Umbraco.Core
             return ReplaceMany(text, regexSpecialCharacters);
         }
 
+        /// <summary>
+        /// Checks whether a string "haystack" contains within it any of the strings in the "needles" collection and returns true if it does or false if it doesn't
+        /// </summary>
+        /// <param name="haystack">The string to check</param>
+        /// <param name="needles">The collection of strings to check are contained within the first string</param>
+        /// <param name="comparison">The type of comparision to perform - defaults to <see cref="StringComparison.CurrentCulture"/></param>
+        /// <returns>True if any of the needles are contained with haystack; otherwise returns false</returns>
+        /// Added fix to ensure the comparison is used - see http://issues.umbraco.org/issue/U4-11313
         public static bool ContainsAny(this string haystack, IEnumerable<string> needles, StringComparison comparison = StringComparison.CurrentCulture)
         {
-            if (haystack == null) throw new ArgumentNullException("haystack");
-            if (string.IsNullOrEmpty(haystack) == false || needles.Any())
+            if (haystack == null)
+                throw new ArgumentNullException("haystack");
+
+            if (string.IsNullOrEmpty(haystack) || needles == null || !needles.Any())
             {
-                return needles.Any(value => haystack.IndexOf(value) >= 0);
+                return false;
             }
-            return false;
+
+            return needles.Any(value => haystack.IndexOf(value, comparison) >= 0);
         }
 
         public static bool CsvContains(this string csv, string value)

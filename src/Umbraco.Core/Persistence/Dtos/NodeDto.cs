@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     internal class NodeDto
     {
-        private const string TableName = Constants.DatabaseSchema.Tables.Node;
+        public const string TableName = Constants.DatabaseSchema.Tables.Node;
         public const int NodeIdSeed = 1060;
 
         [Column("id")]

@@ -240,13 +240,20 @@ namespace umbraco.presentation.templateControls
 
         #region Field Information Functions
 
+        static string FindAttribute(IDictionary attributes, string key)
+        {
+            key = key.ToLowerInvariant();
+            var attributeValue = attributes.Contains(key) ? attributes[key].ToString() : string.Empty;
+            return MacroRenderer.ParseAttribute(null, attributeValue);
+        }
+
         /// <summary>
         /// Determines whether the field is a dictionary item.
         /// </summary>
         /// <returns><c>true</c> if the field is a dictionary item; otherwise, <c>false</c>.</returns>
         protected virtual bool FieldIsDictionaryItem()
         {
-            return helper.FindAttribute(new AttributeCollectionAdapter(Attributes), "field").StartsWith("#");
+            return FindAttribute(new AttributeCollectionAdapter(Attributes), "field").StartsWith("#");
         }
 
         /// <summary>
@@ -255,7 +262,7 @@ namespace umbraco.presentation.templateControls
         /// <returns><c>true</c> if the field is recursive; otherwise, <c>false</c>.</returns>
         protected virtual bool FieldIsRercursive()
         {
-            return helper.FindAttribute(new AttributeCollectionAdapter(Attributes), "recursive") == "true";
+            return FindAttribute(new AttributeCollectionAdapter(Attributes), "recursive") == "true";
         }
 
         /// <summary>

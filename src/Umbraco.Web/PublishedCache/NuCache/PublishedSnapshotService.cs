@@ -710,7 +710,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return;
 
             foreach (var payload in payloads)
-                _logger.Debug<XmlStore>($"Notified {payload.ChangeTypes} for {payload.ItemType} {payload.Id}");
+                _logger.Debug<PublishedSnapshotService>($"Notified {payload.ChangeTypes} for {payload.ItemType} {payload.Id}");
 
             Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);
             Notify<IMediaType>(_mediaStore, payloads, RefreshMediaTypesLocked);

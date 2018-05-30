@@ -6,11 +6,13 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.User)]
+    [TableName(TableName)]
     [PrimaryKey("id", AutoIncrement = true)]
     [ExplicitColumns]
     internal class UserDto
     {
+        public const string TableName = Constants.DatabaseSchema.Tables.User;
+
         public UserDto()
         {
             UserGroupDtos = new List<UserGroupDto>();

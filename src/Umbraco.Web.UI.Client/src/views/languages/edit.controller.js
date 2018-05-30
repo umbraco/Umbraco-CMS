@@ -41,7 +41,14 @@
 
                 if($routeParams.create) {
                     vm.page.name = vm.labels.addLanguage;
-                    languageResource.getCultures().then(function(cultures) {
+                    languageResource.getCultures().then(function (culturesDictionary) {
+                        var cultures = [];
+                        angular.forEach(culturesDictionary, function (value, key) {
+                            cultures.push({
+                                name: key,
+                                displayName: value
+                            });
+                        });
                         vm.availableCultures = cultures;
                     });
                 }

@@ -4,17 +4,19 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.UserLogin)]
+    [TableName(TableName)]
     [PrimaryKey("sessionId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class UserLoginDto
     {
+        public const string TableName = Constants.DatabaseSchema.Tables.UserLogin;
+
         [Column("sessionId")]
         [PrimaryKeyColumn(AutoIncrement = false)]
         public Guid SessionId { get; set; }
 
         [Column("userId")]
-        [ForeignKey(typeof(UserDto), Name = "FK_" + Constants.DatabaseSchema.Tables.UserLogin + "_umbracoUser_id")]
+        [ForeignKey(typeof(UserDto), Name = "FK_" + TableName + "_umbracoUser_id")]
         public int UserId { get; set; }
 
         /// <summary>

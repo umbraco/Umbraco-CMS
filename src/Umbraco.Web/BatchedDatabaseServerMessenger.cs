@@ -33,9 +33,7 @@ namespace Umbraco.Web
             _databaseFactory = databaseFactory;
         }
 
-        // invoked by BatchedDatabaseServerMessengerStartup which is an ApplicationEventHandler
-        // with default "ShouldExecute", so that method will run if app IsConfigured and database
-        // context IsDatabaseConfigured - we still want to check CanConnect though to be safe
+        // invoked by DatabaseServerRegistrarAndMessengerComponent
         internal void Startup()
         {
             UmbracoModule.EndRequest += UmbracoModule_EndRequest;

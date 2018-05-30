@@ -3,11 +3,13 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.Language)]
+    [TableName(TableName)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class LanguageDto
     {
+        public const string TableName = Constants.DatabaseSchema.Tables.Language;
+
         [Column("id")]
         [PrimaryKeyColumn(IdentitySeed = 2)]
         public short Id { get; set; }

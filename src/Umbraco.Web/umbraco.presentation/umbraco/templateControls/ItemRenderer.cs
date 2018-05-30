@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +10,7 @@ using System.Xml;
 using Umbraco.Core.Macros;
 using Umbraco.Web.Templates;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Macros;
 
 namespace umbraco.presentation.templateControls
 {
@@ -58,7 +60,7 @@ namespace umbraco.presentation.templateControls
                 string renderOutput = renderOutputWriter.ToString();
                 renderOutput = renderOutput.Trim().Length == 0 ? string.Empty : renderOutput;
                 // handle text before/after
-                renderOutput = AddBeforeAfterText(renderOutput, helper.FindAttribute(item.LegacyAttributes, "insertTextBefore"), helper.FindAttribute(item.LegacyAttributes, "insertTextAfter"));
+                renderOutput = AddBeforeAfterText(renderOutput, FindAttribute(item.LegacyAttributes, "insertTextBefore"), FindAttribute(item.LegacyAttributes, "insertTextAfter"));
                 string finalResult = renderOutput.Trim().Length > 0 ? renderOutput : GetEmptyText(item);
 
                 //Don't parse urls if a content item is assigned since that is taken care
@@ -84,6 +86,13 @@ namespace umbraco.presentation.templateControls
                     writer.RenderEndTag();
                 }
             }
+        }
+
+        static string FindAttribute(IDictionary attributes, string key)
+        {
+            key = key.ToLowerInvariant();
+            var attributeValue = attributes.Contains(key) ? attributes[key].ToString() : string.Empty;
+            return MacroRenderer.ParseAttribute(null, attributeValue);
         }
 
         /// <summary>

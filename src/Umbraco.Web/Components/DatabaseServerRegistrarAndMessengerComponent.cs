@@ -99,6 +99,8 @@ namespace Umbraco.Web.Components
             _messenger = serverMessenger as BatchedDatabaseServerMessenger;
             if (_messenger == null) throw new Exception("panic: messenger");
 
+            _messenger.Startup();
+
             _runtime = runtime;
             _logger = logger;
             _registrationService = registrationService;

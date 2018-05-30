@@ -64,7 +64,19 @@ namespace umbraco
                 //if we are cancelling then return and don't proceed
                 if (args.Cancel) return;
 
-                this.MasterPageFile = template.GetMasterPageName(_upage.Template);
+                var template = Current.Services.FileService.GetTemplate(_upage.Template);
+                if (template != null)
+                {
+                    var alias = template.MasterTemplateAlias;
+                    var file = alias.Replace(" ", "") + ".master";
+                    var path = SystemDirectories.Masterpages + "/" + file;
+
+
+                    if (File.Exists(IOHelper.MapPath(VirtualPathUtility.ToAbsolute(path))))
+                        this.MasterPageFile = path;
+                    else
+                        this.MasterPageFile = SystemDirectories.Umbraco + "/masterPages/default.master";
+                }
 
                 // reset the friendly path so it's used by forms, etc.
                 Context.RewritePath(UmbracoContext.Current.OriginalRequestUrl.PathAndQuery);

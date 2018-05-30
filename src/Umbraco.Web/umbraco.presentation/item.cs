@@ -11,6 +11,7 @@ using Umbraco.Web;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Strings;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Macros;
 
 namespace umbraco
 {
@@ -55,7 +56,7 @@ namespace umbraco
         /// </remarks>
         internal item(IPublishedContent publishedContent, IDictionary elements, IDictionary attributes)
         {
-            _fieldName = helper.FindAttribute(attributes, "field");
+            _fieldName = FindAttribute(attributes, "field");
 
             if (_fieldName.StartsWith("#"))
             {
@@ -64,7 +65,7 @@ namespace umbraco
             else
             {
                 // Loop through XML children we need to find the fields recursive
-                var recursive = helper.FindAttribute(attributes, "recursive") == "true";
+                var recursive = FindAttribute(attributes, "recursive") == "true";
 
                 if (publishedContent == null)
                 {
@@ -90,7 +91,7 @@ namespace umbraco
                 //now we check if the value is still empty and if so we'll check useIfEmpty
                 if (string.IsNullOrEmpty(_fieldContent))
                 {
-                    var altFieldName = helper.FindAttribute(attributes, "useIfEmpty");
+                    var altFieldName = FindAttribute(attributes, "useIfEmpty");
                     if (string.IsNullOrEmpty(altFieldName) == false)
                     {
                         if (publishedContent != null && (publishedContent.HasProperty(altFieldName) || recursive))
@@ -112,6 +113,13 @@ namespace umbraco
             }
 
             ParseItem(attributes);
+        }
+
+        static string FindAttribute(IDictionary attributes, string key)
+        {
+            key = key.ToLowerInvariant();
+            var attributeValue = attributes.Contains(key) ? attributes[key].ToString() : string.Empty;
+            return MacroRenderer.ParseAttribute(null, attributeValue);
         }
 
         /// <summary>
@@ -160,21 +168,21 @@ namespace umbraco
             using (Current.ProfilingLogger.DebugDuration<item>("Start parsing " + _fieldName))
             {
                 HttpContext.Current.Trace.Write("item", "Start parsing '" + _fieldName + "'");
-                if (helper.FindAttribute(attributes, "textIfEmpty") != "" && _fieldContent == "")
-                    _fieldContent = helper.FindAttribute(attributes, "textIfEmpty");
+                if (FindAttribute(attributes, "textIfEmpty") != "" && _fieldContent == "")
+                    _fieldContent = FindAttribute(attributes, "textIfEmpty");
 
                 _fieldContent = _fieldContent.Trim();
 
                 // DATE FORMATTING FUNCTIONS
-                if (helper.FindAttribute(attributes, "formatAsDateWithTime") == "true")
+                if (FindAttribute(attributes, "formatAsDateWithTime") == "true")
                 {
                     if (_fieldContent == "")
                         _fieldContent = DateTime.Now.ToString();
                     _fieldContent = Convert.ToDateTime(_fieldContent).ToLongDateString() +
-                                    helper.FindAttribute(attributes, "formatAsDateWithTimeSeparator") +
+                                    FindAttribute(attributes, "formatAsDateWithTimeSeparator") +
                                     Convert.ToDateTime(_fieldContent).ToShortTimeString();
                 }
-                else if (helper.FindAttribute(attributes, "formatAsDate") == "true")
+                else if (FindAttribute(attributes, "formatAsDate") == "true")
                 {
                     if (_fieldContent == "")
                         _fieldContent = DateTime.Now.ToString();
@@ -183,7 +191,7 @@ namespace umbraco
 
 
                 // TODO: Needs revision to check if parameter-tags has attributes
-                if (helper.FindAttribute(attributes, "stripParagraph") == "true" && _fieldContent.Length > 5)
+                if (FindAttribute(attributes, "stripParagraph") == "true" && _fieldContent.Length > 5)
                 {
                     _fieldContent = _fieldContent.Trim();
                     string fieldContentLower = _fieldContent.ToLower();
@@ -200,20 +208,20 @@ namespace umbraco
                 }
 
                 // CASING
-                if (helper.FindAttribute(attributes, "case") == "lower")
+                if (FindAttribute(attributes, "case") == "lower")
                     _fieldContent = _fieldContent.ToLower();
-                else if (helper.FindAttribute(attributes, "case") == "upper")
+                else if (FindAttribute(attributes, "case") == "upper")
                     _fieldContent = _fieldContent.ToUpper();
-                else if (helper.FindAttribute(attributes, "case") == "title")
+                else if (FindAttribute(attributes, "case") == "title")
                     _fieldContent = _fieldContent.ToCleanString(CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.PascalCase);
 
                 // OTHER FORMATTING FUNCTIONS
                 
-                if (helper.FindAttribute(attributes, "urlEncode") == "true")
+                if (FindAttribute(attributes, "urlEncode") == "true")
                     _fieldContent = HttpUtility.UrlEncode(_fieldContent);
-                if (helper.FindAttribute(attributes, "htmlEncode") == "true")
+                if (FindAttribute(attributes, "htmlEncode") == "true")
                     _fieldContent = HttpUtility.HtmlEncode(_fieldContent);
-                if (helper.FindAttribute(attributes, "convertLineBreaks") == "true")
+                if (FindAttribute(attributes, "convertLineBreaks") == "true")
                     _fieldContent = _fieldContent.Replace("\n", "<br/>\n");
 
                 HttpContext.Current.Trace.Write("item", "Done parsing '" + _fieldName + "'");

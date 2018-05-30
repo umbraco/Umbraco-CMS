@@ -15,7 +15,7 @@
 * When the website starts you'll see the Umbraco installer and just follow the prompts
 * Your all set!
 
-### Wan't to run from a zip instead?
+### Want to run from a zip instead?
 
 If you just want to try out a few things, you can run the site from a zip file which you can download from here https://github.com/umbraco/Umbraco-CMS/releases/tag/temp8-cg18. 
 
