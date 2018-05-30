@@ -4,16 +4,11 @@ namespace Umbraco.Examine.Config
 {
     public sealed class IndexSets : ConfigurationSection
     {
-
         #region Singleton definition
 
-        protected IndexSets() { }
-        static IndexSets()
-        {
-            Instance = ConfigurationManager.GetSection(SectionName) as IndexSets;
+        private IndexSets() { }
 
-        }
-        public static IndexSets Instance { get; }
+        public static IndexSets Instance { get; } = ConfigurationManager.GetSection(SectionName) as IndexSets;
 
         #endregion
 
