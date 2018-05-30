@@ -74,9 +74,7 @@
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.2.3" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.6" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client">
-      <Version>5.2.6</Version>
-    </PackageReference>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.0" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.0.0" />
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.0.0" />
@@ -86,7 +84,6 @@
     <PackageReference Include="NPoco" Version="3.9.3" />
     <PackageReference Include="Semver" Version="2.0.4" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.8.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
@@ -300,7 +297,7 @@
     <Compile Include="PropertyEditors\MultiNodePickerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MultiNodePickerConfigurationTreeSource.cs" />
     <Compile Include="PropertyEditors\MultiNodeTreePickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MultipleTestStringConfiguration.cs" />
+    <Compile Include="PropertyEditors\MultipleTextStringConfiguration.cs" />
     <Compile Include="PropertyEditors\MultipleTextStringConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\NestedContentConfiguration.cs" />
     <Compile Include="PropertyEditors\NestedContentConfigurationEditor.cs" />

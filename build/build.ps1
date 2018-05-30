@@ -298,10 +298,10 @@
     # copy libs
     Write-Host "Copy SqlCE libraries"
     $nugetPackages = [System.Environment]::ExpandEnvironmentVariables("%userprofile%\.nuget\packages")
-    $this.CopyFiles("$nugetPackages\SqlServerCE\4.0.0.1", "*.*", "$tmp\bin", `
-      { -not $_.Extension.StartsWith(".nu") -and -not $_.RelativeName.StartsWith("lib\") })
-    $this.CopyFiles("$nugetPackages\SqlServerCE\4.0.0.1", "*.*", "$tmp\WebApp\bin", `
-      { -not $_.Extension.StartsWith(".nu") -and -not $_.RelativeName.StartsWith("lib\") })
+    $this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x86\native", "*.*", "$tmp\bin\x86")
+    $this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x64\native", "*.*", "$tmp\bin\amd64")
+    $this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x86\native", "*.*", "$tmp\WebApp\bin\x86")
+    $this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x64\native", "*.*", "$tmp\WebApp\bin\amd64")
 
     # copy Belle
     Write-Host "Copy Belle"
@@ -388,11 +388,6 @@
 
     Write-Host "Create NuGet packages"
 
-    # see https://docs.microsoft.com/en-us/nuget/schema/nuspec
-    # note - warnings about SqlCE native libs being outside of 'lib' folder,
-    # nothing much we can do about it as it's intentional yet there does not
-    # seem to be a way to disable the warning
-
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Core.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
@@ -430,6 +425,8 @@
 
   $ubuild.DefineMethod("Build",
   {
+    $error.Clear()
+
     $this.PrepareBuild()
     if ($this.OnError()) { return }
     $this.RestoreNuGet()

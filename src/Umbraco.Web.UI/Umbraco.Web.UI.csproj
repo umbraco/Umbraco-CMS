@@ -108,9 +108,7 @@
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
     <PackageReference Include="MySql.Data" Version="6.10.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="SqlServerCE" Version="4.0.0.1" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
-    <PackageReference Include="Umbraco.ModelsBuilder" Version="8.0.0-alpha.17" />
+    <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
@@ -120,6 +118,10 @@
     <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
       <Name>Umbraco.Examine</Name>
       <Project>{07FBC26B-2927-4A22-8D96-D644C667FECC}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.ModelsBuilder\Umbraco.ModelsBuilder.csproj">
+      <Project>{7020a059-c0d1-43a0-8efd-23591a0c9af6}</Project>
+      <Name>Umbraco.ModelsBuilder</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651e1350-91b6-44b7-bd60-7207006d7003}</Project>
@@ -604,14 +606,6 @@
     <Message Text="WebPublishingTasks:    $(WebPublishingTasks)" Importance="high" />
     <Message Text="NuGetPackageFolders:   $(NuGetPackageFolders)" Importance="high" />
     <Message Text="NuGetPackages:         $(NuGetPackages)" Importance="high" />
-    <!-- copy SqlCe -->
-    <ItemGroup>
-      <SqlCE64 Include="$(NuGetPackages)SqlServerCE\4.0.0.1\amd64\*.*" />
-      <SqlCE86 Include="$(NuGetPackages)SqlServerCE\4.0.0.1\x86\*.*" />
-    </ItemGroup>
-    <Message Text="Copy SqlCe files to $(TargetDir)" Importance="high" />
-    <Copy SourceFiles="@(SqlCe64)" DestinationFolder="$(TargetDir)amd64" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(SqlCe86)" DestinationFolder="$(TargetDir)x86" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
     <!-- Create web.config file from Template if it doesn't exist -->
     <Message Text="Copy Web.Template.config to Web.config" Importance="high" Condition="!Exists('$(ProjectDir)Web.config')" />
     <Copy SourceFiles="$(ProjectDir)web.Template.config" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Web.config')" />

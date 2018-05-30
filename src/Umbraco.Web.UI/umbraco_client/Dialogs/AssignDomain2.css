@@ -13,10 +13,6 @@ select.language {
     width: 90px;
 }
 
-input.domain {
-    width: 280px;
-}
-
 label.error {
     padding: 0 0 6px 0;
     margin: 0;

@@ -1,3 +1,8 @@
+#
+# Umbraco Cms Git Ignore
+#
+
+# common files
 *.obj
 *.pdb
 *.user
@@ -9,21 +14,29 @@
 *.vs10x
 *.ndproj
 
+# common directories
 .DS_Store
 ._.DS_Store
+.vs/
+/local/
 
-[Bb]in
+# build directories
+[Bb]in/
 [Db]ebug*/
-obj/
 [Rr]elease*/
+obj/
 
+# tools
 _ReSharper*/
-
 _NCrunch_*/
 *.ncrunchsolution
 *.ncrunchsolution.user
 *.ncrunchproject
 *.crunchsolution.cache
+tools/NDepend/
+
+
+
 
 [Tt]est[Rr]esult*
 [Bb]uild[Ll]og.*
@@ -97,7 +110,6 @@ src/Umbraco.Web.UI.Client/[Bb]uild/[Bb]elle/
 src/Umbraco.Web.UI/[Uu]ser[Cc]ontrols/
 
 src/Umbraco.Web.UI.Client/src/[Ll]ess/*.css
-tools/NDepend/
 
 src/Umbraco.Web.UI/App_Plugins/*
 src/*.psess
@@ -146,7 +158,6 @@ apidocs/api/*
 build/docs.zip
 build/ui-docs.zip
 build/csharp-docs.zip
-.vs/
 src/packages/
 src/PrecompiledWeb/*
 
@@ -155,3 +166,7 @@ build.out/
 build.tmp/
 build/hooks/
 build/temp/
+
+
+
+# eof

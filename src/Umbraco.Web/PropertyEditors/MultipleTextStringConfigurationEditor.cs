@@ -8,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents the configuration editor for a multiple testring value editor.
     /// </summary>
-    internal class MultipleTextStringConfigurationEditor : ConfigurationEditor<MultipleTestStringConfiguration>
+    internal class MultipleTextStringConfigurationEditor : ConfigurationEditor<MultipleTextStringConfiguration>
     {
         public MultipleTextStringConfigurationEditor()
         {
@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors
                 Key = "min",
                 View = "requiredfield",
                 Name = "Minimum",
-                PropertyName = nameof(MultipleTestStringConfiguration.Minimum)
+                PropertyName = nameof(MultipleTextStringConfiguration.Minimum)
             });
 
             Fields.Add(new ConfigurationField(new IntegerValidator())
@@ -27,12 +27,12 @@ namespace Umbraco.Web.PropertyEditors
                 Key = "max",
                 View = "requiredfield",
                 Name = "Maximum",
-                PropertyName = nameof(MultipleTestStringConfiguration.Maximum)
+                PropertyName = nameof(MultipleTextStringConfiguration.Maximum)
             });
         }
 
         /// <inheritdoc />
-        public override MultipleTestStringConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, MultipleTestStringConfiguration configuration)
+        public override MultipleTextStringConfiguration FromConfigurationEditor(IDictionary<string, object> editorValues, MultipleTextStringConfiguration configuration)
         {
             // fixme this isn't pretty
             //the values from the editor will be min/max fieds and we need to format to json in one field
@@ -40,7 +40,7 @@ namespace Umbraco.Web.PropertyEditors
             var min = (editorValues.ContainsKey("min") ? editorValues["min"].ToString() : "0").TryConvertTo<int>();
             var max = (editorValues.ContainsKey("max") ? editorValues["max"].ToString() : "0").TryConvertTo<int>();
 
-            return new MultipleTestStringConfiguration
+            return new MultipleTextStringConfiguration
             {
                 Minimum = min ? min.Result : 0,
                 Maximum = max ? max.Result : 0
@@ -48,7 +48,7 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <inheritdoc />
-        public override Dictionary<string, object> ToConfigurationEditor(MultipleTestStringConfiguration configuration)
+        public override Dictionary<string, object> ToConfigurationEditor(MultipleTextStringConfiguration configuration)
         {
             return new Dictionary<string, object>
             {
