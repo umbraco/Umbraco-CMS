@@ -16,14 +16,10 @@ namespace Umbraco.Web.PublishedCache
             get
             {
                 var umbracoContext = _umbracoContextAccessor.UmbracoContext;
-                if (umbracoContext == null) throw new Exception("The IUmbracoContextAccessor could not provide an UmbracoContext.");
-                return umbracoContext.PublishedSnapshot;
+                return umbracoContext?.PublishedSnapshot;
             }
 
-            set
-            {
-                throw new NotSupportedException(); // not ok to set
-            }
+            set => throw new NotSupportedException(); // not ok to set
         }
     }
 }

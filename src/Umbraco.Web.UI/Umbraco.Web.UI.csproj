@@ -485,7 +485,7 @@
     <Content Include="Umbraco\Views\Preview\Radius.cshtml" />
     <Content Include="Umbraco\Views\Preview\Shadow.cshtml" />
     <Content Include="Umbraco\Views\Preview\Slider.cshtml" />
-    <Content Include="Umbraco\Views\Preview\web.config" />
+    <Content Include="Umbraco\Views\web.config" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>

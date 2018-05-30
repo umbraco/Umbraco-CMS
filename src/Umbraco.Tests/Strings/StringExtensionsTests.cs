@@ -58,7 +58,7 @@ namespace Umbraco.Tests.Strings
         [TestCase("hello.txt", "hello")]
         [TestCase("this.is.a.Txt", "this.is.a")]
         [TestCase("this.is.not.a. Txt", "this.is.not.a. Txt")]
-        [TestCase("not a file","not a file")]
+        [TestCase("not a file", "not a file")]
         public void Strip_File_Extension(string input, string result)
         {
             var stripped = input.StripFileExtension();
@@ -149,6 +149,19 @@ namespace Umbraco.Tests.Strings
         public void ToFirstLower(string input, string expected)
         {
             var output = input.ToFirstLower();
+            Assert.AreEqual(expected, output);
+        }
+
+        [TestCase("pineapple", new string[] { "banana", "apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture, true)]
+        [TestCase("PINEAPPLE", new string[] { "banana", "apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture, false)]
+        [TestCase("pineapple", new string[] { "banana", "Apple", "blueberry", "strawberry" }, StringComparison.CurrentCulture, false)]
+        [TestCase("pineapple", new string[] { "banana", "Apple", "blueberry", "strawberry" }, StringComparison.OrdinalIgnoreCase, true)]
+        [TestCase("pineapple", new string[] { "banana", "blueberry", "strawberry" }, StringComparison.OrdinalIgnoreCase, false)]
+        [TestCase("Strawberry unicorn pie", new string[] { "Berry" }, StringComparison.OrdinalIgnoreCase, true)]
+        [TestCase("empty pie", new string[0], StringComparison.OrdinalIgnoreCase, false)]
+        public void ContainsAny(string haystack, IEnumerable<string> needles, StringComparison comparison, bool expected)
+        {
+            bool output = haystack.ContainsAny(needles, comparison);
             Assert.AreEqual(expected, output);
         }
 

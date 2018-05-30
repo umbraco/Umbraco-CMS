@@ -3,15 +3,17 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.MediaVersion)]
+    [TableName(TableName)]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     internal class MediaVersionDto
     {
+        public const string TableName = Constants.DatabaseSchema.Tables.MediaVersion;
+
         [Column("id")]
         [PrimaryKeyColumn(AutoIncrement = false)]
         [ForeignKey(typeof(ContentVersionDto))]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + Constants.DatabaseSchema.Tables.MediaVersion, ForColumns = "id, path")]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_" + TableName, ForColumns = "id, path")]
         public int Id { get; set; }
 
         [Column("path")]

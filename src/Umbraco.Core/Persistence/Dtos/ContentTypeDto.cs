@@ -3,11 +3,13 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.ContentType)]
+    [TableName(TableName)]
     [PrimaryKey("pk")]
     [ExplicitColumns]
     internal class ContentTypeDto
     {
+        public const string TableName = Constants.DatabaseSchema.Tables.ContentType;
+
         [Column("pk")]
         [PrimaryKeyColumn(IdentitySeed = 535)]
         public int PrimaryKey { get; set; }

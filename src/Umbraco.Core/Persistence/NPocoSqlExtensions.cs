@@ -869,11 +869,27 @@ namespace Umbraco.Core.Persistence
 
             var u = new SqlUpd<TDto>(sql.SqlContext);
             u = updates(u);
-            for (var i = 0; i < u.SetExpressions.Count; i++)
+            var first = true;
+            foreach (var setExpression in u.SetExpressions)
             {
-                var setExpression = u.SetExpressions[i];
-                sql.Append(setExpression.Item1 + "=@0" + (i < u.SetExpressions.Count - 1 ? "," : ""), setExpression.Item2);
+                switch (setExpression.Item2)
+                {
+                    case null:
+                        sql.Append((first ? "" : ",") + " " + setExpression.Item1 + "=NULL");
+                        break;
+                    case string s when s == string.Empty:
+                        sql.Append((first ? "" : ",") + " " + setExpression.Item1 + "=''");
+                        break;
+                    default:
+                        sql.Append((first ? "" : ",") + " " + setExpression.Item1 + "=@0", setExpression.Item2);
+                        break;
+                }
+
+                first = false;
             }
+
+            if (!first)
+                sql.Append(" ");
 
             return sql;
         }

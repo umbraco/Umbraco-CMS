@@ -111,6 +111,15 @@ INNER JOIN [dto2] ON [dto1].[id] = [dto2].[dto1id]".NoCrLf(), sql.SQL.NoCrLf());
             Assert.AreEqual("SELECT [dto1].[id] AS [Id] , [dto2].[id] AS [id2]".NoCrLf(), sql.SQL.NoCrLf());
         }
 
+        [Test]
+        public void UpdateTests()
+        {
+            var sql = Sql()
+                .Update<DataTypeDto>(u => u.Set(x => x.EditorAlias, "Umbraco.ColorPicker"))
+                .Where<DataTypeDto>(x => x.EditorAlias == "Umbraco.ColorPickerAlias");
+            sql.WriteToConsole();
+        }
+
         [TableName("dto1")]
         [PrimaryKey("id", AutoIncrement = false)]
         [ExplicitColumns]

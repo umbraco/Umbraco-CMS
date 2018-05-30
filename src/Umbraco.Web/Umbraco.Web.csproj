@@ -1190,9 +1190,6 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\helper.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\item.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1206,9 +1203,6 @@
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\template.cs">
-      <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbracoPageHolder.cs">
       <SubType>Code</SubType>
