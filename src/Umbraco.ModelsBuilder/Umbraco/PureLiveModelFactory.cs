@@ -36,13 +36,16 @@ namespace Umbraco.ModelsBuilder.Umbraco
         private int _ver, _skipver;
         private readonly int _debugLevel;
         private BuildManager _theBuildManager;
+        private readonly Lazy<UmbracoServices> _umbracoServices;
+        private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
         private static readonly Regex AssemblyVersionRegex = new Regex("AssemblyVersion\\(\"[0-9]+.[0-9]+.[0-9]+.[0-9]+\"\\)", RegexOptions.Compiled);
         private const string ProjVirt = "~/App_Data/Models/all.generated.cs";
         private static readonly string[] OurFiles = { "models.hash", "models.generated.cs", "all.generated.cs", "all.dll.path", "models.err" };
 
-        public PureLiveModelFactory(ProfilingLogger logger)
+        public PureLiveModelFactory(Lazy<UmbracoServices> umbracoServices, ProfilingLogger logger)
         {
+            _umbracoServices = umbracoServices;
             _logger = logger;
             _ver = 1; // zero is for when we had no version
             _skipver = -1; // nothing to skip
@@ -161,8 +164,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
 
                 if (_debugLevel > 0)
                     _logger.Logger.Debug<PureLiveModelFactory>("RazorBuildProvider.CodeGenerationStarted");
-                var provider = sender as RazorBuildProvider;
-                if (provider == null) return;
+                if (!(sender is RazorBuildProvider provider)) return;
 
                 // add the assembly, and add a dependency to a text file that will change on each
                 // compilation as in some environments (could not figure which/why) the BuildManager
@@ -309,8 +311,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     .ToDictionary(x => x, File.ReadAllText)
                 : new Dictionary<string, string>();
 
-            var umbraco = ModelsBuilderComponent.Umbraco;
-            var typeModels = umbraco.GetAllTypes();
+            var typeModels = UmbracoServices.GetAllTypes();
             var currentHash = HashHelper.Hash(ourFiles, typeModels);
             var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
             var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");

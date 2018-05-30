@@ -12,14 +12,14 @@ using Umbraco.ModelsBuilder.Configuration;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    public class Application
+    public class UmbracoServices
     {
         private readonly IContentTypeService _contentTypeService;
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IMemberTypeService _memberTypeService;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
 
-        public Application(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory)
+        public UmbracoServices(IContentTypeService contentTypeService, IMediaTypeService mediaTypeService, IMemberTypeService memberTypeService, IPublishedContentTypeFactory publishedContentTypeFactory)
         {
             _contentTypeService = contentTypeService;
             _mediaTypeService = mediaTypeService;

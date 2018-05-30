@@ -11,6 +11,7 @@ using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.ModelsBuilder.Dashboard;
 using Umbraco.Web.Editors;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
@@ -22,8 +23,16 @@ namespace Umbraco.ModelsBuilder.Umbraco
     /// correct CSRF security is adhered to for angular and it also ensures that this controller is not subseptipal to
     /// global WebApi formatters being changed since this is always forced to only return Angular JSON Specific formats.
     /// </remarks>
+    [UmbracoApplicationAuthorize(Core.Constants.Applications.Developer)]
     public class ModelsBuilderBackOfficeController : UmbracoAuthorizedJsonController
     {
+        private readonly UmbracoServices _umbracoServices;
+
+        public ModelsBuilderBackOfficeController(UmbracoServices umbracoServices)
+        {
+            _umbracoServices = umbracoServices;
+        }
+
         // invoked by the dashboard
         // requires that the user is logged into the backoffice and has access to the developer section
         // beware! the name of the method appears in modelsbuilder.controller.js
@@ -93,7 +102,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
             };
         }
 
-        internal static void GenerateModels(string modelsDirectory, string bin)
+        private void GenerateModels(string modelsDirectory, string bin)
+        {
+            GenerateModels(_umbracoServices, modelsDirectory, bin);
+        }
+
+        internal static void GenerateModels(UmbracoServices umbracoServices, string modelsDirectory, string bin)
         {
             if (!Directory.Exists(modelsDirectory))
                 Directory.CreateDirectory(modelsDirectory);
@@ -101,8 +115,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
                 File.Delete(file);
 
-            var umbraco = ModelsBuilderComponent.Umbraco;
-            var typeModels = umbraco.GetAllTypes();
+            var typeModels = umbracoServices.GetAllTypes();
 
             var ourFiles = Directory.GetFiles(modelsDirectory, "*.cs").ToDictionary(x => x, File.ReadAllText);
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(ourFiles);
