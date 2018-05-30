@@ -107,14 +107,14 @@
         <key alias="emptyRecycleBin">Brugeren tømte papirkurven</key>
         <key alias="copy">Brugeren har kopieret indholdet</key>
         <key alias="sendToPublish">Brugeren har sendt indholdet til udgivelse</key>
-        <key alias="contentRollback">Brugeren har returneret indholdet til en tidligere tilstand</key>
+        <key alias="contentRollback">Brugeren har tilbagerullet indholdet til en tidligere tilstand</key>
         <key alias="sortContent">Brugeren har sorteret indholdet</key>
         <key alias="bulkSave">Brugeren har gemt flere sider</key>
         <key alias="deleteByVersion">Brugeren har slettet indholdet efter version</key>
         <key alias="deleteByVersionDate">Brugeren har slettet indholdet efter versiondato</key>
         <key alias="deleteOfType">Brugeren har slettet indhold af typerne %0%</key>
         <key alias="trashedContent">Brugeren har slettet indholdet med id: '%0%' som har en relation til forældresiden med id: '%1%'</key>
-        <key alias="rollbackWithId">Indhold returneret til revision '%0%'</key>
+        <key alias="rollbackWithId">Indhold tilbagerullet til revision '%0%'</key>
         <key alias="copyWithId">Brugeren har kopieret indholdet med id: '%0%' som har en relation til original siden med id: '%1%'</key>
         <key alias="smallCopy">Kopieret</key>
         <key alias="smallPublish">Udgivet</key>
@@ -122,7 +122,7 @@
         <key alias="smallSave">Gemt</key>
         <key alias="smallDelete">Slettet</key>
         <key alias="smallUnPublish">Afpubliceret</key>
-        <key alias="smallRollBack">Afpubliceret</key>
+        <key alias="smallRollBack">Indhold tilbagerullet</key>
     </area>
     <area alias="buttons">
         <key alias="clearSelection">Ryd valg</key>
@@ -217,7 +217,9 @@
         <key alias="parentNotPublishedAnomaly">Upd: dette dokument er udgiver, men er ikke i cachen (intern fejl)</key>
         <key alias="getUrlException">Kunne ikke hente url'en</key>
         <key alias="routeError">Dette dokument er udgivet, men dets url ville kollidere med indholdet %0%</key>
-        <key alias="publish">Udgivet</key>
+        <key alias="publish">Udgiv</key>
+        <key alias="published">Udgivet</key>
+        <key alias="publishedPendingChanges">Udgivet (Ventede ændringer)</key>
         <key alias="publishStatus">Udgivelsesstatus</key>
         <key alias="releaseDate">Udgivelsesdato</key>
         <key alias="unpublishDate">Afpubliceringsdato</key>
@@ -230,6 +232,7 @@
         <key alias="altTextOptional">Alternativ tekst (valgfri)</key>
         <key alias="type">Type</key>
         <key alias="unPublish">Afpublicér</key>
+        <key alias="unpublished">Afpubliceret</key>
         <key alias="updateDate">Sidst redigeret</key>
         <key alias="updateDateDesc" version="7.0">Tidspunkt for seneste redigering</key>
         <key alias="uploadClear">Fjern fil</key>
