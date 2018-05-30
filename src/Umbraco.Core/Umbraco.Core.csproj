@@ -688,6 +688,7 @@
     <Compile Include="PropertyEditors\ValueConverters\DropdownListValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DropdownListWithKeysValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\EmailAddressValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\FlexibleDropdownPropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DecimalValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\LabelValueConverter.cs" />
