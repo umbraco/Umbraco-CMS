@@ -1,9 +1,9 @@
 ﻿namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
-    /// Represents the configuration for a multiple textstring value editor.
+    /// Represents the configuration for a multiple testring value editor.
     /// </summary>
-    public class MultipleTextStringConfiguration
+    public class MultipleTestStringConfiguration
     {
         // fields are configured in the editor
 

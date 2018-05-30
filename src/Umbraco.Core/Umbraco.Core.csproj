@@ -77,6 +77,7 @@
     <PackageReference Include="NPoco" Version="3.9.3" />
     <PackageReference Include="Semver" Version="2.0.4" />
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
     <!--

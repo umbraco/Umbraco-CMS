@@ -16,6 +16,7 @@
     <tags>umbraco</tags>
     <dependencies>
       <dependency id="UmbracoCms.Core" version="[$version$]" />
+      <dependency id="Umbraco.ModelsBuilder" version="[8.0.0-alpha.18, 9.0.0)" />
       <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.2.3, 3.0.0)" />
     </dependencies>
   </metadata>
@@ -31,11 +32,6 @@
     <file src="$BuildTmp$\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
     <file src="$BuildTmp$\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
     <file src="$BuildTmp$\WebApp\Media\Web.config" target="Content\Media\Web.config" />
-
-    <file src="$BuildTmp$\WebApp\App_Plugins\ModelsBuilder\modelsbuilder.htm" target="Content\App_Plugins\ModelsBuilder\modelsbuilder.htm" />
-    <file src="$BuildTmp$\WebApp\App_Plugins\ModelsBuilder\modelsbuilder.controller.js" target="Content\App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
-    <file src="$BuildTmp$\WebApp\App_Plugins\ModelsBuilder\modelsbuilder.resource.js" target="Content\App_Plugins\ModelsBuilder\modelsbuilder.resource.js" />
-    <file src="$BuildTmp$\WebApp\App_Plugins\ModelsBuilder\package.manifest" target="Content\App_Plugins\ModelsBuilder\package.manifest" />
 
     <file src="tools\install.ps1" target="tools\install.ps1" />
     <file src="tools\Readme.txt" target="tools\Readme.txt" />

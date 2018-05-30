@@ -55,7 +55,7 @@ namespace Umbraco.Web.PropertyEditors
                     return null;
                 }
 
-                if (!(editorValue.DataTypeConfiguration is MultipleTextStringConfiguration config))
+                if (!(editorValue.DataTypeConfiguration is MultipleTestStringConfiguration config))
                     throw new Exception("panic");
                 var max = config.Maximum;
 
