@@ -70,7 +70,7 @@ The pull request team consists of a member of Umbraco HQ, [Sebastiaan](https://g
 
 - [Anders Bjerner](https://github.com/abjerner)
 - [Dave Woestenborghs](https://github.com/dawoe)
-- [Emma Burstow](https://github.com/emaburst)
+- [Emma Burstow](https://github.com/emmaburstow)
 - [Kyle Weems](https://github.com/cssquirrel)
 - [Poornima Nayar](https://github.com/poornimanayar)
 
