@@ -90,8 +90,7 @@ function angularHelper($log, $q) {
             // is to inject the $element object and use: $element.inheritedData('$formController');
 
             var form = null;
-            //var requiredFormProps = ["$error", "$name", "$dirty", "$pristine", "$valid", "$invalid", "$addControl", "$removeControl", "$setValidity", "$setDirty"];
-            var requiredFormProps = ["$addControl", "$removeControl", "$setValidity", "$setDirty", "$setPristine"];
+            var requiredFormProps = ["$error", "$name", "$dirty", "$pristine", "$valid", "$submitted", "$pending"];
 
             // a method to check that the collection of object prop names contains the property name expected
             function propertyExists(objectPropNames) {
