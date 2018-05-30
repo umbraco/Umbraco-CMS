@@ -149,7 +149,7 @@ namespace Umbraco.Core.Persistence
 
 #if DEBUG_DATABASES
             // determines the database connection SPID for debugging
-            if (DatabaseType == DBType.MySql)
+            if (DatabaseType.IsMySql())
             {
                 using (var command = connection.CreateCommand())
                 {
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Persistence
                     _spid = Convert.ToInt32(command.ExecuteScalar());
                 }
             }
-            else if (DatabaseType == DBType.SqlServer)
+            else if (DatabaseType.IsSqlServer())
             {
                 using (var command = connection.CreateCommand())
                 {
@@ -183,7 +183,7 @@ namespace Umbraco.Core.Persistence
         }
 
 #if DEBUG_DATABASES
-        public override void OnConnectionClosing(IDbConnection conn)
+        protected override void OnConnectionClosing(DbConnection conn)
         {
             _spid = -1;
             base.OnConnectionClosing(conn);
@@ -212,7 +212,7 @@ namespace Umbraco.Core.Persistence
 
 #if DEBUG_DATABASES
             // detects whether the command is already in use (eg still has an open reader...)
-            DatabaseDebugHelper.SetCommand(cmd, InstanceId + " [T" + Thread.CurrentThread.ManagedThreadId + "]");
+            DatabaseDebugHelper.SetCommand(cmd, InstanceId + " [T" + System.Threading.Thread.CurrentThread.ManagedThreadId + "]");
             var refsobj = DatabaseDebugHelper.GetReferencedObjects(cmd.Connection);
             if (refsobj != null) _logger.Debug<UmbracoDatabase>("Oops!" + Environment.NewLine + refsobj);
 #endif
