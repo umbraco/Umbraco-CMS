@@ -73,7 +73,7 @@
             {
                 "element": "#applications [data-element='section-help']",
                 "title": "Help",
-                "content": "If you ever find yourself in trouble click here to open the help drawer.",
+                "content": "If you ever find yourself in trouble click here to open the Help drawer.",
                 "event": "click",
                 "backdropOpacity": 0.6
             },
@@ -108,7 +108,7 @@
         "steps": [
             {
                 "title": "Create your first Document Type",
-                "content": "<p>Step 1 of any site is to create a <strong>Document Type</strong>.<br> A Document Type is a template for content. For each <em>type</em> of content you want to create you'll create a Document Type. This will define were content based on this Document Type can be created, how many properties it holds and what the input method should be for these properties.</p><p>When you have at least one Document type in place you can start creating content and this content can the be used in a template.</p><p>In this tour you will learn how to set up a basic Document Type with a property to enter a short text.</p>",
+                "content": "<p>Step 1 of any site is to create a <strong>Document Type</strong>.<br> A Document Type is a template for content. For each <em>type</em> of content you want to create you'll create a Document Type. This will define where content based on this Document Type can be created, how many properties it holds and what the input method should be for these properties.</p><p>When you have at least one Document type in place you can start creating content and this content can then be used in a template.</p><p>In this tour you will learn how to set up a basic Document Type with a property to enter a short text.</p>",
                 "type": "intro"
             },
             {
@@ -121,14 +121,14 @@
             {
                 "element": "#tree [data-element='tree-item-documentTypes']",
                 "title": "Create Document Type",
-                "content": "<p>Hover the Document Type tree and click the <b>three small dots</b> to open the <b>context menu</b>.</p>",
+                "content": "<p>Hover over the Document Type tree and click the <b>three small dots</b> to open the <b>context menu</b>.</p>",
                 "event": "click",
                 "eventElement": "#tree [data-element='tree-item-documentTypes'] [data-element='tree-item-options']"
             },
             {
                 "element": "#dialog [data-element='action-documentType']",
                 "title": "Create Document Type",
-                "content": "<p>Click <b>Document Type</b> to create a new document type with a template. The template will be automatically created and set as the default template for this Document Type</p><p>You will use the template in a later tour render content.</p>",
+                "content": "<p>Click <b>Document Type</b> to create a new document type with a template. The template will be automatically created and set as the default template for this Document Type</p><p>You will use the template in a later tour to render content.</p>",
                 "event": "click"
             },
             {
@@ -157,7 +157,7 @@
             {
                 "element": "[data-element='property-add']",
                 "title": "Add a property",
-                "content": "<p>Properties are the different input fields on a content page.</p><p>On our Home Page we wan't to add a welcome text.</p><p>Click <b>Add property</b> to open the property dialog.</p>",
+                "content": "<p>Properties are the different input fields on a content page.</p><p>On our Home Page we want to add a welcome text.</p><p>Click <b>Add property</b> to open the property dialog.</p>",
                 "event": "click"
             },
             {
@@ -181,7 +181,7 @@
                 "element": "[data-element~='overlay-editor-picker']",
                 "elementPreventClick": true,
                 "title": "Editor picker",
-                "content": "<p>In the editor picker dialog we can pick one of the many build in editor.</p><p><em>You can choose from preconfigured data types (Reuse) or create a new configuration (Available editors)</em></p>"
+                "content": "<p>In the editor picker dialog we can pick one of the many built-in editor.</p><p><em>You can choose from preconfigured data types (Reuse) or create a new configuration (Available editors)</em></p>"
             },
             {
                 "element": "[data-element~='overlay-editor-picker'] [data-element='editor-Textarea']",
@@ -193,12 +193,12 @@
                 "element": "[data-element~='overlay-editor-settings']",
                 "elementPreventClick": true,
                 "title": "Editor settings",
-                "content": "Each property editor can have individual settings. For the textarea editor you can set a charachter limit but in this case it is not needed"
+                "content": "Each property editor can have individual settings. For the textarea editor you can set a character limit but in this case it is not needed"
             },
             {
                 "element": "[data-element~='overlay-editor-settings'] [data-element='button-overlaySubmit']",
                 "title": "Save editor",
-                "content": "Click <b>Submit</b> to save the editor.",
+                "content": "Click <b>Submit</b> to save the changes.",
                 "event": "click"
             },
             {
@@ -245,7 +245,7 @@
             {
                 "element": "[data-element='tree-root']",
                 "title": "Open context menu",
-                "content": "<p>Open the context menu by hovering the root of the content section.</p><p>Now click the <b>three small dots</b> to the right.</p>",
+                "content": "<p>Open the context menu by hovering over the root of the content section.</p><p>Now click the <b>three small dots</b> to the right.</p>",
                 "event": "click",
                 "eventElement": "[data-element='tree-root'] [data-element='tree-item-options']"
             },
