@@ -356,7 +356,7 @@ namespace Umbraco.Web
 
             logger.Debug<UmbracoModule>(() => $"Response status: Redirect={(pcr.IsRedirect ? (pcr.IsRedirectPermanent ? "permanent" : "redirect") : "none")}, Is404={(pcr.Is404 ? "true" : "false")}, StatusCode={pcr.ResponseStatusCode}");
 
-            if(pcr.Cacheability != default(HttpCacheability))
+            if(pcr.Cacheability != default)
                 response.Cache.SetCacheability(pcr.Cacheability);
 
             foreach (var cacheExtension in pcr.CacheExtensions)

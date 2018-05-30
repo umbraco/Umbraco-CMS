@@ -29,8 +29,7 @@ namespace Umbraco.Core.Components
         /// <param name="container">The application container.</param>
         public BootLoader(IServiceContainer container)
         {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            _container = container;
+            _container = container ?? throw new ArgumentNullException(nameof(container));
             _proflog = container.GetInstance<ProfilingLogger>();
             _logger = container.GetInstance<ILogger>();
         }
@@ -176,8 +175,7 @@ namespace Umbraco.Core.Components
                 foreach (var attr in componentType.GetCustomAttributes<EnableComponentAttribute>())
                 {
                     var type = attr.EnabledType ?? componentType;
-                    EnableInfo enableInfo;
-                    if (enabled.TryGetValue(type, out enableInfo) == false) enableInfo = enabled[type] = new EnableInfo();
+                    if (enabled.TryGetValue(type, out var enableInfo) == false) enableInfo = enabled[type] = new EnableInfo();
                     var weight = type == componentType ? 1 : 2;
                     if (enableInfo.Weight > weight) continue;
 
@@ -188,8 +186,7 @@ namespace Umbraco.Core.Components
                 {
                     var type = attr.DisabledType ?? componentType;
                     if (type == typeof(UmbracoCoreComponent)) throw new InvalidOperationException("Cannot disable UmbracoCoreComponent.");
-                    EnableInfo enableInfo;
-                    if (enabled.TryGetValue(type, out enableInfo) == false) enableInfo = enabled[type] = new EnableInfo();
+                    if (enabled.TryGetValue(type, out var enableInfo) == false) enableInfo = enabled[type] = new EnableInfo();
                     var weight = type == componentType ? 1 : 2;
                     if (enableInfo.Weight > weight) continue;
 
