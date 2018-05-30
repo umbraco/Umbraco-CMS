@@ -51,6 +51,16 @@ angular.module("umbraco.viewcache", [])
                             var rnd = Umbraco.Sys.ServerVariables.application.cacheBuster;
                             var _op = (url.indexOf("?") > 0) ? "&" : "?";
                             url += _op + "umb__rnd=" + rnd;
+                            if ('serviceWorker' in navigator && window.isSecureContext && Umbraco.Sys.ServerVariables.umbracoSettings) {
+                                navigator.serviceWorker.getRegistration(Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath).then(
+                                    function (reg) {
+                                        if (reg && Umbraco.Sys.ServerVariables.serviceCaches.views) {
+                                            caches.open(Umbraco.Sys.ServerVariables.serviceCaches.views).then(function (cache) {
+                                                cache.add(url);
+                                            });
+                                        }
+                                    });
+                            }
                         }
                         
                         return get(url, config);
