@@ -324,14 +324,14 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 },
                 data: jsonData
             }).
-            success(function (data, status, headers, config) {
+            then(function (response) {
                 if (successCallback) {
-                    successCallback.apply(this, [data, status, headers, config]);
+                    successCallback.apply(this, [response.data, response.status, response.headers, response.config]);
                 }
             }).
-            error(function (data, status, headers, config) {
+            catch(function (response) {
                 if (failureCallback) {
-                    failureCallback.apply(this, [data, status, headers, config]);
+                    failureCallback.apply(this, [response.data, response.status, response.headers, response.config]);
                 }
             });
         },
