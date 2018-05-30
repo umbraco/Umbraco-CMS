@@ -1,4 +1,4 @@
-﻿[
+[
     {
         "name": "Introduction",
         "alias": "umbIntroIntroduction",
@@ -73,7 +73,7 @@
             {
                 "element": "#applications [data-element='section-help']",
                 "title": "Help",
-                "content": "If you ever find yourself in trouble click here to open the help drawer.",
+                "content": "If you ever find yourself in trouble click here to open the Help drawer.",
                 "event": "click",
                 "backdropOpacity": 0.6
             },
@@ -181,7 +181,7 @@
                 "element": "[data-element~='overlay-editor-picker']",
                 "elementPreventClick": true,
                 "title": "Editor picker",
-                "content": "<p>In the editor picker dialog we can pick one of the many built in editors.</p><p><em>You can choose from preconfigured data types (Reuse) or create a new configuration (Available editors)</em>.</p>"
+                "content": "<p>In the editor picker dialog we can pick one of the many built-in editors.</p><p><em>You can choose from preconfigured data types (Reuse) or create a new configuration (Available editors)</em>.</p>"
             },
             {
                 "element": "[data-element~='overlay-editor-picker'] [data-element='editor-Textarea']",
@@ -198,7 +198,7 @@
             {
                 "element": "[data-element~='overlay-editor-settings'] [data-element='button-overlaySubmit']",
                 "title": "Save editor",
-                "content": "Click <b>Submit</b> to save the editor.",
+                "content": "Click <b>Submit</b> to save the changes.",
                 "event": "click"
             },
             {
