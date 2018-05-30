@@ -39,6 +39,12 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
         },
         link: function (scope, element, attr, formCtrl) {
 
+
+            /*
+            FIXME: This is commented out because it caused this error 
+            http://uixdk.com/angular/docs/error/ng/cpws
+            resulting in an endless digest loop for all editors
+
             scope.$watch(function () {
                 return formCtrl.$error;
             }, function (e) {
@@ -127,6 +133,7 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
             $timeout(function(){
                 formCtrl.$setPristine();
             }, 1000);
+            */
         }
     };
 }
