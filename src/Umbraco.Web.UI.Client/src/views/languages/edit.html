@@ -25,7 +25,7 @@
                             <select name="newLang"
                                     class="input-block-level"
                                     ng-model="vm.language.culture"
-                                    ng-options="key as value for (key, value) in vm.availableCultures"
+                                    ng-options="culture.name as culture.displayName for culture in vm.availableCultures"
                                     val-server-field="IsoCode"
                                     required></select>
                             <span class="help-inline" val-msg-for="newLang" val-toggle-msg="required">Required</span>
