@@ -307,13 +307,6 @@ namespace Umbraco.Tests.Clr
 
             setterInt4(object4, 42);
             Assert.AreEqual(42, object4.IntValue);
-
-            // converting works
-            setterInt4(object4, 42.0);
-            Assert.AreEqual(42, object4.IntValue);
-
-            // unsafe is... unsafe
-            Assert.Throws<FormatException>(() => setterInt4(object4, "foo"));
         }
 
         [Test]
