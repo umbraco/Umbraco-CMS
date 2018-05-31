@@ -199,7 +199,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "logApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LogController>(
-                                controller => controller.GetEntityLog(0))
+                                controller => controller.GetPagedEntityLog(0, 0, 0, Core.Persistence.DatabaseModelDefinitions.Direction.Ascending, null))
                         },
                         {
                             "memberApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<MemberController>(
