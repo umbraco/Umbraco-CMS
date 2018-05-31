@@ -121,6 +121,7 @@
     <Compile Include="Editors\EditorValidatorCollection.cs" />
     <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />
     <Compile Include="Editors\EditorValidatorOfT.cs" />
+    <Compile Include="Editors\ExamineManagementController.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
     <Compile Include="Editors\HelpController.cs" />
     <Compile Include="Editors\IsCurrentUserModelFilterAttribute.cs" />
