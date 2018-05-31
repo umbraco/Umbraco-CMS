@@ -162,7 +162,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional id of the user creating the content</param>
         /// <returns><see cref="IContent"/></returns>
-        public IContent Create(string name, Guid parentId, string contentTypeAlias, int userId = 0)
+        public IContent Create(string name, Guid parentId, string contentTypeAlias, int userId = -1)
         {
             //fixme - what about culture?
 
@@ -182,7 +182,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="contentTypeAlias">The alias of the content type.</param>
         /// <param name="userId">The optional id of the user creating the content.</param>
         /// <returns>The content object.</returns>
-        public IContent Create(string name, int parentId, string contentTypeAlias, int userId = 0)
+        public IContent Create(string name, int parentId, string contentTypeAlias, int userId = -1)
         {
             //fixme - what about culture?
 
@@ -215,7 +215,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="contentTypeAlias">The alias of the content type.</param>
         /// <param name="userId">The optional id of the user creating the content.</param>
         /// <returns>The content object.</returns>
-        public IContent Create(string name, IContent parent, string contentTypeAlias, int userId = 0)
+        public IContent Create(string name, IContent parent, string contentTypeAlias, int userId = -1)
         {
             //fixme - what about culture?
 
@@ -246,7 +246,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="contentTypeAlias">The alias of the content type.</param>
         /// <param name="userId">The optional id of the user creating the content.</param>
         /// <returns>The content object.</returns>
-        public IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = 0)
+        public IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = -1)
         {
             //fixme - what about culture?
 
@@ -280,7 +280,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="contentTypeAlias">The alias of the content type.</param>
         /// <param name="userId">The optional id of the user creating the content.</param>
         /// <returns>The content object.</returns>
-        public IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = 0)
+        public IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = -1)
         {
             //fixme - what about culture?
 
@@ -858,7 +858,7 @@ namespace Umbraco.Core.Services.Implement
         // fixme - kill all those raiseEvents
 
         /// <inheritdoc />
-        public OperationResult Save(IContent content, int userId = 0, bool raiseEvents = true)
+        public OperationResult Save(IContent content, int userId = -1, bool raiseEvents = true)
         {
             var publishedState = content.PublishedState;
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
@@ -900,7 +900,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public OperationResult Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true)
+        public OperationResult Save(IEnumerable<IContent> contents, int userId = -1, bool raiseEvents = true)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var contentsA = contents.ToArray();
@@ -942,7 +942,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public PublishResult SaveAndPublish(IContent content, int userId = 0, bool raiseEvents = true)
+        public PublishResult SaveAndPublish(IContent content, int userId = -1, bool raiseEvents = true)
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublishResult result;
@@ -1026,7 +1026,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public UnpublishResult Unpublish(IContent content, string culture = null, string segment = null, int userId = 0)
+        public UnpublishResult Unpublish(IContent content, string culture = null, string segment = null, int userId = -1)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -1189,7 +1189,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = null, string segment = null, int userId = 0)
+        public IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = null, string segment = null, int userId = -1)
         {
             segment = segment?.ToLowerInvariant();
 
@@ -1201,7 +1201,7 @@ namespace Umbraco.Core.Services.Implement
 
         /// <inheritdoc />
         public IEnumerable<PublishResult> SaveAndPublishBranch(IContent document, bool force,
-            Func<IContent, bool> editing, Func<IContent, bool> publishValues, int userId = 0)
+            Func<IContent, bool> editing, Func<IContent, bool> publishValues, int userId = -1)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var results = new List<PublishResult>();
@@ -1372,7 +1372,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="id">Id of the <see cref="IContent"/> object to delete versions from</param>
         /// <param name="versionDate">Latest version date</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        public void DeleteVersions(int id, DateTime versionDate, int userId = 0)
+        public void DeleteVersions(int id, DateTime versionDate, int userId = -1)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1402,7 +1402,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="versionId">Id of the version to delete</param>
         /// <param name="deletePriorVersions">Boolean indicating whether to delete versions prior to the versionId</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
-        public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = 0)
+        public void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = -1)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1489,7 +1489,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="content">The <see cref="IContent"/> to move</param>
         /// <param name="parentId">Id of the Content's new Parent</param>
         /// <param name="userId">Optional Id of the User moving the Content</param>
-        public void Move(IContent content, int parentId, int userId = 0)
+        public void Move(IContent content, int parentId, int userId = -1)
         {
             // if moving to the recycle bin then use the proper method
             if (parentId == Constants.System.RecycleBinContent)
@@ -1660,7 +1660,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="relateToOriginal">Boolean indicating whether the copy should be related to the original</param>
         /// <param name="userId">Optional Id of the User copying the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
-        public IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = 0)
+        public IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = -1)
         {
             return Copy(content, parentId, relateToOriginal, true, userId);
         }
@@ -1675,7 +1675,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="recursive">A value indicating whether to recursively copy children.</param>
         /// <param name="userId">Optional Id of the User copying the Content</param>
         /// <returns>The newly created <see cref="IContent"/> object</returns>
-        public IContent Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = 0)
+        public IContent Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = -1)
         {
             var copy = content.DeepCloneWithResetIdentities();
             copy.ParentId = parentId;
@@ -1771,7 +1771,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="content">The <see cref="IContent"/> to send to publication</param>
         /// <param name="userId">Optional Id of the User issueing the send to publication</param>
         /// <returns>True if sending publication was succesfull otherwise false</returns>
-        public bool SendToPublication(IContent content, int userId = 0)
+        public bool SendToPublication(IContent content, int userId = -1)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1806,7 +1806,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId"></param>
         /// <param name="raiseEvents"></param>
         /// <returns>True if sorting succeeded, otherwise False</returns>
-        public bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true)
+        public bool Sort(IEnumerable<IContent> items, int userId = -1, bool raiseEvents = true)
         {
             var itemsA = items.ToArray();
             if (itemsA.Length == 0) return true;
@@ -1833,7 +1833,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId"></param>
         /// <param name="raiseEvents"></param>
         /// <returns>True if sorting succeeded, otherwise False</returns>
-        public bool Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true)
+        public bool Sort(IEnumerable<int> ids, int userId = -1, bool raiseEvents = true)
         {
             var idsA = ids.ToArray();
             if (idsA.Length == 0) return true;
@@ -2211,7 +2211,7 @@ namespace Umbraco.Core.Services.Implement
         /// </remarks>
         /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
-        public void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = 0)
+        public void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = -1)
         {
             //TODO: This currently this is called from the ContentTypeService but that needs to change,
             // if we are deleting a content type, we should just delete the data and do this operation slightly differently.
@@ -2287,7 +2287,7 @@ namespace Umbraco.Core.Services.Implement
         /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
         /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional id of the user deleting the media</param>
-        public void DeleteOfType(int contentTypeId, int userId = 0)
+        public void DeleteOfType(int contentTypeId, int userId = -1)
         {
             DeleteOfTypes(new[] { contentTypeId }, userId);
         }
@@ -2345,7 +2345,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void SaveBlueprint(IContent content, int userId = 0)
+        public void SaveBlueprint(IContent content, int userId = -1)
         {
             //always ensure the blueprint is at the root
             if (content.ParentId != -1)
@@ -2376,7 +2376,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void DeleteBlueprint(IContent content, int userId = 0)
+        public void DeleteBlueprint(IContent content, int userId = -1)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -2387,7 +2387,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = 0)
+        public IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = -1)
         {
             if (blueprint == null) throw new ArgumentNullException(nameof(blueprint));
 
@@ -2421,7 +2421,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = 0)
+        public void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = -1)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -2448,7 +2448,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void DeleteBlueprintsOfType(int contentTypeId, int userId = 0)
+        public void DeleteBlueprintsOfType(int contentTypeId, int userId = -1)
         {
             DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
         }

@@ -102,7 +102,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreationDate))
                 .ForMember(dest => dest.UpdateDate, opt => opt.MapFrom(src => src.LastActivityDate))
                 .ForMember(dest => dest.Key, opt => opt.MapFrom(src => src.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
-                .ForMember(dest => dest.Owner, opt => opt.UseValue(new UserProfile {Name = "Admin", UserId = 0}))
+                .ForMember(dest => dest.Owner, opt => opt.UseValue(new UserProfile {Name = "Admin", UserId = -1 }))
                 .ForMember(dest => dest.Icon, opt => opt.UseValue("icon-user"))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.UserName))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))

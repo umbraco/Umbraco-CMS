@@ -196,12 +196,12 @@ namespace Umbraco.Tests.TestHelpers
 
             public Dictionary<int, IDataType> DataTypes { get; }
 
-            public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = 0)
+            public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = -1)
             {
                 throw new NotImplementedException();
             }
 
-            public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = 0)
+            public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = -1)
             {
                 throw new NotImplementedException();
             }
@@ -231,12 +231,12 @@ namespace Umbraco.Tests.TestHelpers
                 throw new NotImplementedException();
             }
 
-            public Attempt<OperationResult> DeleteContainer(int containerId, int userId = 0)
+            public Attempt<OperationResult> DeleteContainer(int containerId, int userId = -1)
             {
                 throw new NotImplementedException();
             }
 
-            public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = 0)
+            public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = -1)
             {
                 throw new NotImplementedException();
             }
@@ -263,12 +263,12 @@ namespace Umbraco.Tests.TestHelpers
                 return ids.Select(x => DataTypes.TryGetValue(x, out var dataType) ? dataType : null).WhereNotNull();
             }
 
-            public void Save(IDataType dataType, int userId = 0)
+            public void Save(IDataType dataType, int userId = -1)
             {
                 throw new NotImplementedException();
             }
 
-            public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = 0)
+            public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = -1)
             {
                 throw new NotImplementedException();
             }
@@ -278,7 +278,7 @@ namespace Umbraco.Tests.TestHelpers
                 throw new NotImplementedException();
             }
 
-            public void Delete(IDataType dataType, int userId = 0)
+            public void Delete(IDataType dataType, int userId = -1)
             {
                 throw new NotImplementedException();
             }

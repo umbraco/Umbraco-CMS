@@ -309,7 +309,7 @@ namespace Umbraco.Core.Packaging
                 }).ToArray();
         }
 
-        private IEnumerable<IContent> InstallDocuments(XElement documentsElement, int userId = 0)
+        private IEnumerable<IContent> InstallDocuments(XElement documentsElement, int userId = -1)
         {
             if ((string.Equals(Constants.Packaging.DocumentSetNodeName, documentsElement.Name.LocalName) == false)
                 && (string.Equals(Constants.Packaging.DocumentsNodeName, documentsElement.Name.LocalName) == false))
@@ -341,7 +341,7 @@ namespace Umbraco.Core.Packaging
             throw new NotImplementedException("The packaging service do not yes have a method for importing stylesheets");
         }
 
-        private IEnumerable<IContentType> InstallDocumentTypes(XElement documentTypes, int userId = 0)
+        private IEnumerable<IContentType> InstallDocumentTypes(XElement documentTypes, int userId = -1)
         {
             if (string.Equals(Constants.Packaging.DocumentTypesNodeName, documentTypes.Name.LocalName) == false)
             {
@@ -355,7 +355,7 @@ namespace Umbraco.Core.Packaging
             return _packagingService.ImportContentTypes(documentTypes, userId);
         }
 
-        private IEnumerable<ITemplate> InstallTemplats(XElement templateElement, int userId = 0)
+        private IEnumerable<ITemplate> InstallTemplats(XElement templateElement, int userId = -1)
         {
             if (string.Equals(Constants.Packaging.TemplatesNodeName, templateElement.Name.LocalName) == false)
             {
@@ -382,7 +382,7 @@ namespace Umbraco.Core.Packaging
                     sd => new KeyValuePair<string, string>(sd.Key, Path.Combine(fullpathToRoot, sd.Value))).ToArray();
         }
 
-        private IEnumerable<IMacro> InstallMacros(XElement macroElements, int userId = 0)
+        private IEnumerable<IMacro> InstallMacros(XElement macroElements, int userId = -1)
         {
             if (string.Equals(Constants.Packaging.MacrosNodeName, macroElements.Name.LocalName) == false)
             {
@@ -403,7 +403,7 @@ namespace Umbraco.Core.Packaging
             return _packagingService.ImportDictionaryItems(dictionaryItemsElement);
         }
 
-        private IEnumerable<ILanguage> InstallLanguages(XElement languageElement, int userId = 0)
+        private IEnumerable<ILanguage> InstallLanguages(XElement languageElement, int userId = -1)
         {
             if (string.Equals(Constants.Packaging.LanguagesNodeName, languageElement.Name.LocalName) == false)
             {
@@ -412,7 +412,7 @@ namespace Umbraco.Core.Packaging
             return _packagingService.ImportLanguages(languageElement, userId);
         }
 
-        private IEnumerable<IDataType> InstallDataTypes(XElement dataTypeElements, int userId = 0)
+        private IEnumerable<IDataType> InstallDataTypes(XElement dataTypeElements, int userId = -1)
         {
             if (string.Equals(Constants.Packaging.DataTypesNodeName, dataTypeElements.Name.LocalName) == false)
             {
