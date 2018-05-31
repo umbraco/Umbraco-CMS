@@ -2126,6 +2126,13 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="notificationEmailsCheckErrorMessage"><![CDATA[Notification email is still set to the default value of <strong>%0%</strong>.]]></key>
         <key alias="scheduledHealthCheckEmailBody"><![CDATA[<html><body><p>Results of the scheduled Umbraco Health Checks run on %0% at %1% are as follows:</p>%2%</body></html>]]></key>
         <key alias="scheduledHealthCheckEmailSubject">Umbraco Health Check Status</key>
+
+        <key alias="developerFilesInRootFound"><![CDATA[The following developer related files where found in the root of your website: <ul><li>%0%</li></ul>]]></key>
+        <key alias="developerFilesInRootNotFound">No undesirable developer files where found in the root of your website.</key>
+        <key alias="developerFilesInRootActionButton">Delete these files</key>
+        <key alias="developerFilesInRootActionDescription"><![CDATA[Ideally you should manually move these files outside of your website folder so they are not accessible. However you can also delete these files from your site but <b>please ensure you have a back up copy of these files as their is no recovery option</b>.]]></key>
+        <key alias="developerFilesRemovedFromRoot">Deleted developer files from the root of your site.</key>
+
     </area>
     <area alias="redirectUrls">
         <key alias="disableUrlTracker">Disable URL tracker</key>
