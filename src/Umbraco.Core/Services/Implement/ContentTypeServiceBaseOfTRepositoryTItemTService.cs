@@ -924,7 +924,8 @@ namespace Umbraco.Core.Services.Implement
                     _containerRepository.Save(container);
                     scope.Complete();
 
-                    OnRenamedContainer(scope, new SaveEventArgs<EntityContainer>(container, evtMsgs));
+                    var saveEventArgs = new SaveEventArgs<EntityContainer>(container, evtMsgs) {CanCancel = false};
+                    OnRenamedContainer(scope, saveEventArgs);
 
                     return OperationResult.Attempt.Succeed(OperationResultType.Success, evtMsgs, container);
                 }

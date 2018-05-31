@@ -114,13 +114,13 @@ namespace Umbraco.Core.Services.Implement
 
         protected void OnSavedContainer(IScope scope, SaveEventArgs<EntityContainer> args)
         {
-            scope.Events.DispatchCancelable(SavedContainer, This, args);
+            scope.Events.Dispatch(SavedContainer, This, args);
         }
 
         protected void OnRenamedContainer(IScope scope, SaveEventArgs<EntityContainer> args)
         {
             // fixme changing the name of the event?!
-            scope.Events.DispatchCancelable(SavedContainer, This, args, "RenamedContainer");
+            scope.Events.Dispatch(SavedContainer, This, args, "RenamedContainer");
         }
 
         // fixme what is this?
