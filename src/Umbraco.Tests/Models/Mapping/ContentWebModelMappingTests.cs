@@ -46,7 +46,7 @@ namespace Umbraco.Tests.Models.Mapping
             // v8 is changing this, so the test would report a <null> creator
             // temp. fixing by assigning super here
             //
-            content.CreatorId = Constants.Security.SuperId;
+            content.CreatorId = Constants.Security.SuperUserId;
         }
 
         [Test]
@@ -223,7 +223,7 @@ namespace Umbraco.Tests.Models.Mapping
             if (ownerId != 0)
             {
                 Assert.IsNotNull(result.Owner);
-                Assert.AreEqual(Constants.Security.SuperId, result.Owner.UserId);
+                Assert.AreEqual(Constants.Security.SuperUserId, result.Owner.UserId);
                 Assert.AreEqual("Administrator", result.Owner.Name);
             }
             else

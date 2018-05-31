@@ -10,6 +10,7 @@ namespace Umbraco.Core.Persistence.Dtos
     internal class ContentVersionCultureVariationDto
     {
         public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCultureVariation;
+        private int? _publishedUserId;
 
         [Column("id")]
         [PrimaryKeyColumn]
@@ -38,7 +39,8 @@ namespace Umbraco.Core.Persistence.Dtos
         // fixme want?
         [Column("availableUserId")]
         [ForeignKey(typeof(UserDto))]
-        public int PublishedUserId { get; set; }
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public int? PublishedUserId { get => _publishedUserId == 0 ? null : _publishedUserId; set => _publishedUserId = value; } //return null if zero
 
         [Column("edited")]
         public bool Edited { get; set; }

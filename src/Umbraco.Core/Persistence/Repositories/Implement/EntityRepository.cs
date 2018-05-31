@@ -847,7 +847,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             entity.Trashed = dto.Trashed;
             entity.CreateDate = dto.CreateDate;
-            entity.CreatorId = dto.UserId ?? 0;
+            entity.CreatorId = dto.UserId ?? Constants.Security.UnknownUserId;
             entity.Id = dto.NodeId;
             entity.Key = dto.UniqueId;
             entity.Level = dto.Level;

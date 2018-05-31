@@ -208,7 +208,7 @@ namespace Umbraco.Web.Editors
             {
                 // only super can see super - but don't use IsSuper, cannot be mapped to SQL - fixme NOW
                 //filterQuery.Where(x => !x.IsSuper());
-                filterQuery.Where(x => x.Id != Constants.Security.SuperId);
+                filterQuery.Where(x => x.Id != Constants.Security.SuperUserId);
             }
 
             if (filter.IsNullOrWhiteSpace() == false)

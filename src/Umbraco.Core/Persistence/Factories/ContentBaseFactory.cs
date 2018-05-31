@@ -38,8 +38,8 @@ namespace Umbraco.Core.Persistence.Factories
                 content.SortOrder = nodeDto.SortOrder;
                 content.Trashed = nodeDto.Trashed;
 
-                content.CreatorId = nodeDto.UserId ?? 0;
-                content.WriterId = contentVersionDto.UserId;
+                content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
+                content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
                 content.CreateDate = nodeDto.CreateDate;
                 content.UpdateDate = contentVersionDto.VersionDate;
 
@@ -96,8 +96,8 @@ namespace Umbraco.Core.Persistence.Factories
                 content.SortOrder = nodeDto.SortOrder;
                 content.Trashed = nodeDto.Trashed;
 
-                content.CreatorId = nodeDto.UserId ?? 0;
-                content.WriterId = contentVersionDto.UserId;
+                content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
+                content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
                 content.CreateDate = nodeDto.CreateDate;
                 content.UpdateDate = contentVersionDto.VersionDate;
 
@@ -137,8 +137,8 @@ namespace Umbraco.Core.Persistence.Factories
                 content.SortOrder = nodeDto.SortOrder;
                 content.Trashed = nodeDto.Trashed;
 
-                content.CreatorId = nodeDto.UserId ?? 0;
-                content.WriterId = contentVersionDto.UserId;
+                content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
+                content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
                 content.CreateDate = nodeDto.CreateDate;
                 content.UpdateDate = contentVersionDto.VersionDate;
 
