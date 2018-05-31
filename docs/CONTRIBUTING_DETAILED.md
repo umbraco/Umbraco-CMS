@@ -36,7 +36,7 @@ Before creating bug reports, please check [this list](#before-submitting-a-bug-r
   * **Use the Google**. Whatever you're experiencing, Google it plus "Umbraco" - usually you can get some pretty good hints from the search results, including open issues and further troubleshooting hints.
   * If you do find and existing issue has **and the issue is still open**, add a comment to the existing issue if you have additional information. If you have the same problem and no new info to add, just "star" the issue.
 
-Explain the problem and include additional details to help maintainers reproduce the problem. The following is a long description which we've boiled down into a few very simple question in the issue tracker when you create a new issue. We're listing the following hints to indicate that the most successful reports usually have a lot of this ground covered:
+Explain the problem and include additional details to help maintainers reproduce the problem. The following is a long description which we've boiled down into a few very simple questions in the issue tracker when you create a new issue. We're listing the following hints to indicate that the most successful reports usually have a lot of this ground covered:
 
   * **Use a clear and descriptive title** for the issue to identify the problem.
   * **Describe the exact steps which reproduce the problem** in as many details as possible. For example, start by explaining which steps you took in the backoffice to get to a certain undesireable result, e.g. you created a document type, inherting 3 levels deep, added a certain datatype, tried to save it and you got an error.
@@ -58,7 +58,7 @@ Include details about your configuration and environment:
 
 ### Suggesting Enhancements
 
-This section guides you through submitting an enhancement suggestion for Atom, including completely new features and minor improvements to existing functionality. Following these guidelines helps maintainers and the community understand your suggestion 📝 and find related suggestions 🔎.
+This section guides you through submitting an enhancement suggestion for Umbraco, including completely new features and minor improvements to existing functionality. Following these guidelines helps maintainers and the community understand your suggestion 📝 and find related suggestions 🔎.
 
 Most of the suggestions in the [reporting bugs](#reporting-bugs) section also count for suggesting enhancements.
 

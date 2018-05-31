@@ -1,5 +1,4 @@
 _Looking for Umbraco version 8? [Click here](https://github.com/umbraco/Umbraco-CMS/blob/temp8/CONTRIBUTING.md) to go to the v8 branch_
-
 # Contributing to Umbraco CMS
 
 👍🎉 First off, thanks for taking the time to contribute! 🎉👍
@@ -93,7 +92,7 @@ This project and everyone participating in it is governed by the [our Code of Co
 
 ## Contributing to Umbraco, in depth
 
-There are other ways to contribute, 
+There are other ways to contribute, and there's a few more things that you might be wondering about. We will answer the [most common questions and ways to contribute in our detailed documentation](CONTRIBUTING_DETAILED.md).
 
 ## Credits
 
