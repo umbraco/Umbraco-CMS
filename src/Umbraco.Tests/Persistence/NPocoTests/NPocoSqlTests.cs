@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Persistence;
@@ -292,6 +293,25 @@ namespace Umbraco.Tests.Persistence.NPocoTests
             Assert.That(sql.SQL, Is.EqualTo(expected.SQL));
 
             Debug.Print(sql.SQL);
+        }
+
+        [Test]
+        public void ForUpdate()
+        {
+            var sessionId = Guid.NewGuid();
+
+            var sql = Sql()
+                .SelectAll()
+                .From<UserLoginDto>()
+                .Where<UserLoginDto>(x => x.SessionId == sessionId);
+
+            sql.WriteToConsole();
+            Assert.AreEqual("SELECT * FROM [umbracoUserLogin] WHERE (([umbracoUserLogin].[sessionId] = @0))", sql.SQL.NoCrLf());
+
+            sql = sql.ForUpdate();
+
+            sql.WriteToConsole();
+            Assert.AreEqual("SELECT * FROM [umbracoUserLogin] WITH (UPDLOCK) WHERE (([umbracoUserLogin].[sessionId] = @0))", sql.SQL.NoCrLf());
         }
     }
 }

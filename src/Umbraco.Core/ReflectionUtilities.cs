@@ -21,6 +21,96 @@ namespace Umbraco.Core
     /// </remarks>
     public static partial class ReflectionUtilities
     {
+        #region Fields
+
+        /// <summary>
+        /// Emits a field getter.
+        /// </summary>
+        /// <typeparam name="TDeclaring">The declaring type.</typeparam>
+        /// <typeparam name="TValue">The field type.</typeparam>
+        /// <param name="fieldName">The name of the field.</param>
+        /// <returns>A field getter function.</returns>
+        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="fieldName"/> is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Occurs when the field does not exist.</exception>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TValue"/> does not match the type of the field.</exception>
+        public static Func<TDeclaring, TValue> EmitFieldGetter<TDeclaring, TValue>(string fieldName)
+        {
+            var field = GetField<TDeclaring, TValue>(fieldName);
+            return EmitFieldGetter<TDeclaring, TValue>(field);
+        }
+
+        /// <summary>
+        /// Emits a field setter.
+        /// </summary>
+        /// <typeparam name="TDeclaring">The declaring type.</typeparam>
+        /// <typeparam name="TValue">The field type.</typeparam>
+        /// <param name="fieldName">The name of the field.</param>
+        /// <returns>A field setter action.</returns>
+        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="fieldName"/> is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Occurs when the field does not exist.</exception>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TValue"/> does not match the type of the field.</exception>
+        public static Action<TDeclaring, TValue> EmitFieldSetter<TDeclaring, TValue>(string fieldName)
+        {
+            var field = GetField<TDeclaring, TValue>(fieldName);
+            return EmitFieldSetter<TDeclaring, TValue>(field);
+        }
+
+        /// <summary>
+        /// Emits a field getter and setter.
+        /// </summary>
+        /// <typeparam name="TDeclaring">The declaring type.</typeparam>
+        /// <typeparam name="TValue">The field type.</typeparam>
+        /// <param name="fieldName">The name of the field.</param>
+        /// <returns>A field getter and setter functions.</returns>
+        /// <exception cref="ArgumentNullOrEmptyException">Occurs when <paramref name="fieldName"/> is null or empty.</exception>
+        /// <exception cref="InvalidOperationException">Occurs when the field does not exist.</exception>
+        /// <exception cref="ArgumentException">Occurs when <typeparamref name="TValue"/> does not match the type of the field.</exception>
+        public static (Func<TDeclaring, TValue>, Action<TDeclaring, TValue>) EmitFieldGetterAndSetter<TDeclaring, TValue>(string fieldName)
+        {
+            var field = GetField<TDeclaring, TValue>(fieldName);
+            return (EmitFieldGetter<TDeclaring, TValue>(field), EmitFieldSetter<TDeclaring, TValue>(field));
+        }
+
+        private static FieldInfo GetField<TDeclaring, TValue>(string fieldName)
+        {
+            if (string.IsNullOrWhiteSpace(fieldName)) throw new ArgumentNullOrEmptyException(nameof(fieldName));
+
+            // get the field
+            var field = typeof(TDeclaring).GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (field == null) throw new InvalidOperationException($"Could not find field {typeof(TDeclaring)}.{fieldName}.");
+
+            // validate field type
+            if (field.FieldType != typeof(TValue)) // strict
+                throw new ArgumentException($"Value type {typeof(TValue)} does not match field {typeof(TDeclaring)}.{fieldName} type {field.FieldType}.");
+
+            return field;
+        }
+
+        private static Func<TDeclaring, TValue> EmitFieldGetter<TDeclaring, TValue>(FieldInfo field)
+        {
+            // emit
+            var (dm, ilgen) = CreateIlGenerator(field.DeclaringType?.Module, new [] { typeof(TDeclaring) }, typeof(TValue));
+            ilgen.Emit(OpCodes.Ldarg_0);
+            ilgen.Emit(OpCodes.Ldfld, field);
+            ilgen.Return();
+
+            return (Func<TDeclaring, TValue>) (object) dm.CreateDelegate(typeof(Func<TDeclaring, TValue>));
+        }
+
+        private static Action<TDeclaring, TValue> EmitFieldSetter<TDeclaring, TValue>(FieldInfo field)
+        {
+            // emit
+            var (dm, ilgen) = CreateIlGenerator(field.DeclaringType?.Module, new [] { typeof(TDeclaring), typeof(TValue) }, typeof(void));
+            ilgen.Emit(OpCodes.Ldarg_0);
+            ilgen.Emit(OpCodes.Ldarg_1);
+            ilgen.Emit(OpCodes.Stfld, field);
+            ilgen.Return();
+
+            return (Action<TDeclaring, TValue>) (object) dm.CreateDelegate(typeof(Action<TDeclaring, TValue>));
+        }
+
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -207,7 +297,7 @@ namespace Umbraco.Core
         /// is specified and does not match the function's returned type.</exception>
         public static TLambda EmitCtor<TLambda>(bool mustExist = true, Type declaring = null)
         {
-            (_, var lambdaParameters, var lambdaReturned) = AnalyzeLambda<TLambda>(true, true);
+            var (_, lambdaParameters, lambdaReturned) = AnalyzeLambda<TLambda>(true, true);
 
             // determine returned / declaring type
             if (declaring == null) declaring = lambdaReturned;
@@ -239,7 +329,7 @@ namespace Umbraco.Core
         {
             if (ctor == null) throw new ArgumentNullException(nameof(ctor));
 
-            (_, var lambdaParameters, var lambdaReturned) = AnalyzeLambda<TLambda>(true, true);
+            var (_, lambdaParameters, lambdaReturned) = AnalyzeLambda<TLambda>(true, true);
 
             return EmitCtorSafe<TLambda>(lambdaParameters, lambdaReturned, ctor);
         }
@@ -281,7 +371,7 @@ namespace Umbraco.Core
         {
             if (ctor == null) throw new ArgumentNullException(nameof(ctor));
 
-            (_, var lambdaParameters, var lambdaReturned) = AnalyzeLambda<TLambda>(true, true);
+            var (_, lambdaParameters, lambdaReturned) = AnalyzeLambda<TLambda>(true, true);
 
             // emit - unsafe - use lambda's args and assume they are correct
             return EmitCtor<TLambda>(lambdaReturned, lambdaParameters, ctor);
@@ -293,7 +383,7 @@ namespace Umbraco.Core
             var ctorParameters = GetParameters(ctor);
 
             // emit
-            (var dm, var ilgen) = CreateIlGenerator(ctor.DeclaringType?.Module, lambdaParameters, declaring);
+            var (dm, ilgen) = CreateIlGenerator(ctor.DeclaringType?.Module, lambdaParameters, declaring);
             EmitLdargs(ilgen, lambdaParameters, ctorParameters);
             ilgen.Emit(OpCodes.Newobj, ctor); // ok to just return, it's only objects
             ilgen.Return();
@@ -342,7 +432,7 @@ namespace Umbraco.Core
         {
             if (string.IsNullOrWhiteSpace(methodName)) throw new ArgumentNullOrEmptyException(nameof(methodName));
 
-            (var lambdaDeclaring, var lambdaParameters, var lambdaReturned) = AnalyzeLambda<TLambda>(true, out var isFunction);
+            var (lambdaDeclaring, lambdaParameters, lambdaReturned) = AnalyzeLambda<TLambda>(true, out var isFunction);
 
             // get the method infos
             var method = declaring.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static, null, lambdaParameters, null);
@@ -374,7 +464,7 @@ namespace Umbraco.Core
             var methodParameters = method.GetParameters().Select(x => x.ParameterType).ToArray();
 
             var isStatic = method.IsStatic;
-            (var lambdaDeclaring, var lambdaParameters, var lambdaReturned) = AnalyzeLambda<TLambda>(isStatic, out var isFunction);
+            var (lambdaDeclaring, lambdaParameters, lambdaReturned) = AnalyzeLambda<TLambda>(isStatic, out var isFunction);
 
             // if not static, then the first lambda arg must be the method declaring type
             if (!isStatic && (methodDeclaring == null || !methodDeclaring.IsAssignableFrom(lambdaDeclaring)))
@@ -408,7 +498,7 @@ namespace Umbraco.Core
             if (method == null) throw new ArgumentNullException(nameof(method));
 
             var isStatic = method.IsStatic;
-            (var lambdaDeclaring, var lambdaParameters, var lambdaReturned) = AnalyzeLambda<TLambda>(isStatic, out _);
+            var (lambdaDeclaring, lambdaParameters, lambdaReturned) = AnalyzeLambda<TLambda>(isStatic, out _);
 
             // emit - unsafe - use lambda's args and assume they are correct
             return EmitMethod<TLambda>(lambdaDeclaring, lambdaReturned, lambdaParameters, method);
@@ -433,7 +523,7 @@ namespace Umbraco.Core
                 throw new ArgumentNullOrEmptyException(nameof(methodName));
 
             // validate lambda type
-            (var lambdaDeclaring, var lambdaParameters, var lambdaReturned) = AnalyzeLambda<TLambda>(false, out var isFunction);
+            var (lambdaDeclaring, lambdaParameters, lambdaReturned) = AnalyzeLambda<TLambda>(false, out var isFunction);
 
             // get the method infos
             var method = lambdaDeclaring.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance, null, lambdaParameters, null);
@@ -464,7 +554,7 @@ namespace Umbraco.Core
             var methodArgTypes = GetParameters(method, withDeclaring: !method.IsStatic);
 
             // emit IL
-            (var dm, var ilgen) = CreateIlGenerator(method.DeclaringType?.Module, parameters, lambdaReturned);
+            var (dm, ilgen) = CreateIlGenerator(method.DeclaringType?.Module, parameters, lambdaReturned);
             EmitLdargs(ilgen, parameters, methodArgTypes);
             ilgen.CallMethod(method);
             EmitOutputAdapter(ilgen, lambdaReturned, method.ReturnType);
@@ -486,7 +576,7 @@ namespace Umbraco.Core
         {
             var typeLambda = typeof(TLambda);
 
-            (var declaring, var parameters, var returned) = AnalyzeLambda<TLambda>(isStatic, out var maybeFunction);
+            var (declaring, parameters, returned) = AnalyzeLambda<TLambda>(isStatic, out var maybeFunction);
 
             if (isFunction)
             {

@@ -916,6 +916,82 @@ namespace Umbraco.Core.Persistence
 
         #endregion
 
+        #region Hints
+
+        /// <summary>
+        /// Appends the relevant ForUpdate hint.
+        /// </summary>
+        /// <param name="sql">The Sql statement.</param>
+        /// <returns>The Sql statement.</returns>
+        public static Sql<ISqlContext> ForUpdate(this Sql<ISqlContext> sql)
+        {
+            // MySql wants "FOR UPDATE" at the end, and T-Sql wants "WITH (UPDLOCK)" in the FROM statement,
+            // and we want to implement it in the least expensive way, so parsing the entire string here is
+            // a no, so we use reflection to work on the Sql expression before it is built.
+            // TODO propose a clean way to do that type of thing in NPoco
+
+            if (sql.SqlContext.DatabaseType.IsMySql())
+            {
+                sql.Append("FOR UPDATE");
+                return sql;
+            }
+
+            // go find the first FROM clause, and append the lock hint
+            Sql s = sql;
+            var updated = false;
+
+            while (s != null)
+            {
+                var sqlText = SqlInspector.GetSqlText(s);
+                if (sqlText.StartsWith("FROM ", StringComparison.OrdinalIgnoreCase))
+                {
+                    SqlInspector.SetSqlText(s, sqlText + " WITH (UPDLOCK)");
+                    updated = true;
+                    break;
+                }
+
+                s = SqlInspector.GetSqlRhs(sql);
+            }
+
+            if (updated)
+                SqlInspector.Reset(sql);
+
+            return sql;
+        }
+
+        #endregion
+
+        #region Sql Inspection
+
+        private static SqlInspectionUtilities _sqlInspector;
+
+        private static SqlInspectionUtilities SqlInspector => _sqlInspector ?? (_sqlInspector = new SqlInspectionUtilities());
+
+        private class SqlInspectionUtilities
+        {
+            private readonly Func<Sql, string> _getSqlText;
+            private readonly Action<Sql, string> _setSqlText;
+            private readonly Func<Sql, Sql> _getSqlRhs;
+            private readonly Action<Sql, string> _setSqlFinal;
+
+            public SqlInspectionUtilities()
+            {
+                (_getSqlText, _setSqlText) = ReflectionUtilities.EmitFieldGetterAndSetter<Sql, string>("_sql");
+                _getSqlRhs = ReflectionUtilities.EmitFieldGetter<Sql, Sql>("_rhs");
+                _setSqlFinal = ReflectionUtilities.EmitFieldSetter<Sql, string>("_sqlFinal");
+            }
+
+            public string GetSqlText(Sql sql) => _getSqlText(sql);
+
+            public void SetSqlText(Sql sql, string sqlText) => _setSqlText(sql, sqlText);
+
+            public Sql GetSqlRhs(Sql sql) => _getSqlRhs(sql);
+
+            public void Reset(Sql sql) => _setSqlFinal(sql, null);
+        }
+
+        #endregion
+
         #region Utilities
 
         private static string[] GetColumns<TDto>(this Sql<ISqlContext> sql, string tableAlias = null, string referenceName = null, Expression<Func<TDto, object>>[] columnExpressions = null, bool withAlias = true)
