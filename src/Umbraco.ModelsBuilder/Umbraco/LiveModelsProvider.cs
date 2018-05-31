@@ -17,6 +17,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
     // supports LiveDll and LiveAppData - but not PureLive
     public sealed class LiveModelsProvider
     {
+        private static UmbracoServices _umbracoServices;
         private static Mutex _mutex;
         private static int _req;
 
@@ -30,11 +31,13 @@ namespace Umbraco.ModelsBuilder.Umbraco
             }
         }
 
-        internal static void Install()
+        internal static void Install(UmbracoServices umbracoServices)
         {
             // just be sure
             if (!IsEnabled)
                 return;
+
+            _umbracoServices = umbracoServices;
 
             // initialize mutex
             // ApplicationId will look like "/LM/W3SVC/1/Root/AppName"
@@ -110,11 +113,11 @@ namespace Umbraco.ModelsBuilder.Umbraco
             var config = UmbracoConfig.For.ModelsBuilder();
 
             // EnableDllModels will recycle the app domain - but this request will end properly
-            ModelsBuilderBackOfficeController.GenerateModels(modelsDirectory, config.ModelsMode.IsAnyDll() ? bin : null);
+            ModelsBuilderBackOfficeController.GenerateModels(_umbracoServices, modelsDirectory, config.ModelsMode.IsAnyDll() ? bin : null);
         }
     }
 
-    // have to do this because it's the only way to subscribe to EndRequest
+    // have to do this because it's the only way to subscribe to EndRequest,
     // module is installed by assembly attribute at the top of this file
     public class LiveModelsProviderModule : IHttpModule
     {

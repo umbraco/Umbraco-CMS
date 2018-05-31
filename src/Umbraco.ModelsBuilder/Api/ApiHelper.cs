@@ -5,13 +5,11 @@ using Umbraco.ModelsBuilder.Umbraco;
 
 namespace Umbraco.ModelsBuilder.Api
 {
-    // internal to be used by Umbraco.ModelsBuilder.Api project
     internal static class ApiHelper
     {
-        public static Dictionary<string, string> GetModels(string modelsNamespace, IDictionary<string, string> files)
+        public static Dictionary<string, string> GetModels(UmbracoServices umbracoServices, string modelsNamespace, IDictionary<string, string> files)
         {
-            var umbraco = ModelsBuilderComponent.Umbraco;
-            var typeModels = umbraco.GetAllTypes();
+            var typeModels = umbracoServices.GetAllTypes();
 
             var parseResult = new CodeParser().ParseWithReferencedAssemblies(files);
             var builder = new TextBuilder(typeModels, parseResult, modelsNamespace);

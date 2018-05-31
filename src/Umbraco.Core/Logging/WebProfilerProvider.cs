@@ -92,6 +92,7 @@ namespace Umbraco.Core.Logging
         }
 
         // obsolete but that's the one that's called ;-(
+        [Obsolete]
         public override MiniProfiler Start(ProfileLevel level, string sessionName = null)
         {
             return Start(sessionName);

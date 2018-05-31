@@ -45,8 +45,8 @@ namespace Umbraco.Core.Runtime
         public virtual void Boot(ServiceContainer container)
         {
             // some components may want to initialize with the UmbracoApplicationBase
-            // well, they should not - we should not do this - however, Compat7 wants
-            // it, so let's do it, but we should remove this eventually.
+            // well, they should not - we should not do this
+            // TODO remove this eventually.
             container.RegisterInstance(_app);
 
             Compose(container);

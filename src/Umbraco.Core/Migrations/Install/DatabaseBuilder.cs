@@ -134,7 +134,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe, logger);
 
-            var path = Path.Combine(GlobalSettings.FullPathToRoot, "App_Data", "Umbraco.sdf");
+            var path = Path.Combine(IOHelper.GetRootDirectorySafe(), "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
             {
                 // this should probably be in a "using (new SqlCeEngine)" clause but not sure
@@ -173,8 +173,7 @@ namespace Umbraco.Core.Migrations.Install
         /// <param name="databaseProvider">The name the provider (Sql, Sql Azure, Sql Ce, MySql).</param>
         public void ConfigureDatabaseConnection(string server, string databaseName, string user, string password, string databaseProvider)
         {
-            string providerName;
-            var connectionString = GetDatabaseConnectionString(server, databaseName, user, password, databaseProvider, out providerName);
+            var connectionString = GetDatabaseConnectionString(server, databaseName, user, password, databaseProvider, out var providerName);
 
             SaveConnectionString(connectionString, providerName, _logger);
             _databaseFactory.Configure(connectionString, providerName);

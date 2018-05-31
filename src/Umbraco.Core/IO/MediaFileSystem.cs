@@ -115,6 +115,9 @@ namespace Umbraco.Core.IO
                     if (FileExists(file) == false) return;
                     DeleteFile(file);
 
+#pragma warning disable 162 // unreachable code
+                    // Not implemented yet, so need to disable warnings
+                    // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                     if (UseTheNewMediaPathScheme == false)
                     {
                         // old scheme: filepath is "<int>/<filename>" OR "<int>-<filename>"
@@ -130,6 +133,7 @@ namespace Umbraco.Core.IO
                         var dir = Path.GetDirectoryName(file);
                         DeleteDirectory(dir, true);
                     }
+#pragma warning restore 162
                 }
                 catch (Exception e)
                 {
@@ -155,6 +159,9 @@ namespace Umbraco.Core.IO
             filename = IOHelper.SafeFileName(filename.ToLowerInvariant());
 
             string folder;
+#pragma warning disable 162 // unreachable code
+            // Not implemented yet, so need to disable warnings
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (UseTheNewMediaPathScheme == false)
             {
                 // old scheme: filepath is "<int>/<filename>" OR "<int>-<filename>"
@@ -169,6 +176,7 @@ namespace Umbraco.Core.IO
                 // for a single content cannot store two different files with the same name
                 folder = Combine(cuid, puid).ToHexString(/*'/', 2, 4*/); // could use ext to fragment path eg 12/e4/f2/...
             }
+#pragma warning restore 162
 
             var filepath = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
                 ? Path.Combine(folder, filename).Replace('\\', '/')
@@ -213,9 +221,8 @@ namespace Umbraco.Core.IO
             var sep = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories ? "/" : "-";
             var pos = prevpath.IndexOf(sep, StringComparison.Ordinal);
             var s = pos > 0 ? prevpath.Substring(0, pos) : null;
-            int ignored;
 
-            var folder = (pos > 0 && int.TryParse(s, out ignored)) ? s : GetNextFolder();
+            var folder = (pos > 0 && int.TryParse(s, out _)) ? s : GetNextFolder();
 
             // ReSharper disable once AssignNullToNotNullAttribute
             var filepath = UmbracoConfig.For.UmbracoSettings().Content.UploadAllowDirectories
@@ -246,8 +253,7 @@ namespace Umbraco.Core.IO
                 var directories = GetDirectories("");
                 foreach (var directory in directories)
                 {
-                    long folderNumber;
-                    if (long.TryParse(directory, out folderNumber) && folderNumber > _folderCounter)
+                    if (long.TryParse(directory, out var folderNumber) && folderNumber > _folderCounter)
                         _folderCounter = folderNumber;
                 }
 

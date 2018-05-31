@@ -87,11 +87,10 @@
     <Compile Include="RenameContentTypeAttribute.cs" />
     <Compile Include="RenamePropertyTypeAttribute.cs" />
     <Compile Include="TypeExtensions.cs" />
-    <Compile Include="Umbraco\Application.cs" />
+    <Compile Include="Umbraco\UmbracoServices.cs" />
     <Compile Include="Umbraco\HashCombiner.cs" />
     <Compile Include="Umbraco\HashHelper.cs" />
     <Compile Include="Umbraco\LiveModelsProvider.cs" />
-    <Compile Include="Umbraco\ModelsBuilderApplication.cs" />
     <Compile Include="Umbraco\ModelsBuilderBackOfficeController.cs" />
     <Compile Include="Umbraco\ModelsBuilderComponent.cs" />
     <Compile Include="Umbraco\ModelsGenerationError.cs" />

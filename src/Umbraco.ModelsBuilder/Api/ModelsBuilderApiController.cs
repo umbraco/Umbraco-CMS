@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.ModelsBuilder.Building;
 using Umbraco.ModelsBuilder.Configuration;
+using Umbraco.ModelsBuilder.Umbraco;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Filters;
-using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.ModelsBuilder.Api
 {
@@ -27,6 +23,13 @@ namespace Umbraco.ModelsBuilder.Api
     public class ModelsBuilderApiController : UmbracoApiController // UmbracoAuthorizedApiController - for ASP.NET identity
     {
         public const string ControllerArea = "ModelsBuilder";
+
+        private readonly UmbracoServices _umbracoServices;
+
+        public ModelsBuilderApiController(UmbracoServices umbracoServices)
+        {
+            _umbracoServices = umbracoServices;
+        }
 
         // invoked by the API
         [System.Web.Http.HttpPost] // use the http one, not mvc, with api controllers!
@@ -60,7 +63,7 @@ namespace Umbraco.ModelsBuilder.Api
             if (!checkResult.Success)
                 return checkResult.Result;
 
-            var models = ApiHelper.GetModels(data.Namespace, data.Files);
+            var models = ApiHelper.GetModels(_umbracoServices, data.Namespace, data.Files);
 
             return Request.CreateResponse(HttpStatusCode.OK, models, Configuration.Formatters.JsonFormatter);
         }

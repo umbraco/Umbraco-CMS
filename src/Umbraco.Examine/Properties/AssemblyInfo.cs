@@ -8,3 +8,7 @@ using System.Runtime.CompilerServices;
 
 // Umbraco Cms
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
+
+// code analysis
+// IDE1006 is broken, wants _value syntax for consts, etc - and it's even confusing ppl at MS, kill it
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "~_~")]

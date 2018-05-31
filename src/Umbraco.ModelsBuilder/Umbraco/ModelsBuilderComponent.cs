@@ -12,6 +12,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.ModelsBuilder.Api;
 using Umbraco.ModelsBuilder.Configuration;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache.NuCache;
@@ -19,59 +20,55 @@ using Umbraco.Web.UI.JavaScript;
 
 namespace Umbraco.ModelsBuilder.Umbraco
 {
-    // fixme
-    // nucache components wants models so we need to setup models before
-    // however for some reason, this creates a cyclic dependency? => need better debugging info
-    // cos nucache is Core so we need to be Core too
-    // also... should have a generic "modelsbuilder" and "contentcache" components for dependencies!
-
     [RequiredComponent(typeof(NuCacheComponent))]
+    [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
     public class ModelsBuilderComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
-            composition.Container.Register<Application>(new PerContainerLifetime());
+
+            composition.Container.Register<UmbracoServices>(new PerContainerLifetime());
 
             var config = UmbracoConfig.For.ModelsBuilder();
 
             if (config.ModelsMode == ModelsMode.PureLive)
-                InstallLiveModels(composition.Container);
+                ComposeForLiveModels(composition.Container);
             else if (config.EnableFactory)
-                InstallDefaultModelsFactory(composition.Container);
+                ComposeForDefaultModelsFactory(composition.Container);
 
             // always setup the dashboard
             InstallServerVars(composition.Container.GetInstance<IRuntimeState>().Level);
+            composition.Container.Register(typeof(ModelsBuilderBackOfficeController), new PerRequestLifeTime());
 
-            // need to do it here 'cos NuCache wants it during compose?
-            Umbraco = composition.Container.GetInstance<Application>();
+            // setup the API if enabled (and in debug mode)
+            if (config.ApiServer)
+                composition.Container.Register(typeof(ModelsBuilderApiController), new PerRequestLifeTime());
         }
 
-        public void Initialize(Application application)
+        public void Initialize(UmbracoServices umbracoServices)
         {
-            Umbraco = application;
-
             var config = UmbracoConfig.For.ModelsBuilder();
 
             if (config.Enable)
                 FileService.SavingTemplate += FileService_SavingTemplate;
 
+            // fixme LiveModelsProvider should not be static
             if (config.ModelsMode.IsLiveNotPure())
-                LiveModelsProvider.Install();
+                LiveModelsProvider.Install(umbracoServices);
 
+            // fixme OutOfDateModelsStatus should not be static
             if (config.FlagOutOfDateModels)
                 OutOfDateModelsStatus.Install();
         }
 
-        public static Application Umbraco { get; private set; }
-
-        private void InstallDefaultModelsFactory(IServiceContainer container)
+        private void ComposeForDefaultModelsFactory(IServiceContainer container)
         {
             container.RegisterSingleton<IPublishedModelFactory>(factory
                 => new PublishedModelFactory(factory.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
         }
 
-        private void InstallLiveModels(IServiceContainer container)
+        private void ComposeForLiveModels(IServiceContainer container)
         {
             container.RegisterSingleton<IPublishedModelFactory, PureLiveModelFactory>();
 
@@ -102,14 +99,12 @@ namespace Umbraco.ModelsBuilder.Umbraco
                 var umbracoUrlsObject = serverVars["umbracoUrls"];
                 if (umbracoUrlsObject == null)
                     throw new Exception("Null umbracoUrls");
-                var umbracoUrls = umbracoUrlsObject as Dictionary<string, object>;
-                if (umbracoUrls == null)
+                if (!(umbracoUrlsObject is Dictionary<string, object> umbracoUrls))
                     throw new Exception("Invalid umbracoUrls");
 
                 if (!serverVars.ContainsKey("umbracoPlugins"))
                     throw new Exception("Missing umbracoPlugins.");
-                var umbracoPlugins = serverVars["umbracoPlugins"] as Dictionary<string, object>;
-                if (umbracoPlugins == null)
+                if (!(serverVars["umbracoPlugins"] is Dictionary<string, object> umbracoPlugins))
                     throw new Exception("Invalid umbracoPlugins");
 
                 if (HttpContext.Current == null) throw new InvalidOperationException("HttpContext is null");
@@ -162,7 +157,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
                     // + this is how we get the default model name in Umbraco.ModelsBuilder.Umbraco.Application
                     var alias = e.AdditionalData["ContentTypeAlias"].ToString();
                     var name = template.Name; // will be the name of the content type since we are creating
-                    var className = Application.GetClrName(name, alias);
+                    var className = UmbracoServices.GetClrName(name, alias);
 
                     var modelNamespace = UmbracoConfig.For.ModelsBuilder().ModelsNamespace;
 

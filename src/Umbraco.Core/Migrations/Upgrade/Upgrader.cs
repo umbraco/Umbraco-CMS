@@ -60,7 +60,7 @@ namespace Umbraco.Core.Migrations.Upgrade
                 // save new state
                 if (forceState)
                     _keyValueService.SetValue(StateValueKey, state);
-                else
+                else if (currentState != state)
                     _keyValueService.SetValue(StateValueKey, currentState, state);
 
                 // run post-migrations

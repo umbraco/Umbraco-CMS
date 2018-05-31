@@ -31,13 +31,13 @@ namespace Umbraco.Core.Models.PublishedContent
             return new PublishedContentType(contentType, this);
         }
 
-        // for tests - fixme what's the point of the factory here?
+        // for tests
         internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.InvariantNeutral)
         {
             return new PublishedContentType(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, variations);
         }
 
-        // for tests - fixme what's the point of the factory here?
+        // for tests
         internal PublishedContentType CreateContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes, ContentVariation variations = ContentVariation.InvariantNeutral)
         {
             return new PublishedContentType(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, variations);
@@ -82,15 +82,6 @@ namespace Umbraco.Core.Models.PublishedContent
                 throw new ArgumentException("Not a valid datatype identifier.", nameof(id));
 
             return dataType;
-        }
-
-        /// <inheritdoc />
-        public void NotifyDataTypeChanges()
-        {
-            lock (_publishedDataTypesLocker)
-            {
-                _publishedDataTypes = null;
-            }
         }
 
         /// <inheritdoc />

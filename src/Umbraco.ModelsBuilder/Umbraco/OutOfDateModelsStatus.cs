@@ -43,10 +43,7 @@ namespace Umbraco.ModelsBuilder.Umbraco
             File.Delete(path);
         }
 
-        public static bool IsEnabled
-        {
-            get { return UmbracoConfig.For.ModelsBuilder().FlagOutOfDateModels; }
-        }
+        public static bool IsEnabled => UmbracoConfig.For.ModelsBuilder().FlagOutOfDateModels;
 
         public static bool IsOutOfDate
         {

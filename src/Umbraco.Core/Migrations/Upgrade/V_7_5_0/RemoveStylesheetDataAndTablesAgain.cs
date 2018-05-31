@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_7_5_0
 {
@@ -14,19 +15,23 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_5_0
 
         public override void Migrate()
         {
+            // these have been obsoleted, need to copy the values here
+            var stylesheetPropertyObjectType = new Guid("5555da4f-a123-42b2-4488-dcdfb25e4111");
+            var stylesheetObjectType = new Guid("9F68DA4F-A3A8-44C2-8226-DCBD125E4840");
+
             //Clear all stylesheet data if the tables exist
             var tables = SqlSyntax.GetTablesInSchema(Context.Database).ToArray();
             if (tables.InvariantContains("cmsStylesheetProperty"))
             {
                 Delete.FromTable("cmsStylesheetProperty").AllRows().Do();
-                Delete.FromTable("umbracoNode").Row(new { nodeObjectType = Constants.ObjectTypes.StylesheetProperty }).Do();
+                Delete.FromTable("umbracoNode").Row(new { nodeObjectType = stylesheetPropertyObjectType }).Do();
 
                 Delete.Table("cmsStylesheetProperty").Do();
             }
             if (tables.InvariantContains("cmsStylesheet"))
             {
                 Delete.FromTable("cmsStylesheet").AllRows().Do();
-                Delete.FromTable("umbracoNode").Row(new { nodeObjectType = Constants.ObjectTypes.Stylesheet }).Do();
+                Delete.FromTable("umbracoNode").Row(new { nodeObjectType = stylesheetObjectType }).Do();
 
                 Delete.Table("cmsStylesheet").Do();
             }
