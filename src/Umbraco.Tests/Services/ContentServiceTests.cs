@@ -24,6 +24,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PropertyEditors;
+using System.Reflection;
 
 namespace Umbraco.Tests.Services
 {
@@ -57,6 +58,32 @@ namespace Umbraco.Tests.Services
 
             // fixme - do it differently
             Container.Register(factory => factory.GetInstance<ServiceContext>().TextService);
+        }
+
+        /// <summary>
+        /// Used to list out all ambiguous events that will require dispatching with a name
+        /// </summary>
+        [Test]
+        public void List_Ambiguous_Events()
+        {
+            var events = ServiceContext.ContentService.GetType().GetEvents(BindingFlags.Static | BindingFlags.Public);
+            var typedEventHandler = typeof(TypedEventHandler<,>);
+            foreach(var e in events)
+            {
+                //only continue if this is a TypedEventHandler
+                if (!e.EventHandlerType.IsGenericType) continue;
+                var typeDef = e.EventHandlerType.GetGenericTypeDefinition();
+                if (typedEventHandler != typeDef) continue;
+
+                //get the event arg type
+                var eventArgType = e.EventHandlerType.GenericTypeArguments[1];
+
+                var found = EventNameExtractor.FindEvent(typeof(ContentService), eventArgType, EventNameExtractor.MatchIngNames);
+                if (!found.Success && found.Result.Error == EventNameExtractorError.Ambiguous)
+                {
+                    Console.WriteLine($"Ambiguous event, source: {typeof(ContentService)}, args: {eventArgType}");
+                }
+            }
         }
 
         [Test]

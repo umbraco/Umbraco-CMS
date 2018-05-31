@@ -1510,7 +1510,7 @@ namespace Umbraco.Core.Services.Implement
 
                 var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentId);
                 var moveEventArgs = new MoveEventArgs<IContent>(moveEventInfo);
-                if (scope.Events.DispatchCancelable(Moving, this, moveEventArgs))
+                if (scope.Events.DispatchCancelable(Moving, this, moveEventArgs, nameof(Moving)))
                 {
                     scope.Complete();
                     return; // causes rollback
@@ -1541,7 +1541,7 @@ namespace Umbraco.Core.Services.Implement
 
                 moveEventArgs.MoveInfoCollection = moveInfo;
                 moveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Moved, this, moveEventArgs);
+                scope.Events.Dispatch(Moved, this, moveEventArgs, nameof(Moved));
                 Audit(AuditType.Move, "Move Content performed by user", userId, content.Id);
 
                 scope.Complete();
@@ -2249,7 +2249,7 @@ namespace Umbraco.Core.Services.Implement
                     // but... UnPublishing event makes no sense (not going to cancel?) and no need to save
                     // just raise the event
                     if (content.Trashed == false && content.Published)
-                        scope.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
+                        scope.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), nameof(UnPublished));
 
                     // if current content has children, move them to trash
                     var c = content;
@@ -2272,7 +2272,7 @@ namespace Umbraco.Core.Services.Implement
                     .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
                     .ToArray();
                 if (moveInfos.Length > 0)
-                    scope.Events.Dispatch(Trashed, this, new MoveEventArgs<IContent>(false, moveInfos), "Trashed");
+                    scope.Events.Dispatch(Trashed, this, new MoveEventArgs<IContent>(false, moveInfos), nameof(Trashed));
                 scope.Events.Dispatch(TreeChanged, this, changes.ToEventArgs());
 
                 Audit(AuditType.Delete, $"Delete Content of Type {string.Join(",", contentTypeIdsA)} performed by user", userId, Constants.System.Root);
