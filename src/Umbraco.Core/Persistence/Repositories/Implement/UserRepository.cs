@@ -83,6 +83,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override IUser PerformGet(int id)
         {
+            if (id == Constants.Security.UnknownId)
+                return null;
+
             var sql = SqlContext.Sql()
                 .Select<UserDto>()
                 .From<UserDto>()
@@ -282,7 +285,8 @@ ORDER BY colName";
         {
             var sql = SqlContext.Sql()
                 .Select<UserDto>()
-                .From<UserDto>();
+                .From<UserDto>()
+                .Where<UserDto>(x => x.Id != Constants.Security.UnknownId); 
 
             with?.Invoke(sql);
 
@@ -616,7 +620,9 @@ ORDER BY colName";
 
         public int GetCountByQuery(IQuery<IUser> query)
         {
-            var sqlClause = GetBaseQuery("umbracoUser.id");
+            var sqlClause = GetBaseQuery("umbracoUser.id")
+                .Where<UserDto>(x => x.Id != Constants.Security.UnknownId);
+
             var translator = new SqlTranslator<IUser>(sqlClause, query);
             var subquery = translator.Translate();
             //get the COUNT base query
@@ -631,7 +637,7 @@ ORDER BY colName";
             var sql = SqlContext.Sql()
                 .SelectCount()
                 .From<UserDto>()
-                .Where<UserDto>(x => x.UserName == username);
+                .Where<UserDto>(x => x.Id != Constants.Security.UnknownId && x.UserName == username);
 
             return Database.ExecuteScalar<int>(sql) > 0;
         }
@@ -669,6 +675,8 @@ ORDER BY colName";
                 sql.WhereIn<UserDto>(x => x.Id, inSql);
             else
                 sql.WhereNotIn<UserDto>(x => x.Id, inSql);
+
+            sql.Where<UserDto>(x => x.Id != Constants.Security.UnknownId);
 
             return ConvertFromDtos(Database.Fetch<UserDto>(sql));
         }
@@ -800,7 +808,7 @@ ORDER BY colName";
                 sql = new SqlTranslator<IUser>(sql, query).Translate();
 
             // get sorted and filtered sql
-            var sqlNodeIdsWithSort = ApplySort(ApplyFilter(sql, filterSql), orderDirection, orderBy);
+            var sqlNodeIdsWithSort = ApplySort(ApplyFilter(sql, filterSql), orderDirection, orderBy);                
 
             // get a page of results and total count
             var pagedResult = Database.Page<UserDto>(pageIndex + 1, pageSize, sqlNodeIdsWithSort);
@@ -813,9 +821,11 @@ ORDER BY colName";
 
         private Sql<ISqlContext> ApplyFilter(Sql<ISqlContext> sql, Sql<ISqlContext> filterSql)
         {
-            if (filterSql == null) return sql;
+            if (filterSql == null)
+                return sql.Where<UserDto>(x => x.Id != Constants.Security.UnknownId);
 
             sql.Append(SqlContext.Sql(" WHERE " + filterSql.SQL.TrimStart("AND "), filterSql.Arguments));
+            sql.Append($" AND umbracoUser.id <> {Constants.Security.UnknownId}");
 
             return sql;
         }
@@ -837,7 +847,7 @@ ORDER BY colName";
             var idsQuery = SqlContext.Sql()
                 .Select<UserDto>(x => x.Id)
                 .From<UserDto>()
-                .Where<UserDto>(x => x.Id >= id)
+                .Where<UserDto>(x => x.Id != Constants.Security.UnknownId && x.Id >= id)
                 .OrderBy<UserDto>(x => x.Id);
 
             // first page is index 1, not zero

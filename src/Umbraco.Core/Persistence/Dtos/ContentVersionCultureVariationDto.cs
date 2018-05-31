@@ -37,8 +37,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         // fixme want?
         [Column("availableUserId")]
-        // [ForeignKey(typeof(UserDto))] -- there is no foreign key so we can delete users without deleting associated content
-        //[NullSetting(NullSetting = NullSettings.Null)]
+        [ForeignKey(typeof(UserDto))]
         public int PublishedUserId { get; set; }
 
         [Column("edited")]

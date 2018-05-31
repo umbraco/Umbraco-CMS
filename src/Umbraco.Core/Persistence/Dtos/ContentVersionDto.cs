@@ -25,6 +25,7 @@ namespace Umbraco.Core.Persistence.Dtos
         public DateTime VersionDate { get; set; }
 
         [Column("userId")]
+        [ForeignKey(typeof(UserDto))]
         public int UserId { get; set; }
 
         [Column("current")]

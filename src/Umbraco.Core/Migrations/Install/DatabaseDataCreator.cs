@@ -144,6 +144,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private void CreateUserData()
         {
+            _database.Insert(Constants.DatabaseSchema.Tables.User, "id", false, new UserDto { Id = Constants.Security.UnknownId, Disabled = true, NoConsole = true, UserName = "$UMB_UNKNOWN_USER$", Login = "$UMB_UNKNOWN_USER$", Password = "$UMB_UNKNOWN_USER$", Email = "", UserLanguage = "en-US", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
             _database.Insert(Constants.DatabaseSchema.Tables.User, "id", false, new UserDto { Id = Constants.Security.SuperId, Disabled = false, NoConsole = false, UserName = "Administrator", Login = "admin", Password = "default", Email = "", UserLanguage = "en-US", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
         }
 
