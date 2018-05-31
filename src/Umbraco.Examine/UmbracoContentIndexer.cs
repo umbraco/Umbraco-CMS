@@ -294,8 +294,7 @@ namespace Umbraco.Examine
 
                     do
                     {
-                        long total;
-                        var descendants = MediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out total);
+                        var descendants = MediaService.GetPagedDescendants(mediaParentId, pageIndex, pageSize, out _);
 
                         //if specific types are declared we need to post filter them
                         //TODO: Update the service layer to join the cmsContentType table so we can query by content type too

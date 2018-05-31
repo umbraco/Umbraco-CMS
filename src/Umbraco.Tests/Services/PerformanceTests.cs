@@ -290,7 +290,7 @@ namespace Umbraco.Tests.Services
                     ParentId = -1,
                     NodeObjectType = customObjectType,
                     Text = i.ToString(CultureInfo.InvariantCulture),
-                    UserId = 0,
+                    UserId = -1,
                     CreateDate = DateTime.Now,
                     Trashed = false,
                     SortOrder = 0,

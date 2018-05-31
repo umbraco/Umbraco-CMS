@@ -160,7 +160,10 @@ namespace Umbraco.Core
                 _runtime = null;
             }
 
-            Current.Reset(); // dispose the container and everything
+            // dispose the container and everything
+            // but first, capture the looger!
+            var logger = Current.Logger;
+            Current.Reset(); 
 
             if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted) return;
 
@@ -183,12 +186,12 @@ namespace Umbraco.Core
 
                 var shutdownMsg = $"Application shutdown. Details: {HostingEnvironment.ShutdownReason}\r\n\r\n_shutDownMessage={shutDownMessage}\r\n\r\n_shutDownStack={shutDownStack}";
 
-                Current.Logger.Info<UmbracoApplicationBase>(shutdownMsg);
+                logger.Info<UmbracoApplicationBase>(shutdownMsg);
             }
             catch (Exception)
             {
                 //if for some reason that fails, then log the normal output
-                Current.Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
+                logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
             }
         }
 

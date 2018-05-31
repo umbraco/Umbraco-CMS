@@ -127,7 +127,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional Id of the user performing the import</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated content</returns>
-        public IEnumerable<IContent> ImportContent(XElement element, int parentId = -1, int userId = 0, bool raiseEvents = true)
+        public IEnumerable<IContent> ImportContent(XElement element, int parentId = -1, int userId = -1, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -337,7 +337,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated ContentTypes</returns>
-        public IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = 0, bool raiseEvents = true)
+        public IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = -1, bool raiseEvents = true)
         {
             return ImportContentTypes(element, true, userId);
         }
@@ -350,7 +350,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated ContentTypes</returns>
-        public IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = 0, bool raiseEvents = true)
+        public IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = -1, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -856,7 +856,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the user</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated DataTypeDefinitions</returns>
-        public IEnumerable<IDataType> ImportDataTypeDefinitions(XElement element, int userId = 0, bool raiseEvents = true)
+        public IEnumerable<IDataType> ImportDataTypeDefinitions(XElement element, int userId = -1, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -1190,7 +1190,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the User performing the operation</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumerable list of generated languages</returns>
-        public IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, int userId = 0, bool raiseEvents = true)
+        public IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, int userId = -1, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -1231,7 +1231,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the User performing the operation</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns></returns>
-        public IEnumerable<IMacro> ImportMacros(XElement element, int userId = 0, bool raiseEvents = true)
+        public IEnumerable<IMacro> ImportMacros(XElement element, int userId = -1, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -1502,7 +1502,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional user id</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated Templates</returns>
-        public IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0, bool raiseEvents = true)
+        public IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = -1, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -1579,7 +1579,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
 
-        public IEnumerable<IFile> ImportStylesheets(XElement element, int userId = 0, bool raiseEvents = true)
+        public IEnumerable<IFile> ImportStylesheets(XElement element, int userId = -1, bool raiseEvents = true)
         {
 
             if (raiseEvents)
@@ -1670,7 +1670,7 @@ namespace Umbraco.Core.Services.Implement
             set { _packageInstallation = value; }
         }
 
-        internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0, bool raiseEvents = false)
+        internal InstallationSummary InstallPackage(string packageFilePath, int userId = -1, bool raiseEvents = false)
         {
             var metaData = GetPackageMetaData(packageFilePath);
 

@@ -377,7 +377,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Save
 
-        public void Save(TItem item, int userId = 0)
+        public void Save(TItem item, int userId = -1)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -415,7 +415,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void Save(IEnumerable<TItem> items, int userId = 0)
+        public void Save(IEnumerable<TItem> items, int userId = -1)
         {
             var itemsA = items.ToArray();
 
@@ -461,7 +461,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Delete
 
-        public void Delete(TItem item, int userId = 0)
+        public void Delete(TItem item, int userId = -1)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -515,7 +515,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void Delete(IEnumerable<TItem> items, int userId = 0)
+        public void Delete(IEnumerable<TItem> items, int userId = -1)
         {
             var itemsA = items.ToArray();
 
@@ -736,7 +736,7 @@ namespace Umbraco.Core.Services.Implement
 
         protected Guid ContainerObjectType => EntityContainer.GetContainerObjectType(ContainedObjectType);
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = 0)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = -1)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -776,7 +776,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = 0)
+        public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = -1)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -795,7 +795,8 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                if (OnSavingContainerCancelled(scope, new SaveEventArgs<EntityContainer>(container, evtMsgs)))
+                var args = new SaveEventArgs<EntityContainer>(container, evtMsgs);
+                if (OnSavingContainerCancelled(scope, args))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
@@ -806,7 +807,8 @@ namespace Umbraco.Core.Services.Implement
                 _containerRepository.Save(container);
                 scope.Complete();
 
-                OnSavedContainer(scope, new SaveEventArgs<EntityContainer>(container, evtMsgs));
+                args.CanCancel = false;
+                OnSavedContainer(scope, args);
             }
 
             //TODO: Audit trail ?
@@ -868,7 +870,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult> DeleteContainer(int containerId, int userId = 0)
+        public Attempt<OperationResult> DeleteContainer(int containerId, int userId = -1)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -905,7 +907,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = 0)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = -1)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -921,10 +923,19 @@ namespace Umbraco.Core.Services.Implement
                         throw new InvalidOperationException("No container found with id " + id);
 
                     container.Name = name;
+
+                    var saveEventArgs = new SaveEventArgs<EntityContainer>(container, evtMsgs);
+                    if (OnRenamingContainerCancelled(scope, saveEventArgs))
+                    {
+                        scope.Complete();
+                        return OperationResult.Attempt.Cancel<EntityContainer>(evtMsgs);
+                    }
+
                     _containerRepository.Save(container);
                     scope.Complete();
 
-                    OnRenamedContainer(scope, new SaveEventArgs<EntityContainer>(container, evtMsgs));
+                    saveEventArgs.CanCancel = false;
+                    OnRenamedContainer(scope, saveEventArgs);
 
                     return OperationResult.Attempt.Succeed(OperationResultType.Success, evtMsgs, container);
                 }

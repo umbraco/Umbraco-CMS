@@ -191,7 +191,20 @@ ORDER BY colName";
 
         public bool ValidateLoginSession(int userId, Guid sessionId)
         {
-            var found = Database.FirstOrDefault<UserLoginDto>("WHERE sessionId=@sessionId", new {sessionId = sessionId});
+            // with RepeatableRead transaction mode, read-then-update operations can
+            // cause deadlocks, and the ForUpdate() hint is required to tell the database
+            // to acquire an exclusive lock when reading
+
+            // that query is going to run a *lot*, make it a template
+            var t = SqlContext.Templates.Get("Umbraco.Core.UserRepository.ValidateLoginSession", s => s
+                .Select<UserLoginDto>()
+                .From<UserLoginDto>()
+                .Where<UserLoginDto>(x => x.SessionId == SqlTemplate.Arg<Guid>("sessionId"))
+                .ForUpdate());
+
+            var sql = t.Sql(sessionId);
+
+            var found = Database.Query<UserLoginDto>(sql).FirstOrDefault();
             if (found == null || found.UserId != userId || found.LoggedOutUtc.HasValue)
                 return false;
 
@@ -211,34 +224,21 @@ ORDER BY colName";
 
         public int ClearLoginSessions(int userId)
         {
-            //TODO: I know this doesn't follow the normal repository conventions which would require us to crete a UserSessionRepository
-            //and also business logic models for these objects but that's just so overkill for what we are doing
-            //and now that everything is properly in a transaction (Scope) there doesn't seem to be much reason for using that anymore
-            var count = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUserLogin WHERE userId=@userId", new { userId = userId });
-            Database.Execute("DELETE FROM umbracoUserLogin WHERE userId=@userId", new {userId = userId});
-            return count;
+            return Database.Delete<UserLoginDto>(Sql().Where<UserLoginDto>(x => x.UserId == userId));
         }
 
         public int ClearLoginSessions(TimeSpan timespan)
         {
-            //TODO: I know this doesn't follow the normal repository conventions which would require us to crete a UserSessionRepository
-            //and also business logic models for these objects but that's just so overkill for what we are doing
-            //and now that everything is properly in a transaction (Scope) there doesn't seem to be much reason for using that anymore
-
             var fromDate = DateTime.UtcNow - timespan;
-
-            var count = Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoUserLogin WHERE lastValidatedUtc=@fromDate", new { fromDate = fromDate });
-            Database.Execute("DELETE FROM umbracoUserLogin WHERE lastValidatedUtc=@fromDate", new { fromDate = fromDate });
-            return count;
+            return Database.Delete<UserLoginDto>(Sql().Where<UserLoginDto>(x => x.LastValidatedUtc < fromDate));
         }
 
         public void ClearLoginSession(Guid sessionId)
         {
-            //TODO: I know this doesn't follow the normal repository conventions which would require us to crete a UserSessionRepository
-            //and also business logic models for these objects but that's just so overkill for what we are doing
-            //and now that everything is properly in a transaction (Scope) there doesn't seem to be much reason for using that anymore
-            Database.Execute("UPDATE umbracoUserLogin SET loggedOutUtc=@now WHERE sessionId=@sessionId",
-                new { now = DateTime.UtcNow, sessionId = sessionId });
+            // fixme why is that one updating and not deleting?
+            Database.Execute(Sql()
+                .Update<UserLoginDto>(u => u.Set(x => x.LoggedOutUtc, DateTime.UtcNow))
+                .Where<UserLoginDto>(x => x.SessionId == sessionId));
         }
 
         protected override IEnumerable<IUser> PerformGetAll(params int[] ids)
@@ -718,7 +718,7 @@ ORDER BY colName";
             if (string.IsNullOrWhiteSpace(orderBy)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(orderBy));
 
             Sql<ISqlContext> filterSql = null;
-            var customFilterWheres = filter != null ? filter.GetWhereClauses().ToArray() : null;
+            var customFilterWheres = filter?.GetWhereClauses().ToArray();
             var hasCustomFilter = customFilterWheres != null && customFilterWheres.Length > 0;
             if (hasCustomFilter
                 || includeUserGroups != null && includeUserGroups.Length > 0

@@ -25,7 +25,7 @@ namespace Umbraco.Core.Packaging
 
         public PackageInstallation(IPackagingService packagingService, IMacroService macroService,
             IFileService fileService, IPackageExtraction packageExtraction)
-            : this(packagingService, macroService, fileService, packageExtraction, GlobalSettings.FullPathToRoot)
+            : this(packagingService, macroService, fileService, packageExtraction, IOHelper.GetRootDirectorySafe())
         {}
 
         public PackageInstallation(IPackagingService packagingService, IMacroService macroService,
@@ -212,9 +212,8 @@ namespace Umbraco.Core.Packaging
 
         private XDocument GetConfigXmlDoc(string packageFilePath)
         {
-            string filePathInPackage;
-            string configXmlContent = _packageExtraction.ReadTextFileFromArchive(packageFilePath,
-                Constants.Packaging.PackageXmlFileName, out filePathInPackage);
+            var configXmlContent = _packageExtraction.ReadTextFileFromArchive(packageFilePath,
+                Constants.Packaging.PackageXmlFileName, out _);
 
             return XDocument.Parse(configXmlContent);
         }
@@ -294,22 +293,20 @@ namespace Umbraco.Core.Packaging
                     };
 
 
-                    XAttribute attr = elemet.Attribute(Constants.Packaging.RunatNodeAttribute);
+                    var attr = elemet.Attribute(Constants.Packaging.RunatNodeAttribute);
 
-                    ActionRunAt runAt;
-                    if (attr != null && Enum.TryParse(attr.Value, true, out runAt)) { packageAction.RunAt = runAt; }
+                    if (attr != null && Enum.TryParse(attr.Value, true, out ActionRunAt runAt)) { packageAction.RunAt = runAt; }
 
                     attr = elemet.Attribute(Constants.Packaging.UndoNodeAttribute);
 
-                    bool undo;
-                    if (attr != null && bool.TryParse(attr.Value, out undo)) { packageAction.Undo = undo; }
+                    if (attr != null && bool.TryParse(attr.Value, out var undo)) { packageAction.Undo = undo; }
 
 
                     return packageAction;
                 }).ToArray();
         }
 
-        private IEnumerable<IContent> InstallDocuments(XElement documentsElement, int userId = 0)
+        private IEnumerable<IContent> InstallDocuments(XElement documentsElement, int userId = -1)
         {
             if ((string.Equals(Constants.Packaging.DocumentSetNodeName, documentsElement.Name.LocalName) == false)
                 && (string.Equals(Constants.Packaging.DocumentsNodeName, documentsElement.Name.LocalName) == false))
@@ -341,7 +338,7 @@ namespace Umbraco.Core.Packaging
             throw new NotImplementedException("The packaging service do not yes have a method for importing stylesheets");
         }
 
-        private IEnumerable<IContentType> InstallDocumentTypes(XElement documentTypes, int userId = 0)
+        private IEnumerable<IContentType> InstallDocumentTypes(XElement documentTypes, int userId = -1)
         {
             if (string.Equals(Constants.Packaging.DocumentTypesNodeName, documentTypes.Name.LocalName) == false)
             {
@@ -355,7 +352,7 @@ namespace Umbraco.Core.Packaging
             return _packagingService.ImportContentTypes(documentTypes, userId);
         }
 
-        private IEnumerable<ITemplate> InstallTemplats(XElement templateElement, int userId = 0)
+        private IEnumerable<ITemplate> InstallTemplats(XElement templateElement, int userId = -1)
         {
             if (string.Equals(Constants.Packaging.TemplatesNodeName, templateElement.Name.LocalName) == false)
             {
@@ -382,7 +379,7 @@ namespace Umbraco.Core.Packaging
                     sd => new KeyValuePair<string, string>(sd.Key, Path.Combine(fullpathToRoot, sd.Value))).ToArray();
         }
 
-        private IEnumerable<IMacro> InstallMacros(XElement macroElements, int userId = 0)
+        private IEnumerable<IMacro> InstallMacros(XElement macroElements, int userId = -1)
         {
             if (string.Equals(Constants.Packaging.MacrosNodeName, macroElements.Name.LocalName) == false)
             {
@@ -403,7 +400,7 @@ namespace Umbraco.Core.Packaging
             return _packagingService.ImportDictionaryItems(dictionaryItemsElement);
         }
 
-        private IEnumerable<ILanguage> InstallLanguages(XElement languageElement, int userId = 0)
+        private IEnumerable<ILanguage> InstallLanguages(XElement languageElement, int userId = -1)
         {
             if (string.Equals(Constants.Packaging.LanguagesNodeName, languageElement.Name.LocalName) == false)
             {
@@ -412,7 +409,7 @@ namespace Umbraco.Core.Packaging
             return _packagingService.ImportLanguages(languageElement, userId);
         }
 
-        private IEnumerable<IDataType> InstallDataTypes(XElement dataTypeElements, int userId = 0)
+        private IEnumerable<IDataType> InstallDataTypes(XElement dataTypeElements, int userId = -1)
         {
             if (string.Equals(Constants.Packaging.DataTypesNodeName, dataTypeElements.Name.LocalName) == false)
             {
@@ -570,8 +567,7 @@ namespace Umbraco.Core.Packaging
 
         private static int IntValue(XElement xElement, int defaultValue = 0)
         {
-            int val;
-            return xElement == null ? defaultValue : int.TryParse(xElement.Value, out val) ? val : defaultValue;
+            return xElement == null ? defaultValue : int.TryParse(xElement.Value, out var val) ? val : defaultValue;
         }
 
         private static string UpdatePathPlaceholders(string path)
