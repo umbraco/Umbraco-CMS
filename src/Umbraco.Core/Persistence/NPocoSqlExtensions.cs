@@ -932,7 +932,7 @@ namespace Umbraco.Core.Persistence
 
             if (sql.SqlContext.DatabaseType.IsMySql())
             {
-                sql.Append("FOR UDPATE");
+                sql.Append("FOR UPDATE");
                 return sql;
             }
 
