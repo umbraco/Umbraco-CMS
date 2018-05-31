@@ -795,7 +795,8 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                if (OnSavingContainerCancelled(scope, new SaveEventArgs<EntityContainer>(container, evtMsgs)))
+                var args = new SaveEventArgs<EntityContainer>(container, evtMsgs);
+                if (OnSavingContainerCancelled(scope, args))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
@@ -806,7 +807,8 @@ namespace Umbraco.Core.Services.Implement
                 _containerRepository.Save(container);
                 scope.Complete();
 
-                OnSavedContainer(scope, new SaveEventArgs<EntityContainer>(container, evtMsgs));
+                args.CanCancel = false;
+                OnSavedContainer(scope, args);
             }
 
             //TODO: Audit trail ?
@@ -921,10 +923,18 @@ namespace Umbraco.Core.Services.Implement
                         throw new InvalidOperationException("No container found with id " + id);
 
                     container.Name = name;
+
+                    var saveEventArgs = new SaveEventArgs<EntityContainer>(container, evtMsgs);
+                    if (OnRenamingContainerCancelled(scope, saveEventArgs))
+                    {
+                        scope.Complete();
+                        return OperationResult.Attempt.Cancel<EntityContainer>(evtMsgs);
+                    }
+
                     _containerRepository.Save(container);
                     scope.Complete();
 
-                    var saveEventArgs = new SaveEventArgs<EntityContainer>(container, evtMsgs) {CanCancel = false};
+                    saveEventArgs.CanCancel = false;
                     OnRenamedContainer(scope, saveEventArgs);
 
                     return OperationResult.Attempt.Succeed(OperationResultType.Success, evtMsgs, container);

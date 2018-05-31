@@ -39,12 +39,10 @@ namespace Umbraco.Core.Services.Implement
         public static event TypedEventHandler<TService, SaveEventArgs<EntityContainer>> SavedContainer;
         public static event TypedEventHandler<TService, DeleteEventArgs<EntityContainer>> DeletingContainer;
         public static event TypedEventHandler<TService, DeleteEventArgs<EntityContainer>> DeletedContainer;
-
-        // fixme - can we have issues with event names?
-
+        
         protected void OnChanged(IScope scope, ContentTypeChange<TItem>.EventArgs args)
         {
-            scope.Events.Dispatch(Changed, This, args, "Changed");
+            scope.Events.Dispatch(Changed, This, args, nameof(Changed));
         }
 
         protected void OnUowRefreshedEntity(ContentTypeChange<TItem>.EventArgs args)
@@ -52,13 +50,7 @@ namespace Umbraco.Core.Services.Implement
             // that one is always immediate (not dispatched, transactional)
             UowRefreshedEntity.RaiseEvent(args, This);
         }
-
-        // fixme what is thsi?
-        protected void OnSaving(IScope scope,  SaveEventArgs<TItem> args)
-        {
-            Saving.RaiseEvent(args, This);
-        }
-
+        
         protected bool OnSavingCancelled(IScope scope, SaveEventArgs<TItem> args)
         {
             return scope.Events.DispatchCancelable(Saving, This, args);
@@ -68,29 +60,17 @@ namespace Umbraco.Core.Services.Implement
         {
             scope.Events.Dispatch(Saved, This, args);
         }
-
-        // fixme what is thsi?
-        protected void OnDeleting(IScope scope,  DeleteEventArgs<TItem> args)
-        {
-            Deleting.RaiseEvent(args, This);
-        }
-
+        
         protected bool OnDeletingCancelled(IScope scope, DeleteEventArgs<TItem> args)
         {
-            return scope.Events.DispatchCancelable(Deleting, This, args);
+            return scope.Events.DispatchCancelable(Deleting, This, args, nameof(Deleting));
         }
-
+        
         protected void OnDeleted(IScope scope, DeleteEventArgs<TItem> args)
         {
             scope.Events.Dispatch(Deleted, This, args);
         }
-
-        // fixme what is thsi?
-        protected void OnMoving(IScope scope,  MoveEventArgs<TItem> args)
-        {
-            Moving.RaiseEvent(args, This);
-        }
-
+        
         protected bool OnMovingCancelled(IScope scope, MoveEventArgs<TItem> args)
         {
             return scope.Events.DispatchCancelable(Moving, This, args);
@@ -100,16 +80,10 @@ namespace Umbraco.Core.Services.Implement
         {
             scope.Events.Dispatch(Moved, This, args);
         }
-
-        // fixme what is this?
-        protected void OnSavingContainer(IScope scope,  SaveEventArgs<EntityContainer> args)
-        {
-            SavingContainer.RaiseEvent(args, This);
-        }
-
+        
         protected bool OnSavingContainerCancelled(IScope scope, SaveEventArgs<EntityContainer> args)
         {
-            return scope.Events.DispatchCancelable(SavingContainer, This, args);
+            return scope.Events.DispatchCancelable(SavingContainer, This, args, nameof(SavingContainer));
         }
 
         protected void OnSavedContainer(IScope scope, SaveEventArgs<EntityContainer> args)
@@ -117,18 +91,16 @@ namespace Umbraco.Core.Services.Implement
             scope.Events.Dispatch(SavedContainer, This, args);
         }
 
+        protected bool OnRenamingContainerCancelled(IScope scope, SaveEventArgs<EntityContainer> args)
+        {
+            return scope.Events.DispatchCancelable(SavedContainer, This, args, nameof(SavedContainer));
+        }
+
         protected void OnRenamedContainer(IScope scope, SaveEventArgs<EntityContainer> args)
         {
-            // fixme changing the name of the event?!
-            scope.Events.Dispatch(SavedContainer, This, args, "RenamedContainer");
+            scope.Events.Dispatch(SavedContainer, This, args, nameof(SavedContainer));
         }
-
-        // fixme what is this?
-        protected void OnDeletingContainer(IScope scope,  DeleteEventArgs<EntityContainer> args)
-        {
-            DeletingContainer.RaiseEvent(args, This);
-        }
-
+        
         protected bool OnDeletingContainerCancelled(IScope scope, DeleteEventArgs<EntityContainer> args)
         {
             return scope.Events.DispatchCancelable(DeletingContainer, This, args);
@@ -136,7 +108,7 @@ namespace Umbraco.Core.Services.Implement
 
         protected void OnDeletedContainer(IScope scope, DeleteEventArgs<EntityContainer> args)
         {
-            scope.Events.Dispatch(DeletedContainer, This, args, "DeletedContainer");
+            scope.Events.Dispatch(DeletedContainer, This, args, nameof(DeletedContainer));
         }
     }
 }
