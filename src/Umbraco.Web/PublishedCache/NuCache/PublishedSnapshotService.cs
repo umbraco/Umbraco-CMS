@@ -1072,8 +1072,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // always refresh the edited data
             OnRepositoryRefreshed(db, content, false);
 
-            // if unpublishing or if it's trashed, remove published data from table
-            if (content.PublishedState == PublishedState.Unpublishing || content.Trashed)
+            // if unpublishing, remove published data from table
+            if (content.PublishedState == PublishedState.Unpublishing)
                 db.Execute("DELETE FROM cmsContentNu WHERE nodeId=@id AND published=1", new { id = content.Id });
 
             // if publishing, refresh the published data
