@@ -528,6 +528,26 @@ namespace Umbraco.Tests.Clr
             Assert.AreEqual(1, values5D["intValue2"]); // JsonProperty changes property name
         }
 
+        [Test]
+        public void EmitFieldGetterSetterEmits()
+        {
+            var getter1 = ReflectionUtilities.EmitFieldGetter<Class1, int>("Field1");
+            var getter2 = ReflectionUtilities.EmitFieldGetter<Class1, int>("Field2");
+            var c = new Class1();
+            Assert.AreEqual(33, getter1(c));
+            Assert.AreEqual(66, getter2(c));
+
+            var setter2 = ReflectionUtilities.EmitFieldSetter<Class1, int>("Field2");
+            setter2(c, 99);
+            Assert.AreEqual(99, getter2(c));
+
+            // works on readonly fields!
+            var (getter3, setter3) = ReflectionUtilities.EmitFieldGetterAndSetter<Class1, int>("Field3");
+            Assert.AreEqual(22, getter3(c));
+            setter3(c, 44);
+            Assert.AreEqual(44, getter3(c));
+        }
+
         // fixme - missing tests specifying 'returned' on method, property
 
         #region IL Code
@@ -549,6 +569,12 @@ namespace Umbraco.Tests.Clr
         // unbox.any    [mscorlib]System.Double
         // conv.i4
         public void SetIntValue2(Class4 object4, object d) => object4.IntValue = (int) (double) d;
+
+        // get field
+        public int GetIntField(Class1 object1) => object1.Field1;
+
+        // set field
+        public void SetIntField(Class1 object1, int i) => object1.Field1 = i;
 
         #endregion
 
@@ -583,6 +609,10 @@ namespace Umbraco.Tests.Clr
             public int Value2 { set { } }
             public int Value3 { get { return 42; } set { } }
             private int ValueP1 => 42;
+
+            public int Field1 = 33;
+            private int Field2 = 66;
+            public readonly int Field3 = 22;
         }
 
         public class Class2 { }

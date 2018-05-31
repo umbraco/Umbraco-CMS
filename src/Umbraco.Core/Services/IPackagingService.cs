@@ -15,7 +15,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user performing the import</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated content</returns>
-        IEnumerable<IContent> ImportContent(XElement element, int parentId = -1, int userId = 0, bool raiseEvents = true);
+        IEnumerable<IContent> ImportContent(XElement element, int parentId = -1, int userId = -1, bool raiseEvents = true);
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentType"/>
@@ -24,7 +24,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated ContentTypes</returns>
-        IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = 0, bool raiseEvents = true);
+        IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = -1, bool raiseEvents = true);
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IContentType"/>
@@ -34,7 +34,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated ContentTypes</returns>
-        IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = 0, bool raiseEvents = true);
+        IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = -1, bool raiseEvents = true);
 
         /// <summary>
         /// Imports and saves package xml as <see cref="IDataType"/>
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated DataTypeDefinitions</returns>
-        IEnumerable<IDataType> ImportDataTypeDefinitions(XElement element, int userId = 0, bool raiseEvents = true);
+        IEnumerable<IDataType> ImportDataTypeDefinitions(XElement element, int userId = -1, bool raiseEvents = true);
 
         /// <summary>
         /// Imports and saves the 'DictionaryItems' part of the package xml as a list of <see cref="IDictionaryItem"/>
@@ -60,7 +60,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumerable list of generated languages</returns>
-        IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, int userId = 0, bool raiseEvents = true);
+        IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, int userId = -1, bool raiseEvents = true);
 
         /// <summary>
         /// Imports and saves the 'Macros' part of a package xml as a list of <see cref="IMacro"/>
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the User performing the operation</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns></returns>
-        IEnumerable<IMacro> ImportMacros(XElement element, int userId = 0, bool raiseEvents = true);
+        IEnumerable<IMacro> ImportMacros(XElement element, int userId = -1, bool raiseEvents = true);
 
         /// <summary>
         /// Imports and saves package xml as <see cref="ITemplate"/>
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated Templates</returns>
-        IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0, bool raiseEvents = true);
+        IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = -1, bool raiseEvents = true);
 
         /// <summary>
         /// Exports an <see cref="IContentType"/> to xml as an <see cref="XElement"/>

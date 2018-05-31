@@ -83,13 +83,21 @@ namespace Umbraco.Web.Editors
         private IEnumerable<AuditLog> MapAvatarsAndNames(IEnumerable<AuditLog> items)
         {
             var userIds = items.Select(x => x.UserId).ToArray();
-            var users = Services.UserService.GetUsersById(userIds)
+            var userAvatars = Services.UserService.GetUsersById(userIds)
                 .ToDictionary(x => x.Id, x => x.GetUserAvatarUrls(ApplicationCache.RuntimeCache));
             var userNames = Services.UserService.GetUsersById(userIds).ToDictionary(x => x.Id, x => x.Name);
             foreach (var item in items)
             {
-                item.UserAvatars = users[item.UserId];
-                item.UserName = userNames[item.UserId];
+                if (userAvatars.TryGetValue(item.UserId, out var avatars))
+                {
+                    item.UserAvatars = avatars;
+                }
+                if (userNames.TryGetValue(item.UserId, out var name))
+                {
+                    item.UserName = name;
+                }
+                
+
             }
             return items;
         }

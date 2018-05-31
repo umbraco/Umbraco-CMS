@@ -963,7 +963,7 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(content, Is.Not.Null);
             Assert.That(content.HasIdentity, Is.False);
-            Assert.That(content.CreatorId, Is.EqualTo(0));//Default to zero/administrator
+            Assert.That(content.CreatorId, Is.EqualTo(-1)); //Default to  -1 administrator
         }
 
         [Test]
