@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using Umbraco.Core;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace Umbraco.Tests.Clr
