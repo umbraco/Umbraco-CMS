@@ -207,6 +207,8 @@
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />
     <Compile Include="Models\ContentEditing\ContentVariation.cs" />
     <Compile Include="Models\ContentEditing\ContentVariationPublish.cs" />
+    <Compile Include="Models\ContentEditing\DomainDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DomainSave.cs" />
     <Compile Include="Models\ContentEditing\EditorNavigation.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
@@ -1417,7 +1419,6 @@
     </Compile>
     <Compile Include="WebServices\BulkPublishController.cs" />
     <Compile Include="WebServices\CoreStringsController.cs" />
-    <Compile Include="WebServices\DomainsApiController.cs" />
     <Compile Include="WebServices\EmbedMediaService.cs" />
     <Compile Include="WebServices\ExamineManagementApiController.cs" />
     <Compile Include="WebServices\TagsController.cs" />
