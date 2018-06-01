@@ -53,7 +53,7 @@ namespace Umbraco.Core.Models
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot get the invariant
         /// name, which must be get or set via the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        IReadOnlyDictionary<string, string> Names { get; }
+        IReadOnlyDictionary<string, string> CultureNames { get; }
 
         /// <summary>
         /// Gets a value indicating whether a given culture is available.

@@ -343,7 +343,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (content.ContentType.Variations.DoesSupportCulture())
             {
                 // names also impact 'edited'
-                foreach (var (culture, name) in content.Names)
+                foreach (var (culture, name) in content.CultureNames)
                     if (name != content.GetPublishName(culture))
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
 
@@ -498,7 +498,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (content.ContentType.Variations.DoesSupportCulture())
             {
                 // names also impact 'edited'
-                foreach (var (culture, name) in content.Names)
+                foreach (var (culture, name) in content.CultureNames)
                     if (name != content.GetPublishName(culture))
                         (editedCultures ?? (editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase))).Add(culture);
 
@@ -1031,7 +1031,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private IEnumerable<ContentVersionCultureVariationDto> GetContentVariationDtos(IContent content, bool publishing)
         {
             // create dtos for the 'current' (non-published) version, all cultures
-            foreach (var (culture, name) in content.Names)
+            foreach (var (culture, name) in content.CultureNames)
                 yield return new ContentVersionCultureVariationDto
                 {
                     VersionId = content.VersionId,
@@ -1046,7 +1046,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (!publishing) yield break;
 
             // create dtos for the 'published' version, for published cultures (those having a name)
-            foreach (var (culture, name) in content.PublishNames)
+            foreach (var (culture, name) in content.PublishCultureNames)
                 yield return new ContentVersionCultureVariationDto
                 {
                     VersionId = content.PublishedVersionId,
@@ -1059,7 +1059,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private IEnumerable<DocumentCultureVariationDto> GetDocumentVariationDtos(IContent content, bool publishing, HashSet<string> editedCultures)
         {
-            foreach (var (culture, name) in content.Names)
+            foreach (var (culture, name) in content.CultureNames)
                 yield return new DocumentCultureVariationDto
                 {
                     NodeId = content.Id,
@@ -1097,7 +1097,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (content.ContentType.Variations.DoesSupportCulture())
             {
                 // no variant name = error
-                if (content.Names.Count == 0)
+                if (content.CultureNames.Count == 0)
                     throw new InvalidOperationException("Cannot save content with an empty name.");
 
                 // sync the invariant name to the default culture name if it's empty since we can't save with an empty invariant name.
@@ -1105,10 +1105,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (string.IsNullOrWhiteSpace(content.Name))
                 {
                     var defaultCulture = LanguageRepository.GetDefaultIsoCode();
-                    if (defaultCulture != null && content.Names.TryGetValue(defaultCulture, out var cultureName))
+                    if (defaultCulture != null && content.CultureNames.TryGetValue(defaultCulture, out var cultureName))
                         content.Name = cultureName;
                     else
-                        content.Name = content.Names.First().Value; // only option is to take the first
+                        content.Name = content.CultureNames.First().Value; // only option is to take the first
                 }
             }
 
@@ -1116,7 +1116,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (publishing && string.IsNullOrWhiteSpace(content.PublishName))
             {
                 // no variant name = error
-                if (content.PublishNames.Count == 0)
+                if (content.PublishCultureNames.Count == 0)
                     throw new InvalidOperationException("Cannot publish content with an empty name.");
 
                 // else... we cannot deal with it here because PublishName is readonly, so in reality, PublishName
@@ -1132,7 +1132,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private void EnsureUniqueVariationNames(IContent content)
         {
-            if (!EnsureUniqueNaming || content.Names.Count == 0) return;
+            if (!EnsureUniqueNaming || content.CultureNames.Count == 0) return;
 
             //Get all culture names at the same level
 
@@ -1156,7 +1156,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (names.Count == 0) return;
 
-            foreach(var n in content.Names)
+            foreach(var n in content.CultureNames)
             {
                 var langId = LanguageRepository.GetIdByIsoCode(n.Key);
                 if (!langId.HasValue) continue;

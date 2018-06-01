@@ -232,7 +232,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc/>
         [IgnoreDataMember]
-        public IReadOnlyDictionary<string, string> PublishNames => _publishInfos?.ToDictionary(x => x.Key, x => x.Value.Name, StringComparer.OrdinalIgnoreCase) ?? NoNames;
+        public IReadOnlyDictionary<string, string> PublishCultureNames => _publishInfos?.ToDictionary(x => x.Key, x => x.Value.Name, StringComparer.OrdinalIgnoreCase) ?? NoNames;
 
         /// <inheritdoc/>
         public string GetPublishName(string culture)
@@ -300,10 +300,10 @@ namespace Umbraco.Core.Models
         }
 
         /// <inheritdoc />
-        public IEnumerable<string> EditedCultures => Names.Keys.Where(IsCultureEdited);
+        public IEnumerable<string> EditedCultures => CultureNames.Keys.Where(IsCultureEdited);
 
         /// <inheritdoc />
-        public IEnumerable<string> AvailableCultures => Names.Keys;
+        public IEnumerable<string> AvailableCultures => CultureNames.Keys;
 
         [IgnoreDataMember]
         public int PublishedVersionId { get; internal set; }
@@ -324,7 +324,7 @@ namespace Umbraco.Core.Models
                 throw new InvalidOperationException($"Cannot publish invariant culture without a name.");
             PublishName = Name;
             var now = DateTime.Now;
-            foreach (var (culture, name) in Names)
+            foreach (var (culture, name) in CultureNames)
             {
                 if (string.IsNullOrWhiteSpace(name))
                     return false; //fixme this should return an attempt with error results
@@ -479,7 +479,7 @@ namespace Umbraco.Core.Models
 
             // copy names
             ClearNames();
-            foreach (var (culture, name) in other.Names)
+            foreach (var (culture, name) in other.CultureNames)
                 SetName(name, culture);
             Name = other.Name;
         }
