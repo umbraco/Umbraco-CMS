@@ -173,7 +173,7 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentFinderByPageIdQuery>()
                 .Append<ContentFinderByUrl>()
                 .Append<ContentFinderByIdPath>()
-                .Append<ContentFinderByUrlAndTemplate>()
+                //.Append<ContentFinderByUrlAndTemplate>() // disabled, this is an odd finder
                 .Append<ContentFinderByUrlAlias>()
                 .Append<ContentFinderByRedirectUrl>();
 
