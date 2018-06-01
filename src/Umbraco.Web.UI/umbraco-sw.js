@@ -1,7 +1,7 @@
 ﻿self.addEventListener('install', function (event) {
     'use strict';
-    //open a cache and precache any urls.
-    console.log(Umbraco.Sys);
+    var serviceCaches = new URL(location).searchParams.get('serviceCaches').split(',');
+    self.serviceCaches = serviceCaches;
 });
 
 self.addEventListener('fetch', function (event) {
@@ -20,7 +20,6 @@ self.addEventListener('fetch', function (event) {
 
 
 self.addEventListener('activate', function (event) {
-    console.log(Umbraco.Sys);
     event.waitUntil(
         caches.keys().then(function (cacheNames) {
             return Promise.all(
@@ -28,7 +27,7 @@ self.addEventListener('activate', function (event) {
                     // Return true if you want to remove this cache,
                     // but remember that caches are shared across
                     // the whole origin
-                    return !Object.values(Umbraco.Sys.serviceCaches).includes(cacheName) && cacheName.startsWith('umb-');
+                    return !self.serviceCaches.includes(cacheName) && cacheName.startsWith('umb-');
                 }).map(function (cacheName) {
                     return caches.delete(cacheName);
                 })
