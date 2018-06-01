@@ -1146,7 +1146,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Where<ContentVersionDto>(x => x.Current == SqlTemplate.Arg<bool>("current"))
                 .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType")
                                     && x.ParentId == SqlTemplate.Arg<int>("parentId")
-                                    && x.NodeId != SqlTemplate.Arg<int>($"{Constants.DatabaseSchema.Tables.Node}.id"))
+                                    && x.NodeId != SqlTemplate.Arg<int>("id"))
                 .OrderBy<ContentVersionCultureVariationDto>(x => x.LanguageId));
 
             var sql = template.Sql(true, NodeObjectTypeId, content.ParentId, content.Id);
