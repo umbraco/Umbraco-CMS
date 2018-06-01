@@ -14,6 +14,7 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
+using static Umbraco.Core.Persistence.NPocoSqlExtensions.Statics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -243,6 +244,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // sanitize names: ensure we have an invariant name, and names are unique-ish
             // (well, only invariant name is unique at the moment)
+            EnsureUniqueVariationNames(entity);
             EnsureInvariantNameValues(entity, publishing);
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
 
@@ -338,7 +340,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Insert(dto);
 
             // persist the variations
-            if (content.ContentType.Variations.HasAny(Models.ContentVariation.CultureNeutral | Models.ContentVariation.CultureSegment))
+            if (content.ContentType.Variations.DoesSupportCulture())
             {
                 // names also impact 'edited'
                 foreach (var (culture, name) in content.Names)
@@ -423,6 +425,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // sanitize names: ensure we have an invariant name, and names are unique-ish
             // (well, only invariant name is unique at the moment)
+            EnsureUniqueVariationNames(entity);
             EnsureInvariantNameValues(entity, publishing);
             entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
 
@@ -492,7 +495,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (content.PublishName != content.Name)
                 edited = true;
 
-            if (content.ContentType.Variations.HasAny(Models.ContentVariation.CultureNeutral | Models.ContentVariation.CultureSegment))
+            if (content.ContentType.Variations.DoesSupportCulture())
             {
                 // names also impact 'edited'
                 foreach (var (culture, name) in content.Names)
@@ -901,7 +904,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // set variations, if varying
-            temps = temps.Where(x => x.ContentType.Variations.HasAny(Models.ContentVariation.CultureNeutral | Models.ContentVariation.CultureSegment)).ToList();
+            temps = temps.Where(x => x.ContentType.Variations.DoesSupportCulture()).ToList();
             if (temps.Count > 0)
             {
                 // load all variations for all documents from database, in one query
@@ -936,7 +939,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             content.Properties = properties[dto.DocumentVersionDto.Id];
 
             // set variations, if varying
-            if (contentType.Variations.HasAny(Models.ContentVariation.CultureNeutral | Models.ContentVariation.CultureSegment))
+            if (contentType.Variations.DoesSupportCulture())
             {
                 var contentVariations = GetContentVariations(ltemp);
                 var documentVariations = GetDocumentVariations(ltemp);
@@ -1086,23 +1089,27 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// </summary>
         private void EnsureInvariantNameValues(IContent content, bool publishing)
         {
-            // here we have to ensure we have names and publish names,
-            // and to try and fix the situation if we have no name
-            // see also: U4-11286
+            // here we have to ensure we have names and publish names, and to try and fix the situation if we have no name, see also: U4-11286
 
-            // cannot save without an invariant name
-            if (string.IsNullOrWhiteSpace(content.Name))
+            if (string.IsNullOrWhiteSpace(content.Name) && content.ContentType.Variations.DoesNotSupportCulture())
+                throw new InvalidOperationException("Cannot save content with an empty name.");
+
+            if (content.ContentType.Variations.DoesSupportCulture())
             {
                 // no variant name = error
                 if (content.Names.Count == 0)
                     throw new InvalidOperationException("Cannot save content with an empty name.");
 
-                // else pick the name for the default culture, or any name
-                var defaultCulture = LanguageRepository.GetDefaultIsoCode();
-                if (defaultCulture != null && content.Names.TryGetValue(defaultCulture, out var cultureName))
-                    content.Name = cultureName;
-                else
-                    content.Name = content.Names.First().Value; // only option is to take the first
+                // sync the invariant name to the default culture name if it's empty since we can't save with an empty invariant name.
+                // fixme should we always sync the invariant name with the default culture name when updating?
+                if (string.IsNullOrWhiteSpace(content.Name))
+                {
+                    var defaultCulture = LanguageRepository.GetDefaultIsoCode();
+                    if (defaultCulture != null && content.Names.TryGetValue(defaultCulture, out var cultureName))
+                        content.Name = cultureName;
+                    else
+                        content.Name = content.Names.First().Value; // only option is to take the first
+                }
             }
 
             // cannot publish without an invariant name
@@ -1121,6 +1128,50 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
         {
             return EnsureUniqueNaming == false ? nodeName : base.EnsureUniqueNodeName(parentId, nodeName, id);
+        }
+
+        private void EnsureUniqueVariationNames(IContent content)
+        {
+            if (content.Names.Count == 0) return;
+
+            //Get all culture names at the same level
+
+            var template = SqlContext.Templates.Get("Umbraco.Core.DocumentRepository.EnsureUniqueVariationNames", tsql => tsql
+                .Select<ContentVersionCultureVariationDto>(x => x.Id, x => x.Name, x => x.LanguageId)
+                .From<ContentVersionCultureVariationDto>()
+                .InnerJoin<ContentVersionDto>()
+                .On<ContentVersionDto, ContentVersionCultureVariationDto>(x => x.Id, x => x.VersionId)
+                .InnerJoin<NodeDto>()
+                .On<NodeDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
+                .Where<ContentVersionDto>(x => x.Current == SqlTemplate.Arg<bool>("current"))
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId"))
+                .OrderBy<ContentVersionCultureVariationDto>(x => x.LanguageId));
+
+            var sql = template.Sql(true, NodeObjectTypeId, content.ParentId);
+            var names = Database.Fetch<CultureNodeName>(sql)
+                .GroupBy(x => x.LanguageId)
+                .ToDictionary(x => x.Key, x => x);
+
+            if (names.Count == 0) return;
+
+            foreach(var n in content.Names)
+            {
+                var langId = LanguageRepository.GetIdByIsoCode(n.Key);
+                if (!langId.HasValue) continue;
+                if (names.TryGetValue(langId.Value, out var cultureNames))
+                {
+                    var otherLangNames = cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });
+                    var uniqueName = SimilarNodeName.GetUniqueName(otherLangNames, 0, n.Value);
+                    content.SetName(uniqueName, n.Key);
+                }
+            }
+        }
+
+        private class CultureNodeName
+        {
+            public int Id { get; set; }
+            public string Name { get; set; }
+            public int LanguageId { get; set; }
         }
 
         #endregion

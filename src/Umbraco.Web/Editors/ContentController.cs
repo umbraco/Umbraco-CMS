@@ -74,7 +74,7 @@ namespace Umbraco.Web.Editors
         public bool AllowsCultureVariation()
         {
             var contentTypes = Services.ContentTypeService.GetAll();
-            return contentTypes.Any(contentType => contentType.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment));
+            return contentTypes.Any(contentType => contentType.Variations.DoesSupportCulture());
         }
 
         /// <summary>

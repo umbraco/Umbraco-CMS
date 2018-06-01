@@ -58,8 +58,7 @@ namespace Umbraco.Web.WebApi.Binders
             protected override bool ValidateCultureVariant(ContentItemSave postedItem, HttpActionContext actionContext)
             {
                 var contentType = postedItem.PersistedContent.GetContentType();
-                if (contentType.Variations.HasAny(Core.Models.ContentVariation.CultureNeutral | Core.Models.ContentVariation.CultureSegment)
-                    && postedItem.Culture.IsNullOrWhiteSpace())
+                if (contentType.Variations.DoesSupportCulture() && postedItem.Culture.IsNullOrWhiteSpace())
                 {
                     //we cannot save a content item that is culture variant if no culture was specified in the request!
                     actionContext.Response = actionContext.Request.CreateValidationErrorResponse($"No 'Culture' found in request. Cannot save a content item that is of a {Core.Models.ContentVariation.CultureNeutral} content type without a specified culture.");
