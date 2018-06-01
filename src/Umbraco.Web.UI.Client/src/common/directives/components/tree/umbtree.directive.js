@@ -446,7 +446,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 loadTree().then(function () {
                     //because angular doesn't return a promise for the resolve method, we need to resort to some hackery, else
                     //like normal JS promises we could do resolve(...).then() 
-                    if (args.onLoaded && angular.isFunction(args.onLoaded)) {
+                    if (args && args.onLoaded && angular.isFunction(args.onLoaded)) {
                         args.onLoaded();
                     }
                 });

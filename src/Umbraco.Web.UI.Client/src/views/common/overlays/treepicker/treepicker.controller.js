@@ -171,7 +171,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                 queryParams["startNodeId"] = $scope.model.startNodeId;
             }
             if (vm.selectedLanguage && vm.selectedLanguage.id) {
-                queryParams["languageId"] = vm.selectedLanguage.id;
+                queryParams["culture"] = vm.selectedLanguage.culture;
             }
             var queryString = $.param(queryParams); //create the query string from the params object
             
