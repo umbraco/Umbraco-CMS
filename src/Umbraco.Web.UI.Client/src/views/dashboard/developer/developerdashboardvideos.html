@@ -5,12 +5,12 @@
 	ng-init="init('http://umbraco.tv/videos/developer/chapterrss?sort=no')"
 	ng-controller="Umbraco.Dashboard.StartupVideosController">
 
-	<div class="umb-getstarted" >
-		<div ng-repeat="video in videos">
-            <a class="btn-link" target="_blank" href="{{video.link}}" title="{{video.title}}">
+	<ul class="umb-getstarted" >
+		<li ng-repeat="video in videos">
+            <a target="_blank" href="{{video.link}}" title="{{video.title}}">
                 <img ng-src="{{video.thumbnail}}" alt="{{video.title}}">
                 <span>{{video.title}}</span>
             </a>
-	    </div>
-	</div>
+	    </li>
+	</ul>
 </div>
