@@ -604,7 +604,7 @@ namespace Umbraco.Core.Services.Implement
                     NodeObjectType = Constants.ObjectTypes.IdReservation,
 
                     CreateDate = DateTime.Now,
-                    UserId = -1,
+                    UserId = null,
                     ParentId = -1,
                     Level = 1,
                     Path = "-1",

@@ -23,7 +23,7 @@ namespace Umbraco.Web.Trees
             long totalUsers;
             nodes.AddRange(
                 Services.UserService.GetAll(0, int.MaxValue, out totalUsers)
-                    .Where(x => x.Id != Constants.Security.SuperId && x.IsApproved)
+                    .Where(x => x.Id != Constants.Security.SuperUserId && x.IsApproved)
                     .Select(x => CreateTreeNode(x.Id.ToString(),
                         id,
                         queryStrings,

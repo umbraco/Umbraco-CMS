@@ -11,6 +11,7 @@ namespace Umbraco.Core.Persistence.Dtos
     internal class ContentVersionDto
     {
         public const string TableName = Constants.DatabaseSchema.Tables.ContentVersion;
+        private int? _userId;
 
         [Column("id")]
         [PrimaryKeyColumn]
@@ -25,7 +26,9 @@ namespace Umbraco.Core.Persistence.Dtos
         public DateTime VersionDate { get; set; }
 
         [Column("userId")]
-        public int UserId { get; set; }
+        [ForeignKey(typeof(UserDto))]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } //return null if zero
 
         [Column("current")]
         public bool Current { get; set; }

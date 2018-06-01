@@ -101,7 +101,7 @@ namespace Umbraco.Core.Migrations.Install
                 var sql = scope.Database.SqlContext.Sql()
                     .SelectCount()
                     .From<UserDto>()
-                    .Where<UserDto>(x => x.Id == Constants.Security.SuperId && x.Password == "default");
+                    .Where<UserDto>(x => x.Id == Constants.Security.SuperUserId && x.Password == "default");
                 var result = scope.Database.ExecuteScalar<int>(sql);
                 var has = result != 1;
                 if (has == false)

@@ -30,6 +30,7 @@ namespace Umbraco.Core.Migrations.Install
         // all tables, in order
         public static readonly List<Type> OrderedTables = new List<Type>
         {
+            typeof (UserDto),
             typeof (NodeDto),
             typeof (ContentTypeDto),
             typeof (TemplateDto),
@@ -58,7 +59,6 @@ namespace Umbraco.Core.Migrations.Install
             typeof (RelationDto),
             typeof (TagDto),
             typeof (TagRelationshipDto),
-            typeof (UserDto),
             typeof (TaskTypeDto),
             typeof (TaskDto),
             typeof (ContentType2ContentTypeDto),

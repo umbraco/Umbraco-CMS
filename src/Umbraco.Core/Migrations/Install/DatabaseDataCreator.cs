@@ -144,7 +144,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private void CreateUserData()
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.User, "id", false, new UserDto { Id = Constants.Security.SuperId, Disabled = false, NoConsole = false, UserName = "Administrator", Login = "admin", Password = "default", Email = "", UserLanguage = "en-US", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
+            _database.Insert(Constants.DatabaseSchema.Tables.User, "id", false, new UserDto { Id = Constants.Security.SuperUserId, Disabled = false, NoConsole = false, UserName = "Administrator", Login = "admin", Password = "default", Email = "", UserLanguage = "en-US", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
         }
 
         private void CreateUserGroupData()
@@ -158,8 +158,8 @@ namespace Umbraco.Core.Migrations.Install
 
         private void CreateUser2UserGroupData()
         {
-            _database.Insert(new User2UserGroupDto { UserGroupId = 1, UserId = Constants.Security.SuperId }); // add super to admins
-            _database.Insert(new User2UserGroupDto { UserGroupId = 5, UserId = Constants.Security.SuperId }); // add super to sensitive data
+            _database.Insert(new User2UserGroupDto { UserGroupId = 1, UserId = Constants.Security.SuperUserId }); // add super to admins
+            _database.Insert(new User2UserGroupDto { UserGroupId = 5, UserId = Constants.Security.SuperUserId }); // add super to sensitive data
         }
 
         private void CreateUserGroup2AppData()

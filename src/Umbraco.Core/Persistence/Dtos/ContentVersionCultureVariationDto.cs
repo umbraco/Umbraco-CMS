@@ -10,6 +10,7 @@ namespace Umbraco.Core.Persistence.Dtos
     internal class ContentVersionCultureVariationDto
     {
         public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCultureVariation;
+        private int? _publishedUserId;
 
         [Column("id")]
         [PrimaryKeyColumn]
@@ -37,9 +38,9 @@ namespace Umbraco.Core.Persistence.Dtos
 
         // fixme want?
         [Column("availableUserId")]
-        // [ForeignKey(typeof(UserDto))] -- there is no foreign key so we can delete users without deleting associated content
-        //[NullSetting(NullSetting = NullSettings.Null)]
-        public int PublishedUserId { get; set; }
+        [ForeignKey(typeof(UserDto))]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public int? PublishedUserId { get => _publishedUserId == 0 ? null : _publishedUserId; set => _publishedUserId = value; } //return null if zero
 
         [Column("edited")]
         public bool Edited { get; set; }

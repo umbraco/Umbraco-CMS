@@ -28,11 +28,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var created = DateTime.Now;
                 var task = new Task(taskType)
                 {
-                    AssigneeUserId = Constants.Security.SuperId,
+                    AssigneeUserId = Constants.Security.SuperUserId,
                     Closed = false,
                     Comment = "hello world",
                     EntityId = -1,
-                    OwnerUserId = Constants.Security.SuperId
+                    OwnerUserId = Constants.Security.SuperUserId
                 };
                 repo.Save(task);
                 

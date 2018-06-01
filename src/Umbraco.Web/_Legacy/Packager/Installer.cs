@@ -349,7 +349,7 @@ namespace umbraco.cms.businesslogic.packager
                     //bool saveNeeded = false;
 
                     // Get current user, with a fallback
-                    var currentUser = Current.Services.UserService.GetUserById(Constants.Security.SuperId);
+                    var currentUser = Current.Services.UserService.GetUserById(Constants.Security.SuperUserId);
 
                     //TODO: Get rid of this entire class! Until then all packages will be installed by the admin user
 

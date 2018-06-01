@@ -105,7 +105,7 @@ namespace Umbraco.Core.Persistence.Factories
             entity.CreateDate = dto.NodeDto.CreateDate;
             entity.Path = dto.NodeDto.Path;
             entity.Level = dto.NodeDto.Level;
-            entity.CreatorId = dto.NodeDto.UserId.Value;
+            entity.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
             entity.AllowedAsRoot = dto.AllowAtRoot;
             entity.IsContainer = dto.IsContainer;
             entity.Trashed = dto.NodeDto.Trashed;

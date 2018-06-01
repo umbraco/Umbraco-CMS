@@ -119,6 +119,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<AddVariationTables1A>("{66B6821A-0DE3-4DF8-A6A4-65ABD211EDDE}");
             Chain<AddVariationTables2>("{49506BAE-CEBB-4431-A1A6-24AD6EBBBC57}");
             Chain<RefactorMacroColumns>("{083A9894-903D-41B7-B6B3-9EAF2D4CCED0}");
+            Chain<UserForeignKeys>("{42097524-0F8C-482C-BD79-AC7407D8A028}");
 
             // must chain to v8 final state (see at end of file)
             Chain("{A7540C58-171D-462A-91C5-7A9AA5CB8BFD}");
@@ -211,11 +212,12 @@ namespace Umbraco.Core.Migrations.Upgrade
             Add<AddVariationTables1A>("{941B2ABA-2D06-4E04-81F5-74224F1DB037}", "{76DF5CD7-A884-41A5-8DC6-7860D95B1DF5}");
 
             Chain<RefactorMacroColumns>("{A7540C58-171D-462A-91C5-7A9AA5CB8BFD}");
+            Chain<UserForeignKeys>("{3E44F712-E2E3-473A-AE49-5D7F8E67CE3F}");
 
             // FINAL STATE - MUST MATCH LAST ONE ABOVE !
             // whenever this changes, update all references in this file!
 
-            Add(string.Empty, "{A7540C58-171D-462A-91C5-7A9AA5CB8BFD}");
+            Add(string.Empty, "{3E44F712-E2E3-473A-AE49-5D7F8E67CE3F}");
         }
     }
 }
