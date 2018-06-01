@@ -1132,7 +1132,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private void EnsureUniqueVariationNames(IContent content)
         {
-            if (content.Names.Count == 0) return;
+            if (!EnsureUniqueNaming || content.Names.Count == 0) return;
 
             //Get all culture names at the same level
 
