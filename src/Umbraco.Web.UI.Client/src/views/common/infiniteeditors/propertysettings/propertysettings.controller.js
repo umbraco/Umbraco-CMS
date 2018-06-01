@@ -18,32 +18,8 @@
         vm.focusOnPatternField = false;
         vm.focusOnMandatoryField = false;
         vm.selectedValidationType = {};
-        vm.validationTypes = [
-            {
-                "name": localizationService.localize("validation_validateAsEmail"),
-                "key": "email",
-                "pattern": "[a-zA-Z0-9_\.\+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-\.]+",
-                "enableEditing": true
-            },
-            {
-                "name": localizationService.localize("validation_validateAsNumber"),
-                "key": "number",
-                "pattern": "^[0-9]*$",
-                "enableEditing": true
-            },
-            {
-                "name": localizationService.localize("validation_validateAsUrl"),
-                "key": "url",
-                "pattern": "https?\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}",
-                "enableEditing": true
-            },
-            {
-                "name": localizationService.localize("validation_enterCustomValidation"),
-                "key": "custom",
-                "pattern": "",
-                "enableEditing": true
-            }
-        ];
+        vm.validationTypes = [];
+        vm.labels = {};
 
         vm.changeValidationType = changeValidationType;
         vm.changeValidationPattern = changeValidationPattern;
@@ -53,17 +29,69 @@
         vm.submit = submit;
         vm.close = close;
 
-        userService.getCurrentUser().then(function(user) {
-            vm.showSensitiveData = user.userGroups.indexOf("sensitiveData") != -1;
-        });
+        function onInit() {
 
-        function activate() {
+            userService.getCurrentUser().then(function(user) {
+                vm.showSensitiveData = user.userGroups.indexOf("sensitiveData") != -1;
+            });
+
             //make the default the same as the content type
             if (!$scope.model.property.id) {
                 $scope.model.property.allowCultureVariant = $scope.model.contentTypeAllowCultureVariant;
             }
             
-            matchValidationType();
+            loadValidationTypes();
+            
+        }
+
+        function loadValidationTypes() {
+
+            var labels = [
+                "validation_validateAsEmail", 
+                "validation_validateAsNumber", 
+                "validation_validateAsUrl", 
+                "validation_enterCustomValidation"
+            ];
+
+            localizationService.localizeMany(labels)
+                .then(function(data){
+
+                    vm.labels.validateAsEmail = data[0];
+                    vm.labels.validateAsNumber = data[1];
+                    vm.labels.validateAsUrl = data[2];
+                    vm.labels.customValidation = data[3];
+
+                    vm.validationTypes = [
+                        {
+                            "name": vm.labels.validateAsEmail,
+                            "key": "email",
+                            "pattern": "[a-zA-Z0-9_\.\+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-\.]+",
+                            "enableEditing": true
+                        },
+                        {
+                            "name": vm.labels.validateAsNumber,
+                            "key": "number",
+                            "pattern": "^[0-9]*$",
+                            "enableEditing": true
+                        },
+                        {
+                            "name": vm.labels.validateAsUrl,
+                            "key": "url",
+                            "pattern": "https?\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}",
+                            "enableEditing": true
+                        },
+                        {
+                            "name": vm.labels.customValidation,
+                            "key": "custom",
+                            "pattern": "",
+                            "enableEditing": true
+                        }
+                    ];
+
+                    matchValidationType();
+
+                });
+
         }
 
         function changeValidationPattern() {
@@ -205,7 +233,7 @@
 
         }
 
-        activate();
+        onInit();
 
     }
 
