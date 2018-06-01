@@ -245,10 +245,8 @@
     margin-right: -10px;
 }
 /* Spacing for boxes */
-.umb-getstarted div {
-    flex: 0 0 auto;
-    flex-basis: 100%;
-    max-width: 100%;
+.umb-getstarted li {
+    display: flex;
     padding: 10px;
     box-sizing: border-box;
     flex-direction: column;
@@ -269,4 +267,15 @@
         flex-basis: 20%;
         max-width: 20%;
     }
+}
+.umb-getstarted li:hover {
+    border: 1px solid @turquoise;
+    cursor: pointer;
+}
+.umb-getstarted li a {
+    text-decoration: none !important;
+}
+.umb-getstarted li a img {
+    max-width: 90%;
+    margin-bottom: 10%;
 }
