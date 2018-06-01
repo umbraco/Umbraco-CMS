@@ -237,3 +237,36 @@
 	margin-top: 5px;
 	font-size: 12px;
 }
+
+.umb-getstarted {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -10px;
+    margin-right: -10px;
+}
+/* Spacing for boxes */
+.umb-getstarted div {
+    flex: 0 0 auto;
+    flex-basis: 100%;
+    max-width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    flex-direction: column;
+    border-radius: 3px;
+    padding: 15px 10px;
+    box-sizing: border-box;
+    text-align: center;
+    border: 1px solid #d8d7d9;
+    height: 100%;
+    margin: 0 10px;
+
+    @media (min-width: 500px) {
+        flex-basis: 50%;
+        max-width: 50%;
+    }
+
+    @media (min-width: 768px) {
+        flex-basis: 20%;
+        max-width: 20%;
+    }
+}
