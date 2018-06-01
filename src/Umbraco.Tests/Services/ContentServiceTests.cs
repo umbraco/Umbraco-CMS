@@ -2565,7 +2565,10 @@ namespace Umbraco.Tests.Services
                 var child = new Content(null, content, contentType);
                 child.SetName("child", langUk.IsoCode);
                 contentService.Save(child);
+                Assert.AreEqual("child" + (i == 0 ? "" : " (" + (i).ToString() + ")"), child.GetName(langUk.IsoCode));
 
+                //Save it again to ensure that the unique check is not performed again against it's own name
+                contentService.Save(child);
                 Assert.AreEqual("child" + (i == 0 ? "" : " (" + (i).ToString() + ")"), child.GetName(langUk.IsoCode));
             }
         }

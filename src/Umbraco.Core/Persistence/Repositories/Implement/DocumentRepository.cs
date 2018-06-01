@@ -1144,10 +1144,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .InnerJoin<NodeDto>()
                 .On<NodeDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
                 .Where<ContentVersionDto>(x => x.Current == SqlTemplate.Arg<bool>("current"))
-                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId"))
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType")
+                                    && x.ParentId == SqlTemplate.Arg<int>("parentId")
+                                    && x.NodeId != SqlTemplate.Arg<int>($"{Constants.DatabaseSchema.Tables.Node}.id"))
                 .OrderBy<ContentVersionCultureVariationDto>(x => x.LanguageId));
 
-            var sql = template.Sql(true, NodeObjectTypeId, content.ParentId);
+            var sql = template.Sql(true, NodeObjectTypeId, content.ParentId, content.Id);
             var names = Database.Fetch<CultureNodeName>(sql)
                 .GroupBy(x => x.LanguageId)
                 .ToDictionary(x => x.Key, x => x);
