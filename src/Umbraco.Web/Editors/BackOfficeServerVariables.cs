@@ -56,7 +56,7 @@ namespace Umbraco.Web.Editors
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}},
-                {"serviceCaches", new string[] {}}
+                {"serviceCaches", new [] {"views"}}
             };
             //now do the filtering...
             var defaults = GetServerVariables();

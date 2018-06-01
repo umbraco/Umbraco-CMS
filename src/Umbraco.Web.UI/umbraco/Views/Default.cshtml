@@ -117,9 +117,9 @@
     {
         <script type="text/javascript">
             if ('serviceWorker' in navigator && window.isSecureContext) {
-                Umbraco.Sys.serviceCaches = { views: 'umb-views-' + Umbraco.Sys.ServerVariables.application.cacheBuster };
                 window.addEventListener('load', function () {
-                    navigator.serviceWorker.register('/umbraco-sw.js', { scope: '/@ViewBag.UmbracoPath'}).then(function (registration) {
+                    var caches = Object.values(Umbraco.Sys.ServerVariables.serviceCaches).join(",");
+                    navigator.serviceWorker.register('/umbraco-sw.js?serviceCaches=' + caches, { scope: '/@ViewBag.UmbracoPath'}).then(function (registration) {
                         // Registration was successful
                         console.log('ServiceWorker registration successful with scope: ', registration.scope);
                     }, function (err) {
