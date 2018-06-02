@@ -1418,7 +1418,6 @@
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
     <Compile Include="WebServices\BulkPublishController.cs" />
-    <Compile Include="WebServices\CoreStringsController.cs" />
     <Compile Include="WebServices\EmbedMediaService.cs" />
     <Compile Include="WebServices\ExamineManagementApiController.cs" />
     <Compile Include="WebServices\TagsController.cs" />
