@@ -75,18 +75,7 @@ namespace Umbraco.Web.Mvc
             }
             return false;
         }
-
-        /// <summary>
-        /// Returns the base path (not including the 'action') of the MVC controller "SaveFileController"
-        /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        public static string GetSaveFileServicePath(this UrlHelper url)
-        {
-            var result = url.Action("SavePartialView", "SaveFile", new {area = UmbracoConfig.For.GlobalSettings().GetUmbracoMvcArea()});
-            return result.TrimEnd("SavePartialView").EnsureEndsWith('/');
-        }
-
+        
         /// <summary>
         /// Returns the base path (not including the 'action') of the MVC controller "BulkPublishController"
         /// </summary>

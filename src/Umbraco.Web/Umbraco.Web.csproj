@@ -1423,7 +1423,6 @@
     <Compile Include="WebServices\ExamineManagementApiController.cs" />
     <Compile Include="WebServices\TagsController.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />
-    <Compile Include="WebServices\SaveFileController.cs" />
     <Compile Include="WebServices\UmbracoAuthorizedWebService.cs">
       <SubType>Component</SubType>
     </Compile>
