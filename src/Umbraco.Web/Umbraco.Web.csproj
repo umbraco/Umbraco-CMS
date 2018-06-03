@@ -443,8 +443,8 @@
     <Compile Include="WebApi\UnhandedExceptionLoggerConfigurationAttribute.cs" />
     <Compile Include="WebApi\UnhandledExceptionLogger.cs" />
     <Compile Include="Runtime\WebRuntimeComponent.cs" />
-    <Compile Include="WebServices\PublishedStatusController.cs" />
-    <Compile Include="WebServices\NuCacheStatusController.cs" />
+    <Compile Include="Editors\PublishedStatusController.cs" />
+    <Compile Include="Editors\NuCacheStatusController.cs" />
     <Compile Include="_Legacy\Actions\Action.cs" />
     <Compile Include="_Legacy\Actions\ActionAssignDomain.cs" />
     <Compile Include="_Legacy\Actions\ActionAudit.cs" />
@@ -1429,7 +1429,7 @@
     <Compile Include="WebServices\UmbracoWebService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="WebServices\XmlDataIntegrityController.cs" />
+    <Compile Include="Editors\XmlDataIntegrityController.cs" />
     <Compile Include="WebViewPageExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
