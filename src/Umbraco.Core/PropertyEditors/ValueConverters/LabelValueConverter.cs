@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
@@ -19,14 +20,64 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             => Constants.PropertyEditors.Aliases.NoEdit.Equals(propertyType.EditorAlias);
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
-            => typeof (string);
+        {
+            var valueType = ConfigurationEditor.ConfigurationAs<LabelConfiguration>(propertyType.DataType.Configuration);
+            switch (valueType.ValueType)
+            {
+                case ValueTypes.DateTime:
+                case ValueTypes.Date:
+                    return typeof(DateTime);
+                case ValueTypes.Time:
+                    return typeof(TimeSpan);
+                case ValueTypes.Decimal:
+                    return typeof(decimal);
+                case ValueTypes.Integer:
+                    return typeof(int);
+                case ValueTypes.Bigint:
+                    return typeof(long);
+                default: // everything else is a string
+                    return typeof(string);
+            }
+        }
 
         public override PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
         {
-            return source?.ToString() ?? string.Empty;
+            var valueType = ConfigurationEditor.ConfigurationAs<LabelConfiguration>(propertyType.DataType.Configuration);
+            switch (valueType.ValueType)
+            {
+                case ValueTypes.DateTime:
+                case ValueTypes.Date:
+                    if (source is DateTime sourceDateTime)
+                        return sourceDateTime;
+                    if (source is string sourceDateTimeString)
+                        return DateTime.TryParse(sourceDateTimeString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt) ? dt : DateTime.MinValue;
+                    return DateTime.MinValue;
+                case ValueTypes.Time:
+                    if (source is DateTime sourceTime)
+                        return sourceTime.TimeOfDay;
+                    if (source is string sourceTimeString)
+                        return TimeSpan.TryParse(sourceTimeString, CultureInfo.InvariantCulture, out var ts) ? ts : TimeSpan.Zero;
+                    return TimeSpan.Zero;
+                case ValueTypes.Decimal:
+                    if (source is decimal sourceDecimal) return sourceDecimal;
+                    if (source is string sourceDecimalString)
+                        return decimal.TryParse(sourceDecimalString, NumberStyles.Any, CultureInfo.InvariantCulture, out var d) ? d : 0;
+                    return (decimal) 0;
+                case ValueTypes.Integer:
+                    if (source is int sourceInt) return sourceInt;
+                    if (source is string sourceIntString)
+                        return int.TryParse(sourceIntString, out var i) ? i : 0;
+                    return 0;
+                case ValueTypes.Bigint:
+                    if (source is string sourceLongString)
+                        return long.TryParse(sourceLongString, out var i) ? i : 0;
+                    return (long) 0;
+                default: // everything else is a string
+                    return source?.ToString() ?? string.Empty;
+            }
         }
     }
 }

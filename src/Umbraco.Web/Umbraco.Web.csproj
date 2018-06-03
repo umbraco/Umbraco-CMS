@@ -280,8 +280,6 @@
     <Compile Include="PropertyEditors\GridConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\ImageCropperConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\IntegerConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\LabelConfiguration.cs" />
-    <Compile Include="PropertyEditors\LabelConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\ListViewConfiguration.cs" />
     <Compile Include="PropertyEditors\ListViewConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MacroContainerConfiguration.cs" />
@@ -750,7 +748,6 @@
     <Compile Include="PropertyEditors\DropDownPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PublishValueValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownWithKeysPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />

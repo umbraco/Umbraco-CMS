@@ -4,6 +4,13 @@
     {
         public static class DataTypes
         {
+            public const int LabelString = -92;
+            public const int LabelInt = -91;
+            public const int LabelBigint = -93;
+            public const int LabelDateTime = -94;
+            public const int LabelTime = -98;
+            public const int LabelDecimal = -99;
+
             public const int Textbox = -88;
             public const int Boolean = -49;
             public const int Datetime = -36;

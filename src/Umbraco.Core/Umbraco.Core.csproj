@@ -321,6 +321,7 @@
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoAuditTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\AddUmbracoConsentTable.cs" />
     <Compile Include="Migrations\Upgrade\V_7_9_0\CreateSensitiveDataUserGroup.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\AddTypedLabels.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddVariationTables1A.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\AddVariationTables2.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\DataTypeMigration.cs" />
@@ -389,6 +390,9 @@
     <Compile Include="PropertyEditors\IManifestValueValidator.cs" />
     <Compile Include="PropertyEditors\IValueFormatValidator.cs" />
     <Compile Include="PropertyEditors\IValueRequiredValidator.cs" />
+    <Compile Include="PropertyEditors\LabelConfiguration.cs" />
+    <Compile Include="PropertyEditors\LabelConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditorCollection.cs" />
     <Compile Include="PropertyEditors\PropertyEditorCollection.cs" />
     <Compile Include="PropertyEditors\PropertyEditorTagsExtensions.cs" />
