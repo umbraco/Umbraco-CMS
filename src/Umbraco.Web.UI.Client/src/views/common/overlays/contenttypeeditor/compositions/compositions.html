@@ -29,7 +29,7 @@
         <h5>Where is this composition used?</h5>
         <p>This composition is currently used in the composition of the following content types:</p>
         <ul class="umb-checkbox-list">
-            <li class="umb-checkbox-list__item" ng-repeat="entity in model.whereCompositionUsed"><a ng-click="vm.openDocumentType(entity.contentType, model.section)"><i class="{{entity.contentType.icon}}"></i>&nbsp;{{entity.contentType.name}}</a></li>
+            <li class="umb-checkbox-list__item" ng-repeat="contentTypeEntity in model.whereCompositionUsed"><a ng-click="vm.openContentType(contentTypeEntity.contentType, model.section)"><i class="{{contentTypeEntity.contentType.icon}}"></i>&nbsp;{{contentTypeEntity.contentType.name}}</a></li>
         </ul>
     </div>
     <ul class="umb-checkbox-list">
