@@ -72,7 +72,7 @@ namespace Umbraco.Web.Runtime
 
             // register accessors for cultures
             composition.Container.RegisterSingleton<IDefaultCultureAccessor, DefaultCultureAccessor>();
-            composition.Container.RegisterSingleton<IVariationContextAccessor, ThreadCultureVariationContextAccessor>();
+            composition.Container.RegisterSingleton<IVariationContextAccessor, HttpContextVariationContextAccessor>();
 
             var typeLoader = composition.Container.GetInstance<TypeLoader>();
             var logger = composition.Container.GetInstance<ILogger>();
