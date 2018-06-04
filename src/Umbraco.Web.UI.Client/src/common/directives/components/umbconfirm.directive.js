@@ -18,7 +18,16 @@ function confirmDirective() {
             caption: '@'
         },
         link: function (scope, element, attr, ctrl) {
+            scope.showCancel = false;
+            scope.showConfirm = false;
 
+            if (scope.onConfirm) {
+                scope.showConfirm = true;
+            }
+
+            if (scope.onCancel) {
+                scope.showCancel = true;
+            }
         }
     };
 }
