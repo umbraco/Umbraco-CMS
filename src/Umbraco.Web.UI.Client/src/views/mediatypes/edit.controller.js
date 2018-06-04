@@ -21,24 +21,40 @@
         vm.page = {};
         vm.page.loading = false;
         vm.page.saveButtonState = "init";
-        vm.page.navigation = [
-			{
-			    "name": localizationService.localize("general_design"),
-			    "icon": "icon-document-dashed-line",
-			    "view": "views/mediatypes/views/design/design.html",
-			    "active": true
-			},
-			{
-			    "name": localizationService.localize("general_listView"),
-			    "icon": "icon-list",
-			    "view": "views/mediatypes/views/listview/listview.html"
-			},
-			{
-			    "name": localizationService.localize("general_rights"),
-			    "icon": "icon-keychain",
-			    "view": "views/mediatypes/views/permissions/permissions.html"
-			}
+        vm.labels = {};
+
+        var labelKeys = [
+            "general_design",
+            "general_listView",
+            "general_rights"
         ];
+
+        localizationService.localizeMany(labelKeys).then(function (values) {
+
+            vm.labels.design = values[0];
+            vm.labels.listview = values[1];
+            vm.labels.permissions = values[2];
+
+            vm.page.navigation = [
+                {
+                    "name": vm.labels.design,
+                    "icon": "icon-document-dashed-line",
+                    "view": "views/mediatypes/views/design/design.html",
+                    "active": true
+                },
+                {
+                    "name": vm.labels.listview,
+                    "icon": "icon-list",
+                    "view": "views/mediatypes/views/listview/listview.html"
+                },
+                {
+                    "name": vm.labels.permissions,
+                    "icon": "icon-keychain",
+                    "view": "views/mediatypes/views/permissions/permissions.html"
+                }
+            ];
+
+        });
 
         vm.page.keyboardShortcutsOverview = [
 			{

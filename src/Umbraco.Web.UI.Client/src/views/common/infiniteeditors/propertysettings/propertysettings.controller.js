@@ -137,7 +137,6 @@
             vm.focusOnMandatoryField = false;
 
             var dataTypeSettings = {
-                title: "Data type settings",
                 view: "views/common/infiniteeditors/datatypesettings/datatypesettings.html",
                 id: property.dataTypeId,
                 submit: function(model) {

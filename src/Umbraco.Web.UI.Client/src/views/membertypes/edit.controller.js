@@ -20,14 +20,19 @@
         vm.page = {};
         vm.page.loading = false;
         vm.page.saveButtonState = "init";
-        vm.page.navigation = [
-			{
-			    "name": localizationService.localize("general_design"),
-			    "icon": "icon-document-dashed-line",
-			    "view": "views/membertypes/views/design/design.html",
-			    "active": true
-			}
-        ];
+        vm.labels = {};
+
+        localizationService.localize("general_design").then(function(data){
+            vm.labels.design = data;
+            vm.page.navigation = [
+                {
+                    "name": vm.labels.design,
+                    "icon": "icon-document-dashed-line",
+                    "view": "views/membertypes/views/design/design.html",
+                    "active": true
+                }
+            ];
+        });
 
         vm.page.keyboardShortcutsOverview = [
 			{

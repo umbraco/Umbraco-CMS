@@ -137,7 +137,6 @@
         function pickEditor(propertyEditor) {
 
             var dataTypeSettings = {
-                title: localizationService.localize("contentTypeEditor_editorSettings"),
                 propertyEditor: propertyEditor,
                 property: $scope.model.property,
                 contentTypeName: $scope.model.contentTypeName,
