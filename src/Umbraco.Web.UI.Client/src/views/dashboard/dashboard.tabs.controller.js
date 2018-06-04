@@ -13,6 +13,10 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
               });
         });
     };
+
+    $scope.openVideo = function (video) {
+        window.location.href = video;
+    };
 }
 
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
