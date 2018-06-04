@@ -963,7 +963,7 @@ namespace Umbraco.Tests.Services
             // Assert
             Assert.That(content, Is.Not.Null);
             Assert.That(content.HasIdentity, Is.False);
-            Assert.That(content.CreatorId, Is.EqualTo(-1)); //Default to  -1 administrator
+            Assert.That(content.CreatorId, Is.EqualTo(0)); //Default to 0 (unknown) since we didn't explicitly set this in the Create call
         }
 
         [Test]
@@ -2499,6 +2499,78 @@ namespace Umbraco.Tests.Services
             contentService.Save(content); // this is effectively a rollback?
             contentService.Rollback(content); // just kill the method and offer options on values + template + name...
             */
+        }
+
+        [Test]
+        public void Ensure_Invariant_Name()
+        {
+            var languageService = ServiceContext.LocalizationService;
+
+            var langUk = new Language("en-UK") { IsDefaultVariantLanguage = true };
+            var langFr = new Language("fr-FR");            
+
+            languageService.Save(langFr);
+            languageService.Save(langUk);
+
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var contentType = contentTypeService.Get("umbTextpage");
+            contentType.Variations = ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral;
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.CultureNeutral });
+            contentTypeService.Save(contentType);
+
+            var contentService = ServiceContext.ContentService;
+            var content = new Content(null, -1, contentType);
+
+            content.SetName("name-us", langUk.IsoCode);
+            content.SetName("name-fr", langFr.IsoCode);
+            contentService.Save(content);
+
+            //the name will be set to the default culture variant name
+            Assert.AreEqual("name-us", content.Name);
+
+            //fixme - should we always sync the invariant name even on update? see EnsureInvariantNameValues
+            ////updating the default culture variant name should also update the invariant name so they stay in sync
+            //content.SetName("name-us-2", langUk.IsoCode);
+            //contentService.Save(content);
+            //Assert.AreEqual("name-us-2", content.Name);
+        }
+
+        [Test]
+        public void Ensure_Unique_Culture_Names()
+        {
+            var languageService = ServiceContext.LocalizationService;
+
+            var langUk = new Language("en-UK") { IsDefaultVariantLanguage = true };
+            var langFr = new Language("fr-FR");
+
+            languageService.Save(langFr);
+            languageService.Save(langUk);
+
+            var contentTypeService = ServiceContext.ContentTypeService;
+
+            var contentType = contentTypeService.Get("umbTextpage");
+            contentType.Variations = ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral;
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.CultureNeutral });
+            contentTypeService.Save(contentType);
+
+            var contentService = ServiceContext.ContentService;
+
+            var content = new Content(null, -1, contentType);
+            content.SetName("root", langUk.IsoCode);
+            contentService.Save(content);
+
+            for (var i = 0; i < 5; i++)
+            {
+                var child = new Content(null, content, contentType);
+                child.SetName("child", langUk.IsoCode);
+                contentService.Save(child);
+                Assert.AreEqual("child" + (i == 0 ? "" : " (" + (i).ToString() + ")"), child.GetName(langUk.IsoCode));
+
+                //Save it again to ensure that the unique check is not performed again against it's own name
+                contentService.Save(child);
+                Assert.AreEqual("child" + (i == 0 ? "" : " (" + (i).ToString() + ")"), child.GetName(langUk.IsoCode));
+            }
         }
 
         [Test]

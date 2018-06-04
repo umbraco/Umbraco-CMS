@@ -69,7 +69,7 @@ namespace Umbraco.Core.Models
             public readonly PropertyInfo DefaultContentTypeIdSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.ContentTypeId);
             public readonly PropertyInfo PropertyCollectionSelector = ExpressionHelper.GetPropertyInfo<ContentBase, PropertyCollection>(x => x.Properties);
             public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<ContentBase, int>(x => x.WriterId);
-            public readonly PropertyInfo NamesSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyDictionary<string, string>>(x => x.Names);
+            public readonly PropertyInfo NamesSelector = ExpressionHelper.GetPropertyInfo<ContentBase, IReadOnlyDictionary<string, string>>(x => x.CultureNames);
         }
 
         protected void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -141,7 +141,7 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         [DataMember]
-        public virtual IReadOnlyDictionary<string, string> Names => _cultureInfos?.ToDictionary(x => x.Key, x => x.Value.Name, StringComparer.OrdinalIgnoreCase) ?? NoNames;
+        public virtual IReadOnlyDictionary<string, string> CultureNames => _cultureInfos?.ToDictionary(x => x.Key, x => x.Value.Name, StringComparer.OrdinalIgnoreCase) ?? NoNames;
 
         // sets culture infos
         // internal for repositories
@@ -180,7 +180,7 @@ namespace Umbraco.Core.Models
                 return;
             }
 
-            if (!ContentTypeBase.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment))
+            if (ContentTypeBase.Variations.DoesNotSupportCulture())
                 throw new NotSupportedException("Content type does not support varying name by culture.");
 
             if (_cultureInfos == null)
@@ -210,7 +210,7 @@ namespace Umbraco.Core.Models
                 return;
             }
 
-            if (!ContentTypeBase.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment))
+            if (ContentTypeBase.Variations.DoesNotSupportCulture())
                 throw new NotSupportedException("Content type does not support varying name by culture.");
 
             if (_cultureInfos == null) return;
@@ -224,7 +224,7 @@ namespace Umbraco.Core.Models
 
         protected virtual void ClearNames()
         {
-            if (!ContentTypeBase.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment))
+            if (ContentTypeBase.Variations.DoesNotSupportCulture())
                 throw new NotSupportedException("Content type does not support varying name by culture.");
 
             _cultureInfos = null;
@@ -327,13 +327,13 @@ namespace Umbraco.Core.Models
         {
             return Properties.Where(x =>
             {
-                if (!culture.IsNullOrWhiteSpace() && !x.PropertyType.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment))
+                if (!culture.IsNullOrWhiteSpace() && x.PropertyType.Variations.DoesNotSupportCulture())
                     return false; //has a culture, this prop is only culture invariant, ignore
-                if (culture.IsNullOrWhiteSpace() && !x.PropertyType.Variations.HasAny(ContentVariation.InvariantNeutral | ContentVariation.InvariantSegment))
+                if (culture.IsNullOrWhiteSpace() && x.PropertyType.Variations.DoesNotSupportInvariant())
                     return false; //no culture, this prop is only culture variant, ignore
-                if (!segment.IsNullOrWhiteSpace() && !x.PropertyType.Variations.HasAny(ContentVariation.InvariantSegment | ContentVariation.CultureSegment))
+                if (!segment.IsNullOrWhiteSpace() && x.PropertyType.Variations.DoesNotSupportSegment())
                     return false; //has segment, this prop is only segment neutral, ignore
-                if (segment.IsNullOrWhiteSpace() && !x.PropertyType.Variations.HasAny(ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral))
+                if (segment.IsNullOrWhiteSpace() && x.PropertyType.Variations.DoesNotSupportNeutral())
                     return false; //no segment, this prop is only non segment neutral, ignore
                 return !x.IsValid(culture, segment);
             }).ToArray();

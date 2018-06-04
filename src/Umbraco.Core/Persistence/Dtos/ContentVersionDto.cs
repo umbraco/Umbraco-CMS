@@ -30,6 +30,7 @@ namespace Umbraco.Core.Persistence.Dtos
         [NullSetting(NullSetting = NullSettings.Null)]
         public int? UserId { get => _userId == 0 ? null : _userId; set => _userId = value; } //return null if zero
 
+        //fixme - we need an index on this it is used almost always in querying and sorting
         [Column("current")]
         public bool Current { get; set; }
 
