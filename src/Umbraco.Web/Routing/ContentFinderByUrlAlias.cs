@@ -78,7 +78,9 @@ namespace Umbraco.Web.Routing
                 // ")]"
 
                 if (!c.HasProperty(propertyAlias)) return false;
-                var v = "," + c.Value<string>(propertyAlias).Replace(" ", "") + ",";
+                var v = c.Value<string>(propertyAlias);
+                if (string.IsNullOrWhiteSpace(v)) return false;
+                v = "," + v.Replace(" ", "") + ",";
                 return v.Contains(a1) || v.Contains(a2);
             }
 
