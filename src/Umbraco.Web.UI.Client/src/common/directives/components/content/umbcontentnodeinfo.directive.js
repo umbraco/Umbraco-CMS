@@ -7,11 +7,30 @@
 
             var evts = [];
             var isInfoTab = false;
+            var labels = {};
             scope.publishStatus = {};
 
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
             
             function onInit() {
+
+                var keys = [
+                    "general_deleted", 
+                    "content_unpublished", 
+                    "content_published",
+                    "content_publishedPendingChanges"
+                ];
+
+                localizationService.localizeMany(keys)
+                    .then(function(data){
+                        labels.deleted = data[0];
+                        labels.unpublished = data[1];
+                        labels.published = data[2];
+                        labels.publishedPendingChanges = data[3];
+
+                        setNodePublishStatus(scope.node);
+
+                    });
 
                 scope.allowOpen = true;
 
@@ -40,8 +59,6 @@
 
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
-
-                setNodePublishStatus(scope.node);
                 
             }
 
@@ -125,25 +142,25 @@
                 
                 // deleted node
                 if(node.trashed === true) {
-                    scope.publishStatus.label = localizationService.localize("general_deleted");
+                    scope.publishStatus.label = labels.deleted;
                     scope.publishStatus.color = "danger";
                 }
 
                 // unpublished node
                 if(node.published === false && node.trashed === false) {
-                    scope.publishStatus.label = localizationService.localize("content_unpublished");
+                    scope.publishStatus.label = labels.unpublished;
                     scope.publishStatus.color = "gray";
                 }
 
                 // published node
                 if(node.publishDate && node.published === true) {
-                    scope.publishStatus.label = localizationService.localize("content_published");
+                    scope.publishStatus.label = labels.published;
                     scope.publishStatus.color = "success";
                 }
 
                 // published node with pending changes
                 if (node.edited === true && node.publishDate) {
-                    scope.publishStatus.label = localizationService.localize("content_publishedPendingChanges");
+                    scope.publishStatus.label = labels.publishedPendingChanges;
                     scope.publishStatus.color = "success"
                 }
 
