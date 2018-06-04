@@ -117,17 +117,32 @@
     {
         <script type="text/javascript">
             if ('serviceWorker' in navigator && window.isSecureContext) {
-                window.addEventListener('load', function () {
-                    var caches = Object.values(Umbraco.Sys.ServerVariables.serviceCaches).join(",");
-                    navigator.serviceWorker.register('/umbraco-sw.js?serviceCaches=' + caches, { scope: '/@ViewBag.UmbracoPath'}).then(function (registration) {
-                        // Registration was successful
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    }, function (err) {
-                        // registration failed :(
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
-                });
-            }            
+                if (Umbraco.Sys.ServerVariables.isDebuggingEnabled) {
+                    navigator.serviceWorker.getRegistration(Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath)
+                        .then(function (reg) {
+                            if (reg) {
+                                reg.unregister(); //ensures we remove the service worker when in debug
+                                }
+                        });
+                } else {
+
+                    window.addEventListener('load',
+                        function() {
+                            var caches = Object.values(Umbraco.Sys.ServerVariables.serviceCaches).join(",");
+                            navigator.serviceWorker
+                                .register('/umbraco-sw.js?serviceCaches=' + caches, { scope: '/@ViewBag.UmbracoPath' })
+                                .then(function(registration) {
+                                        // Registration was successful
+                                        console.log('ServiceWorker registration successful with scope: ',
+                                            registration.scope);
+                                    },
+                                    function(err) {
+                                        // registration failed :(
+                                        console.log('ServiceWorker registration failed: ', err);
+                                    });
+                        });
+                }
+            }
         </script>
     }
 </body>
