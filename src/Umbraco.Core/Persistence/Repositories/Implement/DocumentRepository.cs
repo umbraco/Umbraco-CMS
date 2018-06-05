@@ -1130,26 +1130,26 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return EnsureUniqueNaming == false ? nodeName : base.EnsureUniqueNodeName(parentId, nodeName, id);
         }
 
+        private SqlTemplate SqlEnsureUniqueVariationNames => SqlContext.Templates.Get("Umbraco.Core.DomainRepository.EnsureUniqueVariationNames", tsql => tsql
+            .Select<ContentVersionCultureVariationDto>(x => x.Id, x => x.Name, x => x.LanguageId)
+            .From<ContentVersionCultureVariationDto>()
+            .InnerJoin<ContentVersionDto>()
+            .On<ContentVersionDto, ContentVersionCultureVariationDto>(x => x.Id, x => x.VersionId)
+            .InnerJoin<NodeDto>()
+            .On<NodeDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
+            .Where<ContentVersionDto>(x => x.Current == SqlTemplate.Arg<bool>("current"))
+            .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") &&
+                                 x.ParentId == SqlTemplate.Arg<int>("parentId") &&
+                                 x.NodeId != SqlTemplate.Arg<int>("id"))
+            .OrderBy<ContentVersionCultureVariationDto>(x => x.LanguageId));
+
         private void EnsureUniqueVariationNames(IContent content)
         {
             if (!EnsureUniqueNaming || content.CultureNames.Count == 0) return;
 
             //Get all culture names at the same level
 
-            var template = SqlContext.Templates.Get("Umbraco.Core.DocumentRepository.EnsureUniqueVariationNames", tsql => tsql
-                .Select<ContentVersionCultureVariationDto>(x => x.Id, x => x.Name, x => x.LanguageId)
-                .From<ContentVersionCultureVariationDto>()
-                .InnerJoin<ContentVersionDto>()
-                .On<ContentVersionDto, ContentVersionCultureVariationDto>(x => x.Id, x => x.VersionId)
-                .InnerJoin<NodeDto>()
-                .On<NodeDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
-                .Where<ContentVersionDto>(x => x.Current == SqlTemplate.Arg<bool>("current"))
-                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType")
-                                    && x.ParentId == SqlTemplate.Arg<int>("parentId")
-                                    && x.NodeId != SqlTemplate.Arg<int>("id"))
-                .OrderBy<ContentVersionCultureVariationDto>(x => x.LanguageId));
-
-            var sql = template.Sql(true, NodeObjectTypeId, content.ParentId, content.Id);
+            var sql = SqlEnsureUniqueVariationNames.Sql(true, NodeObjectTypeId, content.ParentId, content.Id);
             var names = Database.Fetch<CultureNodeName>(sql)
                 .GroupBy(x => x.LanguageId)
                 .ToDictionary(x => x.Key, x => x);
