@@ -8,14 +8,12 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
-using System.Xml;
-using Newtonsoft.Json;
-using Umbraco.Core.Configuration;
 using System.Web.Security;
-using Umbraco.Core.Strings;
+using Newtonsoft.Json;
 using Umbraco.Core.CodeAnnotations;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core
 {
@@ -472,13 +470,16 @@ namespace Umbraco.Core
             return ch.ToString(CultureInfo.InvariantCulture) == ch.ToString(CultureInfo.InvariantCulture).ToUpperInvariant();
         }
 
-        /// <summary>Is null or white space.</summary>
-        /// <param name="str">The str.</param>
-        /// <returns>The is null or white space.</returns>
-        public static bool IsNullOrWhiteSpace(this string str)
-        {
-            return (str == null) || (str.Trim().Length == 0);
-        }
+        /// <summary>Indicates whether a specified string is null, empty, or
+        /// consists only of white-space characters.</summary>
+        /// <param name="value">The value to check.</param>
+        /// <returns>Returns <see langword="true"/> if the value is null,
+        /// empty, or consists only of white-space characters, otherwise
+        /// returns <see langword="false"/>.</returns>
+        public static bool IsNullOrWhiteSpace(this string value) => string.IsNullOrWhiteSpace(value);
+        //{
+        //    return (value == null) || (value.Trim().Length == 0);
+        //}
 
         public static string IfNullOrWhiteSpace(this string str, string defaultValue)
         {
