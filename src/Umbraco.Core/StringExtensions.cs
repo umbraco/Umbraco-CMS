@@ -477,9 +477,6 @@ namespace Umbraco.Core
         /// empty, or consists only of white-space characters, otherwise
         /// returns <see langword="false"/>.</returns>
         public static bool IsNullOrWhiteSpace(this string value) => string.IsNullOrWhiteSpace(value);
-        //{
-        //    return (value == null) || (value.Trim().Length == 0);
-        //}
 
         public static string IfNullOrWhiteSpace(this string str, string defaultValue)
         {
