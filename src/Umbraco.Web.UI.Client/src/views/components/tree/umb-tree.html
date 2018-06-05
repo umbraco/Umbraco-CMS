@@ -1,4 +1,4 @@
-<ul class="umb-tree ' + hideoptions + '">
+<ul class="umb-tree" ng-class="{'hide-options': hideoptions === 'true'}">
     <li class="root">
         <div data-element="tree-root" ng-class="getNodeCssClass(tree.root)" ng-hide="hideheader" on-right-click="altSelect(tree.root, $event)">
             <h5>

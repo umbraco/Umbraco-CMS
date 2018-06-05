@@ -28,8 +28,6 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
         },
         controller: function ($scope, $element) {
 
-            $scope.hideoptions = ($scope.hideoptions === 'true') ? "hide-options" : "";
-
             var vm = this;
 
             var registeredCallbacks = {
