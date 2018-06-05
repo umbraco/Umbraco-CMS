@@ -74,7 +74,7 @@ namespace Umbraco.Web.Editors
         public bool AllowsCultureVariation()
         {
             var contentTypes = Services.ContentTypeService.GetAll();
-            return contentTypes.Any(contentType => contentType.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment));
+            return contentTypes.Any(contentType => contentType.Variations.DoesSupportCulture());
         }
 
         /// <summary>
@@ -974,7 +974,7 @@ namespace Umbraco.Web.Editors
         {
             var toMove = ValidateMoveOrCopy(move);
 
-            Services.ContentService.Move(toMove, move.ParentId);
+            Services.ContentService.Move(toMove, move.ParentId, Security.GetUserId().ResultOr(0));
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
@@ -991,7 +991,7 @@ namespace Umbraco.Web.Editors
         {
             var toCopy = ValidateMoveOrCopy(copy);
 
-            var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, Security.CurrentUser.Id);
+            var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, Security.GetUserId().ResultOr(0));
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(c.Path, Encoding.UTF8, "application/json");
@@ -1013,7 +1013,7 @@ namespace Umbraco.Web.Editors
             if (foundContent == null)
                 HandleContentNotFound(id);
            
-            var unpublishResult = Services.ContentService.Unpublish(foundContent, culture: culture, userId: Security.CurrentUser.Id);
+            var unpublishResult = Services.ContentService.Unpublish(foundContent, culture: culture, userId: Security.GetUserId().ResultOr(0));
 
             var content = MapToDisplay(foundContent, culture);
 

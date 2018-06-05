@@ -53,7 +53,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var dto = Database.First<LogDto>(sql);
             return dto == null
                 ? null
-                : new AuditItem(dto.NodeId, dto.Comment, Enum<AuditType>.Parse(dto.Header), dto.UserId);
+                : new AuditItem(dto.NodeId, dto.Comment, Enum<AuditType>.Parse(dto.Header), dto.UserId ?? Constants.Security.UnknownUserId);
         }
 
         protected override IEnumerable<IAuditItem> PerformGetAll(params int[] ids)
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var dtos = Database.Fetch<LogDto>(sql);
 
-            return dtos.Select(x => new AuditItem(x.NodeId, x.Comment, Enum<AuditType>.Parse(x.Header), x.UserId)).ToArray();
+            return dtos.Select(x => new AuditItem(x.NodeId, x.Comment, Enum<AuditType>.Parse(x.Header), x.UserId ?? Constants.Security.UnknownUserId)).ToArray();
         }
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
@@ -160,7 +160,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             totalRecords = page.TotalItems;
 
             var items = page.Items.Select(
-                dto => new AuditItem(dto.Id, dto.Comment, Enum<AuditType>.Parse(dto.Header), dto.UserId)).ToArray();
+                dto => new AuditItem(dto.Id, dto.Comment, Enum<AuditType>.Parse(dto.Header), dto.UserId ?? Constants.Security.UnknownUserId)).ToArray();
 
             // map the DateStamp
             for (var i = 0; i < items.Length; i++)

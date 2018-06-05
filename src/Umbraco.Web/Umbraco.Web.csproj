@@ -252,6 +252,7 @@
     <Compile Include="Models\Mapping\TemplateMapperProfile.cs" />
     <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
     <Compile Include="Models\Mapping\ContentItemDisplayVariationResolver.cs" />
+    <Compile Include="Models\PublishedContent\HttpContextVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\PublishedValueFallback.cs" />
     <Compile Include="Models\RelatedLink.cs" />
     <Compile Include="Models\RelatedLinkBase.cs" />
@@ -280,8 +281,6 @@
     <Compile Include="PropertyEditors\GridConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\ImageCropperConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\IntegerConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\LabelConfiguration.cs" />
-    <Compile Include="PropertyEditors\LabelConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\ListViewConfiguration.cs" />
     <Compile Include="PropertyEditors\ListViewConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MacroContainerConfiguration.cs" />
@@ -750,7 +749,6 @@
     <Compile Include="PropertyEditors\DropDownPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PublishValueValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownWithKeysPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />

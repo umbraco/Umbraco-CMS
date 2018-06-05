@@ -408,22 +408,13 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     if (args.section) {
                         $scope.section = args.section;
                     }
-                    if (args.customTreeParams) {
-                        $scope.customtreeparams = args.customTreeParams;
-                    }
-                    if (args.treealias) {
-                        $scope.treealias = args.treealias;
-                    }
-                    if (args.cacheKey) {
-                        $scope.cachekey = args.cacheKey;
-                    }
                 }
 
                 //load the tree
                 loadTree().then(function () {
                     //because angular doesn't return a promise for the resolve method, we need to resort to some hackery, else
                     //like normal JS promises we could do resolve(...).then() 
-                    if (args.onLoaded && angular.isFunction(args.onLoaded)) {
+                    if (args && args.onLoaded && angular.isFunction(args.onLoaded)) {
                         args.onLoaded();
                     }
                 });

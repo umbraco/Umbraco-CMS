@@ -27,6 +27,7 @@ namespace Umbraco.Web.Routing
         private readonly IContentLastChanceFinder _contentLastChanceFinder;
         private readonly ServiceContext _services;
         private readonly ProfilingLogger _profilingLogger;
+        private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly ILogger _logger;
 
         /// <summary>
@@ -36,6 +37,7 @@ namespace Umbraco.Web.Routing
             IWebRoutingSection webRoutingSection,
             ContentFinderCollection contentFinders,
             IContentLastChanceFinder contentLastChanceFinder,
+            IVariationContextAccessor variationContextAccessor,
             ServiceContext services,
             ProfilingLogger proflog,
             Func<string, IEnumerable<string>> getRolesForLogin = null)
@@ -45,6 +47,7 @@ namespace Umbraco.Web.Routing
             _contentLastChanceFinder = contentLastChanceFinder ?? throw new ArgumentNullException(nameof(contentLastChanceFinder));
             _services = services ?? throw new ArgumentNullException(nameof(services));
             _profilingLogger = proflog ?? throw new ArgumentNullException(nameof(proflog));
+            _variationContextAccessor = variationContextAccessor ?? throw new ArgumentNullException(nameof(variationContextAccessor));
             _logger = proflog.Logger;
 
             GetRolesForLogin = getRolesForLogin ?? (s => Roles.Provider.GetRolesForUser(s));
@@ -89,6 +92,13 @@ namespace Umbraco.Web.Routing
             return request.HasPublishedContent;
         }
 
+        private void SetVariationContext(string culture)
+        {
+            var variationContext = _variationContextAccessor.VariationContext;
+            if (variationContext != null && variationContext.Culture == culture) return;
+            _variationContextAccessor.VariationContext = new VariationContext(culture);
+        }
+
         /// <summary>
         /// Prepares the request.
         /// </summary>
@@ -123,6 +133,7 @@ namespace Umbraco.Web.Routing
 
             // set the culture on the thread - once, so it's set when running document lookups
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = request.Culture;
+            SetVariationContext(request.Culture.Name);
 
             //find the published content if it's not assigned. This could be manually assigned with a custom route handler, or
             // with something like EnsurePublishedContentRequestAttribute or UmbracoVirtualNodeRouteHandler. Those in turn call this method
@@ -138,6 +149,7 @@ namespace Umbraco.Web.Routing
 
             // set the culture on the thread -- again, 'cos it might have changed due to a finder or wildcard domain
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = request.Culture;
+            SetVariationContext(request.Culture.Name);
 
             // trigger the Prepared event - at that point it is still possible to change about anything
             // even though the request might be flagged for redirection - we'll redirect _after_ the event
@@ -173,6 +185,7 @@ namespace Umbraco.Web.Routing
 
             // set the culture on the thread -- again, 'cos it might have changed in the event handler
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = frequest.Culture;
+            SetVariationContext(frequest.Culture.Name);
 
             // if request has been flagged to redirect, or has no content to display,
             // then return - whoever called us is in charge of actually redirecting

@@ -1188,9 +1188,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var names = content is IContent document
                     ? (published
-                        ? document.PublishNames
-                        : document.Names)
-                    : content.Names;
+                        ? document.PublishCultureNames
+                        : document.CultureNames)
+                    : content.CultureNames;
 
             foreach (var (culture, name) in names)
             {

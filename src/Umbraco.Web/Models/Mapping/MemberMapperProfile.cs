@@ -45,7 +45,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.CreatorId, opt => opt.Ignore())
                 .ForMember(dest => dest.Level, opt => opt.Ignore())
                 .ForMember(dest => dest.Name, opt => opt.Ignore())
-                .ForMember(dest => dest.Names, opt => opt.Ignore())
+                .ForMember(dest => dest.CultureNames, opt => opt.Ignore())
                 .ForMember(dest => dest.ParentId, opt => opt.Ignore())
                 .ForMember(dest => dest.Path, opt => opt.Ignore())
                 .ForMember(dest => dest.SortOrder, opt => opt.Ignore())

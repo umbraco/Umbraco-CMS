@@ -31,7 +31,7 @@ namespace Umbraco.Core.Models
         public static bool IsSuper(this IUser user)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
-            return user.Id == Constants.Security.SuperId;
+            return user.Id == Constants.Security.SuperUserId;
         }
 
         /// <summary>

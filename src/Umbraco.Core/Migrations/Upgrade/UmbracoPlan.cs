@@ -119,9 +119,11 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<AddVariationTables1A>("{66B6821A-0DE3-4DF8-A6A4-65ABD211EDDE}");
             Chain<AddVariationTables2>("{49506BAE-CEBB-4431-A1A6-24AD6EBBBC57}");
             Chain<RefactorMacroColumns>("{083A9894-903D-41B7-B6B3-9EAF2D4CCED0}");
+            Chain<UserForeignKeys>("{42097524-0F8C-482C-BD79-AC7407D8A028}");
+            Chain<AddTypedLabels>("{3608CD41-792A-4E9A-A97D-42A5E797EE31}");
 
             // must chain to v8 final state (see at end of file)
-            Chain("{A7540C58-171D-462A-91C5-7A9AA5CB8BFD}");
+            Chain("{4CACE351-C6B9-4F0C-A6BA-85A02BBD39E4}");
 
 
             // UPGRADE FROM 7, MORE RECENT
@@ -210,12 +212,19 @@ namespace Umbraco.Core.Migrations.Upgrade
             // however, need to take care of ppl in post-AddVariationTables1 state
             Add<AddVariationTables1A>("{941B2ABA-2D06-4E04-81F5-74224F1DB037}", "{76DF5CD7-A884-41A5-8DC6-7860D95B1DF5}");
 
+            // 8.0.0
             Chain<RefactorMacroColumns>("{A7540C58-171D-462A-91C5-7A9AA5CB8BFD}");
+            
+            // merge
+            Chain<UserForeignKeys>("{3E44F712-E2E3-473A-AE49-5D7F8E67CE3F}"); // shannon added that one - let's keep it as the default path
+            Chain<AddTypedLabels>("{4CACE351-C6B9-4F0C-A6BA-85A02BBD39E4}"); // then add stephan's - to new final state            
+            //Chain<AddTypedLabels>("{65D6B71C-BDD5-4A2E-8D35-8896325E9151}"); // stephan added that one - need a path to final state
+            Add<UserForeignKeys>("{65D6B71C-BDD5-4A2E-8D35-8896325E9151}", "{4CACE351-C6B9-4F0C-A6BA-85A02BBD39E4}");
 
             // FINAL STATE - MUST MATCH LAST ONE ABOVE !
             // whenever this changes, update all references in this file!
 
-            Add(string.Empty, "{A7540C58-171D-462A-91C5-7A9AA5CB8BFD}");
+            Add(string.Empty, "{4CACE351-C6B9-4F0C-A6BA-85A02BBD39E4}");
         }
     }
 }

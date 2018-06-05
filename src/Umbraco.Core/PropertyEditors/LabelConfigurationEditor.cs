@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration for the label value editor.
