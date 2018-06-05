@@ -1,6 +1,21 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.GridController",
-    function ($scope, $http, assetsService, localizationService, $rootScope, dialogService, gridService, mediaResource, imageHelper, $timeout, umbRequestHelper, angularHelper) {
+    function (
+        $scope,
+        $http,
+        assetsService,
+        localizationService,
+        $rootScope,
+        dialogService,
+        gridService,
+        mediaResource,
+        imageHelper,
+        $timeout,
+        umbRequestHelper,
+        angularHelper,
+        $element,
+        eventsService
+    ) {
 
         // Grid status variables
         var placeHolder = "";
@@ -335,6 +350,8 @@ angular.module("umbraco")
 
             $scope.showRowConfigurations = false;
 
+            eventsService.emit("grid.rowAdded", { scope: $scope, element: $element, row: row });
+
         };
 
         $scope.removeRow = function (section, $index) {
@@ -583,6 +600,8 @@ angular.module("umbraco")
             $scope.initControl(newControl, index + 1);
 
             cell.controls.push(newControl);
+
+            eventsService.emit("grid.itemAdded", { scope: $scope, element: $element, cell: cell, item: newControl });
 
         };
 
@@ -873,7 +892,12 @@ angular.module("umbraco")
             // *********************************************
             // Init grid
             // *********************************************
+
+            eventsService.emit("grid.initializing", { scope: $scope, element: $element });
+
             $scope.initContent();
+
+            eventsService.emit("grid.initialized", { scope: $scope, element: $element });
 
         });
 
