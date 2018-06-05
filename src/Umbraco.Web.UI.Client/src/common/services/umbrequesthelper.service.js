@@ -300,9 +300,9 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 url: url,
                 //IMPORTANT!!! You might think this should be set to 'multipart/form-data' but this is not true because when we are sending up files
                 // the request needs to include a 'boundary' parameter which identifies the boundary name between parts in this multi-part request
-                // and setting the Content-type manually will not set this boundary parameter. For whatever reason, setting the Content-type to 'false'
+                // and setting the Content-type manually will not set this boundary parameter. For whatever reason, setting the Content-type to 'undefined'
                 // will force the request to automatically populate the headers properly including the boundary parameter.
-                headers: { 'Content-Type': false },
+                headers: { 'Content-Type': undefined },
                 transformRequest: function (data) {
                     var formData = new FormData();
                     //add the json data
