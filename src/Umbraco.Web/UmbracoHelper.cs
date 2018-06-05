@@ -1033,10 +1033,14 @@ namespace Umbraco.Web
             return ContentQuery.TypedMedia(id);
 		}
 
+        /// <summary>
+        /// Returns typed Media content based on an Identifier
+        /// </summary>
+        /// <param name="id">The id - this can be the numeric Id such as '1234' or a UDI string such as 'umb://media/a1276990a50e4784b25458fc8d0c487c'</param>
+        /// <returns>PublishedContent if a corresponding media Id exists; otherwise null</returns>
 		public IPublishedContent TypedMedia(string id)
 		{
-            int intId;
-            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.TypedMedia(intId) : null;
+            return TypedMediaForObject(id);
 		}
 
         /// <summary>
