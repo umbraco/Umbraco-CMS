@@ -483,7 +483,6 @@
             vm.queryBuilderOverlay = {
                 view: "querybuilder",
                 show: true,
-                title: localizationService.localize("template_queryBuilder"),
                 submit: function (model) {
 
                     var code = templateHelper.getQuerySnippet(model.result.queryExpression);
