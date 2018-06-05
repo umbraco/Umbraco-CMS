@@ -17,7 +17,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             hideheader: '@',
             cachekey: '@',
             isdialog: '@',
-            onlyinitialized: '@',
+            onlyInitialized: '@',
             //Custom query string arguments to pass in to the tree as a string, example: "startnodeid=123&something=value"
             customtreeparams: '@',
             enablecheckboxes: '@',
@@ -258,7 +258,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     deleteAnimations = false;
 
                     //default args
-                    var args = { section: $scope.section, tree: $scope.treealias, cacheKey: $scope.cachekey, isDialog: $scope.isdialog ? $scope.isdialog : false, onlyinitialized: $scope.onlyinitialized };
+                    var args = { section: $scope.section, tree: $scope.treealias, cacheKey: $scope.cachekey, isDialog: $scope.isdialog ? $scope.isdialog : false, onlyinitialized: $scope.onlyInitialized };
 
                     //add the extra query string params if specified
                     if ($scope.customtreeparams) {
