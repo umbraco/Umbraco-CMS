@@ -5,18 +5,26 @@
 
         var vm = this;
 
-        if(!$scope.model.title) {
-            $scope.model.title = localizationService.localize("template_insert");
-        }
-
-        if(!$scope.model.subtitle) {
-            $scope.model.subtitle = localizationService.localize("template_insertDesc");
-        }
-
         vm.openMacroPicker = openMacroPicker;
         vm.openPageFieldOverlay = openPageFieldOverlay;
         vm.openDictionaryItemOverlay = openDictionaryItemOverlay;
         vm.openPartialOverlay = openPartialOverlay;
+
+        function onInit() {
+            
+            if(!$scope.model.title) {
+                localizationService.localize("template_insert").then(function(value){
+                    $scope.model.title = value;
+                });
+            }
+    
+            if(!$scope.model.subtitle) {
+                localizationService.localize("template_insertDesc").then(function(value){
+                    $scope.model.subtitle = value;
+                });
+            }
+            
+        }
 
         function openMacroPicker() {
 
@@ -136,6 +144,8 @@
                 }
             };
         }
+
+        onInit();
 
     }
 
