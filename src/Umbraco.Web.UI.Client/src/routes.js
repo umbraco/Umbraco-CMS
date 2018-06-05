@@ -89,6 +89,9 @@ app.config(function ($routeProvider) {
     }
 
     $routeProvider
+        .when("/", {
+            redirectTo: '/content'
+        })
         .when('/login', {
             templateUrl: 'views/common/login.html',
             //ensure auth is *not* required so it will redirect to /
