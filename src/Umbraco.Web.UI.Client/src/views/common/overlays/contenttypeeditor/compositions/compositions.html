@@ -26,8 +26,8 @@
         <localize key="contentTypeEditor_compositionInUse"></localize>
     </umb-empty-state>
     <div ng-if="model.availableCompositeContentTypes.length === 0 && model.totalContentTypes > 1 && model.whereCompositionUsed.length > 0">
-        <h5>Where is this composition used?</h5>
-        <p>This composition is currently used in the composition of the following content types:</p>
+        <h5><localize key="contentTypeEditor_compositionUsageHeading"></localize></h5>
+        <p><localize key="contentTypeEditor_compositionUsageSpecification"></localize></p>
         <ul class="umb-checkbox-list">
             <li class="umb-checkbox-list__item" ng-repeat="contentTypeEntity in model.whereCompositionUsed"><a ng-click="vm.openContentType(contentTypeEntity.contentType, model.section)"><i class="{{contentTypeEntity.contentType.icon}}"></i>&nbsp;{{contentTypeEntity.contentType.name}}</a></li>
         </ul>
