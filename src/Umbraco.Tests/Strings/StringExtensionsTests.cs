@@ -165,6 +165,29 @@ namespace Umbraco.Tests.Strings
             Assert.AreEqual(expected, output);
         }
 
+        [TestCase("", true)]
+        [TestCase(" ", true)]
+        [TestCase("\r\n\r\n", true)]
+        [TestCase("\r\n", true)]
+        [TestCase(@"
+        Hello
+        ", false)]
+        [TestCase(null, true)]
+        [TestCase("a", false)]
+        [TestCase("abc", false)]
+        [TestCase("abc   ", false)]
+        [TestCase("   abc", false)]
+        [TestCase("   abc   ", false)]
+        public void IsNullOrWhiteSpace(string value, bool expected)
+        {
+            // Act
+            bool result = value.IsNullOrWhiteSpace();
+
+            // Assert
+            Assert.AreEqual(expected, result);
+        }
+
+
         // FORMAT STRINGS
 
         // note: here we just ensure that the proper helper gets called properly

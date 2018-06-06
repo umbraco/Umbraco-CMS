@@ -75,14 +75,11 @@ Use this directive to render an umbraco button. The directive can be used to gen
       function link(scope, el, attr, ctrl) {
 
          scope.style = null;
+         scope.innerState = "init";
 
          function activate() {
 
              scope.blockElement = false;
-
-            if (!scope.state) {
-               scope.state = "init";
-            }
 
             if (scope.buttonStyle) {
 
@@ -116,10 +113,13 @@ Use this directive to render an umbraco button. The directive can be used to gen
          activate();
 
          var unbindStateWatcher = scope.$watch('state', function(newValue, oldValue) {
+            if (newValue) {
+               scope.innerState = newValue;
+            }
 
             if (newValue === 'success' || newValue === 'error') {
                $timeout(function() {
-                  scope.state = 'init';
+                  scope.innerState = 'init';
                }, 2000);
             }
 

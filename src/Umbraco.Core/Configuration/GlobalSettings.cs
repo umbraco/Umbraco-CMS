@@ -284,7 +284,7 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Returns a string value to determine if umbraco should skip version-checking.
+        /// Returns the number of days that should take place between version checks.
         /// </summary>
         /// <value>The version check period in days (0 = never).</value>
         public int VersionCheckPeriod
