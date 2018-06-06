@@ -1,4 +1,10 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using Moq;
+using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
@@ -8,6 +14,28 @@ namespace Umbraco.Tests.Routing
     [TestFixture]
     public class ContentFinderByAliasTests : UrlRoutingTestBase
     {
+        private PublishedContentType _publishedContentType;
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+
+            var properties = new[]
+            {
+                new PublishedPropertyType("umbracoUrlAlias", Constants.DataTypes.Textbox, false, ContentVariation.InvariantNeutral,
+                    new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()),
+                    Mock.Of<IPublishedModelFactory>(),
+                    Mock.Of<IPublishedContentTypeFactory>()), 
+            };
+            _publishedContentType = new PublishedContentType(0, "Doc", PublishedItemType.Content, Enumerable.Empty<string>(), properties, ContentVariation.InvariantNeutral);
+        }
+
+        protected override PublishedContentType GetPublishedContentTypeByAlias(string alias)
+        {
+            if (alias == "Doc") return _publishedContentType;
+            return null;
+        }
+
         [TestCase("/this/is/my/alias", 1001)]
         [TestCase("/anotheralias", 1001)]
         [TestCase("/page2/alias", 10011)]

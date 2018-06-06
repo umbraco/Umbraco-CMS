@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Migrations
                 upgrader.Execute();
 
                 var helper = new DatabaseSchemaCreator(scope.Database, logger);
-                var exists = helper.TableExists("umbracoNode");
+                var exists = helper.TableExists("umbracoUser");
                 Assert.IsTrue(exists);
 
                 scope.Complete();
@@ -194,8 +194,8 @@ namespace Umbraco.Tests.Migrations
 
             public override void Migrate()
             {
-                // creates Node table with keys, indexes, etc
-                Create.Table<NodeDto>().Do();
+                // creates User table with keys, indexes, etc
+                Create.Table<UserDto>().Do();
             }
         }
 
@@ -207,8 +207,8 @@ namespace Umbraco.Tests.Migrations
 
             public override void Migrate()
             {
-                // drops Node table keys and indexes
-                //Execute.DropKeysAndIndexes("umbracoNode");
+                // drops User table keys and indexes
+                //Execute.DropKeysAndIndexes("umbracoUser");
 
                 // drops *all* tables keys and indexes
                 Delete.KeysAndIndexes().Do();
@@ -224,7 +224,7 @@ namespace Umbraco.Tests.Migrations
             public override void Migrate()
             {
                 // creates Node table keys and indexes
-                Create.KeysAndIndexes<NodeDto>().Do();
+                Create.KeysAndIndexes<UserDto>().Do();
             }
         }
 
@@ -240,7 +240,7 @@ namespace Umbraco.Tests.Migrations
                 foreach (var x in DatabaseSchemaCreator.OrderedTables)
                 {
                     // ok - for tests, restrict to Node
-                    if (x != typeof(NodeDto)) continue;
+                    if (x != typeof(UserDto)) continue;
 
                     Create.KeysAndIndexes(x).Do();
                 }
@@ -258,12 +258,12 @@ namespace Umbraco.Tests.Migrations
                 // cannot delete the column without this, of course
                 Delete.KeysAndIndexes().Do();
 
-                Delete.Column("id").FromTable("umbracoNode").Do();
+                Delete.Column("id").FromTable("umbracoUser").Do();
 
-                var table = DefinitionFactory.GetTableDefinition(typeof(NodeDto), SqlSyntax);
+                var table = DefinitionFactory.GetTableDefinition(typeof(UserDto), SqlSyntax);
                 var column = table.Columns.First(x => x.Name == "id");
                 var create = SqlSyntax.Format(column); // returns [id] INTEGER NOT NULL IDENTITY(1060,1)
-                Database.Execute($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoNode")} ADD " + create);
+                Database.Execute($"ALTER TABLE {SqlSyntax.GetQuotedTableName("umbracoUser")} ADD " + create);
             }
         }
     }

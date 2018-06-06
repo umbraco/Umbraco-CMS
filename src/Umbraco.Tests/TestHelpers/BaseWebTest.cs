@@ -5,6 +5,7 @@ using System.Threading;
 using LightInject;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -14,6 +15,7 @@ using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.TestHelpers
@@ -22,6 +24,14 @@ namespace Umbraco.Tests.TestHelpers
     [Apartment(ApartmentState.STA)]
     public abstract class BaseWebTest : TestWithDatabaseBase
     {
+        protected override void Compose()
+        {
+            base.Compose();
+
+            Container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
+            Container.RegisterSingleton<ProfilingLogger>();
+        }
+
         protected override void Initialize()
         {
             base.Initialize();
@@ -34,8 +44,10 @@ namespace Umbraco.Tests.TestHelpers
 
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             var type = new AutoPublishedContentType(0, "anything", new PublishedPropertyType[] { });
-            ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
+            ContentTypesCache.GetPublishedContentTypeByAlias = alias => GetPublishedContentTypeByAlias(alias) ?? type;
         }
+
+        protected virtual PublishedContentType GetPublishedContentTypeByAlias(string alias) => null;
 
         protected override string GetXmlContent(int templateId)
         {
