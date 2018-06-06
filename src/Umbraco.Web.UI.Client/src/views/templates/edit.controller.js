@@ -375,7 +375,6 @@
                 view: "macropicker",
                 dialogData: {},
                 show: true,
-                title: localizationService.localize("template_insertMacro"),
                 submit: function (model) {
 
                     var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, "Mvc");
