@@ -503,7 +503,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
    $scope.copy = function () {
       $scope.copyDialog = {};
-      $scope.copyDialog.title = localizationService.localize("general_copy");
       $scope.copyDialog.section = $scope.entityType;
       $scope.copyDialog.currentNode = $scope.contentId;
       $scope.copyDialog.view = "copy";
