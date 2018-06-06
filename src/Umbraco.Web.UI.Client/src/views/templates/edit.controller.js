@@ -418,63 +418,81 @@
 
 
         function openDictionaryItemOverlay() {
-            vm.dictionaryItemOverlay = {
-                view: "treepicker",
-                section: "settings",
-                treeAlias: "dictionary",
-                entityType: "dictionary",
-                multiPicker: false,
-                show: true,
-                title: localizationService.localize("template_insertDictionaryItem"),
-                emptyStateMessage: localizationService.localize("emptyStates_emptyDictionaryTree"),
-                select: function(node){
-                    var code = templateHelper.getInsertDictionarySnippet(node.name);
-                	insert(code);
 
-                	vm.dictionaryItemOverlay.show = false;
-                    vm.dictionaryItemOverlay = null;
-                },
-                close: function (model) {
-                    // close dialog
-                    vm.dictionaryItemOverlay.show = false;
-                    vm.dictionaryItemOverlay = null;
-                    // focus editor
-                    vm.editor.focus();
-                }
-            };
+            var labelKeys = [
+                "template_insertDictionaryItem",
+                "emptyStates_emptyDictionaryTree"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(function(values){
+                var title = values[0];
+                var emptyStateMessage = values[1];
+
+                vm.dictionaryItemOverlay = {
+                    view: "treepicker",
+                    section: "settings",
+                    treeAlias: "dictionary",
+                    entityType: "dictionary",
+                    multiPicker: false,
+                    show: true,
+                    title: title,
+                    emptyStateMessage: emptyStateMessage,
+                    select: function(node){
+                        var code = templateHelper.getInsertDictionarySnippet(node.name);
+                        insert(code);
+    
+                        vm.dictionaryItemOverlay.show = false;
+                        vm.dictionaryItemOverlay = null;
+                    },
+                    close: function (model) {
+                        // close dialog
+                        vm.dictionaryItemOverlay.show = false;
+                        vm.dictionaryItemOverlay = null;
+                        // focus editor
+                        vm.editor.focus();
+                    }
+                };
+
+            });
+
         }
 
         function openPartialOverlay() {
-            vm.partialItemOverlay = {
-                view: "treepicker",
-                section: "settings", 
-                treeAlias: "partialViews",
-                entityType: "partialView",
-                multiPicker: false,
-                show: true,
-                title: localizationService.localize("template_insertPartialView"),
-                filter: function(i) {
-                    if(i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
-                        return true;
-                    }
-                },
-                filterCssClass: "not-allowed",
-                select: function(node){
-                    
-                    var code = templateHelper.getInsertPartialSnippet(node.parentId, node.name);
-                    insert(code);
 
-                    vm.partialItemOverlay.show = false;
-                    vm.partialItemOverlay = null;
-                },
-                close: function (model) {
-                    // close dialog
-                    vm.partialItemOverlay.show = false;
-                    vm.partialItemOverlay = null;
-                    // focus editor
-                    vm.editor.focus();
-                }
-            };
+            localizationService.localize("template_insertPartialView").then(function(value){
+                var title = value;
+
+                vm.partialItemOverlay = {
+                    view: "treepicker",
+                    section: "settings", 
+                    treeAlias: "partialViews",
+                    entityType: "partialView",
+                    multiPicker: false,
+                    show: true,
+                    title: title,
+                    filter: function(i) {
+                        if(i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
+                            return true;
+                        }
+                    },
+                    filterCssClass: "not-allowed",
+                    select: function(node){
+                        
+                        var code = templateHelper.getInsertPartialSnippet(node.parentId, node.name);
+                        insert(code);
+    
+                        vm.partialItemOverlay.show = false;
+                        vm.partialItemOverlay = null;
+                    },
+                    close: function (model) {
+                        // close dialog
+                        vm.partialItemOverlay.show = false;
+                        vm.partialItemOverlay = null;
+                        // focus editor
+                        vm.editor.focus();
+                    }
+                };
+            });
         }
 
         function openQueryBuilderOverlay() {
