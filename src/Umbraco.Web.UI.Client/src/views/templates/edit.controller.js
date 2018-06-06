@@ -401,7 +401,6 @@
                 closeButtonlabel: "Cancel",
                 view: "insertfield",
                 show: true,
-                title: localizationService.localize("template_insertPageField"),
                 submit: function (model) {
                     insert(model.umbracoField);
                     vm.pageFieldOverlay.show = false;
