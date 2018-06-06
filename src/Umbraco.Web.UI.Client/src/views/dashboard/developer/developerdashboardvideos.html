@@ -5,7 +5,7 @@
      ng-controller="Umbraco.Dashboard.StartupVideosController">
 
     <div class="umb-getstartedcards">
-        <a class="umb-getstartedcard" ng-repeat="video in videos" href="{{video.link}}" title="{{video.title}}" target="_blank">
+        <a class="umb-getstartedcard" ng-repeat="video in videos" href="{{video.link}}" title="{{video.title}}" target="_blank" rel="noopener">
             <img ng-src="{{video.thumbnail}}" alt="{{video.title}}">
             <div class="umb-getstartedbody">
                 <p>{{video.title}}</p>
