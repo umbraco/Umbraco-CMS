@@ -432,7 +432,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
     $scope.move = function() {
         $scope.moveDialog = {};
-        $scope.moveDialog.title = localizationService.localize("general_move");
         $scope.moveDialog.section = $scope.entityType;
         $scope.moveDialog.currentNode = $scope.contentId;
         $scope.moveDialog.view = "move";
