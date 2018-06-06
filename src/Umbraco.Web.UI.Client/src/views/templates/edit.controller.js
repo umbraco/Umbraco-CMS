@@ -569,34 +569,38 @@
                 }
             });
 
-            vm.masterTemplateOverlay = {
-                view: "itempicker",
-                title: localizationService.localize("template_mastertemplate"),
-                availableItems: availableMasterTemplates,
-                show: true,
-                submit: function(model) {
+            localizationService.localize("template_mastertemplate").then(function(value){
+                var title = value;
 
-                    var template = model.selectedItem;
-
-                    if (template && template.alias) {
-                        vm.template.masterTemplateAlias = template.alias;
-                        setLayout(template.alias + ".cshtml");
-                    } else {
-                        vm.template.masterTemplateAlias = null;
-                        setLayout(null);
+                vm.masterTemplateOverlay = {
+                    view: "itempicker",
+                    title: title,
+                    availableItems: availableMasterTemplates,
+                    show: true,
+                    submit: function(model) {
+    
+                        var template = model.selectedItem;
+    
+                        if (template && template.alias) {
+                            vm.template.masterTemplateAlias = template.alias;
+                            setLayout(template.alias + ".cshtml");
+                        } else {
+                            vm.template.masterTemplateAlias = null;
+                            setLayout(null);
+                        }
+    
+                        vm.masterTemplateOverlay.show = false;
+                        vm.masterTemplateOverlay = null;
+                    },
+                    close: function(oldModel) {
+                        // close dialog
+                        vm.masterTemplateOverlay.show = false;
+                        vm.masterTemplateOverlay = null;
+                        // focus editor
+                        vm.editor.focus();
                     }
-
-                    vm.masterTemplateOverlay.show = false;
-                    vm.masterTemplateOverlay = null;
-                },
-                close: function(oldModel) {
-                    // close dialog
-                    vm.masterTemplateOverlay.show = false;
-                    vm.masterTemplateOverlay = null;
-                    // focus editor
-                    vm.editor.focus();
-                }
-            };
+                };
+            });
 
         }
 
