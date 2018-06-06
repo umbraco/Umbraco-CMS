@@ -17,13 +17,14 @@
 
         vm.availableTemplates = [];
         vm.updateTemplatePlaceholder = false;
+        vm.loadingTemplates = false;
 
 
         /* ---------- INIT ---------- */
 
-        init();
+        function onInit() {
 
-        function init() {
+            vm.loadingTemplates = true;
 
             entityResource.getAll("Template").then(function(templates){
 
@@ -35,9 +36,13 @@
                   vm.availableTemplates = contentTypeHelper.insertTemplatePlaceholder(vm.availableTemplates);
                 }
 
+                vm.loadingTemplates = false;
+
             });
 
         }
+
+        onInit();
 
     }
 

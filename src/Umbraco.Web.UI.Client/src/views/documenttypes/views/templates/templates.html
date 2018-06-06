@@ -10,7 +10,7 @@
                 
                 <div class="sub-view-column-right">
                     <umb-grid-selector
-                        ng-if="vm.availableTemplates"
+                        ng-if="!vm.loadingTemplates"
                         selected-items="model.allowedTemplates"
                         available-items="vm.availableTemplates"
                         default-item="model.defaultTemplate"
