@@ -1541,7 +1541,11 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="xmlDataIntegrityCheckMedia">Total XML : %0%, Total : %1%</key>
     <key alias="xmlDataIntegrityCheckContent">Total XML : %0%, Total publié : %1%</key>
 
-	<key alias="httpsCheckValidCertificate">Le certificat de votre site a été marqué comme valide.</key>
+    <key alias="databaseSchemaValidationCheckDatabaseOk">Database - Le schéma de la base de données est correct pour cette version d'Umbraco</key>
+    <key alias="databaseSchemaValidationCheckDatabaseErrors">%0% problèmes ont été détectés avec votre schéma de base de données (consultez le journal pour plus de détails)</key>
+    <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Certaines erreurs ont été détectées lors de la validation du schéma de base de données par rapport à la version actuelle d'Umbraco.</key>
+
+    <key alias="httpsCheckValidCertificate">Le certificat de votre site a été marqué comme valide.</key>
     <key alias="httpsCheckInvalidCertificate">Erreur de validation du certificat : '%0%'</key>
     <key alias="healthCheckInvalidUrl">Erreur en essayant de contacter l'URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Vous êtes actuellement %0% à voir le site via le schéma HTTPS.</key>
