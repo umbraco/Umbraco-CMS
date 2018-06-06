@@ -1,16 +1,17 @@
 <h3>Hours of Umbraco training videos are only a click away</h3>
-<p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco, then visit <a class="btn-link -underline"  href="http://umbraco.tv" target="_blank">umbraco.tv</a> for even more Umbraco videos.</p>
+<p>Want to master Umbraco? Spend a couple of minutes learning some best practices by watching one of these videos about using Umbraco, then visit <a class="btn-link -underline" href="http://umbraco.tv" target="_blank">umbraco.tv</a> for even more Umbraco videos.</p>
 
-<div class="row-fluid"
-	ng-init="init('http://umbraco.tv/videos/developer/chapterrss?sort=no')"
-	ng-controller="Umbraco.Dashboard.StartupVideosController">
+<div ng-init="init('http://umbraco.tv/videos/developer/chapterrss?sort=no')"
+     ng-controller="Umbraco.Dashboard.StartupVideosController">
 
-    <ul class="umb-getstarted">
-            <li ng-repeat="video in videos" ng-click="openVideo(video.link)">
-                <div class="umb-getstarted-content">
-                <img ng-src="{{video.thumbnail}}" alt="{{video.title}}">
+    <div class="umb-getstartedcards">
+        <div class="umb-getstartedcard" ng-repeat="video in videos" ng-click="openVideo(video.link)">
+            <img ng-src="{{video.thumbnail}}" alt="{{video.title}}">
+            <div class="body">
                 <p>{{video.title}}</p>
-                </div>
-            </li>
-        </ul>
+            </div>
+
+        </div>
+
+    </div>
 </div>
