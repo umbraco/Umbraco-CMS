@@ -133,19 +133,19 @@ namespace Umbraco.Web.Editors
                 case UmbracoObjectTypes.DocumentType:
                     if (contentTypeId > 0)
                     {
-                        source = Services.ContentTypeService.GetContentType(contentTypeId);
+                        source = Services.ContentTypeService.Get(contentTypeId);
                         if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
                     }
-                    allContentTypes = Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>().ToArray();
+                    allContentTypes = Services.ContentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
                     break;
 
                 case UmbracoObjectTypes.MediaType:
                     if (contentTypeId > 0)
                     {
-                        source = Services.ContentTypeService.GetMediaType(contentTypeId);
+                        source = Services.ContentTypeService.Get(contentTypeId);
                         if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
                     }
-                    allContentTypes = Services.ContentTypeService.GetAllMediaTypes().Cast<IContentTypeComposition>().ToArray();
+                    allContentTypes = Services.ContentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
                     break;
 
                 case UmbracoObjectTypes.MemberType:
