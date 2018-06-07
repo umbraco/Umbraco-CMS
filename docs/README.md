@@ -1,5 +1,7 @@
 _You are browsing the Umbraco v8 branch._
+
 _Looking for Umbraco version 7? [Click here](https://github.com/umbraco/Umbraco-CMS) to go to the v7 branch._
+
 _Ready to try out Version 8? [See the quick start guide](V8_GETTING_STARTED.md)._
 
 Umbraco CMS
