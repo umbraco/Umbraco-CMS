@@ -2,7 +2,7 @@
 
 ### What you need:
 
-* [Visual Studio 2017 Community (Free)](https://www.visualstudio.com/vs/community/), or Professional, Enterprise, etc... _(**Minimum of Version 15.7** or great, this is important, you WILL get issues with lesser versions)_
+* [Visual Studio 2017 Community (Free)](https://www.visualstudio.com/vs/community/), or Professional, Enterprise, etc... _(**Minimum of Version 15.7** or higher, this is important, you WILL get issues with lesser versions)_
 * .NET Framework 4.7.2 installed, get it here: https://www.microsoft.com/net/download/thank-you/net472?survey=false
 * .NET Framework 4.7.2 developer pack, get it here: https://www.microsoft.com/net/download/thank-you/net472-developer-pack _(be sure this is the ENU file which will be named `NDP472-DevPack-ENU.exe`)_
 * Clone the Umbraco repository and ensure you have the `temp8` branch checked out
