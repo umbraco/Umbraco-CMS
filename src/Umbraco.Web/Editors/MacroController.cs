@@ -121,9 +121,12 @@ namespace Umbraco.Web.Editors
             // Since a Macro might contain thing thats related to the culture of the "IPublishedContent" (ie Dictionary keys) we want
             // to set the current culture to the culture related to the content item. This is hacky but it works.
             var publishedContent = UmbracoContext.ContentCache.GetById(doc.Id);
-            var culture = publishedContent.GetCulture();
-            Thread.CurrentThread.CurrentCulture = culture;
-            Thread.CurrentThread.CurrentUICulture = culture;
+            var culture = publishedContent?.GetCulture();
+            if (culture != null)
+            {
+                Thread.CurrentThread.CurrentCulture = culture;
+                Thread.CurrentThread.CurrentUICulture = culture;
+            }
 
             var legacyPage = new global::umbraco.page(doc);
             UmbracoContext.HttpContext.Items["pageID"] = doc.Id;
