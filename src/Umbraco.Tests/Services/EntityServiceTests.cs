@@ -471,7 +471,6 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        [Ignore("TEMP - fails")]
         public void EntityService_Can_Get_Child_Content_By_ParentId_And_UmbracoObjectType_With_Variant_Names()
         {
             var service = ServiceContext.EntityService;
@@ -481,6 +480,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(contentType);
 
             var root = MockedContent.CreateSimpleContent(contentType);
+            root.SetName("Root", _langFr.IsoCode); // else cannot save
             ServiceContext.ContentService.Save(root);
 
             for (int i = 0; i < 10; i++)
@@ -490,6 +490,10 @@ namespace Umbraco.Tests.Services
                 {
                     c1.SetName("Test " + i + " - FR", _langFr.IsoCode);
                     c1.SetName("Test " + i + " - ES", _langEs.IsoCode);
+                }
+                else
+                {
+                    c1.SetName("Test", _langFr.IsoCode); // else cannot save
                 }
                 ServiceContext.ContentService.Save(c1);
             }

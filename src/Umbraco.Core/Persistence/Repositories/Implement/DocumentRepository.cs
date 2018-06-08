@@ -1091,16 +1091,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             // here we have to ensure we have names and publish names, and to try and fix the situation if we have no name, see also: U4-11286
 
-            if (string.IsNullOrWhiteSpace(content.Name) && content.ContentType.Variations.DoesNotSupportCulture())
+            // invariant content must have an invariant name
+            if (content.ContentType.Variations.DoesNotSupportCulture() && string.IsNullOrWhiteSpace(content.Name))
                 throw new InvalidOperationException("Cannot save content with an empty name.");
 
+            // variant content must have at least one variant name
             if (content.ContentType.Variations.DoesSupportCulture())
             {
-                // no variant name = error
                 if (content.CultureNames.Count == 0)
                     throw new InvalidOperationException("Cannot save content with an empty name.");
 
-                // sync the invariant name to the default culture name if it's empty since we can't save with an empty invariant name.
+                // cannot save with an empty invariant name,
+                // if invariant name is missing, derive it from variant names
                 // fixme should we always sync the invariant name with the default culture name when updating?
                 if (string.IsNullOrWhiteSpace(content.Name))
                 {
