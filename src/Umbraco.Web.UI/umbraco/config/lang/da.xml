@@ -95,23 +95,6 @@
         </key>
         <key alias="setDomains">Domæner</key>
     </area>
-    <area alias="auditTrails">
-        <key alias="atViewingFor">For</key>
-        <key alias="delete">Brugeren har slettet indholdet</key>
-        <key alias="unpublish">Brugeren har afpubliceret indholdet</key>
-        <key alias="publish">Brugeren har gemt og udgivet indholdet</key>
-        <key alias="save">Brugeren har gemt indholdet</key>
-        <key alias="move">Brugeren har flyttet indholdet</key>
-        <key alias="copy">Brugeren har kopieret indholdet</key>
-        <key alias="rollback">Brugeren har tilbagerullet indholdet til en tidligere tilstand</key>
-        <key alias="smallCopy">Kopieret</key>
-        <key alias="smallPublish">Udgivet</key>
-        <key alias="smallMove">Flyttet</key>
-        <key alias="smallSave">Gemt</key>
-        <key alias="smallDelete">Slettet</key>
-        <key alias="smallUnPublish">Afpubliceret</key>
-        <key alias="smallRollBack">Indhold tilbagerullet</key>
-    </area>
     <area alias="buttons">
         <key alias="clearSelection">Ryd valg</key>
         <key alias="select">Vælg</key>
@@ -149,6 +132,23 @@
         <key alias="saveAndGenerateModels">Gem og generer modeller</key>
         <key alias="undo">Fortryd</key>
         <key alias="redo">Genskab</key>
+    </area>
+    <area alias="auditTrails">
+        <key alias="atViewingFor">For</key>
+        <key alias="delete">Brugeren har slettet indholdet</key>
+        <key alias="unpublish">Brugeren har afpubliceret indholdet</key>
+        <key alias="publish">Brugeren har gemt og udgivet indholdet</key>
+        <key alias="save">Brugeren har gemt indholdet</key>
+        <key alias="move">Brugeren har flyttet indholdet</key>
+        <key alias="copy">Brugeren har kopieret indholdet</key>
+        <key alias="rollback">Brugeren har tilbagerullet indholdet til en tidligere tilstand</key>
+        <key alias="smallCopy">Kopieret</key>
+        <key alias="smallPublish">Udgivet</key>
+        <key alias="smallMove">Flyttet</key>
+        <key alias="smallSave">Gemt</key>
+        <key alias="smallDelete">Slettet</key>
+        <key alias="smallUnPublish">Afpubliceret</key>
+        <key alias="smallRollBack">Indhold tilbagerullet</key>
     </area>
     <area alias="changeDocType">
         <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
