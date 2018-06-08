@@ -62,14 +62,14 @@ namespace Umbraco.Core.Strategies
                     // Add a relation for the item being deleted, so that we can know the original parent for if we need to restore later
                     var relation = new Relation(originalParentId, item.Entity.Id, relationType);
                     relationService.Save(relation);
-                    string[] tokens = new string[] { item.Entity.Id.ToString(), originalParentId.ToString() };
 
-                    ApplicationContext.Current.Services.AuditService.Add(AuditType.Delete, ApplicationContext.Current.Services.TextService.Localize("auditTrails/trashedContent", tokens),
+                    ApplicationContext.Current.Services.AuditService.Add(AuditType.Delete,
+                        string.Format("Trashed content with Id: '{0}' related to original parent content with Id: '{1}'", item.Entity.Id, originalParentId),
                         item.Entity.WriterId,
                         item.Entity.Id);
                 }
 
-                
+
             }
         }
     }

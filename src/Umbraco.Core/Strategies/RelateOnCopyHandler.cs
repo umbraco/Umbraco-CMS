@@ -26,18 +26,19 @@ namespace Umbraco.Core.Strategies
                     relationType = new RelationType(new Guid(Constants.ObjectTypes.Document),
                         new Guid(Constants.ObjectTypes.Document),
                         Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
-                        Constants.Conventions.RelationTypes.RelateDocumentOnCopyName) { IsBidirectional = true };
+                        Constants.Conventions.RelationTypes.RelateDocumentOnCopyName)
+                    { IsBidirectional = true };
 
                     relationService.Save(relationType);
                 }
 
                 var relation = new Relation(e.Original.Id, e.Copy.Id, relationType);
                 relationService.Save(relation);
-                string[] tokens = new string[] { e.Copy.Id.ToString(), e.Original.Id.ToString() };
 
                 ApplicationContext.Current.Services.AuditService.Add(
                     AuditType.Copy,
-                    ApplicationContext.Current.Services.TextService.Localize("auditTrails/copyWithId", tokens), e.Copy.WriterId, e.Copy.Id);
+                    string.Format("Copied content with Id: '{0}' related to original content with Id: '{1}'",
+                        e.Copy.Id, e.Original.Id), e.Copy.WriterId, e.Copy.Id);
             }
         }
     }
