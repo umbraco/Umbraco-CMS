@@ -64,7 +64,11 @@
                                     <!--{{ item.logType }}-->
                                     <localize key="auditTrails_small{{ item.logType }}">{{ item.logType }}</localize>
                                 </umb-badge>
-                                <span>{{ item.comment }}</span>
+                                <span>
+                                    <localize key="auditTrails_{{ item.logType | lowercase }}">{{ item.comment }}</localize>
+                                </span>
+
+                                <!--<span>{{ item.comment }}</span>-->
                             </div>
 
                         </div>
