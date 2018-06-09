@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.FrontEnd
 {
     [TestFixture]
     public class UmbracoHelperTests
+        : BaseUmbracoApplicationTest
     {
         [Test]
         public void Truncate_Simple()
@@ -308,6 +310,10 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         // ------- UDI Conversion Tests
+        /// <remarks>
+        /// This requires PluginManager.Current to be initialised before
+        /// running.
+        /// </remarks>
         [Test]
         public static void Converting_boxed_udi_to_a_udi_returns_original_udi_value()
         {
@@ -326,6 +332,10 @@ namespace Umbraco.Tests.FrontEnd
             Assert.That(result, Is.EqualTo(sample));
         }
 
+        /// <remarks>
+        /// This requires PluginManager.Current to be initialised before
+        /// running.
+        /// </remarks>
         [Test]
         public static void Converting_string_udi_to_a_udi_returns_original_udi_value()
         {
@@ -344,6 +354,10 @@ namespace Umbraco.Tests.FrontEnd
             Assert.That(result, Is.EqualTo(sample));
         }
 
+        /// <remarks>
+        /// This requires PluginManager.Current to be initialised before
+        /// running.
+        /// </remarks>
         [Test]
         public static void Converting_hello_to_a_udi_returns_false()
         {
@@ -362,6 +376,10 @@ namespace Umbraco.Tests.FrontEnd
             Assert.That(result, Is.Null);
         }
 
+        /// <remarks>
+        /// This requires PluginManager.Current to be initialised before
+        /// running.
+        /// </remarks>
         [Test]
         public static void Converting_unsupported_object_to_a_udi_returns_false()
         {
