@@ -236,24 +236,39 @@ namespace Umbraco.Web
         #endregion
 
         /// <summary>
-        /// Returns the current IPublishedContent item assigned to the UmbracoHelper
+        /// Returns the current <seealso cref="IPublishedContent"/> item
+        /// assigned to the UmbracoHelper.
         /// </summary>
         /// <remarks>
-        /// Note that this is the assigned IPublishedContent item to the UmbracoHelper, this is not necessarily the Current IPublishedContent item
-        /// being rendered. This IPublishedContent object is contextual to the current UmbracoHelper instance.
-        ///
-        /// In some cases accessing this property will throw an exception if there is not IPublishedContent assigned to the Helper
-        /// this will only ever happen if the Helper is constructed with an UmbracoContext and it is not a front-end request
+        /// <para>
+        /// Note that this is the assigned IPublishedContent item to the
+        /// UmbracoHelper, this is not necessarily the Current IPublishedContent
+        /// item being rendered. This IPublishedContent object is contextual to
+        /// the current UmbracoHelper instance.
+        /// </para>
+        ///<para>
+        /// In some cases accessing this property will throw an exception if
+        /// there is not IPublishedContent assigned to the Helper this will
+        /// only ever happen if the Helper is constructed with an UmbracoContext
+        /// and it is not a front-end request.
+        /// </para>
         /// </remarks>
-        /// <exception cref="InvalidOperationException">Thrown if the UmbracoHelper is constructed with an UmbracoContext and it is not a front-end request</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the
+        /// UmbracoHelper is constructed with an UmbracoContext and it is not a
+        /// front-end request.</exception>
 	    public IPublishedContent AssignedContentItem
 	    {
 	        get
 	        {
-	            if (_currentPage == null)
-                    throw new InvalidOperationException("Cannot return the " + typeof(IPublishedContent).Name + " because the " + typeof(UmbracoHelper).Name + " was constructed with an " + typeof(UmbracoContext).Name + " and the current request is not a front-end request.");
+	            if (_currentPage != null)
+                {
+                    return _currentPage;
+                }
 
-                return _currentPage;
+                throw new InvalidOperationException(
+                    $"Cannot return the {nameof(IPublishedContent)} because the {nameof(UmbracoHelper)} was constructed with an {nameof(UmbracoContext)} and the current request is not a front-end request."
+                    );
+
 	        }
 	    }
 
