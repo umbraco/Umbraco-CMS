@@ -931,35 +931,37 @@ namespace Umbraco.Web
         /// <remarks>Had to change to internal for testing.</remarks>
         internal static bool ConvertIdObjectToGuid(object id, out Guid guidId)
         {
-            var s = id as string;
-            if (s != null)
+            switch (id)
             {
-                return Guid.TryParse(s, out guidId);
+                case string s:
+                    return Guid.TryParse(s, out guidId);
+
+                case Guid g:
+                    guidId = g;
+                    return true;
+
+                default:
+                    guidId = default;
+                    return false;
             }
-            if (id is Guid)
-            {
-                guidId = (Guid)id;
-                return true;
-            }
-            guidId = default(Guid);
-            return false;
         }
 
         /// <remarks>Had to change to internal for testing.</remarks>
         internal static bool ConvertIdObjectToUdi(object id, out Udi guidId)
         {
-            var s = id as string;
-            if (s != null)
+            switch (id)
             {
-                return Udi.TryParse(s, out guidId);
+                case string s:
+                    return Udi.TryParse(s, out guidId);
+
+                case Udi u:
+                    guidId = (Udi)id;
+                    return true;
+
+                default:
+                    guidId = null;
+                    return false;
             }
-            if (id is Udi)
-            {
-                guidId = (Udi)id;
-                return true;
-            }
-            guidId = null;
-            return false;
         }
 
         private static bool ConvertIdsObjectToInts(IEnumerable<object> ids, out IEnumerable<int> intIds)
