@@ -913,17 +913,19 @@ namespace Umbraco.Web
         /// <remarks>Had to change to internal for testing.</remarks>
         internal static bool ConvertIdObjectToInt(object id, out int intId)
         {
-            var s = id as string;
-            if (s != null)
+            if (id is string s)
             {
                 return int.TryParse(s, out intId);
             }
-            if (id is int)
+
+            if (id is int i)
             {
-                intId = (int)id;
+                intId = i;
                 return true;
             }
-            intId = default(int);
+
+            intId = default;
+
             return false;
         }
 
