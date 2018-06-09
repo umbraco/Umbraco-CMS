@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -169,11 +170,12 @@ namespace Umbraco.Tests.FrontEnd
             Assert.AreEqual("Hello world, is some text with a link", result);
         }
 
+        // ------- Int32 conversion tests
         [Test]
         public static void Converting_boxed_34_to_an_int_returns_34()
         {
             // Arrange
-            object sample = 34;
+            const int sample = 34;
 
             // Act
             bool success = UmbracoHelper.ConvertIdObjectToInt(
@@ -190,7 +192,7 @@ namespace Umbraco.Tests.FrontEnd
         public static void Converting_string_54_to_an_int_returns_54()
         {
             // Arrange
-            object sample = "54";
+            const string sample = "54";
 
             // Act
             bool success = UmbracoHelper.ConvertIdObjectToInt(
@@ -207,7 +209,7 @@ namespace Umbraco.Tests.FrontEnd
         public static void Converting_hello_to_an_int_returns_false()
         {
             // Arrange
-            object sample = "Hello";
+            const string sample = "Hello";
 
             // Act
             bool success = UmbracoHelper.ConvertIdObjectToInt(
@@ -235,6 +237,144 @@ namespace Umbraco.Tests.FrontEnd
             // Assert
             Assert.IsFalse(success);
             Assert.That(result, Is.EqualTo(0));
+        }
+
+        // ------- GUID conversion tests
+        [Test]
+        public static void Converting_boxed_guid_to_a_guid_returns_original_guid_value()
+        {
+            // Arrange
+            Guid sample = Guid.NewGuid();
+
+            // Act
+            bool success = UmbracoHelper.ConvertIdObjectToGuid(
+                sample,
+                out Guid result
+                );
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.That(result, Is.EqualTo(sample));
+        }
+
+        [Test]
+        public static void Converting_string_guid_to_a_guid_returns_original_guid_value()
+        {
+            // Arrange
+            Guid sample = Guid.NewGuid();
+
+            // Act
+            bool success = UmbracoHelper.ConvertIdObjectToGuid(
+                sample.ToString(),
+                out Guid result
+                );
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.That(result, Is.EqualTo(sample));
+        }
+
+        [Test]
+        public static void Converting_hello_to_a_guid_returns_false()
+        {
+            // Arrange
+            const string sample = "Hello";
+
+            // Act
+            bool success = UmbracoHelper.ConvertIdObjectToGuid(
+                sample,
+                out Guid result
+                );
+
+            // Assert
+            Assert.IsFalse(success);
+            Assert.That(result, Is.EqualTo(new Guid("00000000-0000-0000-0000-000000000000")));
+        }
+
+        [Test]
+        public static void Converting_unsupported_object_to_a_guid_returns_false()
+        {
+            // Arrange
+            var clearlyWillNotConvertToGuid = new StringBuilder(0);
+
+            // Act
+            bool success = UmbracoHelper.ConvertIdObjectToGuid(
+                clearlyWillNotConvertToGuid,
+                out Guid result
+                );
+
+            // Assert
+            Assert.IsFalse(success);
+            Assert.That(result, Is.EqualTo(new Guid("00000000-0000-0000-0000-000000000000")));
+        }
+
+        // ------- UDI Conversion Tests
+        [Test]
+        public static void Converting_boxed_udi_to_a_udi_returns_original_udi_value()
+        {
+            // Arrange
+            Udi sample = new GuidUdi(Constants.UdiEntityType.AnyGuid, Guid.NewGuid());
+
+            // Act
+            bool success = UmbracoHelper.ConvertIdObjectToUdi(
+                sample,
+                out Udi result
+                );
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.That(result, Is.EqualTo(sample));
+        }
+
+        [Test]
+        public static void Converting_string_udi_to_a_udi_returns_original_udi_value()
+        {
+            // Arrange
+            Udi sample = new GuidUdi(Constants.UdiEntityType.AnyGuid, Guid.NewGuid());
+
+            // Act
+            bool success = UmbracoHelper.ConvertIdObjectToUdi(
+                sample.ToString(),
+                out Udi result
+                );
+
+            // Assert
+            Assert.IsTrue(success, "Conversion of UDI failed.");
+            Assert.That(result, Is.EqualTo(sample));
+        }
+
+        [Test]
+        public static void Converting_hello_to_a_udi_returns_false()
+        {
+            // Arrange
+            const string sample = "Hello";
+
+            // Act
+            bool success = UmbracoHelper.ConvertIdObjectToUdi(
+                sample,
+                out Udi result
+                );
+
+            // Assert
+            Assert.IsFalse(success);
+            Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public static void Converting_unsupported_object_to_a_udi_returns_false()
+        {
+            // Arrange
+            var clearlyWillNotConvertToGuid = new StringBuilder(0);
+
+            // Act
+            bool success = UmbracoHelper.ConvertIdObjectToUdi(
+                clearlyWillNotConvertToGuid,
+                out Udi result
+                );
+
+            // Assert
+            Assert.IsFalse(success);
+            Assert.That(result, Is.Null);
         }
     }
 }

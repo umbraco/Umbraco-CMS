@@ -913,23 +913,23 @@ namespace Umbraco.Web
         /// <remarks>Had to change to internal for testing.</remarks>
         internal static bool ConvertIdObjectToInt(object id, out int intId)
         {
-            if (id is string s)
+            switch (id)
             {
-                return int.TryParse(s, out intId);
+                case string s:
+                    return int.TryParse(s, out intId);
+
+                case int i:
+                    intId = i;
+                    return true;
+
+                default:
+                    intId = default;
+                    return false;
             }
-
-            if (id is int i)
-            {
-                intId = i;
-                return true;
-            }
-
-            intId = default;
-
-            return false;
         }
 
-        private static bool ConvertIdObjectToGuid(object id, out Guid guidId)
+        /// <remarks>Had to change to internal for testing.</remarks>
+        internal static bool ConvertIdObjectToGuid(object id, out Guid guidId)
         {
             var s = id as string;
             if (s != null)
@@ -945,7 +945,8 @@ namespace Umbraco.Web
             return false;
         }
 
-        private static bool ConvertIdObjectToUdi(object id, out Udi guidId)
+        /// <remarks>Had to change to internal for testing.</remarks>
+        internal static bool ConvertIdObjectToUdi(object id, out Udi guidId)
         {
             var s = id as string;
             if (s != null)
