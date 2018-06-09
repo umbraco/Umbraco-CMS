@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Web;
@@ -8,7 +9,7 @@ namespace Umbraco.Tests.FrontEnd
     [TestFixture]
     public class UmbracoHelperTests
     {
-       
+
         [Test]
         public void Truncate_Simple()
         {
@@ -69,7 +70,7 @@ namespace Umbraco.Tests.FrontEnd
                 key2 = "value2",
                 Key3 = "Value3",
                 keY4 = "valuE4"
-        };
+            };
             var encryptedRouteString = UmbracoHelper.CreateEncryptedRouteString("FormController", "FormAction", "", additionalRouteValues);
             var result = encryptedRouteString.DecryptWithMachineKey();
             var expectedResult = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
@@ -90,7 +91,7 @@ namespace Umbraco.Tests.FrontEnd
             var encryptedRouteString = UmbracoHelper.CreateEncryptedRouteString("FormController", "FormAction", "", additionalRouteValues);
             var result = encryptedRouteString.DecryptWithMachineKey();
             var expectedResult = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
-            
+
             Assert.AreEqual(expectedResult, result);
         }
 
@@ -147,7 +148,7 @@ namespace Umbraco.Tests.FrontEnd
         {
             var text = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
 
-            string [] tags = {"b"};
+            string[] tags = { "b" };
 
             var helper = new UmbracoHelper();
 
@@ -166,6 +167,74 @@ namespace Umbraco.Tests.FrontEnd
             var result = helper.StripHtml(text).ToString();
 
             Assert.AreEqual("Hello world, is some text with a link", result);
+        }
+
+        [Test]
+        public static void Converting_boxed_34_to_an_int_returns_34()
+        {
+            // Arrange
+            object sample = 34;
+
+            // Act
+            bool success = UmbracoHelper.ConvertIdObjectToInt(
+                sample,
+                out int result
+                );
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.That(result, Is.EqualTo(34));
+        }
+
+        [Test]
+        public static void Converting_string_54_to_an_int_returns_54()
+        {
+            // Arrange
+            object sample = "54";
+
+            // Act
+            bool success = UmbracoHelper.ConvertIdObjectToInt(
+                sample,
+                out int result
+                );
+
+            // Assert
+            Assert.IsTrue(success);
+            Assert.That(result, Is.EqualTo(54));
+        }
+
+        [Test]
+        public static void Converting_hello_to_an_int_returns_false()
+        {
+            // Arrange
+            object sample = "Hello";
+
+            // Act
+            bool success = UmbracoHelper.ConvertIdObjectToInt(
+                sample,
+                out int result
+                );
+
+            // Assert
+            Assert.IsFalse(success);
+            Assert.That(result, Is.EqualTo(0));
+        }
+
+        [Test]
+        public static void Converting_unsupported_object_to_an_int_returns_false()
+        {
+            // Arrange
+            var clearlyWillNotConvertToInt = new StringBuilder(0);
+
+            // Act
+            bool success = UmbracoHelper.ConvertIdObjectToInt(
+                clearlyWillNotConvertToInt,
+                out int result
+                );
+
+            // Assert
+            Assert.IsFalse(success);
+            Assert.That(result, Is.EqualTo(0));
         }
     }
 }

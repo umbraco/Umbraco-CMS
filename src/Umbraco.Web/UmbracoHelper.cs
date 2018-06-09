@@ -910,7 +910,8 @@ namespace Umbraco.Web
             return ContentQuery.ContentAtRoot();
         }
 
-        private static bool ConvertIdObjectToInt(object id, out int intId)
+        /// <remarks>Had to change to internal for testing.</remarks>
+        internal static bool ConvertIdObjectToInt(object id, out int intId)
         {
             var s = id as string;
             if (s != null)
