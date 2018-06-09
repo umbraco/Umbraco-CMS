@@ -10,7 +10,6 @@ namespace Umbraco.Tests.FrontEnd
     [TestFixture]
     public class UmbracoHelperTests
     {
-
         [Test]
         public void Truncate_Simple()
         {
@@ -313,6 +312,7 @@ namespace Umbraco.Tests.FrontEnd
         public static void Converting_boxed_udi_to_a_udi_returns_original_udi_value()
         {
             // Arrange
+            Udi.ResetUdiTypes();
             Udi sample = new GuidUdi(Constants.UdiEntityType.AnyGuid, Guid.NewGuid());
 
             // Act
@@ -330,6 +330,7 @@ namespace Umbraco.Tests.FrontEnd
         public static void Converting_string_udi_to_a_udi_returns_original_udi_value()
         {
             // Arrange
+            Udi.ResetUdiTypes();
             Udi sample = new GuidUdi(Constants.UdiEntityType.AnyGuid, Guid.NewGuid());
 
             // Act
@@ -347,6 +348,7 @@ namespace Umbraco.Tests.FrontEnd
         public static void Converting_hello_to_a_udi_returns_false()
         {
             // Arrange
+            Udi.ResetUdiTypes();
             const string sample = "Hello";
 
             // Act
@@ -364,6 +366,8 @@ namespace Umbraco.Tests.FrontEnd
         public static void Converting_unsupported_object_to_a_udi_returns_false()
         {
             // Arrange
+            Udi.ResetUdiTypes();
+
             var clearlyWillNotConvertToGuid = new StringBuilder(0);
 
             // Act
