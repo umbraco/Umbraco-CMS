@@ -959,7 +959,7 @@ namespace Umbraco.Web
                     return true;
 
                 default:
-                    guidId = null;
+                    guidId = default;
                     return false;
             }
         }
