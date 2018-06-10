@@ -955,7 +955,7 @@ namespace Umbraco.Web
                     return Udi.TryParse(s, out guidId);
 
                 case Udi u:
-                    guidId = (Udi)id;
+                    guidId = u;
                     return true;
 
                 default:
