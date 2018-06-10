@@ -1,4 +1,5 @@
-﻿using LightInject;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Core.Components
 {
@@ -17,8 +18,9 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="container">A container.</param>
         /// <param name="level">The runtime level.</param>
-        public Composition(IServiceContainer container, RuntimeLevel level)
+        public Composition(IServiceCollection services, IServiceProvider container, RuntimeLevel level)
         {
+            Services = services;
             Container = container;
             RuntimeLevel = level;
         }
@@ -27,7 +29,9 @@ namespace Umbraco.Core.Components
         /// Gets the container.
         /// </summary>
         /// <remarks>Use with care!</remarks>
-        public IServiceContainer Container { get; }
+        public IServiceProvider Container { get; }
+
+        public IServiceCollection Services { get; }
 
         /// <summary>
         /// Gets the runtime level.
