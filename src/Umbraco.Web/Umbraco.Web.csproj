@@ -1417,13 +1417,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
-    <Compile Include="WebServices\TagsController.cs" />
-    <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />
-    <Compile Include="WebServices\UmbracoAuthorizedWebService.cs">
+    <Compile Include="TagsController.cs" />
+    <Compile Include="UmbracoAuthorizedHttpHandler.cs" />
+    <Compile Include="umbraco.presentation\umbraco\webservices\UmbracoAuthorizedWebService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="WebServices\UmbracoHttpHandler.cs" />
-    <Compile Include="WebServices\UmbracoWebService.cs">
+    <Compile Include="UmbracoHttpHandler.cs" />
+    <Compile Include="UmbracoWebService.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Editors\XmlDataIntegrityController.cs" />
