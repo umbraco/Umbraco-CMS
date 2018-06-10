@@ -1,4 +1,5 @@
 ﻿using LightInject;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Core
 {
@@ -11,7 +12,7 @@ namespace Umbraco.Core
         /// Boots the runtime.
         /// </summary>
         /// <param name="container">The application service container.</param>
-        void Boot(ServiceContainer container);
+        void Boot(IServiceCollection services);
 
         /// <summary>
         /// Terminates the runtime.

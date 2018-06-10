@@ -22,8 +22,14 @@ namespace Umbraco.Core.Composing
 
         public virtual IServiceProvider Create(IServiceCollection services)
         {
-            ConcreteContainer = new ServiceContainer();
-            return LightInject.DependencyInjectionContainerExtensions.CreateServiceProvider((ServiceContainer)ConcreteContainer, services);
+            var lightinjectContainer = new ServiceContainer();
+            lightinjectContainer.ConfigureUmbracoCore();
+
+            var serviceProvider = LightInject.DependencyInjectionContainerExtensions.CreateServiceProvider(lightinjectContainer, services);
+
+            ConcreteContainer = lightinjectContainer;
+
+            return serviceProvider;
         }
     }
 }

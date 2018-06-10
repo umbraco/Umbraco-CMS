@@ -28,9 +28,9 @@ namespace Umbraco.Core.Components
         /// Initializes a new instance of the <see cref="BootLoader"/> class.
         /// </summary>
         /// <param name="services">The application container.</param>
-        public BootLoader(IServiceCollection services)
+        public BootLoader(IServiceProvider container)
         {
-            _container = ContainerFactory.CreateContainer(services ?? throw new ArgumentNullException(nameof(services)));
+            _container = container ?? throw new ArgumentNullException(nameof(container));
             _proflog = _container.GetService<ProfilingLogger>();
             _logger = _container.GetService<ILogger>();
         }
@@ -286,7 +286,7 @@ namespace Umbraco.Core.Components
         {
             using (_proflog.DebugDuration<BootLoader>($"Composing components. (log when >{LogThresholdMilliseconds}ms)", "Composed components."))
             {
-                var composition = new Composition(_container, level);
+                var composition = new Composition(_services, _container, level);
                 foreach (var component in _components)
                 {
                     var componentType = component.GetType();

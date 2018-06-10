@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Threading;
 using System.Web;
 using LightInject;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
@@ -42,14 +43,17 @@ namespace Umbraco.Core.Runtime
         }
 
         /// <inheritdoc/>
-        public virtual void Boot(ServiceContainer container)
+        public virtual void Boot(IServiceCollection services)
         {
             // some components may want to initialize with the UmbracoApplicationBase
             // well, they should not - we should not do this
             // TODO remove this eventually.
-            container.RegisterInstance(_app);
+            services.AddSingleton(_app);
 
-            Compose(container);
+            Compose(services);
+
+            // TODO: Figure out if anything configures services after this?
+            var container = ContainerFactory.CreateContainer(services);
 
             // prepare essential stuff
 
@@ -57,12 +61,12 @@ namespace Umbraco.Core.Runtime
             if (string.IsNullOrWhiteSpace(path) == false)
                 IOHelper.SetRootDirectory(path);
 
-            _state = (RuntimeState) container.GetInstance<IRuntimeState>();
+            _state = (RuntimeState) container.GetService<IRuntimeState>();
             _state.Level = RuntimeLevel.Boot;
 
-            Logger = container.GetInstance<ILogger>();
-            Profiler = container.GetInstance<IProfiler>();
-            ProfilingLogger = container.GetInstance<ProfilingLogger>();
+            Logger = container.GetService<ILogger>();
+            Profiler = container.GetService<IProfiler>();
+            ProfilingLogger = container.GetService<ProfilingLogger>();
 
             // the boot loader boots using a container scope, so anything that is PerScope will
             // be disposed after the boot loader has booted, and anything else will remain.
@@ -114,13 +118,13 @@ namespace Umbraco.Core.Runtime
             //sa.Scope?.Dispose();
         }
 
-        private void AquireMainDom(IServiceFactory container)
+        private void AquireMainDom(IServiceProvider container)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Aquired."))
             {
                 try
                 {
-                    var mainDom = container.GetInstance<MainDom>();
+                    var mainDom = container.GetService<MainDom>();
                     mainDom.Acquire();
                 }
                 catch
@@ -132,13 +136,13 @@ namespace Umbraco.Core.Runtime
         }
 
         // internal for tests
-        internal void DetermineRuntimeLevel(IServiceFactory container)
+        internal void DetermineRuntimeLevel(IServiceProvider container)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined."))
             {
                 try
                 {
-                    var dbfactory = container.GetInstance<IUmbracoDatabaseFactory>();
+                    var dbfactory = container.GetService<IUmbracoDatabaseFactory>();
                     SetRuntimeStateLevel(dbfactory, Logger);
 
                     Logger.Debug<CoreRuntime>($"Runtime level: {_state.Level}");
@@ -185,15 +189,15 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Composes the runtime.
         /// </summary>
-        public virtual void Compose(ServiceContainer container)
+        public virtual void Compose(IServiceCollection services)
         {
             // compose the very essential things that are needed to bootstrap, before anything else,
             // and only these things - the rest should be composed in runtime components
 
             // register basic things
-            container.RegisterSingleton<IProfiler, LogProfiler>();
-            container.RegisterSingleton<ProfilingLogger>();
-            container.RegisterSingleton<IRuntimeState, RuntimeState>();
+            services.AddSingleton<IProfiler, LogProfiler>();
+            services.AddSingleton<ProfilingLogger>();
+            services.AddSingleton<IRuntimeState, RuntimeState>();
 
             container.RegisterFrom<ConfigurationCompositionRoot>();
 
@@ -201,20 +205,21 @@ namespace Umbraco.Core.Runtime
             // need the deep clone runtime cache profiver to ensure entities are cached properly, ie
             // are cloned in and cloned out - no request-based cache here since no web-based context,
             // will be overriden later or
-            container.RegisterSingleton(_ => new CacheHelper(
+            services.AddSingleton(_ => new CacheHelper(
                 new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
                 new StaticCacheProvider(),
                 NullCacheProvider.Instance,
                 new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
-            container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
+            services.AddSingleton(f => f.GetService<CacheHelper>().RuntimeCache);
 
             // register the plugin manager
-            container.RegisterSingleton(f => new TypeLoader(f.GetInstance<IRuntimeCacheProvider>(), f.GetInstance<IGlobalSettings>(), f.GetInstance<ProfilingLogger>()));
+            services.AddSingleton(f => new TypeLoader(f.GetService<IRuntimeCacheProvider>(), f.GetService<IGlobalSettings>(), f.GetService<ProfilingLogger>()));
 
             // register syntax providers - required by database factory
-            container.Register<ISqlSyntaxProvider, MySqlSyntaxProvider>("MySqlSyntaxProvider");
-            container.Register<ISqlSyntaxProvider, SqlCeSyntaxProvider>("SqlCeSyntaxProvider");
-            container.Register<ISqlSyntaxProvider, SqlServerSyntaxProvider>("SqlServerSyntaxProvider");
+            // TODO: These will now have to be resolved by type name instead of key
+            services.AddTransient<ISqlSyntaxProvider, MySqlSyntaxProvider>();
+            services.AddTransient<ISqlSyntaxProvider, SqlCeSyntaxProvider>();
+            services.AddTransient<ISqlSyntaxProvider, SqlServerSyntaxProvider>();
 
             // register persistence mappers - required by database factory so needs to be done here
             // means the only place the collection can be modified is in a runtime - afterwards it
@@ -226,16 +231,16 @@ namespace Umbraco.Core.Runtime
             // will be initialized with syntax providers and a logger, and will try to configure
             // from the default connection string name, if possible, else will remain non-configured
             // until properly configured (eg when installing)
-            container.RegisterSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
-            container.RegisterSingleton(f => f.GetInstance<IUmbracoDatabaseFactory>().SqlContext);
+            services.AddSingleton<IUmbracoDatabaseFactory, UmbracoDatabaseFactory>();
+            services.AddSingleton(f => f.GetService<IUmbracoDatabaseFactory>().SqlContext);
 
             // register the scope provider
-            container.RegisterSingleton<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
-            container.RegisterSingleton<IScopeProvider>(f => f.GetInstance<ScopeProvider>());
-            container.RegisterSingleton<IScopeAccessor>(f => f.GetInstance<ScopeProvider>());
+            services.AddSingleton<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
+            services.AddSingleton<IScopeProvider>(f => f.GetService<ScopeProvider>());
+            services.AddSingleton<IScopeAccessor>(f => f.GetService<ScopeProvider>());
 
             // register MainDom
-            container.RegisterSingleton<MainDom>();
+            services.AddSingleton<MainDom>();
         }
 
         protected virtual void ComposeMapperCollection(MapperCollectionBuilder builder)
