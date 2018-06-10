@@ -182,6 +182,8 @@
     <Compile Include="Composing\WeightAttribute.cs" />
     <Compile Include="Composing\WeightedCollectionBuilderBase.cs" />
     <Compile Include="Composing\_ContainerFactory.cs" />
+    <Compile Include="Composing\_IComposition.cs" />
+    <Compile Include="Composing\_ServiceRegistrationExtensions.cs" />
     <Compile Include="Configuration\CaseInsensitiveEnumConfigConverter.cs" />
     <Compile Include="Configuration\ClientDependencyConfiguration.cs" />
     <Compile Include="Configuration\CommaDelimitedConfigurationElement.cs" />

@@ -199,7 +199,7 @@ namespace Umbraco.Core.Runtime
             services.AddSingleton<ProfilingLogger>();
             services.AddSingleton<IRuntimeState, RuntimeState>();
 
-            container.RegisterFrom<ConfigurationCompositionRoot>();
+            services.RegisterFrom<ConfigurationCompositionRoot>();
 
             // register caches
             // need the deep clone runtime cache profiver to ensure entities are cached properly, ie
@@ -224,6 +224,8 @@ namespace Umbraco.Core.Runtime
             // register persistence mappers - required by database factory so needs to be done here
             // means the only place the collection can be modified is in a runtime - afterwards it
             // has been frozen and it is too late
+#error Why does 
+            services.RegisterCollectionBuilder<MapperCollectionBuilder>();
             var mapperCollectionBuilder = container.RegisterCollectionBuilder<MapperCollectionBuilder>();
             ComposeMapperCollection(mapperCollectionBuilder);
 
