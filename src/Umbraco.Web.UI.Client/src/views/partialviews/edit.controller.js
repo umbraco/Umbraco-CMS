@@ -168,7 +168,6 @@
                 view: "macropicker",
                 dialogData: {},
                 show: true,
-                title: "Insert macro",
                 submit: function (model) {
 
                     var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, "Mvc");
@@ -212,31 +211,42 @@
 
 
         function openDictionaryItemOverlay() {
-            vm.dictionaryItemOverlay = {
-                view: "treepicker",
-                section: "settings",
-                treeAlias: "dictionary",
-                entityType: "dictionary",
-                multiPicker: false,
-                show: true,
-                title: "Insert dictionary item",
-                emptyStateMessage: localizationService.localize("emptyStates_emptyDictionaryTree"),
-                select: function(node){
 
-                    var code = templateHelper.getInsertDictionarySnippet(node.name);
-                	insert(code);
+            var labelKeys = [
+                "template_insertDictionaryItem",
+                "emptyStates_emptyDictionaryTree"
+            ];
 
-                	vm.dictionaryItemOverlay.show = false;
-                    vm.dictionaryItemOverlay = null;
-                },
-                close: function (model) {
-                    // close dialog
-                    vm.dictionaryItemOverlay.show = false;
-                    vm.dictionaryItemOverlay = null;
-                    // focus editor
-                    vm.editor.focus();
-                }
-            };
+            localizationService.localizeMany(labelKeys).then(function(values){
+                var title = values[0];
+                var emptyStateMessage = values[1];
+
+                vm.dictionaryItemOverlay = {
+                    view: "treepicker",
+                    section: "settings",
+                    treeAlias: "dictionary",
+                    entityType: "dictionary",
+                    multiPicker: false,
+                    show: true,
+                    title: title,
+                    emptyStateMessage: emptyStateMessage,
+                    select: function(node){
+
+                        var code = templateHelper.getInsertDictionarySnippet(node.name);
+                        insert(code);
+
+                        vm.dictionaryItemOverlay.show = false;
+                        vm.dictionaryItemOverlay = null;
+                    },
+                    close: function (model) {
+                        // close dialog
+                        vm.dictionaryItemOverlay.show = false;
+                        vm.dictionaryItemOverlay = null;
+                        // focus editor
+                        vm.editor.focus();
+                    }
+                };
+            });
         }
 
         function openQueryBuilderOverlay() {

@@ -5,7 +5,9 @@ angular.module("umbraco")
         $scope.model.subtitle = "Umbraco version" + " " + $scope.version;
 
         if(!$scope.model.title) {
-            $scope.model.title = localizationService.localize("general_help");
+            localizationService.localize("general_help").then(function(value) {
+                $scope.model.title = value;
+            });
         }
 
         if(!$scope.section){
