@@ -242,6 +242,11 @@ namespace Umbraco.Web.Trees
             return menu;
         }
 
+        /// <summary>
+        /// Returns a collection of all menu items that can be on a deleted (in recycle bin) content node
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         protected MenuItemCollection GetNodeMenuItemsForDeletedContent(IUmbracoEntity item)
         {
             var menu = new MenuItemCollection();
