@@ -156,13 +156,14 @@ angular.module("umbraco")
                                 });
                         });
 
-                    mediaTypeHelper.getAllowedImagetypes(folder.id)
-                        .then(function(types) {
-                            $scope.acceptedMediatypes = types;
-                        });
                 } else {
                     $scope.path = [];
                 }
+
+                mediaTypeHelper.getAllowedImagetypes(folder.id)
+                    .then(function (types) {
+                        $scope.acceptedMediatypes = types;
+                    });
 
                 $scope.lockedFolder = folder.id === -1 && $scope.model.startNodeIsVirtual;
 

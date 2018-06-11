@@ -480,6 +480,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.ContentTypeService.Save(contentType);
 
             var root = MockedContent.CreateSimpleContent(contentType);
+            root.SetName("Root", _langFr.IsoCode); // else cannot save
             ServiceContext.ContentService.Save(root);
 
             for (int i = 0; i < 10; i++)
@@ -489,6 +490,10 @@ namespace Umbraco.Tests.Services
                 {
                     c1.SetName("Test " + i + " - FR", _langFr.IsoCode);
                     c1.SetName("Test " + i + " - ES", _langEs.IsoCode);
+                }
+                else
+                {
+                    c1.SetName("Test", _langFr.IsoCode); // else cannot save
                 }
                 ServiceContext.ContentService.Save(c1);
             }

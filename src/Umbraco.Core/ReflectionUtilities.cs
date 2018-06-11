@@ -687,8 +687,8 @@ namespace Umbraco.Core
                 else
                     ilgen.Emit(OpCodes.Ldarg, i);
 
-                var local = false;
-                EmitInputAdapter(ilgen, lambdaArgTypes[i], methodArgTypes[i], ref local);
+                //var local = false;
+                EmitInputAdapter(ilgen, lambdaArgTypes[i], methodArgTypes[i]/*, ref local*/);
             }
         }
 
@@ -700,7 +700,7 @@ namespace Umbraco.Core
         //  valueType  -> !valueType : not supported ('cos, why?)
         //  !valueType -> valueType  : unbox and convert
         //  !valueType -> !valueType : cast (could throw)
-        private static void EmitInputAdapter(ILGenerator ilgen, Type inputType, Type methodParamType, ref bool local)
+        private static void EmitInputAdapter(ILGenerator ilgen, Type inputType, Type methodParamType /*, ref bool local*/)
         {
             if (inputType == methodParamType) return;
 
@@ -720,25 +720,43 @@ namespace Umbraco.Core
 
                 var unbox = ilgen.DefineLabel();
 
-                if (!local)
-                {
-                    ilgen.DeclareLocal(typeof(object)); // declare local var for st/ld loc_0
-                    local = true;
-                }
+                //if (!local)
+                //{
+                //    ilgen.DeclareLocal(typeof(object)); // declare local var for st/ld loc_0
+                //    local = true;
+                //}
 
-                ilgen.Emit(OpCodes.Stloc_0); // pop value
+                // stack: value
 
-                ilgen.Emit(OpCodes.Ldloc_0); // push value
-                ilgen.Emit(OpCodes.Ldloc_0); // push value
+                // following code can be replaced with .Dump (and then we don't need the local variable anymore)
+                //ilgen.Emit(OpCodes.Stloc_0); // pop value into loc.0
+                //// stack:
+                //ilgen.Emit(OpCodes.Ldloc_0); // push loc.0
+                //ilgen.Emit(OpCodes.Ldloc_0); // push loc.0
+
+                ilgen.Emit(OpCodes.Dup); // duplicate top of stack
+
+                // stack: value ; value
 
                 ilgen.Emit(OpCodes.Isinst, methodParamType); // test, pops value, and pushes either a null ref, or an instance of the type
-                ilgen.Emit(OpCodes.Ldnull); // push null
-                ilgen.Emit(OpCodes.Cgt_Un); // compare what isInst returned to null - pops 2 values, and pushes 1 if greater else 0
-                ilgen.Emit(OpCodes.Brtrue_S, unbox); // pops value, branches to unbox if ok
 
-                // after we poped and whatever the branch, we still have the value on top of the stack
+                // stack: inst|null ; value
+
+                ilgen.Emit(OpCodes.Ldnull); // push null
+
+                // stack: null ; inst|null ; value
+
+                ilgen.Emit(OpCodes.Cgt_Un); // compare what isInst returned to null - pops 2 values, and pushes 1 if greater else 0
+
+                // stack: 0|1 ; value
+
+                ilgen.Emit(OpCodes.Brtrue_S, unbox); // pops value, branches to unbox if true, ie nonzero
+
+                // stack: value
 
                 ilgen.Convert(methodParamType); // convert
+
+                // stack: value|converted
 
                 ilgen.MarkLabel(unbox);
                 ilgen.Emit(OpCodes.Unbox_Any, methodParamType);
@@ -763,14 +781,19 @@ namespace Umbraco.Core
         //}
 
         private static MethodInfo _convertMethod;
+        private static MethodInfo _getTypeFromHandle;
 
         private static void Convert(this ILGenerator ilgen, Type type)
         {
-            ilgen.Emit(OpCodes.Ldtoken, type);
+
+            if (_getTypeFromHandle == null)
+                _getTypeFromHandle = typeof(Type).GetMethod("GetTypeFromHandle", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(RuntimeTypeHandle) }, null);
 
             if (_convertMethod == null)
                 _convertMethod = typeof(Convert).GetMethod("ChangeType", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(object), typeof(Type) }, null);
 
+            ilgen.Emit(OpCodes.Ldtoken, type);
+            ilgen.CallMethod(_getTypeFromHandle);
             ilgen.CallMethod(_convertMethod);
         }
 

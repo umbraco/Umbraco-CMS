@@ -1,14 +1,14 @@
-_Looking for Umbraco version 7? [Click here](https://github.com/umbraco/Umbraco-CMS) to go to the v7 branch_
+_You are browsing the Umbraco v8 branch._
 
-__Ready to try out Version 8? [See the quick start guide](https://github.com/umbraco/Umbraco-CMS/blob/temp8/V8_GETTING_STARTED.md).__
+_Looking for Umbraco version 7? [Click here](https://github.com/umbraco/Umbraco-CMS) to go to the v7 branch._
 
-_Looking for Umbraco version 8? [Click here](https://github.com/umbraco/Umbraco-CMS/tree/temp8) to go to the v8 branch_
+_Ready to try out Version 8? [See the quick start guide](V8_GETTING_STARTED.md)._
 
 Umbraco CMS
 ===========
 The friendliest, most flexible and fastest growing ASP.NET CMS used by more than 443,000 websites worldwide: [https://umbraco.com](https://umbraco.com)
 
-[![ScreenShot](vimeo.png)](https://vimeo.com/172382998/)
+[![ScreenShot](img/vimeo.png)](https://vimeo.com/172382998/)
 
 ## Umbraco CMS
 Umbraco is a free open source Content Management System built on the ASP.NET platform. Our mission is to help you deliver delightful digital experiences by making Umbraco friendly, simpler and social.
