@@ -36,7 +36,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
       else {
          $scope.entityType = "content";
          contentResource = $injector.get('contentResource');
-         getContentTypesCallback = $injector.get('contentTypeResource').getAllowedTypes;
+          getContentTypesCallback = $injector.get('contentTypeResource').getAllowedTypes;
       }
       getListResultsCallback = contentResource.getChildren;
       deleteItemCallback = contentResource.deleteById;
@@ -604,8 +604,10 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
          id = -1;
       }
 
-      $scope.listViewAllowedTypes = getContentTypesCallback(id);
-
+      getContentTypesCallback(id).then(function (items) {
+           $scope.listViewAllowedTypes = items;
+      });
+       
       $scope.contentId = id;
       $scope.isTrashed = id === "-20" || id === "-21";
 
