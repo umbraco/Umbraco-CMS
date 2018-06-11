@@ -5,7 +5,7 @@
    </div>
 
    <div class="row-fluid" ng-switch-when="false">
-
+       
        <umb-editor-sub-header>
 
            <umb-editor-sub-header-content-left>
@@ -69,7 +69,7 @@
                </umb-editor-sub-header-section>
 
                <umb-editor-sub-header-section ng-if="!isAnythingSelected()">
-                   <form class="form-search -no-margin-bottom pull-right" novalidate>
+                   <ng-form class="form-search -no-margin-bottom pull-right" novalidate>
                        <div class="inner-addon left-addon">
                            <i class="icon icon-search" ng-click="enterSearch($event)"></i>
                            <input
@@ -83,7 +83,7 @@
                                prevent-enter-submit
                                no-dirty-check>
                        </div>
-                   </form>
+                   </ng-form>
                </umb-editor-sub-header-section>
 
                <umb-editor-sub-header-section ng-if="isAnythingSelected()">
