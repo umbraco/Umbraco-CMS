@@ -1,7 +1,7 @@
 (function () {
     "use strict";
     
-    function PublishController($scope) {
+    function PublishController($scope, localizationService) {
 
         var vm = this;
         vm.variants = $scope.model.variants;
