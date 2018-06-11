@@ -149,7 +149,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 //when it's successful, just return the data
                 deferred.resolve(result);
 
-            }).catch(function (response) {
+            }, function (response) {
 
                 //invoke the callback
                 var result = callbacks.error.apply(this, [response.data, response.status, response.headers, response.config]);
