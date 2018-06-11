@@ -92,19 +92,25 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             if (vm.treeAlias === "content") {
                 vm.entityType = "Document";
                 if (!$scope.model.title) {
-                    $scope.model.title = localizationService.localize("defaultdialogs_selectContent");
+                    localizationService.localize("defaultdialogs_selectContent").then(function(value){
+                        $scope.model.title = value;
+                    });
                 }
             }
             else if (vm.treeAlias === "member" || vm.section) {
                 vm.entityType = "Member";
                 if (!$scope.model.title) {
-                    $scope.model.title = localizationService.localize("defaultdialogs_selectMember");
+                    localizationService.localize("defaultdialogs_selectMember").then(function(value){
+                        $scope.model.title = value;
+                    })
                 }
             }
             else if (vm.treeAlias === "media" || vm.section === "media") {
                 vm.entityType = "Media";
                 if (!$scope.model.title) {
-                    $scope.model.title = localizationService.localize("defaultdialogs_selectMedia");
+                    localizationService.localize("defaultdialogs_selectMedia").then(function(value){
+                        $scope.model.title = value;
+                    });
                 }
             }
 

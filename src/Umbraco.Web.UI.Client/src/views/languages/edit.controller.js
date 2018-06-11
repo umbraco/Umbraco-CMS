@@ -91,7 +91,9 @@
 
                     vm.language = lang;
                     vm.page.saveButtonState = "success";
-                    notificationsService.success(localizationService.localize("speechBubbles_languageSaved"));
+                    localizationService.localize("speechBubbles_languageSaved").then(function(value){
+                        notificationsService.success(value);
+                    });
 
                     // emit event when language is created
                     if($routeParams.create) {

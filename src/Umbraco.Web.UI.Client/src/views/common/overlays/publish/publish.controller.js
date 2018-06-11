@@ -47,6 +47,13 @@
         }
 
         function onInit() {
+
+            if(!$scope.model.title) {
+                localizationService.localize("content_readyToPublish").then(function(value){
+                    $scope.model.title = value;
+                });
+            }
+
             vm.hasPristineVariants = false;
 
             _.each(vm.variants,

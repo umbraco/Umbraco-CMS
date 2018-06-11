@@ -320,7 +320,6 @@
                 if (formHelper.submitForm({ scope: $scope, action: "publish"})) {
 
                     var dialog = {
-                        title: localizationService.localize("content_readyToPublish"),
                         view: "publish",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
