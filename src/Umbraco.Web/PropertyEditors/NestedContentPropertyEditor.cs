@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
@@ -104,10 +102,9 @@ namespace Umbraco.Web.PropertyEditors
             {
                 base.ConfigureForDisplay(preValues);
 
-                var asDictionary = preValues.PreValuesAsDictionary.ToDictionary(x => x.Key, x => x.Value.Value);
-                if (asDictionary.ContainsKey("hideLabel"))
+                if (preValues.PreValuesAsDictionary.ContainsKey("hideLabel"))
                 {
-                    var boolAttempt = asDictionary["hideLabel"].TryConvertTo<bool>();
+                    var boolAttempt = preValues.PreValuesAsDictionary["hideLabel"].Value.TryConvertTo<bool>();
                     if (boolAttempt.Success)
                     {
                         HideLabel = boolAttempt.Result;
@@ -120,10 +117,14 @@ namespace Umbraco.Web.PropertyEditors
             public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
             {
                 // Convert / validate value
-                if (property.Value == null || string.IsNullOrWhiteSpace(property.Value.ToString()))
+                if (property.Value == null)
                     return string.Empty;
 
-                var value = JsonConvert.DeserializeObject<List<object>>(property.Value.ToString());
+                var propertyValue = property.Value.ToString();
+                if (string.IsNullOrWhiteSpace(propertyValue))
+                    return string.Empty;
+
+                var value = JsonConvert.DeserializeObject<List<object>>(propertyValue);
                 if (value == null)
                     return string.Empty;
 
@@ -182,11 +183,8 @@ namespace Umbraco.Web.PropertyEditors
                     }
                 }
 
-                // Update the value on the property
-                property.Value = JsonConvert.SerializeObject(value);
-
-                // Pass the call down
-                return base.ConvertDbToString(property, propertyType, dataTypeService);
+                // Return the serialized value
+                return JsonConvert.SerializeObject(value);
             }
 
             #endregion
@@ -195,10 +193,14 @@ namespace Umbraco.Web.PropertyEditors
 
             public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
             {
-                if (property.Value == null || string.IsNullOrWhiteSpace(property.Value.ToString()))
+                if (property.Value == null)
                     return string.Empty;
 
-                var value = JsonConvert.DeserializeObject<List<object>>(property.Value.ToString());
+                var propertyValue = property.Value.ToString();
+                if (string.IsNullOrWhiteSpace(propertyValue))
+                    return string.Empty;
+
+                var value = JsonConvert.DeserializeObject<List<object>>(propertyValue);
                 if (value == null)
                     return string.Empty;
 
@@ -260,11 +262,8 @@ namespace Umbraco.Web.PropertyEditors
                     }
                 }
 
-                // Update the value on the property
-                property.Value = JsonConvert.SerializeObject(value);
-
-                // Pass the call down
-                return base.ConvertDbToEditor(property, propertyType, dataTypeService);
+                // Return the strongly-typed object, Umbraco will handle the JSON serializing/parsing, then Angular can handle it directly
+                return value;
             }
 
             #endregion
@@ -273,10 +272,14 @@ namespace Umbraco.Web.PropertyEditors
 
             public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
             {
-                if (editorValue.Value == null || string.IsNullOrWhiteSpace(editorValue.Value.ToString()))
+                if (editorValue.Value == null)
                     return null;
 
-                var value = JsonConvert.DeserializeObject<List<object>>(editorValue.Value.ToString());
+                var rawValue = editorValue.Value.ToString();
+                if (string.IsNullOrWhiteSpace(rawValue))
+                    return null;
+
+                var value = JsonConvert.DeserializeObject<List<object>>(rawValue);
                 if (value == null)
                     return null;
 

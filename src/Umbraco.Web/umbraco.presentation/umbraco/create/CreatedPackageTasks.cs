@@ -27,7 +27,7 @@ namespace umbraco
             // we need to grab the id from the alias as the new tree needs to prefix the NodeID with "package_"
             if (ParentID == 0)
             {
-                ParentID = int.Parse(Alias.Substring(loadPackages.PACKAGE_TREE_PREFIX.Length));
+                ParentID = int.Parse(Alias.Substring("package_".Length));
             }
             cms.businesslogic.packager.CreatedPackage.GetById(ParentID).Delete();
             return true;

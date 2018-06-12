@@ -38,7 +38,37 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                        query),
                'Failed to retrieve data for content type id ' + contentTypeId);
         },
-
+         /**
+         * @ngdoc method
+         * @name umbraco.resources.contentTypeResource#getWhereCompositionIsUsedInContentTypes
+         * @methodOf umbraco.resources.contentTypeResource
+         *
+         * @description
+         * Returns a list of content types which use a specific composition with a given id
+         *
+         * ##usage
+         * <pre>
+         * contentTypeResource.getWhereCompositionIsUsedInContentTypes(1234)
+         *    .then(function(contentTypeList) {
+         *        console.log(contentTypeList);
+         *    });
+         * </pre>
+         * @param {Int} contentTypeId id of the composition content type to retrieve the list of the content types where it has been used
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getWhereCompositionIsUsedInContentTypes: function (contentTypeId) {
+            var query = {
+                contentTypeId: contentTypeId
+            };
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "contentTypeApiBaseUrl",
+                        "GetWhereCompositionIsUsedInContentTypes"),
+                    query),
+                'Failed to retrieve data for content type id ' + contentTypeId);
+        },
 
         /**
          * @ngdoc method

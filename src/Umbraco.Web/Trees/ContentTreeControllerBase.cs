@@ -96,6 +96,12 @@ namespace Umbraco.Web.Trees
                 return null;
 
             var treeNode = GetSingleTreeNode(e, parentId, queryStrings);
+            if (treeNode == null)
+            {
+                //this means that the user has NO access to this node via permissions! They at least need to have browse permissions to see
+                //the node so we need to return null;
+                return null;
+            }
             if (hasPathAccess == false)
             {
                 treeNode.AdditionalData["noAccess"] = true;
@@ -189,22 +195,12 @@ namespace Umbraco.Web.Trees
         {
             // try to parse id as an integer else use GetEntityFromId
             // which will grok Guids, Udis, etc and let use obtain the id
-            int entityId;
-            if (int.TryParse(id, out entityId) == false)
+            if (int.TryParse(id, out var entityId) == false)
             {
                 var entity = GetEntityFromId(id);
                 if (entity == null)
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 entityId = entity.Id;
-            }
-
-            // if a request is made for the root node but user has no access to
-            // root node, return start nodes instead
-            if (entityId == Constants.System.Root && UserStartNodes.Contains(Constants.System.Root) == false)
-            {
-                return UserStartNodes.Length > 0
-                    ? Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes)
-                    : Enumerable.Empty<IUmbracoEntity>();
             }
 
             return Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToArray();

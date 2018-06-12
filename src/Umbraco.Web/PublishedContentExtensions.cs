@@ -1199,7 +1199,7 @@ namespace Umbraco.Web
             return content.AncestorsOrSelf<T>(maxLevel).FirstOrDefault();
         }
 
-        internal static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func)
+        public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func)
         {
             var ancestorsOrSelf = content.EnumerateAncestors(orSelf);
             return func == null ? ancestorsOrSelf : ancestorsOrSelf.Where(func);
