@@ -22,11 +22,6 @@ angular.module('umbraco.security.interceptor')
                 //Here we'll check if our custom header is in the response which indicates how many seconds the user's session has before it
                 //expires. Then we'll update the user in the user service accordingly.
                 var headers = response.headers();
-                
-                //WB: Logging to help temp-debugging
-                console.log('response success', response);
-                console.log('response success headers', headers);
-
 
                 if (headers["x-umb-user-seconds"]) {
                     // We must use $injector to get the $http service to prevent circular dependency
@@ -95,7 +90,7 @@ angular.module('umbraco.security.interceptor')
 
                     notifications.error(
                         "Request error",
-                        errMsg);
+                        errMsg); 
 
                 }
                 else if (rejection.status === 403) {
@@ -141,7 +136,7 @@ angular.module('umbraco.security.interceptor')
     .config(['$httpProvider', function ($httpProvider) {
         $httpProvider.defaults.xsrfHeaderName = 'X-UMB-XSRF-TOKEN';
         $httpProvider.defaults.xsrfCookieName = 'UMB-XSRF-TOKEN';
-        // Fixme: https://stackoverflow.com/questions/23804981/alternative-of-httpprovider-responseinterceptors
+
         $httpProvider.interceptors.push('securityInterceptor');
         $httpProvider.interceptors.push('umbracoRequestInterceptor');
     }]);
