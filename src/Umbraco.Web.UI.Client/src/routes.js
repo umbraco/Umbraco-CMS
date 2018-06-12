@@ -76,8 +76,11 @@ app.config(function ($routeProvider) {
     /** When this is used to resolve it will attempt to log the current user out */
     var doLogout = function() {
         return {
-            isLoggedOut: function ($q, userService) {
+            isLoggedOut: function ($q, $location, userService) {
                 return userService.logout().then(function () {
+                    // we have to redirect here instead of the routes redirectTo
+                    // https://github.com/angular/angular.js/commit/7f4b356c2bebb87f0c26b57a20415b004b20bcd1
+                    $location.path("/login/false");
                     //success so continue
                     return $q.when(true);
                 }, function() {
@@ -103,7 +106,6 @@ app.config(function ($routeProvider) {
             resolve: canRoute(false)
         })
         .when('/logout', {
-             redirectTo: '/login/false',
             resolve: doLogout()
         })
         .when('/:section?', {
