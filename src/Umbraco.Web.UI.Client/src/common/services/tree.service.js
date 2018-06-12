@@ -264,6 +264,11 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                         args.node.expanded = true;
                         args.node.hasChildren = true;
                     }
+
+                    if (angular.isFunction(args.node.updateNodeData)) {
+                        args.node.updateNodeData(args.node);
+                    }
+
                     return data;
 
                 }, function(reason) {
