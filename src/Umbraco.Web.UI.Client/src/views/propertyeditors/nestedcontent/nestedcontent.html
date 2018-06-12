@@ -61,7 +61,11 @@
 
                 <ul class="elements">
                     <li ng-repeat="scaffold in overlayMenu.scaffolds | filter:searchTerm">
-                        <a ng-click="addNode(scaffold.alias)" href>
+                        <a ng-if="!isGroup(scaffold)" ng-click="addNode(scaffold.alias)" href>
+                            <i class="icon {{scaffold.icon}}"></i>
+                            {{scaffold.name}}
+                        </a>
+                        <a ng-if="isGroup(scaffold)" ng-click="openNodeTypePicker($event,scaffold.group)" href>
                             <i class="icon {{scaffold.icon}}"></i>
                             {{scaffold.name}}
                         </a>
