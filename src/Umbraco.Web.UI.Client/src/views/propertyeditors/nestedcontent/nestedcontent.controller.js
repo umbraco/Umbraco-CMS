@@ -11,7 +11,8 @@
                 // For good measure we'll also prefix the tab alias "nc"
                 ncAlias: "",
                 ncTabAlias: "",
-                nameTemplate: ""
+                nameTemplate: "",
+                nameGroup: ""
             }
             );
         }
@@ -127,7 +128,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             $scope.closeNodeTypePicker();
         };
 
-        $scope.openNodeTypePicker = function (event) {
+        $scope.openNodeTypePicker = function (event, group) {
             if ($scope.nodes.length >= $scope.maxItems) {
                 return;
             }
@@ -135,18 +136,42 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             // this could be used for future limiting on node types
             $scope.overlayMenu.scaffolds = [];
             _.each($scope.scaffolds, function (scaffold) {
-                $scope.overlayMenu.scaffolds.push({
-                    alias: scaffold.contentTypeAlias,
-                    name: scaffold.contentTypeName,
-                    icon: iconHelper.convertFromLegacyIcon(scaffold.icon)
-                });
+
+                var isGroup = false;
+                var inGroup = true;
+
+                if (group === "" || !group) {
+                    if (scaffold.nameGroup !== "") {
+                        if (!$scope.getScaffoldGroup(scaffold.nameGroup)) {
+                            isGroup = true;
+                        } else {
+                            inGroup = false;
+                        }
+                    }
+                } else if (scaffold.nameGroup !== group) {
+                    inGroup = false;
+                }
+
+                if (isGroup ) {
+                    $scope.overlayMenu.scaffolds.push({
+                        group: scaffold.nameGroup,
+                        name: scaffold.nameGroup,
+                        icon: iconHelper.convertFromLegacyIcon(scaffold.icon)
+                    });
+                } else if (inGroup){
+                    $scope.overlayMenu.scaffolds.push({
+                        alias: scaffold.contentTypeAlias,
+                        name: scaffold.contentTypeName,
+                        icon: iconHelper.convertFromLegacyIcon(scaffold.icon)
+                    });
+                }
             });
 
             if ($scope.overlayMenu.scaffolds.length == 0) {
                 return;
             }
 
-            if ($scope.overlayMenu.scaffolds.length == 1) {
+            if ($scope.overlayMenu.scaffolds.length == 1 && $scope.countScaffoldGroup() == 0) {
                 // only one scaffold type - no need to display the picker
                 $scope.addNode($scope.scaffolds[0].contentTypeAlias);
                 return;
@@ -266,6 +291,22 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             });
         }
 
+        $scope.getScaffoldGroup = function (group) {
+            return _.find($scope.overlayMenu.scaffolds, function (scaffold) {
+                return scaffold.group === group;
+            });
+        }
+
+        $scope.countScaffoldGroup = function () {
+            return _.find($scope.overlayMenu.scaffolds, function (scaffold) {
+                return scaffold.group != "";
+            }).length;
+        }
+
+        $scope.isGroup = function (scaffold) {
+            return !scaffold.alias;
+        }
+
         var notSupported = [
           "Umbraco.Tags",
           "Umbraco.UploadField",
@@ -294,7 +335,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                           }
                       });
                 }
-
+                scaffold.nameGroup = contentType.nameGroup;
                 // Store the scaffold object
                 $scope.scaffolds.push(scaffold);
 

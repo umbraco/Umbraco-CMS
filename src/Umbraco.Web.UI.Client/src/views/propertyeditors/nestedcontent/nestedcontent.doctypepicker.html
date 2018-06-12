@@ -3,12 +3,15 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th/>
+                    <th />
                     <th>
                         <localize key="content_documentType">Document Type</localize>
                     </th>
                     <th>
                         <localize key="editcontenttype_tab">Tab</localize>
+                    </th>
+                    <th class="nested-content_group">
+                        <localize key="editcontenttype_group">Group</localize>
                     </th>
                     <th>
                         <localize key="template_template">Template</localize>
@@ -18,17 +21,19 @@
             </thead>
             <tbody ui-sortable="sortableOptions" ng-model="model.value">
                 <tr ng-repeat="config in model.value">
-                    <td class="icon icon-navigation">
-                    </td>
+                    <td class="icon icon-navigation"></td>
                     <td>
                         <select id="{{model.alias}}_doctype_select"
-                            ng-options="dt.alias as dt.name for dt in model.docTypes | orderBy: 'name'"
-                            ng-model="config.ncAlias" required></select>
+                                ng-options="dt.alias as dt.name for dt in model.docTypes | orderBy: 'name'"
+                                ng-model="config.ncAlias" required></select>
                     </td>
                     <td>
                         <select id="{{model.alias}}_tab_select"
-                            ng-options="t for t in docTypeTabs[config.ncAlias]"
-                            ng-model="config.ncTabAlias" required></select>
+                                ng-options="t for t in docTypeTabs[config.ncAlias]"
+                                ng-model="config.ncTabAlias" required></select>
+                    </td>
+                    <td>
+                        <input type="text" ng-model="config.nameGroup" />
                     </td>
                     <td>
                         <input type="text" ng-model="config.nameTemplate" />
@@ -51,12 +56,16 @@
     <br/>
     <div class="nested-content__help-text" ng-show="showHelpText">
         <p>
-            <b><localize key="editcontenttype_tab">Tab</localize>:</b><br/>
+            <b><localize key="editcontenttype_tab">Tab</localize>:</b><br />
             Select the tab who's properties should be displayed. If left blank, the first tab on the doc type will be used.
         </p>
         <p>
-            <b><localize key="template_template">Template</localize>:</b><br/>
-            Enter an angular expression to evaluate against each item for its name. Use <code ng-non-bindable>{{$index}}</code> to display the item index  
+            <b><localize key="editcontenttype_Group">Group</localize>:</b><br />
+            Enter the group name to appear when inserting an item. If left blank, item will be displayed on the main screen.
+        </p>
+        <p>
+            <b><localize key="template_template">Template</localize>:</b><br />
+            Enter an angular expression to evaluate against each item for its name. Use <code ng-non-bindable>{{$index}}</code> to display the item index
         </p>
     </div>
 </div>
