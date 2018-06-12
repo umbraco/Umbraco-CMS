@@ -127,12 +127,14 @@
                 controller.setLayout = function() {};
 
                 controller.openMasterTemplateOverlay();
-                controller.masterTemplateOverlay.submit({
-                    selectedItem: {
-                        alias: "NewMasterPage"
-                    }
-                });
-                expect(controller.template.masterTemplateAlias).toBe("NewMasterPage");
+                setTimeout(function(){
+                    controller.masterTemplateOverlay.submit({
+                        selectedItem: {
+                            alias: "NewMasterPage"
+                        }
+                    });
+                    expect(controller.template.masterTemplateAlias).toBe("NewMasterPage");
+                }, 1000);
             });
 
             it("changes layout value when masterpage is selected", function() {
@@ -147,12 +149,14 @@
                 }
 
                 controller.openMasterTemplateOverlay();
-                controller.masterTemplateOverlay.submit({
-                    selectedItem: {
-                        alias: "NewMasterPage"
-                    }
-                });
-                expect(newTemplate).toBe("@{ Layout = \"NewMasterPage.cshtml\"; }");
+                setTimeout(function(){
+                    controller.masterTemplateOverlay.submit({
+                        selectedItem: {
+                            alias: "NewMasterPage"
+                        }
+                    });
+                    expect(newTemplate).toBe("@{ Layout = \"NewMasterPage.cshtml\"; }");
+                }, 1000);
             });
             
         });

@@ -197,6 +197,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
              });
           }
 
+          angularHelper.getCurrentForm($scope).$setDirty();
+
           $scope.contentPickerOverlay.show = false;
           $scope.contentPickerOverlay = null;
       }

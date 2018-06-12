@@ -152,18 +152,24 @@ function angularHelper($log, $q) {
          * Returns a null angular FormController, mostly for use in unit tests
          *      NOTE: This is actually the same construct as angular uses internally for creating a null form but they don't expose
          *          any of this publicly to us, so we need to create our own.
+         *      NOTE: The properties has been added to the null form because we use them to get a form on a scope.
          *
          * @param {string} formName The form name to assign
          */
         getNullForm: function (formName) {
             return {
+                $error: {},
+                $dirty: false,
+                $pristine: true,
+                $valid: true,
+                $submitted: false,
+                $pending: undefined,
                 $addControl: angular.noop,
                 $removeControl: angular.noop,
                 $setValidity: angular.noop,
                 $setDirty: angular.noop,
                 $setPristine: angular.noop,
                 $name: formName
-                //NOTE: we don't include the 'properties', just the methods.
             };
         }
     };
