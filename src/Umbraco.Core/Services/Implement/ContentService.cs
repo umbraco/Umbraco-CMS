@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
@@ -857,6 +858,14 @@ namespace Umbraco.Core.Services.Implement
 
         // fixme - kill all those raiseEvents
 
+        // fixme
+        // the API is not consistent
+        // SaveAndPublish requires that SetPublishValues / ClearPublishValues is called beforehand
+        // Unpublish will unpublish one culture - no idea what happens if we SetPublishValues / ClearPublishValues beforehand
+        // and there's not way to just plainly unpublish the whole thing - refactor!
+        //
+        // plus, does it make any sense for the 'default' culture to also be 'mandatory'?
+
         /// <inheritdoc />
         public OperationResult Save(IContent content, int userId = 0, bool raiseEvents = true)
         {
@@ -944,6 +953,11 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public PublishResult SaveAndPublish(IContent content, int userId = 0, bool raiseEvents = true)
         {
+            // note: SaveAndPublish does *not* publishes value, it assumes that content.PublishValues()
+            // has been called for the variations that are to be published - those are are already
+            // published remain published - can also be used to simply put the content back into its
+            // previous published state after it had been completely unpublished
+
             var evtMsgs = EventMessagesFactory.Get();
             PublishResult result;
 
@@ -1028,118 +1042,97 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public UnpublishResult Unpublish(IContent content, string culture = null, string segment = null, int userId = 0)
         {
+            // unpublish a variation - and that may end up unpublishing the document as a whole,
+            // if the variation was mandatory (ie for a mandatory language - no idea what would happen w/ segments)
+
+            if (!segment.IsNullOrWhiteSpace())
+                throw new NotImplementedException("Segments are not supported.");
+
             var evtMsgs = EventMessagesFactory.Get();
 
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
 
-                var tryUnpublishVariation = TryUnpublishVariationInternal(scope, content, evtMsgs, culture, segment, userId);
-
-                if (tryUnpublishVariation) return tryUnpublishVariation.Result;
-
-                //continue the normal Unpublish operation to unpublish the entire content item
-                var result = UnpublishInternal(scope, content, evtMsgs, userId);
-
-                //not succesful, so return it
-                if (!result.Success) return result;
-
-                //else check if there was a status returned from TryUnpublishVariationInternal and if so use that
-                return tryUnpublishVariation.Result ?? result;
-            }
-        }
-
-        /// <summary>
-        /// Used to unpublish the requested variant if possible
-        /// </summary>
-        /// <param name="scope"></param>
-        /// <param name="content"></param>
-        /// <param name="evtMsgs"></param>
-        /// <param name="culture"></param>
-        /// <param name="segment"></param>
-        /// <param name="userId"></param>
-        /// <returns>
-        /// A successful attempt if a variant was unpublished and it wasn't the last, else a failed result if it's an invariant document or if it's the last.
-        /// A failed result indicates that a normal unpublish operation will need to be performed.
-        /// </returns>
-        private Attempt<UnpublishResult> TryUnpublishVariationInternal(IScope scope, IContent content, EventMessages evtMsgs, string culture, string segment, int userId)
-        {
-            if (!culture.IsNullOrWhiteSpace() || !segment.IsNullOrWhiteSpace())
-            {
-                //now we need to check if this is not the last culture/segment that is published
-                if (!culture.IsNullOrWhiteSpace())
+                // not varying, or invariant culture
+                // simply unpublish the document
+                if (!content.ContentType.Variations.DoesSupportCulture() || culture.IsNullOrWhiteSpace())
                 {
-                    //capture before we clear the values
-                    var publishedCultureCount = content.PublishedCultures.Count();
+                    var unpublished = UnpublishScoped(scope, content, evtMsgs, userId);
+                    if (unpublished.Success) scope.Complete();
+                    return unpublished;
+                }
 
-                    //we need to unpublish everything if this is a mandatory language
-                    var unpublishAll = _languageRepository.GetMany().Where(x => x.Mandatory).Select(x => x.IsoCode).Contains(culture, StringComparer.InvariantCultureIgnoreCase);
+                // varying, with culture = deal with cultures
 
-                    content.ClearPublishedValues(culture, segment);
-                    //now we just publish with the name cleared
-                    SaveAndPublish(content, userId);
+                // if already unpublished, nothing to do
+                var publishedCultures = content.PublishedCultures.ToList();
+                if (!publishedCultures.Contains(culture, StringComparer.OrdinalIgnoreCase))
+                {
+                    scope.Complete();
+                    return new UnpublishResult(UnpublishResultType.SuccessAlready, evtMsgs, content);
+                }
+
+                // otherwise, in any case, clear the unpublishing variation
+                content.ClearPublishedValues(culture, segment);
+
+                // would there be any culture left?
+                var mandatoryCultures = _languageRepository.GetMany().Where(x => x.Mandatory).Select(x => x.IsoCode);
+                var isMandatory = mandatoryCultures.Contains(culture, StringComparer.OrdinalIgnoreCase);
+                if (isMandatory || publishedCultures.Count == 1)
+                {
+                    // nothing left = unpublish all
+                    var unpublished = UnpublishScoped(scope, content, evtMsgs, userId);
+                    if (unpublished.Success) scope.Complete();
+                    return unpublished;
+                }
+
+                // else we need to republish, without that culture
+                var saved = SaveAndPublish(content, userId);
+                if (saved.Success)
+                {
                     Audit(AuditType.UnPublish, $"UnPublish variation culture: {culture ?? string.Empty}, segment: {segment ?? string.Empty} performed by user", userId, content.Id);
-
-                    //We don't need to unpublish all and this is not the last one, so complete the scope and return
-                    if (!unpublishAll && publishedCultureCount > 1)
-                    {
-                        scope.Complete();
-                        return Attempt.Succeed(new UnpublishResult(UnpublishResultType.SuccessVariant, evtMsgs, content));
-                    }
-
-                    if (unpublishAll)
-                    {
-                        //return a fail with a custom status here so the normal unpublish operation takes place but the result will be this flag
-                        return Attempt.Fail(new UnpublishResult(UnpublishResultType.SuccessMandatoryCulture, evtMsgs, content));
-                    }
+                    scope.Complete();
+                    return new UnpublishResult(UnpublishResultType.SuccessVariant, evtMsgs, content);
                 }
 
-                if (!segment.IsNullOrWhiteSpace())
-                {
-                    //TODO: When segments are supported, implement this, a discussion needs to happen about what how a segment is 'published' or not
-                    // since currently this is very different from a culture.
-                    throw new NotImplementedException("Segments are currently not supported in Umbraco");
-                }
+                // failed - map result
+                var r = saved.Result == PublishResultType.FailedCancelledByEvent
+                    ? UnpublishResultType.FailedCancelledByEvent
+                    : UnpublishResultType.Failed;
+                return new UnpublishResult(r, evtMsgs, content);
             }
-
-            //This is either a non variant document or this is the last one or this was a mandatory variant, so return a failed result which indicates that a normal unpublish operation needs to also take place
-            return Attempt.Fail<UnpublishResult>();
         }
 
         /// <summary>
-        /// Performs the logic to unpublish an entire document
+        /// Unpublishes an entire document.
         /// </summary>
-        /// <param name="scope"></param>
-        /// <param name="content"></param>
-        /// <param name="evtMsgs"></param>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        private UnpublishResult UnpublishInternal(IScope scope, IContent content, EventMessages evtMsgs, int userId)
+        private UnpublishResult UnpublishScoped(IScope scope, IContent content, EventMessages evtMsgs, int userId)
         {
             var newest = GetById(content.Id); // ensure we have the newest version
             if (content.VersionId != newest.VersionId) // but use the original object if it's already the newest version
                 content = newest;
-            if (content.Published == false)
-            {
-                scope.Complete();
-                return new UnpublishResult(UnpublishResultType.SuccessAlready, evtMsgs, content); // already unpublished
-            }
 
-            // strategy
+            // if already unpublished, nothing to do
+            if (!content.Published)
+                return new UnpublishResult(UnpublishResultType.SuccessAlready, evtMsgs, content);
+
+            // run strategies
             // fixme should we still complete the uow? don't want to rollback here!
             var attempt = StrategyCanUnpublish(scope, content, userId, evtMsgs);
             if (attempt.Success == false) return attempt; // causes rollback
             attempt = StrategyUnpublish(scope, content, true, userId, evtMsgs);
             if (attempt.Success == false) return attempt; // causes rollback
 
+            // save
             content.WriterId = userId;
             _documentRepository.Save(content);
 
+            // events and audit
             scope.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
             scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
             Audit(AuditType.UnPublish, "UnPublish performed by user", userId, content.Id);
 
-            scope.Complete();
             return new UnpublishResult(evtMsgs, content);
         }
 

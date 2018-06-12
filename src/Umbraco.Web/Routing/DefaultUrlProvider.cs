@@ -79,23 +79,18 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public virtual IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
-            //get the invariant route for this item, this will give us the Id of it's domain node if one is assigned
-            var invariantRoute = umbracoContext.ContentCache.GetRouteById(id);
-            
-            if (string.IsNullOrWhiteSpace(invariantRoute))
-            {
-                _logger.Debug<DefaultUrlProvider>(() => $"Couldn't find any page with nodeId={id}. This is most likely caused by the page not being published.");
-                return null;
-            }
-
+            var node = umbracoContext.ContentCache.GetById(id);
             var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
 
-            // extract domainUri and path
-            // route is /<path> or <domainRootId>/<path>
-            var pos = invariantRoute.IndexOf('/');
-            var path = pos == 0 ? invariantRoute : invariantRoute.Substring(pos);
-            var domainUris = pos == 0 ? null : domainHelper.DomainsForNode(int.Parse(invariantRoute.Substring(0, pos)), current);
+            var n = node;
+            var domainUris = domainHelper.DomainsForNode(n.Id, current, false);
+            while (domainUris == null && n != null) // n is null at root
+            {
+                n = n.Parent; // move to parent node
+                domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current, false);
+            }
 
+            // no domains = exit
             if (domainUris ==null)
                 return Enumerable.Empty<string>();
 
@@ -107,8 +102,8 @@ namespace Umbraco.Web.Routing
                 if (route == null) continue;
 
                 //need to strip off the leading ID for the route if it exists (occurs if the route is for a node with a domain assigned)
-                pos = route.IndexOf('/');
-                path = pos == 0 ? route : route.Substring(pos);
+                var pos = route.IndexOf('/');
+                var path = pos == 0 ? route : route.Substring(pos);
 
                 var uri = new Uri(CombinePaths(d.Uri.GetLeftPart(UriPartial.Path), path));
                 uri = UriUtility.UriFromUmbraco(uri, _globalSettings, _requestSettings);

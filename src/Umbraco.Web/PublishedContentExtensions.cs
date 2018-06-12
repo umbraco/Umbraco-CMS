@@ -42,17 +42,6 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="content">The content.</param>
         /// <returns>The absolute url for the content.</returns>
-        //[Obsolete("UrlWithDomain() is obsolete, use the UrlAbsolute() method instead.")]
-        public static string UrlWithDomain(this IPublishedContent content)
-        {
-            return content.UrlAbsolute();
-        }
-
-        /// <summary>
-        /// Gets the absolute url for the content.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <returns>The absolute url for the content.</returns>
         public static string UrlAbsolute(this IPublishedContent content)
         {
             // adapted from PublishedContentBase.Url
@@ -85,8 +74,12 @@ namespace Umbraco.Web
             if (!content.ContentType.Variations.Has(ContentVariation.CultureNeutral))
                 return content.UrlSegment;
 
+            // content.GetCulture(culture) will use the 'current' culture (via accessor) in case 'culture'
+            // is null (meaning, 'current') - and can return 'null' if that culture is not published - and
+            // will return 'null' if the content is variant and culture is invariant
+
             // else try and get the culture info
-            // return the corresponding url segment, or null if none (ie the culture is not published)
+            // return the corresponding url segment, or null if none
             var cultureInfo = content.GetCulture(culture);
             return cultureInfo?.UrlSegment;
         }
