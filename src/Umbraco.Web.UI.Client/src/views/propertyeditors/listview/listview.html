@@ -18,7 +18,7 @@
                        </a>
                        <ul class="dropdown-menu">
                            <li ng-repeat="contentType in listViewAllowedTypes | orderBy:'name':false">
-                               <a href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
+                               <a ng-href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
                                    <i class="icon-{{contentType.cssClass}}"></i>
                                    {{contentType.name}}
                                </a>
@@ -26,7 +26,7 @@
                        </ul>
                    </div>
                    <div class="btn-group" ng-show="listViewAllowedTypes.length === 1">
-                       <a class="btn btn-success" href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{listViewAllowedTypes[0].alias}}&create=true">
+                       <a class="btn btn-success" ng-href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{listViewAllowedTypes[0].alias}}&create=true">
                            <i class="icon-{{listViewAllowedTypes[0].cssClass}}"></i>
                            <localize key="actions_create">Create</localize> {{ listViewAllowedTypes[0].name }}
                        </a>
