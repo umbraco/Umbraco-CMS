@@ -18,7 +18,7 @@
 
             // set default title
             if(!$scope.model.title) {
-                localizationService.localize("defaultdialogs_selectUsers").then(function(value){
+                localizationService.localize("user_selectUserGroups").then(function(value){
                     $scope.model.title = value;
                 });
             }

@@ -315,10 +315,9 @@
             vm.selectedBulkUserGroups = _.clone(firstSelectedUser.userGroups);
 
             vm.userGroupPicker = {
-                title: localizationService.localize("user_selectUserGroups"),
                 view: "usergrouppicker",
                 selection: vm.selectedBulkUserGroups,
-                closeButtonLabel: localizationService.localize("general_cancel"),
+                closeButtonLabelKey: "general_cancel",
                 show: true,
                 submit: function (model) {
                     usersResource.setUserGroupsOnUsers(model.selection, vm.selection).then(function (data) {
@@ -351,10 +350,9 @@
 
         function openUserGroupPicker(event) {
             vm.userGroupPicker = {
-                title: localizationService.localize("user_selectUserGroups"),
                 view: "usergrouppicker",
                 selection: vm.newUser.userGroups,
-                closeButtonLabel: localizationService.localize("general_cancel"),
+                closeButtonLabelKey: "general_cancel",
                 show: true,
                 submit: function (model) {
                     // apply changes
