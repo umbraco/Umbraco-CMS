@@ -361,8 +361,6 @@
     <Compile Include="Configurations\UmbracoSettings\DistributedCallElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\LoggingElementTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\PackageRepositoriesElementDefaultTests.cs" />
-    <Compile Include="Configurations\UmbracoSettings\PackageRepositoriesElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ProvidersElementDefaultTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\ProvidersElementTests.cs" />
     <Compile Include="Configurations\UmbracoSettings\RequestHandlerElementDefaultTests.cs" />

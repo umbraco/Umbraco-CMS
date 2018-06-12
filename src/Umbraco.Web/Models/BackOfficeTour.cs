@@ -11,7 +11,7 @@ namespace Umbraco.Web.Models
     {
         public BackOfficeTour()
         {
-            RequiredSections = new List<string>();
+            RequiredSections = new List<string>();            
         }
 
         [DataMember(Name = "name")]
@@ -28,5 +28,8 @@ namespace Umbraco.Web.Models
         public List<string> RequiredSections { get; set; }
         [DataMember(Name = "steps")]
         public BackOfficeTourStep[] Steps { get; set; }
+
+        [DataMember(Name = "culture")]
+        public string Culture { get; set; }
     }
 }
