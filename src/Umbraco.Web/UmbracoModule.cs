@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Web;
+using System.Web.Mvc;
 using System.Web.Routing;
 using LightInject;
+using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -22,8 +24,38 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 
+[assembly: PreApplicationStartMethod(typeof(Umbraco.Web.ContainerUmbracoModule), "Start")]
 namespace Umbraco.Web
 {
+    public class ContainerUmbracoModule : IHttpModule
+    {
+        private UmbracoModule umbracoModule;
+
+        public static void Start()
+        {
+            DynamicModuleUtility.RegisterModule(typeof(ContainerUmbracoModule));
+        }
+
+        public ContainerUmbracoModule()
+        {
+            
+        }
+
+        public void Init(HttpApplication context)
+        {
+            // Should be extended with lazy list of modules from registry
+            // Example here: https://haacked.com/archive/2011/06/03/dependency-injection-with-asp-net-httpmodules.aspx/
+
+            umbracoModule = Current.Container.GetInstance<UmbracoModule>();
+            umbracoModule.Init(context);
+        }
+
+        public void Dispose()
+        {
+            umbracoModule.Dispose();
+        }
+    }
+
     // also look at IOHelper.ResolveUrlsFromTextString - nightmarish?!
 
     // context.RewritePath supports ~/ or else must begin with /vdir
@@ -38,44 +70,74 @@ namespace Umbraco.Web
         // get our dependencies injected manually, through properties, in
         // Init(). works for dependencies that are singletons.
 
-        [Inject]
         public IUmbracoSettingsSection UmbracoSettings { get; set; }
 
-        [Inject]
         public IGlobalSettings GlobalSettings { get; set; }
 
-        [Inject]
         public IUmbracoContextAccessor UmbracoContextAccessor { get; set; }
 
-        [Inject]
         public IPublishedSnapshotService PublishedSnapshotService { get; set; }
 
-        [Inject]
         public IUserService UserService { get; set; }
 
-        [Inject]
         public UrlProviderCollection UrlProviders { get; set; }
 
-        [Inject]
         public IRuntimeState Runtime { get; set; }
 
-        [Inject]
         public ILogger Logger { get; set; }
 
-        [Inject]
         internal PublishedRouter PublishedRouter { get; set; }
 
-        [Inject]
         internal IUmbracoDatabaseFactory DatabaseFactory { get; set; }
 
-        [Inject]
         internal IVariationContextAccessor VariationContextAccessor { get; set; }
 
         #endregion
 
         public UmbracoModule()
+            : this(
+                Current.Container.GetInstance<IUmbracoSettingsSection>(),
+                Current.Container.GetInstance<IGlobalSettings>(),
+                Current.Container.GetInstance<IUmbracoContextAccessor>(),
+                Current.Container.GetInstance<IPublishedSnapshotService>(),
+                Current.Container.GetInstance<IUserService>(),
+                Current.Container.GetInstance<UrlProviderCollection>(),
+                Current.Container.GetInstance<IRuntimeState>(),
+                Current.Container.GetInstance<ILogger>(),
+                Current.Container.GetInstance<PublishedRouter>(),
+                Current.Container.GetInstance<IUmbracoDatabaseFactory>(),
+                Current.Container.GetInstance<IVariationContextAccessor>()
+            )
+        {
+        }
+
+        public UmbracoModule(
+            IUmbracoSettingsSection umbracoSettings,
+            IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IPublishedSnapshotService publishedSnapshotService,
+            IUserService userService,
+            UrlProviderCollection urlProviders,
+            IRuntimeState runtime,
+            ILogger logger,
+            PublishedRouter publishedRouter,
+            IUmbracoDatabaseFactory databaseFactory,
+            IVariationContextAccessor variationContextAccessor
+            )
         {
             _combinedRouteCollection = new Lazy<RouteCollection>(CreateRouteCollection);
+
+            UmbracoSettings = umbracoSettings;
+            GlobalSettings = globalSettings;
+            UmbracoContextAccessor = umbracoContextAccessor;
+            PublishedSnapshotService = publishedSnapshotService;
+            UserService = userService;
+            UrlProviders = urlProviders;
+            Runtime = runtime;
+            Logger = logger;
+            PublishedRouter = publishedRouter;
+            DatabaseFactory = databaseFactory;
+            VariationContextAccessor = variationContextAccessor;
         }
 
         #region HttpModule event handlers
@@ -544,9 +606,9 @@ namespace Umbraco.Web
                 return;
             }
 
-            // modules are *not* instanciated by the container so we have to
+            // modules **are** instanciated by the container so we **don't** have to
             // get our dependencies injected manually, through properties.
-            Core.Composing.Current.Container.InjectProperties(this);
+            //Core.Composing.Current.Container.InjectProperties(this);
 
             app.BeginRequest += (sender, e) =>
             {

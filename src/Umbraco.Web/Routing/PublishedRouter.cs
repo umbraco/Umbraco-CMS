@@ -20,7 +20,7 @@ namespace Umbraco.Web.Routing
 {
     // fixme - make this public
     // fixme - making sense to have an interface?
-    internal class PublishedRouter
+    public class PublishedRouter
     {
         private readonly IWebRoutingSection _webRoutingSection;
         private readonly ContentFinderCollection _contentFinders;
