@@ -18,28 +18,27 @@ angular.module('umbraco.security.interceptor')
             },
 
             'response': function(response) {
-                // do something on success
-                console.log('response success', response);
-                var headers = response.headers();
-                console.log('response success headers', headers);
-
-                /*
                 // Intercept successful requests
                 //Here we'll check if our custom header is in the response which indicates how many seconds the user's session has before it
                 //expires. Then we'll update the user in the user service accordingly.
-                var headers = originalResponse.headers();
+                var headers = response.headers();
+                
+                //WB: Logging to help temp-debugging
+                console.log('response success', response);
+                console.log('response success headers', headers);
+
+
                 if (headers["x-umb-user-seconds"]) {
                     // We must use $injector to get the $http service to prevent circular dependency
                     var userService = $injector.get('userService');
                     userService.setUserTimeout(headers["x-umb-user-seconds"]);
                 }
-
+                
                 //this checks if the user's values have changed, in which case we need to update the user details throughout
                 //the back office similar to how we do when a user logs in
                 if (headers["x-umb-user-modified"]) {
                     eventsService.emit("app.userRefresh");
                 }
-                */
 
                 return response;
             },
