@@ -168,15 +168,7 @@ app.config(function ($routeProvider) {
                     $scope.templateUrl = ('views/' + $routeParams.tree + '/' + $routeParams.method + '.html');
                 }
 
-            },/*
-            templateUrl: function (rp) {
-
-                //if there is no method registered for this then show the dashboard
-                if (!rp.method)
-                    return "views/common/dashboard.html";
-                
-                return ('views/' + rp.tree + '/' + rp.method + '.html');
-            },*/
+            },
             resolve: canRoute(true)
         })
         .when('/:section/:tree/:method/:id', {
