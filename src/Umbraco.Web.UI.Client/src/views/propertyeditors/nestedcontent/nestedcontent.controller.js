@@ -140,6 +140,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
                 var isGroup = false;
                 var inGroup = true;
+                var groups = parseScaffolds(scaffold.nameGroup);
 
                 if (group === "" || !group) {
                     if (scaffold.nameGroup !== "") {
@@ -149,16 +150,19 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                             inGroup = false;
                         }
                     }
-                } else if (scaffold.nameGroup !== group) {
+                } else if (!groups.includes(group)) {
                     inGroup = false;
                 }
-
-                if (isGroup ) {
-                    $scope.overlayMenu.scaffolds.push({
-                        group: scaffold.nameGroup,
-                        name: scaffold.nameGroup,
-                        icon: iconHelper.convertFromLegacyIcon(scaffold.icon)
+                
+                if (isGroup) {
+                    _.each(groups, function(groupItem) {
+                        $scope.overlayMenu.scaffolds.push({
+                            group: groupItem,
+                            name: groupItem,
+                            icon: iconHelper.convertFromLegacyIcon(scaffold.icon)
+                        });    
                     });
+                    
                 } else if (inGroup){
                     $scope.overlayMenu.scaffolds.push({
                         alias: scaffold.contentTypeAlias,
@@ -293,8 +297,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         }
 
         $scope.getScaffoldGroup = function (group) {
+            var scaffolds = parseScaffolds(group);
             return _.find($scope.overlayMenu.scaffolds, function (scaffold) {
-                return scaffold.group === group;
+                return scaffolds.includes(scaffold.group);
             });
         }
 
@@ -307,6 +312,17 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.isGroup = function (scaffold) {
             return !scaffold.alias;
         }
+
+        var parseScaffolds = function(groupName) {
+            var groups = [];
+            _.each(groupName.split("|"), function(group) {
+                var trimGroup = group.trim();
+                if (trimGroup !== "") {
+                    groups.push(trimGroup);    
+                }
+            });
+            return groups;
+        };
 
         var notSupported = [
           "Umbraco.Tags",
