@@ -1,9 +1,9 @@
-﻿namespace Umbraco.Web.Models.ContentEditing
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Runtime.Serialization;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 
+namespace Umbraco.Web.Models.ContentEditing
+{
     /// <summary>
     /// The dictionary display model
     /// </summary>
@@ -19,6 +19,7 @@
             this.Translations = new List<DictionaryTranslationDisplay>();
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
         /// </summary>

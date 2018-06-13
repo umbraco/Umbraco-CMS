@@ -3,7 +3,7 @@
     * @name umbraco.resources.dictionaryResource
     * @description Loads in data for dictionary items
 **/
-function dictionaryResource($q, $http, umbRequestHelper, umbDataFormatter) {
+function dictionaryResource($q, $http, $location, umbRequestHelper, umbDataFormatter) {
 
   /**
          * @ngdoc method
@@ -146,12 +146,41 @@ function dictionaryResource($q, $http, umbRequestHelper, umbDataFormatter) {
             "Failed to get list");
     }
 
+    /**
+         * @ngdoc method
+         * @name umbraco.resources.dictionaryResource#getSection
+         * @methodOf umbraco.resources.dictionaryResource
+         *
+         * @description
+         * Gets the current section that the dictionary tree is in (only settings and translation are allowed currently)
+         *
+         * ##usage
+         * <pre>
+         * var section = dictionaryResource.getSection();
+         * </pre>
+         *         
+         * @returns string.
+         *
+  **/
+    function getSection() {
+        var section = $location.$$path;
+        if (section.startsWith("/")) {
+            section = section.substring(1, section.length);
+        }
+        var firstSlash = section.indexOf("/");
+        if (firstSlash !== -1) {
+            section = section.substring(0, firstSlash);
+        }
+        return section;
+    }
+
   var resource = {
     deleteById: deleteById,
     create: create,
     getById: getById,
     save: save,
-    getList : getList
+    getList : getList,
+    getSection: getSection
   };
 
   return resource;

@@ -1,17 +1,16 @@
-﻿namespace Umbraco.Web.Models.Mapping
+﻿using AutoMapper;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.Mapping;
+using Umbraco.Core.Services;
+using Umbraco.Web.Models.ContentEditing;
+
+namespace Umbraco.Web.Models.Mapping
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
-    using AutoMapper;
-
-    using Umbraco.Core;
-    using Umbraco.Core.Models;
-    using Umbraco.Core.Models.Mapping;
-    using Umbraco.Core.Services;
-    using Umbraco.Web.Models.ContentEditing;
-
+    /// <inheritdoc />
     /// <summary>
     /// The dictionary model mapper.
     /// </summary>
@@ -42,9 +41,8 @@
                             // TODO check if there is a better way
                             if (src.ParentId.HasValue)
                             {
-                                var ids = new List<int>();
+                                var ids = new List<int> { -1 };
 
-                                ids.Add(-1);
 
                                 var parentIds = new List<int>();
 
@@ -95,7 +93,7 @@
                                 var translation = src.Translations.FirstOrDefault(x => x.LanguageId == langId);
 
                                 dest.Translations.Add(
-                                    new DictionaryOverviewTranslationDisplay()
+                                    new DictionaryOverviewTranslationDisplay
                                         {
                                             DisplayName = lang.CultureInfo.DisplayName,
                                             HasTranslation = translation != null && string.IsNullOrEmpty(translation.Value) == false                                           
@@ -103,8 +101,6 @@
                             }
                         });
         }
-
-
 
         /// <summary>
         /// Goes up the dictoinary tree to get all parent ids
@@ -122,15 +118,13 @@
         {
             var dictionary = localizationService.GetDictionaryItemById(parentId);
 
-            if (dictionary != null)
-            {
-                ids.Add(dictionary.Id);
+            if (dictionary == null)
+                return;
 
-                if (dictionary.ParentId.HasValue)
-                {
-                    this.GetParentId(dictionary.ParentId.Value, localizationService, ids);
-                }
-            }
+            ids.Add(dictionary.Id);
+
+            if (dictionary.ParentId.HasValue)
+                GetParentId(dictionary.ParentId.Value, localizationService, ids);
         }
     }
 }

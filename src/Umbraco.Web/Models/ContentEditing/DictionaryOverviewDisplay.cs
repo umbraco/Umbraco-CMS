@@ -1,8 +1,8 @@
-﻿namespace Umbraco.Web.Models.ContentEditing
-{
-    using System.Collections.Generic;
-    using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 
+namespace Umbraco.Web.Models.ContentEditing
+{
     /// <summary>
     /// The dictionary overview display.
     /// </summary>
@@ -14,7 +14,7 @@
         /// </summary>
         public DictionaryOverviewDisplay()
         {
-            this.Translations = new List<DictionaryOverviewTranslationDisplay>();
+            Translations = new List<DictionaryOverviewTranslationDisplay>();
         }
 
         /// <summary>

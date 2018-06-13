@@ -7,7 +7,7 @@
  * The controller for editing dictionary items
  */
 function DictionaryEditController($scope, $routeParams, dictionaryResource, treeService, navigationService, appState, editorState, contentEditingHelper, formHelper, notificationsService, localizationService) {
-    vm = this;
+    var vm = this;
 
     //setup scope vars
     vm.nameDirty = false;
@@ -17,7 +17,7 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
     vm.page.menu = {};
     vm.page.menu.currentSection = appState.getSectionState("currentSection");
     vm.page.menu.currentNode = null;
-    vm.description = '';
+    vm.description = "";
   
     function loadDictionary() {
 
@@ -42,8 +42,8 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
     }
 
     function bindDictionary(data) {
-        localizationService.localize('dictionaryItem_description').then(function (value) {
-            vm.description = value.replace('%0%', data.name);
+        localizationService.localize("dictionaryItem_description").then(function (value) {
+            vm.description = value.replace("%0%", data.name);
         });
 
         // create data for  umb-property displaying
@@ -104,7 +104,7 @@ function DictionaryEditController($scope, $routeParams, dictionaryResource, tree
 
     $scope.$watch("vm.content.name", function (newVal, oldVal) {
         //when the value changes, we need to set the name dirty
-        if (newVal && (newVal !== oldVal) && typeof(oldVal) !== 'undefined') {
+        if (newVal && (newVal !== oldVal) && typeof(oldVal) !== "undefined") {
             vm.nameDirty = true;           
         }
     });

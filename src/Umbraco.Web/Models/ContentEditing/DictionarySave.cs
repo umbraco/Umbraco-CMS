@@ -1,9 +1,9 @@
-﻿namespace Umbraco.Web.Models.ContentEditing
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Runtime.Serialization;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 
+namespace Umbraco.Web.Models.ContentEditing
+{
     /// <summary>
     /// Dictionary Save model
     /// </summary>

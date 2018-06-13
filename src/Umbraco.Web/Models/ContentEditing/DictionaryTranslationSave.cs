@@ -1,7 +1,7 @@
+using System.Runtime.Serialization;
+
 namespace Umbraco.Web.Models.ContentEditing
 {
-    using System.Runtime.Serialization;
-
     /// <summary>
     /// The dictionary translation save model
     /// </summary>

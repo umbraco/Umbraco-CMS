@@ -1,23 +1,21 @@
-﻿namespace Umbraco.Web.Editors
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
+using AutoMapper;
+using Umbraco.Core.Models;
+using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Mvc;
+using Umbraco.Web.UI;
+using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
+using Constants = Umbraco.Core.Constants;
+using Notification = Umbraco.Web.Models.ContentEditing.Notification;
+
+namespace Umbraco.Web.Editors
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Configuration;
-    using System.Net;
-    using System.Net.Http;
-    using System.Web.Http;
-
-    using AutoMapper;
-
-    using Umbraco.Core.Models;
-    using Umbraco.Web.Models.ContentEditing;
-    using Umbraco.Web.Mvc;
-    using Umbraco.Web.UI;
-    using Umbraco.Web.WebApi;
-    using Umbraco.Web.WebApi.Filters;
-
-    using Constants = Umbraco.Core.Constants;
-
+    /// <inheritdoc />
     /// <summary>
     /// The API controller used for editing dictionary items
     /// </summary>
@@ -39,15 +37,14 @@
         [HttpPost]
         public HttpResponseMessage DeleteById(int id)
         {
-            var foundDictionary = this.Services.LocalizationService.GetDictionaryItemById(id);
+            var foundDictionary = Services.LocalizationService.GetDictionaryItemById(id);
+
             if (foundDictionary == null)
-            {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+            
+            Services.LocalizationService.Delete(foundDictionary, Security.CurrentUser.Id);
 
-            this.Services.LocalizationService.Delete(foundDictionary, Security.CurrentUser.Id);
-
-            return this.Request.CreateResponse(HttpStatusCode.OK);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         /// <summary>
@@ -66,19 +63,16 @@
         public HttpResponseMessage Create(int parentId, string key)
         {
             if (string.IsNullOrEmpty(key))
-            {
-
-                return this.Request
+                return Request
                     .CreateNotificationValidationErrorResponse("Key can not be empty;"); // TODO translate
-            }
 
-            if (this.Services.LocalizationService.DictionaryItemExists(key))
+            if (Services.LocalizationService.DictionaryItemExists(key))
             {
-                var message = this.Services.TextService.Localize(
+                var message = Services.TextService.Localize(
                      "dictionaryItem/changeKeyError",
-                     this.Security.CurrentUser.GetUserCulture(this.Services.TextService),
+                     Security.CurrentUser.GetUserCulture(Services.TextService),
                      new Dictionary<string, string> { { "0", key } });
-                return this.Request.CreateNotificationValidationErrorResponse(message);
+                return Request.CreateNotificationValidationErrorResponse(message);
             }
 
             try
@@ -86,22 +80,20 @@
                 Guid? parentGuid = null;
 
                 if (parentId > 0)
-                {
-                    parentGuid = this.Services.LocalizationService.GetDictionaryItemById(parentId).Key;
-                }
+                    parentGuid = Services.LocalizationService.GetDictionaryItemById(parentId).Key;
 
-                var item = this.Services.LocalizationService.CreateDictionaryItemWithIdentity(
+                var item = Services.LocalizationService.CreateDictionaryItemWithIdentity(
                     key,
                     parentGuid,
                     string.Empty);
 
 
-                return this.Request.CreateResponse(HttpStatusCode.OK, item.Id);
+                return Request.CreateResponse(HttpStatusCode.OK, item.Id);
             }
             catch (Exception exception)
             {
-                this.Logger.Error(this.GetType(), "Error creating dictionary", exception);
-                return this.Request.CreateNotificationValidationErrorResponse("Error creating dictionary item");
+                Logger.Error(GetType(), "Error creating dictionary", exception);
+                return Request.CreateNotificationValidationErrorResponse("Error creating dictionary item");
             }
         }
 
@@ -119,12 +111,10 @@
         /// </exception>
         public DictionaryDisplay GetById(int id)
         {
-            var dictionary = this.Services.LocalizationService.GetDictionaryItemById(id);
+            var dictionary = Services.LocalizationService.GetDictionaryItemById(id);
 
             if (dictionary == null)
-            {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
 
             return Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionary);
         }
@@ -141,54 +131,55 @@
         public DictionaryDisplay PostSave(DictionarySave dictionary)
         {
             var dictionaryItem =
-                this.Services.LocalizationService.GetDictionaryItemById(int.Parse(dictionary.Id.ToString()));
+                Services.LocalizationService.GetDictionaryItemById(int.Parse(dictionary.Id.ToString()));
 
-            if (dictionaryItem != null)
+            if (dictionaryItem == null)
+                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Dictionary item does not exist"));
+
+            var userCulture = Security.CurrentUser.GetUserCulture(Services.TextService);
+
+            if (dictionary.NameIsDirty)
             {
-                var userCulture = this.Security.CurrentUser.GetUserCulture(this.Services.TextService);
+                // if the name (key) has changed, we need to check if the new key does not exist
+                var dictionaryByKey = Services.LocalizationService.GetDictionaryItemByKey(dictionary.Name);
 
-                if (dictionary.NameIsDirty)
+                if (dictionaryByKey != null && dictionaryItem.Id != dictionaryByKey.Id)
                 {
-                    // if the name (key) has changed, we need to check if the new key does not exist
-                    var dictionaryByKey = this.Services.LocalizationService.GetDictionaryItemByKey(dictionary.Name);
 
-                    if (dictionaryByKey != null && dictionaryItem.Id != dictionaryByKey.Id)
-                    {
-
-                        var message = this.Services.TextService.Localize(
-                            "dictionaryItem/changeKeyError",
-                            userCulture,
-                            new Dictionary<string, string> { { "0", dictionary.Name } });
-                        this.ModelState.AddModelError("Name", message);
-                        throw new HttpResponseException(this.Request.CreateValidationErrorResponse(ModelState));
-                    }
-
-                    dictionaryItem.ItemKey = dictionary.Name;
+                    var message = Services.TextService.Localize(
+                        "dictionaryItem/changeKeyError",
+                        userCulture,
+                        new Dictionary<string, string> { { "0", dictionary.Name } });
+                    ModelState.AddModelError("Name", message);
+                    throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
                 }
 
-                foreach (var translation in dictionary.Translations)
-                {
-                    this.Services.LocalizationService.AddOrUpdateDictionaryValue(dictionaryItem, this.Services.LocalizationService.GetLanguageById(translation.LanguageId), translation.Translation);
-                }
-
-                try
-                {
-                    this.Services.LocalizationService.Save(dictionaryItem);
-
-                    var model = Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
-
-                    model.Notifications.Add(new Models.ContentEditing.Notification(this.Services.TextService.Localize("speechBubbles/dictionaryItemSaved", userCulture), string.Empty, SpeechBubbleIcon.Success));
-
-                    return model;
-                }
-                catch (Exception e)
-                {
-                    this.Logger.Error(this.GetType(), "Error saving dictionary", e);
-                    throw new HttpResponseException(this.Request.CreateNotificationValidationErrorResponse("Something went wrong saving dictionary"));
-                }
+                dictionaryItem.ItemKey = dictionary.Name;
             }
 
-            throw new HttpResponseException(this.Request.CreateNotificationValidationErrorResponse("Dictionary item does not exist"));
+            foreach (var translation in dictionary.Translations)
+            {
+                Services.LocalizationService.AddOrUpdateDictionaryValue(dictionaryItem,
+                    Services.LocalizationService.GetLanguageById(translation.LanguageId), translation.Translation);
+            }
+
+            try
+            {
+                Services.LocalizationService.Save(dictionaryItem);
+
+                var model = Mapper.Map<IDictionaryItem, DictionaryDisplay>(dictionaryItem);
+
+                model.Notifications.Add(new Notification(
+                    Services.TextService.Localize("speechBubbles/dictionaryItemSaved", userCulture), string.Empty,
+                    SpeechBubbleIcon.Success));
+
+                return model;
+            }
+            catch (Exception e)
+            {
+                Logger.Error(GetType(), "Error saving dictionary", e);
+                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Something went wrong saving dictionary"));
+            }
         }
 
         /// <summary>
@@ -201,15 +192,15 @@
         {
             var list = new List<DictionaryOverviewDisplay>();
 
-            var level = 0;
+            const int level = 0;
 
-            foreach (var dictionaryItem in this.Services.LocalizationService.GetRootDictionaryItems())
+            foreach (var dictionaryItem in Services.LocalizationService.GetRootDictionaryItems())
             {
                 var item = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(dictionaryItem);
                 item.Level = 0;
                 list.Add(item);
 
-                this.GetChildItemsForList(dictionaryItem, level + 1, list);
+                GetChildItemsForList(dictionaryItem, level + 1, list);
             }
 
             return list;
@@ -229,14 +220,14 @@
         /// </param>
         private void GetChildItemsForList(IDictionaryItem dictionaryItem, int level, List<DictionaryOverviewDisplay> list)
         {
-            foreach (var childItem in this.Services.LocalizationService.GetDictionaryItemChildren(
+            foreach (var childItem in Services.LocalizationService.GetDictionaryItemChildren(
                 dictionaryItem.Key))
             {
                 var item = Mapper.Map<IDictionaryItem, DictionaryOverviewDisplay>(childItem);
                 item.Level = level;
                 list.Add(item);
 
-                this.GetChildItemsForList(childItem, level + 1, list);
+                GetChildItemsForList(childItem, level + 1, list);
             }
         }
     }

@@ -1,7 +1,8 @@
-﻿namespace Umbraco.Web.Models.ContentEditing
-{
-    using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
+namespace Umbraco.Web.Models.ContentEditing
+{
+    /// <inheritdoc />
     /// <summary>
     /// The dictionary translation display model
     /// </summary>

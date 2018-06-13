@@ -7,8 +7,8 @@
  * The controller for listting dictionary items
  */
 function DictionaryListController($scope, $location, dictionaryResource, localizationService) {
-    vm = this;
-    vm.title = 'Dictionary overview';
+    var vm = this;
+    vm.title = "Dictionary overview";
     vm.loading = false;
     vm.items = [];   
 
@@ -26,13 +26,14 @@ function DictionaryListController($scope, $location, dictionaryResource, localiz
     }
 
     function clickItem(id) {
-        $location.path("/settings/dictionary/edit/" + id);
+        var section = dictionaryResource.getSection();
+        $location.path("/" + section + "/dictionary/edit/" + id);
     }
 
     vm.clickItem = clickItem;
 
     function onInit() {
-        localizationService.localize('dictionaryItem_overviewTitle').then(function (value) {
+        localizationService.localize("dictionaryItem_overviewTitle").then(function (value) {
             vm.title = value;
         });
 

@@ -7,37 +7,38 @@
  * The controller for creating dictionary items
  */
 function DictionaryCreateController($scope, $location, dictionaryResource, navigationService, notificationsService, formHelper) {
-  vm = this;
+    var vm = this;
 
-  vm.itemKey = '';
+    vm.itemKey = "";
 
-  function createItem() {
+    function createItem() {
 
-    var node = $scope.dialogOptions.currentNode;
+        var node = $scope.dialogOptions.currentNode;
 
-    dictionaryResource.create(node.id, vm.itemKey).then(function(data) {      
-      navigationService.hideMenu();
+        dictionaryResource.create(node.id, vm.itemKey).then(function (data) {
+            navigationService.hideMenu();
 
-      // set new item as active in tree
-      var currPath = node.path ? node.path : "-1";
-      navigationService.syncTree({ tree: "dictionary", path: currPath + "," + data, forceReload: true, activate: true });
+            // set new item as active in tree
+            var currPath = node.path ? node.path : "-1";
+            navigationService.syncTree({ tree: "dictionary", path: currPath + "," + data, forceReload: true, activate: true });
 
-      // reset form state
-      formHelper.resetForm({ scope: $scope });
+            // reset form state
+            formHelper.resetForm({ scope: $scope });
 
-      // navigate to edit view
-      $location.path("/settings/dictionary/edit/" + data);
+            // navigate to edit view
+            var section = dictionaryResource.getSection();
+            $location.path("/" + section + "/dictionary/edit/" + data);
 
-      
-    },function(err) {
-      if (err.data && err.data.message) {
-        notificationsService.error(err.data.message);
-        navigationService.hideMenu();
-      }
-    });
-  }
 
-  vm.createItem = createItem;
+        }, function (err) {
+            if (err.data && err.data.message) {
+                notificationsService.error(err.data.message);
+                navigationService.hideMenu();
+            }
+        });
+    }
+
+    vm.createItem = createItem;
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.Dictionary.CreateController", DictionaryCreateController);
