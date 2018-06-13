@@ -7,7 +7,7 @@
 * @description This directive is used to control the display of the property level validation message.
 * We will listen for server side validation changes
 * and when an error is detected for this property we'll show the error message.
-* In order for this directive to work, the valStatusChanged directive must be placed on the containing form.
+* In order for this directive to work, the valFormManager directive must be placed on the containing form.
 **/
 function valPropertyMsg(serverValidationManager) {
 
