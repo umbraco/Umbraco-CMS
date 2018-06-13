@@ -106,6 +106,7 @@
             scope: {
                 icon: "=?",
                 name: "=",
+                alias: "=?",
                 description: "=?",
                 permissions: "=?",
                 published: "=?",
