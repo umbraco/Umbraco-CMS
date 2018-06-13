@@ -253,10 +253,6 @@ namespace Umbraco.Web.Trees
             menu.Items.Add<ActionRestore>(ui.Text("actions", ActionRestore.Instance.Alias));
             menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
 
-            menu.Items.Add<ActionSort>(ui.Text("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
-            menu.Items.Add<ActionRollback>(ui.Text("actions", ActionRollback.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
-            menu.Items.Add<ActionAudit>(ui.Text("actions", ActionAudit.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
-
             menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
 
             return menu;
