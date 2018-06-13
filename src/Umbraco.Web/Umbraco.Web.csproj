@@ -323,6 +323,7 @@
     <Compile Include="Editors\BackOfficeAssetsController.cs" />
     <Compile Include="Features\DisabledFeatures.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
+    <Compile Include="Editors\DictionaryController.cs" />
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
     <Compile Include="Editors\DashboardHelper.cs" />
     <Compile Include="Editors\EditorModelEventArgs.cs" />
@@ -399,6 +400,11 @@
     <Compile Include="Models\ContentEditing\AssignedContentPermissions.cs" />
     <Compile Include="Models\ContentEditing\AssignedUserGroupPermissions.cs" />
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryOverviewDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DictionarySave.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryOverviewTranslationDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryTranslationSave.cs" />
     <Compile Include="Models\ContentEditing\EditorNavigation.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
@@ -425,6 +431,7 @@
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
     <Compile Include="Models\ContentEditing\SnippetDisplay.cs" />
     <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryTranslationDisplay.cs" />
     <Compile Include="Models\ContentEditing\UserDisplay.cs" />
     <Compile Include="Models\ContentEditing\UserBasic.cs" />
     <Compile Include="Models\ContentEditing\UserGroupBasic.cs" />
@@ -439,6 +446,7 @@
     <Compile Include="Models\Mapping\CodeFileDisplayMapper.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMapperExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
+    <Compile Include="Models\Mapping\DictionaryModelMapper.cs" />
     <Compile Include="Models\Mapping\EntityModelMapperExtensions.cs" />
     <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
     <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
@@ -525,6 +533,7 @@
     <Compile Include="Suspendable.cs" />
     <Compile Include="Trees\ContentBlueprintTreeController.cs" />
     <Compile Include="Trees\ContentTypeTreeController.cs" />
+    <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\PackagesTreeController.cs" />
     <Compile Include="Trees\MediaTypeTreeController.cs" />
     <Compile Include="Trees\MemberTypeTreeController.cs" />

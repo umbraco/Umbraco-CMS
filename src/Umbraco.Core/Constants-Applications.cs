@@ -93,6 +93,11 @@
 			/// </summary>
 			public const string Dictionary = "dictionary";
 
+            /// <summary>
+            /// The dictionary obsolete.
+            /// </summary>
+            public const string DictionaryObsolete = "dictionary-obsolete";
+
             public const string Stylesheets = "stylesheets";
 
             /// <summary>
