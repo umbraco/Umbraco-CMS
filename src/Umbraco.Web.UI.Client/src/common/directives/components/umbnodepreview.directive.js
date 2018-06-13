@@ -91,12 +91,16 @@
 (function () {
     'use strict';
 
-    function NodePreviewDirective() {
+    function NodePreviewDirective(userService) {
 
         function link(scope, el, attr, ctrl) {
             if (!scope.editLabelKey) {
                 scope.editLabelKey = "general_edit";
             }
+            userService.getCurrentUser().then(function (u) {
+                var isAdmin = u.userGroups.indexOf('admin') !== -1;
+                scope.alias = (Umbraco.Sys.ServerVariables.isDebuggingEnabled === true || isAdmin) ? scope.alias : null;
+            });
         }
 
         var directive = {
