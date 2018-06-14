@@ -24,6 +24,7 @@ namespace Umbraco.Tests.Routing
         {
             base.SetUp();
 
+            // fixme - use the full injected ctor, then we can ditch this one.
             //create the module
             _module = new UmbracoModule
             {

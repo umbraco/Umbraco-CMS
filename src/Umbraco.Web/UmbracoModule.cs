@@ -94,6 +94,7 @@ namespace Umbraco.Web
 
         #endregion
 
+        // fixme - delete, just one usage in a test.
         public UmbracoModule()
             : this(
                 Current.Container.GetInstance<IUmbracoSettingsSection>(),
