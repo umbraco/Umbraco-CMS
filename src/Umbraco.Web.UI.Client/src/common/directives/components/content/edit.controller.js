@@ -396,7 +396,7 @@
                 else {
                     $scope.save().then(function (data) {
                         previewWindow.location.href = redirect;
-                    });
+                    }).catch(angular.noop);
                 }
             }
         };
