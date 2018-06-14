@@ -13,6 +13,11 @@
 * be marked with the 'error' css class. This ensures that labels included in that control group are styled correctly.
 **/
 function valFormManager(serverValidationManager, $rootScope, $log, $timeout, notificationsService, eventsService, $routeParams) {
+
+    var SHOW_VALIDATION_CLASS_NAME = "show-validation";
+    var SAVING_EVENT_NAME = "formSubmitting";
+    var SAVED_EVENT_NAME = "formSubmitted";
+
     return {
         require: "form",
         restrict: "A",
@@ -67,10 +72,6 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
                 noInError.removeClass("error");
 
             });
-            
-            var className = attr.valShowValidation ? attr.valShowValidation : "show-validation";
-            var savingEventName = attr.savingEvent ? attr.savingEvent : "formSubmitting";
-            var savedEvent = attr.savedEvent ? attr.savingEvent : "formSubmitted";
 
             //This tracks if the user is currently saving a new item, we use this to determine 
             // if we should display the warning dialog that they are leaving the page - if a new item
@@ -80,23 +81,23 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
 
             //we should show validation if there are any msgs in the server validation collection
             if (serverValidationManager.items.length > 0) {
-                element.addClass(className);
+                element.addClass(SHOW_VALIDATION_CLASS_NAME);
             }
 
             var unsubscribe = [];
 
             //listen for the forms saving event
-            unsubscribe.push(scope.$on(savingEventName, function(ev, args) {
-                element.addClass(className);
+            unsubscribe.push(scope.$on(SAVING_EVENT_NAME, function(ev, args) {
+                element.addClass(SHOW_VALIDATION_CLASS_NAME);
 
                 //set the flag so we can check to see if we should display the error.
                 isSavingNewItem = $routeParams.create;
             }));
 
             //listen for the forms saved event
-            unsubscribe.push(scope.$on(savedEvent, function(ev, args) {
+            unsubscribe.push(scope.$on(SAVED_EVENT_NAME, function(ev, args) {
                 //remove validation class
-                element.removeClass(className);
+                element.removeClass(SHOW_VALIDATION_CLASS_NAME);
 
                 //clear form state as at this point we retrieve new data from the server
                 //and all validation will have cleared at this point    

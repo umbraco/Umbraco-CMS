@@ -15,7 +15,7 @@ var _umbPropertyEditor = function (umbPropEditorHelper) {
                 preview: "@"
             },
             
-            require: "^form",
+            require: "^^form",
             restrict: 'E',
             replace: true,      
             templateUrl: 'views/components/property/umb-property-editor.html',
