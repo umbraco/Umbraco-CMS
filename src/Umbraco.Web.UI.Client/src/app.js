@@ -16,6 +16,18 @@ var app = angular.module('umbraco', [
     'LocalStorageModule'
 ]);
 
+// I configure the $animate service during bootstrap.
+angular.module("umbraco").config(
+    function configureAnimate( $animateProvider ) {
+        // By default, the $animate service will check for animation styling
+        // on every structural change. This requires a lot of animateFrame-based
+        // DOM-inspection. However, we can tell $animate to only check for
+        // animations on elements that have a specific class name RegExp pattern
+        // present. In this case, we are requiring the "umb-animated" class.
+        $animateProvider.classNameFilter( /\bumb-animated\b/ );
+    }
+);
+
 var packages = angular.module("umbraco.packages", []);
 
 //this ensures we can inject our own views into templateCache and clear
