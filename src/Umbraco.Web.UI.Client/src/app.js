@@ -16,6 +16,15 @@ var app = angular.module('umbraco', [
     'LocalStorageModule'
 ]);
 
+app.config(['$compileProvider', function ($compileProvider) {
+    // when not in debug mode remove all angularjs debug css classes and  HTML comments from the dom
+    $compileProvider.debugInfoEnabled(Umbraco.Sys.ServerVariables.isDebuggingEnabled);
+    // don't execute directives inside comments
+    $compileProvider.commentDirectivesEnabled(false);
+    // don't execute directives inside css classes
+    $compileProvider.cssClassDirectivesEnabled(false);
+}]);
+
 // I configure the $animate service during bootstrap.
 angular.module("umbraco").config(
     function configureAnimate( $animateProvider ) {
