@@ -112,9 +112,10 @@
                         getQuerySnippet: function() { return ""; },
                         getRenderBodySnippet: function() { return ""; },
                         getRenderSectionSnippet: function() { return ""; },
-                        getGeneralShortcuts: function() { return ""; },
-                        getEditorShortcuts: function() { return ""; },
-                        getTemplateEditorShortcuts: function() { return ""; }
+
+                        getGeneralShortcuts: resolvedPromise({}),
+                        getEditorShortcuts: resolvedPromise({}),
+                        getTemplateEditorShortcuts: resolvedPromise({})
                     }
                 });
             }
@@ -137,6 +138,7 @@
                 }, 1000);
             });
 
+            //TODO: THIS FAILED
             it("changes layout value when masterpage is selected", function() {
                 var newTemplate;
                 ace.clearSelection = nada;
