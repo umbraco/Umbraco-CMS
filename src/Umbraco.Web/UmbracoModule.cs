@@ -94,24 +94,6 @@ namespace Umbraco.Web
 
         #endregion
 
-        // fixme - delete, just one usage in a test.
-        public UmbracoModule()
-            : this(
-                Current.Container.GetInstance<IUmbracoSettingsSection>(),
-                Current.Container.GetInstance<IGlobalSettings>(),
-                Current.Container.GetInstance<IUmbracoContextAccessor>(),
-                Current.Container.GetInstance<IPublishedSnapshotService>(),
-                Current.Container.GetInstance<IUserService>(),
-                Current.Container.GetInstance<UrlProviderCollection>(),
-                Current.Container.GetInstance<IRuntimeState>(),
-                Current.Container.GetInstance<ILogger>(),
-                Current.Container.GetInstance<PublishedRouter>(),
-                Current.Container.GetInstance<IUmbracoDatabaseFactory>(),
-                Current.Container.GetInstance<IVariationContextAccessor>()
-            )
-        {
-        }
-
         public UmbracoModule(
             IUmbracoSettingsSection umbracoSettings,
             IGlobalSettings globalSettings,
