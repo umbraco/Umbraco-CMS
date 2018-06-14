@@ -280,6 +280,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                         data: response.data,
                         status: response.status
                     });
+
                 });
         },
 
