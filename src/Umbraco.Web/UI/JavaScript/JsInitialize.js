@@ -39,6 +39,7 @@
     'js/umbraco.filters.js',
     'js/umbraco.services.js',
     'js/umbraco.security.js',
+    'js/umbraco.components.js',
     'js/umbraco.controllers.js',
     'js/routes.js',
     'js/init.js'

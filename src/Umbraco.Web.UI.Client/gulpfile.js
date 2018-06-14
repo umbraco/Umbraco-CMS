@@ -75,6 +75,7 @@ var sources = {
         preview: { files: ["src/canvasdesigner/**/*.js"], out: "umbraco.canvasdesigner.js" },
         installer: { files: ["src/installer/**/*.js"], out: "umbraco.installer.js" },
         controllers: { files: ["src/{views,controllers}/**/*.controller.js"], out: "umbraco.controllers.js" },
+        components: { files: ["src/common/components/**/*.js"], out: "umbraco.components.js" },
         directives: { files: ["src/common/directives/**/*.js"], out: "umbraco.directives.js" },
         filters: { files: ["src/common/filters/**/*.js"], out: "umbraco.filters.js" },
         resources: { files: ["src/common/resources/**/*.js"], out: "umbraco.resources.js" },
@@ -86,17 +87,18 @@ var sources = {
     //processed in the views task
     views:{
         umbraco: {files: ["src/views/**/*.html"], folder: ""},
+        components: {files: ["src/common/components/**/*.html"], folder: "common/components"},
         installer: {files: ["src/installer/steps/*.html"], folder: "install"}
     },
 
     //globs for file-watching
     globs:{
-        views: "./src/views/**/*.html",
-        less: "./src/less/**/*.less",
+        views: "./src/**/*.html",
+        less: "./src/**/*.less",
         js: "./src/*.js",
         lib: "./lib/**/*",
         bower: "./lib-bower/**/*",
-        assets: "./src/assets/**"    
+        assets: "./src/assets/**"
     }
 };
 
@@ -280,7 +282,7 @@ gulp.task('views', function () {
 
     _.forEach(sources.views, function (group) {
 
-        console.log("copying " + group.files + " to " + root + targets.views + group.folder)
+        console.log("copying " + group.files + " to " + root + targets.views + group.folder);
 
         stream.add (
             gulp.src(group.files)

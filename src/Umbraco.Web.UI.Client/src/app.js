@@ -1,4 +1,5 @@
 var app = angular.module('umbraco', [
+    'umbraco.components',
 	'umbraco.filters',
 	'umbraco.directives',
 	'umbraco.resources',

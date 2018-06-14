@@ -71,10 +71,10 @@ Use this directive to render an umbraco button. The directive can be used to gen
     'use strict';
 
     angular
-        .module('umbraco.directives')
+        .module('umbraco.components')
         .component('umbButton', {
             transclude: true,
-            templateUrl: 'views/components/buttons/umb-button.html',
+            templateUrl: 'views/common/components/buttons/umbbutton/umb-button.html',
             controller: UmbButtonController,
             controllerAs: 'vm',
             bindings: {
