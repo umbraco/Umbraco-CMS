@@ -286,7 +286,7 @@
                 contentResource.unPublish($scope.content.id, culture)
                     .then(function (data) {
 
-                        formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                        formHelper.resetForm({ scope: $scope });
 
                         contentEditingHelper.handleSuccessfulSave({
                             scope: $scope,

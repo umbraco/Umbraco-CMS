@@ -147,7 +147,7 @@ angular.module("umbraco")
                         $scope.changePasswordModel.value.generatedPassword = data.value;
                     }
 
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                    formHelper.resetForm({ scope: $scope });
 
                     $scope.changePasswordButtonState = "success";
                     $timeout(function() {

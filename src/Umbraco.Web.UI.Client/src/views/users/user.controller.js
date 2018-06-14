@@ -138,7 +138,7 @@
                         //if the user saved, then try to execute all extended save options
                         extendedSave(saved).then(function(result) {
                             //if all is good, then reset the form
-                            formHelper.resetForm({ scope: $scope, notifications: saved.notifications });
+                            formHelper.resetForm({ scope: $scope });
                         }, angular.noop);
                         
                         vm.user = _.omit(saved, "navigation");

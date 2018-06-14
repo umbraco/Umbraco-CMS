@@ -60,7 +60,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 return args.saveMethod(args.content, $routeParams.create, fileManager.getFiles())
                     .then(function (data) {
 
-                        formHelper.resetForm({ scope: args.scope, notifications: data.notifications });
+                        formHelper.resetForm({ scope: args.scope });
 
                         self.handleSuccessfulSave({
                             scope: args.scope,

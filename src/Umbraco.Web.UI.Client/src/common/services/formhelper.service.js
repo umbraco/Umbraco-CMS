@@ -64,8 +64,7 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
          * @function
          *
          * @description
-         * Called by controllers when a form has been successfully submitted. the correct events execute 
-         * and that the notifications are displayed if there are any.
+         * Called by controllers when a form has been successfully submitted, this ensures the correct events are raised.
          * 
          * @param {object} args An object containing arguments for form submission
          */
@@ -77,8 +76,6 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
                 throw "args.scope cannot be null";
             }
             
-            this.showNotifications(args);
-
             args.scope.$broadcast("formSubmitted", { scope: args.scope });
         },
 

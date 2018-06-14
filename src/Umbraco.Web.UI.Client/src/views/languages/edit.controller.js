@@ -85,9 +85,7 @@
 
                 languageResource.save(vm.language).then(function (lang) {
 
-                    formHelper.resetForm({
-                        scope: $scope
-                    });
+                    formHelper.resetForm({ scope: $scope });
 
                     vm.language = lang;
                     vm.page.saveButtonState = "success";

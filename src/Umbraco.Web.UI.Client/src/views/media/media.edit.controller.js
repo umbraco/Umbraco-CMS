@@ -191,7 +191,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
             mediaResource.save($scope.content, create, fileManager.getFiles())
                 .then(function(data) {
 
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                    formHelper.resetForm({ scope: $scope });
 
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,
