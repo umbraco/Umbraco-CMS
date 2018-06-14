@@ -125,7 +125,7 @@ function startUpDynamicContentController($timeout, $scope, dashboardResource, as
 angular.module("umbraco").controller("Umbraco.Dashboard.StartUpDynamicContentController", startUpDynamicContentController);
 
 
-function FormsController($scope, $route, $cookieStore, packageResource, localizationService) {
+function FormsController($scope, $route, $cookies, packageResource, localizationService) {
 
     var labels = {};
     var labelKeys = [
@@ -173,7 +173,7 @@ function FormsController($scope, $route, $cookieStore, packageResource, localiza
 
     $scope.complete = function(result){
         var url = window.location.href + "?init=true";
-        $cookieStore.put("umbPackageInstallId", result.packageGuid);
+        $cookies.putObject("umbPackageInstallId", result.packageGuid);
         window.location.reload(true);
     };
 
