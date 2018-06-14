@@ -6,7 +6,7 @@
  * @description
  * The controller for listting dictionary items
  */
-function DictionaryListController($scope, $location, dictionaryResource, localizationService) {
+function DictionaryListController($scope, $location, dictionaryResource, localizationService, appState) {
     var vm = this;
     vm.title = "Dictionary overview";
     vm.loading = false;
@@ -26,8 +26,8 @@ function DictionaryListController($scope, $location, dictionaryResource, localiz
     }
 
     function clickItem(id) {
-        var section = dictionaryResource.getSection();
-        $location.path("/" + section + "/dictionary/edit/" + id);
+        var currentSection = appState.getSectionState("currentSection");
+        $location.path("/" + currentSection + "/dictionary/edit/" + id);
     }
 
     vm.clickItem = clickItem;

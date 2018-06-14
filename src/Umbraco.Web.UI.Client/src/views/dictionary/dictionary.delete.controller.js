@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting dictionary items
  */
-function DictionaryDeleteController($scope, $location, dictionaryResource, treeService, navigationService) {
+function DictionaryDeleteController($scope, $location, dictionaryResource, treeService, navigationService, appState) {
     var vm = this;
 
     function cancel() {
@@ -31,13 +31,13 @@ function DictionaryDeleteController($scope, $location, dictionaryResource, treeS
 
             navigationService.hideMenu();
 
-            var section = dictionaryResource.getSection();
+            var currentSection = appState.getSectionState("currentSection");
             if (parentId !== "-1") {
                 // set the view of the parent item
-                $location.path("/" + section + "/dictionary/edit/" + parentId);
+                $location.path("/" + currentSection + "/dictionary/edit/" + parentId);
             } else {
                 // we have no parent, so redirect to section
-                $location.path("/" + section + "/");
+                $location.path("/" + currentSection + "/");
             }
 
         });

@@ -6,7 +6,7 @@
  * @description
  * The controller for creating dictionary items
  */
-function DictionaryCreateController($scope, $location, dictionaryResource, navigationService, notificationsService, formHelper) {
+function DictionaryCreateController($scope, $location, dictionaryResource, navigationService, notificationsService, formHelper, appState) {
     var vm = this;
 
     vm.itemKey = "";
@@ -26,8 +26,8 @@ function DictionaryCreateController($scope, $location, dictionaryResource, navig
             formHelper.resetForm({ scope: $scope });
 
             // navigate to edit view
-            var section = dictionaryResource.getSection();
-            $location.path("/" + section + "/dictionary/edit/" + data);
+            var currentSection = appState.getSectionState("currentSection");
+            $location.path("/" + currentSection + "/dictionary/edit/" + data);
 
 
         }, function (err) {
