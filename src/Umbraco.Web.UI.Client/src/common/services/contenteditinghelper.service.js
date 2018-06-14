@@ -30,6 +30,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
         /** Used by the content editor and mini content editor to perform saving operations */
         //TODO: Make this a more helpful/reusable method for other form operations! we can simplify this form most forms
+        //         = this is already done in the formhelper service
         contentEditorPerformSave: function (args) {
             if (!angular.isObject(args)) {
                 throw "args must be an object";
@@ -71,7 +72,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         });
 
                         args.scope.busy = false;
-                        return $q.when(data);
+                        return $q.resolve(data);
 
                     }, function (err) {
                         self.handleSaveError({

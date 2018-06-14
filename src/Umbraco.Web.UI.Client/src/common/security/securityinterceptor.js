@@ -1,6 +1,6 @@
 angular.module('umbraco.security.interceptor')
     // This http interceptor listens for authentication successes and failures
-    .factory('securityInterceptor', ['$injector', 'securityRetryQueue', 'notificationsService', 'eventsService', 'requestInterceptorFilter', function ($injector, queue, notifications, eventsService, requestInterceptorFilter) {
+    .factory('securityInterceptor', function($q, $injector, securityRetryQueue, notificationsService, eventsService, requestInterceptorFilter) {
         return {            
 
             'response': function(response) {
@@ -36,13 +36,13 @@ angular.module('umbraco.security.interceptor')
                 //Here we'll check if we should ignore the error (either based on the original header set or the request configuration)
                 if (headers["x-umb-ignore-error"] === "ignore" || config.umbIgnoreErrors === true || (angular.isArray(config.umbIgnoreStatus) && config.umbIgnoreStatus.indexOf(rejection.status) !== -1)) {
                     //exit/ignore
-                    return promise;
+                    return $q.reject(rejection);
                 }
                 var filtered = _.find(requestInterceptorFilter(), function (val) {
                     return config.url.indexOf(val) > 0;
                 });
                 if (filtered) {
-                    return promise;
+                    return $q.reject(rejection);
                 }
 
                 //A 401 means that the user is not logged in
@@ -51,11 +51,11 @@ angular.module('umbraco.security.interceptor')
                     var userService = $injector.get('userService'); // see above
 
                     //Associate the user name with the retry to ensure we retry for the right user
-                    promise = userService.getCurrentUser()
+                    return userService.getCurrentUser()
                         .then(function (user) {
                             var userName = user ? user.name : null;
                             //The request bounced because it was not authorized - add a new request to the retry queue
-                            return queue.pushRetryFn('unauthorized-server', userName, function retryRequest() {
+                            return securityRetryQueue.pushRetryFn('unauthorized-server', userName, function retryRequest() {
                                 // We must use $injector to get the $http service to prevent circular dependency
                                 return $injector.get('$http')(rejection.config);
                             });
@@ -74,7 +74,7 @@ angular.module('umbraco.security.interceptor')
                         errMsg += "<br/> with data: <br/><i>" + angular.toJson(rejection.config.data) + "</i><br/>Contact your administrator for information.";
                     }
 
-                    notifications.error(
+                    notificationsService.error(
                         "Request error",
                         errMsg); 
 
@@ -94,13 +94,13 @@ angular.module('umbraco.security.interceptor')
                         msg += "<br/> with data: <br/><i>" + angular.toJson(rejection.config.data) + "</i><br/>Contact your administrator for information.";
                     }
 
-                    notifications.error("Authorization error", msg);
+                    notificationsService.error("Authorization error", msg);
                 }
 
                 return $q.reject(rejection);
             }
         };
-    }])
+    })
     //used to set headers on all requests where necessary
     .factory('umbracoRequestInterceptor', function ($q, urlHelper) {
         return {

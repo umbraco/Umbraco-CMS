@@ -367,12 +367,12 @@
                 }
             }
             else {
-                return performSave({ saveMethod: contentResource.publish, action: "publish" });
+                return performSave({ saveMethod: contentResource.publish, action: "publish" }).catch(angular.noop);;
             }
         };
 
         $scope.save = function () {
-            return performSave({ saveMethod: $scope.saveMethod(), action: "save" });
+            return performSave({ saveMethod: $scope.saveMethod(), action: "save" }).catch(angular.noop);
         };
 
         $scope.preview = function (content) {
