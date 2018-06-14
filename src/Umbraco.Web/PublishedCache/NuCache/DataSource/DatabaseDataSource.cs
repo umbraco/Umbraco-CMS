@@ -141,7 +141,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
 
             var dto = scope.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
-            return dto == null ? new ContentNodeKit() : CreateContentNodeKit(dto);
+            return dto == null ? new ContentNodeKit() : CreateMediaNodeKit(dto);
         }
 
         public IEnumerable<ContentNodeKit> GetAllMediaSources(IScope scope)
