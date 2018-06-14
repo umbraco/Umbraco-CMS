@@ -54,7 +54,7 @@ function angularHelper($log, $q) {
          * This checks if a digest/apply is already occuring, if not it will force an apply call
          */
         safeApply: function (scope, fn) {
-            if (scope.$$phase || scope.$root.$$phase) {
+            if (scope.$$phase || (scope.$root && scope.$root.$$phase)) {
                 if (angular.isFunction(fn)) {
                     fn();
                 }

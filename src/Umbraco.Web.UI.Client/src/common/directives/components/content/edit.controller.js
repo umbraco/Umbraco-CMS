@@ -301,7 +301,6 @@
                         $scope.page.buttonGroupState = "success";
 
                     }, function (err) {
-            formHelper.showNotifications(err.data);
                         $scope.page.buttonGroupState = 'error';
                     });
             }

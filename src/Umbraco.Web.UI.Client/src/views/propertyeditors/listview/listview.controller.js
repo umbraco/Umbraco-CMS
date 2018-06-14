@@ -217,11 +217,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             $scope.reloadView($scope.contentId, true);
         }
 
-        if (err.data && angular.isArray(err.data.notifications)) {
-            for (var i = 0; i < err.data.notifications.length; i++) {
-                notificationsService.showNotification(err.data.notifications[i]);
-            }
-        } else if (successMsg) {
+        if (successMsg) {
             localizationService.localize("bulk_done")
                 .then(function(v) {
                     notificationsService.success(v, successMsg);

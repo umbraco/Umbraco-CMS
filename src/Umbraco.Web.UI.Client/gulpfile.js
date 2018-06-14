@@ -79,7 +79,7 @@ var sources = {
         filters: { files: ["src/common/filters/**/*.js"], out: "umbraco.filters.js" },
         resources: { files: ["src/common/resources/**/*.js"], out: "umbraco.resources.js" },
         services: { files: ["src/common/services/**/*.js"], out: "umbraco.services.js" },
-        security: { files: ["src/common/security/**/*.js"], out: "umbraco.security.js" }
+        security: { files: ["src/common/interceptors/**/*.js"], out: "umbraco.interceptors.js" }
     },
 
     //selectors for copying all views into the build

@@ -4,7 +4,7 @@ var app = angular.module('umbraco', [
 	'umbraco.resources',
 	'umbraco.services',
 	'umbraco.mocks',
-	'umbraco.security',
+	'umbraco.interceptors',
     'ngCookies',
     'LocalStorageModule' 
 ]);

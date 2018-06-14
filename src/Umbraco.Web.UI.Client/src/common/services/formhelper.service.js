@@ -7,7 +7,7 @@
  * A utility class used to streamline how forms are developed, to ensure that validation is check and displayed consistently and to ensure that the correct events
  * fire when they need to.
  */
-function formHelper(angularHelper, serverValidationManager, $timeout, notificationsService, dialogService, localizationService) {
+function formHelper(angularHelper, serverValidationManager, $timeout, notificationsService, dialogService) {
     return {
 
         /**

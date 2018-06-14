@@ -54,9 +54,7 @@
                 }, function (err) {
 
                     vm.createFolderError = err;
-
-                    //show any notifications
-                    formHelper.showNotifications(err.data);    
+                    
                 });
             }
         }

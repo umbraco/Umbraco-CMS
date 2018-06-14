@@ -38,7 +38,7 @@
     'js/umbraco.directives.js',
     'js/umbraco.filters.js',
     'js/umbraco.services.js',
-    'js/umbraco.security.js',
+    'js/umbraco.interceptors.js',
     'js/umbraco.controllers.js',
     'js/routes.js',
     'js/init.js'

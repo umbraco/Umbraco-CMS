@@ -71,11 +71,7 @@
                 if($routeParams.create && $routeParams.nomacro !== "true") {
                     macroResource.createPartialViewMacroWithFile(saved.virtualPath, saved.name).then(function(created) {
                         completeSave(saved);
-                    }, function(err) {
-                        //show any notifications
-                        formHelper.showNotifications(err.data);    
-                        
-                    });
+                    }, angular.noop);
                 } else {
                     completeSave(saved);
                 }

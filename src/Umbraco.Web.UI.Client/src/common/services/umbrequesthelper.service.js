@@ -3,17 +3,7 @@
 * @name umbraco.services.umbRequestHelper
 * @description A helper object used for sending requests to the server
 **/
-function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogService, notificationsService, eventsService) {
-    function showFailureNotifications(data, status) {
-        var i;
-
-        if (status >= 400 && data && data.notifications && data.notifications.length) {
-            for (i = 0; i < data.notifications.length; i++) {
-                notificationsService.showNotification(data.notifications[i]);
-            }
-        }
-
-    }
+function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogService, notificationsService, eventsService, formHelper) {
 
     return {
 
@@ -155,6 +145,8 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 //invoke the callback 
                 var result = callbacks.success.apply(this, [response.data, response.status, response.headers, response.config]);
 
+                formHelper.showNotifications(response.data);
+
                 //when it's successful, just return the data
                 return $q.resolve(result);
 
@@ -181,7 +173,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
                 }
                 else {
-                    showFailureNotifications(data, status);
+                    formHelper.showNotifications(result.data);
                 }
 
                 //return an error object including the error message for UI
@@ -242,6 +234,8 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                         response.data.tabs[activeTabIndex].active = true;
                     }
 
+                    formHelper.showNotifications(response.data);
+
                     //the data returned is the up-to-date data so the UI will refresh
                     return $q.resolve(response.data);
                 }, function (response) {
@@ -271,7 +265,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
                     }
                     else {
-                        showFailureNotifications(data, status);
+                        formHelper.showNotifications(response.data);
                     }
 
                     //return an error object including the error message for UI
