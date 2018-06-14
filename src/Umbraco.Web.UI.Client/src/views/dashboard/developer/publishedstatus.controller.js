@@ -6,10 +6,10 @@
         $http.get(umbRequestHelper.getApiUrl('publishedStatusBaseUrl', 'GetPublishedStatusUrl')),
         'Failed to get published status url')
     .then(function (result) {
-        $scope.includeUrl = angular.fromJson(result);
-    });
 
-    //$scope.includeUrl = 'views/dashboard/developer/xmldataintegrityreport.html';
+        //result = 'views/dashboard/developer/nucache.html'
+        $scope.includeUrl = result;
+    });
 
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.PublishedStatusController", publishedStatusController);

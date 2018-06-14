@@ -83,7 +83,7 @@
                     ng-if="!hideDescription && !descriptionLocked"
                     ng-model="$parent.description" />
         
-                <div class="umb-panel-header-locked-description" ng-show="descriptionLocked">{{ description }}</div>
+                <div class="umb-panel-header-locked-description" ng-if="descriptionLocked">{{ description }}</div>
 
             </div>
 

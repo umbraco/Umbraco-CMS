@@ -1,21 +1,7 @@
 angular.module('umbraco.security.interceptor')
     // This http interceptor listens for authentication successes and failures
     .factory('securityInterceptor', ['$injector', 'securityRetryQueue', 'notificationsService', 'eventsService', 'requestInterceptorFilter', function ($injector, queue, notifications, eventsService, requestInterceptorFilter) {
-        return {
-
-            'request': function(config) {
-                // do something on success
-                // request for data - if we want to modify headers or url etc
-                console.log('request config', config);
-                return config;
-            },
-
-            'requestError': function(rejection) {
-                // do something on error
-               
-                console.log('request error rejection', rejection);
-                return $q.reject(rejection);
-            },
+        return {            
 
             'response': function(response) {
                 // Intercept successful requests
