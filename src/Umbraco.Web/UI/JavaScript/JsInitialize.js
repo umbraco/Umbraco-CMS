@@ -15,6 +15,7 @@
     'lib/angular-touch/angular-touch.js',
     'lib/angular-sanitize/angular-sanitize.js',
     'lib/angular-animate/angular-animate.js',
+    'lib/angular-messages/angular-messages.js',
 
     'lib/angular-ui-sortable/sortable.js',
 

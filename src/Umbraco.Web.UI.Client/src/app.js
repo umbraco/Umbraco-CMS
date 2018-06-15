@@ -11,6 +11,7 @@ var app = angular.module('umbraco', [
     'ngCookies',
     'ngSanitize',
     'ngTouch',
+    'ngMessages',
     'tmh.dynamicLocale',
     'ngFileUpload',
     'LocalStorageModule'
