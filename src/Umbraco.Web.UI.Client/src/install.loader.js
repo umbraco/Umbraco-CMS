@@ -7,7 +7,7 @@ LazyLoad.js([
     'lib/angular/1.1.5/angular-mocks.js',
     'lib/angular/1.1.5/angular-sanitize.min.js',
     'lib/underscore/underscore-min.js',
-    'lib/angular/angular-ui-sortable.js',
+    'lib/angular-ui-sortable/sortable.js',
     'js/installer.app.js',
     'js/umbraco.directives.js',
     'js/umbraco.installer.js'

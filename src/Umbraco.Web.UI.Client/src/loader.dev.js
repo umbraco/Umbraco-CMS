@@ -17,7 +17,7 @@ LazyLoad.js(
         'lib/underscore/underscore-min.js',
 
         'lib/angular-dynamic-locale/tmhDynamicLocale.min.js',
-        
+
         'lib/bootstrap/js/bootstrap.2.3.2.min.js',
         'lib/bootstrap-tabdrop/bootstrap-tabdrop.min.js',
         'lib/umbraco/Extensions.js',

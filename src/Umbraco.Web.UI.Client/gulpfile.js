@@ -140,7 +140,7 @@ gulp.task('dependencies', function () {
     //as we do multiple things in this task, we merge the multiple streams
     var stream = new MergeStream();
 
-    //Tinymce
+    //Tinymce plugins/themes
     stream.add(
         gulp.src(["./bower_components/tinymce/plugins/**",
             "./bower_components/tinymce/themes/**"],
