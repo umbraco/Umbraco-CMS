@@ -8,7 +8,7 @@
 **/
 function valTab() {
     return {
-        require: ['^form', '^valFormManager'],
+        require: ['^^form', '^^valFormManager'],
         restrict: "A",
         link: function (scope, element, attr, ctrs) {
 

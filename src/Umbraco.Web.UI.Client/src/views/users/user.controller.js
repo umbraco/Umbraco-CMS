@@ -138,11 +138,8 @@
                         //if the user saved, then try to execute all extended save options
                         extendedSave(saved).then(function(result) {
                             //if all is good, then reset the form
-                            formHelper.resetForm({ scope: $scope, notifications: saved.notifications });
-                        }, function(err) {
-                            //otherwise show the notifications for the user being saved
-                            formHelper.showNotifications(saved);
-                        });
+                            formHelper.resetForm({ scope: $scope });
+                        }, angular.noop);
                         
                         vm.user = _.omit(saved, "navigation");
                         //restore
@@ -162,10 +159,7 @@
                             redirectOnFailure: false,
                             err: err
                         });
-                        //show any notifications
-                        if (err.data) {
-                            formHelper.showNotifications(err.data);
-                        }
+                        
                         vm.page.saveButtonState = "error";
                     });
             }
@@ -319,10 +313,10 @@
                 vm.user.userState = 1;
                 setUserDisplayState();
                 vm.disableUserButtonState = "success";
-                formHelper.showNotifications(data);
+                
             }, function (error) {
                 vm.disableUserButtonState = "error";
-                formHelper.showNotifications(error.data);
+                
             });
         }
 
@@ -332,10 +326,8 @@
                 vm.user.userState = 0;
                 setUserDisplayState();
                 vm.enableUserButtonState = "success";
-                formHelper.showNotifications(data);
             }, function (error) {
                 vm.enableUserButtonState = "error";
-                formHelper.showNotifications(error.data);
             });
         }
 
@@ -345,10 +337,8 @@
                 vm.user.userState = 0;
                 setUserDisplayState();
                 vm.unlockUserButtonState = "success";
-                formHelper.showNotifications(data);
             }, function (error) {
                 vm.unlockUserButtonState = "error";
-                formHelper.showNotifications(error.data);
             });
         }
 

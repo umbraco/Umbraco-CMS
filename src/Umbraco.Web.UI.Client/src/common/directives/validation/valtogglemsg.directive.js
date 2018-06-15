@@ -1,6 +1,6 @@
 function valToggleMsg(serverValidationManager) {
     return {
-        require: "^form",
+        require: "^^form",
         restrict: "A",
 
         /**

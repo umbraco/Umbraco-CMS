@@ -7,7 +7,7 @@
 * @description This directive is used to control the display of the property level validation message.
 * We will listen for server side validation changes
 * and when an error is detected for this property we'll show the error message.
-* In order for this directive to work, the valStatusChanged directive must be placed on the containing form.
+* In order for this directive to work, the valFormManager directive must be placed on the containing form.
 **/
 function valPropertyMsg(serverValidationManager) {
 
@@ -15,16 +15,18 @@ function valPropertyMsg(serverValidationManager) {
         scope: {
             property: "="
         },
-        require: "^form",   //require that this directive is contained within an ngForm
-        replace: true,      //replace the element with the template
-        restrict: "E",      //restrict to element
+        require: ['^^form', '^^valFormManager'],
+        replace: true,
+        restrict: "E",
         template: "<div ng-show=\"errorMsg != ''\" class='alert alert-error property-error' >{{errorMsg}}</div>",
 
-        /**
-            Our directive requries a reference to a form controller 
-            which gets passed in to this parameter
-         */
-        link: function (scope, element, attrs, formCtrl) {
+        link: function (scope, element, attrs, ctrl) {
+
+            //the property form controller api
+            var formCtrl = ctrl[0];
+
+            //the valFormManager controller api
+            var valFormManager = ctrl[1];
 
             var watcher = null;
 
@@ -39,10 +41,12 @@ function valPropertyMsg(serverValidationManager) {
                         return err.errorMsg;
                     }
                     else {
+                        //TODO: localize
                         return scope.property.propertyErrorMessage ? scope.property.propertyErrorMessage : "Property has errors";
                     }
 
                 }
+                //TODO: localize
                 return "Property has errors";
             }
 
@@ -98,18 +102,19 @@ function valPropertyMsg(serverValidationManager) {
 
             var unsubscribe = [];
 
-            //listen for form error changes
-            unsubscribe.push(scope.$on("valStatusChanged", function(evt, args) {
-                if (args.form.$invalid) {
-
+            //listen for form validation changes.
+            //The alternative is to add a watch to formCtrl.$invalid but that would lead to many more watches then
+            // subscribing to this single watch.
+            valFormManager.onValidationStatusChanged(function (evt, args) {
+                if (formCtrl.$invalid) {
                     //first we need to check if the valPropertyMsg validity is invalid
                     if (formCtrl.$error.valPropertyMsg && formCtrl.$error.valPropertyMsg.length > 0) {
                         //since we already have an error we'll just return since this means we've already set the 
                         // hasError and errorMsg properties which occurs below in the serverValidationManager.subscribe
                         return;
                     }
-                    else if (element.closest(".umb-control-group").find(".ng-invalid").length > 0) {
-                        //check if it's one of the properties that is invalid in the current content property
+                    //if there are any errors in the current property form that are not valPropertyMsg
+                    else if (_.without(_.keys(formCtrl.$error), "valPropertyMsg").length > 0) {
                         hasError = true;
                         //update the validation message if we don't already have one assigned.
                         if (showValidation && scope.errorMsg === "") {
@@ -125,7 +130,7 @@ function valPropertyMsg(serverValidationManager) {
                     hasError = false;
                     scope.errorMsg = "";
                 }
-            }, true));
+            });
 
             //listen for the forms saving event
             unsubscribe.push(scope.$on("formSubmitting", function(ev, args) {

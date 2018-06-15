@@ -2,8 +2,9 @@
     * @ngdoc directive
     * @name umbraco.directives.directive:valServerField
     * @restrict A
-    * @description This directive is used to associate a content field (not user defined) with a server-side validation response
+    * @description This directive is used to associate a field with a server-side validation response
     *               so that the validators in angular are updated based on server-side feedback.
+    *               (For validation of user defined content properties on content/media/members, the valServer directive is used)
     **/
 function valServerField(serverValidationManager) {
     return {

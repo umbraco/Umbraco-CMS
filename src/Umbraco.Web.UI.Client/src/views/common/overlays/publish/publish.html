@@ -10,9 +10,9 @@
 
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading">
 
-        <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter">
+        <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.dirtyVariantFilter track by variant.compositeId">
             <ng-form name="publishVariantSelectorForm">
-                <label class="flex" for="{{variant.htmlId}}">
+                <div class="flex">
                     <input id="{{variant.htmlId}}"
                            name="publishVariantSelector"
                            type="checkbox"
@@ -22,14 +22,16 @@
                            style="margin-right: 8px;"
                            val-server-field="{{variant.htmlId}}" />
                     <div>
-                        <div ng-class="{'bold': variant.published}" style="margin-bottom: 2px;">{{ variant.language.name }}</div>
-                        <div class="umb-permission__description" ng-if="!variant.validationError && variant.isEdited && variant.state === 'Published'"><localize key="content_publishedPendingChanges"></localize></div>
-                        <div class="umb-permission__description" ng-if="!variant.validationError && variant.isEdited && variant.state === 'Unpublished'"><localize key="content_unpublishedPendingChanges"></localize></div>
-                        <div class="umb-permission__description" ng-if="!variant.validationError && variant.isEdited === false">{{ variant.state }}</div>
-
+                        <label for="{{variant.htmlId}}">
+                            <span ng-class="{'bold': variant.published}" style="margin-bottom: 2px;">{{ variant.language.name }}</span>
+                        </label>
+                        <div class="umb-permission__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && variant.isEdited && variant.state === 'Published'"><localize key="content_publishedPendingChanges"></localize></div>
+                        <div class="umb-permission__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && variant.isEdited && variant.state === 'Unpublished'"><localize key="content_unpublishedPendingChanges"></localize></div>
+                        <div class="umb-permission__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && variant.isEdited === false">{{ variant.state }}</div>
                         <div class="umb-permission__description" style="color: #F02E28;" val-msg-for="publishVariantSelector" val-toggle-msg="valServerField"></div>
                     </div>
-                </label>
+                </div>
+                
             </ng-form>
         </div>
         <br/>

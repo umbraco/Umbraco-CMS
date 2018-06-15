@@ -1,9 +1,19 @@
-angular.module('umbraco.security.interceptor')
-    // This http interceptor listens for authentication successes and failures
-    .factory('securityInterceptor', ['$injector', 'securityRetryQueue', 'notificationsService', 'eventsService', 'requestInterceptorFilter', function ($injector, queue, notifications, eventsService, requestInterceptorFilter) {
-        return {            
+﻿(function () {
+    'use strict';
 
-            'response': function(response) {
+    /**
+     * This http interceptor listens for authentication successes and failures
+     * @param {any} $q
+     * @param {any} $injector
+     * @param {any} requestRetryQueue
+     * @param {any} notificationsService
+     * @param {any} eventsService
+     * @param {any} requestInterceptorFilter
+     */
+    function securityInterceptor($q, $injector, requestRetryQueue, notificationsService, eventsService, requestInterceptorFilter) {
+        return {
+
+            'response': function (response) {
                 // Intercept successful requests
                 //Here we'll check if our custom header is in the response which indicates how many seconds the user's session has before it
                 //expires. Then we'll update the user in the user service accordingly.
@@ -14,7 +24,7 @@ angular.module('umbraco.security.interceptor')
                     var userService = $injector.get('userService');
                     userService.setUserTimeout(headers["x-umb-user-seconds"]);
                 }
-                
+
                 //this checks if the user's values have changed, in which case we need to update the user details throughout
                 //the back office similar to how we do when a user logs in
                 if (headers["x-umb-user-modified"]) {
@@ -23,8 +33,8 @@ angular.module('umbraco.security.interceptor')
 
                 return response;
             },
-        
-            'responseError': function(rejection) {
+
+            'responseError': function (rejection) {
 
                 // Intercept failed requests
                 // Make sure we have the configuration of the request (don't we always?)
@@ -36,13 +46,13 @@ angular.module('umbraco.security.interceptor')
                 //Here we'll check if we should ignore the error (either based on the original header set or the request configuration)
                 if (headers["x-umb-ignore-error"] === "ignore" || config.umbIgnoreErrors === true || (angular.isArray(config.umbIgnoreStatus) && config.umbIgnoreStatus.indexOf(rejection.status) !== -1)) {
                     //exit/ignore
-                    return promise;
+                    return $q.reject(rejection);
                 }
                 var filtered = _.find(requestInterceptorFilter(), function (val) {
                     return config.url.indexOf(val) > 0;
                 });
                 if (filtered) {
-                    return promise;
+                    return $q.reject(rejection);
                 }
 
                 //A 401 means that the user is not logged in
@@ -51,11 +61,11 @@ angular.module('umbraco.security.interceptor')
                     var userService = $injector.get('userService'); // see above
 
                     //Associate the user name with the retry to ensure we retry for the right user
-                    promise = userService.getCurrentUser()
+                    return userService.getCurrentUser()
                         .then(function (user) {
                             var userName = user ? user.name : null;
                             //The request bounced because it was not authorized - add a new request to the retry queue
-                            return queue.pushRetryFn('unauthorized-server', userName, function retryRequest() {
+                            return requestRetryQueue.pushRetryFn('unauthorized-server', userName, function retryRequest() {
                                 // We must use $injector to get the $http service to prevent circular dependency
                                 return $injector.get('$http')(rejection.config);
                             });
@@ -74,9 +84,9 @@ angular.module('umbraco.security.interceptor')
                         errMsg += "<br/> with data: <br/><i>" + angular.toJson(rejection.config.data) + "</i><br/>Contact your administrator for information.";
                     }
 
-                    notifications.error(
+                    notificationsService.error(
                         "Request error",
-                        errMsg); 
+                        errMsg);
 
                 }
                 else if (rejection.status === 403) {
@@ -94,35 +104,15 @@ angular.module('umbraco.security.interceptor')
                         msg += "<br/> with data: <br/><i>" + angular.toJson(rejection.config.data) + "</i><br/>Contact your administrator for information.";
                     }
 
-                    notifications.error("Authorization error", msg);
+                    notificationsService.error("Authorization error", msg);
                 }
 
                 return $q.reject(rejection);
             }
         };
-    }])
-    //used to set headers on all requests where necessary
-    .factory('umbracoRequestInterceptor', function ($q, urlHelper) {
-        return {
-            //dealing with requests:
-            'request': function (config) {
-                var queryStrings = urlHelper.getQueryStringParams();
-                if (queryStrings.umbDebug === "true" || queryStrings.umbdebug === "true") {
-                    config.headers["X-UMB-DEBUG"] = "true";
-                }
-                return config;
-            }
-        };
-    })
-    .value('requestInterceptorFilter', function () {
-        return ["www.gravatar.com"];
-    })
+    }
 
-    // We have to add the interceptor to the queue as a string because the interceptor depends upon service instances that are not available in the config block.
-    .config(['$httpProvider', function ($httpProvider) {
-        $httpProvider.defaults.xsrfHeaderName = 'X-UMB-XSRF-TOKEN';
-        $httpProvider.defaults.xsrfCookieName = 'UMB-XSRF-TOKEN';
+    angular.module('umbraco.interceptors').factory('securityInterceptor', securityInterceptor);
 
-        $httpProvider.interceptors.push('securityInterceptor');
-        $httpProvider.interceptors.push('umbracoRequestInterceptor');
-    }]);
+
+})();

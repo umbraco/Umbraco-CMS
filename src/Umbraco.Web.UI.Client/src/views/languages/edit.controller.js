@@ -85,9 +85,7 @@
 
                 languageResource.save(vm.language).then(function (lang) {
 
-                    formHelper.resetForm({
-                        scope: $scope
-                    });
+                    formHelper.resetForm({ scope: $scope });
 
                     vm.language = lang;
                     vm.page.saveButtonState = "success";
@@ -108,12 +106,6 @@
 
                     formHelper.handleError(err);
 
-                    //show any notifications
-                    if (angular.isArray(err.data.notifications)) {
-                        for (var i = 0; i < err.data.notifications.length; i++) {
-                            notificationsService.showNotification(err.data.notifications[i]);
-                        }
-                    }
                 });
             }
 

@@ -54,12 +54,6 @@ function ContentDeleteController($scope, contentResource, treeService, navigatio
             if (err.status && err.status >= 500) {
                 dialogService.ysodDialog(err);
             }
-            
-            if (err.data && angular.isArray(err.data.notifications)) {
-                for (var i = 0; i < err.data.notifications.length; i++) {
-                    notificationsService.showNotification(err.data.notifications[i]);
-                }
-            }
         });
 
     };

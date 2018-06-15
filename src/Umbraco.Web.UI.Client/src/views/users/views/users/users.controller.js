@@ -250,14 +250,11 @@
                 // show the correct badges
                 setUserDisplayState(vm.users);
 
-                formHelper.showNotifications(data);
-
                 vm.disableUserButtonState = "init";
                 clearSelection();
 
             }, function (error) {
                 vm.disableUserButtonState = "error";
-                formHelper.showNotifications(error.data);
             });
         }
 
@@ -273,13 +270,10 @@
                 });
                 // show the correct badges
                 setUserDisplayState(vm.users);
-                // show notification
-                formHelper.showNotifications(data);
                 vm.enableUserButtonState = "init";
                 clearSelection();
             }, function (error) {
                 vm.enableUserButtonState = "error";
-                formHelper.showNotifications(error.data);
             });
         }
 
@@ -295,13 +289,10 @@
                 });
                 // show the correct badges
                 setUserDisplayState(vm.users);
-                // show notification
-                formHelper.showNotifications(data);
                 vm.unlockUserButtonState = "init";
                 clearSelection();
             }, function (error) {
                 vm.unlockUserButtonState = "error";
-                formHelper.showNotifications(error.data);
             });
         }
 
@@ -334,11 +325,8 @@
                         vm.selectedBulkUserGroups = [];
                         vm.userGroupPicker.show = false;
                         vm.userGroupPicker = null;
-                        formHelper.showNotifications(data);
                         clearSelection();
-                    }, function (error) {
-                        formHelper.showNotifications(error.data);
-                    });
+                    }, angular.noop);
                 },
                 close: function (oldModel) {
                     vm.selectedBulkUserGroups = [];

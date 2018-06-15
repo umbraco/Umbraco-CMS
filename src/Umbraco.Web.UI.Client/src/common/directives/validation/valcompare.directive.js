@@ -1,7 +1,7 @@
 angular.module('umbraco.directives.validation')
 	.directive('valCompare',function () {
 	return {
-	        require: ["ngModel", "^form"], 
+	        require: ["ngModel", "^^form"], 
 	        link: function (scope, elem, attrs, ctrls) {
 
                 var ctrl = ctrls[0];

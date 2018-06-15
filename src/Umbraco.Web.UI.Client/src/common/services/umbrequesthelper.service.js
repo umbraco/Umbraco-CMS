@@ -3,7 +3,8 @@
 * @name umbraco.services.umbRequestHelper
 * @description A helper object used for sending requests to the server
 **/
-function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogService, notificationsService, eventsService) {
+function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogService, notificationsService, eventsService, formHelper) {
+
     return {
 
         /**
@@ -24,7 +25,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
             if (!virtualPath.startsWith("~/")) {
                 throw "The path " + virtualPath + " is not a virtual path";
             }
-            if (!Umbraco.Sys.ServerVariables.application.applicationPath) { 
+            if (!Umbraco.Sys.ServerVariables.application.applicationPath) {
                 throw "No applicationPath defined in Umbraco.ServerVariables.application.applicationPath";
             }
             return Umbraco.Sys.ServerVariables.application.applicationPath + virtualPath.trimStart("~/");
@@ -42,7 +43,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
          * @param {Array} queryStrings An array of key/value pairs
          */
         dictionaryToQueryString: function (queryStrings) {
-            
+
             if (angular.isArray(queryStrings)) {
                 return _.map(queryStrings, function (item) {
                     var key = null;
@@ -63,7 +64,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 //this allows for a normal object to be passed in (ie. a dictionary)
                 return decodeURIComponent($.param(queryStrings));
             }
-            
+
             throw "The queryString parameter is not an array or object of key value pairs";
         },
 
@@ -116,12 +117,10 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
          *   The error callback must return an object containing: {errorMsg: errorMessage, data: originalData, status: status }
          */
         resourcePromise: function (httpPromise, opts) {
-            var deferred = $q.defer();
-
+            
             /** The default success callback used if one is not supplied in the opts */
             function defaultSuccess(data, status, headers, config) {
                 //when it's successful, just return the data
-                console.log("succes promise", data);
                 return data;
             }
 
@@ -141,13 +140,15 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 error: ((!opts || !opts.error) ? defaultError : opts.error)
             };
 
-            httpPromise.then(function (response) {
+            return httpPromise.then(function (response) {
 
                 //invoke the callback 
                 var result = callbacks.success.apply(this, [response.data, response.status, response.headers, response.config]);
 
+                formHelper.showNotifications(response.data);
+
                 //when it's successful, just return the data
-                deferred.resolve(result);
+                return $q.resolve(result);
 
             }, function (response) {
 
@@ -169,24 +170,23 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                         //show a simple error notification                         
                         notificationsService.error("Server error", "Contact administrator, see log for full details.<br/><i>" + result.errorMsg + "</i>");
                     }
-                    
+
+                }
+                else {
+                    formHelper.showNotifications(result.data);
                 }
 
                 //return an error object including the error message for UI
-                deferred.reject({
+                return $q.reject({
                     errorMsg: result.errorMsg,
                     data: result.data,
                     status: result.status
-                });
-
-
+                })
             });
-
-            return deferred.promise;
 
         },
 
-        /** Used for saving media/content specifically */
+        /** Used for saving content/media/members specifically */
         postSaveContent: function (args) {
 
             if (!args.restApiUrl) {
@@ -204,10 +204,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
             if (!args.dataFormatter) {
                 throw "args.dataFormatter is a required argument";
             }
-
-
-            var deferred = $q.defer();
-
+            
             //save the active tab id so we can set it when the data is returned.
             var activeTab = _.find(args.content.tabs, function (item) {
                 return item.active;
@@ -215,9 +212,10 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
             var activeTabIndex = (activeTab === undefined ? 0 : _.indexOf(args.content.tabs, activeTab));
 
             //save the data
-            this.postMultiPartRequest(
+            return this.postMultiPartRequest(
                 args.restApiUrl,
                 { key: "contentItem", value: args.dataFormatter(args.content, args.action) },
+                //data transform callback:
                 function (data, formData) {
                     //now add all of the assigned files
                     for (var f in args.files) {
@@ -225,64 +223,63 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                         // so we know which property it belongs to on the server side
                         formData.append("file_" + args.files[f].alias, args.files[f].file);
                     }
-
-                },
-                function (data, status, headers, config) {
+                }).then(function (response) {
                     //success callback
 
                     //reset the tabs and set the active one
-                    if(data.tabs && data.tabs.length > 0) {
-                        _.each(data.tabs, function (item) {
+                    if (response.data.tabs && response.data.tabs.length > 0) {
+                        _.each(response.data.tabs, function (item) {
                             item.active = false;
                         });
-                        data.tabs[activeTabIndex].active = true;
+                        response.data.tabs[activeTabIndex].active = true;
                     }
 
+                    formHelper.showNotifications(response.data);
+
                     //the data returned is the up-to-date data so the UI will refresh
-                    deferred.resolve(data);
-                },
-                function (data, status, headers, config) {
+                    return $q.resolve(response.data);
+                }, function (response) {
                     //failure callback
 
                     //when there's a 500 (unhandled) error show a YSOD overlay if debugging is enabled.
-                    if (status >= 500 && status < 600) {
+                    if (response.status >= 500 && response.status < 600) {
 
                         //This is a bit of a hack to check if the error is due to a file being uploaded that is too large,
                         // we have to just check for the existence of a string value but currently that is the best way to
                         // do this since it's very hacky/difficult to catch this on the server
-                        if (typeof data !== "undefined" && typeof data.indexOf === "function" && data.indexOf("Maximum request length exceeded") >= 0) {
+                        if (typeof response.data !== "undefined" && typeof response.data.indexOf === "function" && response.data.indexOf("Maximum request length exceeded") >= 0) {
                             notificationsService.error("Server error", "The uploaded file was too large, check with your site administrator to adjust the maximum size allowed");
-                        }                        
+                        }
                         else if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
                             //show a ysod dialog
                             eventsService.emit('app.ysod',
                             {
                                 errorMsg: 'An error occured',
-                                data: data
+                                data: response.data
                             });
                         }
                         else {
                             //show a simple error notification                         
-                            notificationsService.error("Server error", "Contact administrator, see log for full details.<br/><i>" + data.ExceptionMessage + "</i>");
+                            notificationsService.error("Server error", "Contact administrator, see log for full details.<br/><i>" + response.data.ExceptionMessage + "</i>");
                         }
-                        
+
                     }
-                    
+                    else {
+                        formHelper.showNotifications(response.data);
+                    }
+
                     //return an error object including the error message for UI
-                    deferred.reject({
+                    return $q.reject({
                         errorMsg: 'An error occurred',
-                        data: data,
-                        status: status
+                        data: response.data,
+                        status: response.status
                     });
-                   
 
                 });
-
-            return deferred.promise;
         },
 
         /** Posts a multi-part mime request to the server */
-        postMultiPartRequest: function (url, jsonData, transformCallback, successCallback, failureCallback) {
+        postMultiPartRequest: function (url, jsonData, transformCallback) {
 
             //validate input, jsonData can be an array of key/value pairs or just one key/value pair.
             if (!jsonData) { throw "jsonData cannot be null"; }
@@ -293,9 +290,8 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 });
             }
             else if (!jsonData.key || !jsonData.value) { throw "jsonData object must have both a key and a value property"; }
-
-
-            $http({
+            
+            return $http({
                 method: 'POST',
                 url: url,
                 //IMPORTANT!!! You might think this should be set to 'multipart/form-data' but this is not true because when we are sending up files
@@ -303,11 +299,11 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 // and setting the Content-type manually will not set this boundary parameter. For whatever reason, setting the Content-type to 'undefined'
                 // will force the request to automatically populate the headers properly including the boundary parameter.
                 headers: { 'Content-Type': undefined },
-                transformRequest: function (data) {
+                transformRequest: function(data) {
                     var formData = new FormData();
                     //add the json data
                     if (angular.isArray(data)) {
-                        _.each(data, function (item) {
+                        _.each(data, function(item) {
                             formData.append(item.key, !angular.isString(item.value) ? angular.toJson(item.value) : item.value);
                         });
                     }
@@ -323,16 +319,10 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     return formData;
                 },
                 data: jsonData
-            }).
-            then(function (response) {
-                if (successCallback) {
-                    successCallback.apply(this, [response.data, response.status, response.headers, response.config]);
-                }
-            }).
-            catch(function (response) {
-                if (failureCallback) {
-                    failureCallback.apply(this, [response.data, response.status, response.headers, response.config]);
-                }
+            }).then(function(response) {
+                return $q.resolve(response);
+            }, function(response) {
+                return $q.reject(response);
             });
         },
         
@@ -343,17 +333,15 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
          */
         downloadFile : function (httpPath) {
 
-            var deferred = $q.defer();
-
             // Use an arraybuffer
-            $http.get(httpPath, { responseType: 'arraybuffer' })
-                .success(function (data, status, headers) {
-
+            return $http.get(httpPath, { responseType: 'arraybuffer' })
+                .then(function (response) {
+                    
                     var octetStreamMime = 'application/octet-stream';
                     var success = false;
 
                     // Get the headers
-                    headers = headers();
+                    var headers = response.headers();
 
                     // Get the filename from the x-filename header or default to "download.bin"
                     var filename = headers['x-filename'] || 'download.bin';
@@ -363,8 +351,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
                     try {
                         // Try using msSaveBlob if supported
-                        console.log("Trying saveBlob method ...");
-                        var blob = new Blob([data], { type: contentType });
+                        var blob = new Blob([response.data], { type: contentType });
                         if (navigator.msSaveBlob)
                             navigator.msSaveBlob(blob, filename);
                         else {
@@ -373,7 +360,6 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                             if (saveBlob === undefined) throw "Not supported";
                             saveBlob(blob, filename);
                         }
-                        console.log("saveBlob succeeded");
                         success = true;
                     } catch (ex) {
                         console.log("saveBlob method failed with the following exception:");
@@ -390,8 +376,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                                 // Try to simulate a click
                                 try {
                                     // Prepare a blob URL
-                                    console.log("Trying download link method with simulated click ...");
-                                    var blob = new Blob([data], { type: contentType });
+                                    var blob = new Blob([response.data], { type: contentType });
                                     var url = urlCreator.createObjectURL(blob);
                                     link.setAttribute('href', url);
 
@@ -402,7 +387,6 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                                     var event = document.createEvent('MouseEvents');
                                     event.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
                                     link.dispatchEvent(event);
-                                    console.log("Download link method with simulated click succeeded");
                                     success = true;
 
                                 } catch (ex) {
@@ -416,11 +400,9 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                                 try {
                                     // Prepare a blob URL
                                     // Use application/octet-stream when using window.location to force download
-                                    console.log("Trying download link method with window.location ...");
-                                    var blob = new Blob([data], { type: octetStreamMime });
+                                    var blob = new Blob([response.data], { type: octetStreamMime });
                                     var url = urlCreator.createObjectURL(blob);
                                     window.location = url;
-                                    console.log("Download link method with window.location succeeded");
                                     success = true;
                                 } catch (ex) {
                                     console.log("Download link method with window.location failed with the following exception:");
@@ -433,23 +415,19 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
                     if (!success) {
                         // Fallback to window.open method
-                        console.log("No methods worked for saving the arraybuffer, using last resort window.open");
                         window.open(httpPath, '_blank', '');
                     }
 
-                    deferred.resolve();
-                })
-                .error(function (data, status) {
-                    console.log("Request failed with status: " + status);
+                    return $q.resolve();
 
-                    deferred.reject({
+                }, function (response) {
+
+                    return $q.reject({
                         errorMsg: "An error occurred downloading the file",
-                        data: data,
-                        status: status
+                        data: response.data,
+                        status: response.status
                     });
                 });
-
-            return deferred.promise;
         }
     };
 }
