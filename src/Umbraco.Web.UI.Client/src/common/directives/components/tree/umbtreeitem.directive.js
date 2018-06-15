@@ -23,29 +23,14 @@ angular.module("umbraco.directives")
         restrict: 'E',
         replace: true,
         require: '^umbTree',
+        templateUrl: 'views/components/tree/umb-tree-item.html',
         scope: {
             section: '@',
-            currentNode: '=',
+            currentNode: '<',
             enablelistviewexpand: '@',
-            node: '=',
-            tree: '=' //TODO: Not sure we need this since we are 'require' on the umbTree
+            node: '<',
+            tree: '<' //TODO: Not sure we need this since we are 'require' on the umbTree
         },
-
-        //TODO: Remove more of the binding from this template and move the DOM manipulation to be manually done in the link function,
-        // this will greatly improve performance since there's potentially a lot of nodes being rendered = a LOT of watches!
-
-        template: '<li data-element="tree-item-{{node.dataElement}}" ng-class="{\'current\': (node == currentNode), \'has-children\': node.hasChildren}" on-right-click="altSelect(node, $event)">' +
-            '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)" >' +
-            //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
-            //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' + 
-            '<ins data-element="tree-item-expand" ng-class="{\'icon-navigation-right\': !node.expanded || node.metaData.isContainer, \'icon-navigation-down\': node.expanded && !node.metaData.isContainer}" ng-click="load(node)">&nbsp;</ins>' +
-            '<i class="icon umb-tree-icon sprTree" ng-click="select(node, $event)"></i>' +
-            '<a class="umb-tree-item__label" href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' +
-            //NOTE: These are the 'option' elipses
-            '<a data-element="tree-item-options" class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' +
-            '<div ng-show="node.loading" class="l"><div></div></div>' +
-            '</div>' +
-            '</li>',
         
         link: function (scope, element, attrs, umbTreeCtrl) {
 
@@ -63,30 +48,6 @@ angular.module("umbraco.directives")
                 element.children(":first")
                     //set the padding
                     .css("padding-left", (node.level * 20) + "px");
-
-                //toggle visibility of last 'ins' depending on children
-                //visibility still ensure the space is "reserved", so both nodes with and without children are aligned.
-                
-                if (node.hasChildren || node.metaData.isContainer && scope.enablelistviewexpand === "true") {
-                    element.find("ins").last().css("visibility", "visible");
-                }
-                else {
-                    element.find("ins").last().css("visibility", "hidden");
-                }
-
-                var icon = element.find("i:first");
-                icon.addClass(node.cssClass);
-                icon.attr("title", node.routePath);
-
-                element.find("a:first").text(node.name);
-
-                if (!node.menuUrl) {
-                    element.find("a.umb-options").remove();
-                }
-
-                if (node.style) {
-                    element.find("i:first").attr("style", node.style);
-                }
 
                 // add a unique data element to each tree item so it is easy to navigate with code
                 if(!node.metaData.treeAlias) {
@@ -243,12 +204,7 @@ angular.module("umbraco.directives")
             if(scope.node.hasChildren && scope.node.metaData.noAccess) {
                 scope.loadChildren(scope.node);
             }
-
-            var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" enablelistviewexpand="{{enablelistviewexpand}}" tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
-            var newElement = angular.element(template);
-            $compile(newElement)(scope);
-            element.append(newElement);
-
+          
         }
     };
 });
