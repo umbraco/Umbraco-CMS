@@ -36,7 +36,7 @@ describe('edit media controller tests', function () {
         httpBackend.flush();
     }));
 
-    describe('media edit controller save', function () {
+    describe('media edit controller init', function () {
 
         it('it should have an media object', function () {
 
@@ -61,15 +61,6 @@ describe('edit media controller tests', function () {
                     expect(tab.properties.length).toBeGreaterThan(0);
                 }
             });
-        });
-
-        it('it should change updateDate on save', function () {
-            var currentUpdateDate = scope.content.updateDate;
-
-            setTimeout(function () {
-                scope.save(scope.content);
-                expect(scope.content.updateDate).toBeGreaterThan(currentUpdateDate);
-            }, 1000);
         });
 
     });
