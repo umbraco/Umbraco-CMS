@@ -59,7 +59,7 @@ namespace Umbraco.Core.Configuration
                 {
                     // fixme - this should live in its own independent file! NOT web.config!
                     var value = ConfigurationManager.AppSettings["umbracoConfigurationStatus"];
-                    return SemVersion.TryParse(value, out var semver) ? semver : null;
+                    return value.IsNullOrWhiteSpace() ? null : SemVersion.TryParse(value, out var semver) ? semver : null;
                 }
                 catch
                 {

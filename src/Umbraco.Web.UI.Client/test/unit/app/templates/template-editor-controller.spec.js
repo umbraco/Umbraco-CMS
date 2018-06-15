@@ -1,9 +1,4 @@
-﻿/// <reference path="../../../../lib/angular/1.1.5/angular.js" />
-/// <reference path="../../../lib/angular/angular-mocks.js" />
-/// <reference path="../../../../src/app.js" />
-/// <reference path="../../../../src/views/templates/edit.controller.js" />
-
-(function() {
+﻿(function() {
     "use strict";
 
     describe("templates editor controller",
@@ -16,22 +11,6 @@
                 ace,
                 controller,
                 nada = function() {};
-
-            // UNCOMMENT TO RUN WITH RESHARPERS TESTRUNNER FOR JS
-            //beforeEach(function() {
-            //    angular.module('umbraco.filters', []);
-            //    angular.module('umbraco.directives', []);
-            //    angular.module('umbraco.resources', []);
-            //    angular.module('umbraco.services', []);
-            //    angular.module('umbraco.packages', []);
-            //    angular.module('umbraco.views', []);
-            //    angular.module('ngCookies', []);
-            //    angular.module('ngSanitize', []);
-            //    angular.module('ngMobile', []);
-            //    angular.module('tmh.dynamicLocale', []);
-            //    angular.module('ngFileUpload', []);
-            //    angular.module('LocalStorageModule', []);
-            //});
 
             beforeEach(module("umbraco"));
 
