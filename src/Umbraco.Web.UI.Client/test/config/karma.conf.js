@@ -12,15 +12,18 @@ module.exports = function (config) {
 
       //libraries
       'lib-bower/jquery/jquery.min.js',
-      'lib/angular/1.1.5/angular.js',
-      'lib/angular/1.1.5/angular-cookies.min.js',
-      'lib/angular/1.1.5/angular-mocks.js',
-      'lib/angular/angular-ui-sortable.js',
+      'lib-bower/angular/angular.js',
+      'lib-bower/angular-animate/angular-animate.js',
+      'lib-bower/angular-cookies/angular-cookies.js',
+      'lib-bower/angular-local-storage/angular-local-storage.min.js',
+      'lib-bower/angular-route/angular-route.js',
+      'lib-bower/angular-sanitize/angular-sanitize.js',
+      'bower_components/angular-mocks/angular-mocks.js',
+      'lib-bower/angular-ui-sortable/sortable.js',
       'lib-bower/underscore/underscore-min.js',
       'lib-bower/moment/moment-with-locales.js',
       'lib/umbraco/Extensions.js',
       'lib-bower/rgrove-lazyload/lazyload.js',
-      'lib-bower//angular-local-storage/angular-local-storage.min.js',
 
       //app bootstrap and loader
       'test/config/app.unit.js',
@@ -29,7 +32,7 @@ module.exports = function (config) {
       'src/common/directives/*.js',
       'src/common/filters/*.js',
       'src/common/services/*.js',
-      'src/common/security/*.js',
+      'src/common/interceptors/*.js',
       'src/common/resources/*.js',
       'src/views/**/*.controller.js',
 
