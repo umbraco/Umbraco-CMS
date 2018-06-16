@@ -73,7 +73,7 @@ namespace Umbraco.Web.Security
 
             // helpers are *not* instanciated by the container so we have to
             // get our dependencies injected manually, through properties.
-            Current.Container.InjectProperties(this);
+            ((IServiceContainer)Current.Container.ConcreteContainer).InjectProperties(this);
         }
 
         // used everywhere
@@ -96,7 +96,7 @@ namespace Umbraco.Web.Security
 
             // helpers are *not* instanciated by the container so we have to
             // get our dependencies injected manually, through properties.
-            Current.Container.InjectProperties(this);
+            ((IServiceContainer)Current.Container.ConcreteContainer).InjectProperties(this);
         }
 
         #endregion

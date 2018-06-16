@@ -3,6 +3,7 @@ using AutoMapper;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using System.Linq;
+using LightInject;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Web.Trees;
@@ -31,7 +32,7 @@ namespace Umbraco.Web.Editors
             // since tree's by nature are controllers and require request contextual data - and then we have to
             // remember to inject properties - nasty indeed
             var appTreeController = new ApplicationTreeController();
-            Current.Container.InjectProperties(appTreeController);
+            ((IServiceContainer)Current.Container.ConcreteContainer).InjectProperties(appTreeController);
             appTreeController.ControllerContext = ControllerContext;
 
             var dashboards = dashboardHelper.GetDashboards(Security.CurrentUser);

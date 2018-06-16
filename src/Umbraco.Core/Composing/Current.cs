@@ -27,7 +27,7 @@ namespace Umbraco.Core.Composing
     /// </remarks>
     public static class Current
     {
-        private static IServiceContainer _container;
+        private static IContainer _container;
 
         private static IShortStringHelper _shortStringHelper;
         private static ILogger _logger;
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Gets or sets the DI container.
         /// </summary>
-        internal static IServiceContainer Container
+        internal static IContainer Container
         {
             get
             {
