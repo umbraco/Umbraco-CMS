@@ -194,6 +194,10 @@
         <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key>
         <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
         <key alias="isSensitiveValue_short">This value is hidden.</key>
+        <key alias="propertyCanVaryByCulture">Property can vary by culture</key>
+        <key alias="languagesToPublish">What languages would you like to publish?</key>
+        <key alias="publishedLanguages">Published Languages.</key>
+        <key alias="readyToPublish">Ready to Publish?</key>
     </area>
     <area alias="media">
         <key alias="clickToUpload">Click to upload</key>
