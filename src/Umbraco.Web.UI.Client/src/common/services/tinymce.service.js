@@ -689,7 +689,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
                     };			
 				
 					// drop the lead char from the anchor text, if it has a value
-					var anchorVal = anchor.data("anchor");
+					var anchorVal = anchor[0].dataset.anchor;
 					if (anchorVal) {
 						currentTarget.anchor = anchorVal.substring(1);
 					}
@@ -699,8 +699,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
                     if (currentTarget.url.indexOf("localLink:") > 0) {						
 						// if the current link has an anchor, it needs to be considered when getting the udi/id
 						// if an anchor exists, reduce the substring max by its length plus two to offset the removed prefix and trailing curly brace
-						var linkId = currentTarget.url.substring(currentTarget.url.indexOf(":") + 1, 
-																 currentTarget.url.length - (currentTarget.anchor ? currentTarget.anchor.length + 2 : 1));
+						var linkId = currentTarget.url.substring(currentTarget.url.indexOf(":") + 1, currentTarget.url.lastIndexOf("}"));
 
                         //we need to check if this is an INT or a UDI
                         var parsedIntId = parseInt(linkId, 10);
