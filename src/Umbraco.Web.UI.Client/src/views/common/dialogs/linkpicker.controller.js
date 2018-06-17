@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
-	function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, userService, localizationService) {
+	function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, userService, localizationService, tinyMceService) {
 	    var dialogOptions = $scope.dialogOptions;
 
 	    var searchText = "Search...";
@@ -39,6 +39,10 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	            });
 	        }
 	    }
+		
+		if (dialogOptions.anchors) {
+			$scope.anchorValues = dialogOptions.anchors;
+		}
 
 	    function nodeSelectHandler(ev, args) {
 	        args.event.preventDefault();
@@ -69,9 +73,10 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	                $scope.target.url = "/";
 	            }
 	            else {
-	                contentResource.getNiceUrl(args.node.id).then(function (url) {
-	                    $scope.target.url = url;
-	                });
+					contentResource.getById(args.node.id).then(function (resp) {				
+						$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));									
+						$scope.model.target.url = resp.urls[0];
+					});
 	            }
 
 	            if (!angular.isUndefined($scope.target.isMedia)) {

@@ -1,8 +1,10 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
-	function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, userService, localizationService) {
+	function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, userService, localizationService, tinyMceService) {
 	    var dialogOptions = $scope.model;
 
+		var anchorPattern = /<a id=\\"(.*?)\\">/gi;
+	
 	    var searchText = "Search...";
 	    localizationService.localize("general_search").then(function (value) {
 	        searchText = value + "...";
@@ -22,11 +24,10 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 	        selectedSearchResults: []
 	    };
 
-            $scope.showTarget = $scope.model.hideTarget !== true;
+		$scope.showTarget = $scope.model.hideTarget !== true;
 
 	    if (dialogOptions.currentTarget) {
 	        $scope.model.target = dialogOptions.currentTarget;
-
 	        //if we have a node ID, we fetch the current node to build the form data
 	        if ($scope.model.target.id || $scope.model.target.udi) {
 
@@ -47,9 +48,12 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 	            });
 	        }
 	    }
-
-	    function nodeSelectHandler(ev, args) {
-
+	
+		if (dialogOptions.anchors) {
+			$scope.anchorValues = dialogOptions.anchors;
+		}
+	
+		function nodeSelectHandler(ev, args) {
 			if(args && args.event) {
 				args.event.preventDefault();
 				args.event.stopPropagation();
@@ -71,9 +75,10 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 			if (args.node.id < 0) {
 				$scope.model.target.url = "/";
 			}
-			else {
-				contentResource.getNiceUrl(args.node.id).then(function (url) {
-					$scope.model.target.url = url;
+			else {			
+				contentResource.getById(args.node.id).then(function (resp) {				
+					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));									
+					$scope.model.target.url = resp.urls[0];
 				});
 			}
 
