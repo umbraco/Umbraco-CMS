@@ -1,6 +1,6 @@
 <div class="umb-property">
     <ng-form name="propertyForm">
-        <div class="control-group umb-control-group" ng-class="{hidelabel:property.hideLabel}">
+        <div class="control-group umb-control-group" ng-class="{hidelabel: property.hideLabel}">
 
             <val-property-msg property="property"></val-property-msg>
 
@@ -12,10 +12,12 @@
                         <strong class="umb-control-required">*</strong>
                     </span>
                     <small ng-bind-html="property.description | preserveNewLineInHtml"></small>
+                    <i class="icon icon-globe" ng-show="property.canVaryByCulture" />
                 </label>
 
                 <div class="controls" ng-transclude>
                 </div>
+                <i class="icon icon-globe" ng-show="property.canVaryByCulture && property.hideLabel" />
             </div>
         </div>
     </ng-form>

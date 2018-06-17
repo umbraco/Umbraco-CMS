@@ -43,6 +43,7 @@ namespace Umbraco.Web.Models.Mapping
             display.Description = originalProp.PropertyType.Description;
             display.Label = originalProp.PropertyType.Name;
             display.HideLabel = valEditor.HideLabel;
+            display.CanVaryByCulture = originalProp.PropertyType.Variations.HasFlag(Core.Models.ContentVariation.CultureNeutral);
 
             //add the validation information
             display.Validation.Mandatory = originalProp.PropertyType.Mandatory;
