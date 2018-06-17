@@ -527,6 +527,7 @@
         <key alias="add">Add</key>
         <key alias="alias">Alias</key>
         <key alias="all">All</key>
+        <key alias="anchor">Anchor</key>
         <key alias="areyousure">Are you sure?</key>
         <key alias="back">Back</key>
         <key alias="border">Border</key>
