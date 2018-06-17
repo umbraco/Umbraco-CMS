@@ -751,9 +751,20 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 
         },
 		
-		getAnchorNames: function(propertyString) {
+		/**
+        * @ngdoc method
+        * @name umbraco.services.tinyMceService#getAnchorNames
+        * @methodOf umbraco.services.tinyMceService
+        *
+        * @description
+        * From the given string, generates a string array where each item is the id attribute value from a named anchor
+		* 'some string <a id="anchor"></a>with a named anchor' returns ['anchor']
+        *
+        * @param {string} input the string to parse      
+        */
+		getAnchorNames: function(input) {
 			var anchorPattern = /<a id=\\"(.*?)\\">/gi;	
-			var matches = propertyString.match(anchorPattern);
+			var matches = input.match(anchorPattern);
 			var anchors = [];			
 			
 			if (matches) {
