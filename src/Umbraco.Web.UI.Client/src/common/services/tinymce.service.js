@@ -686,12 +686,12 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
                         name: anchor.attr("title"),
                         url: anchor.attr("href"),
                         target: anchor.attr("target")
-                    };
-
-					// split the URL to check for an anchor or querystring, then add that value to the currentTarget object
-					var urlParts = currentTarget.url.split(/(\?|#)/);
-					if (urlParts.length === 3) {
-						currentTarget.anchor = urlParts[2];
+                    };			
+				
+					// drop the lead char from the anchor text, if it has a value
+					var anchorVal = anchor.data("anchor");
+					if (anchorVal) {
+						currentTarget.anchor = anchorVal.substring(1);
 					}
 					
                     //locallink detection, we do this here, to avoid poluting the dialogservice
@@ -795,6 +795,7 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
                     target: target.target ? target.target : null,
                     rel: target.rel ? target.rel : null
                 };
+				
                 if (hasUdi) {
                     a["data-udi"] = target.udi;
                 }
@@ -805,8 +806,10 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 				if (target.anchor) {
 					a["data-anchor"] = target.anchor;
 					a.href = a.href + target.anchor;
+				} else {
+					a["data-anchor"] = null;
 				}
-				
+								
                 return a;
             }
 
