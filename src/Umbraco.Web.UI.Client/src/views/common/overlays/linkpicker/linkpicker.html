@@ -5,11 +5,24 @@
             localize="placeholder"
             placeholder="@general_url"
             class="umb-editor umb-textstring"
+ 		    style="float:left; min-width:0; width:65%"
             ng-model="model.target.url"
             ng-disabled="model.target.id"
             focus-when="{{true}} "/>
+		
+		<input type="text"
+		   list="anchors"
+		   localize="placeholder"
+		   placeholder="@general_anchor"
+		   class="umb-editor umb-textstring"	
+		   style="float:right; min-width:0; width:30%"
+		   ng-model="model.target.anchor" />
+		
+		<datalist id="anchors">
+			<option value="{{a}}" ng-repeat="a in anchorValues"></option>
+		</datalist>
     </umb-control-group>
-
+	
     <umb-control-group label="@defaultdialogs_nodeNameLinkPicker">
         <input type="text"
             localize="placeholder"
