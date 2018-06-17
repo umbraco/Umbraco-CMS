@@ -645,7 +645,6 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
                 data.href = anchorElm ? dom.getAttrib(anchorElm, 'href') : '';
                 data.target = anchorElm ? dom.getAttrib(anchorElm, 'target') : '';
                 data.rel = anchorElm ? dom.getAttrib(anchorElm, 'rel') : '';
-				data.anchor = anchorElm ? dom.getAttrib(anchorElm, 'anchor') : '';
 
                 if (selectedElm.nodeName === "IMG") {
                     data.text = initialText = " ";
