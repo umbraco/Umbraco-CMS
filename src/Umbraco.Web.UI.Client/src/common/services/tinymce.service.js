@@ -6,7 +6,7 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper, userService) {
+function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper, userService) {
     return {
 
         /**
@@ -645,6 +645,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                 data.href = anchorElm ? dom.getAttrib(anchorElm, 'href') : '';
                 data.target = anchorElm ? dom.getAttrib(anchorElm, 'target') : '';
                 data.rel = anchorElm ? dom.getAttrib(anchorElm, 'rel') : '';
+				data.anchor = anchorElm ? dom.getAttrib(anchorElm, 'anchor') : '';
 
                 if (selectedElm.nodeName === "IMG") {
                     data.text = initialText = " ";
@@ -677,8 +678,6 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                     };
                 }
 
-                var injector = angular.element(document.getElementById("umbracoMainPageBody")).injector();
-                var dialogService = injector.get("dialogService");
                 var currentTarget = null;
 
                 //if we already have a link selected, we want to pass that data over to the dialog
@@ -690,10 +689,20 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         target: anchor.attr("target")
                     };
 
+					// split the URL to check for an anchor or querystring, then add that value to the currentTarget object
+					var urlParts = currentTarget.url.split(/(\?|#)/);
+					if (urlParts.length === 3) {
+						currentTarget.anchor = urlParts[2];
+					}
+					
                     //locallink detection, we do this here, to avoid poluting the dialogservice
                     //so the dialog service can just expect to get a node-like structure
-                    if (currentTarget.url.indexOf("localLink:") > 0) {
-                        var linkId = currentTarget.url.substring(currentTarget.url.indexOf(":") + 1, currentTarget.url.length - 1);
+                    if (currentTarget.url.indexOf("localLink:") > 0) {						
+						// if the current link has an anchor, it needs to be considered when getting the udi/id
+						// if an anchor exists, reduce the substring max by its length plus two to offset the removed prefix and trailing curly brace
+						var linkId = currentTarget.url.substring(currentTarget.url.indexOf(":") + 1, 
+																 currentTarget.url.length - (currentTarget.anchor ? currentTarget.anchor.length + 2 : 1));
+
                         //we need to check if this is an INT or a UDI
                         var parsedIntId = parseInt(linkId, 10);
                         if (isNaN(parsedIntId)) {
@@ -741,6 +750,20 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
             });
 
         },
+		
+		getAnchorNames: function(propertyString) {
+			var anchorPattern = /<a id=\\"(.*?)\\">/gi;	
+			var matches = propertyString.match(anchorPattern);
+			var anchors = [];			
+			
+			if (matches) {
+				anchors = matches.map(function(v) {
+					return v.substring(v.indexOf('"') + 1, v.lastIndexOf('\\'));
+				});
+			}
+			
+			return anchors;
+		},
 
         insertLinkInEditor: function(editor, target, anchorElm) {
 
@@ -749,13 +772,18 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
             var hasUdi = target.udi ? true : false;
             var id = hasUdi ? target.udi : (target.id ? target.id : null);
 
+			// if an anchor exists, check that it is appropriately prefixed
+			if (target.anchor && target.anchor[0] !== '?' && target.anchor[0] !== '#') {
+				target.anchor = (target.anchor.indexOf('=') === -1 ? '#' : '?') + target.anchor;				
+			}
+			
             //Create a json obj used to create the attributes for the tag
             function createElemAttributes() {
                 var a = {
                     href: href,
                     title: target.name,
                     target: target.target ? target.target : null,
-                    rel: target.rel ? target.rel : null                   
+                    rel: target.rel ? target.rel : null
                 };
                 if (hasUdi) {
                     a["data-udi"] = target.udi;
@@ -763,6 +791,12 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                 else if (target.id) {
                     a["data-id"] = target.id;
                 }         
+				
+				if (target.anchor) {
+					a["data-anchor"] = target.anchor;
+					a.href = a.href + target.anchor;
+				}
+				
                 return a;
             }
 
