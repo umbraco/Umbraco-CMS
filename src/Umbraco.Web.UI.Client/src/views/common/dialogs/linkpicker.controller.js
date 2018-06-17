@@ -34,8 +34,10 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	                });
 	            }
 
-	            contentResource.getNiceUrl(id).then(function (url) {
-	                $scope.target.url = url;
+				// if a link exists, get the properties to build the anchor name list
+                contentResource.getById(id).then(function (resp) {
+					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
+	                $scope.model.target.url = resp.urls[0];
 	            });
 	        }
 	    }

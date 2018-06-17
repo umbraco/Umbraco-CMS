@@ -42,14 +42,14 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 	                    $scope.dialogTreeEventHandler.syncTree({ path: $scope.model.target.path, tree: "content" });
 	                });
 	            }
-
-                contentResource.getNiceUrl(id).then(function (url) {
-	                $scope.model.target.url = url;
+				
+				// if a link exists, get the properties to build the anchor name list
+                contentResource.getById(id).then(function (resp) {
+					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
+	                $scope.model.target.url = resp.urls[0];
 	            });
 	        }
-	    }
-	
-		if (dialogOptions.anchors) {
+	    } else if (dialogOptions.anchors) {
 			$scope.anchorValues = dialogOptions.anchors;
 		}
 	
