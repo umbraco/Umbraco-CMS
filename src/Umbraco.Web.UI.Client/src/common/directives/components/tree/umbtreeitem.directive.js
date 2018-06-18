@@ -39,7 +39,7 @@ angular.module("umbraco.directives")
             });
 
             //flag to enable/disable delete animations, default for an item is true
-            var deleteAnimations = true;
+            scope.deleteAnimations = true;
 
             // updates the node's DOM/styles
             function setupNodeDom(node, tree) {
@@ -63,7 +63,7 @@ angular.module("umbraco.directives")
                 //do timeout so that it re-enables them after this digest
                 $timeout(function () {
                     //enable delete animations
-                    deleteAnimations = true;
+                    scope.deleteAnimations = true;
                 }, 0, false);
             }
 
@@ -150,7 +150,7 @@ angular.module("umbraco.directives")
                 if (scope.node.showHideAnimation) {
                     return scope.node.showHideAnimation;
                 }
-                if (deleteAnimations && scope.node.expanded) {
+                if (scope.deleteAnimations && scope.node.expanded) {
                     return { leave: 'tree-node-delete-leave' };
                 }
                 else {
@@ -165,7 +165,7 @@ angular.module("umbraco.directives")
             */
             scope.load = function (node) {
                 if (node.expanded && !node.metaData.isContainer) {
-                    deleteAnimations = false;
+                    scope.deleteAnimations = false;
                     umbTreeCtrl.emitEvent("treeNodeCollapsing", { tree: scope.tree, node: node, element: element });
                     node.expanded = false;
                 }
