@@ -123,10 +123,13 @@ src/*.boltdata/
 /src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.panel.js
 /src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.config.js
 /src/Umbraco.Web.UI/Umbraco/Js/canvasdesigner.front.js
+/src/Umbraco.Web.UI.Client/Web.config
+/src/Umbraco.Web.UI/Umbraco.Web.UI.csproj
 src/umbraco.sln.ide/*
 src/.vs/
 src/Umbraco.Web.UI/umbraco/js/install.loader.js
 src/Umbraco.Tests/media
+src/package-lock.json
 tools/docfx/*
 apidocs/_site/*
 apidocs/api/*
@@ -142,3 +145,5 @@ build.out/
 build.tmp/
 build/Modules/*/temp/
 /src/.idea/*
+build/_BuildOutput/*
+
