@@ -26,10 +26,10 @@ angular.module("umbraco.directives")
         templateUrl: 'views/components/tree/umb-tree-item.html',
         scope: {
             section: '@',
-            currentNode: '<',
+            currentNode: '=',
             enablelistviewexpand: '@',
-            node: '<',
-            tree: '<' //TODO: Not sure we need this since we are 'require' on the umbTree
+            node: '=',
+            tree: '=' //TODO: Not sure we need this since we are 'require' on the umbTree
         },
         
         link: function (scope, element, attrs, umbTreeCtrl) {
