@@ -243,6 +243,7 @@ namespace Umbraco.Web.Trees
         public TreeNode CreateTreeNode(UmbracoEntity entity, Guid entityObjectType, string parentId, FormDataCollection queryStrings, bool hasChildren)
         {
             var treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, entity.ContentTypeIcon);
+            treeNode.Path = entity.Path;
             treeNode.Udi = Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(entityObjectType), entity.Key);
             treeNode.HasChildren = hasChildren;
             return treeNode;
@@ -261,6 +262,7 @@ namespace Umbraco.Web.Trees
         public TreeNode CreateTreeNode(IUmbracoEntity entity, Guid entityObjectType, string parentId, FormDataCollection queryStrings, string icon, bool hasChildren)
         {
             var treeNode = CreateTreeNode(entity.Id.ToInvariantString(), parentId, queryStrings, entity.Name, icon);
+            treeNode.Path = entity.Path;
             treeNode.Udi = Udi.Create(UmbracoObjectTypesExtensions.GetUdiType(entityObjectType), entity.Key);
             treeNode.HasChildren = hasChildren;
             return treeNode;
