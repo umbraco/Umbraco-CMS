@@ -1,12 +1,16 @@
 ﻿<div>
-    <label class="radio">
-        <input type="radio" name="orderDirection" value="asc" ng-model="model.value" />
-        Ascending <code>[a-z]</code>
-    </label>
-    <label class="radio">
-        <input type="radio" name="orderDirection" value="desc" ng-model="model.value" />
-        Descending <code>[z-a]</code>
-    </label>
-    
-    <span class="help-inline" val-msg-for="orderDirection" val-toggle-msg="required">Required</span>
+    <ng-form name="listViewOrderDirectionForm">
+        <label class="radio">
+            <input type="radio" name="orderDirection" value="asc" ng-model="model.value" />
+            Ascending <code>[a-z]</code>
+        </label>
+        <label class="radio">
+            <input type="radio" name="orderDirection" value="desc" ng-model="model.value" />
+            Descending <code>[z-a]</code>
+        </label>
+
+        <span ng-messages="listViewOrderDirectionForm.orderDirection.$error" show-validation-on-submit >
+            <span class="help-inline" ng-message="required">Required</span>
+        </span>
+    </ng-form>
 </div>

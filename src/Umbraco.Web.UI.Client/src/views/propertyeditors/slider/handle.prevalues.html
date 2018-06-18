@@ -1,11 +1,13 @@
 ﻿<div>
-    <select ng-model="model.value" name="handle">
-        <option value="round">Round</option>
-        <option value="square">Square</option>
-        <option value="triangle">Triangle</option>
-    </select>
+    <ng-form name="sliderHandleForm">
+        <select ng-model="model.value" name="handle">
+            <option value="round">Round</option>
+            <option value="square">Square</option>
+            <option value="triangle">Triangle</option>
+        </select>
 
-    <span class="help-inline" val-msg-for="handle" val-toggle-msg="required">
-        <localize key="general_required">Required</localize>
-    </span>
+        <span ng-messages="sliderHandleForm.handle.$error" show-validation-on-submit >
+            <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+        </span>
+    </ng-form>
 </div>

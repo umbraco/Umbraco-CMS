@@ -21,18 +21,20 @@
                         <div class="umb-control-group" ng-if="!model.property.locked">
                             <div class="control-group">
                                 <textarea class="editor-label"
-                                        data-element="property-name"
-                                        name="propertyLabel"
-                                        ng-model="model.property.label"
-                                        localize="placeholder"
-                                        placeholder="@placeholders_entername"
-                                        umb-auto-focus
-                                        focus-on-filled="true"
-                                        umb-auto-resize
-                                        required
-                                        ng-keypress="vm.submitOnEnter($event)">
+                                          data-element="property-name"
+                                          name="propertyLabel"
+                                          ng-model="model.property.label"
+                                          localize="placeholder"
+                                          placeholder="@placeholders_entername"
+                                          umb-auto-focus
+                                          focus-on-filled="true"
+                                          umb-auto-resize
+                                          required
+                                          ng-keypress="vm.submitOnEnter($event)">
                                 </textarea>
-                                <div class="umb-validation-label" val-msg-for="propertyLabel" val-toggle-msg="required">Required label</div>
+                                <div ng-messages="propertySettingsForm.propertyLabel.$error" show-validation-on-submit>
+                                    <span class="umb-validation-label" ng-message="required">Required label</span>
+                                </div>
                             </div>
                             <div class="control-group -no-margin">
                                 <umb-generate-alias enable-lock="true" alias-from="model.property.label" alias="model.property.alias"></umb-generate-alias>
@@ -172,4 +174,3 @@
 </form>
 
 </div>
- 
