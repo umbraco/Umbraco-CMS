@@ -18,7 +18,7 @@
    </example>
  */
 angular.module("umbraco.directives")
-.directive('umbTreeItem', function ($compile, $http, $templateCache, $interpolate, $log, $location, $rootScope, $window, treeService, $timeout, localizationService) {
+    .directive('umbTreeItem', function(treeService, $timeout, localizationService, eventsService, appState) {
     return {
         restrict: 'E',
         replace: true,
@@ -37,10 +37,7 @@ angular.module("umbraco.directives")
             localizationService.localize("general_search").then(function (value) {
                 scope.searchAltText = value;
             });
-
-            //flag to enable/disable delete animations, default for an item is true
-            scope.deleteAnimations = true;
-
+            
             // updates the node's DOM/styles
             function setupNodeDom(node, tree) {
                 
@@ -56,15 +53,6 @@ angular.module("umbraco.directives")
                     node.dataElement = node.metaData.treeAlias;
                 }
 
-            }
-
-            //This will deleteAnimations to true after the current digest
-            function enableDeleteAnimations() {
-                //do timeout so that it re-enables them after this digest
-                $timeout(function () {
-                    //enable delete animations
-                    scope.deleteAnimations = true;
-                }, 0, false);
             }
 
             /** Returns the css classses assigned to the node (div element) */
@@ -138,26 +126,10 @@ angular.module("umbraco.directives")
               and emits it as a treeNodeSelect element if there is a callback object
               defined on the tree
             */
-            scope.altSelect = function (n, ev) {
+            scope.altSelect = function(n, ev) {
                 umbTreeCtrl.emitEvent("treeNodeAltSelect", { element: element, tree: scope.tree, node: n, event: ev });
             };
-
-            /** method to set the current animation for the node. 
-            *  This changes dynamically based on if we are changing sections or just loading normal tree data. 
-            *  When changing sections we don't want all of the tree-ndoes to do their 'leave' animations.
-            */
-            scope.animation = function () {
-                if (scope.node.showHideAnimation) {
-                    return scope.node.showHideAnimation;
-                }
-                if (scope.deleteAnimations && scope.node.expanded) {
-                    return { leave: 'tree-node-delete-leave' };
-                }
-                else {
-                    return {};
-                }
-            };
-
+            
             /**
               Method called when a node in the tree is expanded, when clicking the arrow
               takes the arrow DOM element and node data as parameters
@@ -165,7 +137,6 @@ angular.module("umbraco.directives")
             */
             scope.load = function (node) {
                 if (node.expanded && !node.metaData.isContainer) {
-                    scope.deleteAnimations = false;
                     umbTreeCtrl.emitEvent("treeNodeCollapsing", { tree: scope.tree, node: node, element: element });
                     node.expanded = false;
                 }
@@ -175,28 +146,11 @@ angular.module("umbraco.directives")
             };
 
             /* helper to force reloading children of a tree node */
-            scope.loadChildren = function (node, forceReload) {
-                //emit treeNodeExpanding event, if a callback object is set on the tree
-                umbTreeCtrl.emitEvent("treeNodeExpanding", { tree: scope.tree, node: node });
-
-                if (node.hasChildren && (forceReload || !node.children || (angular.isArray(node.children) && node.children.length === 0))) {
-                    //get the children from the tree service
-                    treeService.loadNodeChildren({ node: node, section: scope.section })
-                        .then(function (data) {
-                            //emit expanded event
-                            umbTreeCtrl.emitEvent("treeNodeExpanded", { tree: scope.tree, node: node, children: data });
-                            enableDeleteAnimations();
-                        });
-                }
-                else {
-                    umbTreeCtrl.emitEvent("treeNodeExpanded", { tree: scope.tree, node: node, children: node.children });
-                    node.expanded = true;
-                    enableDeleteAnimations();
-                }
-            };            
+            scope.loadChildren = function(node, forceReload) {
+                return umbTreeCtrl.loadChildren(node, forceReload);
+            };
 
             //if the current path contains the node id, we will auto-expand the tree item children
-
             setupNodeDom(scope.node, scope.tree);
 
             // load the children if the current user don't have access to the node
@@ -204,7 +158,49 @@ angular.module("umbraco.directives")
             if(scope.node.hasChildren && scope.node.metaData.noAccess) {
                 scope.loadChildren(scope.node);
             }
-          
+
+            var evts = [];
+
+            //listen for section changes
+            evts.push(eventsService.on("appState.sectionState.changed", function(e, args) {
+                if (args.key === "currentSection") {
+                    //when the section changes disable all delete animations
+                    scope.node.deleteAnimations = false;
+                }
+            }));
+
+            /** Depending on if any menu is shown and if the menu is shown for the current node, toggle delete animations */
+            function toggleDeleteAnimations() {
+                //if both are false then remove animations
+                var hide = !appState.getMenuState("showMenuDialog") && !appState.getMenuState("showMenu");
+                if (hide) {
+                    scope.node.deleteAnimations = false;
+                }
+                else {
+                    //enable animations for this node if it is the node currently showing a context menu
+                    var currentNode = appState.getMenuState("currentNode");
+                    if (currentNode && currentNode.id == scope.node.id) {
+                        scope.node.deleteAnimations = true;
+                    }
+                    else {
+                        scope.node.deleteAnimations = false;
+                    }
+                }
+            }
+
+            //listen for context menu and current node changes
+            evts.push(eventsService.on("appState.menuState.changed", function(e, args) {
+                if (args.key === "showMenuDialog" || args.key == "showMenu" || args.key == "currentNode") {
+                    toggleDeleteAnimations();
+                }
+            }));
+
+            //cleanup events
+            scope.$on('$destroy', function() {
+                for (var e in evts) {
+                    eventsService.unsubscribe(evts[e]);
+                }
+            });
         }
     };
 });
