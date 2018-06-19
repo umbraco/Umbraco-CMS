@@ -23,16 +23,21 @@
                             <small style="font-size: 13px;">{{invitedUserPasswordModel.passwordPolicyText}}</small>
                         </label>
                         <input type="password" ng-model="invitedUserPasswordModel.password" name="password" class="-full-width-input" umb-auto-focus required val-server-field="value" autocomplete="off" ng-minlength="{{invitedUserPasswordModel.passwordPolicies.minPasswordLength}}" />
-                        <span class="help-inline" val-msg-for="password" val-toggle-msg="required"><localize key="user_passwordIsBlank">Your new password cannot be blank!</localize></span>
-                        <span class="help-inline" val-msg-for="password" val-toggle-msg="minlength">Minimum {{invitedUserPasswordModel.passwordPolicies.minPasswordLength}} characters</span>
-                        <span class="help-inline" val-msg-for="password" val-toggle-msg="valServerField"></span>
+                        <span ng-messages="inviteUserPasswordForm.password.$error" show-validation-on-submit >
+                            <span class="help-inline" ng-message="required"><localize key="user_passwordIsBlank">Your new password cannot be blank!</localize></span>
+                            <span class="help-inline" ng-message="minlength">Minimum {{invitedUserPasswordModel.passwordPolicies.minPasswordLength}} characters</span>
+                            <span class="help-inline" ng-message="valServerField">{{inviteUserPasswordForm.password.errorMsg}}</span>
+                        </span>
                     </div>
 
                     <div class="control-group" ng-class="{error: setPasswordForm.confirmPassword.$invalid}">
                         <label><localize key="user_confirmNewPassword">Confirm new password</localize></label>
                         <input type="password" ng-model="invitedUserPasswordModel.confirmPassword" name="confirmPassword" class="-full-width-input" required val-compare="password" autocomplete="off" />
-                        <span class="help-inline" val-msg-for="confirmPassword" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                        <span class="help-inline" val-msg-for="confirmPassword" val-toggle-msg="valCompare"><localize key="user_passwordMismatch">The confirmed password doesn't match the new password!</localize></span>
+                        <span ng-messages="inviteUserPasswordForm.confirmPassword.$error" show-validation-on-submit >
+                            <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                            <span class="help-inline" ng-message="valCompare"><localize key="user_passwordMismatch">The confirmed password doesn't match the new password!</localize></span>
+                        </span>
+                        
                     </div>
 
                     <div class="flex justify-between items-center">

@@ -28,7 +28,11 @@
                         <div class="umb-permission__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && variant.isEdited && variant.state === 'Published'"><localize key="content_publishedPendingChanges"></localize></div>
                         <div class="umb-permission__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && variant.isEdited && variant.state === 'Unpublished'"><localize key="content_unpublishedPendingChanges"></localize></div>
                         <div class="umb-permission__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && variant.isEdited === false">{{ variant.state }}</div>
-                        <div class="umb-permission__description" style="color: #F02E28;" val-msg-for="publishVariantSelector" val-toggle-msg="valServerField"></div>
+
+                        <div ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
+                            <div class="umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</div>
+                        </div>
+                        
                     </div>
                 </div>
                 

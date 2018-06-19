@@ -182,7 +182,7 @@
 
                         vm.page.saveButtonState = "busy";
 
-                        vm.save().then(function (result) {
+                        vm.saveInternal().then(function (result) {
 
                             vm.page.saveButtonState = "busy";
 
@@ -267,18 +267,22 @@
         /* ---------- SAVE ---------- */
 
         function save() {
+            //return the saveInternal method but catch rejections since this is the upper most caller
+            return saveInternal().catch(angular.noop); 
+        }
+
+        /** This internal save method performs the actual saving and returns a promise, not to be bound to any buttons but used by other bound methods */
+        function saveInternal() {
 
             // only save if there is no overlays open
             if (overlayHelper.getNumberOfOverlays() === 0) {
-
-                var deferred = $q.defer();
 
                 vm.page.saveButtonState = "busy";
 
                 // reformat allowed content types to array if id's
                 vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
 
-                contentEditingHelper.contentEditorPerformSave({
+                return contentEditingHelper.contentEditorPerformSave({
                     saveMethod: contentTypeResource.save,
                     scope: $scope,
                     content: vm.contentType,
@@ -321,7 +325,7 @@
 
                     vm.page.saveButtonState = "success";
 
-                    deferred.resolve(data);
+                    return $q.resolve(data);
                 }, function (err) {
                     //error
                     if (err) {
@@ -335,9 +339,11 @@
                         });
                     }
                     vm.page.saveButtonState = "error";
-                    deferred.reject(err);
+                    return $q.reject(err);
                 });
-                return deferred.promise;
+            }
+            else {
+                return $q.reject();
             }
         }
 

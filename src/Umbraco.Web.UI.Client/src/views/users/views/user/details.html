@@ -3,50 +3,59 @@
     <div class="umb-package-details__main-content">
 
         <umb-box>
+            <ng-form name="userProfileForm">
+                <umb-box-header title-key="user_profile"></umb-box-header>
 
-            <umb-box-header title-key="user_profile"></umb-box-header>
+                <umb-box-content class="block-form">
 
-            <umb-box-content class="block-form">
+                    <umb-control-group label="@general_email" required="true">
 
-                <umb-control-group label="@general_email" required="true">
+                        <input type="email"
+                               localize="placeholder"
+                               placeholder="@placeholders_enteremail"
+                               class="input-block-level"
+                               ng-model="model.user.email"
+                               umb-auto-focus
+                               name="email"
+                               val-email
+                               required
+                               val-server-field="Email" />
+                        <span ng-messages="userProfileForm.email.$error" show-validation-on-submit >
+                            <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                            <span class="help-inline" ng-message="valEmail"><localize key="validation_invalidEmail">Invalid email</localize></span>
+                            <span class="help-inline" ng-message="valServerField">{{userProfileForm.email.errorMsg}}</span>
+                        </span>
+                    </umb-control-group>
 
-                    <input type="email"
-                           localize="placeholder"
-                           placeholder="@placeholders_enteremail"
-                           class="input-block-level"
-                           ng-model="model.user.email"
-                           umb-auto-focus name="email"
-                           val-email
-                           required
-                           val-server-field="Email" />
-                    <span class="help-inline" val-msg-for="email" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                    <span class="help-inline" val-msg-for="email" val-toggle-msg="valServerField"></span>
-                </umb-control-group>
+                    <umb-control-group label="@general_username" ng-if="!model.usernameIsEmail" required="true">
+                        <input type="text"
+                               localize="placeholder"
+                               placeholder="@placeholders_enterusername"
+                               class="input-block-level"
+                               ng-model="model.user.username"
+                               umb-auto-focus name="username"
+                               required
+                               val-server-field="Username" />
+                        <span ng-messages="userProfileForm.username.$error" show-validation-on-submit >
+                            <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                            <span class="help-inline" ng-message="valServerField">{{userProfileForm.username.errorMsg}}</span>
+                        </span>
+                    </umb-control-group>
 
-                <umb-control-group label="@general_username" ng-if="!model.usernameIsEmail" required="true">
-                    <input type="text"
-                           localize="placeholder"
-                           placeholder="@placeholders_enterusername"
-                           class="input-block-level"
-                           ng-model="model.user.username"
-                           umb-auto-focus name="username"
-                           required
-                           val-server-field="Username" />
-                    <span class="help-inline" val-msg-for="username" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                    <span class="help-inline" val-msg-for="username" val-toggle-msg="valServerField"></span>
-                </umb-control-group>
-
-                <umb-control-group label="@user_language" description="@user_languageHelp">
-                    <select class="input-block-level"
-                            ng-model="model.user.culture"
-                            ng-options="key as value for (key, value) in model.user.availableCultures"
-                            name="culture"
-                            required
-                            val-server-field="Culture"></select>
-                    <span class="help-inline" val-msg-for="culture" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                    <span class="help-inline" val-msg-for="culture" val-toggle-msg="valServerField"></span>
-                </umb-control-group>
-            </umb-box-content>
+                    <umb-control-group label="@user_language" description="@user_languageHelp">
+                        <select class="input-block-level"
+                                ng-model="model.user.culture"
+                                ng-options="key as value for (key, value) in model.user.availableCultures"
+                                name="culture"
+                                required
+                                val-server-field="Culture"></select>
+                        <span ng-messages="userProfileForm.culture.$error" show-validation-on-submit >
+                            <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                            <span class="help-inline" ng-message="valServerField">{{userProfileForm.username.errorMsg}}</span>
+                        </span>
+                    </umb-control-group>
+                </umb-box-content>
+            </ng-form>
         </umb-box>
 
         <umb-box>

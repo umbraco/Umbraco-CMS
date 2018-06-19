@@ -318,7 +318,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     function loadLanguages() {
 
         return contentResource.allowsCultureVariation().then(function (b) {
-            if (b === "true") {
+            if (b === true) {
                 return languageResource.getAll()
             } else {
                 return $q.when([]); //resolve an empty collection
