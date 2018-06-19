@@ -28,13 +28,6 @@ namespace Umbraco.Core.IO
         private long _folderCounter;
         private bool _folderCounterInitialized;
 
-        // fixme - remove
-        //private static readonly Dictionary<int, string> DefaultSizes = new Dictionary<int, string>
-        //{
-        //    { 100, "thumb" },
-        //    { 500, "big-thumb" }
-        //};
-
         public MediaFileSystem(IFileSystem wrapped)
             : base(wrapped)
         {
@@ -53,9 +46,13 @@ namespace Umbraco.Core.IO
 
         internal UploadAutoFillProperties UploadAutoFillProperties { get; }
 
-        // note - this is currently experimental / being developed
-        //public static bool UseTheNewMediaPathScheme { get; set; }
-        public const bool UseTheNewMediaPathScheme = false;
+        // fixme - work-in-progress
+        // the new scheme is now the default scheme - media items with old paths will still
+        // work, but whenever a file is uploaded, the new scheme is used. we have a temp.
+        // option to let people opt-out of the new scheme. eventually, the media filesystem
+        // will only support the new scheme - but it should be an interface, and it should
+        // be possible to switch its implementation to whatever people want to use
+        public bool UseTheNewMediaPathScheme => ContentConfig.UseTheNewMediaPathScheme;
 
         /// <summary>
         /// Deletes all files passed in.
@@ -116,7 +113,6 @@ namespace Umbraco.Core.IO
                     DeleteFile(file);
 
 #pragma warning disable 162 // unreachable code
-                    // Not implemented yet, so need to disable warnings
                     // ReSharper disable once ConditionIsAlwaysTrueOrFalse
                     if (UseTheNewMediaPathScheme == false)
                     {
@@ -160,7 +156,6 @@ namespace Umbraco.Core.IO
 
             string folder;
 #pragma warning disable 162 // unreachable code
-            // Not implemented yet, so need to disable warnings
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (UseTheNewMediaPathScheme == false)
             {
@@ -207,6 +202,8 @@ namespace Umbraco.Core.IO
         /// specified by <paramref name="prevpath"/>. Else, we CREATE a new one. Each time we are invoked.</remarks>
         public string GetMediaPath(string filename, string prevpath, Guid cuid, Guid puid)
         {
+#pragma warning disable 162 // unreachable code
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if (UseTheNewMediaPathScheme || string.IsNullOrWhiteSpace(prevpath))
                 return GetMediaPath(filename, cuid, puid);
 
@@ -230,6 +227,7 @@ namespace Umbraco.Core.IO
                 : folder + "-" + filename;
 
             return filepath;
+#pragma warning restore 162 // unreachable code
         }
 
         /// <summary>

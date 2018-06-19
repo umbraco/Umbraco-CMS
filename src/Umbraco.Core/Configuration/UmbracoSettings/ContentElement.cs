@@ -20,6 +20,9 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("UploadAllowDirectories")]
         internal InnerTextConfigurationElement<bool> UploadAllowDirectories => GetOptionalTextElement("UploadAllowDirectories", true);
 
+        [ConfigurationProperty("UseTheNewMediaPathScheme")]
+        internal InnerTextConfigurationElement<bool> UseTheNewMediaPathScheme => GetOptionalTextElement("UseTheNewMediaPathScheme", true);
+
         public IEnumerable<IContentErrorPage> Error404Collection => Errors.Error404Collection;
 
         [ConfigurationProperty("errors", IsRequired = true)]
@@ -104,6 +107,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool IContentSection.ResolveUrlsFromTextString => ResolveUrlsFromTextString;
 
         bool IContentSection.UploadAllowDirectories => UploadAllowDirectories;
+
+        bool IContentSection.UseTheNewMediaPathScheme => UseTheNewMediaPathScheme;
 
         bool IContentSection.EnsureUniqueNaming => EnsureUniqueNaming;
 
