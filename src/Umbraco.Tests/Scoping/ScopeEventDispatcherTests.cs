@@ -36,6 +36,10 @@ namespace Umbraco.Tests.Scoping
             Current.Container = new ContainerAdapter(lightinjectContainer);
 
             _testObjects = new TestObjects(lightinjectContainer);
+
+            // fixme - move to container factory?
+            Current.Container.RegisterSingleton(f => (IServiceContainer)Current.Container.ConcreteContainer);
+
             Current.Container.RegisterSingleton(f => Current.Container);
             Current.Container.RegisterSingleton(factory => new FileSystems(factory.TryGetInstance<ILogger>()));
             Current.Container.RegisterCollectionBuilder<MapperCollectionBuilder>();
