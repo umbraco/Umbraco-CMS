@@ -7,7 +7,7 @@
 **/
 
 //share property editor directive function
-var _umbPropertyEditor = function (umbPropEditorHelper) {
+function umbPropEditor(umbPropEditorHelper) {
         return {
             scope: {
                 model: "=",
@@ -30,11 +30,10 @@ var _umbPropertyEditor = function (umbPropEditorHelper) {
                    scope.model.alias = Math.random().toString(36).slice(2);
                 }
 
-                scope.$watch("model.view", function(val){
-                    scope.propertyEditorView = umbPropEditorHelper.getViewPath(scope.model.view, scope.isPreValue);
-                });
+                scope.propertyEditorView = umbPropEditorHelper.getViewPath(scope.model.view, scope.isPreValue);
+                
             }
         };
     };
 
-angular.module("umbraco.directives").directive('umbPropertyEditor', _umbPropertyEditor);
+angular.module("umbraco.directives").directive('umbPropertyEditor', umbPropEditor);
