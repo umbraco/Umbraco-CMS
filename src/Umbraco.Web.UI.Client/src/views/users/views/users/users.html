@@ -188,7 +188,7 @@
 
         <!-- Layout: Cards -->
         <div class="umb-user-cards" ng-if="vm.activeLayout.path === '1' && vm.loading === false">
-            <a href="" class="umb-user-card" ng-repeat="user in vm.users" ng-click="vm.clickUser(user)">
+            <a href="" class="umb-user-card" ng-repeat="user in vm.users track by user.key" ng-click="vm.clickUser(user)">
                 <div class="umb-user-card__content" ng-class="{'umb-user-card__content--selected': user.selected}">
                     <umb-badge class="umb-user-card__badge" size="xs" ng-if="user.userDisplayState.key !== 'Active'" color="{{user.userDisplayState.color}}">
                         {{ user.userDisplayState.name }}
@@ -241,7 +241,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="user in vm.users" ng-click="vm.clickUser(user)" style="cursor: pointer;" ng-mouseenter="user.hover = true" ng-mouseleave="user.hover = false">
+                    <tr ng-repeat="user in vm.users track by user.key" ng-click="vm.clickUser(user)" style="cursor: pointer;" ng-mouseenter="user.hover = true" ng-mouseleave="user.hover = false">
                         <td style="padding-left: 10px;">
                             <div ng-if="!user.isCurrentUser" ng-click="vm.selectUser(user, vm.selection, $event)">
                                 <umb-checkmark
