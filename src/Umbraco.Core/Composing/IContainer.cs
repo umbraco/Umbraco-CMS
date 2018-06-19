@@ -10,6 +10,7 @@ namespace Umbraco.Core.Composing
     {
         T TryGetInstance<T>();
         T GetInstance<T>();
+        object GetInstance(Type parameterType);
         object ConcreteContainer { get; }
         void RegisterSingleton<T>(Func<IContainer, T> factory);
         void Register<T>(Func<IContainer, T> factory);

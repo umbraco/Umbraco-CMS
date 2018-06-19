@@ -42,5 +42,10 @@ namespace Umbraco.Core.Composing.LightInject
         {
             return container.GetInstance<T>();
         }
+
+        public object GetInstance(Type type)
+        {
+            return container.GetInstance(type);
+        }
     }
 }

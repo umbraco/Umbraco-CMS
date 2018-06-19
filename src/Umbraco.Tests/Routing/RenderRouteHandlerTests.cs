@@ -6,6 +6,7 @@ using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
@@ -17,7 +18,10 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
@@ -182,6 +186,10 @@ namespace Umbraco.Tests.Routing
         /// </summary>
         public class CustomDocumentController : RenderMvcController
         {
+            public CustomDocumentController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger) : base(globalSettings, umbracoContext, databaseFactory, services, applicationCache, logger, profilingLogger)
+            {
+            }
+
             public ActionResult HomePage(ContentModel model)
             {
                 return View();
