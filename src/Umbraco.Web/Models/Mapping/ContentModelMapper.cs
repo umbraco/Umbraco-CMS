@@ -211,6 +211,9 @@ namespace Umbraco.Web.Models.Mapping
             }
         }
 
+        /// <summary>
+        /// Gets the tour alias for the current document type
+        /// </summary>
         private class TourResolver : ValueResolver<IContent, string>
         {
             protected override string ResolveCore(IContent source)
@@ -230,7 +233,18 @@ namespace Umbraco.Web.Models.Mapping
                 }
 
                 var tour = tourFiles.SelectMany(x => x.Tours)
-                    .FirstOrDefault(x => x.ContentType == source.ContentType.Alias);
+                    .FirstOrDefault(x =>
+                    {
+                        if (string.IsNullOrEmpty(x.ContentType))
+                        {
+                            return false;
+                        }
+
+                        var contentTypes = x.ContentType.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(ct => ct.Trim());
+
+                        return contentTypes.Contains(source.ContentType.Alias);
+
+                    });
 
                 if (tour == null)
                 {
