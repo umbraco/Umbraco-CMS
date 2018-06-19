@@ -154,13 +154,14 @@ angular.module("umbraco")
                                 });
                         });
 
-                    mediaTypeHelper.getAllowedImagetypes(folder.id)
-                        .then(function(types) {
-                            $scope.acceptedMediatypes = types;
-                        });
                 } else {
                     $scope.path = [];
                 }
+
+                mediaTypeHelper.getAllowedImagetypes(folder.id)
+                    .then(function (types) {
+                        $scope.acceptedMediatypes = types;
+                    });
 
                 $scope.lockedFolder = folder.id === -1 && $scope.model.startNodeIsVirtual;
 
@@ -329,6 +330,11 @@ angular.module("umbraco")
                                         {
                                             alias: "umbracoHeight",
                                             value: mediaItem.metaData.umbracoHeight.Value
+                                        },
+                                        {
+                                            alias: 'umbracoFile',
+                                            editor: mediaItem.metaData.umbracoFile.PropertyEditorAlias,
+                                            value: mediaItem.metaData.umbracoFile.Value
                                         }
                                     ];
                                 }

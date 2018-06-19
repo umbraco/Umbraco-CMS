@@ -78,6 +78,8 @@
 
           resetLastListPageNumber($scope.content);
 
+          eventsService.emit("content.loaded", { content: $scope.content });
+
           $scope.page.loading = false;
 
         });
@@ -139,6 +141,8 @@
 
       $scope.page.buttonGroupState = "busy";
 
+      eventsService.emit("content.saving", { content: $scope.content, action: args.action });
+
       contentEditingHelper.contentEditorPerformSave({
         statusMessage: args.statusMessage,
         saveMethod: args.saveMethod,
@@ -153,6 +157,9 @@
         $scope.page.buttonGroupState = "success";
 
         deferred.resolve(data);
+
+        eventsService.emit("content.saved", { content: $scope.content, action: args.action });
+
       }, function (err) {
         //error
         if (err) {
@@ -192,7 +199,9 @@
 
           $scope.page.loading = false;
 
-        });
+          eventsService.emit("content.newReady", { content: $scope.content });
+
+          });
     }
     else {
 
@@ -210,6 +219,8 @@
 
         $scope.page.buttonGroupState = "busy";
 
+        eventsService.emit("content.unpublishing", { content: $scope.content });
+
         contentResource.unPublish($scope.content.id)
           .then(function (data) {
 
@@ -226,6 +237,8 @@
             syncTreeNode($scope.content, data.path);
 
             $scope.page.buttonGroupState = "success";
+
+            eventsService.emit("content.unpublished", { content: $scope.content });
 
           }, function(err) {
             formHelper.showNotifications(err.data);

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 using Umbraco.Core;
@@ -15,10 +13,7 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
-using umbraco.businesslogic;
 using umbraco.businesslogic.Actions;
-using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Search;
 using Constants = Umbraco.Core.Constants;
@@ -174,16 +169,13 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
 
-            var nodeMenu = GetAllNodeMenuItems(item);
-            var allowedMenuItems = GetAllowedUserMenuItemsForNode(item);
-
-            FilterUserAllowedMenuItems(nodeMenu, allowedMenuItems);
-
-            //if the media item is in the recycle bin, don't have a default menu, just show the regular menu
+            var nodeMenu = GetAllNodeMenuItems(item);            
+            
+            //if the content node is in the recycle bin, don't have a default menu, just show the regular menu
             if (item.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
                 nodeMenu.DefaultMenuAlias = null;
-                nodeMenu.Items.Insert(2, new MenuItem(ActionRestore.Instance, ui.Text("actions", ActionRestore.Instance.Alias)));
+                nodeMenu = GetNodeMenuItemsForDeletedContent(item);
             }
             else
             {
@@ -191,6 +183,8 @@ namespace Umbraco.Web.Trees
                 nodeMenu.DefaultMenuAlias = ActionNew.Instance.Alias;
             }
 
+            var allowedMenuItems = GetAllowedUserMenuItemsForNode(item);
+            FilterUserAllowedMenuItems(nodeMenu, allowedMenuItems);
 
             return nodeMenu;
         }
@@ -242,6 +236,22 @@ namespace Umbraco.Web.Trees
 
             menu.Items.Add<ActionNotify>(ui.Text("actions", ActionNotify.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
             menu.Items.Add<ActionSendToTranslate>(ui.Text("actions", ActionSendToTranslate.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
+
+            menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+
+            return menu;
+        }
+
+        /// <summary>
+        /// Returns a collection of all menu items that can be on a deleted (in recycle bin) content node
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        protected MenuItemCollection GetNodeMenuItemsForDeletedContent(IUmbracoEntity item)
+        {
+            var menu = new MenuItemCollection();
+            menu.Items.Add<ActionRestore>(ui.Text("actions", ActionRestore.Instance.Alias));
+            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
 
             menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
 

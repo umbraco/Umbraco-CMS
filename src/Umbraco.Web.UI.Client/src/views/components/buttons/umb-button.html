@@ -1,15 +1,15 @@
 <div class="umb-button" ng-class="{'umb-button--block': blockElement}" data-element="{{ alias ? 'button-' + alias : '' }}">
 
-   <div class="icon-check umb-button__success" ng-class="{'-hidden': state !== 'success', '-white': style}"></div>
+   <div class="icon-check umb-button__success" ng-class="{'-hidden': innerState !== 'success', '-white': style}"></div>
 
-   <div class="icon-delete umb-button__error" ng-class="{'-hidden': state !== 'error', '-white': style}"></div>
+   <div class="icon-delete umb-button__error" ng-class="{'-hidden': innerState !== 'error', '-white': style}"></div>
 
-   <div class="umb-button__progress" ng-class="{'-hidden': state !== 'busy', '-white': style}"></div>
+   <div class="umb-button__progress" ng-class="{'-hidden': innerState !== 'busy', '-white': style}"></div>
 
-   <div ng-if="state !== 'init'" class="umb-button__overlay"></div>
+   <div ng-if="innerState !== 'init'" class="umb-button__overlay"></div>
 
    <a ng-if="type === 'link'" href="{{href}}" class="btn umb-button__button {{style}} umb-button--{{size}}" ng-click="action(model)" hotkey="{{shortcut}}" hotkey-when-hidden="{{shortcutWhenHidden}}">
-      <span class="umb-button__content" ng-class="{'-hidden': state !== 'init'}">
+      <span class="umb-button__content" ng-class="{'-hidden': innerState !== 'init'}">
          <i ng-if="icon" class="{{icon}} umb-button__icon"></i>
          <localize ng-if="labelKey" key="{{labelKey}}">{{label}}</localize>
          <span ng-if="!labelKey">{{label}}</span>
@@ -17,7 +17,7 @@
    </a>
 
    <button ng-if="type === 'button'" type="button" class="btn umb-button__button {{style}} umb-button--{{size}}" ng-click="action(model)" hotkey="{{shortcut}}" hotkey-when-hidden="{{shortcutWhenHidden}}" ng-disabled="disabled">
-      <span class="umb-button__content" ng-class="{'-hidden': state !== 'init'}">
+      <span class="umb-button__content" ng-class="{'-hidden': innerState !== 'init'}">
          <i ng-if="icon" class="{{icon}} umb-button__icon"></i>
          <localize ng-if="labelKey" key="{{labelKey}}">{{label}}</localize>
          <span ng-if="!labelKey">{{label}}</span>
@@ -25,7 +25,7 @@
    </button>
 
    <button ng-if="type === 'submit'" type="submit" class="btn umb-button__button {{style}} umb-button--{{size}}" hotkey="{{shortcut}}" hotkey-when-hidden="{{shortcutWhenHidden}}" ng-disabled="disabled">
-      <span class="umb-button__content" ng-class="{'-hidden': state !== 'init'}">
+      <span class="umb-button__content" ng-class="{'-hidden': innerState !== 'init'}">
          <i ng-if="icon" class="{{icon}} umb-button__icon"></i>
          <localize ng-if="labelKey" key="{{labelKey}}">{{label}}</localize>
          <span ng-if="!labelKey">{{label}}</span>
