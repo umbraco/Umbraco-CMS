@@ -330,6 +330,11 @@ angular.module("umbraco")
                                         {
                                             alias: "umbracoHeight",
                                             value: mediaItem.metaData.umbracoHeight.Value
+                                        },
+                                        {
+                                            alias: 'umbracoFile',
+                                            editor: mediaItem.metaData.umbracoFile.PropertyEditorAlias,
+                                            value: mediaItem.metaData.umbracoFile.Value
                                         }
                                     ];
                                 }
