@@ -11,19 +11,18 @@
            <umb-editor-sub-header-content-left>
 
                <umb-editor-sub-header-section ng-if="(listViewAllowedTypes && listViewAllowedTypes.length > 0 && !isAnythingSelected()) && currentNodePermissions.canCreate">
-                   <div class="btn-group btn-success" ng-show="listViewAllowedTypes.length > 1">
-                       <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                   <div class="btn-group" ng-show="listViewAllowedTypes.length > 1">
+                       <a class="btn btn-success dropdown-toggle" ng-click="page.createDropdownOpen = !page.createDropdownOpen" ng-href="">
                            <localize key="actions_create">Create</localize>
                            <span class="caret"></span>
                        </a>
-                       <ul class="dropdown-menu">
-                           <li ng-repeat="contentType in listViewAllowedTypes | orderBy:'name':false">
-                               <a ng-href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
-                                   <i class="icon-{{contentType.cssClass}}"></i>
-                                   {{contentType.name}}
-                               </a>
-                           </li>
-                       </ul>
+                       <umb-dropdown class="umb-actions" ng-if="page.createDropdownOpen" on-close="page.createDropdownOpen = false">
+                            <umb-dropdown-item ng-repeat="contentType in listViewAllowedTypes track by contentType.key | orderBy:'name':false">
+                                <a ng-href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
+                                    {{::contentType.name}}
+                                </a>
+                            </umb-dropdown-item>
+                        </umb-dropdown>
                    </div>
                    <div class="btn-group" ng-show="listViewAllowedTypes.length === 1">
                        <a class="btn btn-success" ng-href="#/{{entityType}}/{{entityType}}/edit/{{contentId}}?doctype={{listViewAllowedTypes[0].alias}}&create=true">

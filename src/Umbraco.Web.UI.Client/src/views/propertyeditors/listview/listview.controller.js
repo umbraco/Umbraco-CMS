@@ -53,6 +53,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
    $scope.actionInProgress = false;
    $scope.selection = [];
    $scope.folders = [];   
+   $scope.page = {};
    $scope.listViewResultSet = {
       totalPages: 0,
       items: []
