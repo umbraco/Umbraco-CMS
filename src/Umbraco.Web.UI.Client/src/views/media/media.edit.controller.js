@@ -237,10 +237,6 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
         
     };
 
-    $scope.backToListView = function() {
-        $location.path($scope.page.listViewPath);
-    };
-
     $scope.close = function() {
         if($scope.model.close) {
             $scope.model.close($scope.model);

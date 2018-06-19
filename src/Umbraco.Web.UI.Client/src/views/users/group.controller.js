@@ -9,6 +9,7 @@
         vm.page.rootIcon = "icon-folder";
         vm.userGroup = {};
         vm.labels = {};
+        vm.showBackButton = true;
 
         vm.goToPage = goToPage;
         vm.openSectionPicker = openSectionPicker;

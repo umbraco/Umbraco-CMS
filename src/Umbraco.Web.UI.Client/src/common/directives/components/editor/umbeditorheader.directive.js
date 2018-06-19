@@ -324,7 +324,7 @@ Use this directive to construct a header inside the main editor window.
                 navigation: "=",
                 key: "=",
                 onBack: "&?",
-                showBackButton: "@?",
+                showBackButton: "<?",
                 splitViewOpen: "=?",
                 onOpenInSplitView: "&?",
                 onCloseSplitView: "&?"

@@ -23,7 +23,7 @@
                             navigation="editor.content.apps"
                             variants="editor.content.variants"
                             on-back="backToListView()"
-                            show-back-button="{{page.listViewPath}}"
+                            show-back-button="page.listViewPath !== null"
                             split-view-open="editors.length > 1"
                             on-open-in-split-view="openInSplitView(variant)"
                             on-close-split-view="closeSplitView($index, editor)">

@@ -6,6 +6,7 @@
         var vm = this;
 
         vm.page = {};
+        vm.showBackButton = true;
         vm.language = {};
         vm.availableCultures = null;
         vm.breadcrumbs = [];
