@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Web.Mvc;
-using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -36,37 +35,31 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the Umbraco context.
         /// </summary>
-        [Inject]
         public virtual UmbracoContext UmbracoContext { get; set; }
 
         /// <summary>
         /// Gets or sets the database context.
         /// </summary>
-        [Inject]
         public IUmbracoDatabaseFactory DatabaseFactory { get; set; }
 
         /// <summary>
         /// Gets or sets the services context.
         /// </summary>
-        [Inject]
         public ServiceContext Services { get; set; }
 
         /// <summary>
         /// Gets or sets the application cache.
         /// </summary>
-        [Inject]
         public CacheHelper ApplicationCache { get; set;  }
 
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        [Inject]
         public ILogger Logger { get; set; }
 
         /// <summary>
         /// Gets or sets the profiling logger.
         /// </summary>
-        [Inject]
         public ProfilingLogger ProfilingLogger { get; set; }
 
         /// <summary>
@@ -94,6 +87,28 @@ namespace Umbraco.Web.Mvc
         /// Gets metadata for this instance.
         /// </summary>
         internal PluginControllerMetadata Metadata => GetMetadata(GetType());
+
+        protected PluginController()
+            : this(
+                  Current.Container.GetInstance<UmbracoContext>(),
+                  Current.Container.GetInstance<IUmbracoDatabaseFactory>(),
+                  Current.Container.GetInstance<ServiceContext>(),
+                  Current.Container.GetInstance<CacheHelper>(),
+                  Current.Container.GetInstance<ILogger>(),
+                  Current.Container.GetInstance<ProfilingLogger>()
+            )
+        {
+        }
+
+        protected PluginController(UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger)
+        {
+            UmbracoContext = umbracoContext;
+            DatabaseFactory = databaseFactory;
+            Services = services;
+            ApplicationCache = applicationCache;
+            Logger = logger;
+            ProfilingLogger = profilingLogger;
+        }
 
         /// <summary>
         /// Gets metadata for a controller type.

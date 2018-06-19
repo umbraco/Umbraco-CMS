@@ -23,6 +23,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
@@ -55,7 +56,13 @@ namespace Umbraco.Web.Editors
         private const string TokenPasswordResetCode = "PasswordResetCode";
         private static readonly string[] TempDataTokenNames = { TokenExternalSignInError, TokenPasswordResetCode };
 
-        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features)
+        //public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features)
+        //{
+        //    _manifestParser = manifestParser;
+        //    _features = features;
+        //}
+
+        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger) : base(globalSettings, umbracoContext, databaseFactory, services, applicationCache, logger, profilingLogger)
         {
             _manifestParser = manifestParser;
             _features = features;

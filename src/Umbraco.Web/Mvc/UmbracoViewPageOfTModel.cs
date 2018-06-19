@@ -3,7 +3,6 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.WebPages;
-using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -34,13 +33,11 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the database context.
         /// </summary>
-        [Inject]
         public ServiceContext Services { get; set; }
 
         /// <summary>
         /// Gets or sets the application cache.
         /// </summary>
-        [Inject]
         public CacheHelper ApplicationCache { get; set; }
 
         // fixme
@@ -108,6 +105,20 @@ namespace Umbraco.Web.Mvc
         /// Gets the membership helper.
         /// </summary>
         public MembershipHelper Members => Umbraco.MembershipHelper;
+
+        protected UmbracoViewPage()
+            : this(
+                Current.Container.GetInstance<ServiceContext>(),
+                Current.Container.GetInstance<CacheHelper>()
+            )
+        {
+        }
+
+        protected UmbracoViewPage(ServiceContext services, CacheHelper applicationCache)
+        {
+            Services = services;
+            ApplicationCache = applicationCache;
+        }
 
         // view logic below:
 
