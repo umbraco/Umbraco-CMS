@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbTree
 * @restrict E
 **/
-function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificationsService, $timeout, userService) {
+function umbTreeDirective($q, $rootScope, treeService, notificationsService, userService) {
 
     return {
         restrict: 'E',
@@ -64,6 +64,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             vm.load = load;
             vm.reloadNode = reloadNode;
             vm.syncTree = syncTree;
+            vm.loadChildren = loadChildren;
 
             //wire up the exposed api object for hosting controllers
             if ($scope.api) {
@@ -81,9 +82,6 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             // since it saves on data retreival and DOM processing.
             var lastSection = "";
             
-            //flag to enable/disable delete animations
-            var deleteAnimations = false;
-
             /** Helper function to emit tree events */
             function emitEvent(eventName, args) {
                 if (registeredCallbacks[eventName] && angular.isArray(registeredCallbacks[eventName])) {
@@ -91,15 +89,6 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         c(args);//call it
                     });
                 }
-            }
-
-            /** This will deleteAnimations to true after the current digest */
-            function enableDeleteAnimations() {
-                //do timeout so that it re-enables them after this digest
-                $timeout(function () {
-                    //enable delete animations
-                    deleteAnimations = true;
-                }, 0, false);
             }
 
             function clearCache(section) {
@@ -189,9 +178,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                             args.path = args.path.splice(_.indexOf(args.path, found));
                         }
                     });
-
-                    deleteAnimations = false;
-
+                    
                     var treeNode = loadActiveTree(args.tree);
 
                     return treeService.syncTree({
@@ -205,9 +192,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         }
 
                         emitEvent("treeSynced", { node: data, activate: args.activate });
-
-                        enableDeleteAnimations();
-
+                        
                         return $q.when({ node: data, activate: args.activate });
                     });
                 });
@@ -251,10 +236,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             function loadTree() {
                 if (!$scope.loading && $scope.section) {
                     $scope.loading = true;
-
-                    //anytime we want to load the tree we need to disable the delete animations
-                    deleteAnimations = false;
-
+                    
                     //default args
                     var args = { section: $scope.section, tree: $scope.treealias, cacheKey: $scope.cachekey, isDialog: $scope.isdialog ? $scope.isdialog : false, onlyinitialized: $scope.onlyInitialized };
 
@@ -268,8 +250,6 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
                             //set the data once we have it
                             $scope.tree = data;
-
-                            enableDeleteAnimations();
 
                             $scope.loading = false;
 
@@ -287,6 +267,33 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 }
                 else {
                     return $q.reject();
+                }
+            }
+
+            function loadChildren(node, forceReload) {
+                //emit treeNodeExpanding event, if a callback object is set on the tree
+                emitEvent("treeNodeExpanding", { tree: $scope.tree, node: node });
+
+                //standardising
+                if (!node.children) {
+                    node.children = [];
+                }
+
+                if (forceReload || (node.hasChildren && node.children.length === 0)) {
+                    //get the children from the tree service
+                    return treeService.loadNodeChildren({ node: node, section: $scope.section })
+                        .then(function(data) {
+                            //emit expanded event
+                            emitEvent("treeNodeExpanded", { tree: $scope.tree, node: node, children: data });
+
+                            return $q.when(data);
+                        });
+                }
+                else {
+                    emitEvent("treeNodeExpanded", { tree: $scope.tree, node: node, children: node.children });
+                    node.expanded = true;
+
+                    return $q.when(node.children);
                 }
             }
 
@@ -317,50 +324,9 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     '';
             };
 
-            /** method to set the current animation for the node.
-             *  This changes dynamically based on if we are changing sections or just loading normal tree data.
-             *  When changing sections we don't want all of the tree-ndoes to do their 'leave' animations.
-             */
-            $scope.animation = function () {
-                if (deleteAnimations && $scope.tree && $scope.tree.root && $scope.tree.root.expanded) {
-                    return { leave: 'tree-node-delete-leave' };
-                }
-                else {
-                    return {};
-                }
-            };
-
             /* helper to force reloading children of a tree node */
-            $scope.loadChildren = function (node, forceReload) {
-
-                //emit treeNodeExpanding event, if a callback object is set on the tree
-                emitEvent("treeNodeExpanding", { tree: $scope.tree, node: node });
-
-                //standardising
-                if (!node.children) {
-                    node.children = [];
-                }
-
-                if (forceReload || (node.hasChildren && node.children.length === 0)) {
-                    //get the children from the tree service
-                    return treeService.loadNodeChildren({ node: node, section: $scope.section })
-                        .then(function (data) {
-                            //emit expanded event
-                            emitEvent("treeNodeExpanded", { tree: $scope.tree, node: node, children: data });
-
-                            enableDeleteAnimations();
-
-                            return $q.when(data);
-                        });
-                }
-                else {
-                    emitEvent("treeNodeExpanded", { tree: $scope.tree, node: node, children: node.children });
-                    node.expanded = true;
-
-                    enableDeleteAnimations();
-
-                    return $q.when(node.children);
-                }
+            $scope.loadChildren = function(node, forceReload) {
+                return loadChildren(node, forceReload);
             };
 
             /**
