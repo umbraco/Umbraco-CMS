@@ -156,16 +156,6 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                                     startNodes.push(userData.startMediaIds[j]);
                                 }
 
-                                _.each(startNodes, function (i) {
-                                    var found = _.find(args.path, function (p) {
-                                        return String(p) === String(i);
-                                    });
-                                    if (found) {
-                                        args.path = args.path.splice(_.indexOf(args.path, found));
-                                    }
-                                });
-
-
                                 loadPath(args.path, args.forceReload, args.activate);
 
                             });
