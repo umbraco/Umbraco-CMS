@@ -13,8 +13,6 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi;
 
-using LightInject;
-
 namespace Umbraco.Web.Editors
 {
     /// <summary>
