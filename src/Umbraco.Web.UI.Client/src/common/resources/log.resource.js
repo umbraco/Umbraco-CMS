@@ -71,7 +71,7 @@ function logResource($q, $http, umbRequestHelper) {
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "logApiBaseUrl",
-                        "GetPagedEntityLog",
+                        "GetPagedCurrentUserLog",
                         options)),
                 'Failed to retrieve log data for id');
         },
