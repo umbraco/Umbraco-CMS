@@ -1,9 +1,9 @@
 ﻿using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenElevenZero
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZero
 {
-    [Migration("7.11.0", 1, Constants.System.UmbracoMigrationName)]
+    [Migration("7.12.0", 1, Constants.System.UmbracoMigrationName)]
     public class UpdateUmbracoConsent : MigrationBase
     {
         public UpdateUmbracoConsent(ISqlSyntaxProvider sqlSyntax, ILogger logger)
