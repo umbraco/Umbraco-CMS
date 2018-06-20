@@ -1097,6 +1097,7 @@
     <Compile Include="Migrations\Upgrade\V_7_7_0\EnsureContentTemplatePermissions.cs" />
     <Compile Include="Migrations\Upgrade\V_7_7_0\ReduceDictionaryKeyColumnsSize.cs" />
     <Compile Include="Migrations\Upgrade\V_7_7_0\UpdateUserTables.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_0_0\ContentVariationMigration.cs" />
     <Compile Include="Persistence\NPocoDatabaseExtensions-Bulk.cs" />
     <Compile Include="Persistence\NPocoDatabaseExtensions.cs" />
     <Compile Include="Persistence\NPocoDatabaseTypeExtensions.cs" />
