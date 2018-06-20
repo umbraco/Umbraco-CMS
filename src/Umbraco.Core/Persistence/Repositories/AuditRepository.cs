@@ -47,6 +47,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
 
             if (query == null) query = new Query<IAuditItem>();
+            
+            var hasQuery = query.GetWhereClauses().ToArray().Length > 0;
+
             var translatorIds = new SqlTranslator<IAuditItem>(sql, query);
             var translatedQuery = translatorIds.Translate();
 
@@ -75,9 +78,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 var first = true;
                 foreach (var filterClaus in auditTypeFilter)
                 {
-                    if (first == false || hasCustomFilter)
+                    if (first == false || hasCustomFilter || hasQuery)
                     {
-                        filterSql.Append(" AND ");
+                        filterSql.Append("AND ");
                     }
                     filterSql.Append("(logHeader = @logHeader)", new {logHeader = filterClaus.ToString() });
                     first = false;
@@ -175,8 +178,13 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // Apply filter
             if (filterSql != null)
-            {
-                var sqlFilter = " WHERE " + filterSql.SQL.TrimStart("AND ");
+            {                
+                var sqlFilter = filterSql.SQL;
+
+                if (sql.SQL.Contains("WHERE") == false)
+                {
+                    sqlFilter = "WHERE " + sqlFilter.TrimStart("AND");
+                }
 
                 //NOTE: this is certainly strange - NPoco handles this much better but we need to re-create the sql
                 // instance a couple of times to get the parameter order correct, for some reason the first
