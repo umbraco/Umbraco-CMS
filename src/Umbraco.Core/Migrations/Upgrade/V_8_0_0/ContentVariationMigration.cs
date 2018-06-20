@@ -45,7 +45,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 }
             }
 
-            var propertyTypes = Database.Fetch<PropertyTypeDto>(Sql().Select<PropertyTypeDto>().From<PropertyDataDto>());
+            var propertyTypes = Database.Fetch<PropertyTypeDto>(Sql().Select<PropertyTypeDto>().From<PropertyTypeDto>());
             foreach (var dto in propertyTypes)
             {
                 dto.Variations = GetNewValue(dto.Variations);
