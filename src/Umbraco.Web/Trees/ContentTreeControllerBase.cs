@@ -203,9 +203,7 @@ namespace Umbraco.Web.Trees
                 entityId = entity.Id;
             }
 
-            var v2 = Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
-           
-            return v2;
+            return Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
         }
 
         /// <summary>
