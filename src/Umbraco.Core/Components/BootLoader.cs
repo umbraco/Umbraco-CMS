@@ -73,8 +73,11 @@ namespace Umbraco.Core.Components
             var componentTypeList = componentTypes
                 .Where(x =>
                 {
+                    // use the min level specified by the attribute if any
+                    // otherwise, user components have Run min level, anything else is Unknown (always run)
                     var attr = x.GetCustomAttribute<RuntimeLevelAttribute>();
-                    return attr == null || level >= attr.MinLevel;
+                    var minLevel = attr?.MinLevel ?? (x.Implements<IUmbracoUserComponent>() ? RuntimeLevel.Run : RuntimeLevel.Unknown);
+                    return level >= minLevel;
                 })
                 .ToList();
 
