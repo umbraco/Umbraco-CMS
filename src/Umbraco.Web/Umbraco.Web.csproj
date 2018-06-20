@@ -529,8 +529,6 @@
     <Compile Include="Security\Identity\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="SingletonHttpContextAccessor.cs" />
     <Compile Include="Trees\DictionaryTreeBaseController.cs" />
-    <Compile Include="Trees\SettingsDictionaryTreeController.cs" />
-    <Compile Include="Trees\TranslationDictionaryTreeController.cs" />
     <Compile Include="Trees\MacroTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
     <Compile Include="Suspendable.cs" />

@@ -36,7 +36,22 @@ namespace Umbraco.Web.Trees
 
                 if (treeAttributes.Length == 0)
                 {
-                    throw new InvalidOperationException("The Tree controller is missing the " + typeof(TreeAttribute).FullName + " attribute");
+                    var allTreesfromConfig = ApplicationContext.Current.Services.ApplicationTreeService.GetAll();
+                    var foundTree = allTreesfromConfig.FirstOrDefault(x => x.Type.Split(',').First() == type.FullName);
+
+                    // Couldn't find the tree in the config file either, nothing we can do now!
+                    if (foundTree == null)
+                        throw new InvalidOperationException("The Tree controller is missing the " + typeof(TreeAttribute).FullName + " attribute");
+
+                    var attribute = new TreeAttribute(foundTree.ApplicationAlias, foundTree.Alias)
+                    {
+                        IconClosed = foundTree.IconClosed,
+                        IconOpen = foundTree.IconOpened,
+                        Title = foundTree.Title,
+                        Initialize = foundTree.Initialize,
+                        SortOrder = foundTree.SortOrder
+                    };
+                    return attribute;
                 }
 
                 //assign the properties of this object to those of the metadata attribute

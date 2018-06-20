@@ -49,10 +49,10 @@ namespace Umbraco.Web.Trees
 
         public string ApplicationAlias { get; private set; }
         public string Alias { get; private set; }
-        public string Title { get; private set; }
-        public string IconClosed { get; private set; }
-        public string IconOpen { get; private set; }
-        public bool Initialize { get; private set; }
-        public int SortOrder { get; private set; }
+        public string Title { get; internal set; }
+        public string IconClosed { get; internal set; }
+        public string IconOpen { get; internal set; }
+        public bool Initialize { get; internal set; }
+        public int SortOrder { get; internal set; }
     }
 }
