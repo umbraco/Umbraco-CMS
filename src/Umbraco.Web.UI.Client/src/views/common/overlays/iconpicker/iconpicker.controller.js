@@ -15,6 +15,14 @@ function IconPickerOverlay($scope, iconHelper, localizationService) {
         $scope.model.title = localizationService.localize("defaultdialogs_selectIcon");
     }
 
+    if ($scope.model.color) {
+        $scope.color = $scope.model.color;
+    }
+
+    if ($scope.model.icon) {
+        $scope.searchTerm = $scope.model.icon;
+    }
+
    iconHelper.getIcons().then(function(icons) {
       $scope.icons = icons;
       $scope.loading = false;
