@@ -1,57 +1,33 @@
-(function() {
-  'use strict';
+(function () {
+    'use strict';
 
-  function UmbTabsNavDirective($timeout) {
-
-    function link(scope, el, attr) {
-
-      function activate() {
-
-        $timeout(function () {
-
-          //use bootstrap tabs API to show the first one
-          el.find("a:first").tab('show');
-
-          //enable the tab drop
-          el.tabdrop();
-
+    angular
+        .module('umbraco.directives')
+        .component('umbTabsNav', {
+            transclude: true,
+            templateUrl: "views/components/tabs/umb-tabs-nav.html",
+            controller: UmbTabsNavController,
+            controllerAs: 'vm',
+            bindings: {
+                tabs: "<",
+                onTabChange: "&"
+            }
         });
 
-      }
+    function UmbTabsNavController(eventsService) {
 
-      var unbindModelWatch = scope.$watch('model', function(newValue, oldValue){
+        var vm = this;
 
-        activate();
+        vm.clickTab = clickTab;
 
-      });
-
-
-      scope.$on('$destroy', function () {
-
-          //ensure to destroy tabdrop (unbinds window resize listeners)
-          el.tabdrop("destroy");
-
-          unbindModelWatch();
-
-      });
+        function clickTab($event, tab) {
+            if (vm.onTabChange) {
+                var args = { "tab": tab, "tabs": vm.tabs };
+                eventsService.emit("app.tabChange", args);
+                vm.onTabChange({ "event": $event, "tab": tab });
+            }
+        }
 
     }
-
-    var directive = {
-      restrict: "E",
-      replace: true,
-      templateUrl: "views/components/tabs/umb-tabs-nav.html",
-      scope: {
-        model: "=",
-        tabdrop: "=",
-        idSuffix: "@"
-      },
-      link: link
-    };
-
-    return directive;
-  }
-
-  angular.module('umbraco.directives').directive('umbTabsNav', UmbTabsNavDirective);
 
 })();

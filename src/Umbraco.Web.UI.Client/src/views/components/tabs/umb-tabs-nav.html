@@ -1,5 +1,5 @@
-<ul class="nav nav-tabs umb-nav-tabs">
-  <li data-element="tab-{{tab.alias}}" ng-class="{'tab-error': tabHasError}" ng-repeat="tab in model" val-tab>
-    <a data-toggle="tab" href="#tab{{tab.id}}{{idSuffix}}">{{ tab.label }}</a>
-  </li>
+<ul class="umb-tabs-nav">
+    <li class="umb-tab" data-element="tab-{{tab.alias}}" ng-class="{'umb-tab--active': tab.active, 'tab-error': tabHasError}" ng-repeat="tab in vm.tabs" val-tab>
+        <a ng-href="" ng-click="vm.clickTab($event, tab)">{{ tab.label }}</a>
+    </li>
 </ul>

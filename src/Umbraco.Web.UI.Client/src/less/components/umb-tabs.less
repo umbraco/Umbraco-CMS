@@ -1,3 +1,31 @@
-.umb-nav-tabs {
-  position: relative;
+.umb-tabs-nav {
+    position: relative;
+    margin-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+}
+
+.umb-tab {
+    display: inline-flex;
+    margin-right: 15px;
+}
+
+.umb-tab > a {
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: @gray-3;
+    padding-bottom: 15px;
+}
+
+.umb-tab > a:hover {
+    color: @black;
+}
+
+.umb-tab--active > a,
+.umb-tab--active > a:hover,
+.umb-tab--active > a:focus {
+  color: @black;
+  border-bottom-color: @turquoise;
+  cursor: default;
+  text-decoration: none !important;
 }
