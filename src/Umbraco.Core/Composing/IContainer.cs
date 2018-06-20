@@ -15,5 +15,6 @@ namespace Umbraco.Core.Composing
         void RegisterSingleton<T>(Func<IContainer, T> factory);
         void Register<T>(Func<IContainer, T> factory);
         T RegisterCollectionBuilder<T>();
+        T GetInstance<T>(params object[] args);
     }
 }

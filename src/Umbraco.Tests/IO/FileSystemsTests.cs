@@ -33,6 +33,9 @@ namespace Umbraco.Tests.IO
             _container.Register(_ => Mock.Of<IDataTypeService>());
             _container.Register(_ => Mock.Of<IContentSection>());
 
+            _container.Register<MediaFileSystem>();
+            _container.Register<NonConfiguredTypeFileSystem>();
+        
             // make sure we start clean
             // because some tests will create corrupt or weird filesystems
             FileSystems.Reset();
