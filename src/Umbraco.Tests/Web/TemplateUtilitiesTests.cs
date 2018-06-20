@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Web
 
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
 
-            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.InvariantNeutral);
+            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Nothing);
             var publishedContent = Mock.Of<IPublishedContent>();
             Mock.Get(publishedContent).Setup(x => x.Id).Returns(1234);
             Mock.Get(publishedContent).Setup(x => x.ContentType).Returns(contentType);

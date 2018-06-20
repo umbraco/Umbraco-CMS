@@ -59,7 +59,7 @@ namespace Umbraco.Tests.UmbracoExamine
                             m.CreateDate == (DateTime)x.Attribute("createDate") &&
                             m.UpdateDate == (DateTime)x.Attribute("updateDate") &&
                             m.Name == (string)x.Attribute("nodeName") &&
-                            m.GetName(It.IsAny<string>()) == (string)x.Attribute("nodeName") &&
+                            m.GetCultureName(It.IsAny<string>()) == (string)x.Attribute("nodeName") &&
                             m.Path == (string)x.Attribute("path") &&
                             m.Properties == new PropertyCollection() &&
                             m.ContentType == Mock.Of<IContentType>(mt =>
@@ -103,7 +103,7 @@ namespace Umbraco.Tests.UmbracoExamine
                             m.CreateDate == (DateTime) x.Attribute("createDate") &&
                             m.UpdateDate == (DateTime) x.Attribute("updateDate") &&
                             m.Name == (string) x.Attribute("nodeName") &&
-                            m.GetName(It.IsAny<string>()) == (string)x.Attribute("nodeName") &&
+                            m.GetCultureName(It.IsAny<string>()) == (string)x.Attribute("nodeName") &&
                             m.Path == (string) x.Attribute("path") &&
                             m.Properties == new PropertyCollection() &&
                             m.ContentType == Mock.Of<IMediaType>(mt =>

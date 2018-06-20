@@ -1188,13 +1188,13 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             var names = content is IContent document
                     ? (published
-                        ? document.PublishCultureNames
+                        ? document.PublishNames
                         : document.CultureNames)
                     : content.CultureNames;
 
             foreach (var (culture, name) in names)
             {
-                cultureData[culture] = new CultureVariation { Name = name, Date = content.GetCultureDate(culture) };
+                cultureData[culture] = new CultureVariation { Name = name, Date = content.GetCultureDate(culture) ?? DateTime.MinValue };
             }
 
             //the dictionary that will be serialized

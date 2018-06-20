@@ -46,7 +46,7 @@ namespace Umbraco.Core.Models
             _propertyTypes = new PropertyTypeCollection(IsPublishing);
             _propertyTypes.CollectionChanged += PropertyTypesChanged;
 
-            _variations = ContentVariation.InvariantNeutral;
+            _variations = ContentVariation.Nothing;
         }
 
         protected ContentTypeBase(IContentTypeBase parent)
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Models
             _propertyTypes = new PropertyTypeCollection(IsPublishing);
             _propertyTypes.CollectionChanged += PropertyTypesChanged;
 
-            _variations = ContentVariation.InvariantNeutral;
+            _variations = ContentVariation.Nothing;
         }
 
         /// <summary>
@@ -201,33 +201,22 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _variations, Ps.Value.VaryBy);
         }
 
-        /// <summary>
-        /// Validates that a variation is valid for the content type.
-        /// </summary>
-        public bool ValidateVariation(string culture, string segment, bool throwIfInvalid)
+        /// <inheritdoc />
+        public bool SupportsVariation(string culture, string segment, bool wildcards = false)
         {
-            ContentVariation variation;
-            if (culture != null)
-            {
-                variation = segment != null
-                    ? ContentVariation.CultureSegment
-                    : ContentVariation.CultureNeutral;
-            }
-            else if (segment != null)
-            {
-                variation = ContentVariation.InvariantSegment;
-            }
-            else
-            {
-                variation = ContentVariation.InvariantNeutral;
-            }
-            if (!Variations.Has(variation))
-            {
-                if (throwIfInvalid)
-                    throw new NotSupportedException($"Variation {variation} is invalid for content type \"{Alias}\".");
-                return false;
-            }
-            return true;
+            // exact validation: cannot accept a 'null' culture if the property type varies
+            //  by culture, and likewise for segment
+            // wildcard validation: can accept a '*' culture or segment
+            return Variations.ValidateVariation(culture, segment, true, wildcards, false);
+        }
+
+        /// <inheritdoc />
+        public bool SupportsPropertyVariation(string culture, string segment, bool wildcards = false)
+        {
+            // non-exact validation: can accept a 'null' culture if the property type varies
+            //  by culture, and likewise for segment
+            // wildcard validation: can accept a '*' culture or segment
+            return Variations.ValidateVariation(culture, segment, false, true, false);
         }
 
         /// <summary>

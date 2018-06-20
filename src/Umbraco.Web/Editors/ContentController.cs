@@ -74,7 +74,7 @@ namespace Umbraco.Web.Editors
         public bool AllowsCultureVariation()
         {
             var contentTypes = Services.ContentTypeService.GetAll();
-            return contentTypes.Any(contentType => contentType.Variations.DoesSupportCulture());
+            return contentTypes.Any(contentType => contentType.VariesByCulture());
         }
 
         /// <summary>
@@ -310,7 +310,7 @@ namespace Umbraco.Web.Editors
             var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
             mapped.Tabs = mapped.Tabs.Except(new[] { containerTab });
 
-            if (contentType.Variations.Has(ContentVariation.CultureNeutral))
+            if (contentType.VariesByCulture())
             {
                 //Remove all variants except for the default since currently the default must be saved before other variants can be edited
                 //TODO: Allow for editing all variants at once ... this will be a future task
@@ -709,7 +709,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         private void PublishInternal(ContentItemSave contentItem, ref PublishResult publishStatus, ref bool wasCancelled)
         {
-            if (!contentItem.PersistedContent.ContentType.Variations.Has(ContentVariation.CultureNeutral))
+            if (!contentItem.PersistedContent.ContentType.VariesByCulture())
             {
                 //its invariant, proceed normally
                 contentItem.PersistedContent.TryPublishValues();
@@ -1037,13 +1037,13 @@ namespace Umbraco.Web.Editors
         private void MapPropertyValues(ContentItemSave contentItem)
         {
             //Don't update the name if it is empty
-            if (contentItem.Name.IsNullOrWhiteSpace() == false)
+            if (!contentItem.Name.IsNullOrWhiteSpace())
             {
-                //set the name according to the culture settings
-                if (contentItem.PersistedContent.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
+                if (contentItem.PersistedContent.ContentType.VariesByCulture())
                 {
-                    if (contentItem.Culture.IsNullOrWhiteSpace()) throw new InvalidOperationException($"Cannot save a content item that is {ContentVariation.CultureNeutral} with a culture specified");
-                    contentItem.PersistedContent.SetName(contentItem.Name, contentItem.Culture);
+                    if (contentItem.Culture.IsNullOrWhiteSpace())
+                        throw new InvalidOperationException($"Cannot set culture name without a culture.");
+                    contentItem.PersistedContent.SetCultureName(contentItem.Name, contentItem.Culture);
                 }
                 else
                 {
@@ -1074,7 +1074,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            bool Varies(Property property) => property.PropertyType.Variations.Has(ContentVariation.CultureNeutral);
+            bool Varies(Property property) => property.PropertyType.VariesByCulture();
 
             MapPropertyValues<IContent, ContentItemSave>(
                 contentItem,
@@ -1276,7 +1276,7 @@ namespace Umbraco.Web.Editors
         {
             //A culture must exist in the mapping context if this content type is CultureNeutral since for a culture variant to be edited,
             // the Cuture property of ContentItemDisplay must exist (at least currently).
-            if (culture == null && content.ContentType.Variations.Has(ContentVariation.CultureNeutral))
+            if (culture == null && content.ContentType.VariesByCulture())
             {
                 //If a culture is not explicitly sent up, then it means that the user is editing the default variant language.
                 culture = Services.LocalizationService.GetDefaultLanguageIsoCode();

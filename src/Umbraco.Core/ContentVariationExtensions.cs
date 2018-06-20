@@ -1,82 +1,110 @@
-﻿using Umbraco.Core.Models;
+﻿using System;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core
 {
     /// <summary>
-    /// Provides extension methods for various enumerations.
+    /// Provides extension methods for content variations.
     /// </summary>
     public static class ContentVariationExtensions
     {
-        /// <summary>
-        /// Determines whether a variation has all flags set.
-        /// </summary>
-        public static bool Has(this ContentVariation variation, ContentVariation values)
-            => (variation & values) == values;
+        // fixme document
+        public static bool VariesByNothing(this IContentTypeBase contentType) => contentType.Variations.VariesByNothing();
+        public static bool VariesByCulture(this IContentTypeBase contentType) => contentType.Variations.VariesByCulture();
+        public static bool VariesBySegment(this IContentTypeBase contentType) => contentType.Variations.VariesBySegment();
+        public static bool VariesByCultureAndSegment(this IContentTypeBase contentType) => contentType.Variations.VariesByCultureAndSegment();
+
+        public static bool VariesByNothing(this PropertyType propertyType) => propertyType.Variations.VariesByNothing();
+        public static bool VariesByCulture(this PropertyType propertyType) => propertyType.Variations.VariesByCulture();
+        public static bool VariesBySegment(this PropertyType propertyType) => propertyType.Variations.VariesBySegment();
+        public static bool VariesByCultureAndSegment(this PropertyType propertyType) => propertyType.Variations.VariesByCultureAndSegment();
+
+        public static bool VariesByNothing(this PublishedContentType contentType) => contentType.Variations.VariesByNothing();
+        public static bool VariesByCulture(this PublishedContentType contentType) => contentType.Variations.VariesByCulture();
+        public static bool VariesBySegment(this PublishedContentType contentType) => contentType.Variations.VariesBySegment();
+        public static bool VariesByCultureAndSegment(this PublishedContentType contentType) => contentType.Variations.VariesByCultureAndSegment();
 
         /// <summary>
-        /// Determines whether a variation has at least a flag set.
+        /// Determines whether a variation varies by nothing.
         /// </summary>
-        public static bool HasAny(this ContentVariation variation, ContentVariation values)
-            => (variation & values) != ContentVariation.Unknown;
+        public static bool VariesByNothing(this ContentVariation variation) => variation == ContentVariation.Nothing;
 
         /// <summary>
-        /// Determines whether a variation does not support culture variations
+        /// Determines whether a variation varies by culture.
         /// </summary>
-        /// <param name="variation"></param>
-        /// <returns></returns>
-        public static bool DoesNotSupportCulture(this ContentVariation variation)
+        public static bool VariesByCulture(this ContentVariation variation) => (variation & ContentVariation.Culture) > 0;
+
+        /// <summary>
+        /// Determines whether a variation varies by segment.
+        /// </summary>
+        public static bool VariesBySegment(this ContentVariation variation) => (variation & ContentVariation.Segment) > 0;
+
+        /// <summary>
+        /// Determines whether a variation varies by culture and segment.
+        /// </summary>
+        public static bool VariesByCultureAndSegment(this ContentVariation variation) => (variation & ContentVariation.CultureAndSegment) > 0;
+
+        /// <summary>
+        /// Validates that a combination of culture and segment is valid for the variation.
+        /// </summary>
+        /// <param name="variation">The variation.</param>
+        /// <param name="culture">The culture.</param>
+        /// <param name="segment">The segment.</param>
+        /// <param name="exact">A value indicating whether to perform exact validation.</param>
+        /// <param name="wildcards">A value indicating whether to support wildcards.</param>
+        /// <param name="throwIfInvalid">A value indicating whether to throw a <see cref="NotSupportedException"/> when the combination is invalid.</param>
+        /// <returns>True if the combination is valid; otherwise false.</returns>
+        /// <remarks>
+        /// <para>When validation is exact, the combination must match the variation exactly. For instance, if the variation is Culture, then
+        /// a culture is required. When validation is not strict, the combination must be equivalent, or more restrictive: if the variation is
+        /// Culture, an invariant combination is ok.</para>
+        /// <para>Basically, exact is for one content type, or one property type, and !exact is for "all property types" of one content type.</para>
+        /// <para>Both <paramref name="culture"/> and <paramref name="segment"/> can be "*" to indicate "all of them".</para>
+        /// </remarks>
+        /// <exception cref="NotSupportedException">Occurs when the combination is invalid, and <paramref name="throwIfInvalid"/> is true.</exception>
+        public static bool ValidateVariation(this ContentVariation variation, string culture, string segment, bool exact, bool wildcards, bool throwIfInvalid)
         {
-            return !variation.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment);
-        }
+            culture = culture.NullOrWhiteSpaceAsNull();
+            segment = segment.NullOrWhiteSpaceAsNull();
 
-        /// <summary>
-        /// Determines whether a variation does support culture variations
-        /// </summary>
-        /// <param name="variation"></param>
-        /// <returns></returns>
-        public static bool DoesSupportCulture(this ContentVariation variation)
-        {
-            return variation.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment);
-        }
+            bool Validate(bool variesBy, string value)
+            {
+                if (variesBy)
+                {
+                    // varies by
+                    // in exact mode, the value cannot be null (but it can be a wildcard)
+                    // in !wildcards mode, the value cannot be a wildcard (but it can be null)
+                    if ((exact && value == null) || (!wildcards && value == "*"))
+                        return false;
+                }
+                else
+                {
+                    // does not vary by value
+                    // the value cannot have a value
+                    // unless wildcards and it's "*"
+                    if (value != null && (!wildcards || value != "*"))
+                        return false;
+                }
 
-        /// <summary>
-        /// Determines whether a variation does not support invariant variations
-        /// </summary>
-        /// <param name="variation"></param>
-        /// <returns></returns>
-        public static bool DoesNotSupportInvariant(this ContentVariation variation)
-        {
-            return !variation.HasAny(ContentVariation.InvariantNeutral | ContentVariation.InvariantSegment);
-        }
+                return true;
+            }
 
-        /// <summary>
-        /// Determines whether a variation does support invariant variations
-        /// </summary>
-        /// <param name="variation"></param>
-        /// <returns></returns>
-        public static bool DoesSupportInvariant(this ContentVariation variation)
-        {
-            return variation.HasAny(ContentVariation.InvariantNeutral | ContentVariation.InvariantSegment);
-        }
+            if (!Validate(variation.VariesByCulture(), culture))
+            {
+                if (throwIfInvalid)
+                    throw new NotSupportedException($"Culture value \"{culture ?? "<null>"}\" is invalid.");
+                return false;
+            }
 
-        /// <summary>
-        /// Determines whether a variation does not support segment variations
-        /// </summary>
-        /// <param name="variation"></param>
-        /// <returns></returns>
-        public static bool DoesNotSupportSegment(this ContentVariation variation)
-        {
-            return !variation.HasAny(ContentVariation.InvariantSegment | ContentVariation.CultureSegment);
-        }
+            if (!Validate(variation.VariesBySegment(), segment))
+            {
+                if (throwIfInvalid)
+                    throw new NotSupportedException($"Segment value \"{segment ?? "<null>"}\" is invalid.");
+                return false;
+            }
 
-        /// <summary>
-        /// Determines whether a variation does not support neutral variations
-        /// </summary>
-        /// <param name="variation"></param>
-        /// <returns></returns>
-        public static bool DoesNotSupportNeutral(this ContentVariation variation)
-        {
-            return !variation.HasAny(ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral);
+            return true;
         }
     }
 }

@@ -16,44 +16,83 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Property : EntityBase
     {
+        // _values contains all property values, including the invariant-neutral value
         private List<PropertyValue> _values = new List<PropertyValue>();
+
+        // _pvalue contains the invariant-neutral property value
         private PropertyValue _pvalue;
+
+        // _vvalues contains the (indexed) variant property values
         private Dictionary<CompositeNStringNStringKey, PropertyValue> _vvalues;
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Property"/> class.
+        /// </summary>
         protected Property()
         { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Property"/> class.
+        /// </summary>
         public Property(PropertyType propertyType)
         {
             PropertyType = propertyType;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Property"/> class.
+        /// </summary>
         public Property(int id, PropertyType propertyType)
         {
             Id = id;
             PropertyType = propertyType;
         }
 
+        /// <summary>
+        /// Represents a property value.
+        /// </summary>
         public class PropertyValue
         {
             private string _culture;
             private string _segment;
 
+            /// <summary>
+            /// Gets or sets the culture of the property.
+            /// </summary>
+            /// <remarks>The culture is either null (invariant) or a non-empty string. If the property is
+            /// set with an empty or whitespace value, its value is converted to null.</remarks>
             public string Culture
             {
                 get => _culture;
-                internal set => _culture = value?.ToLowerInvariant();
+                internal set => _culture = value.IsNullOrWhiteSpace() ? null : value.ToLowerInvariant();
             }
+
+            /// <summary>
+            /// Gets or sets the segment of the property.
+            /// </summary>
+            /// <remarks>The segment is either null (neutral) or a non-empty string. If the property is
+            /// set with an empty or whitespace value, its value is converted to null.</remarks>
             public string Segment
             {
                 get => _segment;
                 internal set => _segment = value?.ToLowerInvariant();
             }
+
+            /// <summary>
+            /// Gets or sets the edited value of the property.
+            /// </summary>
             public object EditedValue { get; internal set; }
+
+            /// <summary>
+            /// Gets or sets the published value of the property.
+            /// </summary>
             public object PublishedValue { get; internal set; }
 
+            /// <summary>
+            /// Clones the property value.
+            /// </summary>
             public PropertyValue Clone()
                 => new PropertyValue { _culture = _culture, _segment = _segment, PublishedValue = PublishedValue, EditedValue = EditedValue };
         }
@@ -101,7 +140,7 @@ namespace Umbraco.Core.Models
             {
                 // make sure we filter out invalid variations
                 // make sure we leave _vvalues null if possible
-                _values = value.Where(x => PropertyType.ValidateVariation(x.Culture, x.Segment, false)).ToList();
+                _values = value.Where(x => PropertyType.SupportsVariation(x.Culture, x.Segment)).ToList();
                 _pvalue = _values.FirstOrDefault(x => x.Culture == null && x.Segment == null);
                 _vvalues = _values.Count > (_pvalue == null ? 0 : 1)
                     ? _values.Where(x => x != _pvalue).ToDictionary(x => new CompositeNStringNStringKey(x.Culture, x.Segment), x => x)
@@ -135,7 +174,11 @@ namespace Umbraco.Core.Models
         /// </summary>
         public object GetValue(string culture = null, string segment = null, bool published = false)
         {
-            if (!PropertyType.ValidateVariation(culture, segment, false)) return null;
+            // ensure null or whitespace are nulls
+            culture = culture.NullOrWhiteSpaceAsNull();
+            segment = segment.NullOrWhiteSpaceAsNull();
+
+            if (!PropertyType.SupportsVariation(culture, segment)) return null;
             if (culture == null && segment == null) return GetPropertyValue(_pvalue, published);
             if (_vvalues == null) return null;
             return _vvalues.TryGetValue(new CompositeNStringNStringKey(culture, segment), out var pvalue)
@@ -152,6 +195,8 @@ namespace Umbraco.Core.Models
                 : pvalue.EditedValue;
         }
 
+        // fixme clear
+        /*
         // internal - must be invoked by the content item
         // does *not* validate the value - content item must validate first
         internal void PublishAllValues()
@@ -161,14 +206,13 @@ namespace Umbraco.Core.Models
                 PublishPropertyValue(_pvalue);
 
             // publish everything not invariant-neutral that is supported
-            if (_vvalues != null)
-            {
-                var pvalues = _vvalues
-                    .Where(x => PropertyType.ValidateVariation(x.Value.Culture, x.Value.Segment, false))
-                    .Select(x => x.Value);
-                foreach (var pvalue in pvalues)
-                    PublishPropertyValue(pvalue);
-            }
+            if (_vvalues == null) return;
+
+            var pvalues = _vvalues
+                .Where(x => PropertyType.ValidateVariation(x.Value.Culture, x.Value.Segment, false))
+                .Select(x => x.Value);
+            foreach (var pvalue in pvalues)
+                PublishPropertyValue(pvalue);
         }
 
         // internal - must be invoked by the content item
@@ -201,7 +245,61 @@ namespace Umbraco.Core.Models
                     PublishPropertyValue(pvalue);
             }
         }
+        */
 
+        // internal - must be invoked by the content item
+        // does *not* validate the value - content item must validate first
+        internal void PublishValues(string culture = null, string segment = null)
+        {
+            culture = culture.NullOrWhiteSpaceAsNull();
+            segment = segment.NullOrWhiteSpaceAsNull();
+
+            // if invariant or all, and invariant-neutral is supported, publish invariant-neutral
+            if ((culture == null || culture == "*") && (segment == null || segment == "*") && PropertyType.SupportsVariation(null, null))
+                PublishPropertyValue(_pvalue);
+
+            // then deal with everything that varies
+            if (_vvalues == null) return;
+
+            // get the property values that are still relevant (wrt the property type variation),
+            // and match the specified culture and segment (or anything when '*').
+            var pvalues = _vvalues.Where(x =>
+                    PropertyType.SupportsVariation(x.Value.Culture, x.Value.Segment) && // the value variation is ok
+                    (culture == "*" || x.Value.Culture.InvariantEquals(culture)) && // the culture matches
+                    (segment == "*" || x.Value.Segment.InvariantEquals(segment))) // the segment matches
+                .Select(x => x.Value);
+
+            foreach (var pvalue in pvalues)
+                PublishPropertyValue(pvalue);
+        }
+
+        // internal - must be invoked by the content item
+        internal void ClearPublishedValues(string culture = null, string segment = null)
+        {
+            culture = culture.NullOrWhiteSpaceAsNull();
+            segment = segment.NullOrWhiteSpaceAsNull();
+
+            // if invariant or all, and invariant-neutral is supported, publish invariant-neutral
+            if ((culture == null || culture == "*") && (segment == null || segment == "*") && PropertyType.SupportsVariation(null, null))
+                ClearPublishedPropertyValue(_pvalue);
+
+            // then deal with everything that varies
+            if (_vvalues == null) return;
+
+            // get the property values that are still relevant (wrt the property type variation),
+            // and match the specified culture and segment (or anything when '*').
+            var pvalues = _vvalues.Where(x =>
+                    PropertyType.SupportsVariation(x.Value.Culture, x.Value.Segment) && // the value variation is ok
+                    (culture == "*" || x.Value.Culture.InvariantEquals(culture)) && // the culture matches
+                    (segment == "*" || x.Value.Segment.InvariantEquals(segment))) // the segment matches
+                .Select(x => x.Value);
+
+            foreach (var pvalue in pvalues)
+                ClearPublishedPropertyValue(pvalue);
+        }
+
+        // fixme clear
+        /*
         // internal - must be invoked by the content item
         internal void ClearPublishedAllValues()
         {
@@ -228,7 +326,7 @@ namespace Umbraco.Core.Models
         }
 
         // internal - must be invoked by the content item
-        internal void ClearPublishedCultureValues(string culture = null)
+        internal void ClearCulturePublishedValues(string culture = null)
         {
             if (culture == null && PropertyType.ValidateVariation(null, null, false))
                 ClearPublishedPropertyValue(_pvalue);
@@ -243,6 +341,7 @@ namespace Umbraco.Core.Models
                     ClearPublishedPropertyValue(pvalue);
             }
         }
+        */
 
         private void PublishPropertyValue(PropertyValue pvalue)
         {
@@ -271,7 +370,12 @@ namespace Umbraco.Core.Models
         /// </summary>
         public void SetValue(object value, string culture = null, string segment = null)
         {
-            PropertyType.ValidateVariation(culture, segment, true);
+            culture = culture.NullOrWhiteSpaceAsNull();
+            segment = segment.NullOrWhiteSpaceAsNull();
+
+            if (!PropertyType.SupportsVariation(culture, segment))
+                throw new NotSupportedException($"Variation \"{culture??"<null>"},{segment??"<null>"}\" is not supported by the property type.");
+
             var (pvalue, change) = GetPValue(culture, segment, true);
 
             var origValue = pvalue.EditedValue;
@@ -335,65 +439,69 @@ namespace Umbraco.Core.Models
         /// Gets a value indicating whether all properties are valid.
         /// </summary>
         /// <returns></returns>
-        internal bool IsAllValid()
+        internal bool IsValid(string culture = null, string segment = null)
         {
-            //fixme - needs API review as this is not used apart from in tests
+            // if validating invariant/neutral, and it is supported, validate
+            // (including ensuring that the value exists, if mandatory)
+            if ((culture == null || culture == "*") && (segment == null || segment == "*") && PropertyType.SupportsVariation(null, null))
+                if (!IsValidValue(_pvalue?.EditedValue))
+                    return false;
 
-            // invariant-neutral is supported, validate invariant-neutral
-            // includes mandatory validation
-            if (PropertyType.ValidateVariation(null, null, false) && !IsValidValue(_pvalue)) return false;
+            // if validating only invariant/neutral, we are good
+            if (culture == null && segment == null) return true;
 
-            // either invariant-neutral is not supported, or it is valid
             // for anything else, validate the existing values (including mandatory),
             // but we cannot validate mandatory globally (we don't know the possible cultures and segments)
 
-            if (_vvalues == null) return true;
+            if (_vvalues == null) return culture == "*" || segment == "*" || IsValidValue(null);
 
-            var pvalues = _vvalues
-                .Where(x => PropertyType.ValidateVariation(x.Value.Culture, x.Value.Segment, false))
+            var pvalues = _vvalues.Where(x =>
+                    PropertyType.SupportsVariation(x.Value.Culture, x.Value.Segment) && // the value variation is ok
+                    (culture == "*" || x.Value.Culture.InvariantEquals(culture)) && // the culture matches
+                    (segment == "*" || x.Value.Segment.InvariantEquals(segment))) // the segment matches
                 .Select(x => x.Value)
-                .ToArray();
+                .ToList();
 
-            return pvalues.Length == 0 || pvalues.All(x => IsValidValue(x.EditedValue));
+            return pvalues.Count == 0 || pvalues.All(x => IsValidValue(x.EditedValue));
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the culture/any values are valid.
-        /// </summary>
-        /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
-        internal bool IsCultureValid(string culture)
-        {
-            //fixme - needs API review as this is not used apart from in tests
+        // fixme clear
+        ///// <summary>
+        ///// Gets a value indicating whether the culture/any values are valid.
+        ///// </summary>
+        ///// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
+        //internal bool IsCultureValid(string culture)
+        //{
 
-            // culture-neutral is supported, validate culture-neutral
-            // includes mandatory validation
-            if (PropertyType.ValidateVariation(culture, null, false) && !IsValidValue(GetValue(culture)))
-                return false;
+        //    // culture-neutral is supported, validate culture-neutral
+        //    // includes mandatory validation
+        //    if (PropertyType.ValidateVariation(culture, null, false) && !IsValidValue(GetValue(culture)))
+        //        return false;
 
-            // either culture-neutral is not supported, or it is valid
-            // for anything non-neutral, validate the existing values (including mandatory),
-            // but we cannot validate mandatory globally (we don't know the possible segments)
+        //    // either culture-neutral is not supported, or it is valid
+        //    // for anything non-neutral, validate the existing values (including mandatory),
+        //    // but we cannot validate mandatory globally (we don't know the possible segments)
 
-            if (_vvalues == null) return true;
+        //    if (_vvalues == null) return true;
 
-            var pvalues = _vvalues
-                .Where(x => x.Value.Culture.InvariantEquals(culture))
-                .Where(x => PropertyType.ValidateVariation(culture, x.Value.Segment, false))
-                .Select(x => x.Value)
-                .ToArray();
+        //    var pvalues = _vvalues
+        //        .Where(x => x.Value.Culture.InvariantEquals(culture))
+        //        .Where(x => PropertyType.ValidateVariation(culture, x.Value.Segment, false))
+        //        .Select(x => x.Value)
+        //        .ToArray();
 
-            return pvalues.Length == 0 || pvalues.All(x => IsValidValue(x.EditedValue));
-        }
+        //    return pvalues.Length == 0 || pvalues.All(x => IsValidValue(x.EditedValue));
+        //}
 
-        /// <summary>
-        /// Gets a value indicating whether the value is valid.
-        /// </summary>
-        /// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
-        public bool IsValid(string culture = null, string segment = null)
-        {
-            // single value -> validates mandatory
-            return IsValidValue(GetValue(culture, segment));
-        }
+        ///// <summary>
+        ///// Gets a value indicating whether the value is valid.
+        ///// </summary>
+        ///// <remarks>An invalid value can be saved, but only valid values can be published.</remarks>
+        //public bool IsValid(string culture = null, string segment = null)
+        //{
+        //    // single value -> validates mandatory
+        //    return IsValidValue(GetValue(culture, segment));
+        //}
 
         /// <summary>
         /// Boolean indicating whether the passed in value is valid

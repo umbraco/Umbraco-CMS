@@ -1056,7 +1056,7 @@ namespace Umbraco.Core.Services.Implement
 
                 // not varying, or invariant culture
                 // simply unpublish the document
-                if (!content.ContentType.Variations.DoesSupportCulture() || culture.IsNullOrWhiteSpace())
+                if (!content.ContentType.VariesByCulture() || culture.IsNullOrWhiteSpace())
                 {
                     var unpublished = UnpublishScoped(scope, content, evtMsgs, userId);
                     if (unpublished.Success) scope.Complete();

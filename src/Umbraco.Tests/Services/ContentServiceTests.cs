@@ -2507,7 +2507,7 @@ namespace Umbraco.Tests.Services
             var languageService = ServiceContext.LocalizationService;
 
             var langUk = new Language("en-UK") { IsDefaultVariantLanguage = true };
-            var langFr = new Language("fr-FR");            
+            var langFr = new Language("fr-FR");
 
             languageService.Save(langFr);
             languageService.Save(langUk);
@@ -2515,15 +2515,15 @@ namespace Umbraco.Tests.Services
             var contentTypeService = ServiceContext.ContentTypeService;
 
             var contentType = contentTypeService.Get("umbTextpage");
-            contentType.Variations = ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral;
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.CultureNeutral });
+            contentType.Variations = ContentVariation.Culture;
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.Culture });
             contentTypeService.Save(contentType);
 
             var contentService = ServiceContext.ContentService;
             var content = new Content(null, -1, contentType);
 
-            content.SetName("name-us", langUk.IsoCode);
-            content.SetName("name-fr", langFr.IsoCode);
+            content.SetCultureName("name-us", langUk.IsoCode);
+            content.SetCultureName("name-fr", langFr.IsoCode);
             contentService.Save(content);
 
             //the name will be set to the default culture variant name
@@ -2550,26 +2550,26 @@ namespace Umbraco.Tests.Services
             var contentTypeService = ServiceContext.ContentTypeService;
 
             var contentType = contentTypeService.Get("umbTextpage");
-            contentType.Variations = ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral;
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.CultureNeutral });
+            contentType.Variations = ContentVariation.Culture;
             contentTypeService.Save(contentType);
 
             var contentService = ServiceContext.ContentService;
 
             var content = new Content(null, -1, contentType);
-            content.SetName("root", langUk.IsoCode);
+            content.SetCultureName("root", langUk.IsoCode);
             contentService.Save(content);
 
             for (var i = 0; i < 5; i++)
             {
                 var child = new Content(null, content, contentType);
-                child.SetName("child", langUk.IsoCode);
+                child.SetCultureName("child", langUk.IsoCode);
                 contentService.Save(child);
-                Assert.AreEqual("child" + (i == 0 ? "" : " (" + (i).ToString() + ")"), child.GetName(langUk.IsoCode));
+
+                Assert.AreEqual("child" + (i == 0 ? "" : " (" + i + ")"), child.GetCultureName(langUk.IsoCode));
 
                 //Save it again to ensure that the unique check is not performed again against it's own name
                 contentService.Save(child);
-                Assert.AreEqual("child" + (i == 0 ? "" : " (" + (i).ToString() + ")"), child.GetName(langUk.IsoCode));
+                Assert.AreEqual("child" + (i == 0 ? "" : " (" + i + ")"), child.GetCultureName(langUk.IsoCode));
             }
         }
 
@@ -2578,7 +2578,7 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
-            var langFr = new Language("fr-FR");
+            var langFr = new Language("fr-FR") { IsDefaultVariantLanguage = true };
             var langUk = new Language("en-UK");
             var langDe = new Language("de-DE");
 
@@ -2588,31 +2588,29 @@ namespace Umbraco.Tests.Services
 
             var contentTypeService = ServiceContext.ContentTypeService;
 
-            // fixme
-            // contentType.Variations is InvariantNeutral | CultureNeutral
-            // propertyType.Variations can only be a subset of contentType.Variations - ie cannot *add* anything
-            //  (at least, we should validate this)
-            // but then,
-            // if the contentType supports InvariantNeutral | CultureNeutral,
-            //    the propertyType should support InvariantNeutral, or both, but not solely CultureNeutral?
-            //  but does this mean that CultureNeutral implies InvariantNeutral?
-            //  can a contentType *not* support InvariantNeutral?
-
             var contentType = contentTypeService.Get("umbTextpage");
-            contentType.Variations = ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral;
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.CultureNeutral });
+            contentType.Variations = ContentVariation.Culture;
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.Culture });
+            // fixme add test w/ an invariant prop
             contentTypeService.Save(contentType);
 
             var contentService = ServiceContext.ContentService;
-            var content = contentService.Create("Home US", - 1, "umbTextpage");
+            var content = contentService.Create("Home US", -1, "umbTextpage");
+
+            // creating content with a name but no culture - will set the invariant name
+            // but, because that content is variant, as soon as we save, we'll need to
+            // replace the invariant name with whatever we have in cultures - always
+            //
+            // in fact, that would throw, because there is no name
+            //contentService.Save(content);
 
             // act
 
             content.SetValue("author", "Barack Obama");
             content.SetValue("prop", "value-fr1", langFr.IsoCode);
             content.SetValue("prop", "value-uk1", langUk.IsoCode);
-            content.SetName("name-fr", langFr.IsoCode);
-            content.SetName("name-uk", langUk.IsoCode);
+            content.SetCultureName("name-fr", langFr.IsoCode); // and then we can save
+            content.SetCultureName("name-uk", langUk.IsoCode);
             contentService.Save(content);
 
             // content has been saved,
@@ -2620,9 +2618,9 @@ namespace Umbraco.Tests.Services
 
             var content2 = contentService.GetById(content.Id);
 
-            Assert.AreEqual("Home US", content2.Name);
-            Assert.AreEqual("name-fr", content2.GetName(langFr.IsoCode));
-            Assert.AreEqual("name-uk", content2.GetName(langUk.IsoCode));
+            Assert.AreEqual("name-fr", content2.Name); // got the default culture name when saved
+            Assert.AreEqual("name-fr", content2.GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("name-uk", content2.GetCultureName(langUk.IsoCode));
 
             Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.IsoCode));
             Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode));
@@ -2657,9 +2655,9 @@ namespace Umbraco.Tests.Services
 
             content2 = contentService.GetById(content.Id);
 
-            Assert.AreEqual("Home US", content2.Name);
-            Assert.AreEqual("name-fr", content2.GetName(langFr.IsoCode));
-            Assert.AreEqual("name-uk", content2.GetName(langUk.IsoCode));
+            Assert.AreEqual("name-fr", content2.Name); // got the default culture name when saved
+            Assert.AreEqual("name-fr", content2.GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("name-uk", content2.GetCultureName(langUk.IsoCode));
 
             // we haven't published InvariantNeutral, but a document cannot be published without an invariant name,
             // so when we tried and published for the first time above the french culture, the french name was used
@@ -2686,8 +2684,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, false), (langUk, false), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, false), (langUk, false), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
+            AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
 
             // note that content and content2 culture published dates might be slightly different due to roundtrip to database
 
@@ -2701,14 +2699,14 @@ namespace Umbraco.Tests.Services
 
             content2 = contentService.GetById(content.Id);
 
-            Assert.AreEqual("Home US", content2.PublishName);
+            Assert.AreEqual("name-fr", content2.PublishName);
 
 
             // act
 
-            content.SetName("Home US2", null);
-            content.SetName("name-fr2", langFr.IsoCode);
-            content.SetName("name-uk2", langUk.IsoCode);
+            content.SetCultureName("Home US2", null);
+            content.SetCultureName("name-fr2", langFr.IsoCode);
+            content.SetCultureName("name-uk2", langUk.IsoCode);
             content.SetValue("author", "Barack Obama2");
             content.SetValue("prop", "value-fr2", langFr.IsoCode);
             content.SetValue("prop", "value-uk2", langUk.IsoCode);
@@ -2719,11 +2717,11 @@ namespace Umbraco.Tests.Services
 
             content2 = contentService.GetById(content.Id);
 
-            Assert.AreEqual("Home US2", content2.Name);
-            Assert.AreEqual("name-fr2", content2.GetName(langFr.IsoCode));
-            Assert.AreEqual("name-uk2", content2.GetName(langUk.IsoCode));
+            Assert.AreEqual("name-fr2", content2.Name); // got the default culture name when saved
+            Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("name-uk2", content2.GetCultureName(langUk.IsoCode));
 
-            Assert.AreEqual("Home US", content2.PublishName);
+            Assert.AreEqual("name-fr", content2.PublishName);
             Assert.AreEqual("name-fr", content2.GetPublishName(langFr.IsoCode));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
 
@@ -2747,8 +2745,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
+            AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
 
 
             // act
@@ -2762,11 +2760,11 @@ namespace Umbraco.Tests.Services
 
             content2 = contentService.GetById(content.Id);
 
-            Assert.AreEqual("Home US2", content2.Name);
-            Assert.AreEqual("name-fr2", content2.GetName(langFr.IsoCode));
-            Assert.AreEqual("name-uk2", content2.GetName(langUk.IsoCode));
+            Assert.AreEqual("name-fr2", content2.Name); // got the default culture name when saved
+            Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("name-uk2", content2.GetCultureName(langUk.IsoCode));
 
-            Assert.AreEqual("Home US", content2.PublishName);
+            Assert.AreEqual("name-fr2", content2.PublishName);
             Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
 
@@ -2790,8 +2788,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
 
 
             // act
@@ -2812,11 +2810,11 @@ namespace Umbraco.Tests.Services
 
             Assert.IsFalse(content2.Published);
 
-            Assert.AreEqual("Home US2", content2.Name);
-            Assert.AreEqual("name-fr2", content2.GetName(langFr.IsoCode));
-            Assert.AreEqual("name-uk2", content2.GetName(langUk.IsoCode));
+            Assert.AreEqual("name-fr2", content2.Name); // got the default culture name when saved
+            Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("name-uk2", content2.GetCultureName(langUk.IsoCode));
 
-            Assert.AreEqual("Home US", content2.PublishName); // not null, see note above
+            Assert.AreEqual("name-fr2", content2.PublishName); // not null, see note above
             Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode)); // not null, see note above
 
@@ -2837,8 +2835,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
 
 
             // act
@@ -2852,11 +2850,11 @@ namespace Umbraco.Tests.Services
 
             Assert.IsTrue(content2.Published);
 
-            Assert.AreEqual("Home US2", content2.Name);
-            Assert.AreEqual("name-fr2", content2.GetName(langFr.IsoCode));
-            Assert.AreEqual("name-uk2", content2.GetName(langUk.IsoCode));
+            Assert.AreEqual("name-fr2", content2.Name); // got the default culture name when saved
+            Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("name-uk2", content2.GetCultureName(langUk.IsoCode));
 
-            Assert.AreEqual("Home US", content2.PublishName);
+            Assert.AreEqual("name-fr2", content2.PublishName);
             Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
 
@@ -2877,8 +2875,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
 
 
             // act
@@ -2900,18 +2898,22 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, false), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, false), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
 
 
             // act
 
-            content.SetName("name-uk3", langUk.IsoCode);
+            content.SetCultureName("name-uk3", langUk.IsoCode);
             contentService.Save(content);
 
             content2 = contentService.GetById(content.Id);
 
+            // note that the 'edited' flags only change once saved - not immediately
+            // but they change, on what's being saved, and when getting it back
+
             // changing the name = edited!
+
             Assert.IsTrue(content.IsCultureEdited(langUk.IsoCode));
             Assert.IsTrue(content2.IsCultureEdited(langUk.IsoCode));
         }

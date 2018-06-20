@@ -87,7 +87,7 @@ namespace Umbraco.Web.Routing
             while (domainUris == null && n != null) // n is null at root
             {
                 n = n.Parent; // move to parent node
-                domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current, false);
+                domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current, excludeDefault: true);
             }
 
             // no domains = exit

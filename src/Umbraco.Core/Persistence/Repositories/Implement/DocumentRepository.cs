@@ -232,7 +232,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IContent entity)
         {
-            //fixme - stop doing this just so we have access to AddingEntity
+            // fixme - stop doing this - sort out IContent vs Content
+            // however, it's not just so we have access to AddingEntity
+            // there are tons of things at the end of the methods, that can only work with a true Content
+            // and basically, the repository requires a Content, not an IContent
             var content = (Content) entity;
 
             content.AddingEntity();
@@ -242,11 +245,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (entity.Template == null)
                 entity.Template = entity.ContentType.DefaultTemplate;
 
-            // sanitize names: ensure we have an invariant name, and names are unique-ish
-            // (well, only invariant name is unique at the moment)
-            EnsureUniqueVariationNames(entity);
-            EnsureInvariantNameValues(entity, publishing);
-            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name);
+            // sanitize names
+            SanitizeNames(content, publishing);
 
             // ensure that strings don't contain characters that are invalid in xml
             // fixme - do we really want to keep doing this here?
@@ -295,7 +295,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var contentVersionDto = dto.DocumentVersionDto.ContentVersionDto;
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = !publishing;
-            contentVersionDto.Text = publishing ? content.PublishName : content.Name;
+            contentVersionDto.Text = content.Name;
             Database.Insert(contentVersionDto);
             content.VersionId = contentVersionDto.Id;
 
@@ -312,7 +312,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 content.PublishedVersionId = content.VersionId;
                 contentVersionDto.Id = 0;
                 contentVersionDto.Current = true;
-                contentVersionDto.Text = content.PublishName;
+                contentVersionDto.Text = content.Name;
                 Database.Insert(contentVersionDto);
                 content.VersionId = contentVersionDto.Id;
 
@@ -326,7 +326,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
-            // name also impacts 'edited'
+            // if !publishing, we may have a new name != current publish name,
+            // also impacts 'edited'
             if (content.PublishName != content.Name)
                 edited = true;
 
@@ -340,7 +341,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Database.Insert(dto);
 
             // persist the variations
-            if (content.ContentType.Variations.DoesSupportCulture())
+            if (content.ContentType.VariesByCulture())
             {
                 // names also impact 'edited'
                 foreach (var (culture, name) in content.CultureNames)
@@ -355,8 +356,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // refresh content
-            if (editedCultures != null)
-                content.SetCultureEdited(editedCultures);
+            content.SetCultureEdited(editedCultures);
 
             // trigger here, before we reset Published etc
             OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
@@ -369,6 +369,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 content.Published = true;
                 content.PublishTemplate = content.Template;
                 content.PublisherId = content.WriterId;
+                content.PublishName = content.Name;
                 content.PublishDate = content.UpdateDate;
 
                 SetEntityTags(entity, _tagRepository);
@@ -378,6 +379,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 content.Published = false;
                 content.PublishTemplate = null;
                 content.PublisherId = null;
+                content.PublishName = null;
                 content.PublishDate = null;
 
                 ClearEntityTags(entity, _tagRepository);
@@ -400,6 +402,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IContent entity)
         {
+            // fixme - stop doing this - sort out IContent vs Content
+            // however, it's not just so we have access to AddingEntity
+            // there are tons of things at the end of the methods, that can only work with a true Content
+            // and basically, the repository requires a Content, not an IContent
             var content = (Content) entity;
 
             // check if we need to make any database changes at all
@@ -423,11 +429,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 Database.Execute(Sql().Update<DocumentVersionDto>(u => u.Set(x => x.Published, false)).Where<DocumentVersionDto>(x => x.Id == content.PublishedVersionId));
             }
 
-            // sanitize names: ensure we have an invariant name, and names are unique-ish
-            // (well, only invariant name is unique at the moment)
-            EnsureUniqueVariationNames(entity);
-            EnsureInvariantNameValues(entity, publishing);
-            entity.Name = EnsureUniqueNodeName(entity.ParentId, entity.Name, entity.Id);
+            // sanitize names
+            SanitizeNames(content, publishing);
 
             // ensure that strings don't contain characters that are invalid in xml
             // fixme - do we really want to keep doing this here?
@@ -460,7 +463,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 documentVersionDto.Published = true; // now published
                 contentVersionDto.Current = false; // no more current
-                contentVersionDto.Text = content.PublishName;
+                contentVersionDto.Text = content.Name;
             }
             Database.Update(contentVersionDto);
             Database.Update(documentVersionDto);
@@ -491,11 +494,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             foreach (var propertyDataDto in propertyDataDtos)
                 Database.Insert(propertyDataDto);
 
-            // name also impacts 'edited'
-            if (content.PublishName != content.Name)
+            // if !publishing, we may have a new name != current publish name,
+            // also impacts 'edited'
+            if (!publishing && content.PublishName != content.Name)
                 edited = true;
 
-            if (content.ContentType.Variations.DoesSupportCulture())
+            if (content.ContentType.VariesByCulture())
             {
                 // names also impact 'edited'
                 foreach (var (culture, name) in content.CultureNames)
@@ -511,7 +515,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var deleteDocumentVariations = Sql().Delete<DocumentCultureVariationDto>().Where<DocumentCultureVariationDto>(x => x.NodeId == content.Id);
                 Database.Execute(deleteDocumentVariations);
 
-                // fixme is we'd like to use the native NPoco InsertBulk here but it causes problems (not sure exaclty all scenarios) but by using SQL Server and updating a variants name will cause: Unable to cast object of type 'Umbraco.Core.Persistence.FaultHandling.RetryDbConnection' to type 'System.Data.SqlClient.SqlConnection'.
+                // fixme is we'd like to use the native NPoco InsertBulk here but it causes problems (not sure exaclty all scenarios)
+                // but by using SQL Server and updating a variants name will cause: Unable to cast object of type
+                // 'Umbraco.Core.Persistence.FaultHandling.RetryDbConnection' to type 'System.Data.SqlClient.SqlConnection'.
                 // (same in PersistNewItem above)
 
                 // insert content variations
@@ -522,8 +528,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // refresh content
-            if (editedCultures != null)
-                content.SetCultureEdited(editedCultures);
+            content.SetCultureEdited(editedCultures);
 
             // update the document dto
             // at that point, when un/publishing, the entity still has its old Published value
@@ -550,6 +555,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 content.Published = true;
                 content.PublishTemplate = content.Template;
                 content.PublisherId = content.WriterId;
+                content.PublishName = content.Name;
                 content.PublishDate = content.UpdateDate;
 
                 SetEntityTags(entity, _tagRepository);
@@ -559,6 +565,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 content.Published = false;
                 content.PublishTemplate = null;
                 content.PublisherId = null;
+                content.PublishName = null;
                 content.PublishDate = null;
 
                 ClearEntityTags(entity, _tagRepository);
@@ -904,7 +911,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // set variations, if varying
-            temps = temps.Where(x => x.ContentType.Variations.DoesSupportCulture()).ToList();
+            temps = temps.Where(x => x.ContentType.VariesByCulture()).ToList();
             if (temps.Count > 0)
             {
                 // load all variations for all documents from database, in one query
@@ -939,7 +946,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             content.Properties = properties[dto.DocumentVersionDto.Id];
 
             // set variations, if varying
-            if (contentType.Variations.DoesSupportCulture())
+            if (contentType.VariesByCulture())
             {
                 var contentVariations = GetContentVariations(ltemp);
                 var documentVariations = GetDocumentVariations(ltemp);
@@ -955,10 +962,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             if (contentVariations.TryGetValue(content.VersionId, out var contentVariation))
                 foreach (var v in contentVariation)
-                    content.SetCultureInfos(v.Culture, v.Name, v.Date);
+                    content.SetCultureInfo(v.Culture, v.Name, v.Date);
             if (content.PublishedVersionId > 0 && contentVariations.TryGetValue(content.PublishedVersionId, out contentVariation))
                 foreach (var v in contentVariation)
-                    content.SetPublishInfos(v.Culture, v.Name, v.Date);
+                    content.SetPublishInfo(v.Culture, v.Name, v.Date);
             if (documentVariations.TryGetValue(content.Id, out var documentVariation))
                 foreach (var v in documentVariation.Where(x => x.Edited))
                     content.SetCultureEdited(v.Culture);
@@ -1038,7 +1045,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
                     Name = name,
-                    Date = content.GetCultureDate(culture)
+                    Date = content.GetCultureDate(culture) ?? DateTime.MinValue // we *know* there is a value
                 };
 
             // if not publishing, we're just updating the 'current' (non-published) version,
@@ -1046,14 +1053,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (!publishing) yield break;
 
             // create dtos for the 'published' version, for published cultures (those having a name)
-            foreach (var (culture, name) in content.PublishCultureNames)
+            foreach (var (culture, name) in content.PublishNames)
                 yield return new ContentVersionCultureVariationDto
                 {
                     VersionId = content.PublishedVersionId,
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
                     Name = name,
-                    Date = content.GetCulturePublishDate(culture)
+                    Date = content.GetPublishDate(culture) ?? DateTime.MinValue // we *know* there is a value
                 };
         }
 
@@ -1084,90 +1091,124 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Utilities
 
-        /// <summary>
-        /// Ensures that the Name/PublishName properties are filled in and validates if all names are null
-        /// </summary>
-        private void EnsureInvariantNameValues(IContent content, bool publishing)
+        private void SanitizeNames(Content content, bool publishing)
         {
-            // here we have to ensure we have names and publish names, and to try and fix the situation if we have no name, see also: U4-11286
+            // a content item *must* have an invariant name, and invariant published name
+            // else we just cannot write the invariant rows (node, content version...) to the database
 
-            // invariant content must have an invariant name
-            if (content.ContentType.Variations.DoesNotSupportCulture() && string.IsNullOrWhiteSpace(content.Name))
-                throw new InvalidOperationException("Cannot save content with an empty name.");
+            // ensure that we have an invariant name
+            // invariant content = must be there already, else throw
+            // variant content = update with default culture or anything really
+            EnsureInvariantNameExists(content);
 
-            // variant content must have at least one variant name
-            if (content.ContentType.Variations.DoesSupportCulture())
+            // ensure that that invariant name is unique
+            EnsureInvariantNameIsUnique(content);
+
+            // now that we have an invariant name, which is unique,
+            // if publishing, ensure that we have an invariant publish name
+            // invariant content = must be there, else throw - then must follow the invariant name
+            // variant content = update with invariant name
+            // fixme wtf is this we never needed it, PublishName derives from Name when publishing!
+            //if (publishing) EnsureInvariantPublishName(content);
+
+            // and finally,
+            // ensure that each culture has a unique node name
+            // no published name = not published
+            // else, it needs to be unique
+            EnsureVariantNamesAreUnique(content, publishing);
+        }
+
+        private void EnsureInvariantNameExists(Content content)
+        {
+            if (content.ContentType.VariesByCulture())
             {
+                // content varies by culture
+                // then it must have at least a variant name, else it makes no sense
                 if (content.CultureNames.Count == 0)
                     throw new InvalidOperationException("Cannot save content with an empty name.");
 
-                // cannot save with an empty invariant name,
-                // if invariant name is missing, derive it from variant names
-                // fixme should we always sync the invariant name with the default culture name when updating?
-                if (string.IsNullOrWhiteSpace(content.Name))
-                {
-                    var defaultCulture = LanguageRepository.GetDefaultIsoCode();
-                    if (defaultCulture != null && content.CultureNames.TryGetValue(defaultCulture, out var cultureName))
-                        content.Name = cultureName;
-                    else
-                        content.Name = content.CultureNames.First().Value; // only option is to take the first
-                }
+                // and then, we need to set the invariant name implicitely,
+                // using the default culture if it has a name, otherwise anything we can
+                var defaultCulture = LanguageRepository.GetDefaultIsoCode();
+                content.Name = defaultCulture != null && content.CultureNames.TryGetValue(defaultCulture, out var cultureName)
+                    ? cultureName
+                    : content.CultureNames.First().Value;
             }
-
-            // cannot publish without an invariant name
-            if (publishing && string.IsNullOrWhiteSpace(content.PublishName))
+            else
             {
-                // no variant name = error
-                if (content.PublishCultureNames.Count == 0)
-                    throw new InvalidOperationException("Cannot publish content with an empty name.");
-
-                // else... we cannot deal with it here because PublishName is readonly, so in reality, PublishName
-                // should not be null because it should have been set when preparing the content for publish.
-                // see also: Content.SetPublishInfos() - it deals with PublishName
+                // content is invariant, and invariant content must have an explicit invariant name
+                if (string.IsNullOrWhiteSpace(content.Name))
+                    throw new InvalidOperationException("Cannot save content with an empty name.");
             }
         }
+
+        private void EnsureInvariantNameIsUnique(Content content)
+        {
+            content.Name = EnsureUniqueNodeName(content.ParentId, content.Name, content.Id);
+        }
+
+        //private void EnsureInvariantPublishName(Content content)
+        //{
+        //    if (content.ContentType.VariesByCulture())
+        //    {
+        //        // content varies by culture, reuse name as publish name
+        //        content.UpdatePublishName(null, content.Name);
+        //    }
+        //    else
+        //    {
+        //        // content is invariant, and invariant content must have an explicit invariant name
+        //        if (string.IsNullOrWhiteSpace(content.PublishName))
+        //            throw new InvalidOperationException("Cannot save content with an empty name.");
+        //        // and then, must follow the name itself
+        //        if (content.PublishName != content.Name)
+        //            content.UpdatePublishName(null, content.Name);
+        //    }
+        //}
 
         protected override string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
         {
             return EnsureUniqueNaming == false ? nodeName : base.EnsureUniqueNodeName(parentId, nodeName, id);
         }
 
-        private SqlTemplate SqlEnsureUniqueVariationNames => SqlContext.Templates.Get("Umbraco.Core.DomainRepository.EnsureUniqueVariationNames", tsql => tsql
+        private SqlTemplate SqlEnsureVariantNamesAreUnique => SqlContext.Templates.Get("Umbraco.Core.DomainRepository.EnsureVariantNamesAreUnique", tsql => tsql
             .Select<ContentVersionCultureVariationDto>(x => x.Id, x => x.Name, x => x.LanguageId)
             .From<ContentVersionCultureVariationDto>()
-            .InnerJoin<ContentVersionDto>()
-            .On<ContentVersionDto, ContentVersionCultureVariationDto>(x => x.Id, x => x.VersionId)
-            .InnerJoin<NodeDto>()
-            .On<NodeDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
+            .InnerJoin<ContentVersionDto>().On<ContentVersionDto, ContentVersionCultureVariationDto>(x => x.Id, x => x.VersionId)
+            .InnerJoin<NodeDto>().On<NodeDto, ContentVersionDto>(x => x.NodeId, x => x.NodeId)
             .Where<ContentVersionDto>(x => x.Current == SqlTemplate.Arg<bool>("current"))
             .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") &&
                                  x.ParentId == SqlTemplate.Arg<int>("parentId") &&
                                  x.NodeId != SqlTemplate.Arg<int>("id"))
             .OrderBy<ContentVersionCultureVariationDto>(x => x.LanguageId));
 
-        private void EnsureUniqueVariationNames(IContent content)
+        private void EnsureVariantNamesAreUnique(Content content, bool publishing)
         {
-            if (!EnsureUniqueNaming || content.CultureNames.Count == 0) return;
+            if (!EnsureUniqueNaming || !content.ContentType.VariesByCulture() || content.CultureNames.Count == 0) return;
 
-            //Get all culture names at the same level
-
-            var sql = SqlEnsureUniqueVariationNames.Sql(true, NodeObjectTypeId, content.ParentId, content.Id);
+            // get names per culture, at same level (ie all siblings)
+            var sql = SqlEnsureVariantNamesAreUnique.Sql(true, NodeObjectTypeId, content.ParentId, content.Id);
             var names = Database.Fetch<CultureNodeName>(sql)
                 .GroupBy(x => x.LanguageId)
                 .ToDictionary(x => x.Key, x => x);
 
             if (names.Count == 0) return;
 
-            foreach(var n in content.CultureNames)
+            foreach(var (culture, name) in content.CultureNames)
             {
-                var langId = LanguageRepository.GetIdByIsoCode(n.Key);
+                var langId = LanguageRepository.GetIdByIsoCode(culture);
                 if (!langId.HasValue) continue;
-                if (names.TryGetValue(langId.Value, out var cultureNames))
-                {
-                    var otherLangNames = cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });
-                    var uniqueName = SimilarNodeName.GetUniqueName(otherLangNames, 0, n.Value);
-                    content.SetName(uniqueName, n.Key);
-                }
+                if (!names.TryGetValue(langId.Value, out var cultureNames)) continue;
+
+                // get a unique name
+                var otherNames = cultureNames.Select(x => new SimilarNodeName { Id = x.Id, Name = x.Name });
+                var uniqueName = SimilarNodeName.GetUniqueName(otherNames, 0, name);
+
+                if (uniqueName == content.GetCultureName(culture)) continue;
+
+                // update the name, and the publish name if published
+                content.SetCultureName(uniqueName, culture);
+                if (publishing && content.PublishNames.ContainsKey(culture)) // fixme but what about those cultures we are NOT publishing NOW?! they shouldn't change their name!
+                    content.SetPublishInfo(culture, uniqueName, DateTime.Now);
             }
         }
 

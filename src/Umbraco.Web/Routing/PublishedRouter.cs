@@ -295,7 +295,7 @@ namespace Umbraco.Web.Routing
                     return false;
 
                 // invariant - always published
-                if (!domainDocument.ContentType.Variations.Has(ContentVariation.CultureNeutral))
+                if (!domainDocument.ContentType.VariesByCulture())
                     return true;
 
                 // variant, ensure that the culture corresponding to the domain's language is published

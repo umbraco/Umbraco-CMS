@@ -450,19 +450,18 @@ namespace Umbraco.Tests.Services
         {
             var service = ServiceContext.EntityService;
 
-
             var alias = "test" + Guid.NewGuid();
             var contentType = MockedContentTypes.CreateSimpleContentType(alias, alias, false);
-            contentType.Variations = ContentVariation.CultureNeutral;
+            contentType.Variations = ContentVariation.Culture;
             ServiceContext.ContentTypeService.Save(contentType);
 
             var c1 = MockedContent.CreateSimpleContent(contentType, "Test", -1);
-            c1.SetName("Test - FR", _langFr.IsoCode);
-            c1.SetName("Test - ES", _langEs.IsoCode);
+            c1.SetCultureName("Test - FR", _langFr.IsoCode);
+            c1.SetCultureName("Test - ES", _langEs.IsoCode);
             ServiceContext.ContentService.Save(c1);
 
             var result = service.Get(c1.Id, UmbracoObjectTypes.Document);
-            Assert.AreEqual("Test", result.Name);
+            Assert.AreEqual("Test - FR", result.Name); // got name from default culture
             Assert.IsNotNull(result as IDocumentEntitySlim);
             var doc = (IDocumentEntitySlim)result;
             var cultureNames = doc.CultureNames;
@@ -476,11 +475,11 @@ namespace Umbraco.Tests.Services
             var service = ServiceContext.EntityService;
 
             var contentType = MockedContentTypes.CreateSimpleContentType("test1", "Test1", false);
-            contentType.Variations = ContentVariation.CultureNeutral;
+            contentType.Variations = ContentVariation.Culture;
             ServiceContext.ContentTypeService.Save(contentType);
 
             var root = MockedContent.CreateSimpleContent(contentType);
-            root.SetName("Root", _langFr.IsoCode); // else cannot save
+            root.SetCultureName("Root", _langFr.IsoCode); // else cannot save
             ServiceContext.ContentService.Save(root);
 
             for (int i = 0; i < 10; i++)
@@ -488,12 +487,12 @@ namespace Umbraco.Tests.Services
                 var c1 = MockedContent.CreateSimpleContent(contentType, Guid.NewGuid().ToString(), root);
                 if (i % 2 == 0)
                 {
-                    c1.SetName("Test " + i + " - FR", _langFr.IsoCode);
-                    c1.SetName("Test " + i + " - ES", _langEs.IsoCode);
+                    c1.SetCultureName("Test " + i + " - FR", _langFr.IsoCode);
+                    c1.SetCultureName("Test " + i + " - ES", _langEs.IsoCode);
                 }
                 else
                 {
-                    c1.SetName("Test", _langFr.IsoCode); // else cannot save
+                    c1.SetCultureName("Test", _langFr.IsoCode); // else cannot save
                 }
                 ServiceContext.ContentService.Save(c1);
             }

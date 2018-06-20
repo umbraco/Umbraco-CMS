@@ -71,7 +71,7 @@ namespace Umbraco.Web
         public static string GetUrlSegment(this IPublishedContent content, string culture = null)
         {
             // for invariant content, return the invariant url segment
-            if (!content.ContentType.Variations.Has(ContentVariation.CultureNeutral))
+            if (!content.ContentType.VariesByCulture())
                 return content.UrlSegment;
 
             // content.GetCulture(culture) will use the 'current' culture (via accessor) in case 'culture'

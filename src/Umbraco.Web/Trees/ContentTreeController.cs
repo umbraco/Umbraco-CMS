@@ -264,7 +264,7 @@ namespace Umbraco.Web.Trees
             // for those items that DO support cultures, we need to get the proper name, IF it exists
             // otherwise, invariant is fine
 
-            if (docEntity.Variations.Has(Core.Models.ContentVariation.CultureNeutral) &&
+            if (docEntity.Variations.VariesByCulture() &&
                 docEntity.CultureNames.TryGetValue(culture, out var name) &&
                 !string.IsNullOrWhiteSpace(name))
             {

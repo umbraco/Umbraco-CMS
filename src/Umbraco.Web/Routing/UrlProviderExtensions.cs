@@ -40,7 +40,7 @@ namespace Umbraco.Web.Routing
             // if content is variant, go with the current culture - and that is NOT safe, there may be
             // no 'main' url for that culture, deal with it later - otherwise, go with the invariant
             // culture, and that is safe.
-            var varies = content.ContentType.Variations.DoesSupportCulture();
+            var varies = content.ContentType.VariesByCulture();
             var culture = varies ? Thread.CurrentThread.CurrentUICulture.Name : "";
 
             if (content.Published == false)

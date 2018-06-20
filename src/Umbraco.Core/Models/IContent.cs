@@ -93,7 +93,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the date a culture was published.
         /// </summary>
-        DateTime GetCulturePublishDate(string culture);
+        DateTime? GetPublishDate(string culture);
 
         /// <summary>
         /// Gets a value indicated whether a given culture is edited.
@@ -121,12 +121,7 @@ namespace Umbraco.Core.Models
         /// <para>Because a dictionary key cannot be <c>null</c> this cannot get the invariant
         /// name, which must be get via the <see cref="PublishName"/> property.</para>
         /// </remarks>
-        IReadOnlyDictionary<string, string> PublishCultureNames { get; }
-
-        /// <summary>
-        /// Gets the available cultures.
-        /// </summary>
-        IEnumerable<string> AvailableCultures { get; }
+        IReadOnlyDictionary<string, string> PublishNames { get; }
 
         /// <summary>
         /// Gets the published cultures.
@@ -161,54 +156,77 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         IContent DeepCloneWithResetIdentities();
 
-        /// <summary>
-        /// Publishes all values.
-        /// </summary>
-        /// <returns>A value indicating whether the values could be published.</returns>
-        /// <remarks>
-        /// <para>The document must then be published via the content service.</para>
-        /// <para>Values are not published if they are not valid.</para>
-        /// </remarks>
-        //fixme return an Attempt with some error results if it doesn't work
-        //fixme - needs API review as this is not used apart from in tests
+        ///// <summary>
+        ///// Publishes all values.
+        ///// </summary>
+        ///// <returns>A value indicating whether the values could be published.</returns>
+        ///// <remarks>
+        ///// <para>Fails if values cannot be published, e.g. if some values are not valid.</para>
+        ///// <para>Sets the property values for all cultures, including the invariant ones.</para>
+        ///// <para>Sets the published name for all culture that are available, thus publishing them all.</para>
+        ///// <para>The document must then be published via the content service SaveAndPublish method.</para>
+        ///// </remarks>
+        //// fixme - should return an attemps with error results
+        //// fixme - needs API review as this is not used apart from in tests << YES but users could use it
         //bool TryPublishAllValues();
 
+        ///// <summary>
+        ///// Publishes the values for a specified culture and all segments.
+        ///// </summary>
+        ///// <returns>A value indicating whether the values could be published.</returns>
+        ///// <remarks>
+        ///// <para>Fails if values cannot be published, e.g. if some values are not valid.</para>
+        ///// <para>Sets the property values for the specified culture, and only the specified culture: must
+        ///// be invoked with a null culture to set the invariant values.</para>
+        ///// <para>Sets the published name for the specified culture, thus publishing the culture.</para>
+        ///// <para>The document must then be published via the content service SaveAndPublish method.</para>
+        ///// </remarks>
+        //// fixme - needs API review as this is not used apart from in tests << NO it is THAT one that we should use for now
+        //// fixme - should return an attemps with error results
+        //// fixme - should it publish the invariant values too? - NO that's done when SaveAndPublish (is it? don't think so) - BUT could we want to avoid it?
+        //bool TryPublishCultureValues(string culture);
+
         /// <summary>
-        /// Publishes values.
+        /// Publishes values for a specific culture and segment.
         /// </summary>
         /// <returns>A value indicating whether the values could be published.</returns>
         /// <remarks>
-        /// <para>The document must then be published via the content service.</para>
-        /// <para>Values are not published if they are not valid.</para>
+        /// <para>Fails if values cannot be published, e.g. if some values are not valid.</para>
+        /// <para>Sets the property values but not the published name for the specified culture,
+        /// thus not explicitely publishing the culture.</para>
+        /// <para>The document must then be published via the content service SaveAndPublish method.</para>
         /// </remarks>
-        //fixme return an Attempt with some error results if it doesn't work
+        // fixme - should return an attemps with error results
+        // fixme - publishing for segments is not supported
+        //   we don't know whether should it also publish the specified culture?
+        //   we don't know how to publish segments but not neutral, etc
+        //   what shall we do then?
         bool TryPublishValues(string culture = null, string segment = null);
 
+        ///// <summary>
+        ///// Clears published values.
+        ///// </summary>
+        ///// <remarks>
+        ///// <para>Clears the published name for all cultures, thus unpublishing all cultures.</para>
+        ///// </remarks>
+        //void ClearAllPublishedValues();
+
         /// <summary>
-        /// Publishes the culture/any values.
+        /// Clears published values for a specified culture and segment.
         /// </summary>
-        /// <returns>A value indicating whether the values could be published.</returns>
         /// <remarks>
-        /// <para>The document must then be published via the content service.</para>
-        /// <para>Values are not published if they are not valie.</para>
+        /// <para>Clears the property values but not the published name for the specified culture,
+        /// thus leaving the culture published.</para>
         /// </remarks>
-        //fixme - needs API review as this is not used apart from in tests
-        //bool PublishCultureValues(string culture = null);
+        void ClearPublishedValues(string culture = null, string segment = null); // fixme should NOT use
 
-        /// <summary>
-        /// Clears all published values.
-        /// </summary>
-        void ClearAllPublishedValues();
-
-        /// <summary>
-        /// Clears published values.
-        /// </summary>
-        void ClearPublishedValues(string culture = null, string segment = null);
-
-        /// <summary>
-        /// Clears the culture/any published values.
-        /// </summary>
-        void ClearCulturePublishedValues(string culture = null);
+        ///// <summary>
+        ///// Clears published values for a specified culture, all segments.
+        ///// </summary>
+        ///// <remarks>
+        ///// <para>Clears the published name for the specified culture, thus unpublishing the culture.</para>
+        ///// </remarks>
+        //void ClearCulturePublishedValues(string culture = null); // fixme that one should be used!
 
         /// <summary>
         /// Copies values from another document.
@@ -216,12 +234,12 @@ namespace Umbraco.Core.Models
         void CopyAllValues(IContent other);
 
         /// <summary>
-        /// Copies values from another document.
+        /// Copies values from another document for a specified culture and segment.
         /// </summary>
         void CopyValues(IContent other, string culture = null, string segment = null);
 
         /// <summary>
-        /// Copies culture/any values from another document.
+        /// Copies values from another document for a specified culture, all segments.
         /// </summary>
         void CopyCultureValues(IContent other, string culture = null);
     }

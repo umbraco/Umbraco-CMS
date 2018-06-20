@@ -905,7 +905,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.Edited = dto.Edited;
             entity.Published = dto.Published;
 
-            if (dto.Variations.Has(ContentVariation.CultureNeutral) && dto.VariationInfo != null && dto.VariationInfo.Count > 0)
+            if (dto.Variations.VariesByCulture() && dto.VariationInfo != null && dto.VariationInfo.Count > 0)
             {
                 var variantInfo = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
                 foreach (var info in dto.VariationInfo)

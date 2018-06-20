@@ -478,14 +478,14 @@ namespace umbraco
             {
                 get
                 {
-                    if (!_inner.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral)) // fixme CultureSegment?
+                    if (!_inner.ContentType.VariesByCulture())
                         return NoCultureInfos;
 
                     if (_cultureInfos != null)
                         return _cultureInfos;
 
-                    return _cultureInfos = _inner.PublishCultureNames
-                        .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value, _inner.GetCulturePublishDate(x.Key)));
+                    return _cultureInfos = _inner.PublishNames
+                        .ToDictionary(x => x.Key, x => new PublishedCultureInfo(x.Key, x.Value, _inner.GetPublishDate(x.Key) ?? DateTime.MinValue));
                 }
             }
 

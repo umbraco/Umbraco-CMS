@@ -56,7 +56,7 @@ namespace Umbraco.Core.Models
             Id = 0; // no identity
             VersionId = 0; // no versions
 
-            SetName(name, culture);
+            SetCultureName(name, culture);
 
             _contentTypeId = contentType.Id;
             _properties = properties ?? throw new ArgumentNullException(nameof(properties));
@@ -139,104 +139,101 @@ namespace Umbraco.Core.Models
 
         #region Cultures
 
+        // notes - common rules
+        // - setting a variant value on an invariant content type throws
+        // - getting a variant value on an invariant content type returns null
+        // - setting and getting the invariant value is always possible
+        // - setting a null value clears the value
+
+        /// <inheritdoc />
+        public IEnumerable<string> AvailableCultures
+            => _cultureInfos?.Select(x => x.Key) ?? Enumerable.Empty<string>();
+
+        /// <inheritdoc />
+        public bool IsCultureAvailable(string culture)
+            => _cultureInfos != null && _cultureInfos.ContainsKey(culture);
+
         /// <inheritdoc />
         [DataMember]
         public virtual IReadOnlyDictionary<string, string> CultureNames => _cultureInfos?.ToDictionary(x => x.Key, x => x.Value.Name, StringComparer.OrdinalIgnoreCase) ?? NoNames;
 
-        // sets culture infos
-        // internal for repositories
-        // clear by clearing name
-        internal void SetCultureInfos(string culture, string name, DateTime date)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentNullOrEmptyException(nameof(name));
-
-            if (culture == null)
-            {
-                Name = name;
-                return;
-            }
-
-            // private method, assume that culture is valid
-
-            if (_cultureInfos == null)
-                _cultureInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
-
-            _cultureInfos[culture] = (name, date);
-        }
-
         /// <inheritdoc />
-        public virtual void SetName(string name, string culture)
+        public virtual string GetCultureName(string culture)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                ClearName(culture);
-                return;
-            }
-
-            if (culture == null)
-            {
-                Name = name;
-                return;
-            }
-
-            if (ContentTypeBase.Variations.DoesNotSupportCulture())
-                throw new NotSupportedException("Content type does not support varying name by culture.");
-
-            if (_cultureInfos == null)
-                _cultureInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
-
-            _cultureInfos[culture] = (name, DateTime.Now);
-            OnPropertyChanged(Ps.Value.NamesSelector);
-        }
-
-        /// <inheritdoc />
-        public virtual string GetName(string culture)
-        {
-            if (culture == null) return Name;
+            if (culture.IsNullOrWhiteSpace()) return Name;
+            if (!ContentTypeBase.VariesByCulture()) return null;
             if (_cultureInfos == null) return null;
             return _cultureInfos.TryGetValue(culture, out var infos) ? infos.Name : null;
         }
 
         /// <inheritdoc />
-        public bool IsCultureAvailable(string culture)
-            => !string.IsNullOrWhiteSpace(GetName(culture));
-
-        private void ClearName(string culture)
+        public DateTime? GetCultureDate(string culture)
         {
-            if (culture == null)
-            {
-                Name = null;
-                return;
-            }
-
-            if (ContentTypeBase.Variations.DoesNotSupportCulture())
-                throw new NotSupportedException("Content type does not support varying name by culture.");
-
-            if (_cultureInfos == null) return;
-            if (!_cultureInfos.ContainsKey(culture))
-                throw new InvalidOperationException($"Cannot unpublish culture {culture}, the document contains only cultures {string.Join(", ", _cultureInfos.Keys)}");
-
-            _cultureInfos.Remove(culture);
-            if (_cultureInfos.Count == 0)
-                _cultureInfos = null;
+            if (culture.IsNullOrWhiteSpace()) return null;
+            if (!ContentTypeBase.VariesByCulture()) return null;
+            if (_cultureInfos == null) return null;
+            return _cultureInfos.TryGetValue(culture, out var infos) ? infos.Date : (DateTime?) null;
         }
 
-        protected virtual void ClearNames()
+        /// <inheritdoc />
+        public virtual void SetCultureName(string name, string culture)
         {
-            if (ContentTypeBase.Variations.DoesNotSupportCulture())
-                throw new NotSupportedException("Content type does not support varying name by culture.");
+            if (ContentTypeBase.VariesByCulture()) // set on variant content type
+            {
+                if (culture.IsNullOrWhiteSpace()) // invariant is ok
+                {
+                    Name = name; // may be null
+                }
+                else if (name.IsNullOrWhiteSpace()) // clear
+                {
+                    ClearCultureInfo(culture);
+                }
+                else // set
+                {
+                    SetCultureInfo(culture, name, DateTime.Now);
+                }
+            }
+            else // set on invariant content type
+            {
+                if (!culture.IsNullOrWhiteSpace()) // invariant is NOT ok
+                    throw new NotSupportedException("Content type does not vary by culture.");
 
+                Name = name; // may be null
+            }
+        }
+
+        protected void ClearCultureInfos()
+        {
             _cultureInfos = null;
             OnPropertyChanged(Ps.Value.NamesSelector);
         }
 
-        /// <inheritdoc />
-        public DateTime GetCultureDate(string culture)
+        protected void ClearCultureInfo(string culture)
         {
-            if (_cultureInfos != null && _cultureInfos.TryGetValue(culture, out var infos))
-                return infos.Date;
-            throw new InvalidOperationException($"Culture \"{culture}\" is not available.");
+            if (culture.IsNullOrWhiteSpace())
+                throw new ArgumentNullOrEmptyException(nameof(culture));
+
+            if (_cultureInfos == null) return;
+            _cultureInfos.Remove(culture);
+            if (_cultureInfos.Count == 0)
+                _cultureInfos = null;
+            OnPropertyChanged(Ps.Value.NamesSelector);
+        }
+
+        // internal for repository
+        internal void SetCultureInfo(string culture, string name, DateTime date)
+        {
+            if (name.IsNullOrWhiteSpace())
+                throw new ArgumentNullOrEmptyException(nameof(name));
+
+            if (culture.IsNullOrWhiteSpace())
+                throw new ArgumentNullOrEmptyException(nameof(culture));
+
+            if (_cultureInfos == null)
+                _cultureInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
+
+            _cultureInfos[culture.ToLowerInvariant()] = (name, date);
+            OnPropertyChanged(Ps.Value.NamesSelector);
         }
 
         #endregion
@@ -307,17 +304,10 @@ namespace Umbraco.Core.Models
 
         #region Validation
 
-        internal virtual Property[] ValidateAllProperties()
-        {
-            //fixme - needs API review as this is not used apart from in tests
-
-            return Properties.Where(x => !x.IsAllValid()).ToArray();
-        }
-
         /// <inheritdoc />
         public bool IsValid(string culture = null, string segment = null)
         {
-            var name = GetName(culture);
+            var name = GetCultureName(culture);
             if (name.IsNullOrWhiteSpace()) return false;
             return ValidateProperties(culture, segment).Length == 0;
         }
@@ -325,25 +315,10 @@ namespace Umbraco.Core.Models
         /// <inheritdoc />
         public virtual Property[] ValidateProperties(string culture = null, string segment = null)
         {
-            return Properties.Where(x =>
-            {
-                if (!culture.IsNullOrWhiteSpace() && x.PropertyType.Variations.DoesNotSupportCulture())
-                    return false; //has a culture, this prop is only culture invariant, ignore
-                if (culture.IsNullOrWhiteSpace() && x.PropertyType.Variations.DoesNotSupportInvariant())
-                    return false; //no culture, this prop is only culture variant, ignore
-                if (!segment.IsNullOrWhiteSpace() && x.PropertyType.Variations.DoesNotSupportSegment())
-                    return false; //has segment, this prop is only segment neutral, ignore
-                if (segment.IsNullOrWhiteSpace() && x.PropertyType.Variations.DoesNotSupportNeutral())
-                    return false; //no segment, this prop is only non segment neutral, ignore
-                return !x.IsValid(culture, segment);
-            }).ToArray();
-        }
-
-        internal virtual Property[] ValidatePropertiesForCulture(string culture = null)
-        {
-            //fixme - needs API review as this is not used apart from in tests
-
-            return Properties.Where(x => !x.IsCultureValid(culture)).ToArray();
+            return Properties.Where(x => // select properties...
+                    x.PropertyType.SupportsVariation(culture, segment, true) && // that support the variation
+                    !x.IsValid(culture, segment)) // and are not valid
+                .ToArray();
         }
 
         #endregion
