@@ -52,7 +52,7 @@ namespace Umbraco.Web.Editors
             var dateQuery = sinceDate.HasValue ? Query<IAuditItem>.Builder.Where(x => x.CreateDate >= sinceDate) : null;
             var result = Services.AuditService.GetPagedItemsByUser(Security.GetUserId(), pageNumber - 1, pageSize, out totalRecords, orderDirection, customFilter:dateQuery);
             var mapped = Mapper.Map<IEnumerable<AuditLog>>(result);
-            return new PagedResult<AuditLog>(totalRecords, pageNumber + 1, pageSize)
+            return new PagedResult<AuditLog>(totalRecords, pageNumber, pageSize)
             {
                 Items = MapAvatarsAndNames(mapped)
             };
