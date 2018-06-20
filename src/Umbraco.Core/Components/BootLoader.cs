@@ -353,8 +353,9 @@ namespace Umbraco.Core.Components
 
             using (_proflog.DebugDuration<BootLoader>($"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
             {
-                foreach (var component in _components)
+                for (var i = _components.Length - 1; i >= 0; i--) // terminate components in reverse order
                 {
+                    var component = _components[i];
                     var componentType = component.GetType();
                     using (_proflog.DebugDuration<BootLoader>($"Terminating {componentType.FullName}.", $"Terminated {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
