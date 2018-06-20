@@ -11,6 +11,7 @@ using Umbraco.Core.Composing.CompositionRoots;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Migrations;
@@ -117,6 +118,8 @@ namespace Umbraco.Core.Runtime
 
             // by default, register a noop factory
             composition.Container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
+
+            composition.Container.RegisterSingleton<IMediaPathScheme, TwoGuidsMediaPathScheme>();
         }
 
         internal void Initialize(IEnumerable<Profile> mapperProfiles)
