@@ -1,5 +1,4 @@
-﻿using LightInject;
-using Umbraco.Core.IO;
+﻿using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
@@ -7,7 +6,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal class PartialViewMacroRepository : PartialViewRepository, IPartialViewMacroRepository
     {
 
-        public PartialViewMacroRepository([Inject("PartialViewMacroFileSystem")] IFileSystem fileSystem)
+        public PartialViewMacroRepository(IFileSystem fileSystem)
             : base(fileSystem)
         { }
 

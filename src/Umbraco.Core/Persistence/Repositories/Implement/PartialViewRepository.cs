@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using LightInject;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 
@@ -10,7 +9,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class PartialViewRepository : FileRepository<string, IPartialView>, IPartialViewRepository
     {
-        public PartialViewRepository([Inject("PartialViewFileSystem")] IFileSystem fileSystem)
+        public PartialViewRepository(IFileSystem fileSystem)
             : base(fileSystem)
         { }
 

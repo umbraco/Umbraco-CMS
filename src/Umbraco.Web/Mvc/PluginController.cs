@@ -35,32 +35,32 @@ namespace Umbraco.Web.Mvc
         /// <summary>
         /// Gets or sets the Umbraco context.
         /// </summary>
-        public virtual UmbracoContext UmbracoContext { get; set; }
+        public virtual UmbracoContext UmbracoContext { get; }
 
         /// <summary>
         /// Gets or sets the database context.
         /// </summary>
-        public IUmbracoDatabaseFactory DatabaseFactory { get; set; }
+        public IUmbracoDatabaseFactory DatabaseFactory { get; }
 
         /// <summary>
         /// Gets or sets the services context.
         /// </summary>
-        public ServiceContext Services { get; set; }
+        public ServiceContext Services { get; }
 
         /// <summary>
         /// Gets or sets the application cache.
         /// </summary>
-        public CacheHelper ApplicationCache { get; set;  }
+        public CacheHelper ApplicationCache { get;  }
 
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        public ILogger Logger { get; set; }
+        public ILogger Logger { get; }
 
         /// <summary>
         /// Gets or sets the profiling logger.
         /// </summary>
-        public ProfilingLogger ProfilingLogger { get; set; }
+        public ProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
         /// Gets the membership helper.

@@ -302,6 +302,9 @@ namespace Umbraco.Core.IO
                 // could be optimized by having FileSystemWrapper inherit from ShadowWrapper, maybe
                 var innerFs = GetUnderlyingFileSystemNoCache(alias, fallback);
                 var shadowWrapper = new ShadowWrapper(innerFs, "typed/" + alias, () => IsScoped());
+
+                // fixme - switch to using container. where are these registered?
+
                 var fs = (IFileSystem) Activator.CreateInstance(typeof(TFileSystem), shadowWrapper);
                 _wrappers.Add(shadowWrapper); // keeping a reference to the wrapper
                 return fs;
