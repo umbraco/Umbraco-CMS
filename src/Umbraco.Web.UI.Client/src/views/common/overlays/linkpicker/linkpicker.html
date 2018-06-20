@@ -4,8 +4,7 @@
         <input type="text"
             localize="placeholder"
             placeholder="@general_url"
-            class="umb-editor umb-textstring"
- 		    style="float:left; min-width:0; width:65%"
+            class="umb-editor umb-editor-pull umb-textstring"
             ng-model="model.target.url"
             ng-disabled="model.target.id"
             focus-when="{{true}} "/>
@@ -14,8 +13,7 @@
 		   list="anchors"
 		   localize="placeholder"
 		   placeholder="@general_anchor"
-		   class="umb-editor umb-textstring"	
-		   style="float:right; min-width:0; width:30%"
+		   class="umb-editor umb-editor-push umb-editor-tiny umb-textstring"	
 		   ng-model="model.target.anchor" />
 		
 		<datalist id="anchors">
