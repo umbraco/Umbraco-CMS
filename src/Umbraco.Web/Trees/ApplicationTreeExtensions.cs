@@ -36,7 +36,38 @@ namespace Umbraco.Web.Trees
 
                 if (treeAttributes.Length == 0)
                 {
-                    throw new InvalidOperationException("The Tree controller is missing the " + typeof(TreeAttribute).FullName + " attribute");
+                    var allTreesfromConfig = ApplicationContext.Current.Services.ApplicationTreeService.GetAll();
+                    // The Type attribute in trees.config looks like "NameSpace.TypeName, umbraco"
+                    // so we're splitting on the comma here to test for both the type and the assembly name
+                    ApplicationTree foundTree = null;
+                    foreach (var applicationTree in allTreesfromConfig)
+                    {
+                        var assemblyName = type.Assembly.GetName().Name;
+                        var splitType = applicationTree.Type.Split(',');
+                        if (splitType.First() !=  null && splitType.First() != type.FullName)
+                            continue;
+
+                        var treesConfigAssemblyName = splitType.Skip(1).FirstOrDefault();
+                        if (treesConfigAssemblyName != null && treesConfigAssemblyName.Trim() == assemblyName)
+                        {
+                            foundTree = applicationTree;
+                            break;
+                        }
+                    }
+
+                    // Couldn't find the tree in the config file either, nothing we can do now!
+                    if (foundTree == null)
+                        throw new InvalidOperationException("The Tree controller is missing the " + typeof(TreeAttribute).FullName + " attribute");
+
+                    var attribute = new TreeAttribute(foundTree.ApplicationAlias, foundTree.Alias)
+                    {
+                        IconClosed = foundTree.IconClosed,
+                        IconOpen = foundTree.IconOpened,
+                        Title = foundTree.Title,
+                        Initialize = foundTree.Initialize,
+                        SortOrder = foundTree.SortOrder
+                    };
+                    return attribute;
                 }
 
                 //assign the properties of this object to those of the metadata attribute

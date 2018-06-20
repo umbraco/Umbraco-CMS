@@ -5,11 +5,31 @@ using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Trees
 {
-    public class DictionaryTreeBaseController : TreeController
+    [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
+    [Mvc.PluginController("UmbracoTrees")]
+    [CoreTree]
+    public class DictionaryTreeController : TreeController
     {
+        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        {
+            var root = base.CreateRootNode(queryStrings);
+
+            // the default section is settings, falling back to this if we can't
+            // figure out where we are from the querystring parameters
+            var section = Constants.Applications.Settings;
+            if (queryStrings["application"] != null)
+                section = queryStrings["application"];
+
+            // this will load in a custom UI instead of the dashboard for the root node
+            root.RoutePath = $"{section}/{Constants.Trees.Dictionary}/list";
+
+            return root;
+        }
+
         /// <summary>
         /// The method called to render the contents of the tree structure
         /// </summary>
