@@ -155,46 +155,21 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
 
                 args.path = _.filter(args.path, function (item) { return (item !== "init" && item !== "-1"); });
 
-                //Once those are filtered we need to check if the current user has a special start node id,
-                // if they do, then we're going to trim the start of the array for anything found from that start node
-                // and previous so that the tree syncs properly. The tree syncs from the top down and if there are parts
-                // of the tree's path in there that don't actually exist in the dom/model then syncing will not work.
+                var treeNode = loadActiveTree(args.tree);
 
-                return userService.getCurrentUser().then(function (userData) {
+                return treeService.syncTree({
+                    node: treeNode,
+                    path: args.path,
+                    forceReload: args.forceReload
+                }).then(function (data) {
 
-                    var startNodes = [];
-                    for (var i = 0; i < userData.startContentIds; i++) {
-                        startNodes.push(userData.startContentIds[i]);
-                    }
-                    for (var j = 0; j < userData.startMediaIds; j++) {
-                        startNodes.push(userData.startMediaIds[j]);
+                    if (args.activate === undefined || args.activate === true) {
+                        $scope.currentNode = data;
                     }
 
-                    _.each(startNodes, function (i) {
-                        var found = _.find(args.path, function (p) {
-                            return String(p) === String(i);
-                        });
-                        if (found) {
-                            args.path = args.path.splice(_.indexOf(args.path, found));
-                        }
-                    });
-                    
-                    var treeNode = loadActiveTree(args.tree);
+                    emitEvent("treeSynced", { node: data, activate: args.activate });
 
-                    return treeService.syncTree({
-                        node: treeNode,
-                        path: args.path,
-                        forceReload: args.forceReload
-                    }).then(function (data) {
-
-                        if (args.activate === undefined || args.activate === true) {
-                            $scope.currentNode = data;
-                        }
-
-                        emitEvent("treeSynced", { node: data, activate: args.activate });
-                        
-                        return $q.when({ node: data, activate: args.activate });
-                    });
+                    return $q.when({ node: data, activate: args.activate });
                 });
                 
             }
@@ -371,6 +346,9 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 if (args) {
                     if (args.section) {
                         $scope.section = args.section;
+                    }
+                    if (args.cacheKey) {
+                        $scope.cachekey = args.cacheKey;
                     }
                 }
 

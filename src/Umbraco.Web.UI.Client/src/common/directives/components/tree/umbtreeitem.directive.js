@@ -29,7 +29,7 @@ angular.module("umbraco.directives")
             currentNode: '=',
             enablelistviewexpand: '@',
             node: '=',
-            tree: '=' //TODO: Not sure we need this since we are 'require' on the umbTree
+            tree: '='
         },
         
         link: function (scope, element, attrs, umbTreeCtrl) {
