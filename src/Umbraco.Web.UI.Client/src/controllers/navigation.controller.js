@@ -196,7 +196,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     //Listen for section state changes
     evts.push(eventsService.on("appState.sectionState.changed", function (e, args) {
         //section changed
-        if (args.key === "currentSection") {
+        if (args.key === "currentSection" && $scope.currentSection != args.value) {
             $scope.currentSection = args.value;
 
             //load the tree
@@ -365,6 +365,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
                 //because angular doesn't return a promise for the resolve method, we need to resort to some hackery, else
                 //like normal JS promises we could do resolve(...).then()
                 onLoaded: function () {
+
                     //the nav is ready, let the app know
                     eventsService.emit("app.navigationReady", { treeApi: $scope.treeApi });
                     //finally set the section state
