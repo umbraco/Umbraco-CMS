@@ -18,6 +18,8 @@ namespace Umbraco.Web.Trees
         {
             var root = base.CreateRootNode(queryStrings);
 
+            // the default section is settings, falling back to this if we can't
+            // figure out where we are from the querystring parameters
             var section = Constants.Applications.Settings;
             if (queryStrings["application"] != null)
                 section = queryStrings["application"];
