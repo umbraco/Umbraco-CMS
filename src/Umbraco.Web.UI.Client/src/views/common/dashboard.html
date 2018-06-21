@@ -16,7 +16,7 @@
 
             <div class="umb-dashboard__content">
 
-                <umb-tab-content ng-repeat="tab in dashboard.tabs" ng-if="tab.active" class="row-fluid">
+                <umb-tab-content ng-repeat="tab in dashboard.tabs" ng-if="tab.active" tab="tab" class="row-fluid">
     
                     <div ng-repeat="property in tab.properties" ng-switch on="property.serverSide">
     

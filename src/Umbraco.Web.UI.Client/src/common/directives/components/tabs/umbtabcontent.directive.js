@@ -10,7 +10,11 @@
         .module('umbraco.directives')
         .component('umbTabContent', {
             transclude: true,
-            templateUrl: 'views/components/tabs/umb-tab-content.html'
+            templateUrl: 'views/components/tabs/umb-tab-content.html',
+            controllerAs: 'vm',
+            bindings: {
+                tab: '<'
+            }
         });
 
 })();
