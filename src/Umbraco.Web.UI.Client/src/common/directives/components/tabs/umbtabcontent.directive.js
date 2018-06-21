@@ -1,7 +1,14 @@
 /**
-* @ngdoc directive
-* @name umbraco.directives.directive:umbTab
-* @restrict E
+@ngdoc directive
+@name umbraco.directives.directive:umbTabContent
+@restrict E
+@scope
+
+@description
+Use this directive to render tab content. For an example see: {@link umbraco.directives.directive:umbTabsContent umbTabsContent}
+
+@param {string=} tab The tab.
+
 **/
 (function () {
     'use strict';
