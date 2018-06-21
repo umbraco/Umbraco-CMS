@@ -528,9 +528,7 @@
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
     <Compile Include="Security\Identity\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="SingletonHttpContextAccessor.cs" />
-    <Compile Include="Trees\DictionaryTreeBaseController.cs" />
-    <Compile Include="Trees\SettingsDictionaryTreeController.cs" />
-    <Compile Include="Trees\TranslationDictionaryTreeController.cs" />
+    <Compile Include="Trees\DictionaryBaseController.cs" />
     <Compile Include="Trees\MacroTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
     <Compile Include="Suspendable.cs" />
@@ -543,6 +541,9 @@
     <Compile Include="Trees\XsltTreeController.cs" />
     <Compile Include="umbraco.presentation\SafeXmlReaderWriter.cs" />
     <Compile Include="Trees\ScriptTreeController.cs" />
+    <Compile Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="UmbracoDefaultOwinStartup.cs" />
     <Compile Include="IUmbracoContextAccessor.cs" />
     <Compile Include="Models\ContentEditing\Relation.cs" />
