@@ -35,6 +35,7 @@
       <dependency id="Examine" version="[0.1.89, 1.0.0)" />
       <dependency id="ImageProcessor" version="[2.5.6, 3.0.0)" />
       <dependency id="ImageProcessor.Web" version="[4.8.7, 5.0.0)" />
+      <dependency id="ImageProcessor.Web.PostProcessor" version="[1.2.3, 2.0.0)" />
       <dependency id="semver" version="[1.1.2, 3.0.0)" />
 	    <!-- Markdown can not be updated due to: https://github.com/hey-red/markdownsharp/issues/71#issuecomment-233585487 -->
       <dependency id="Markdown" version="[1.14.7, 2.0.0)" />
