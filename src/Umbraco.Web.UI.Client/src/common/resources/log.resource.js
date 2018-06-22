@@ -107,6 +107,7 @@ function logResource($q, $http, umbRequestHelper) {
          * @methodOf umbraco.resources.logResource
          *
          * @description
+         *  <strong>[OBSOLETE] use getPagedEntityLog instead</strong><br />
          * Gets the log history for a give entity id
          *
          * ##usage
@@ -137,7 +138,8 @@ function logResource($q, $http, umbRequestHelper) {
          * @methodOf umbraco.resources.logResource
          *
          * @description
-         * Gets the current users' log history for a given type of log entry
+         * <strong>[OBSOLETE] use getPagedUserLog instead</strong><br />
+         * Gets the current user's log history for a given type of log entry
          *
          * ##usage
          * <pre>
