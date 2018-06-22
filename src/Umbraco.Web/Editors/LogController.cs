@@ -53,7 +53,7 @@ namespace Umbraco.Web.Editors
             };
         }
 
-        [Obsolete("Use GetPagedLog instead")]
+        [Obsolete("Use GetPagedEntityLog instead")]
         public IEnumerable<AuditLog> GetEntityLog(int id)
         {
             long totalRecords;
