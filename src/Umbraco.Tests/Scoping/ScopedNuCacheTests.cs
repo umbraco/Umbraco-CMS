@@ -152,7 +152,6 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                item.TryPublishValues();
                 Current.Services.ContentService.SaveAndPublish(item);
                 scope.Complete();
             }
@@ -167,7 +166,6 @@ namespace Umbraco.Tests.Scoping
             using (var scope = ScopeProvider.CreateScope())
             {
                 item.Name = "changed";
-                item.TryPublishValues();
                 Current.Services.ContentService.SaveAndPublish(item);
 
                 if (complete)

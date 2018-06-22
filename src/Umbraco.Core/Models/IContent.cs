@@ -81,7 +81,7 @@ namespace Umbraco.Core.Models
         ContentStatus Status { get; }
 
         /// <summary>
-        /// Gets a value indicating whether a given culture is published.
+        /// Gets a value indicating whether a culture is published.
         /// </summary>
         /// <remarks>
         /// <para>A culture becomes published whenever values for this culture are published,
@@ -89,6 +89,14 @@ namespace Umbraco.Core.Models
         /// whenever values for this culture are unpublished.</para>
         /// </remarks>
         bool IsCulturePublished(string culture);
+
+        /// <summary>
+        /// Gets a value indicating whether a culture was published.
+        /// </summary>
+        /// <remarks>
+        /// <para>Mirrors <see cref="IsCulturePublished"/> whenever the content item is saved.</para>
+        /// </remarks>
+        bool WasCulturePublished(string culture);
 
         /// <summary>
         /// Gets the date a culture was published.
@@ -156,91 +164,27 @@ namespace Umbraco.Core.Models
         /// <returns></returns>
         IContent DeepCloneWithResetIdentities();
 
-        ///// <summary>
-        ///// Publishes all values.
-        ///// </summary>
-        ///// <returns>A value indicating whether the values could be published.</returns>
-        ///// <remarks>
-        ///// <para>Fails if values cannot be published, e.g. if some values are not valid.</para>
-        ///// <para>Sets the property values for all cultures, including the invariant ones.</para>
-        ///// <para>Sets the published name for all culture that are available, thus publishing them all.</para>
-        ///// <para>The document must then be published via the content service SaveAndPublish method.</para>
-        ///// </remarks>
-        //// fixme - should return an attemps with error results
-        //// fixme - needs API review as this is not used apart from in tests << YES but users could use it
-        //bool TryPublishAllValues();
-
-        ///// <summary>
-        ///// Publishes the values for a specified culture and all segments.
-        ///// </summary>
-        ///// <returns>A value indicating whether the values could be published.</returns>
-        ///// <remarks>
-        ///// <para>Fails if values cannot be published, e.g. if some values are not valid.</para>
-        ///// <para>Sets the property values for the specified culture, and only the specified culture: must
-        ///// be invoked with a null culture to set the invariant values.</para>
-        ///// <para>Sets the published name for the specified culture, thus publishing the culture.</para>
-        ///// <para>The document must then be published via the content service SaveAndPublish method.</para>
-        ///// </remarks>
-        //// fixme - needs API review as this is not used apart from in tests << NO it is THAT one that we should use for now
-        //// fixme - should return an attemps with error results
-        //// fixme - should it publish the invariant values too? - NO that's done when SaveAndPublish (is it? don't think so) - BUT could we want to avoid it?
-        //bool TryPublishCultureValues(string culture);
-
         /// <summary>
-        /// Publishes values for a specific culture and segment.
+        /// Registers a culture to be published.
         /// </summary>
-        /// <returns>A value indicating whether the values could be published.</returns>
+        /// <returns>A value indicating whether the culture can be published.</returns>
         /// <remarks>
         /// <para>Fails if values cannot be published, e.g. if some values are not valid.</para>
         /// <para>Sets the property values but not the published name for the specified culture,
-        /// thus not explicitely publishing the culture.</para>
-        /// <para>The document must then be published via the content service SaveAndPublish method.</para>
+        /// thus not explicitely publishing the culture.</para> fixme uhuh?
+        /// <para>Publishing must be finalized via the content service SavePublishing method.</para>
         /// </remarks>
-        // fixme - should return an attemps with error results
-        // fixme - publishing for segments is not supported
-        //   we don't know whether should it also publish the specified culture?
-        //   we don't know how to publish segments but not neutral, etc
-        //   what shall we do then?
-        bool TryPublishValues(string culture = null, string segment = null);
-
-        ///// <summary>
-        ///// Clears published values.
-        ///// </summary>
-        ///// <remarks>
-        ///// <para>Clears the published name for all cultures, thus unpublishing all cultures.</para>
-        ///// </remarks>
-        //void ClearAllPublishedValues();
+        // fixme - should return an attempt with error results
+        bool PublishCulture(string culture = "*");
 
         /// <summary>
-        /// Clears published values for a specified culture and segment.
+        /// Registers a culture to be unpublished.
         /// </summary>
         /// <remarks>
         /// <para>Clears the property values but not the published name for the specified culture,
-        /// thus leaving the culture published.</para>
+        /// thus leaving the culture published.</para> fixme wtf?
+        /// <para>Publishing must be finalized via the content service SavePublishing method.</para>
         /// </remarks>
-        void ClearPublishedValues(string culture = null, string segment = null); // fixme should NOT use
-
-        ///// <summary>
-        ///// Clears published values for a specified culture, all segments.
-        ///// </summary>
-        ///// <remarks>
-        ///// <para>Clears the published name for the specified culture, thus unpublishing the culture.</para>
-        ///// </remarks>
-        //void ClearCulturePublishedValues(string culture = null); // fixme that one should be used!
-
-        /// <summary>
-        /// Copies values from another document.
-        /// </summary>
-        void CopyAllValues(IContent other);
-
-        /// <summary>
-        /// Copies values from another document for a specified culture and segment.
-        /// </summary>
-        void CopyValues(IContent other, string culture = null, string segment = null);
-
-        /// <summary>
-        /// Copies values from another document for a specified culture, all segments.
-        /// </summary>
-        void CopyCultureValues(IContent other, string culture = null);
+        void UnpublishCulture(string culture = "*");
     }
 }

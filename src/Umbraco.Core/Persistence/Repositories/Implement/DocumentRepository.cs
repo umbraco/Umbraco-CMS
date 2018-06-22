@@ -328,7 +328,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // if !publishing, we may have a new name != current publish name,
             // also impacts 'edited'
-            if (content.PublishName != content.Name)
+            if (!publishing && content.PublishName != content.Name)
                 edited = true;
 
             // persist the document dto

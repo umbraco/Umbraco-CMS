@@ -348,23 +348,48 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves and publishes a document.
         /// </summary>
-        /// <remarks>Property values must first be published at document level.</remarks>
-        PublishResult SaveAndPublish(IContent content, int userId = 0, bool raiseEvents = true);
+        /// <remarks>
+        /// <para>By default, publishes all variations of the document, but it is possible to specify a culture to be published.</para>
+        /// <para>When a culture is being published, it includes all varying values along with all invariant values. For
+        /// anything more complicated, see <see cref="SavePublishing"/>.</para>
+        /// <para>The document is *always* saved, even when publishing fails.</para>
+        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
+        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
+        /// </remarks>
+        PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Saves and publishes a publishing document.
+        /// </summary>
+        /// <remarks>
+        /// <para>A publishing document is a document with values that are being published, i.e.
+        /// that have been published or cleared via <see cref="IContent.PublishCulture"/> and
+        /// <see cref="IContent.UnpublishCulture"/>.</para>
+        /// <para>The document is *always* saved, even when publishing fails.</para>
+        /// </remarks>
+        PublishResult SavePublishing(IContent content, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Saves and publishes a document branch.
         /// </summary>
-        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = null, string segment = null, int userId = 0);
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = 0);
 
         /// <summary>
         /// Saves and publishes a document branch.
         /// </summary>
-        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, Func<IContent, bool> editing, Func<IContent, bool> publishValues, int userId = 0);
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, Func<IContent, bool> editing, Func<IContent, bool> publishCultures, int userId = 0);
 
         /// <summary>
-        /// Unpublishes a document or optionally unpublishes a culture and/or segment for the document.
+        /// Unpublishes a document.
         /// </summary>
-        UnpublishResult Unpublish(IContent content, string culture = null, string segment = null, int userId = 0);
+        /// <remarks>
+        /// <para>By default, unpublishes the document as a whole, but it is possible to specify a culture to be
+        /// unpublished. Depending on whether that culture is mandatory, and other cultures remain published,
+        /// the document as a whole may or may not remain published.</para>
+        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither null nor
+        /// empty. If the content type is invariant, then culture can be either '*' or null or empty.</para>
+        /// </remarks>
+        UnpublishResult Unpublish(IContent content, string culture = "*", int userId = 0);
 
         /// <summary>
         /// Gets a value indicating whether a document is path-publishable.

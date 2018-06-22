@@ -712,8 +712,7 @@ namespace Umbraco.Web.Editors
             if (!contentItem.PersistedContent.ContentType.VariesByCulture())
             {
                 //its invariant, proceed normally
-                contentItem.PersistedContent.TryPublishValues();
-                publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, Security.CurrentUser.Id);
+                publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, userId: Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedCancelledByEvent;
             }
             else
@@ -760,13 +759,13 @@ namespace Umbraco.Web.Editors
                 if (canPublish)
                 {
                     //try to publish all the values on the model
-                    canPublish = TryPublishValues(contentItem, otherVariantsToValidate, allLangs);
+                    canPublish = PublishCulture(contentItem, otherVariantsToValidate, allLangs);
                 }
 
                 if (canPublish)
                 {
                     //proceed to publish if all validation still succeeds
-                    publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, Security.CurrentUser.Id);
+                    publishStatus = Services.ContentService.SavePublishing(contentItem.PersistedContent, Security.CurrentUser.Id);
                     wasCancelled = publishStatus.Result == PublishResultType.FailedCancelledByEvent;
                 }
                 else
@@ -786,16 +785,15 @@ namespace Umbraco.Web.Editors
         /// <param name="otherVariantsToValidate"></param>
         /// <param name="allLangs"></param>
         /// <returns></returns>
-        private bool TryPublishValues(ContentItemSave contentItem, IEnumerable<ContentVariationPublish> otherVariantsToValidate, IDictionary<string, ILanguage> allLangs)
+        private bool PublishCulture(ContentItemSave contentItem, IEnumerable<ContentVariationPublish> otherVariantsToValidate, IDictionary<string, ILanguage> allLangs)
         {
             var culturesToPublish = new List<string> { contentItem.Culture };
-            if (!contentItem.Culture.IsNullOrWhiteSpace())
-                culturesToPublish.Add(null); //we need to publish the invariant values if culture is specified, so we can pass in null
             culturesToPublish.AddRange(otherVariantsToValidate.Select(x => x.Culture));
 
             foreach(var culture in culturesToPublish)
             {
-                var valid = contentItem.PersistedContent.TryPublishValues(culture);
+                // publishing any culture, implies the invariant culture
+                var valid = contentItem.PersistedContent.PublishCulture(culture);
                 if (!valid)
                 {
                     var errMsg = Services.TextService.Localize("speechBubbles/contentCultureUnexpectedValidationError", new[] { allLangs[culture].CultureName });
@@ -827,8 +825,7 @@ namespace Umbraco.Web.Editors
                 return HandleContentNotFound(id, false);
             }
 
-            foundContent.TryPublishValues(); // fixme variants?
-            var publishResult = Services.ContentService.SaveAndPublish(foundContent, Security.GetUserId().ResultOr(0));
+            var publishResult = Services.ContentService.SavePublishing(foundContent, Security.GetUserId().ResultOr(0));
             if (publishResult.Success == false)
             {
                 var notificationModel = new SimpleNotificationModel();

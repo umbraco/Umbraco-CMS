@@ -302,22 +302,112 @@ namespace Umbraco.Core.Models
 
         #endregion
 
+        #region Copy
+
+        /// <inheritdoc />
+        public virtual void CopyFrom(IContent other, string culture = "*")
+        {
+            if (other.ContentTypeId != ContentTypeId)
+                throw new InvalidOperationException("Cannot copy values from a different content type.");
+
+            culture = culture?.ToLowerInvariant().NullOrWhiteSpaceAsNull();
+
+            // the variation should be supported by the content type properties
+            //  if the content type is invariant, only '*' and 'null' is ok
+            //  if the content type varies, everything is ok because some properties may be invariant
+            if (!ContentTypeBase.SupportsPropertyVariation(culture, "*", true))
+                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{ContentTypeBase.Alias}\" with variation \"{ContentTypeBase.Variations}\".");
+
+            // copying from the same Id and VersionPk
+            var copyingFromSelf = Id == other.Id && VersionId == other.VersionId;
+            var published = copyingFromSelf;
+
+            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
+
+            // clear all existing properties for the specified culture
+            foreach (var property in Properties)
+            {
+                // each property type may or may not support the variation
+                if (!property.PropertyType.SupportsVariation(culture, "*", wildcards: true))
+                    continue;
+
+                foreach (var pvalue in property.Values)
+                    if (property.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) &&
+                        (culture == "*" || pvalue.Culture.InvariantEquals(culture)))
+                    {
+                        property.SetValue(null, pvalue.Culture, pvalue.Segment);
+                    }
+            }
+
+            // copy properties from 'other'
+            var otherProperties = other.Properties;
+            foreach (var otherProperty in otherProperties)
+            {
+                if (!otherProperty.PropertyType.SupportsVariation(culture, "*", wildcards: true))
+                    continue;
+
+                var alias = otherProperty.PropertyType.Alias;
+                foreach (var pvalue in otherProperty.Values)
+                {
+                    if (otherProperty.PropertyType.SupportsVariation(pvalue.Culture, pvalue.Segment, wildcards: true) &&
+                        (culture == "*" || pvalue.Culture.InvariantEquals(culture)))
+                    {
+                        var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
+                        SetValue(alias, value, pvalue.Culture, pvalue.Segment);
+                    }
+                }
+            }
+
+            // copy names, too
+
+            if (culture == "*")
+                ClearCultureInfos();
+
+            if (culture == null || culture == "*")
+                Name = other.Name;
+
+            foreach (var (otherCulture, otherName) in other.CultureNames)
+            {
+                if (culture == "*" || culture == otherCulture)
+                    SetCultureName(otherName, otherCulture);
+            }
+        }
+
+        #endregion
+
         #region Validation
 
         /// <inheritdoc />
-        public bool IsValid(string culture = null, string segment = null)
+        public bool IsValid(string culture = "*")
         {
-            var name = GetCultureName(culture);
-            if (name.IsNullOrWhiteSpace()) return false;
-            return ValidateProperties(culture, segment).Length == 0;
+            culture = culture.NullOrWhiteSpaceAsNull();
+
+            if (culture == null)
+            {
+                if (Name.IsNullOrWhiteSpace()) return false;
+                return ValidateProperties(null).Length == 0;
+            }
+
+            if (culture != "*")
+            {
+                var name = GetCultureName(culture);
+                if (name.IsNullOrWhiteSpace()) return false;
+                return ValidateProperties(culture).Length == 0;
+            }
+
+            // 'all cultures'
+            // those that have a name are ok, those without a name... we don't validate
+            return AvailableCultures.All(c => ValidateProperties(c).Length == 0);
         }
 
         /// <inheritdoc />
-        public virtual Property[] ValidateProperties(string culture = null, string segment = null)
+        public virtual Property[] ValidateProperties(string culture = "*")
         {
+            var alsoInvariant = culture != null && culture != "*";
+
             return Properties.Where(x => // select properties...
-                    x.PropertyType.SupportsVariation(culture, segment, true) && // that support the variation
-                    !x.IsValid(culture, segment)) // and are not valid
+                    x.PropertyType.SupportsVariation(culture, "*", true) && // that support the variation
+                    (!x.IsValid(culture) || (alsoInvariant && !x.IsValid(null)))) // and are not valid
                 .ToArray();
         }
 

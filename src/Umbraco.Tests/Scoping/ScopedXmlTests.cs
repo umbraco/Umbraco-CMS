@@ -123,10 +123,8 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                item.TryPublishValues();
                 Current.Services.ContentService.SaveAndPublish(item); // should create an xml clone
                 item.Name = "changed";
-                item.TryPublishValues();
                 Current.Services.ContentService.SaveAndPublish(item); // should re-use the xml clone
 
                 // this should never change
@@ -230,13 +228,11 @@ namespace Umbraco.Tests.Scoping
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                item.TryPublishValues();
                 Current.Services.ContentService.SaveAndPublish(item);
 
                 for (var i = 0; i < count; i++)
                 {
                     var temp = new Content("content_" + i, -1, contentType);
-                    temp.TryPublishValues();
                     Current.Services.ContentService.SaveAndPublish(temp);
                     ids[i] = temp.Id;
                 }

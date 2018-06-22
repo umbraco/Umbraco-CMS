@@ -29,8 +29,8 @@ namespace Umbraco.Web.WebServices
 
             if (publishDescendants == false)
             {
-                content.TryPublishValues(); // fixme variants? validation - when this returns null?
-                var result = Services.ContentService.SaveAndPublish(content, Security.CurrentUser.Id);
+                content.PublishCulture(); // fixme variants? validation - when this returns null?
+                var result = Services.ContentService.SaveAndPublish(content, userId: Security.CurrentUser.Id);
                 return Json(new
                     {
                         success = result.Success,

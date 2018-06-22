@@ -779,8 +779,6 @@ namespace Umbraco.Core.Services.Implement
                 if (string.IsNullOrWhiteSpace(media.Name))
                     throw new ArgumentException("Media has no name.", nameof(media));
 
-                var isNew = media.IsNewEntity();
-
                 scope.WriteLock(Constants.Locks.MediaTree);
                 if (media.HasIdentity == false)
                     media.CreatorId = userId;
@@ -791,7 +789,7 @@ namespace Umbraco.Core.Services.Implement
                     saveEventArgs.CanCancel = false;
                     scope.Events.Dispatch(Saved, this, saveEventArgs);
                 }
-                var changeType = isNew ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode;
+                var changeType = TreeChangeTypes.RefreshNode;
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>(media, changeType).ToEventArgs());
 
                 Audit(AuditType.Save, "Save Media performed by user", userId, media.Id);
@@ -832,7 +830,7 @@ namespace Umbraco.Core.Services.Implement
                     return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
-                var treeChanges = mediasA.Select(x => new TreeChange<IMedia>(x, x.IsNewEntity() ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode));
+                var treeChanges = mediasA.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.RefreshNode));
 
                 scope.WriteLock(Constants.Locks.MediaTree);
                 foreach (var media in mediasA)

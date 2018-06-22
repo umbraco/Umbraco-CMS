@@ -116,47 +116,40 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the value of a Property
         /// </summary>
+        /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
         object GetValue(string propertyTypeAlias, string culture = null, string segment = null, bool published = false);
 
         /// <summary>
         /// Gets the typed value of a Property
         /// </summary>
+        /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
         TValue GetValue<TValue>(string propertyTypeAlias, string culture = null, string segment = null, bool published = false);
 
         /// <summary>
         /// Sets the (edited) value of a Property
         /// </summary>
+        /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
         void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null);
+
+        /// <summary>
+        /// Copies values from another document.
+        /// </summary>
+        void CopyFrom(IContent other, string culture = "*");
+
+        // fixme validate published cultures?
 
         /// <summary>
         /// Checks if the content and property values are valid in order to be persisted.
         /// </summary>
-        /// <param name="culture"></param>
-        /// <param name="segment"></param>
-        /// <returns></returns>
-        bool IsValid(string culture = null, string segment = null);
+        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
+        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
+        bool IsValid(string culture = "*");
 
         /// <summary>
-        /// Gets a value indicating if all properties values are valid.
+        /// Validates the content item's properties.
         /// </summary>
-        //fixme - needs API review as this is not used apart from in tests
-        //Property[] ValidateAllProperties();
-
-        /// <summary>
-        /// Validates the content item's properties for the provided culture/segment
-        /// </summary>
-        /// <param name="culture"></param>
-        /// <param name="segment"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This will not perform validation for properties that do not match the required ContentVariation based on the culture/segment values provided
-        /// </remarks>
-        Property[] ValidateProperties(string culture = null, string segment = null);
-
-        /// <summary>
-        /// Gets a value indicating if the culture properties values are valid.
-        /// </summary>
-        //fixme - needs API review as this is not used apart from in tests
-        //Property[] ValidatePropertiesForCulture(string culture = null);
+        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
+        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
+        Property[] ValidateProperties(string culture = "*");
     }
 }
