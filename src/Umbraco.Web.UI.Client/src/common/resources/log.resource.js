@@ -27,6 +27,39 @@ function logResource($q, $http, umbRequestHelper) {
 
     //the factory object returned
     return {
+
+        /**
+        * @ngdoc method
+        * @name umbraco.resources.logResource#getPagedEntityLog
+        * @methodOf umbraco.resources.logResource
+        *
+        * @description
+        * Gets a paginated log history for a entity
+        *
+        * ##usage
+        * <pre>
+        * var options = {
+        *      id : 1234
+        *      pageSize : 10,
+        *      pageNumber : 1,
+        *      orderDirection : "Descending",
+        *      sinceDate : new Date(2018,0,1)
+        * };
+        * logResource.getPagedEntityLog(options)
+        *    .then(function(log) {
+        *        alert('its here!');
+        *    });
+        * </pre> 
+        * 
+        * @param {Object} options options object
+        * @param {Int} options.id the id of the entity
+        * @param {Int} options.pageSize if paging data, number of nodes per page, default = 10, set to 0 to disable paging
+        * @param {Int} options.pageNumber if paging data, current page index, default = 1
+        * @param {String} options.orderDirection can be `Ascending` or `Descending` - Default: `Descending`
+        * @param {Date} options.sinceDate if provided this will only get log entries going back to this date
+        * @returns {Promise} resourcePromise object containing the log.
+        *
+        */
         getPagedEntityLog: function(options) {
 
             var defaults = {
