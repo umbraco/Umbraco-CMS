@@ -61,7 +61,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var first = true;
                 foreach (var filterClaus in customFilterWheres)
                 {
-                    if (first == false)
+                    if (first == false || hasQuery)
                     {
                         filterSql.Append(" AND ");
                     }
