@@ -1,18 +1,13 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Http;
-using AutoMapper;
-using Umbraco.Core;
-using Umbraco.Web.Models.ContentEditing;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Editors
@@ -65,8 +60,7 @@ namespace Umbraco.Web.Editors
             var result = Services.AuditService.GetPagedItemsByEntity(id, 1, int.MaxValue, out totalRecords);
             return Mapper.Map<IEnumerable<AuditLog>>(result);
         }
-
-        //TODO: Move to CurrentUserController?
+       
         [Obsolete("Use GetPagedCurrentUserLog instead")]
         public IEnumerable<AuditLog> GetCurrentUserLog(AuditType logType, DateTime? sinceDate)
         {
