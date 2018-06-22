@@ -30,8 +30,13 @@ function IconPickerOverlay($scope, iconHelper, localizationService) {
        { name: 'Pink', value: 'color-pink' },
        { name: 'Purple', value: 'color-purple' },
        { name: 'Deep Purple', value: 'color-deep-purple' },
-       { name: 'Indigo', value: 'color-indigo'}
-   ]
+       { name: 'Indigo', value: 'color-indigo' }
+   ];
+
+    if (!$scope.color) {
+        // Set default selected color to black
+        $scope.color = $scope.colors[0].value;
+    }
 
    if (!$scope.model.title) {
        $scope.model.title = localizationService.localize("defaultdialogs_selectIcon");
@@ -39,7 +44,7 @@ function IconPickerOverlay($scope, iconHelper, localizationService) {
 
    $scope.setColor = function (color) {   
        $scope.color = color;
-       console.log(color);    
+       //console.log(color);    
    };
 
    iconHelper.getIcons().then(function(icons) {
