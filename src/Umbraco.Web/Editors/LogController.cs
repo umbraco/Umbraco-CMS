@@ -73,8 +73,7 @@ namespace Umbraco.Web.Editors
             var result = Services.AuditService.GetPagedItemsByUser(Security.GetUserId(), 0, int.MaxValue, out totalRecords, auditTypeFilter: new[] {logType},customFilter: dateQuery);
             return Mapper.Map<IEnumerable<AuditLog>>(result);
         }
-
-        [Obsolete("Use GetPagedLog instead")]
+        
         public IEnumerable<AuditLog> GetLog(AuditType logType, DateTime? sinceDate)
         {
             if (sinceDate == null)
