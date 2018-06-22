@@ -7,10 +7,27 @@
     **/
 function logResource($q, $http, umbRequestHelper) {
 
+    function isValidDate(input) {
+        if (input) {
+            if (Object.prototype.toString.call(input) === "[object Date]" && !isNaN(input.getTime())) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    function dateToValidIsoString(input) {
+        if (isValidDate(input)) {
+            return input.toISOString();
+        }
+
+        return '';
+    };
+
     //the factory object returned
     return {
-
-        getPagedEntityLog: function (options) {
+        getPagedEntityLog: function(options) {
 
             var defaults = {
                 pageSize: 10,
@@ -24,11 +41,15 @@ function logResource($q, $http, umbRequestHelper) {
             angular.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
+
+            if (options.hasOwnProperty('sinceDate')) {
+                options.sinceDate = dateToValidIsoString(options.sinceDate);
+            }
+
             //change asc/desct
             if (options.orderDirection === "asc") {
                 options.orderDirection = "Ascending";
-            }
-            else if (options.orderDirection === "desc") {
+            } else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
 
@@ -45,7 +66,7 @@ function logResource($q, $http, umbRequestHelper) {
                 'Failed to retrieve log data for id');
         },
 
-        getPagedUserLog: function (options) {
+        getPagedUserLog: function(options) {
 
             var defaults = {
                 pageSize: 10,
@@ -59,11 +80,15 @@ function logResource($q, $http, umbRequestHelper) {
             angular.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
+
+            if (options.hasOwnProperty('sinceDate')) {
+                options.sinceDate = dateToValidIsoString(options.sinceDate);
+            }
+
             //change asc/desct
             if (options.orderDirection === "asc") {
                 options.orderDirection = "Ascending";
-            }
-            else if (options.orderDirection === "desc") {
+            } else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
 
@@ -96,16 +121,16 @@ function logResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the log.
          *
          */
-        getEntityLog: function (id) {            
+        getEntityLog: function(id) {
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "logApiBaseUrl",
-                       "GetEntityLog",
-                       [{ id: id }])),
-               'Failed to retrieve user data for id ' + id);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "logApiBaseUrl",
+                        "GetEntityLog",
+                        [{ id: id }])),
+                'Failed to retrieve user data for id ' + id);
         },
-        
+
         /**
          * @ngdoc method
          * @name umbraco.resources.logResource#getUserLog
@@ -127,14 +152,14 @@ function logResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the log.
          *
          */
-        getUserLog: function (type, since) {            
+        getUserLog: function(type, since) {
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "logApiBaseUrl",
-                       "GetCurrentUserLog",
-                       [{ logtype: type}, {sinceDate: since }])),
-               'Failed to retrieve log data for current user of type ' + type + ' since ' + since);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "logApiBaseUrl",
+                        "GetCurrentUserLog",
+                        [{ logtype: type }, { sinceDate:  dateToValidIsoString(since) }])),
+                'Failed to retrieve log data for current user of type ' + type + ' since ' + since);
         },
 
         /**
@@ -158,16 +183,16 @@ function logResource($q, $http, umbRequestHelper) {
          * @returns {Promise} resourcePromise object containing the log.
          *
          */
-        getLog: function (type, since) {            
+        getLog: function(type, since) {
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "logApiBaseUrl",
-                       "GetLog",
-                       [{ logtype: type}, {sinceDate: since }])),
-               'Failed to retrieve log data of type ' + type + ' since ' + since);
-        }
-    };
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "logApiBaseUrl",
+                        "GetLog",
+                        [{ logtype: type }, { sinceDate: dateToValidIsoString(since) }])),
+                'Failed to retrieve log data of type ' + type + ' since ' + since);
+        }      
+};
 }
 
 angular.module('umbraco.resources').factory('logResource', logResource);
