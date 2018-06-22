@@ -65,6 +65,10 @@ namespace Umbraco.Web.Editors
         public IEnumerable<AuditLog> GetCurrentUserLog(AuditType logType, DateTime? sinceDate)
         {
             long totalRecords;
+
+            if (sinceDate == null)
+                sinceDate = DateTime.Now.Subtract(new TimeSpan(7, 0, 0, 0, 0));
+
             var dateQuery = sinceDate.HasValue ? Query<IAuditItem>.Builder.Where(x => x.CreateDate >= sinceDate) : null;
             var result = Services.AuditService.GetPagedItemsByUser(Security.GetUserId(), 0, int.MaxValue, out totalRecords, auditTypeFilter: new[] {logType},customFilter: dateQuery);
             return Mapper.Map<IEnumerable<AuditLog>>(result);
