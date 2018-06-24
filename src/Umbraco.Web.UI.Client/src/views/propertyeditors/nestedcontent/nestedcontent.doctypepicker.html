@@ -10,9 +10,6 @@
                     <th>
                         <localize key="editcontenttype_tab">Tab</localize>
                     </th>
-                    <th class="nested-content_group">
-                        <localize key="editcontenttype_group">Group</localize>
-                    </th>
                     <th>
                         <localize key="template_template">Template</localize>
                     </th>
@@ -31,9 +28,6 @@
                         <select id="{{model.alias}}_tab_select"
                                 ng-options="t for t in docTypeTabs[config.ncAlias]"
                                 ng-model="config.ncTabAlias" required></select>
-                    </td>
-                    <td>
-                        <input type="text" ng-model="config.nameGroup" />
                     </td>
                     <td>
                         <input type="text" ng-model="config.nameTemplate" />
@@ -58,10 +52,6 @@
         <p>
             <b><localize key="editcontenttype_tab">Tab</localize>:</b><br />
             Select the tab who's properties should be displayed. If left blank, the first tab on the doc type will be used.
-        </p>
-        <p>
-            <b><localize key="editcontenttype_Group">Group</localize>:</b><br />
-            Enter the group name to appear when inserting an item. If left blank, item will be displayed on the main screen.
         </p>
         <p>
             <b><localize key="template_template">Template</localize>:</b><br />
