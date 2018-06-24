@@ -47,6 +47,7 @@
                 <h5>
                     <localize key="grid_insertControl" />
                 </h5>
+                <a class="umb-breadcrumbs__ancestor-link" ng-show="hasGroupFilter" ng-click="openNodeTypePicker($event)" href>Back</a>
                 <ul class="elements">
                     <li ng-repeat="scaffold in overlayMenu.scaffolds">
                         <a ng-if="!isGroup(scaffold)" ng-click="addNode(scaffold.alias)" href>
@@ -54,7 +55,7 @@
                             {{scaffold.name}}
                         </a>
                         <a ng-if="isGroup(scaffold)" ng-click="openNodeTypePicker($event,scaffold.group)" href>
-                            <i class="icon {{scaffold.icon}}"></i>
+                            <i class="icon icon-folder"></i>
                             {{scaffold.name}}
                         </a>
                     </li>
