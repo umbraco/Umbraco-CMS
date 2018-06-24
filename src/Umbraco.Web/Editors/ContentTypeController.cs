@@ -375,14 +375,14 @@ namespace Umbraco.Web.Editors
         /// <param name="id"></param> 
         /// <returns></returns> 
         [HttpGet]
-        public IEnumerable<string> GetPathById(int id)
+        public IEnumerable<string> GetFolderPathById(int id)
         {
             var contentType = Services.ContentTypeService.GetContentType(id);
             if (contentType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            return GetPathByContentType(contentType);
+            return GetFolderPathByContentType(contentType);
         }
 
         /// <summary> 
@@ -391,17 +391,17 @@ namespace Umbraco.Web.Editors
         /// <param name="alias"></param> 
         /// <returns></returns> 
         [HttpGet]
-        public IEnumerable<string> GetPathByAlias(string alias)
+        public IEnumerable<string> GetFolderPathByAlias(string alias)
         {
             var contentType = Services.ContentTypeService.GetContentType(alias);
             if (contentType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            return GetPathByContentType(contentType);
+            return GetFolderPathByContentType(contentType);
         }
 
-        private IEnumerable<string> GetPathByContentType(IContentType contentType)
+        private IEnumerable<string> GetFolderPathByContentType(IContentType contentType)
         {
             return contentType.Path.Split(',')
                 .Select(idString => int.TryParse(idString, out int pathId) ? pathId : 0)

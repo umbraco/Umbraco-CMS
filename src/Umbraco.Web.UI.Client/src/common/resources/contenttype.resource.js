@@ -315,7 +315,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "contentTypeApiBaseUrl",
-                        "GetPathById",
+                        "GetFolderPathById",
                         [{ id: id }])),
                 'Failed to retrieve content type path');
         },
@@ -326,7 +326,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "contentTypeApiBaseUrl",
-                        "GetPathByAlias",
+                        "GetFolderPathByAlias",
                         [{ alias: alias }])),
                 'Failed to retrieve content type path');
         }
