@@ -43,7 +43,7 @@
         </div>
 
         <div class="usky-grid nested-content__node-type-picker" ng-if="overlayMenu.show">
-            <div class="cell-tools-menu" ng-style="overlayMenu.style" style="margin: 0;">
+            <div class="cell-tools-menu" ng-style="overlayMenu.style" style="margin: 0;" delayed-mouseleave="closeNodeTypePicker()" on-delayed-mouseleave="closeNodeTypePicker()">
                 <h5>
                     <a class="nested-content_links-header" ng-class="{'show': hasGroupFilter==true}" ng-click="openNodeTypePicker($event)" href><<</a>
                     <localize key="grid_insertControl" />
