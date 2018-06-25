@@ -142,6 +142,8 @@
         <key alias="move">Brugeren har flyttet indholdet</key>
         <key alias="copy">Brugeren har kopieret indholdet</key>
         <key alias="rollback">Brugeren har tilbagerullet indholdet til en tidligere tilstand</key>
+        <key alias="sendtopublish">Brugeren har sendt indholdet til udgivelse</key>
+        <key alias="sendtotranslate">Brugeren har sendt indholdet til oversættelse</key>
         <key alias="smallCopy">Kopieret</key>
         <key alias="smallPublish">Udgivet</key>
         <key alias="smallMove">Flyttet</key>
@@ -149,6 +151,8 @@
         <key alias="smallDelete">Slettet</key>
         <key alias="smallUnPublish">Afpubliceret</key>
         <key alias="smallRollBack">Indhold tilbagerullet</key>
+        <key alias="smallSendToPublish">Sendt til udgivelse</key>
+        <key alias="smallSendToTranslate">Sendt til oversættelse</key>
     </area>
     <area alias="changeDocType">
         <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
