@@ -18,7 +18,7 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
 
 
-function startUpDynamicContentController($timeout, dashboardResource, assetsService, tourService, eventsService) {
+function startUpDynamicContentController($timeout, $scope, dashboardResource, assetsService, tourService, eventsService) {
     var vm = this;
     var evts = [];
 
@@ -95,7 +95,7 @@ function startUpDynamicContentController($timeout, dashboardResource, assetsServ
     }));
     
     //proxy remote css through the local server
-    assetsService.loadCss( dashboardResource.getRemoteDashboardCssUrl("content") );
+    assetsService.loadCss(dashboardResource.getRemoteDashboardCssUrl("content"), $scope);
     dashboardResource.getRemoteDashboardContent("content").then(
         function (data) {
 

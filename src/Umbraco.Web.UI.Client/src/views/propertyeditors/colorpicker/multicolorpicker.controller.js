@@ -105,5 +105,5 @@
         };
 
         //load the separate css for the editor to avoid it blocking our js loading
-        assetsService.loadCss("lib/spectrum/spectrum.css");
+        assetsService.loadCss("lib/spectrum/spectrum.css", $scope);
     });

@@ -346,8 +346,6 @@
     <Compile Include="businesslogic\member\MemberType.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="businesslogic\Packager\Repositories\Repository.cs" />
-    <Compile Include="businesslogic\Packager\Repositories\RepositoryWebservice.cs" />
     <Compile Include="businesslogic\Packager\Settings.cs" />
     <Compile Include="businesslogic\Permission.cs">
       <SubType>Code</SubType>

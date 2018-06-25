@@ -16,14 +16,7 @@ namespace Umbraco.Web.Features
             Disabled = new DisabledFeatures();
             Enabled = new EnabledFeatures();
         }
-
-        // note
-        // currently, the only thing a FeatureSet does is list disabled controllers,
-        // but eventually we could enable and disable more parts of Umbraco. and then
-        // we would need some logic to figure out what's enabled/disabled - hence it's
-        // better to use IsEnabled, where the logic would go, rather than directly
-        // accessing the Disabled collection.
-
+        
         /// <summary>
         /// Gets the disabled features.
         /// </summary>
@@ -35,9 +28,9 @@ namespace Umbraco.Web.Features
         public EnabledFeatures Enabled { get; set; }
 
         /// <summary>
-        /// Determines whether a feature is enabled.
+        /// Determines whether a controller is enabled.
         /// </summary>
-        public bool IsEnabled(Type feature)
+        public bool IsControllerEnabled(Type feature)
         {
             if (typeof(UmbracoApiControllerBase).IsAssignableFrom(feature))
                 return Disabled.Controllers.Contains(feature) == false;

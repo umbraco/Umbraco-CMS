@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
@@ -9,7 +7,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using umbraco;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -53,7 +50,7 @@ namespace Umbraco.Web.Models.Mapping
                 //perform the mapping with the current umbraco context
                 ResolveCore(source.Context.GetUmbracoContext(), (TSource)source.Value), typeof(List<Tab<ContentPropertyDisplay>>));
         }
-        
+
         /// <summary>
         /// Adds the container (listview) tab to the document
         /// </summary>
@@ -275,7 +272,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //now add the user props
             contentProps.AddRange(currProps);
-            
+
             //re-assign
             genericProps.Properties = contentProps;
 
@@ -308,6 +305,6 @@ namespace Umbraco.Web.Models.Mapping
 
             return result;
         }
-        
+
     }
 }

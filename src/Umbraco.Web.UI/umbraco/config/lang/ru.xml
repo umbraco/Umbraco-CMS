@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <language alias="ru" intName="Russian" localName="русский" lcid="" culture="ru-RU">
   <creator>
     <name>The Umbraco community</name>
@@ -19,6 +19,7 @@
     <key alias="disable">Отключить</key>
     <key alias="emptyTrashcan">Очистить корзину</key>
     <key alias="enable">Включить</key>
+    <key alias="export">Экспорт</key>
     <key alias="exportDocumentType">Экспортировать</key>
     <key alias="importDocumentType">Импортировать</key>
     <key alias="importPackage">Импортировать пакет</key>
@@ -158,8 +159,9 @@
     <key alias="returnToList">Вернуться к списку</key>
     <key alias="save">Сохранить</key>
     <key alias="saveAndGenerateModels">Сохранить и построить модели</key>
-    <key alias="saveAndPublish">Сохранить и опубликовать</key>
-    <key alias="saveToPublish">Сохранить и направить на публикацию</key>
+    <key alias="saveAndPublish">Опубликовать</key>
+    <key alias="saveAndSchedule">Запланировать</key>
+    <key alias="saveToPublish">Направить на публикацию</key>
     <key alias="saveListView">Сохранить список</key>
     <key alias="select">Выбрать</key>
     <key alias="selectCurrentFolder">Выбрать текущую папку</key>
@@ -201,7 +203,20 @@
     <key alias="yellow">Желтый</key>
     <key alias="orange">Оранжевый</key>
     <key alias="blue">Синий</key>
+    <key alias="bluegrey">Серо-синий</key>
+    <key alias="grey">Серый</key>
+    <key alias="brown">Коричневый</key>
+    <key alias="lightblue">Светло-синий</key>
+    <key alias="cyan">Голубой</key>
+    <key alias="lightgreen">Светло-зеленый</key>
+    <key alias="lime">Лайм</key>
+    <key alias="amber">Янтарный</key>
+    <key alias="deeporange">Рыжий</key>
     <key alias="red">Красный</key>
+    <key alias="pink">Розовый</key>
+    <key alias="purple">Лиловый</key>
+    <key alias="deeppurple">Темно-лиловый</key>
+    <key alias="indigo">Индиго</key>
   </area>
   <area alias="content">
     <key alias="about">Об этой странице</key>
@@ -221,6 +236,8 @@
     <key alias="expireDate">Скрыть</key>
     <key alias="getUrlException">ВНИМАНИЕ: невозможно получить URL документа (внутренняя ошибка - подробности в системном журнале)</key>
     <key alias="isPublished" version="7.2">Опубликовано</key>
+    <key alias="isSensitiveValue">Это значение скрыто. Если Вам нужен доступ к просмотру этого значения, свяжитесь с администратором веб-сайта.</key>
+    <key alias="isSensitiveValue_short">Это значение скрыто.</key>
     <key alias="itemChanged">Этот документ был изменен после публикации</key>
     <key alias="itemNotPublished">Этот документ не опубликован</key>
     <key alias="lastPublished">Документ опубликован</key>
@@ -236,19 +253,24 @@
     <key alias="membertype">Тип участника</key>
     <key alias="nestedContentDeleteItem">Вы уверены, что хотите удалить этот элемент?</key>
     <key alias="nestedContentEditorNotSupported">Свойство '%0%' использует редактор '%1%', который не поддерживается для вложенного содержимого.</key>
+    <key alias="noChanges">Не было сделано никаких изменений</key>
     <key alias="noDate">Дата не указана</key>
     <key alias="nodeName">Заголовок страницы</key>
+    <key alias="noMediaLink">Этот медиа-элемент не содержит ссылки</key>
     <key alias="notmemberof">Доступные группы</key>
     <key alias="otherElements">Свойства</key>
     <key alias="parentNotPublished">Этот документ опубликован, но скрыт, потому что его родительский документ '%0%' не опубликован</key>
     <key alias="parentNotPublishedAnomaly">ВНИМАНИЕ: этот документ опубликован, но его нет в глобальном кэше (внутренняя ошибка - подробности в системном журнале)</key>
     <key alias="publish">Опубликовать</key>
+    <key alias="published">Опубликовано</key>
+    <key alias="publishedPendingChanges">Опубликовано (есть измененения)</key>
     <key alias="publishStatus">Состояние публикации</key>
     <key alias="releaseDate">Опубликовать</key>
     <key alias="removeDate">Очистить дату</key>
     <key alias="routeError">ВНИМАНИЕ: этот документ опубликован, но его URL вступает в противоречие с документом %0%</key>
     <key alias="scheduledPublishServerTime">Это время будет соответствовать следующему времени на сервере:</key>
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Что это означает?</a>]]></key>
+    <key alias="setDate">Задать дату</key>
     <key alias="sortDone">Порядок сортировки обновлен</key>
     <key alias="sortHelp">Для сортировки узлов просто перетаскивайте узлы или нажмите на заголовке столбца. Вы можете выбрать несколько узлов, удерживая клавиши "shift" или "ctrl" при пометке</key>
     <key alias="statistics">Статистика</key>
@@ -256,6 +278,7 @@
     <key alias="titleOptional">Заголовок (необязательно)</key>
     <key alias="type">Тип</key>
     <key alias="unPublish">Скрыть</key>
+    <key alias="unpublished">Распубликовано</key>
     <key alias="unpublishDate">Распубликовать</key>
     <key alias="updateDate">Последняя правка</key>
     <key alias="updateDateDesc" version="7.0">Дата/время редактирования документа</key>
@@ -264,6 +287,10 @@
     <key alias="urls">Ссылка на документ</key>
     <key alias="addTextBox">Добавить новое поле текста</key>
     <key alias="removeTextBox">Удалить это поле текста</key>
+  </area>
+  <area alias="contentPicker">
+    <key alias="pickedTrashedItem">Выбран элемент содержимого, который в настоящее время удален или находится в корзине</key>
+    <key alias="pickedTrashedItems">Выбраны элементы содержимого, которые в настоящее время удалены или находятся в корзине</key>
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Композиции</key>
@@ -289,6 +316,8 @@
     <key alias="chooseChildNode">Выбрать дочерний узел</key>
     <key alias="compositionsDescription">Унаследовать вкладки и свойства из уже существующего типа документов. Вкладки будут либо добавлены в создаваемый тип, либо в случае совпадения названий вкладок будут добавлены наследуемые свойства.</key>
     <key alias="compositionInUse">Этот тип документов уже участвует в композиции другого типа, поэтому сам не может быть композицией.</key>
+    <key alias="compositionUsageHeading">Где используется эта композиция?</key>
+    <key alias="compositionUsageSpecification">Эта композиция сейчас используется при создании следующих типов документов:</key>
     <key alias="noAvailableCompositions">В настоящее время нет типов документов, допустимых для построения композиции.</key>
 
     <key alias="availableEditors">Доступные редакторы</key>
@@ -320,7 +349,11 @@
     <key alias="thisEditorUpdateSettings">, использующие этот редактор, будут обновлены с применением этих установок</key>
 
     <key alias="memberCanEdit">Участник может изменить</key>
+    <key alias="memberCanEditDescription">Разрешает редактирование значение данного свойства участником в своем профиле</key>
+    <key alias="isSensitiveData">Конфеденциальные данные</key>
+    <key alias="isSensitiveDataDescription">Скрывает значение это свойства от редакторов содержимого, не имеющих доступа к конфеденциальной информации</key>
     <key alias="showOnMemberProfile">Показать в профиле участника</key>
+    <key alias="showOnMemberProfileDescription">Разрешает показ данного свойства в профиле участника</key>
     <key alias="tabHasNoSortOrder">для вкладки не указан порядок сортировки</key>
   </area>
   <area alias="create">
@@ -447,6 +480,7 @@
       Ключ '%0%' уже существует в словаре.
    ]]>
     </key>
+    <key alias="overviewTitle">Обзор словаря</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Допустим как корневой</key>
@@ -569,13 +603,16 @@
     <key alias="error">Ошибка</key>
     <key alias="findDocument">Найти</key>
     <key alias="first">Начало</key>
+    <key alias="general">Общее</key>
     <key alias="groups">Группы</key>
     <key alias="folder">Папка</key>
     <key alias="height">Высота</key>
     <key alias="help">Справка</key>
     <key alias="hide">Скрыть</key>
+    <key alias="history">История</key>
     <key alias="icon">Иконка</key>
     <key alias="import">Импорт</key>
+    <key alias="info">Инфо</key>
     <key alias="innerMargin">Внутренний отступ</key>
     <key alias="insert">Вставить</key>
     <key alias="install">Установить</key>
@@ -585,6 +622,7 @@
     <key alias="language">Язык</key>
     <key alias="last">Конец</key>
     <key alias="layout">Макет</key>
+    <key alias="links">Ссылки</key>
     <key alias="loading">Загрузка</key>
     <key alias="locked">БЛОКИРОВКА</key>
     <key alias="login">Войти</key>
@@ -605,6 +643,7 @@
     <key alias="ok">Ok</key>
     <key alias="open">Открыть</key>
     <key alias="on">Вкл</key>
+    <key alias="options">Варианты</key>
     <key alias="or">или</key>
     <key alias="orderBy">Сортировка по</key>
     <key alias="password">Пароль</key>
@@ -624,6 +663,7 @@
     <key alias="retrieve">Получить</key>
     <key alias="retry">Повторить</key>
     <key alias="rights">Разрешения</key>
+    <key alias="scheduledPublishing">Публикация по расписанию</key>
     <key alias="search">Поиск</key>
     <key alias="searchNoResult">К сожалению, ничего подходящего не нашлось</key>
     <key alias="searchResults">Результаты поиска</key>
@@ -657,7 +697,8 @@
     <key alias="saving">Сохранение...</key>
     <key alias="current">текущий</key>
     <key alias="selected">выбрано</key>
-    <key alias="embed">Внедрить</key>
+    <key alias="embed">Встроить</key>
+    <key alias="retrieve">Получить</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Цвет фона</key>
@@ -667,12 +708,12 @@
     <key alias="text">Текст</key>
   </area>
   <area alias="grid">
-    <key alias="rte">Rich Text Editor</key>
-    <key alias="media">Image</key>
-    <key alias="macro">Macro</key>
-    <key alias="embed">Embed</key>
-    <key alias="headline">Headline</key>
-    <key alias="quote">Quote</key>  
+    <key alias="rte">Редактор текста</key>
+    <key alias="media">Изображение</key>
+    <key alias="macro">Макрос</key>
+    <key alias="embed">Встраивание</key>
+    <key alias="headline">Заголовок</key>
+    <key alias="quote">Цитата</key>  
     <key alias="addElement">Добавить содержимое</key>
     <key alias="dropElement">Сбросить содержимое</key>
     <key alias="addGridLayout">Добавить шаблон сетки</key>
@@ -754,9 +795,10 @@
     <key alias="xmlDataIntegrityCheckMedia">Медиа - всего в XML: %0%, всего: %1%Б с ошибками: %2%</key>
     <key alias="xmlDataIntegrityCheckContent">Содержимое - всего в XML: %0%, всего опубликовано: %1%, с ошибками: %2%</key>
 
+    <key alias="healthCheckInvalidUrl">Ошибка проверки адреса URL %0% - '%1%'</key>
+
     <key alias="httpsCheckValidCertificate">Сертификат Вашего веб-сайта отмечен как проверенный.</key>
     <key alias="httpsCheckInvalidCertificate">Ошибка проверки сертификата: '%0%'</key>
-    <key alias="httpsCheckInvalidUrl">Ошибка проверки адреса URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">Сейчас Вы %0% просматриваете сайт, используя протокол HTTPS.</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">Параметр 'umbracoUseSSL' в секции 'appSetting' установлен в 'false' в файле web.config. Если Вам необходим доступ к сайту по протоколу HTTPS, нужно установить данный параметр в 'true'.</key>
     <key alias="httpsCheckConfigurationCheckResult">Параметр 'umbracoUseSSL' в секции 'appSetting' в файле установлен в '%0%', значения cookies %1% маркированы как безопасные.</key>
@@ -796,10 +838,26 @@
 
     <key alias="clickJackingCheckHeaderFound"><![CDATA[Был обнаружен заголовок или мета-тэг <strong>X-Frame-Options</strong>, использующийся для управления возможностью помещать сайт в IFRAME на другом сайте.]]></key>
     <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Заголовок или мета-тэг <strong>X-Frame-Options</strong>, использующийся для управления возможностью помещать сайт в IFRAME на другом сайте, не обнаружен.]]></key>
-    <key alias="clickJackingSetHeaderInConfig">Установить заголовок в файле конфигурации</key>
     <key alias="clickJackingSetHeaderInConfigDescription">Добавляет значение в секцию 'httpProtocol/customHeaders' файла web.config, препятствующее возможному использованию этого сайта внутри IFRAME на другом сайте.</key>
     <key alias="clickJackingSetHeaderInConfigSuccess">Значение, добавляющее заголовок, препятствующий использованию этого сайта внутри IFRAME другого сайта, успешно добавлено в файл web.config.</key>
-    <key alias="clickJackingSetHeaderInConfigError">Невозможно обновить файл web.config. Ошибка: %0%</key>
+
+    <key alias="setHeaderInConfig">Установить заголовок в файле конфигурации</key>
+    <key alias="setHeaderInConfigError">Невозможно обновить файл web.config. Ошибка: %0%</key>
+
+    <key alias="noSniffCheckHeaderFound"><![CDATA[Заголовок или мета-тэг <strong>X-Content-Type-Options</strong>, использующиеся для защиты от MIME-уязвимостей, обнаружены.]]></key>
+    <key alias="noSniffCheckHeaderNotFound"><![CDATA[Заголовок или мета-тэг <strong>X-Content-Type-Options</strong>, использующиеся для защиты от MIME-уязвимостей, не найдены.]]></key>
+    <key alias="noSniffSetHeaderInConfigDescription">Добавляет значение в секцию httpProtocol/customHeaders файла web.config, препятствующее использованию MIME-уязвимостей.</key>
+    <key alias="noSniffSetHeaderInConfigSuccess">Значение, добавляющее заголовок, препятствующий использованию MIME-уязвимостей, успешно добавлено в файл web.config.</key>
+
+    <key alias="hSTSCheckHeaderFound"><![CDATA[Заголовок <strong>Strict-Transport-Security</strong>, известный также как HSTS-header, обнаружен.]]></key>
+    <key alias="hSTSCheckHeaderNotFound"><![CDATA[Заголовок <strong>Strict-Transport-Security</strong> не найден.]]></key>
+    <key alias="hSTSSetHeaderInConfigDescription">Добавляет заголовок 'Strict-Transport-Security' и его значение 'max-age=10886400; preload' в секцию httpProtocol/customHeaders файла web.config. Применяйте этот способ только в случае, если доступ к Вашим сайтам будет осуществляться по протоколу https как минимум ближайшие 18 недель.</key>
+    <key alias="hSTSSetHeaderInConfigSuccess">Заголовок HSTS-header успешно добавлен в файл web.config.</key>
+
+    <key alias="xssProtectionCheckHeaderFound"><![CDATA[Заголовок <strong>X-XSS-Protection</strong> обнаружен.]]></key>
+    <key alias="xssProtectionCheckHeaderNotFound"><![CDATA[Заголовок <strong>X-XSS-Protection</strong> не найден.]]></key>
+    <key alias="xssProtectionSetHeaderInConfigDescription">Добавляет заголовок 'X-XSS-Protection' и его значение '1; mode=block' в секцию httpProtocol/customHeaders файла web.config. </key>
+    <key alias="xssProtectionSetHeaderInConfigSuccess">Заголовок X-XSS-Protection успешно добавлен в файл web.config.</key>
 
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
@@ -970,7 +1028,87 @@
     <key alias="resetCodeExpired">Ссылка, по которой Вы попали сюда, неверна или устарела</key>
     <key alias="resetPasswordEmailCopySubject">Umbraco: сброс пароля</key>
     <key alias="resetPasswordEmailCopyFormat">
-      <![CDATA[<html><body><p>Ваше имя пользователя для входа в панель администрирования Umbraco: <strong>%0%</strong></p><p>Перейдите по <a href="%1%"><strong>этой ссылке</strong></a> для того, чтобы сбросить Ваш пароль, или скопируйте текст ссылки и вставьте в адресную строку своего браузера:</p><p><em>%1%</em></p></body></html>]]>
+      <![CDATA[
+        <html> 
+			<head> 
+				<meta name='viewport' content='width=device-width'> 
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'> 
+			</head> 
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'> 
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style> 
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr> 
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top"> 
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr> 
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;"> 
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]--> 
+										<div> </div> 
+										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]--> 
+									</td> 
+									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td> 
+								</tr>
+							</table> 
+						</td> 
+					</tr>
+				</table> 
+				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+					<tr> 
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td> 
+						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'> 
+							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+								<br>
+								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+									<tr> 
+										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'> 
+											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+												<tr> 
+													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>     
+														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															Запрошен сброс пароля
+														</h1>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Ваше имя пользователя для входа в административную панель Umbraco: <strong>%0%</strong>
+														</p>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+																<tbody>
+																	<tr> 
+																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'> 
+																			<a href='%1%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																				Нажмите на эту ссылку для того, чтобы сбросить пароль
+																			</a> 
+																		</td> 
+																	</tr>
+																</tbody>
+															</table>
+														</p>
+														<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Если Вы не имеете возможности нажать на сслыку, скопируйте следующий адрес (URL) и вставьте в адресную строку Вашего браузера:</p>
+															<table border='0' cellpadding='0' cellspacing='0'>
+																<tr>
+																	<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+																		<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+																			<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%1%'>%1%</a>
+																		</font>
+																	</td> 
+																</tr>
+															</table>
+														</p>
+													</td> 
+												</tr>
+											</table> 
+										</td> 
+									</tr>
+								</table> 
+								<br><br><br> 
+							</div> 
+						</td> 
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td> 
+					</tr>
+				</table> 
+			</body>
+		</html>
+      ]]>
     </key>
   </area>
   <area alias="main">
@@ -987,6 +1125,11 @@
     <key alias="onlyAllowedFiles">Разрешены только типы файлов: </key>
     <key alias="maxFileSize">Максимально допустимый размер файла: </key>
     <key alias="mediaRoot">Начальный узел медиа</key>
+  </area>
+  <area alias="mediaPicker">
+      <key alias="pickedTrashedItem">Выбран медиа-элемент, который в настоящее время удален или находится в корзине</key>
+      <key alias="pickedTrashedItems">Выбраны медиа-элементы, которые в настоящее время удалены или находятся в корзине</key>
+      <key alias="deletedItem">Удаленный элемент</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Создать нового участника</key>
@@ -1027,34 +1170,88 @@
 		Удачи!
 
 		Генератор уведомлений Umbraco.
-		]]></key>
-    <key alias="mailBodyHtml"><![CDATA[<p>Здравствуйте, %0%</p>
-
-		<p>Это автоматически сгенерированное уведомление. Операция <strong>'%1%'</strong>
-		была произведена на странице <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a>
-		пользователем <strong>'%3%'</strong>.</p>
-
-		<div style="margin: 8px 0; padding: 8px; display: block;">
-			<br />
-			<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ИЗМЕНИТЬ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
-			<br />
-		</div>
-
-		<p>
-			<h3>Сводка обновлений:</h3>
-			<table style="width: 100%;">
-				%6%
-			</table>
-		</p>
-
-		<div style="margin: 8px 0; padding: 8px; display: block;">
-			<br />
-			<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ИЗМЕНИТЬ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
-			<br />
-		</div>
-
-		<p>Удачи!<br /><br />Генератор уведомлений Umbraco
-		</p>]]></key>
+		]]>
+    </key>
+    <key alias="mailBodyHtml">
+      <![CDATA[
+        <html> 
+			<head> 
+				<meta name='viewport' content='width=device-width'> 
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'> 
+			</head> 
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'> 
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style> 
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr> 
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top"> 
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr> 
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;"> 
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]--> 
+										<div> </div> 
+										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]--> 
+									</td> 
+									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td>
+								</tr>
+							</table> 
+						</td> 
+					</tr>
+				</table> 
+				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+					<tr> 
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td> 
+						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'> 
+							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+								<br>
+								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+									<tr> 
+										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'> 
+											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+												<tr> 
+													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>      
+														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															Здравствуйте, %0%,
+														</h1>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'> 
+															Это автоматически сгенерированное сообщение, отправленное, чтобы уведомить Вас о том, что операция <strong>'%1%'</strong> была выполнена на странице <a style="color: #392F54; text-decoration: none; -ms-word-break: break-all; word-break: break-all;" href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> пользователем <strong>'%3%'</strong>
+														</p>
+														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+															<tbody>
+																<tr>
+																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr> 
+																			<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'> 
+																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>ВНЕСТИ ИЗМЕНЕНИЯ</a> </td> </tr></tbody></table>
+																	</td>
+																</tr>
+															</tbody>
+														</table>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															<h3>Обзор обновления:</h3>
+															<table style="width: 100%;">
+																 %6%
+															</table>	
+														</p>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Удачного дня!<br /><br />
+															К Вашим услугам, почтовый робот Umbraco
+														</p>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+								<br><br><br> 
+							</div>
+						</td>
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td> 
+					</tr>
+				</table>
+			</body>
+		</html>
+      ]]>
+    </key>
     <key alias="mailSubject">[%0%] Уведомление об операции %1% над документом %2%</key>
     <key alias="notifications">Уведомления</key>
   </area>
@@ -1409,6 +1606,8 @@
     <key alias="unlockUsersError">При разблокировке пользователей произошла ошибка</key>
     <key alias="unlockUserSuccess">'%0%' сейчас разблокирован</key>
     <key alias="unlockUserError">При разблокировке пользователя произошла ошибка</key>
+    <key alias="memberExportedSuccess">Данные участника успешно экспортированы в файл</key>
+    <key alias="memberExportedError">Во время экспортирования данных участника произошла ошибка</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Используется синтаксис селекторов CSS, например: h1, .redHeader, .blueTex</key>
@@ -1682,9 +1881,103 @@
     <key alias="failedPasswordAttempts">Неудачных попыток входа</key>
     <key alias="goToProfile">К профилю пользователя</key>
     <key alias="groupsHelp">Добавьте пользователя в группу(ы) для задания прав доступа</key>
+    <key alias="invite">Пригласить</key>
     <key alias="inviteEmailCopySubject">Приглашение в панель администрирования Umbraco</key>
     <key alias="inviteEmailCopyFormat">
       <![CDATA[<html><body><p>Здравствуйте, %0%,<br><br>Вы были приглашены пользователем %1%, и Вам предоставлен доступ в панель администрирования Umbraco.</p><p>Сообщение от %1%: <em>%2%</em></p><p>Перейдите по <a href="%3%" target="_blank">этой ссылке</a>, чтобы принять приглашение.</p><p><small>Если Вы не имеете возможности перейти по ссылке, скопируйте нижеследующий текст ссылки и вставьте в адресную строку Вашего браузера.<br/><br/>%3%</small></p></body></html>]]>
+
+      <![CDATA[
+        <html> 
+			<head> 
+				<meta name='viewport' content='width=device-width'> 
+				<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'> 
+			</head> 
+			<body class='' style='font-family: sans-serif; -webkit-font-smoothing: antialiased; font-size: 14px; color: #392F54; line-height: 22px; -ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #1d1333; margin: 0; padding: 0;' bgcolor='#1d1333'> 
+				<style type='text/css'> @media only screen and (max-width: 620px) {table[class=body] h1 {font-size: 28px !important; margin-bottom: 10px !important; } table[class=body] .wrapper {padding: 32px !important; } table[class=body] .article {padding: 32px !important; } table[class=body] .content {padding: 24px !important; } table[class=body] .container {padding: 0 !important; width: 100% !important; } table[class=body] .main {border-left-width: 0 !important; border-radius: 0 !important; border-right-width: 0 !important; } table[class=body] .btn table {width: 100% !important; } table[class=body] .btn a {width: 100% !important; } table[class=body] .img-responsive {height: auto !important; max-width: 100% !important; width: auto !important; } } .btn-primary table td:hover {background-color: #34495e !important; } .btn-primary a:hover {background-color: #34495e !important; border-color: #34495e !important; } .btn  a:visited {color:#FFFFFF;} </style> 
+				<table border="0" cellpadding="0" cellspacing="0" class="body" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;" bgcolor="#1d1333">
+					<tr> 
+						<td style="font-family: sans-serif; font-size: 14px; vertical-align: top; padding: 24px;" valign="top"> 
+							<table style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;">
+								<tr> 
+									<td background="https://umbraco.com/umbraco/assets/img/application/logo.png" bgcolor="#1d1333" width="28" height="28" valign="top" style="font-family: sans-serif; font-size: 14px; vertical-align: top;"> 
+										<!--[if gte mso 9]> <v:rect xmlns:v="urn:schemas-microsoft-com:vml" fill="true" stroke="false" style="width:30px;height:30px;"> <v:fill type="tile" src="https://umbraco.com/umbraco/assets/img/application/logo.png" color="#1d1333" /> <v:textbox inset="0,0,0,0"> <![endif]--> 
+										<div> </div> 
+										<!--[if gte mso 9]> </v:textbox> </v:rect> <![endif]--> 
+									</td> 
+									<td style="font-family: sans-serif; font-size: 14px; vertical-align: top;" valign="top"></td> 
+								</tr>
+							</table> 
+						</td> 
+					</tr>
+				</table> 
+				<table border='0' cellpadding='0' cellspacing='0' class='body' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; background: #1d1333;' bgcolor='#1d1333'>
+					<tr> 
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td> 
+						<td class='container' style='font-family: sans-serif; font-size: 14px; vertical-align: top; display: block; max-width: 560px; width: 560px; margin: 0 auto; padding: 10px;' valign='top'> 
+							<div class='content' style='box-sizing: border-box; display: block; max-width: 560px; margin: 0 auto; padding: 10px;'>
+								<br>
+								<table class='main' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; border-radius: 3px; background: #FFFFFF;' bgcolor='#FFFFFF'>
+									<tr> 
+										<td class='wrapper' style='font-family: sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 50px;' valign='top'> 
+											<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;'>
+												<tr> 
+													<td style='line-height: 24px; font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'>     
+														<h1 style='color: #392F54; font-family: sans-serif; font-weight: bold; line-height: 1.4; font-size: 24px; text-align: left; text-transform: capitalize; margin: 0 0 30px;' align='left'>
+															Здравствуйте, %0%,
+														</h1>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Вы были приглашены пользователем <a href="mailto:%4%" style="text-decoration: underline; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a> в панель администрирования веб-сайта.
+														</p>
+														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
+															Сообщение от пользователя <a href="mailto:%1%" style="text-decoration: none; color: #392F54; -ms-word-break: break-all; word-break: break-all;">%1%</a>:
+															<br/>
+															<em>%2%</em>
+														</p>
+														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
+															<tbody>
+																<tr>
+																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
+																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
+																			<tbody>
+																				<tr> 
+																					<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'> 
+																						<a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																							Нажмите на эту ссылку, чтобы принять приглашение
+																						</a> 
+																					</td> 
+																				</tr>
+																			</tbody>
+																		</table>
+																	</td>
+																</tr>
+															</tbody>
+														</table>
+														<p style='max-width: 400px; display: block; color: #392F54; font-family: sans-serif; font-size: 14px; line-height: 20px; font-weight: normal; margin: 15px 0;'>Если Вы не имеете возможности нажать на ссылку, скопируйте следующий адрес (URL) и вставьте в адресную строку Вашего браузера:</p>
+															<table border='0' cellpadding='0' cellspacing='0'>
+																<tr>
+																	<td style='-ms-word-break: break-all; word-break: break-all; font-family: sans-serif; font-size: 11px; line-height:14px;'>
+																		<font style="-ms-word-break: break-all; word-break: break-all; font-size: 11px; line-height:14px;">
+																			<a style='-ms-word-break: break-all; word-break: break-all; color: #392F54; text-decoration: underline; font-size: 11px; line-height:15px;' href='%3%'>%3%</a>
+																		</font>
+																	</td> 
+																</tr>
+															</table>
+														</p>
+													</td> 
+												</tr>
+											</table> 
+										</td> 
+									</tr>
+								</table> 
+								<br><br><br> 
+							</div> 
+						</td> 
+						<td style='font-family: sans-serif; font-size: 14px; vertical-align: top;' valign='top'> </td> 
+					</tr>
+				</table> 
+			</body>
+      </html>
+    ]]>
     </key>
     <key alias="inviteAnotherUser">Пригласить еще одного пользователя</key>
     <key alias="inviteUser">Пригласить пользователя</key>
@@ -1735,7 +2028,7 @@
     <key alias="sortNameDescending">Имя (Я-А)</key>
     <key alias="sortCreateDateDescending">Сначала новые</key>
     <key alias="sortCreateDateAscending">Сначала старые</key>
-    <key alias="sortLastLoginDateDescending">Недавно зашедшие</key>
+    <key alias="sortLastLoginDateDescending">Недавно заходившие</key>
     <key alias="stateActive">Активные</key>
     <key alias="stateAll">Все</key>
     <key alias="stateDisabled">Отключенные</key>

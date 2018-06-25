@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -115,6 +115,9 @@
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Transactions" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.Web.Extensions" />
@@ -278,8 +281,6 @@
     <Compile Include="Configuration\UmbracoSettings\INotDynamicXmlDocument.cs" />
     <Compile Include="Configuration\UmbracoSettings\IProvidersSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IRazorStaticMapping.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IRepositoriesSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IRepository.cs" />
     <Compile Include="Configuration\UmbracoSettings\IRequestHandlerSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IScheduledTask.cs" />
     <Compile Include="Configuration\UmbracoSettings\IScheduledTasksSection.cs" />
@@ -305,10 +306,6 @@
     <Compile Include="Configuration\UmbracoSettings\RazorElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RazorStaticMappingCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\RazorStaticMappingElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoriesCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoriesElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoryConfigExtensions.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoryElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RequestHandlerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ScheduledTaskElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ScheduledTasksCollection.cs" />
@@ -604,6 +601,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\NormalizeTemplateGuids.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\RemovePropertyDataIdIndex.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\RemoveUmbracoDeployTables.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTenZero\RenamePreviewFolder.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeTwo\EnsureMigrationsTableIdentityIsCorrect.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\EnsureContentTypeUniqueIdsAreConsistent.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddExternalLoginsTable.cs" />
@@ -638,6 +636,7 @@
     <Compile Include="Media\Exif\TIFFStrip.cs" />
     <Compile Include="Media\Exif\Utility.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeOne\UpdateUserLanguagesToIsoCode.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwelveZero\UpdateUmbracoConsent.cs" />
     <Compile Include="Persistence\PocoDataDataReader.cs" />
     <Compile Include="Persistence\Querying\CachedExpression.cs" />
     <Compile Include="Persistence\Querying\QueryExtensions.cs" />
@@ -691,6 +690,7 @@
     <Compile Include="PropertyEditors\ValueConverters\DropdownListValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DropdownListWithKeysValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\EmailAddressValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\FlexibleDropdownPropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DecimalValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\LabelValueConverter.cs" />
@@ -1603,6 +1603,9 @@
     <Compile Include="Constants-Packaging.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
+    <Compile Include="Constants-PackageRepository.cs">
+      <DependentUpon>Constants.cs</DependentUpon>
+    </Compile>
     <Compile Include="Constants-ObjectTypes.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
@@ -1672,6 +1675,7 @@
       <LastGenOutput>Files.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
@@ -1681,4 +1685,3 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-</Project>

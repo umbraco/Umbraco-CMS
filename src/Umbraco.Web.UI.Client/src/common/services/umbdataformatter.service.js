@@ -99,6 +99,28 @@
                 return saveModel;
             },
 
+            /** formats the display model used to display the dictionary to the model used to save the dictionary */
+            formatDictionaryPostData : function(dictionary, nameIsDirty) {
+                var saveModel = {
+                    parentId: dictionary.parentId,
+                    id: dictionary.id,
+                    name: dictionary.name,
+                    nameIsDirty: nameIsDirty,
+                    translations: [],
+                    key : dictionary.key
+                };
+
+                for(var i = 0; i < dictionary.translations.length; i++) {
+                    saveModel.translations.push({
+                        isoCode: dictionary.translations[i].isoCode,
+                        languageId: dictionary.translations[i].languageId,
+                        translation: dictionary.translations[i].translation
+                    });
+                }
+
+                return saveModel;
+            },
+
             /** formats the display model used to display the user to the model used to save the user */
             formatUserPostData: function (displayModel) {
 
@@ -267,10 +289,10 @@
                             // by looking at the key
                             switch (foundAlias[0]) {
                                 case "umbracoMemberLockedOut":
-                                    saveModel.isLockedOut = prop.value.toString() === "1" ? true : false;
+                                    saveModel.isLockedOut = prop.value ? (prop.value.toString() === "1" ? true : false) : false;
                                     break;
                                 case "umbracoMemberApproved":
-                                    saveModel.isApproved = prop.value.toString() === "1" ? true : false;
+                                    saveModel.isApproved = prop.value ? (prop.value.toString() === "1" ? true : false) : true;
                                     break;
                                 case "umbracoMemberComments":
                                     saveModel.comments = prop.value;

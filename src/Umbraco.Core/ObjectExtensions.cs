@@ -140,8 +140,7 @@ namespace Umbraco.Core
                     if (underlying != null)
                     {
                         // Special case for empty strings for bools/dates which should return null if an empty string.
-                        var inputString = input as string;
-                        if (inputString != null)
+                        if (input is string inputString)
                         {
                             //TODO: Why the check against only bool/date when a string is null/empty? In what scenario can we convert to another type when the string is null or empty other than just being null?
                             if (string.IsNullOrEmpty(inputString) && (underlying == typeof(DateTime) || underlying == typeof(bool)))
@@ -168,8 +167,7 @@ namespace Umbraco.Core
                 {
                     // target is not a generic type
 
-                    var inputString = input as string;
-                    if (inputString != null)
+                    if (input is string inputString)
                     {
                         // Try convert from string, returns an Attempt if the string could be
                         // processed (either succeeded or failed), else null if we need to try
@@ -218,8 +216,7 @@ namespace Umbraco.Core
                 }
 
                 // Re-check convertables since we altered the input through recursion
-                var convertible2 = input as IConvertible;
-                if (convertible2 != null)
+                if (input is IConvertible convertible2)
                 {
                     return Attempt.Succeed(Convert.ChangeType(convertible2, target));
                 }
@@ -277,8 +274,7 @@ namespace Umbraco.Core
             {
                 if (target == typeof(int))
                 {
-                    int value;
-                    if (int.TryParse(input, out value))
+                    if (int.TryParse(input, out var value))
                     {
                         return Attempt<object>.Succeed(value);
                     }
@@ -286,30 +282,26 @@ namespace Umbraco.Core
                     // Because decimal 100.01m will happily convert to integer 100, it
                     // makes sense that string "100.01" *also* converts to integer 100.
                     var input2 = NormalizeNumberDecimalSeparator(input);
-                    decimal value2;
-                    return Attempt<object>.SucceedIf(decimal.TryParse(input2, out value2), Convert.ToInt32(value2));
+                    return Attempt<object>.SucceedIf(decimal.TryParse(input2, out var value2), Convert.ToInt32(value2));
                 }
 
                 if (target == typeof(long))
                 {
-                    long value;
-                    if (long.TryParse(input, out value))
+                    if (long.TryParse(input, out var value))
                     {
                         return Attempt<object>.Succeed(value);
                     }
 
                     // Same as int
                     var input2 = NormalizeNumberDecimalSeparator(input);
-                    decimal value2;
-                    return Attempt<object>.SucceedIf(decimal.TryParse(input2, out value2), Convert.ToInt64(value2));
+                    return Attempt<object>.SucceedIf(decimal.TryParse(input2, out var value2), Convert.ToInt64(value2));
                 }
 
                 // TODO: Should we do the decimal trick for short, byte, unsigned?
 
                 if (target == typeof(bool))
                 {
-                    bool value;
-                    if (bool.TryParse(input, out value))
+                    if (bool.TryParse(input, out var value))
                     {
                         return Attempt<object>.Succeed(value);
                     }
@@ -322,53 +314,42 @@ namespace Umbraco.Core
                 switch (Type.GetTypeCode(target))
                 {
                     case TypeCode.Int16:
-                        short value;
-                        return Attempt<object>.SucceedIf(short.TryParse(input, out value), value);
+                        return Attempt<object>.SucceedIf(short.TryParse(input, out var value), value);
 
                     case TypeCode.Double:
                         var input2 = NormalizeNumberDecimalSeparator(input);
-                        double valueD;
-                        return Attempt<object>.SucceedIf(double.TryParse(input2, out valueD), valueD);
+                        return Attempt<object>.SucceedIf(double.TryParse(input2, out var valueD), valueD);
 
                     case TypeCode.Single:
                         var input3 = NormalizeNumberDecimalSeparator(input);
-                        float valueF;
-                        return Attempt<object>.SucceedIf(float.TryParse(input3, out valueF), valueF);
+                        return Attempt<object>.SucceedIf(float.TryParse(input3, out var valueF), valueF);
 
                     case TypeCode.Char:
-                        char valueC;
-                        return Attempt<object>.SucceedIf(char.TryParse(input, out valueC), valueC);
+                        return Attempt<object>.SucceedIf(char.TryParse(input, out var valueC), valueC);
 
                     case TypeCode.Byte:
-                        byte valueB;
-                        return Attempt<object>.SucceedIf(byte.TryParse(input, out valueB), valueB);
+                        return Attempt<object>.SucceedIf(byte.TryParse(input, out var valueB), valueB);
 
                     case TypeCode.SByte:
-                        sbyte valueSb;
-                        return Attempt<object>.SucceedIf(sbyte.TryParse(input, out valueSb), valueSb);
+                        return Attempt<object>.SucceedIf(sbyte.TryParse(input, out var valueSb), valueSb);
 
                     case TypeCode.UInt32:
-                        uint valueU;
-                        return Attempt<object>.SucceedIf(uint.TryParse(input, out valueU), valueU);
+                        return Attempt<object>.SucceedIf(uint.TryParse(input, out var valueU), valueU);
 
                     case TypeCode.UInt16:
-                        ushort valueUs;
-                        return Attempt<object>.SucceedIf(ushort.TryParse(input, out valueUs), valueUs);
+                        return Attempt<object>.SucceedIf(ushort.TryParse(input, out var valueUs), valueUs);
 
                     case TypeCode.UInt64:
-                        ulong valueUl;
-                        return Attempt<object>.SucceedIf(ulong.TryParse(input, out valueUl), valueUl);
+                        return Attempt<object>.SucceedIf(ulong.TryParse(input, out var valueUl), valueUl);
                 }
             }
             else if (target == typeof(Guid))
             {
-                Guid value;
-                return Attempt<object>.SucceedIf(Guid.TryParse(input, out value), value);
+                return Attempt<object>.SucceedIf(Guid.TryParse(input, out var value), value);
             }
             else if (target == typeof(DateTime))
             {
-                DateTime value;
-                if (DateTime.TryParse(input, out value))
+                if (DateTime.TryParse(input, out var value))
                 {
                     switch (value.Kind)
                     {
@@ -388,24 +369,20 @@ namespace Umbraco.Core
             }
             else if (target == typeof(DateTimeOffset))
             {
-                DateTimeOffset value;
-                return Attempt<object>.SucceedIf(DateTimeOffset.TryParse(input, out value), value);
+                return Attempt<object>.SucceedIf(DateTimeOffset.TryParse(input, out var value), value);
             }
             else if (target == typeof(TimeSpan))
             {
-                TimeSpan value;
-                return Attempt<object>.SucceedIf(TimeSpan.TryParse(input, out value), value);
+                return Attempt<object>.SucceedIf(TimeSpan.TryParse(input, out var value), value);
             }
             else if (target == typeof(decimal))
             {
                 var input2 = NormalizeNumberDecimalSeparator(input);
-                decimal value;
-                return Attempt<object>.SucceedIf(decimal.TryParse(input2, out value), value);
+                return Attempt<object>.SucceedIf(decimal.TryParse(input2, out var value), value);
             }
             else if (input != null && target == typeof(Version))
             {
-                Version value;
-                return Attempt<object>.SucceedIf(Version.TryParse(input, out value), value);
+                return Attempt<object>.SucceedIf(Version.TryParse(input, out var value), value);
             }
 
             // E_NOTIMPL IPAddress, BigInteger
@@ -690,8 +667,7 @@ namespace Umbraco.Core
         {
             var key = new CompositeTypeTypeKey(source, target);
 
-            TypeConverter typeConverter;
-            if (InputTypeConverterCache.TryGetValue(key, out typeConverter))
+            if (InputTypeConverterCache.TryGetValue(key, out TypeConverter typeConverter))
             {
                 return typeConverter;
             }
@@ -711,8 +687,7 @@ namespace Umbraco.Core
         {
             var key = new CompositeTypeTypeKey(source, target);
 
-            TypeConverter typeConverter;
-            if (DestinationTypeConverterCache.TryGetValue(key, out typeConverter))
+            if (DestinationTypeConverterCache.TryGetValue(key, out TypeConverter typeConverter))
             {
                 return typeConverter;
             }
@@ -730,8 +705,7 @@ namespace Umbraco.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static Type GetCachedGenericNullableType(Type type)
         {
-            Type underlyingType;
-            if (NullableGenericCache.TryGetValue(type, out underlyingType))
+            if (NullableGenericCache.TryGetValue(type, out Type underlyingType))
             {
                 return underlyingType;
             }
@@ -750,8 +724,7 @@ namespace Umbraco.Core
         private static bool GetCachedCanAssign(object input, Type source, Type target)
         {
             var key = new CompositeTypeTypeKey(source, target);
-            bool canConvert;
-            if (AssignableTypeCache.TryGetValue(key, out canConvert))
+            if (AssignableTypeCache.TryGetValue(key, out bool canConvert))
             {
                 return canConvert;
             }
@@ -770,8 +743,7 @@ namespace Umbraco.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool GetCachedCanConvertToBoolean(Type type)
         {
-            bool result;
-            if (BoolConvertCache.TryGetValue(type, out result))
+            if (BoolConvertCache.TryGetValue(type, out bool result))
             {
                 return result;
             }

@@ -106,7 +106,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         $scope.overlayMenu = {
             show: false,
-            style: {}
+            style: {},
+            showFilter: false
         };
 
         // helper to force the current form into the dirty state
@@ -267,11 +268,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         }
 
         var notSupported = [
-          "Umbraco.CheckBoxList",
-          "Umbraco.DropDownMultiple",
-          "Umbraco.MacroContainer",
-          "Umbraco.RadioButtonList",
-          "Umbraco.MultipleTextstring",
           "Umbraco.Tags",
           "Umbraco.UploadField",
           "Umbraco.ImageCropper"
@@ -348,6 +344,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 if ($scope.singleMode || ($scope.nodes.length == 1 && $scope.maxItems == 1)) {
                     $scope.currentNode = $scope.nodes[0];
                 }
+
+                $scope.overlayMenu.showFilter = $scope.scaffolds.length > 15;
 
                 inited = true;
             }

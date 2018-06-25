@@ -80,17 +80,21 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IMember TO MemberBasic
             config.CreateMap<IMember, MemberBasic>()
-                .ForMember(display => display.Udi, expression => expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
+                .ForMember(display => display.Udi,
+                    expression =>
+                        expression.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
                 .ForMember(dto => dto.Owner, expression => expression.ResolveUsing(new OwnerResolver<IMember>()))
                 .ForMember(dto => dto.Icon, expression => expression.MapFrom(content => content.ContentType.Icon))
-                .ForMember(dto => dto.ContentTypeAlias, expression => expression.MapFrom(content => content.ContentType.Alias))
+                .ForMember(dto => dto.ContentTypeAlias,
+                    expression => expression.MapFrom(content => content.ContentType.Alias))
                 .ForMember(dto => dto.Email, expression => expression.MapFrom(content => content.Email))
                 .ForMember(dto => dto.Username, expression => expression.MapFrom(content => content.Username))
                 .ForMember(dto => dto.Trashed, expression => expression.Ignore())
                 .ForMember(dto => dto.Published, expression => expression.Ignore())
                 .ForMember(dto => dto.Updater, expression => expression.Ignore())
                 .ForMember(dto => dto.Alias, expression => expression.Ignore())
-                .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore());
+                .ForMember(dto => dto.HasPublishedVersion, expression => expression.Ignore())
+                .ForMember(dto => dto.Properties, expression => expression.ResolveUsing(new MemberBasicPropertiesResolver()));
 
             //FROM MembershipUser TO MemberBasic
             config.CreateMap<MembershipUser, MemberBasic>()
@@ -260,7 +264,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     //it's a generic provider so update the locked out property based on our known constant alias
                     var isLockedOutProperty = result.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
-                    if (isLockedOutProperty != null && isLockedOutProperty.Value.ToString() != "1")
+                    if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
                     {
                         isLockedOutProperty.View = "readonlyvalue";
                         isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
@@ -274,7 +278,7 @@ namespace Umbraco.Web.Models.Mapping
                     // if we just had all of the membeship provider fields on the member table :(
                     // TODO: But is there a way to map the IMember.IsLockedOut to the property ? i dunno.
                     var isLockedOutProperty = result.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == umbracoProvider.LockPropertyTypeAlias);
-                    if (isLockedOutProperty != null && isLockedOutProperty.Value.ToString() != "1")
+                    if (isLockedOutProperty?.Value != null && isLockedOutProperty.Value.ToString() != "1")
                     {
                         isLockedOutProperty.View = "readonlyvalue";
                         isLockedOutProperty.Value = _localizedTextService.Localize("general/no");
@@ -395,6 +399,8 @@ namespace Umbraco.Web.Models.Mapping
                     //check permissions for viewing sensitive data
                     if (isSensitiveProperty && umbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
                     {
+                        //mark this property as sensitive
+                        prop.IsSensitive = true;
                         //mark this property as readonly so that it does not post any data
                         prop.Readonly = true;
                         //replace this editor with a sensitivevalue
@@ -477,8 +483,51 @@ namespace Umbraco.Web.Models.Mapping
                 return AutoMapperExtensions.MapWithUmbracoContext<IMember, MemberDisplay>(member, context.GetUmbracoContext());
             }
         }
+
+        /// <summary>
+        /// A resolver to map <see cref="IMember"/> properties to a collection of <see cref="ContentPropertyBasic"/>
+        /// </summary>
+        internal class MemberBasicPropertiesResolver : IValueResolver
+        {
+            public ResolutionResult Resolve(ResolutionResult source)
+            {
+                if (source.Value != null && (source.Value is IMember) == false)
+                    throw new AutoMapperMappingException(string.Format("Value supplied is of type {0} but expected {1}.\nChange the value resolver source type, or redirect the source value supplied to the value resolver using FromMember.", new object[]
+                    {
+                    source.Value.GetType(),
+                    typeof (IMember)
+                    }));
+                return source.New(
+                    //perform the mapping with the current umbraco context
+                    ResolveCore(source.Context.GetUmbracoContext(), (IMember)source.Value), typeof(IEnumerable<ContentPropertyDisplay>));
+            }
+
+            private IEnumerable<ContentPropertyBasic> ResolveCore(UmbracoContext umbracoContext, IMember content)
+            {
+                var result = Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyBasic>>(
+                    // Sort properties so items from different compositions appear in correct order (see U4-9298). Map sorted properties.
+                    content.Properties.OrderBy(prop => prop.PropertyType.SortOrder))
+                .ToList();
+
+                var member = (IMember)content;
+                var memberType = member.ContentType;
+
+                //now update the IsSensitive value
+                foreach (var prop in result)
+                {
+                    //check if this property is flagged as sensitive
+                    var isSensitiveProperty = memberType.IsSensitiveProperty(prop.Alias);
+                    //check permissions for viewing sensitive data
+                    if (isSensitiveProperty && umbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
+                    {
+                        //mark this property as sensitive
+                        prop.IsSensitive = true;
+                        //clear the value
+                        prop.Value = null;
+                    }
+                }
+                return result;
+            }
+        }
     }
 }
-
-
-
