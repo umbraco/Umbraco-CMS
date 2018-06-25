@@ -1817,7 +1817,7 @@ namespace Umbraco.Web
 
         /// <summary>
         /// Gets the first child of the content, of a given content type, and returns it as <see cref="IPublishedContent"/>.
-        /// For strongly typed version use <seealso cref="FirstChildOf{T}(IPublishedContent)"/>.
+        /// For strongly typed version use <seealso cref="FirstChildAs{T}(IPublishedContent)"/>.
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="alias">The content type alias.</param>
@@ -1830,7 +1830,7 @@ namespace Umbraco.Web
 
         /// <summary>
         /// Gets the first child of the content using the passed predicate and returns it as <see cref="IPublishedContent"/>.
-        /// For strongly typed version use <see cref="FirstChildOf{T}(IPublishedContent, Func{T, bool})"/>.
+        /// For strongly typed version use <see cref="FirstChildAs{T}(IPublishedContent, Func{T, bool})"/>.
         /// </summary>
         /// <param name="content">The content.</param>
         /// <param name="predicate">The predicate query.</param>
@@ -1847,7 +1847,7 @@ namespace Umbraco.Web
         /// <param name="content">The content.</param>
         /// <param name="alias">The content type alias.</param>
         /// <returns>The first child of content, of the given content type as type T.</returns>
-        public static T FirstChildOf<T>(this IPublishedContent content)
+        public static T FirstChildAs<T>(this IPublishedContent content)
             where T : class, IPublishedContent
         {
             return content.Children<T>().FirstOrDefault();
@@ -1859,7 +1859,7 @@ namespace Umbraco.Web
         /// <param name="content">The content.</param>
         /// <param name="predicate">The matching predicate func.</param>
         /// <returns>The first child of content that matches the predicate as type T.</returns>
-        public static T FirstChildOf<T>(this IPublishedContent content, Func<T, bool> predicate)
+        public static T FirstChildAs<T>(this IPublishedContent content, Func<T, bool> predicate)
             where T : class, IPublishedContent
         {
             return content.Children<T>().FirstOrDefault(predicate);
