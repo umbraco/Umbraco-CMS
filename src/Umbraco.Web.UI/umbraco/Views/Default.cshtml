@@ -49,16 +49,18 @@
 
         <div id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
 
-            <noscript>
-                <h3>Umbraco</h3>
-                <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
-                <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank">instructions how to enable JavaScript in your web browser</a>.</p>
-            </noscript>
-
             <umb-navigation></umb-navigation>
 
             <section id="contentwrapper">
-                <div id="contentcolumn" ng-view></div>
+                <div id="contentcolumn" ng-view>
+                    <noscript>
+                        <div>
+                            <h3><img src="assets/img/application/logo.png" alt="Umbraco logo" style="vertical-align: text-bottom;" /> Umbraco</h3>
+                            <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
+                            <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>
+                        </div>
+                    </noscript>
+                </div>
             </section>
 
             <umb-tour
