@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Hosting;
 using log4net;
 using LightInject;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 
@@ -60,14 +61,18 @@ namespace Umbraco.Core
 
             // create the container for the application, and configure.
             // the boot manager is responsible for registrations
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore(); // also sets Current.Container
+
+            //var container = new ServiceContainer();
+            var services = new ServiceCollection();
+
+            //moved to container factory
+            //container.ConfigureUmbracoCore(); // also sets Current.Container
 
             // register the essential stuff,
             // ie the global application logger
             // (profiler etc depend on boot manager)
             var logger = GetLogger();
-            container.RegisterInstance(logger);
+            services.AddSingleton(logger);
             // now it is ok to use Current.Logger
 
             ConfigureUnhandledException(logger);
@@ -75,7 +80,7 @@ namespace Umbraco.Core
 
             // get runtime & boot
             _runtime = GetRuntime();
-            _runtime.Boot(container);
+            _runtime.Boot(services);
         }
 
         protected virtual void ConfigureUnhandledException(ILogger logger)
