@@ -84,36 +84,108 @@ Use this directive to render a tabs navigation.
 
 **/
 
-(function () {
+(function() {
     'use strict';
 
-    angular
-        .module('umbraco.directives')
-        .component('umbTabsNav', {
+    function TabsNavDirective($timeout, $window) {
+
+        function link(scope, element, attrs, ctrl) {
+
+            var tabNavItemsWidths = [];
+            // the parent is the component itself so we need to go one level higher
+            var container = element.parent().parent();
+
+            $timeout(function(){
+                element.find("li:not(umb-tab--expand)").each(function() {
+                    tabNavItemsWidths.push($(this).outerWidth());
+                });
+                calculateWidth();
+            });
+
+            function calculateWidth(){
+				$timeout(function(){
+                    // 70 is the width of the expand menu (three dots)
+                    var containerWidth = container.width() - 70;
+                    var tabsWidth = 0;
+                    ctrl.overflowingSections = 0;
+                    ctrl.needTray = false;
+                    ctrl.maxTabs = 7;
+                    					
+					// detect how many tabs we can show on the screen
+					for (var i = 0; i < tabNavItemsWidths.length; i++) {
+                        
+                        var tabWidth = tabNavItemsWidths[i];
+                        tabsWidth += tabWidth;
+
+						if(tabsWidth >= containerWidth) {
+							ctrl.needTray = true;
+							ctrl.maxTabs = i;
+							ctrl.overflowingTabs = ctrl.maxTabs - ctrl.tabs.length;
+							break;
+						}
+                    }
+                    
+				});
+            }
+
+            $(window).bind('resize.tabsNav', function () {
+                calculateWidth();
+            });
+
+            scope.$on('$destroy', function() {
+                $(window).unbind('resize.tabsNav');
+            });
+
+        }
+
+        function UmbTabsNavController(eventsService) {
+
+            var vm = this;
+
+            vm.needTray = false;
+            vm.showTray = false;
+            vm.overflowingSections = 0;
+            vm.maxTabs = 7;
+
+            vm.clickTab = clickTab;
+            vm.toggleTray = toggleTray;
+            vm.hideTray = hideTray;
+    
+            function clickTab($event, tab) {
+                if (vm.onTabChange) {
+                    hideTray();
+                    var args = { "tab": tab, "tabs": vm.tabs };
+                    eventsService.emit("app.tabChange", args);
+                    vm.onTabChange({ "event": $event, "tab": tab });
+                }
+            }
+
+            function toggleTray() {
+                vm.showTray = !vm.showTray;
+            }
+
+            function hideTray() {
+                vm.showTray = false;
+            }
+
+        }
+
+        var directive = {
+            restrict: 'E',
             transclude: true,
             templateUrl: "views/components/tabs/umb-tabs-nav.html",
+            link: link,
+            bindToController: true,
             controller: UmbTabsNavController,
             controllerAs: 'vm',
-            bindings: {
+            scope: {
                 tabs: "<",
                 onTabChange: "&"
             }
-        });
-
-    function UmbTabsNavController(eventsService) {
-
-        var vm = this;
-
-        vm.clickTab = clickTab;
-
-        function clickTab($event, tab) {
-            if (vm.onTabChange) {
-                var args = { "tab": tab, "tabs": vm.tabs };
-                eventsService.emit("app.tabChange", args);
-                vm.onTabChange({ "event": $event, "tab": tab });
-            }
-        }
-
+        };
+        return directive;
     }
+
+    angular.module('umbraco.directives').directive('umbTabsNav', TabsNavDirective);
 
 })();
