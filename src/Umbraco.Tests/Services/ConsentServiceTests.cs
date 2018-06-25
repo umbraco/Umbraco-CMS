@@ -9,7 +9,7 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests.Services
 {
     [TestFixture]
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     public class ConsentServiceTests : BaseServiceTest
     {
         [SetUp]

@@ -212,6 +212,8 @@ Use this directive to construct a header inside the main editor window.
                 scope.dialogModel = {
                     view: "iconpicker",
                     show: true,
+                    icon: scope.icon.split(' ')[0],
+                    color: scope.icon.split(' ')[1],
                     submit: function (model) {
 
                         /* ensure an icon is selected, because on focus on close button
