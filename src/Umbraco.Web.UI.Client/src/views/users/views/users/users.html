@@ -188,7 +188,7 @@
 
         <!-- Layout: Cards -->
         <div class="umb-user-cards" ng-if="vm.activeLayout.path === '1' && vm.loading === false">
-            <a href="" class="umb-user-card" ng-repeat="user in vm.users" ng-click="vm.clickUser(user)">
+            <a href="" class="umb-user-card" ng-repeat="user in vm.users track by user.key" ng-click="vm.clickUser(user)">
                 <div class="umb-user-card__content" ng-class="{'umb-user-card__content--selected': user.selected}">
                     <umb-badge class="umb-user-card__badge" size="xs" ng-if="user.userDisplayState.key !== 'Active'" color="{{user.userDisplayState.color}}">
                         {{ user.userDisplayState.name }}
@@ -241,7 +241,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="user in vm.users" ng-click="vm.clickUser(user)" style="cursor: pointer;" ng-mouseenter="user.hover = true" ng-mouseleave="user.hover = false">
+                    <tr ng-repeat="user in vm.users track by user.key" ng-click="vm.clickUser(user)" style="cursor: pointer;" ng-mouseenter="user.hover = true" ng-mouseleave="user.hover = false">
                         <td style="padding-left: 10px;">
                             <div ng-if="!user.isCurrentUser" ng-click="vm.selectUser(user, vm.selection, $event)">
                                 <umb-checkmark
@@ -323,23 +323,32 @@
 
                         <umb-control-group label="@general_name" label-for="name" required="true">
                             <input type="text" name="name" localize="placeholder" placeholder="@placeholders_entername" class="input-block-level" ng-model="vm.newUser.name"
-                                umb-auto-focus required val-server-field="Name" />
-                            <span class="help-inline" val-msg-for="name" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                            <span class="help-inline" val-msg-for="name" val-toggle-msg="valServerField"></span>
+                                   umb-auto-focus required val-server-field="Name" />
+                            <span ng-messages="addUserForm.name.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{addUserForm.name.errorMsg}}</span>
+                            </span>
+                            
                         </umb-control-group>
 
                         <umb-control-group label="@general_username" label-for="username" required="true" ng-if="!vm.usernameIsEmail">
                             <input type="text" name="username" localize="placeholder" placeholder="@placeholders_enterusername" class="input-block-level"
-                                ng-model="vm.newUser.username" val-server-field="Username" ng-required="vm.usernameIsEmail" />
-                            <span class="help-inline" val-msg-for="username" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                            <span class="help-inline" val-msg-for="username" val-toggle-msg="valServerField"></span>
+                                   ng-model="vm.newUser.username" val-server-field="Username" ng-required="vm.usernameIsEmail" />
+                            <span ng-messages="addUserForm.username.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{addUserForm.username.errorMsg}}</span>
+                            </span>
+                            
                         </umb-control-group>
 
                         <umb-control-group label="@general_email" label-for="email" required="true">
                             <input type="email" name="email" localize="placeholder" placeholder="@placeholders_enteremail" class="input-block-level"
-                                ng-model="vm.newUser.email" required val-email val-server-field="Email" />
-                            <span class="help-inline" val-msg-for="email" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                            <span class="help-inline" val-msg-for="email" val-toggle-msg="valServerField"></span>
+                                   ng-model="vm.newUser.email" required val-email val-server-field="Email" />
+                            <span ng-messages="addUserForm.email.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valEmail"><localize key="validation_invalidEmail">Invalid email</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{addUserForm.email.errorMsg}}</span>
+                            </span>
                         </umb-control-group>
 
                         <umb-control-group label="@user_usergroup" description="@user_groupsHelp" required="true">
@@ -362,18 +371,19 @@
                         </umb-control-group>
 
                         <umb-control-group label="@general_message" ng-if="vm.usersViewState === 'inviteUser'" label-for="message" required="true">
-                            <textarea
-                                name="message"
-                                type="text"
-                                class="input-block-level"
-                                localize="placeholder"
-                                placeholder="@placeholders_enterMessage"
-                                ng-model="vm.newUser.message"
-                                rows="4"
-                                required val-server-field="Message">
+                            <textarea name="message"
+                                      type="text"
+                                      class="input-block-level"
+                                      localize="placeholder"
+                                      placeholder="@placeholders_enterMessage"
+                                      ng-model="vm.newUser.message"
+                                      rows="4"
+                                      required val-server-field="Message">
                             </textarea>
-                            <span class="help-inline" val-msg-for="message" val-toggle-msg="required"><localize key="general_required">Required</localize></span>
-                            <span class="help-inline" val-msg-for="message" val-toggle-msg="valServerField"></span>
+                            <span ng-messages="addUserForm.message.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required"><localize key="general_required">Required</localize></span>
+                                <span class="help-inline" ng-message="valServerField">{{addUserForm.message.errorMsg}}</span>
+                            </span>
                         </umb-control-group>
 
                         <umb-button

@@ -124,7 +124,7 @@ function ColorPickerController($scope) {
 
     // figures out if a value is trueish enough
     function isTrue(bool) {
-        return !!bool && bool !== "0" && angular.lowercase(bool) !== "false";
+        return !!bool && bool !== "0" && bool.toString().toLowerCase() !== "false";
     }
 }
 

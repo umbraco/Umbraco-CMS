@@ -7,7 +7,7 @@ LazyLoad.js([
   '../js/app.js',
   '../js/umbraco.resources.js',
   '../js/umbraco.services.js',
-  '../js/umbraco.security.js',
+  '../js/umbraco.interceptors.js',
   '../ServerVariables',
   '../lib/signalr/jquery.signalR.js',
   '/umbraco/BackOffice/signalr/hubs',

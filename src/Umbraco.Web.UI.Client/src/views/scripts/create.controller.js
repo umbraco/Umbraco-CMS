@@ -39,16 +39,13 @@
                         activate: true
                     });
 
-                    formHelper.resetForm({
-                        scope: $scope
-                    });
+                    formHelper.resetForm({ scope: $scope });
 
                     var section = appState.getSectionState("currentSection");
 
                 }, function(err) {
 
                   vm.createFolderError = err;
-                  formHelper.showNotifications(err.data);
                     
                 });
             }

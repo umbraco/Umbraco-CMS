@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function InsertFieldController($scope, $http, contentTypeResource) {
+    function InsertFieldController($scope, $http, contentTypeResource, localizationService) {
         
         var vm = this;
 
@@ -34,7 +34,9 @@
 
             // set default title
             if(!$scope.model.title) {
-                $scope.model.title = "Insert value";
+                localizationService.localize("template_insertPageField").then(function(value){
+                    $scope.model.title = value;
+                });
             }
 
             // Load all fields

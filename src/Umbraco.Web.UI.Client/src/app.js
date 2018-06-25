@@ -6,13 +6,37 @@ var app = angular.module('umbraco', [
 	'umbraco.packages',
 	'umbraco.views',
 
+    'ngRoute',
+	'ngAnimate',
     'ngCookies',
     'ngSanitize',
-    'ngMobile',
+    'ngTouch',
+    'ngMessages',
     'tmh.dynamicLocale',
     'ngFileUpload',
     'LocalStorageModule'
 ]);
+
+app.config(['$compileProvider', function ($compileProvider) {
+    // when not in debug mode remove all angularjs debug css classes and  HTML comments from the dom
+    $compileProvider.debugInfoEnabled(Umbraco.Sys.ServerVariables.isDebuggingEnabled);
+    // don't execute directives inside comments
+    $compileProvider.commentDirectivesEnabled(false);
+    // don't execute directives inside css classes
+    $compileProvider.cssClassDirectivesEnabled(false);
+}]);
+
+// I configure the $animate service during bootstrap.
+angular.module("umbraco").config(
+    function configureAnimate( $animateProvider ) {
+        // By default, the $animate service will check for animation styling
+        // on every structural change. This requires a lot of animateFrame-based
+        // DOM-inspection. However, we can tell $animate to only check for
+        // animations on elements that have a specific class name RegExp pattern
+        // present. In this case, we are requiring the "umb-animated" class.
+        $animateProvider.classNameFilter( /\bumb-animated\b/ );
+    }
+);
 
 var packages = angular.module("umbraco.packages", []);
 

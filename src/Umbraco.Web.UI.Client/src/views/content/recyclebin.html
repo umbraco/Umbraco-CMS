@@ -1,16 +1,19 @@
-<umb-editor-view ng-controller="Umbraco.Editors.Content.RecycleBinController">
-    <form>
-        <umb-editor-header name="page.name"
-                           name-locked="page.nameLocked"
-                           hide-icon="true"
-                           hide-description="true"
-                           hide-alias="true">
+<umb-editor-view>
+    <form ng-controller="Umbraco.Editors.Content.RecycleBinController">
+
+        <umb-editor-header
+            name="page.name"
+            name-locked="page.nameLocked"
+            hide-icon="true"
+            hide-description="true"
+            hide-alias="true">
         </umb-editor-header>
 
         <umb-editor-container>
-
-            <div ng-include="listViewPath"></div>
-
+            <ng-include
+                src="listViewPath">
+            </ng-include>
         </umb-editor-container>
+        
     </form>
 </umb-editor-view>

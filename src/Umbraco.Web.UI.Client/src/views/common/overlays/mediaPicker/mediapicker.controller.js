@@ -4,7 +4,9 @@ angular.module("umbraco")
         function($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, mediaTypeHelper, eventsService, treeService, $element, $timeout, $cookies, localStorageService, localizationService) {
 
             if (!$scope.model.title) {
-                $scope.model.title = localizationService.localize("defaultdialogs_selectMedia");
+                localizationService.localize("defaultdialogs_selectMedia").then(function(value){
+                    $scope.model.title = value;
+                });
             }
 
             var dialogOptions = $scope.model;

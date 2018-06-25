@@ -86,7 +86,10 @@
 
                         var index = vm.redirectUrls.indexOf(redirectToDelete);
                         vm.redirectUrls.splice(index, 1);
-                        notificationsService.success(localizationService.localize("redirectUrls_redirectRemoved"));
+
+                        localizationService.localize("redirectUrls_redirectRemoved").then(function(value){
+                            notificationsService.success(value);
+                        });
 
                         // check if new redirects needs to be loaded
                         if (vm.redirectUrls.length === 0 && vm.pagination.totalPages > 1) {
@@ -100,7 +103,9 @@
                             search();
                         }
                     }, function (error) {
-                        notificationsService.error(localizationService.localize("redirectUrls_redirectRemoveError"));
+                        localizationService.localize("redirectUrls_redirectRemoveError").then(function(value){
+                            notificationsService.error(value);
+                        });
                     });
                 }
             });
@@ -113,9 +118,13 @@
 
                     redirectUrlsResource.toggleUrlTracker(true).then(function () {
                         activate();
-                        notificationsService.success(localizationService.localize("redirectUrls_disabledConfirm"));
+                        localizationService.localize("redirectUrls_disabledConfirm").then(function(value){
+                            notificationsService.success(value);
+                        });
                     }, function (error) {
-                        notificationsService.warning(localizationService.localize("redirectUrls_disableError"));
+                        localizationService.localize("redirectUrls_disableError").then(function(value){
+                            notificationsService.warning(value);
+                        });
                     });
 
                 }
@@ -125,9 +134,13 @@
         function enableUrlTracker() {
             redirectUrlsResource.toggleUrlTracker(false).then(function() {
                 activate();
-                notificationsService.success(localizationService.localize("redirectUrls_enabledConfirm"));
+                localizationService.localize("redirectUrls_enabledConfirm").then(function(value){
+                    notificationsService.success(value);
+                });
             }, function(error) {
-                notificationsService.warning(localizationService.localize("redirectUrls_enableError"));
+                localizationService.localize("redirectUrls_enableError").then(function(value){
+                    notificationsService.warning(value);
+                });
             });
         }
 

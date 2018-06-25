@@ -54,7 +54,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var translator = new SqlTranslator<IUmbracoEntity>(sql, query);
             sql = translator.Translate();
             sql = AddGroupBy(isContent, isMedia, sql);
-            sql = sql.OrderBy<NodeDto>(x => x.NodeId);
+            //fixme - we should be able to do sql = sql.OrderBy(x => Alias(x.NodeId, "NodeId")); but we can't because the OrderBy extension don't support Alias currently
+            sql = sql.OrderBy("NodeId");
 
             //IEnumerable<IUmbracoEntity> result;
             //

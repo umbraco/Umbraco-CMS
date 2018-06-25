@@ -34,6 +34,12 @@
 
         function onInit() {
 
+            if(!$scope.model.title) {
+                localizationService.localize("template_queryBuilder").then(function(value){
+                    $scope.model.title = value;
+                });
+            }
+
             vm.query = {
                 contentType: {
                     name: everything

@@ -13,14 +13,6 @@
       var searchText = "Search...";
       var node = dialogOptions.currentNode;
 
-      localizationService.localize("general_search").then(function (value) {
-          searchText = value + "...";
-      });
-
-      if(!$scope.model.title) {
-          $scope.model.title = localizationService.localize("actions_move");
-      }
-
       $scope.model.relateToOriginal = true;
       $scope.dialogTreeApi = {};
 
@@ -34,6 +26,20 @@
 
       // get entity type based on the section
       $scope.entityType = entityHelper.getEntityTypeFromSection(dialogOptions.section);
+
+        function onInit() {
+
+            if (!$scope.model.title) {
+                localizationService.localize("actions_move").then(function (value) {
+                    $scope.model.title = value;
+                });
+            }
+
+            localizationService.localize("general_search").then(function (value) {
+                searchText = value + "...";
+            });
+
+        }
 
       function nodeSelectHandler(args) {
 
@@ -98,6 +104,8 @@
       function openMiniListView(node) {
         $scope.miniListView = node;
       }
+
+      onInit();
 
 	}
 

@@ -8,7 +8,7 @@
             <localize key="create_noDocumentTypes" />
         </p>
 
-        <ul class="umb-actions umb-actions-child" ng-show="selectContentType">
+        <ul class="umb-actions umb-actions-child" ng-if="selectContentType && allowedTypes.length > 0">
 
             <li data-element="action-create-{{docType.alias}}" ng-repeat="docType in allowedTypes | orderBy:'name':false">
                 <a ng-click="createOrSelectBlueprintIfAny(docType)">
@@ -23,7 +23,7 @@
             </li>
 
         </ul>
-        <ul class="umb-actions umb-actions-child" ng-show="selectBlueprint">
+        <ul class="umb-actions umb-actions-child" ng-if="selectBlueprint && docType.blueprints.length > 0">
 
             <li ng-repeat="(key, value) in docType.blueprints | orderBy:'name':false">
                 <a ng-click="createFromBlueprint(key)">

@@ -281,10 +281,9 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
          */
         showMenu: function(args) {
             
-            var deferred = $q.defer();
             var self = this;
 
-            treeService.getMenu({ treeNode: args.node })
+            return treeService.getMenu({ treeNode: args.node })
                 .then(function(data) {
 
                     //check for a default
@@ -313,8 +312,7 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
                             });
 
                             //return the dialog this is opening.
-                            deferred.resolve(dialog);
-                            return;
+                            return $q.resolve(dialog);
                         }
                     }
 
@@ -327,10 +325,9 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
                     appState.setMenuState("dialogTitle", args.node.name);
 
                     //we're not opening a dialog, return null.
-                    deferred.resolve(null);
+                    return $q.resolve(null);
                 });
-
-            return deferred.promise;
+            
         },
 
         /**

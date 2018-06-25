@@ -21,80 +21,115 @@
         vm.page = {};
         vm.page.loading = false;
         vm.page.saveButtonState = "init";
-        vm.page.navigation = [
-			{
-			    "name": localizationService.localize("general_design"),
-			    "icon": "icon-document-dashed-line",
-			    "view": "views/mediatypes/views/design/design.html",
-			    "active": true
-			},
-			{
-			    "name": localizationService.localize("general_listView"),
-			    "icon": "icon-list",
-			    "view": "views/mediatypes/views/listview/listview.html"
-			},
-			{
-			    "name": localizationService.localize("general_rights"),
-			    "icon": "icon-keychain",
-			    "view": "views/mediatypes/views/permissions/permissions.html"
-			}
+        vm.labels = {};
+
+        var labelKeys = [
+            "general_design",
+            "general_listView",
+            "general_rights",
+
+            "main_sections",
+            "shortcuts_navigateSections",
+            "shortcuts_addTab",
+            "shortcuts_addProperty",
+            "shortcuts_addEditor",
+            "shortcuts_editDataType",
+            "shortcuts_toggleListView",
+            "shortcuts_toggleAllowAsRoot",
+            "shortcuts_addChildNode"
         ];
 
-        vm.page.keyboardShortcutsOverview = [
-			{
-			    "name": localizationService.localize("main_sections"),
-			    "shortcuts": [
-					{
-					    "description": localizationService.localize("shortcuts_navigateSections"),
-					    "keys": [{ "key": "1" }, { "key": "3" }],
-					    "keyRange": true
-					}
-			    ]
-			},
-			{
-			    "name": localizationService.localize("general_design"),
-			    "shortcuts": [
-				{
-				    "description": localizationService.localize("shortcuts_addTab"),
-				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
-				},
-				{
-				    "description": localizationService.localize("shortcuts_addProperty"),
-				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
-				},
-				{
-				    "description": localizationService.localize("shortcuts_addEditor"),
-				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
-				},
-				{
-				    "description": localizationService.localize("shortcuts_editDataType"),
-				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
-				}
-			    ]
-			},
-		{
-		    "name": localizationService.localize("general_listView"),
-		    "shortcuts": [
-				{
-				    "description": localizationService.localize("shortcuts_toggleListView"),
-				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "l" }]
-				}
-		    ]
-		},
-		{
-		    "name": localizationService.localize("general_rights"),
-		    "shortcuts": [
-				{
-				    "description": localizationService.localize("shortcuts_toggleAllowAsRoot"),
-				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "r" }]
-				},
-				{
-				    "description": localizationService.localize("shortcuts_addChildNode"),
-				    "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "c" }]
-				}
-		    ]
-		}
-        ];
+        localizationService.localizeMany(labelKeys).then(function (values) {
+            // navigation
+            vm.labels.design = values[0];
+            vm.labels.listview = values[1];
+            vm.labels.permissions = values[2];
+            // keyboard shortcuts
+            vm.labels.sections = values[3];
+            vm.labels.navigateSections = values[4];
+            vm.labels.addTab = values[5];
+            vm.labels.addProperty = values[6];
+            vm.labels.addEditor = values[7];
+            vm.labels.editDataType = values[8];
+            vm.labels.toggleListView = values[9];
+            vm.labels.allowAsRoot = values[10];
+            vm.labels.addChildNode = values[11];
+
+            vm.page.navigation = [
+                {
+                    "name": vm.labels.design,
+                    "icon": "icon-document-dashed-line",
+                    "view": "views/mediatypes/views/design/design.html",
+                    "active": true
+                },
+                {
+                    "name": vm.labels.listview,
+                    "icon": "icon-list",
+                    "view": "views/mediatypes/views/listview/listview.html"
+                },
+                {
+                    "name": vm.labels.permissions,
+                    "icon": "icon-keychain",
+                    "view": "views/mediatypes/views/permissions/permissions.html"
+                }
+            ];
+
+            vm.page.keyboardShortcutsOverview = [
+                {
+                    "name": vm.labels.sections,
+                    "shortcuts": [
+                        {
+                            "description": vm.labels.navigateSections,
+                            "keys": [{ "key": "1" }, { "key": "3" }],
+                            "keyRange": true
+                        }
+                    ]
+                },
+                {
+                    "name": vm.labels.design,
+                    "shortcuts": [
+                    {
+                        "description": vm.labels.addTab,
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
+                    },
+                    {
+                        "description": vm.labels.addProperty,
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
+                    },
+                    {
+                        "description": vm.labels.addEditor,
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
+                    },
+                    {
+                        "description": vm.labels.editDataType,
+                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
+                    }
+                    ]
+                },
+                {
+                    "name": vm.labels.listview,
+                    "shortcuts": [
+                        {
+                            "description": vm.labels.toggleListView,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "l" }]
+                        }
+                    ]
+                },
+                {
+                    "name": vm.labels.permissions,
+                    "shortcuts": [
+                        {
+                            "description": vm.labels.allowAsRoot,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "r" }]
+                        },
+                        {
+                            "description": vm.labels.addChildNode,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "c" }]
+                        }
+                    ]
+                }
+            ];
+        });
 
         contentTypeHelper.checkModelsBuilderStatus().then(function (result) {
             vm.page.modelsBuilder = result;

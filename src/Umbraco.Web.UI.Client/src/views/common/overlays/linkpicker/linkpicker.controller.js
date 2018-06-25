@@ -9,7 +9,9 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 	    });
 
 		if(!$scope.model.title) {
-		    $scope.model.title = localizationService.localize("defaultdialogs_selectLink");
+			localizationService.localize("defaultdialogs_selectLink").then(function(value){
+				$scope.model.title = value;
+			});
 		}
 
 	    $scope.dialogTreeApi = {};

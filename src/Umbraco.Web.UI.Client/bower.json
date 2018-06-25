@@ -16,32 +16,41 @@
     "tests"
   ],
   "dependencies": {
+    "angular": "~1.7.2",
+    "angular-cookies": "~1.7.2",
+    "angular-sanitize": "~1.7.2",
+    "angular-touch": "~1.7.2",
+    "angular-route": "~1.7.2",
+    "angular-animate": "~1.7.2",
+    "angular-i18n": "~1.7.2",
     "signalr": "^2.2.1",
     "typeahead.js": "~0.10.5",
     "underscore": "~1.7.0",
     "rgrove-lazyload": "*",
     "bootstrap-social": "~4.8.0",
     "jquery": "2.2.4",
-    "jquery-ui": "1.11.4",
+    "jquery-ui": "~1.12.0",
     "jquery-migrate": "1.4.0",
-    "angular-dynamic-locale": "0.1.28",
-    "ng-file-upload": "~7.3.8",
+    "angular-dynamic-locale": "~0.1.36",
+    "ng-file-upload": "~12.2.13",
     "tinymce": "~4.7.1",
     "codemirror": "~5.3.0",
-    "angular-local-storage": "~0.2.3",
+    "angular-local-storage": "~0.7.1",
     "moment": "~2.10.3",
-    "ace-builds": "^1.2.3",
-    "clipboard": "1.7.1",
+    "ace-builds": "~1.3.0",
+    "clipboard": "~2.0.0",
     "font-awesome": "~4.2",
-    "animejs": "^2.2.0"
+    "animejs": "^2.2.0",
+    "angular-ui-sortable": "0.14.3",
+    "angular-messages": "^1.7.2"
   },
   "install": {
     "path": "lib-bower",
     "ignore": [
       "font-awesome",
-      "angular",
       "bootstrap",
-      "codemirror"
+      "codemirror",
+      "ace-builds"
     ],
     "sources": {
       "moment": [
@@ -69,6 +78,7 @@
       "tinymce": [
         "bower_components/tinymce/tinymce.min.js"
       ],
+      "angular-i18n": "bower_components/angular-i18n/angular-locale_*.js",
       "typeahead.js": "bower_components/typeahead.js/dist/typeahead.bundle.min.js",
       "rgrove-lazyload": "bower_components/rgrove-lazyload/lazyload.js",
       "ng-file-upload": "bower_components/ng-file-upload/ng-file-upload.min.js",
@@ -77,5 +87,8 @@
       "clipboard": "bower_components/clipboard/dist/clipboard.min.js",
       "animejs": "bower_components/animejs/anime.min.js"
     }
+  },
+  "devDependencies": {
+    "angular-mocks": "~1.7.2"
   }
 }

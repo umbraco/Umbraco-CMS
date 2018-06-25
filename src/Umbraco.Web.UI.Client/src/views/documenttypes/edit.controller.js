@@ -15,34 +15,7 @@
         var evts = [];
 
         var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
-
-        var buttons = [
-            {
-                "name": localizationService.localize("general_design"),
-                "alias": "design",
-                "icon": "icon-document-dashed-line",
-                "view": "views/documenttypes/views/design/design.html",
-                "active": true
-            },
-            {
-                "name": localizationService.localize("general_listView"),
-                "alias": "listView",
-                "icon": "icon-list",
-                "view": "views/documenttypes/views/listview/listview.html"
-            },
-            {
-                "name": localizationService.localize("general_rights"),
-                "alias": "permissions",
-                "icon": "icon-keychain",
-                "view": "views/documenttypes/views/permissions/permissions.html"
-            },
-            {
-                "name": localizationService.localize("treeHeaders_templates"),
-                "alias": "templates",
-                "icon": "icon-layout",
-                "view": "views/documenttypes/views/templates/templates.html"
-            }
-        ];
+        vm.labels = {};
 
         vm.save = save;
 
@@ -54,72 +27,137 @@
         vm.page.saveButtonState = "init";
         vm.page.navigation = [];
 
-        loadButtons();
-
-        vm.page.keyboardShortcutsOverview = [
-            {
-                "name": localizationService.localize("main_sections"),
-                "shortcuts": [
-                    {
-                        "description": localizationService.localize("shortcuts_navigateSections"),
-                        "keys": [{ "key": "1" }, { "key": "4" }],
-                        "keyRange": true
-                    }
-                ]
-            },
-            {
-                "name": localizationService.localize("general_design"),
-                "shortcuts": [
-                    {
-                        "description": localizationService.localize("shortcuts_addTab"),
-                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
-                    },
-                    {
-                        "description": localizationService.localize("shortcuts_addProperty"),
-                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
-                    },
-                    {
-                        "description": localizationService.localize("shortcuts_addEditor"),
-                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
-                    },
-                    {
-                        "description": localizationService.localize("shortcuts_editDataType"),
-                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
-                    }
-                ]
-            },
-            {
-                "name": localizationService.localize("general_listView"),
-                "shortcuts": [
-                    {
-                        "description": localizationService.localize("shortcuts_toggleListView"),
-                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "l" }]
-                    }
-                ]
-            },
-            {
-                "name": localizationService.localize("general_rights"),
-                "shortcuts": [
-                    {
-                        "description": localizationService.localize("shortcuts_toggleAllowAsRoot"),
-                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "r" }]
-                    },
-                    {
-                        "description": localizationService.localize("shortcuts_addChildNode"),
-                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "c" }]
-                    }
-                ]
-            },
-            {
-                "name": localizationService.localize("treeHeaders_templates"),
-                "shortcuts": [
-                    {
-                        "description": localizationService.localize("shortcuts_addTemplate"),
-                        "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
-                    }
-                ]
-            }
+        var labelKeys = [
+            "general_design",
+            "general_listView",
+            "general_rights",
+            "treeHeaders_templates",
+            "main_sections",
+            "shortcuts_navigateSections",
+            "shortcuts_addTab",
+            "shortcuts_addProperty",
+            "shortcuts_addEditor",
+            "shortcuts_editDataType",
+            "shortcuts_toggleListView",
+            "shortcuts_toggleAllowAsRoot",
+            "shortcuts_addChildNode",
+            "shortcuts_addTemplate"
         ];
+
+        localizationService.localizeMany(labelKeys).then(function (values) {
+            // navigation
+            vm.labels.design = values[0];
+            vm.labels.listview = values[1];
+            vm.labels.permissions = values[2];
+            vm.labels.templates = values[3];
+            // keyboard shortcuts
+            vm.labels.sections = values[4];
+            vm.labels.navigateSections = values[5];
+            vm.labels.addTab = values[6];
+            vm.labels.addProperty = values[7];
+            vm.labels.addEditor = values[8];
+            vm.labels.editDataType = values[9];
+            vm.labels.toggleListView = values[10];
+            vm.labels.allowAsRoot = values[11];
+            vm.labels.addChildNode = values[12];
+            vm.labels.addTemplate = values[13];
+
+            var buttons = [
+                {
+                    "name": vm.labels.design,
+                    "alias": "design",
+                    "icon": "icon-document-dashed-line",
+                    "view": "views/documenttypes/views/design/design.html",
+                    "active": true
+                },
+                {
+                    "name": vm.labels.listview,
+                    "alias": "listView",
+                    "icon": "icon-list",
+                    "view": "views/documenttypes/views/listview/listview.html"
+                },
+                {
+                    "name": vm.labels.permissions,
+                    "alias": "permissions",
+                    "icon": "icon-keychain",
+                    "view": "views/documenttypes/views/permissions/permissions.html"
+                },
+                {
+                    "name": vm.labels.templates,
+                    "alias": "templates",
+                    "icon": "icon-layout",
+                    "view": "views/documenttypes/views/templates/templates.html"
+                }
+            ];
+
+            vm.page.keyboardShortcutsOverview = [
+                {
+                    "name": vm.labels.sections,
+                    "shortcuts": [
+                        {
+                            "description": vm.labels.navigateSections,
+                            "keys": [{ "key": "1" }, { "key": "4" }],
+                            "keyRange": true
+                        }
+                    ]
+                },
+                {
+                    "name": vm.labels.design,
+                    "shortcuts": [
+                        {
+                            "description": vm.labels.addTab,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
+                        },
+                        {
+                            "description": vm.labels.addProperty,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "p" }]
+                        },
+                        {
+                            "description": vm.labels.addEditor,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "e" }]
+                        },
+                        {
+                            "description": vm.labels.editDataType,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "d" }]
+                        }
+                    ]
+                },
+                {
+                    "name": vm.labels.listview,
+                    "shortcuts": [
+                        {
+                            "description": vm.labels.toggleListView,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "l" }]
+                        }
+                    ]
+                },
+                {
+                    "name": vm.labels.permissions,
+                    "shortcuts": [
+                        {
+                            "description": vm.labels.allowAsRoot,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "r" }]
+                        },
+                        {
+                            "description": vm.labels.addChildNode,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "c" }]
+                        }
+                    ]
+                },
+                {
+                    "name": vm.labels.templates,
+                    "shortcuts": [
+                        {
+                            "description": vm.labels.addTemplate,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "t" }]
+                        }
+                    ]
+                }
+            ];
+
+            loadButtons(buttons);
+
+        });
 
         contentTypeHelper.checkModelsBuilderStatus().then(function (result) {
             vm.page.modelsBuilder = result;
@@ -144,7 +182,7 @@
 
                         vm.page.saveButtonState = "busy";
 
-                        vm.save().then(function (result) {
+                        vm.saveInternal().then(function (result) {
 
                             vm.page.saveButtonState = "busy";
 
@@ -212,7 +250,7 @@
             });
         }
 
-        function loadButtons() {
+        function loadButtons(buttons) {
 
             angular.forEach(buttons,
                 function (val, index) {
@@ -229,18 +267,22 @@
         /* ---------- SAVE ---------- */
 
         function save() {
+            //return the saveInternal method but catch rejections since this is the upper most caller
+            return saveInternal().catch(angular.noop); 
+        }
+
+        /** This internal save method performs the actual saving and returns a promise, not to be bound to any buttons but used by other bound methods */
+        function saveInternal() {
 
             // only save if there is no overlays open
             if (overlayHelper.getNumberOfOverlays() === 0) {
-
-                var deferred = $q.defer();
 
                 vm.page.saveButtonState = "busy";
 
                 // reformat allowed content types to array if id's
                 vm.contentType.allowedContentTypes = contentTypeHelper.createIdArray(vm.contentType.allowedContentTypes);
 
-                contentEditingHelper.contentEditorPerformSave({
+                return contentEditingHelper.contentEditorPerformSave({
                     saveMethod: contentTypeResource.save,
                     scope: $scope,
                     content: vm.contentType,
@@ -283,7 +325,7 @@
 
                     vm.page.saveButtonState = "success";
 
-                    deferred.resolve(data);
+                    return $q.resolve(data);
                 }, function (err) {
                     //error
                     if (err) {
@@ -297,9 +339,11 @@
                         });
                     }
                     vm.page.saveButtonState = "error";
-                    deferred.reject(err);
+                    return $q.reject(err);
                 });
-                return deferred.promise;
+            }
+            else {
+                return $q.reject();
             }
         }
 

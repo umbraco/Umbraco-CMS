@@ -1,7 +1,7 @@
 (function () {
     "use strict";
     
-    function PublishController($scope) {
+    function PublishController($scope, localizationService) {
 
         var vm = this;
         vm.variants = $scope.model.variants;
@@ -47,6 +47,13 @@
         }
 
         function onInit() {
+
+            if(!$scope.model.title) {
+                localizationService.localize("content_readyToPublish").then(function(value){
+                    $scope.model.title = value;
+                });
+            }
+
             vm.hasPristineVariants = false;
 
             _.each(vm.variants,
