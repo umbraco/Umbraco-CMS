@@ -69,7 +69,7 @@ namespace Umbraco.Core.Strategies
                         item.Entity.Id);
                 }
 
-                
+
             }
         }
     }
