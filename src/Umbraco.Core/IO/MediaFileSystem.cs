@@ -6,10 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using LightInject;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
@@ -35,21 +33,23 @@ namespace Umbraco.Core.IO
         //    { 500, "big-thumb" }
         //};
 
-        public MediaFileSystem(IFileSystem wrapped)
+        public MediaFileSystem(IFileSystem wrapped, IContentSection contentConfig, ILogger logger)
             : base(wrapped)
         {
+            ContentConfig = contentConfig;
+            Logger = logger;
+
+            // fixme - remove obsolete comments
             // due to how FileSystems is written at the moment, the ctor cannot be used to inject
             // dependencies, so we have to rely on property injection for anything we might need
-            ((IServiceContainer)Current.Container.ConcreteContainer).InjectProperties(this);
+            //((IServiceContainer)Current.Container.ConcreteContainer).InjectProperties(this);
 
             UploadAutoFillProperties = new UploadAutoFillProperties(this, Logger, ContentConfig);
         }
 
-        [Inject]
-        internal IContentSection ContentConfig { get; set; }
+        internal IContentSection ContentConfig { get; }
 
-        [Inject]
-        internal ILogger Logger { get; set; }
+        internal ILogger Logger { get; }
 
         internal UploadAutoFillProperties UploadAutoFillProperties { get; }
 

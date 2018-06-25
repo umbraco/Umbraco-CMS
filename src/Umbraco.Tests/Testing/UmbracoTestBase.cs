@@ -13,6 +13,7 @@ using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Composing.CompositionRoots;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -267,7 +268,7 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton(factory => globalSettings);
             Container.RegisterSingleton(factory => umbracoSettings.Content);
             Container.RegisterSingleton(factory => umbracoSettings.Templates);
-            Container.Register(factory => new MediaFileSystem(Mock.Of<IFileSystem>()));
+            Container.Register<IFileSystem, MediaFileSystem>((factory, fileSystem) => new MediaFileSystem(fileSystem, factory.GetInstance<IContentSection>(), factory.GetInstance<ILogger>()));
             Container.RegisterSingleton<IExamineManager>(factory => ExamineManager.Instance);
 
             // replace some stuff

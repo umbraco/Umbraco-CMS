@@ -72,7 +72,7 @@ namespace Umbraco.Tests.PropertyEditors
 
                 container.Register<ILogger, PerContainerLifetime>(f => Mock.Of<ILogger>());
                 container.Register<IContentSection, PerContainerLifetime>(f => Mock.Of<IContentSection>());
-                var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>());
+                var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), Mock.Of<IContentSection>(), Mock.Of<ILogger>());
 
                 var dataTypeService = new TestObjects.TestDataTypeService(
                     new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSection>())) { Id = 1 });

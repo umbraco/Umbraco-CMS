@@ -318,7 +318,7 @@ namespace Umbraco.Core.IO
 
             // validate the ctor
             var constructor = fsType.GetConstructors().SingleOrDefault(x
-                => x.GetParameters().Length == 1 && TypeHelper.IsTypeAssignableFrom<IFileSystem>(x.GetParameters().Single().ParameterType));
+                => x.GetParameters().Length >= 1 && TypeHelper.IsTypeAssignableFrom<IFileSystem>(x.GetParameters().First().ParameterType));
             if (constructor == null)
                 throw new InvalidOperationException("Type " + fsType.FullName + " must inherit from FileSystemWrapper and have a constructor that accepts one parameter of type " + typeof(IFileSystem).FullName + ".");
 
