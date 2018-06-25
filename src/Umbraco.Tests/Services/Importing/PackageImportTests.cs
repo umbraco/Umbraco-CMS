@@ -16,6 +16,7 @@ using LightInject;
 namespace Umbraco.Tests.Services.Importing
 {
     [TestFixture]
+    [Category("Slow")]
     [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class PackageImportTests : TestWithSomeContentBase
