@@ -478,7 +478,7 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        public void FirstChildT()
+        public void FirstChildOfT()
         {
             var doc = GetNode(1046); // has child nodes
             var model = doc.FirstChild<Home>();
@@ -488,7 +488,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsInstanceOf<Home>(model);
             Assert.IsInstanceOf<IPublishedContent>(model);
 
-            model = doc.FirstChild<Home>(x => true); // predicate
+            model = doc.FirstChildOf<Home>(x => true); // predicate
 
             Assert.IsNotNull(model);
             Assert.IsTrue(model.Id == 1173);
@@ -496,8 +496,8 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsInstanceOf<IPublishedContent>(model);
 
             doc = GetNode(1175); // does not have child nodes
-            Assert.IsNull(doc.FirstChild<Home>());
-            Assert.IsNull(doc.FirstChild<Home>(x => true));
+            Assert.IsNull(doc.FirstChildOf<Home>());
+            Assert.IsNull(doc.FirstChildOf<Home>(x => true));
         }
 
         [Test]
