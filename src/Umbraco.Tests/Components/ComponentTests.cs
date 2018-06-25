@@ -12,7 +12,6 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Stubs;
 
 namespace Umbraco.Tests.Components
 {
@@ -43,16 +42,30 @@ namespace Umbraco.Tests.Components
         }
 
         [Test]
-        public void Boot1()
+        public void Boot1A()
         {
             var container = MockContainer();
 
             var loader = new BootLoader(container);
             Composed.Clear();
             // 2 is Core and requires 4
-            // 3 is User
+            // 3 is User - goes away with RuntimeLevel.Unknown
             // => reorder components accordingly
             loader.Boot(TypeArray<Component1, Component2, Component3, Component4>(), RuntimeLevel.Unknown);
+            AssertTypeArray(TypeArray<Component1, Component4, Component2>(), Composed);
+        }
+
+        [Test]
+        public void Boot1B()
+        {
+            var container = MockContainer();
+
+            var loader = new BootLoader(container);
+            Composed.Clear();
+            // 2 is Core and requires 4
+            // 3 is User - stays with RuntimeLevel.Run
+            // => reorder components accordingly
+            loader.Boot(TypeArray<Component1, Component2, Component3, Component4>(), RuntimeLevel.Run);
             AssertTypeArray(TypeArray<Component1, Component4, Component2, Component3>(), Composed);
         }
 
@@ -152,13 +165,27 @@ namespace Umbraco.Tests.Components
         }
 
         [Test]
-        public void Requires2()
+        public void Requires2A()
         {
             var container = MockContainer();
 
             var thing = new BootLoader(container);
             Composed.Clear();
             thing.Boot(new[] { typeof(Component9), typeof(Component2), typeof(Component4) }, RuntimeLevel.Unknown);
+            Assert.AreEqual(2, Composed.Count);
+            Assert.AreEqual(typeof(Component4), Composed[0]);
+            Assert.AreEqual(typeof(Component2), Composed[1]);
+            //Assert.AreEqual(typeof(Component9), Composed[2]); -- goes away with RuntimeLevel.Unknown
+        }
+
+        [Test]
+        public void Requires2B()
+        {
+            var container = MockContainer();
+
+            var thing = new BootLoader(container);
+            Composed.Clear();
+            thing.Boot(new[] { typeof(Component9), typeof(Component2), typeof(Component4) }, RuntimeLevel.Run);
             Assert.AreEqual(3, Composed.Count);
             Assert.AreEqual(typeof(Component4), Composed[0]);
             Assert.AreEqual(typeof(Component2), Composed[1]);

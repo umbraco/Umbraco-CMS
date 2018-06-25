@@ -144,7 +144,7 @@
                     .then(function (data) {
 
                         //success
-                        formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                        formHelper.resetForm({ scope: $scope });
                         $scope.invitedUserPasswordModel.buttonState = "success";
                         //set the user and set them as logged in
                         $scope.invitedUser = data;

@@ -40,9 +40,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
                     activate: true
                 });
 
-                formHelper.resetForm({
-                    scope: $scope
-                });
+                formHelper.resetForm({ scope: $scope });
 
                 var section = appState.getSectionState("currentSection");
 
@@ -50,12 +48,6 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
                 $scope.error = err;
 
-                //show any notifications
-                if (angular.isArray(err.data.notifications)) {
-                    for (var i = 0; i < err.data.notifications.length; i++) {
-                        notificationsService.showNotification(err.data.notifications[i]);
-                    }
-                }
             });
         }
     };

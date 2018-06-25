@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, $cookieStore, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService) {
+function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService) {
 
    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
    // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -36,7 +36,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       else {
          $scope.entityType = "content";
          contentResource = $injector.get('contentResource');
-         getContentTypesCallback = $injector.get('contentTypeResource').getAllowedTypes;
+          getContentTypesCallback = $injector.get('contentTypeResource').getAllowedTypes;
       }
       getListResultsCallback = contentResource.getChildren;
       deleteItemCallback = contentResource.deleteById;
@@ -53,6 +53,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    $scope.actionInProgress = false;
    $scope.selection = [];
    $scope.folders = [];   
+   $scope.page = {};
    $scope.listViewResultSet = {
       totalPages: 0,
       items: []
@@ -217,11 +218,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             $scope.reloadView($scope.contentId, true);
         }
 
-        if (err.data && angular.isArray(err.data.notifications)) {
-            for (var i = 0; i < err.data.notifications.length; i++) {
-                notificationsService.showNotification(err.data.notifications[i]);
-            }
-        } else if (successMsg) {
+        if (successMsg) {
             localizationService.localize("bulk_done")
                 .then(function(v) {
                     notificationsService.success(v, successMsg);
@@ -432,7 +429,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
     $scope.move = function() {
         $scope.moveDialog = {};
-        $scope.moveDialog.title = localizationService.localize("general_move");
         $scope.moveDialog.section = $scope.entityType;
         $scope.moveDialog.currentNode = $scope.contentId;
         $scope.moveDialog.view = "move";
@@ -503,7 +499,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
    $scope.copy = function () {
       $scope.copyDialog = {};
-      $scope.copyDialog.title = localizationService.localize("general_copy");
       $scope.copyDialog.section = $scope.entityType;
       $scope.copyDialog.currentNode = $scope.contentId;
       $scope.copyDialog.view = "copy";
@@ -606,8 +601,10 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          id = -1;
       }
 
-      $scope.listViewAllowedTypes = getContentTypesCallback(id);
-
+      getContentTypesCallback(id).then(function (items) {
+           $scope.listViewAllowedTypes = items;
+      });
+       
       $scope.contentId = id;
       $scope.isTrashed = id === "-20" || id === "-21";
 

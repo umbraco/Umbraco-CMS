@@ -1,5 +1,5 @@
 <div ng-controller="Umbraco.Overlays.TreePickerController as vm">
-    <div ng-hide="miniListView">
+    <div ng-hide="vm.miniListView">
 
         <div class="umb-language-picker" ng-if="vm.showLanguageSelector && vm.languages.length > 1" on-outside-click="vm.page.languageSelectorIsOpen = false" style="padding-bottom: 5px">
             <div class="umb-language-picker__toggle" ng-click="vm.toggleLanguageSelector()">
@@ -37,7 +37,7 @@
                       hideheader="{{vm.hideHeader}}"
                       hideoptions="true"
                       isdialog="true"
-                      onlyinitialized="{{vm.onlyInitialized}}"
+                      only-initialized="{{vm.onlyInitialized}}"
                       customtreeparams="{{vm.customTreeParams}}"
                       enablelistviewsearch="true"
                       enablelistviewexpand="true"

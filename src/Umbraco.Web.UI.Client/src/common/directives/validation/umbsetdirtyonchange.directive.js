@@ -25,7 +25,7 @@
         }
 
         var directive = {
-            require: "^form",
+            require: "^^form",
             restrict: 'A',
             link: link
         };

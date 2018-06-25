@@ -5,24 +5,31 @@
 
         var vm = this;
 
-        if(!$scope.model.title) {
-            $scope.model.title = localizationService.localize("template_insert");
-        }
-
-        if(!$scope.model.subtitle) {
-            $scope.model.subtitle = localizationService.localize("template_insertDesc");
-        }
-
         vm.openMacroPicker = openMacroPicker;
         vm.openPageFieldOverlay = openPageFieldOverlay;
         vm.openDictionaryItemOverlay = openDictionaryItemOverlay;
         vm.openPartialOverlay = openPartialOverlay;
 
+        function onInit() {
+            
+            if(!$scope.model.title) {
+                localizationService.localize("template_insert").then(function(value){
+                    $scope.model.title = value;
+                });
+            }
+    
+            if(!$scope.model.subtitle) {
+                localizationService.localize("template_insertDesc").then(function(value){
+                    $scope.model.subtitle = value;
+                });
+            }
+            
+        }
+
         function openMacroPicker() {
 
             vm.macroPickerOverlay = {
                 view: "macropicker",
-                title: localizationService.localize("template_insertMacro"),
                 dialogData: {},
                 show: true,
                 submit: function(model) {
@@ -45,8 +52,6 @@
 
         function openPageFieldOverlay() {
             vm.pageFieldOverlay = {
-                title: localizationService.localize("template_insertPageField"),
-                description: localizationService.localize("template_insertPageFieldDesc"),
                 submitButtonLabel: "Insert",
                 closeButtonlabel: "Cancel",
                 view: "insertfield",
@@ -72,70 +77,89 @@
 
         function openDictionaryItemOverlay() {
 
-            vm.dictionaryItemOverlay = {
-                view: "treepicker",
-                section: "settings",
-                treeAlias: "dictionary",
-                entityType: "dictionary",
-                multiPicker: false,
-                title: localizationService.localize("template_insertDictionaryItem"),
-                description: localizationService.localize("template_insertDictionaryItemDesc"),
-                emptyStateMessage: localizationService.localize("emptyStates_emptyDictionaryTree"),
-                show: true,
-                select: function(node){
+            var labelKeys = [
+                "template_insertDictionaryItem", 
+                "template_insertDictionaryItemDesc", 
+                "emptyStates_emptyDictionaryTree"
+            ];
 
-                    $scope.model.insert = {
-                        "type": "dictionary",
-                        "node": node
-                    };
+            localizationService.localizeMany(labelKeys).then(function(values){
+                var title = values[0];
+                var subtitle = values[1];
+                var emptyStateMessage = values[2];
 
-                    $scope.model.submit($scope.model);
-
-                    vm.dictionaryItemOverlay.show = false;
-                    vm.dictionaryItemOverlay = null;
-                },
-
-                close: function(model) {
-                    vm.dictionaryItemOverlay.show = false;
-                    vm.dictionaryItemOverlay = null;
-                }
-            };
+                vm.dictionaryItemOverlay = {
+                    view: "treepicker",
+                    section: "settings",
+                    treeAlias: "dictionary",
+                    entityType: "dictionary",
+                    multiPicker: false,
+                    title: title,
+                    subtitle: subtitle,
+                    emptyStateMessage: emptyStateMessage,
+                    show: true,
+                    select: function(node){
+    
+                        $scope.model.insert = {
+                            "type": "dictionary",
+                            "node": node
+                        };
+    
+                        $scope.model.submit($scope.model);
+    
+                        vm.dictionaryItemOverlay.show = false;
+                        vm.dictionaryItemOverlay = null;
+                    },
+    
+                    close: function(model) {
+                        vm.dictionaryItemOverlay.show = false;
+                        vm.dictionaryItemOverlay = null;
+                    }
+                };
+            });
         }
 
         function openPartialOverlay() {
-            vm.partialItemOverlay = {
-                view: "treepicker",
-                section: "settings",
-                treeAlias: "partialViews",
-                entityType: "partialView",
-                multiPicker: false,
-                filter: function(i) {
-                    if(i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
-                        return true;
+            localizationService.localize("template_insertPartialView").then(function(value){
+                var title = value;
+
+                vm.partialItemOverlay = {
+                    view: "treepicker",
+                    section: "settings",
+                    treeAlias: "partialViews",
+                    entityType: "partialView",
+                    multiPicker: false,
+                    title: title,
+                    filter: function(i) {
+                        if(i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
+                            return true;
+                        }
+                    },
+                    filterCssClass: "not-allowed",
+                    show: true,
+                    select: function(node){
+                        
+                        $scope.model.insert = {
+                            "type": "partial",
+                            "node": node
+                        };
+    
+                        $scope.model.submit($scope.model);
+    
+                        vm.partialItemOverlay.show = false;
+                        vm.partialItemOverlay = null;
+                    },
+    
+                    close: function (model) {
+                        vm.partialItemOverlay.show = false;
+                        vm.partialItemOverlay = null;
                     }
-                },
-                filterCssClass: "not-allowed",
-                title: localizationService.localize("template_insertPartialView"),
-                show: true,
-                select: function(node){
-                    
-                    $scope.model.insert = {
-                        "type": "partial",
-                        "node": node
-                    };
+                };
 
-                    $scope.model.submit($scope.model);
-
-                    vm.partialItemOverlay.show = false;
-                    vm.partialItemOverlay = null;
-                },
-
-                close: function (model) {
-                    vm.partialItemOverlay.show = false;
-                    vm.partialItemOverlay = null;
-                }
-            };
+            });
         }
+
+        onInit();
 
     }
 

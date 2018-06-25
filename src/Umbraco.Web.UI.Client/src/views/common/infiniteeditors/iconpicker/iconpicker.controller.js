@@ -17,15 +17,22 @@ function IconPickerController($scope, iconHelper, localizationService) {
 
         vm.loading = true;
 
-        if (!$scope.model.title) {
-            $scope.model.title = localizationService.localize("defaultdialogs_selectIcon");
-        }
+        setTitle();
     
         iconHelper.getIcons().then(function (icons) {
             vm.icons = icons;
             vm.loading = false;
         });
 
+    }
+
+    function setTitle() {
+        if (!$scope.model.title) {
+            localizationService.localize("defaultdialogs_selectIcon")
+                .then(function(data){
+                    $scope.model.title = data;
+                });
+        }
     }
 
     function selectIcon(icon, color) {

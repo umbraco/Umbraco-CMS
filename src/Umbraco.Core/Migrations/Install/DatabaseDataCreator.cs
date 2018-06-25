@@ -90,7 +90,7 @@ namespace Umbraco.Core.Migrations.Install
                     ParentId = -1,
                     UserId = -1,
                     Level = 1,
-                    Path = "-1,-" + id,
+                    Path = "-1," + id,
                     SortOrder = sortOrder,
                     UniqueId = new Guid(uniqueId),
                     Text = text,

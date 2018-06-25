@@ -41,7 +41,7 @@
     }
 
     var directive = {
-      require: ['?^form', '?^valFormManager'],
+      require: ['?^^form', '?^^valFormManager'],
       restrict: "A",
       link: link
     };

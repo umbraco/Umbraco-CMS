@@ -36,7 +36,9 @@
                 <p>This is most likely due to an error during application startup</p>
                 <iframe id="ysod"></iframe>
             </div>
-            <div ng-switch-default ng-include="installer.current.view"></div>    
+            <div ng-switch-default>
+                <div ng-include="installer.current.view"></div>
+            </div>    
         </div>
     </div>
 

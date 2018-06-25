@@ -2,7 +2,7 @@
     
     <div class="flex items-center" style="height: 100%;">
 
-        <div ng-if="showBackButton === 'true' && splitViewOpen !== true" style="margin-right: 15px;">
+        <div ng-if="showBackButton === true && splitViewOpen !== true" style="margin-right: 15px;">
             <a class="umb-editor-header__back" href="#" ng-click="goBack()" prevent-default>
                 <i class="fa fa-arrow-left" aria-hidden="true"></i>
             </a>
@@ -83,7 +83,7 @@
                     ng-if="!hideDescription && !descriptionLocked"
                     ng-model="$parent.description" />
         
-                <div class="umb-panel-header-locked-description" ng-show="descriptionLocked">{{ description }}</div>
+                <div class="umb-panel-header-locked-description" ng-if="descriptionLocked">{{ description }}</div>
 
             </div>
 

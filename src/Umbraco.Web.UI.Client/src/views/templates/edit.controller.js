@@ -55,9 +55,16 @@
 
         //Keyboard shortcuts for help dialog
         vm.page.keyboardShortcutsOverview = [];
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getGeneralShortcuts());
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getEditorShortcuts());
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getTemplateEditorShortcuts());
+
+        templateHelper.getGeneralShortcuts().then(function(data){
+            vm.page.keyboardShortcutsOverview.push(data);
+        });
+        templateHelper.getEditorShortcuts().then(function(data){
+            vm.page.keyboardShortcutsOverview.push(data);
+        });
+        templateHelper.getTemplateEditorShortcuts().then(function(data){
+            vm.page.keyboardShortcutsOverview.push(data);
+        });
 
         
         vm.save = function () {
@@ -375,7 +382,6 @@
                 view: "macropicker",
                 dialogData: {},
                 show: true,
-                title: localizationService.localize("template_insertMacro"),
                 submit: function (model) {
 
                     var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, "Mvc");
@@ -402,7 +408,6 @@
                 closeButtonlabel: "Cancel",
                 view: "insertfield",
                 show: true,
-                title: localizationService.localize("template_insertPageField"),
                 submit: function (model) {
                     insert(model.umbracoField);
                     vm.pageFieldOverlay.show = false;
@@ -420,70 +425,87 @@
 
 
         function openDictionaryItemOverlay() {
-            vm.dictionaryItemOverlay = {
-                view: "treepicker",
-                section: "settings",
-                treeAlias: "dictionary",
-                entityType: "dictionary",
-                multiPicker: false,
-                show: true,
-                title: localizationService.localize("template_insertDictionaryItem"),
-                emptyStateMessage: localizationService.localize("emptyStates_emptyDictionaryTree"),
-                select: function(node){
-                    var code = templateHelper.getInsertDictionarySnippet(node.name);
-                	insert(code);
 
-                	vm.dictionaryItemOverlay.show = false;
-                    vm.dictionaryItemOverlay = null;
-                },
-                close: function (model) {
-                    // close dialog
-                    vm.dictionaryItemOverlay.show = false;
-                    vm.dictionaryItemOverlay = null;
-                    // focus editor
-                    vm.editor.focus();
-                }
-            };
+            var labelKeys = [
+                "template_insertDictionaryItem",
+                "emptyStates_emptyDictionaryTree"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(function(values){
+                var title = values[0];
+                var emptyStateMessage = values[1];
+
+                vm.dictionaryItemOverlay = {
+                    view: "treepicker",
+                    section: "settings",
+                    treeAlias: "dictionary",
+                    entityType: "dictionary",
+                    multiPicker: false,
+                    show: true,
+                    title: title,
+                    emptyStateMessage: emptyStateMessage,
+                    select: function(node){
+                        var code = templateHelper.getInsertDictionarySnippet(node.name);
+                        insert(code);
+    
+                        vm.dictionaryItemOverlay.show = false;
+                        vm.dictionaryItemOverlay = null;
+                    },
+                    close: function (model) {
+                        // close dialog
+                        vm.dictionaryItemOverlay.show = false;
+                        vm.dictionaryItemOverlay = null;
+                        // focus editor
+                        vm.editor.focus();
+                    }
+                };
+
+            });
+
         }
 
         function openPartialOverlay() {
-            vm.partialItemOverlay = {
-                view: "treepicker",
-                section: "settings", 
-                treeAlias: "partialViews",
-                entityType: "partialView",
-                multiPicker: false,
-                show: true,
-                title: localizationService.localize("template_insertPartialView"),
-                filter: function(i) {
-                    if(i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
-                        return true;
-                    }
-                },
-                filterCssClass: "not-allowed",
-                select: function(node){
-                    
-                    var code = templateHelper.getInsertPartialSnippet(node.parentId, node.name);
-                    insert(code);
 
-                    vm.partialItemOverlay.show = false;
-                    vm.partialItemOverlay = null;
-                },
-                close: function (model) {
-                    // close dialog
-                    vm.partialItemOverlay.show = false;
-                    vm.partialItemOverlay = null;
-                    // focus editor
-                    vm.editor.focus();
-                }
-            };
+            localizationService.localize("template_insertPartialView").then(function(value){
+                var title = value;
+
+                vm.partialItemOverlay = {
+                    view: "treepicker",
+                    section: "settings", 
+                    treeAlias: "partialViews",
+                    entityType: "partialView",
+                    multiPicker: false,
+                    show: true,
+                    title: title,
+                    filter: function(i) {
+                        if(i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
+                            return true;
+                        }
+                    },
+                    filterCssClass: "not-allowed",
+                    select: function(node){
+                        
+                        var code = templateHelper.getInsertPartialSnippet(node.parentId, node.name);
+                        insert(code);
+    
+                        vm.partialItemOverlay.show = false;
+                        vm.partialItemOverlay = null;
+                    },
+                    close: function (model) {
+                        // close dialog
+                        vm.partialItemOverlay.show = false;
+                        vm.partialItemOverlay = null;
+                        // focus editor
+                        vm.editor.focus();
+                    }
+                };
+            });
         }
 
         function openQueryBuilderOverlay() {
             vm.queryBuilderOverlay = {
                 view: "querybuilder",
                 show: true,
-                title: localizationService.localize("template_queryBuilder"),
                 submit: function (model) {
 
                     var code = templateHelper.getQuerySnippet(model.result.queryExpression);
@@ -554,34 +576,38 @@
                 }
             });
 
-            vm.masterTemplateOverlay = {
-                view: "itempicker",
-                title: localizationService.localize("template_mastertemplate"),
-                availableItems: availableMasterTemplates,
-                show: true,
-                submit: function(model) {
+            localizationService.localize("template_mastertemplate").then(function(value){
+                var title = value;
 
-                    var template = model.selectedItem;
-
-                    if (template && template.alias) {
-                        vm.template.masterTemplateAlias = template.alias;
-                        setLayout(template.alias + ".cshtml");
-                    } else {
-                        vm.template.masterTemplateAlias = null;
-                        setLayout(null);
+                vm.masterTemplateOverlay = {
+                    view: "itempicker",
+                    title: title,
+                    availableItems: availableMasterTemplates,
+                    show: true,
+                    submit: function(model) {
+    
+                        var template = model.selectedItem;
+    
+                        if (template && template.alias) {
+                            vm.template.masterTemplateAlias = template.alias;
+                            setLayout(template.alias + ".cshtml");
+                        } else {
+                            vm.template.masterTemplateAlias = null;
+                            setLayout(null);
+                        }
+    
+                        vm.masterTemplateOverlay.show = false;
+                        vm.masterTemplateOverlay = null;
+                    },
+                    close: function(oldModel) {
+                        // close dialog
+                        vm.masterTemplateOverlay.show = false;
+                        vm.masterTemplateOverlay = null;
+                        // focus editor
+                        vm.editor.focus();
                     }
-
-                    vm.masterTemplateOverlay.show = false;
-                    vm.masterTemplateOverlay = null;
-                },
-                close: function(oldModel) {
-                    // close dialog
-                    vm.masterTemplateOverlay.show = false;
-                    vm.masterTemplateOverlay = null;
-                    // focus editor
-                    vm.editor.focus();
-                }
-            };
+                };
+            });
 
         }
 

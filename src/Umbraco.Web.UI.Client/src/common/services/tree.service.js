@@ -779,7 +779,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 }
                 else {
                     //couldn't find it in the 
-                    return self.loadNodeChildren({ node: node, section: node.section }).then(function () {
+                    return self.loadNodeChildren({ node: node, section: node.section }).then(function (children) {
                         //ok, got the children, let's find it
                         var found = self.getChildNode(node, args.path[currPathIndex]);
                         if (found) {

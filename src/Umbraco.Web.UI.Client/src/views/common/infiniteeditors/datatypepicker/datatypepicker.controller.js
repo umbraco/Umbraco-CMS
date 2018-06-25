@@ -14,29 +14,14 @@
 
         var vm = this;
 
-        if (!$scope.model.title) {
-            $scope.model.title = localizationService.localize("defaultdialogs_selectEditor");
-        }
-
         vm.searchTerm = "";
         vm.showTabs = false;
         vm.tabsLoaded = 0;
         vm.typesAndEditors = [];
         vm.userConfigured = [];
         vm.loading = false;
-        vm.tabs = [{
-            active: true,
-            id: 1,
-            label: localizationService.localize("contentTypeEditor_availableEditors"),
-            alias: "Default",
-            typesAndEditors: []
-        }, {
-            active: false,
-            id: 2,
-            label: localizationService.localize("contentTypeEditor_reuse"),
-            alias: "Reuse",
-            userConfigured: []
-        }];
+        vm.tabs = [];
+        vm.labels = {};
 
         vm.filterItems = filterItems;
         vm.showDetailsOverlay = showDetailsOverlay;
@@ -46,10 +31,46 @@
         vm.close = close;
 
         function activate() {
-
+            setTitle();
+            loadTabs();
             getGroupedDataTypes();
             getGroupedPropertyEditors();
 
+        }
+
+        function setTitle() {
+            if (!$scope.model.title) {
+                localizationService.localize("defaultdialogs_selectEditor")
+                    .then(function(data){
+                        $scope.model.title = data;
+                    });
+            }
+        }
+
+        function loadTabs() {
+
+            var labels = ["contentTypeEditor_availableEditors", "contentTypeEditor_reuse"];
+
+            localizationService.localizeMany(labels)
+                .then(function(data){
+                    vm.labels.availableDataTypes = data[0];
+                    vm.labels.reuse = data[1];
+
+                    vm.tabs = [{
+                        active: true,
+                        id: 1,
+                        label: vm.labels.availableDataTypes,
+                        alias: "Default",
+                        typesAndEditors: []
+                    }, {
+                        active: false,
+                        id: 2,
+                        label: vm.labels.reuse,
+                        alias: "Reuse",
+                        userConfigured: []
+                    }];
+
+                });
         }
 
         function getGroupedPropertyEditors() {
@@ -116,7 +137,6 @@
         function pickEditor(propertyEditor) {
 
             var dataTypeSettings = {
-                title: localizationService.localize("contentTypeEditor_editorSettings"),
                 propertyEditor: propertyEditor,
                 property: $scope.model.property,
                 contentTypeName: $scope.model.contentTypeName,

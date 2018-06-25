@@ -134,7 +134,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
             memberResource.save($scope.content, $routeParams.create, fileManager.getFiles())
                 .then(function(data) {
 
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                    formHelper.resetForm({ scope: $scope });
 
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,

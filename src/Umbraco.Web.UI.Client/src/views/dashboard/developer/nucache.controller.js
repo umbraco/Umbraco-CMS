@@ -21,7 +21,7 @@
                     'Failed to verify the cache.')
             .then(function (result) {
                 $scope.working = false;
-                $scope.status = angular.fromJson(result);
+                $scope.status = result;
             });
     };
 
@@ -33,7 +33,7 @@
                     'Failed to verify the cache.')
             .then(function (result) {
                 $scope.working = false;
-                $scope.status = angular.fromJson(result);
+                $scope.status = result;
             });
     };
 
@@ -46,7 +46,7 @@
                         'Failed to rebuild the cache.')
                 .then(function (result) {
                     $scope.working = false;
-                    $scope.status = angular.fromJson(result);
+                    $scope.status = result;
                 });
         }
     };

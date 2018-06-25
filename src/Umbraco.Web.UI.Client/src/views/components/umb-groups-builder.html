@@ -82,17 +82,22 @@
                                    required
                                    val-server-field="{{'Groups[' + $index + '].Name'}}" />
 
-                            <div class="umb-validation-label -arrow-left" val-msg-for="groupName" val-toggle-msg="valServerField"></div>
-                            <div class="umb-validation-label -arrow-left" val-msg-for="groupName" val-toggle-msg="required"><localize key="required"></localize></div>
-
+                            <div ng-messages="groupNameForm.groupName.$error" show-validation-on-submit>
+                                <div class="umb-validation-label -arrow-left" ng-message="valServerField">{{groupNameForm.groupName.errorMsg}}</div>
+                                <div class="umb-validation-label -arrow-left" ng-message="required"><localize key="required"></localize></div>
+                            </div>
                         </div>
                     </ng-form>
 
                     <ng-form name="groupSortOrderForm">
                         <div class="umb-group-builder__group-sort-order" ng-if="sortingMode">
                             <input name="groupSortOrder" type="number" class="umb-property-editor-tiny" style="margin-bottom: 0;" ng-model="tab.sortOrder" ng-disabled="tab.inherited" on-blur="changeSortOrderValue(tab)" required />
+
+                            <!-- This is a manual validation message not bound to a validator -->
                             <div class="umb-validation-label -arrow-left" ng-if="groupSortOrderForm.groupSortOrder.$error.required && tab.showSortOrderMissing"><localize key="required"></localize></div>
-                            <div class="umb-validation-label -arrow-left" ng-if="!tab.showSortOrderMissing" val-msg-for="groupSortOrder" val-toggle-msg="required"><localize key="required"></localize></div>
+                            <div ng-messages="groupSortOrderForm.groupSortOrder.$error" show-validation-on-submit>
+                                <div class="umb-validation-label -arrow-left" ng-message="required"><localize key="required"></localize></div>
+                            </div>
                         </div>
                     </ng-form>
 
@@ -160,19 +165,21 @@
                                         </umb-locked-field>
 
                                         <div class="umb-group-builder__property-meta-label">
-                                            <textarea
-                                                localize="placeholder"
-                                                placeholder="@placeholders_label"
-                                                ng-model="property.label"
-                                                ng-disabled="property.inherited || property.locked"
-                                                name="groupName"
-                                                umb-auto-resize
-                                                required
-                                                val-server-field="{{'Groups[' + $parent.$parent.$parent.$parent.$index + '].Properties[' + $index + '].Label'}}">
+                                            <textarea localize="placeholder"
+                                                      placeholder="@placeholders_label"
+                                                      ng-model="property.label"
+                                                      ng-disabled="property.inherited || property.locked"
+                                                      name="groupName"
+                                                      umb-auto-resize
+                                                      required
+                                                      val-server-field="{{'Groups[' + $parent.$parent.$parent.$parent.$index + '].Properties[' + $index + '].Label'}}">
                                             </textarea>
 
-                                            <div class="umb-validation-label" val-msg-for="groupName" val-toggle-msg="valServerField"></div>
-                                            <div class="umb-validation-label" val-msg-for="groupName" val-toggle-msg="required"><localize key="contentTypeEditor_requiredLabel"></localize></div>
+                                            <div ng-messages="propertyTypeForm.groupName.$error" show-validation-on-submit>
+                                                <div class="umb-validation-label" ng-message="valServerField">{{propertyTypeForm.groupName.errorMsg}}</div>
+                                                <div class="umb-validation-label" ng-message="required"><localize key="contentTypeEditor_requiredLabel"></localize></div>
+                                            </div>
+                                            
                                         </div>
 
                                         <div class="umb-group-builder__property-meta-description">

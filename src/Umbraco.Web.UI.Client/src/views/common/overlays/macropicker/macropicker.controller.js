@@ -1,16 +1,19 @@
 function MacroPickerController($scope, entityResource, macroResource, umbPropEditorHelper, macroService, formHelper, localizationService) {
 
-
-    if(!$scope.model.title) {
-        $scope.model.title = localizationService.localize("defaultdialogs_selectMacro");
-    }
-
     $scope.macros = [];
     $scope.model.selectedMacro = null;
     $scope.model.macroParams = [];
 
     $scope.wizardStep = "macroSelect";
     $scope.noMacroParams = false;
+
+    function onInit() {
+        if(!$scope.model.title) {
+            localizationService.localize("defaultdialogs_selectMacro").then(function(value){
+                $scope.model.title = value;    
+            });
+        }
+    }
 
     $scope.selectMacro = function (macro) {
 
@@ -121,6 +124,7 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
             $scope.wizardStep = "macroSelect";
         });
 
+    onInit();
 
 }
 

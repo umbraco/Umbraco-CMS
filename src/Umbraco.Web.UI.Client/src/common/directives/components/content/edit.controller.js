@@ -286,7 +286,7 @@
                 contentResource.unPublish($scope.content.id, culture)
                     .then(function (data) {
 
-                        formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                        formHelper.resetForm({ scope: $scope });
 
                         contentEditingHelper.handleSuccessfulSave({
                             scope: $scope,
@@ -301,7 +301,6 @@
                         $scope.page.buttonGroupState = "success";
 
                     }, function (err) {
-            formHelper.showNotifications(err.data);
                         $scope.page.buttonGroupState = 'error';
                     });
             }
@@ -320,7 +319,6 @@
                 if (formHelper.submitForm({ scope: $scope, action: "publish"})) {
 
                     var dialog = {
-                        title: localizationService.localize("content_readyToPublish"),
                         view: "publish",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
@@ -368,12 +366,12 @@
                 }
             }
             else {
-                return performSave({ saveMethod: contentResource.publish, action: "publish" });
+                return performSave({ saveMethod: contentResource.publish, action: "publish" }).catch(angular.noop);;
             }
         };
 
         $scope.save = function () {
-            return performSave({ saveMethod: $scope.saveMethod(), action: "save" });
+            return performSave({ saveMethod: $scope.saveMethod(), action: "save" }).catch(angular.noop);
         };
 
         $scope.preview = function (content) {
@@ -397,7 +395,7 @@
                 else {
                     $scope.save().then(function (data) {
                         previewWindow.location.href = redirect;
-                    });
+                    }).catch(angular.noop);
                 }
             }
         };

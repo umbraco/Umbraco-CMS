@@ -7,10 +7,6 @@
       var origWidth = 500;
       var origHeight = 300;
 
-      if(!$scope.model.title) {
-          $scope.model.title = localizationService.localize("general_embed");
-      }
-
       $scope.model.embed = {
          url: "",
          width: 360,
@@ -24,6 +20,14 @@
 
       vm.showPreview = showPreview;
       vm.changeSize = changeSize;
+
+    function onInit() {
+        if(!$scope.model.title) {
+            localizationService.localize("general_embed").then(function(value){
+                $scope.model.title = value;
+            });
+        }
+    }
 
       function showPreview() {
 
@@ -94,6 +98,8 @@
          }
 
       }
+
+      onInit();
 
    }
 

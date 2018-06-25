@@ -1,15 +1,21 @@
 function ItemPickerOverlay($scope, localizationService) {
 
-    if (!$scope.model.title) {
-        $scope.model.title = localizationService.localize("defaultdialogs_selectItem");
-    }
+    function onInit() {
+        $scope.model.hideSubmitButton = true;
 
-    $scope.model.hideSubmitButton = true;
+        if (!$scope.model.title) {
+            localizationService.localize("defaultdialogs_selectItem").then(function(value){
+                $scope.model.title = value;
+            });
+        }
+    }
 
     $scope.selectItem = function(item) {
         $scope.model.selectedItem = item;
         $scope.submitForm($scope.model);
     };
+
+    onInit();
 
 }
 

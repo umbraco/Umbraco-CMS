@@ -191,7 +191,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
             mediaResource.save($scope.content, create, fileManager.getFiles())
                 .then(function(data) {
 
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                    formHelper.resetForm({ scope: $scope });
 
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,
@@ -226,13 +226,6 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
                     });
                     
-                    //show any notifications
-                    if (angular.isArray(err.data.notifications)) {
-                        for (var i = 0; i < err.data.notifications.length; i++) {
-                            notificationsService.showNotification(err.data.notifications[i]);
-                        }
-                    }
-
                     editorState.set($scope.content);
                     $scope.busy = false;
                     $scope.page.saveButtonState = "error";
@@ -242,10 +235,6 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
             $scope.busy = false;
         }
         
-    };
-
-    $scope.backToListView = function() {
-        $location.path($scope.page.listViewPath);
     };
 
     $scope.close = function() {

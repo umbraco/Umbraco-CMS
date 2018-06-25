@@ -250,14 +250,11 @@
                 // show the correct badges
                 setUserDisplayState(vm.users);
 
-                formHelper.showNotifications(data);
-
                 vm.disableUserButtonState = "init";
                 clearSelection();
 
             }, function (error) {
                 vm.disableUserButtonState = "error";
-                formHelper.showNotifications(error.data);
             });
         }
 
@@ -273,13 +270,10 @@
                 });
                 // show the correct badges
                 setUserDisplayState(vm.users);
-                // show notification
-                formHelper.showNotifications(data);
                 vm.enableUserButtonState = "init";
                 clearSelection();
             }, function (error) {
                 vm.enableUserButtonState = "error";
-                formHelper.showNotifications(error.data);
             });
         }
 
@@ -295,13 +289,10 @@
                 });
                 // show the correct badges
                 setUserDisplayState(vm.users);
-                // show notification
-                formHelper.showNotifications(data);
                 vm.unlockUserButtonState = "init";
                 clearSelection();
             }, function (error) {
                 vm.unlockUserButtonState = "error";
-                formHelper.showNotifications(error.data);
             });
         }
 
@@ -315,10 +306,9 @@
             vm.selectedBulkUserGroups = _.clone(firstSelectedUser.userGroups);
 
             vm.userGroupPicker = {
-                title: localizationService.localize("user_selectUserGroups"),
                 view: "usergrouppicker",
                 selection: vm.selectedBulkUserGroups,
-                closeButtonLabel: localizationService.localize("general_cancel"),
+                closeButtonLabelKey: "general_cancel",
                 show: true,
                 submit: function (model) {
                     usersResource.setUserGroupsOnUsers(model.selection, vm.selection).then(function (data) {
@@ -335,11 +325,8 @@
                         vm.selectedBulkUserGroups = [];
                         vm.userGroupPicker.show = false;
                         vm.userGroupPicker = null;
-                        formHelper.showNotifications(data);
                         clearSelection();
-                    }, function (error) {
-                        formHelper.showNotifications(error.data);
-                    });
+                    }, angular.noop);
                 },
                 close: function (oldModel) {
                     vm.selectedBulkUserGroups = [];
@@ -351,10 +338,9 @@
 
         function openUserGroupPicker(event) {
             vm.userGroupPicker = {
-                title: localizationService.localize("user_selectUserGroups"),
                 view: "usergrouppicker",
                 selection: vm.newUser.userGroups,
-                closeButtonLabel: localizationService.localize("general_cancel"),
+                closeButtonLabelKey: "general_cancel",
                 show: true,
                 submit: function (model) {
                     // apply changes
