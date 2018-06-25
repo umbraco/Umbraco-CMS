@@ -39,6 +39,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int State { get; set; }
 
         [Column("comment")]
+        [NullSetting(NullSetting = NullSettings.Null)]
         public string Comment { get; set; }
     }
 }
