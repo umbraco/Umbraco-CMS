@@ -25,8 +25,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         bool UploadAllowDirectories { get; }
 
-        bool UseTheNewMediaPathScheme { get; }
-
         IEnumerable<IContentErrorPage> Error404Collection { get; }
 
         bool EnsureUniqueNaming { get; }
