@@ -15,12 +15,18 @@
         var evts = [];
 
         var disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
-        vm.labels = {};
+        var documentTypeId = $routeParams.id;
+        var create = $routeParams.create;
+        var noTemplate = $routeParams.notemplate;
+        var infiniteMode = $scope.model && $scope.model.infiniteMode;
 
         vm.save = save;
+        vm.close = close;
 
         vm.currentNode = null;
         vm.contentType = {};
+        vm.labels = {};
+        vm.submitButtonKey = "buttons_save";
 
         vm.page = {};
         vm.page.loading = false;
@@ -43,6 +49,18 @@
             "shortcuts_addChildNode",
             "shortcuts_addTemplate"
         ];
+
+        onInit();
+
+        function onInit() {
+            // get init values from model when in infinite mode
+            if(infiniteMode) {
+                documentTypeId = $scope.model.id;
+                create = $scope.model.create;
+                noTemplate = $scope.model.notemplate;
+                vm.submitButtonKey = "buttons_saveAndClose";
+            }
+        }
 
         localizationService.localizeMany(labelKeys).then(function (values) {
             // navigation
@@ -227,11 +245,11 @@
             }
         });
 
-        if ($routeParams.create) {
+        if (create) {
             vm.page.loading = true;
 
             //we are creating so get an empty data type item
-            contentTypeResource.getScaffold($routeParams.id)
+            contentTypeResource.getScaffold(documentTypeId)
                 .then(function (dt) {
                     init(dt);
                     vm.page.loading = false;
@@ -243,9 +261,12 @@
 
         function loadDocumentType() {
             vm.page.loading = true;
-            contentTypeResource.getById($routeParams.id).then(function (dt) {
+            contentTypeResource.getById(documentTypeId).then(function (dt) {
                 init(dt);
-                syncTreeNode(vm.contentType, dt.path, true);
+                // we don't need to sync the tree in infinite mode
+                if(!infiniteMode) { 
+                    syncTreeNode(vm.contentType, dt.path, true);
+                }
                 vm.page.loading = false;
             });
         }
@@ -321,9 +342,21 @@
                     }
                 }).then(function (data) {
                     //success
-                    syncTreeNode(vm.contentType, data.path);
+                    // we don't need to sync the tree in infinite mode
+                    if(!infiniteMode) {
+                        syncTreeNode(vm.contentType, data.path);
+                    }
 
+                    // emit event
+                    var args = { documentType: vm.contentType };
+                    eventsService.emit("editors.documentType.saved", args);
+                    
                     vm.page.saveButtonState = "success";
+
+                    if(infiniteMode && $scope.model.submit) {
+                        $scope.model.documentTypeAlias = vm.contentType.alias;
+                        $scope.model.submit($scope.model);
+                    }
 
                     return $q.resolve(data);
                 }, function (err) {
@@ -362,7 +395,7 @@
             }
 
             // insert template on new doc types
-            if (!$routeParams.notemplate && contentType.id === 0) {
+            if (!noTemplate && contentType.id === 0) {
                 contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
                 contentType.allowedTemplates = contentTypeHelper.insertTemplatePlaceholder(contentType.allowedTemplates);
             }
@@ -405,6 +438,12 @@
             navigationService.syncTree({ tree: "documenttypes", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
                 vm.currentNode = syncArgs.node;
             });
+        }
+
+        function close() {
+            if($scope.model.close) {
+                $scope.model.close($scope.model);
+            }
         }
 
         evts.push(eventsService.on("app.refreshEditor", function (name, error) {
