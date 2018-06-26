@@ -142,6 +142,22 @@
             open(editor);
         }
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#documentTypeEditor
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the document type editor in infinite editing, the submit callback returns the save document type
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function documentTypeEditor(editor) {
+            editor.view = "views/documenttypes/edit.html";
+            open(editor);
+        }
+
         var service = {
             getEditors: getEditors,
             open: open,
@@ -149,7 +165,8 @@
             mediaEditor: mediaEditor,
             contentEditor: contentEditor,
             mediaPicker: mediaPicker,
-            iconPicker: iconPicker
+            iconPicker: iconPicker,
+            documentTypeEditor: documentTypeEditor
         };
 
         return service;
