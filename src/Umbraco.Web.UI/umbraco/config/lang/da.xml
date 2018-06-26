@@ -763,6 +763,8 @@
     <key alias="forgottenPassword">Glemt adgangskode?</key>
     <key alias="forgottenPasswordInstruction">En e-mail vil blive sendt til den angivne adresse med et link til at nulstille din adgangskode</key>
     <key alias="requestPasswordResetConfirmation">En e-mail med instruktioner for nulstilling af adgangskoden vil blive sendt til den angivne adresse, hvis det matcher vores optegnelser</key>
+    <key alias="showPassword">Vis adgangskode</key>
+    <key alias="hidePassword">Skjul adgangskode</key>
     <key alias="returnToLogin">Tilbage til login formular</key>
     <key alias="setPasswordInstruction">Angiv en ny adgangskode</key>
     <key alias="setPasswordConfirmation">Din adgangskode er blevet opdateret</key>
