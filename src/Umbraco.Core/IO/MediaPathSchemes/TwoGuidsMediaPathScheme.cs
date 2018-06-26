@@ -7,7 +7,7 @@ namespace Umbraco.Core.IO.MediaPathSchemes
     /// Implements a two-guids media path scheme.
     /// </summary>
     /// <remarks>
-    /// <para>Path is "{itemGuid}-{propertyGuid}/{filename}".</para>
+    /// <para>Path is "{itemGuid}/{propertyGuid}/{filename}".</para>
     /// </remarks>
     public class TwoGuidsMediaPathScheme : IMediaPathScheme
     {
@@ -18,8 +18,7 @@ namespace Umbraco.Core.IO.MediaPathSchemes
         /// <inheritdoc />
         public string GetFilePath(Guid itemGuid, Guid propertyGuid, string filename, string previous = null)
         {
-            var directory = itemGuid.ToString("N") + "-" + propertyGuid.ToString("N");
-            return Path.Combine(directory, filename).Replace('\\', '/');
+            return Path.Combine(itemGuid.ToString("N"), propertyGuid.ToString("N"), filename).Replace('\\', '/');
         }
 
         /// <inheritdoc />
