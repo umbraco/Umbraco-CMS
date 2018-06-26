@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper) {
+    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper, editorService) {
 
         function link(scope, element, attrs, ctrl) {
 
@@ -67,9 +67,17 @@
                 loadAuditTrail();
             };
 
-            scope.openDocumentType = function (documentType) {               
-                var url = "/settings/documenttypes/edit/" + documentType.id;
-                $location.url(url);
+            scope.openDocumentType = function (documentType) {
+                var editor = {
+                    id: documentType.id,
+                    submit: function(model) {
+                        editorService.close();
+                    },
+                    close: function() {
+                        editorService.close();
+                    }
+                };
+                editorService.documentTypeEditor(editor);
             };
 
             scope.updateTemplate = function (templateAlias) {
