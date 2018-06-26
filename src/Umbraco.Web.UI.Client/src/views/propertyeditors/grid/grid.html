@@ -1,6 +1,7 @@
 <div ng-controller="Umbraco.PropertyEditors.GridController" class="umb-grid umb-editor clearfix" id="umb-grid">
 
     <umb-editor-sub-header>
+        <label style="float: right;"><input type="checkbox" ng-model="showNav" />Nav</label>
 
         <umb-editor-sub-header-content-right>
             <umb-button
@@ -12,6 +13,8 @@
                 action="toggleSortMode()">
             </umb-button>
         </umb-editor-sub-header-content-right>
+
+        <umb-grid-nav ng-show="showNav"></umb-grid-nav>
 
     </umb-editor-sub-header>
 

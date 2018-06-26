@@ -8,7 +8,7 @@
 .usky-grid IFRAME {overflow:hidden;}
 
 
- // Sortabel
+ // Sortable
  // -------------------------
 
  .usky-grid .ui-sortable-helper  {
@@ -895,3 +895,83 @@
 }
 
 .usky-grid-configuration a.uSky-templates-column{height: 70px !important;}
+
+// Nav
+
+.umb-grid-nav {
+    .column() {
+        display: inline-block;
+        float: left;
+    }
+
+    background-color: white;
+    border: 1px solid gray;
+    opacity: .8;
+    position: absolute;
+    top: 25px;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    margin-top: 35px;
+    z-index: 999;
+
+    .area {
+        height: 14px;
+    }
+
+    .area-gutter {
+        height: 10px;
+        margin: 2px;
+        background-color: lightgray;
+
+        &.active {
+            background-color: #2e8aea;
+        }
+    }
+
+    .col-xs-1 {
+        .column();
+        width: 8.33%;
+    }
+    .col-xs-2 {
+        .column();
+        width: 16.66%;
+    }
+    .col-xs-3 {
+        .column();
+        width: 25%;
+    }
+    .col-xs-4 {
+        .column();
+        width: 33%;
+    }
+    .col-xs-6 {
+        .column();
+        width: 50%;
+    }
+    .col-xs-7 {
+        .column();
+        width: 58.3%;
+    }
+    .col-xs-8 {
+        .column();
+        width: 66.66%;
+    }
+    .col-xs-9 {
+        .column();
+        width: 75%;
+    }
+    .col-xs-10 {
+        .column();
+        width: 83.3%;
+    }
+    .col-xs-11 {
+        .column();
+        width: 91.66%;
+    }
+    .col-xs-12 {
+        .column();
+        width: 100%;
+    }
+
+}
