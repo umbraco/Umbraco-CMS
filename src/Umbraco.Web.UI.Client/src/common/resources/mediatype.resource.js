@@ -122,6 +122,18 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                'Failed to delete content type contaier');
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaTypeResource#save
+         * @methodOf umbraco.resources.mediaTypeResource
+         *
+         * @description
+         * Saves or update a media type
+         *
+         * @param {Object} content data type object to create/update
+         * @returns {Promise} resourcePromise object.
+         *
+         */
         save: function (contentType) {
 
             var saveModel = umbDataFormatter.formatContentTypePostData(contentType);

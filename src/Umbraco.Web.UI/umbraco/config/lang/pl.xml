@@ -1618,7 +1618,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
 	  <key alias="httpsCheckInvalidCertificate">Błąd walidacji certyfikatu: '%0%'</key>
     <key alias="httpsCheckExpiredCertificate">Certyfikat SSL Twojej strony wygasł.</key>
     <key alias="httpsCheckExpiringCertificate">Certyfikat SSL Twojej strony wygaśnie za %0% dni.</key>
-	  <key alias="httpsCheckInvalidUrl">Błąd pingowania adresu URL %0% - '%1%'</key>
+	  <key alias="healthCheckInvalidUrl">Błąd pingowania adresu URL %0% - '%1%'</key>
 	  <key alias="httpsCheckIsCurrentSchemeHttps">Oglądasz %0% stronę używając HTTPS.</key>
 	  <key alias="httpsCheckConfigurationRectifyNotPossible">appSetting 'umbracoUseSSL' został ustawiony na 'false' w Twoim pliku web.config. Po uzyskaniu dostępu do strony, używając HTTPS, powinieneś go ustawić na 'true'.</key>
 	  <key alias="httpsCheckConfigurationCheckResult">appSetting 'umbracoUseSSL' został ustawiony na '%0%' w Twoim pliku web.config, Twoje ciasteczka są %1% ustawione jako bezpieczne.</key>
@@ -1658,10 +1658,10 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
 
     <key alias="clickJackingCheckHeaderFound"><![CDATA[Nagłówek lub meta-tag <strong>X-Frame-Options</strong> używany do kontrolowania czy strona może być IFRAME'owana przez inną został znaleziony.]]></key>
     <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Nagłówek lub meta-tag <strong>X-Frame-Options</strong> używany do kontrolowania czy strona może być IFRAME'owana przez inną nie został znaleziony.]]></key>
-    <key alias="clickJackingSetHeaderInConfig">Ustaw nagłówek w Config</key>
+    <key alias="setHeaderInConfig">Ustaw nagłówek w Config</key>
     <key alias="clickJackingSetHeaderInConfigDescription">Dodaje wartość do sekcji httpProtocol/customHeaders pliku web.config, aby zapobiec IFRAME'owania strony przez inne witryny.</key>
     <key alias="clickJackingSetHeaderInConfigSuccess">Ustawienie do tworzenia nagłówka, zapobiegającego IFRAME'owania strony przez inne witryny zostało dodane do Twojego pliku web.config.</key>
-    <key alias="clickJackingSetHeaderInConfigError">Nie można zaktualizować pliku web.config. Błąd: %0%</key>
+    <key alias="setHeaderInConfigError">Nie można zaktualizować pliku web.config. Błąd: %0%</key>
 
     <!-- Następujące klucze spowodują, że tokeny zostaną przekazane:
 	    0: Lista znalezionych nagłówków, oddzielonych przecinkami
