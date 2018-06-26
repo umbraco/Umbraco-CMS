@@ -1357,7 +1357,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="uppercase">Store bogstaver</key>
     <key alias="urlEncode">URL encode</key>
     <key alias="urlEncodeHelp">Hvis indholdet af felterne skal sendes til en url, skal denne slåes til så specialtegn formateres</key>
-    <key alias="usedIfAllEmpty">Denne tekst vil blive brugt hvis ovenstående felter er tomme</key>
+    <key alias="usedIfAllEmpty">Denne tekst bruges hvis ovenstående felter er tomme</key>
     <key alias="usedIfEmpty">Dette felt vil blive brugt hvis ovenstående felt er tomt</key>
     <key alias="withTime">Ja, med klokkeslæt. Dato/tid separator: </key>
   </area>
