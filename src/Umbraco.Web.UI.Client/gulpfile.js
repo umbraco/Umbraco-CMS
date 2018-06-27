@@ -7,6 +7,7 @@ var sort = require('gulp-sort');
 var connect = require('gulp-connect');
 var open = require('gulp-open');
 var runSequence = require('run-sequence');
+const imagemin = require('gulp-imagemin');
 
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
@@ -206,6 +207,17 @@ gulp.task('dependencies', function () {
     //css, fonts and image files
     stream.add( 
             gulp.src(sources.globs.assets)
+				.pipe(imagemin([
+                    imagemin.gifsicle({interlaced: true}),
+                    imagemin.jpegtran({progressive: true}),
+                    imagemin.optipng({optimizationLevel: 5}),
+                    imagemin.svgo({
+                        plugins: [
+                            {removeViewBox: true},
+                            {cleanupIDs: false}
+                        ]
+                    })
+                ]))
                 .pipe(gulp.dest(root + targets.assets))
         );
 

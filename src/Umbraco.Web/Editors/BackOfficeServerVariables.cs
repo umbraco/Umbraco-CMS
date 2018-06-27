@@ -269,6 +269,10 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetByPath("", ""))
                         },
                         {
+                            "dictionaryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DictionaryController>(
+                                controller => controller.DeleteById(int.MaxValue))
+						},
+                        {
                             "helpApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<HelpController>(
                                 controller => controller.GetContextHelpForPage("","",""))
                         },
@@ -276,6 +280,7 @@ namespace Umbraco.Web.Editors
                             "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
                                 controller => controller.GetSupportedMomentLocales())
                         }
+
                     }
                 },
                 {
