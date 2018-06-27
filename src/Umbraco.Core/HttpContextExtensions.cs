@@ -10,10 +10,20 @@ namespace Umbraco.Core
             {
                 return "Unknown, httpContext is null";
             }
-            if (httpContext.Request == null)
+
+            try
             {
+                // Sometimes you can't access this and it throws, this catches that and reports back something useful at least
+                var request = httpContext.Request;
+            }
+            catch (HttpException exc) {
                 return "Unknown, httpContext.Request is null";
             }
+
+            if (httpContext.Request == null) {
+                return "Unknown, httpContext.Request is null";
+            }
+
             if (httpContext.Request.ServerVariables == null)
             {
                 return "Unknown, httpContext.Request.ServerVariables is null";
