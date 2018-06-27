@@ -7,8 +7,19 @@
 
             var evts = [];
 
+            scope.allowChangeMediaType = false;
+
             function onInit() {
-                scope.allowOpenMediaType = true;
+
+                userService.getCurrentUser().then(function(user){
+                    // only allow change of media type if user has access to the settings sections
+                    angular.forEach(user.sections, function(section){
+                        if(section.alias === "settings") {
+                            scope.allowChangeMediaType = true;
+                        }
+                    });
+                });
+
                 // get document type details
                 scope.mediaType = scope.node.contentType;
                 // get node url
