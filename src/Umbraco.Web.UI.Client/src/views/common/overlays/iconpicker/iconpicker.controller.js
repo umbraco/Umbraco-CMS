@@ -9,11 +9,19 @@
 function IconPickerOverlay($scope, iconHelper, localizationService) {
 
    $scope.loading = true;
-   $scope.model.hideSubmitButton = true;
+   $scope.model.hideSubmitButton = false;
 
     if (!$scope.model.title) {
         $scope.model.title = localizationService.localize("defaultdialogs_selectIcon");
-    }
+    };
+
+    if ($scope.model.color) {
+        $scope.color = $scope.model.color;
+    };
+
+    if ($scope.model.icon) {
+        $scope.icon = $scope.model.icon;
+    };
 
    iconHelper.getIcons().then(function(icons) {
       $scope.icons = icons;
@@ -26,6 +34,9 @@ function IconPickerOverlay($scope, iconHelper, localizationService) {
        $scope.submitForm($scope.model);
    };
 
+    $scope.changeColor = function (color) {
+        $scope.model.color = color;
+    };
 }
 
 angular.module("umbraco").controller("Umbraco.Overlays.IconPickerOverlay", IconPickerOverlay);

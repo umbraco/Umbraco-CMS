@@ -8,14 +8,16 @@
 
             <umb-box-content class="block-form">
 
-                <umb-control-group label="@general_email" required="true">
+                <umb-control-group label="@general_email" required="true" alias="email">
 
                     <input type="email"
                            localize="placeholder"
                            placeholder="@placeholders_enteremail"
                            class="input-block-level"
                            ng-model="model.user.email"
-                           umb-auto-focus name="email"
+                           umb-auto-focus
+                           name="email"
+                           id="email"
                            val-email
                            required
                            val-server-field="Email" />
