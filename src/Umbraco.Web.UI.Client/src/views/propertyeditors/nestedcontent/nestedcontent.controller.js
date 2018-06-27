@@ -144,32 +144,12 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             // this could be used for future limiting on node types
             $scope.overlayMenu.scaffolds = [];
             _.each($scope.scaffolds, function (scaffold) {
-               
-                var isGroup = false;
-                var inGroup = true;
-                var groups = parseScaffolds(scaffold.nameGroup);
-
-                if (group === "" || !group) {
-                    if (scaffold.nameGroup !== "") {
-                        if (!$scope.getScaffoldGroup(scaffold.nameGroup)) {
-                            isGroup = true;
-                        } else {
-                            inGroup = false;
-                        }
-                    }
-                } else if (!groups.includes(group)) {
-                    inGroup = false;
-                }
-
-                if (isGroup) {
-                    _.each(groups, function(groupItem) {
-                        $scope.overlayMenu.scaffolds.push({
-                            group: groupItem,
-                            name: groupItem
-                        });    
-                    });
-                    
-                } else if (inGroup){
+                if ((!group || group === "") && hasGroup(scaffold) && !groupExists(scaffold.nameGroup)) {
+                    $scope.overlayMenu.scaffolds.push({
+                        group: scaffold.nameGroup,
+                        name: scaffold.nameGroup
+                    }); 
+                } else if (inGroup(scaffold, group)){
                     $scope.overlayMenu.scaffolds.push({
                         alias: scaffold.contentTypeAlias,
                         name: scaffold.contentTypeName,
@@ -303,18 +283,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             });
         }
 
-        $scope.getScaffoldGroup = function (group) {
-            var scaffolds = parseScaffolds(group);
-
-            if (!scaffolds || scaffolds.length === 0) {
-                return null;
-            }
-
-            return _.find($scope.overlayMenu.scaffolds, function (scaffold) {
-                return scaffolds.includes(scaffold.group);
-            });
-        }
-
         $scope.countScaffoldGroup = function () {
             return _.find($scope.overlayMenu.scaffolds, function (scaffold) {
                 return scaffold.group != "";
@@ -325,21 +293,23 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             return !scaffold.alias;
         }
 
-        var parseScaffolds = function(groupName) {
-            var groups = [];
-
-            if (groupName === "" || !groupName) {
-                return groups;
-            }
-
-            _.each(groupName.split("|"), function(group) {
-                var trimGroup = group.trim();
-                if (trimGroup !== "") {
-                    groups.push(trimGroup);    
-                }
+        var groupExists = function (group) {
+            var existingGroup = _.find($scope.overlayMenu.scaffolds, function (scaffold) {
+                return scaffold.group === group;
             });
-            return groups;
+            return existingGroup != null;
         };
+
+        var hasGroup = function (scaffold) {
+            return scaffold.nameGroup != null && scaffold.nameGroup !== "";
+        };
+
+        var inGroup = function (scaffold, group) {
+            if ((group == null || group === "") && !hasGroup(scaffold)) {
+                return true;
+            }
+            return scaffold.nameGroup === group;
+        }
 
         var notSupported = [
           "Umbraco.Tags",
