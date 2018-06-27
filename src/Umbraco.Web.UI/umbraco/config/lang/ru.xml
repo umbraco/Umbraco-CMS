@@ -754,10 +754,6 @@
     <key alias="xmlDataIntegrityCheckMedia">Медиа - всего в XML: %0%, всего: %1%Б с ошибками: %2%</key>
     <key alias="xmlDataIntegrityCheckContent">Содержимое - всего в XML: %0%, всего опубликовано: %1%, с ошибками: %2%</key>
 
-    <key alias="databaseSchemaValidationCheckDatabaseOk">База данных - схема базы данных верна для этой версии Umbraco</key>
-    <key alias="databaseSchemaValidationCheckDatabaseErrors">В вашей схеме базы данных обнаружено %0% проблемы (проверьте данные журнала)</key>
-    <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Некоторые ошибки были обнаружены при проверке схемы базы данных в отношении текущей версии Umbraco.</key>
-
     <key alias="httpsCheckValidCertificate">Сертификат Вашего веб-сайта отмечен как проверенный.</key>
     <key alias="httpsCheckInvalidCertificate">Ошибка проверки сертификата: '%0%'</key>
     <key alias="healthCheckInvalidUrl">Ошибка проверки адреса URL %0% - '%1%'</key>

@@ -1366,10 +1366,6 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="xmlDataIntegrityCheckMedia">Media - Totaal XML: %0%, Totaal: %1%, Total incorrect: %2%</key>
     <key alias="xmlDataIntegrityCheckContent">Content - Totaal XML: %0%, Totaal gepubliceerd: %1%, Total incorrect: %2%</key>
 
-    <key alias="databaseSchemaValidationCheckDatabaseOk">Database - Het databaseschema is correct voor deze versie van Umbraco</key>
-    <key alias="databaseSchemaValidationCheckDatabaseErrors">%0% problemen werden gedetecteerd met uw databaseschema (controleer het logboek voor details)</key>
-    <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Sommige fouten zijn gedetecteerd tijdens het valideren van het databaseschema ten opzichte van de huidige versie van Umbraco.</key>
-
     <key alias="httpsCheckValidCertificate">Het cerficaat van de website is ongeldig.</key>
     <key alias="httpsCheckInvalidCertificate">Cerficaat validatie foutmelding: '%0%'</key>
     <key alias="healthCheckInvalidUrl">Fout bij pingen van URL %0% - '%1%'</key>

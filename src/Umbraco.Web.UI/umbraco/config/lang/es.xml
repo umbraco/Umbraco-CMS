@@ -1794,10 +1794,6 @@
         <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalidos: %2%</key>
         <key alias="xmlDataIntegrityCheckContent">Contenido - Total XML: %0%, Total publicados: %1%, Total invalidos: %2%</key>
 
-        <key alias="databaseSchemaValidationCheckDatabaseOk">Base de datos: el esquema de la base de datos es correcto para esta versión de Umbraco</key>
-        <key alias="databaseSchemaValidationCheckDatabaseErrors">Se detectaron %0% problemas con su esquema de base de datos (consulte el registro para obtener más información)</key>
-        <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Se detectaron algunos errores al validar el esquema de la base de datos con la versión actual de Umbraco.</key>
-
         <key alias="httpsCheckValidCertificate">El certificado de tu sitio es válido.</key>
         <key alias="httpsCheckInvalidCertificate">Error validando certificado: '%0%'</key>
         <key alias="httpsCheckExpiredCertificate">El ceriticado SSL de tu sitio ha caducado.</key>
