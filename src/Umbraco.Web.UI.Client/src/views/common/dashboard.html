@@ -7,30 +7,32 @@
         <div class="umb-dashboard" ng-if="!page.loading">
 
             <div class="umb-dashboard__header" ng-show="dashboard.tabs.length > 1">
-                <umb-tabs-nav ng-if="dashboard.tabs" model="dashboard.tabs" style="margin-bottom: 0;"></umb-tabs-nav>
+                <umb-tabs-nav
+                    ng-if="dashboard.tabs"
+                    tabs="dashboard.tabs"
+                    on-tab-change="changeTab(tab)">
+                </umb-tabs-nav>
             </div>
 
             <div class="umb-dashboard__content">
 
-                <umb-tabs-content view="true">
-                    <umb-tab id="tab{{tab.id}}" ng-repeat="tab in dashboard.tabs" rel="{{tab.id}}" class="row-fluid">
-        
-                        <div ng-repeat="property in tab.properties" ng-switch on="property.serverSide">
-        
-                            <div class="clearfix" ng-switch-when="false">
-                                <h3 ng-show="property.caption">{{property.caption}}</h3>
-                                <div ng-include="property.path"></div>
-                            </div>
-        
-                            <div class="umb-dashboard-control clearfix" ng-switch-when="true">
-                                <h3 ng-show="property.caption">{{property.caption}}</h3>
-                                <iframe ng-src="dashboard/usercontrolproxy.aspx?ctrl={{ property.path}}"></iframe>
-                            </div>
-        
+                <umb-tab-content ng-repeat="tab in dashboard.tabs" ng-if="tab.active" tab="tab" class="row-fluid">
+    
+                    <div ng-repeat="property in tab.properties" ng-switch on="property.serverSide">
+    
+                        <div class="clearfix" ng-switch-when="false">
+                            <h3 ng-show="property.caption">{{property.caption}}</h3>
+                            <div ng-include="property.path"></div>
                         </div>
-        
-                    </umb-tab>
-                </umb-tabs-content>
+    
+                        <div class="umb-dashboard-control clearfix" ng-switch-when="true">
+                            <h3 ng-show="property.caption">{{property.caption}}</h3>
+                            <iframe ng-src="dashboard/usercontrolproxy.aspx?ctrl={{ property.path}}"></iframe>
+                        </div>
+
+                    </div>
+                    
+                </umb-tab-content>
 
             </div>
 
