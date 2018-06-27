@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper) {
+    function MediaNodeInfoDirective($timeout, $location, eventsService, userService, dateHelper, editorService) {
 
         function link(scope, element, attrs, ctrl) {
 
@@ -26,9 +26,16 @@
             }
 
             scope.openMediaType = function (mediaType) {
-                // remove first "#" from url if it is prefixed else the path won't work
-                var url = "/settings/mediaTypes/edit/" + mediaType.id;
-                $location.path(url);
+                var editor = {
+                    id: mediaType.id,
+                    submit: function(model) {
+                        editorService.close();
+                    },
+                    close: function() {
+                        editorService.close();
+                    }
+                };
+                editorService.mediaTypeEditor(editor);
             };
             
             // watch for content updates - reload content when node is saved, published etc.

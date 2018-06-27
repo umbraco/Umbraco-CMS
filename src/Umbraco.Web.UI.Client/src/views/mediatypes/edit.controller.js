@@ -13,8 +13,12 @@
 
         var vm = this;
         var evts = [];
+        var mediaTypeId = $routeParams.id;
+        var create = $routeParams.create;
+        var infiniteMode = $scope.model && $scope.model.infiniteMode;
 
         vm.save = save;
+        vm.close = close;
 
         vm.currentNode = null;
         vm.contentType = {};
@@ -22,6 +26,18 @@
         vm.page.loading = false;
         vm.page.saveButtonState = "init";
         vm.labels = {};
+        vm.saveButtonKey = "buttons_save";
+
+        onInit();
+
+        function onInit() {
+            // get init values from model when in infinite mode
+            if(infiniteMode) {
+                mediaTypeId = $scope.model.id;
+                create = $scope.model.create;
+                vm.saveButtonKey = "buttons_saveAndClose";
+            }
+        }
 
         var labelKeys = [
             "general_design",
@@ -198,11 +214,11 @@
             }
         });
 
-        if ($routeParams.create) {
+        if (create) {
             vm.page.loading = true;
 
             //we are creating so get an empty data type item
-            mediaTypeResource.getScaffold($routeParams.id)
+            mediaTypeResource.getScaffold(mediaTypeId)
                 .then(function(dt) {
                     init(dt);
 
@@ -216,10 +232,12 @@
         function loadMediaType() {
             vm.page.loading = true;
 
-            mediaTypeResource.getById($routeParams.id).then(function(dt) {
+            mediaTypeResource.getById(mediaTypeId).then(function(dt) {
                 init(dt);
 
-                syncTreeNode(vm.contentType, dt.path, true);
+                if(!infiniteMode) {
+                    syncTreeNode(vm.contentType, dt.path, true);
+                }
 
                 vm.page.loading = false;
             });
@@ -282,11 +300,23 @@
                     }
                 }).then(function (data) {
                     //success
-                    syncTreeNode(vm.contentType, data.path);
+
+                    if(!infiniteMode) {
+                        syncTreeNode(vm.contentType, data.path);
+                    }
+
+                    // emit event
+                    var args = { mediaType: vm.contentType };
+                    eventsService.emit("editors.mediaType.saved", args);
 
                     vm.page.saveButtonState = "success";
 
+                    if(infiniteMode && $scope.model.submit) {
+                        $scope.model.submit();
+                    }
+
                     deferred.resolve(data);
+                    
                 }, function (err) {
                     //error
                     if (err) {
@@ -363,6 +393,12 @@
             navigationService.syncTree({ tree: "mediatypes", path: path.split(","), forceReload: initialLoad !== true }).then(function(syncArgs) {
                 vm.currentNode = syncArgs.node;
             });
+        }
+
+        function close() {
+            if(infiniteMode && $scope.model.close) {
+                $scope.model.close();
+            }
         }
 
         evts.push(eventsService.on("app.refreshEditor", function(name, error) {
