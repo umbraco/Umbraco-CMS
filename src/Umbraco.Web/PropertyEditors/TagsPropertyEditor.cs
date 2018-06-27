@@ -133,7 +133,7 @@ namespace Umbraco.Web.PropertyEditors
 
                 Fields.Add(new PreValueField(new ManifestPropertyValidator {Type = "Required"})
                 {
-                    Description = "Select whether to store the tags in cache as CSV (default) or as JSON. The only benefits of storage as JSON is that you are able to have commas in a tag value but this will require parsing the json in your views or using a property value converter",
+                    Description = "Select whether to store the tags in cache as CSV (default) or as JSON. The only benefits of storage as JSON is that you are able to have commas in a tag value",
                     Key = "storageType",
                     Name = "Storage Type",
                     View = "views/propertyeditors/tags/tags.prevalues.html"

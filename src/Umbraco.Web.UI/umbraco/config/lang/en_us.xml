@@ -417,6 +417,7 @@
       The key '%0%' already exists.
    ]]>
         </key>
+        <key alias="overviewTitle">Dictionary overview</key>
     </area>
     <area alias="placeholders">
         <key alias="username">Enter your username</key>
@@ -885,6 +886,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="forgottenPassword">Forgotten password?</key>
         <key alias="forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</key>
         <key alias="requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</key>
+        <key alias="showPassword">Show password</key>
+        <key alias="hidePassword">Hide password</key>
         <key alias="returnToLogin">Return to login form</key>
         <key alias="setPasswordInstruction">Please provide a new password</key>
         <key alias="setPasswordConfirmation">Your Password has been updated</key>
