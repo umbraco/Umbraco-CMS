@@ -11,8 +11,18 @@
             scope.publishStatus = {};
 
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
+            scope.allowChangeDocumentType = false;
             
             function onInit() {
+
+                userService.getCurrentUser().then(function(user){
+                        // only allow change of media type if user has access to the settings sections
+                        angular.forEach(user.sections, function(section){
+                            if(section.alias === "settings") {
+                                scope.allowChangeDocumentType = true;
+                            }
+                        });
+                    });
 
                 var keys = [
                     "general_deleted", 
@@ -31,8 +41,6 @@
                         setNodePublishStatus(scope.node);
 
                     });
-
-                scope.allowOpen = true;
 
                 scope.datePickerConfig = {
                     pickDate: true,
