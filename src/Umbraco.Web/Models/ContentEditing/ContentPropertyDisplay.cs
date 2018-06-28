@@ -38,5 +38,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "readonly")]
         public bool Readonly { get; set; }
+
+        [DataMember(Name = "canVaryByCulture")]
+        public bool CanVaryByCulture { get; set; }
     }
 }

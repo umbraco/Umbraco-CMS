@@ -1,21 +1,26 @@
 <div class="umb-property">
     <ng-form name="propertyForm">
-        <div class="control-group umb-control-group" ng-class="{hidelabel:property.hideLabel}">
+        <div class="control-group umb-control-group" ng-class="{hidelabel: property.hideLabel}">
 
             <val-property-msg property="property"></val-property-msg>
 
             <div class="umb-el-wrap">
 
-                <label class="control-label" ng-hide="property.hideLabel" for="{{property.alias}}" ng-attr-title="{{propertyAlias}}">
-                    {{property.label}}
+                <label class="control-label" ng-hide="property.hideLabel" for="{{property.alias}}">
+                    <span ng-attr-title="{{propertyAlias}}">
+                        {{property.label}}
+                    </span>
                     <span ng-if="property.validation.mandatory">
                         <strong class="umb-control-required">*</strong>
                     </span>
                     <small ng-bind-html="property.description | preserveNewLineInHtml"></small>
+                    <i class="icon icon-globe" localize="title" title="@content_propertyCanVaryByCulture" ng-show="property.canVaryByCulture"/>
                 </label>
 
                 <div class="controls" ng-transclude>
                 </div>
+
+                <i class="icon icon-globe" localize="title" title="@content_propertyCanVaryByCulture" ng-show="property.canVaryByCulture && property.hideLabel"/>
             </div>
         </div>
     </ng-form>
