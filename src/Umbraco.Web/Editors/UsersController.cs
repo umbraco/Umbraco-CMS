@@ -241,6 +241,11 @@ namespace Umbraco.Web.Editors
                 filterQuery.Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
             }
 
+            if (UmbracoConfig.For.UmbracoSettings().Security.HideDisabledUsersInBackoffice)
+            {
+                filterQuery.Where(user => !user.IsApproved);
+            }
+
             long pageIndex = pageNumber - 1;
             long total;
             var result = Services.UserService.GetAll(pageIndex, pageSize, out total, orderBy, orderDirection, userStates, userGroups, excludeUserGroups, filterQuery);
