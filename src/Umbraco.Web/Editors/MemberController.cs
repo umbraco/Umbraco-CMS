@@ -140,13 +140,16 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public MemberListDisplay GetListNodeDisplay(string listName)
         {
+            var foundType = Services.MemberTypeService.Get(listName);
+            var name = foundType != null ? foundType.Name : listName;
+
             var display = new MemberListDisplay
             {
                 ContentTypeAlias = listName,
-                ContentTypeName = listName,
+                ContentTypeName = name,
                 Id = listName,
                 IsContainer = true,
-                Name = listName == Constants.Conventions.MemberTypes.AllMembersListId ? "All Members" : listName,
+                Name = listName == Constants.Conventions.MemberTypes.AllMembersListId ? "All Members" : name,
                 Path = "-1," + listName,
                 ParentId = -1
             };
