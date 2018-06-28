@@ -2054,6 +2054,10 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
         <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid: %2%</key>
 
+        <key alias="databaseSchemaValidationCheckDatabaseOk">Database - The database schema is correct for this version of Umbraco</key>
+        <key alias="databaseSchemaValidationCheckDatabaseErrors">%0% problems were detected with your database schema (Check the log for details)</key>
+        <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Some errors were detected while validating the database schema against the current version of Umbraco.</key>
+
         <key alias="httpsCheckValidCertificate">Your website's certificate is valid.</key>
         <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>
         <key alias="httpsCheckExpiredCertificate">Your website's SSL certificate has expired.</key>
