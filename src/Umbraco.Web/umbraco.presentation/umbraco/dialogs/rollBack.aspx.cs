@@ -15,20 +15,19 @@ using umbraco.cms.businesslogic.property;
 
 namespace umbraco.presentation.dialogs
 {
-    /// <summary>
-    /// Summary description for rollBack.
-    /// </summary>
-    public partial class rollBack : UmbracoEnsuredPage
-    {
-        public rollBack()
-        {
+	/// <summary>
+	/// Summary description for rollBack.
+	/// </summary>
+	public partial class rollBack : UmbracoEnsuredPage
+	{
+	    public rollBack()
+	    {
             CurrentApp = BusinessLogic.DefaultApps.content.ToString();
 
-        }
+	    }
         private Document currentDoc = new Document(int.Parse(helper.Request("nodeId")));
-
-        protected void version_load(object sender, EventArgs e)
-        {
+        
+        protected void version_load(object sender, EventArgs e) {
 
             if (allVersions.SelectedValue != "")
             {
@@ -95,7 +94,7 @@ namespace umbraco.presentation.dialogs
                 }
 
                 Button1.Visible = true;
-
+                
 
             }
             else
@@ -106,8 +105,8 @@ namespace umbraco.presentation.dialogs
 
         }
 
-        protected void Page_Load(object sender, System.EventArgs e)
-        {
+		protected void Page_Load(object sender, System.EventArgs e)
+		{
 
             if (String.IsNullOrEmpty(allVersions.SelectedValue))
                 rbl_mode.AutoPostBack = false;
@@ -117,10 +116,9 @@ namespace umbraco.presentation.dialogs
             currentVersionTitle.Text = currentDoc.Text;
             currentVersionMeta.Text = ui.Text("content", "createDate") + ": " + currentDoc.VersionDate.ToShortDateString() + " " + currentDoc.VersionDate.ToShortTimeString();
 
-            if (!IsPostBack)
-            {
-                allVersions.Items.Add(new ListItem(ui.Text("rollback", "selectVersion") + "...", ""));
-
+            if (!IsPostBack) {
+                allVersions.Items.Add(new ListItem(ui.Text("rollback", "selectVersion")+ "...", ""));
+                
                 foreach (DocumentVersionList dl in currentDoc.GetVersions())
                 {
                     //we don't need to show the current version
@@ -131,27 +129,27 @@ namespace umbraco.presentation.dialogs
                 }
                 Button1.Text = ui.Text("actions", "rollback");
             }
-        }
-
-        protected void doRollback_Click(object sender, System.EventArgs e)
-        {
+		}
+        
+		protected void doRollback_Click(object sender, System.EventArgs e)
+		{
             if (allVersions.SelectedValue.Trim() != "")
             {
                 Document d = new Document(int.Parse(helper.Request("nodeId")));
                 d.RollBack(new Guid(allVersions.SelectedValue), base.getUser());
-
+                
                 BusinessLogic.Log.Add(BusinessLogic.LogTypes.RollBack, base.getUser(), d.Id, "Version rolled back to revision '" + allVersions.SelectedValue + "'");
-
+                
                 Document rollback = new Document(d.Id, new Guid(allVersions.SelectedValue));
                 feedBackMsg.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
-                string[] vars = { rollback.Text, rollback.VersionDate.ToLongDateString() };
-
+                string[] vars = {rollback.Text, rollback.VersionDate.ToLongDateString()};
+                
                 feedBackMsg.Text = ui.Text("rollback", "documentRolledBack", vars, new global::umbraco.BusinessLogic.User(0)) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
                 diffPanel.Visible = false;
                 pl_buttons.Visible = false;
 
                 ClientTools.ReloadLocationIfMatched(string.Format("/content/content/edit/{0}", d.Id));
             }
-        }
-    }
+		}
+	}
 }
