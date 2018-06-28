@@ -27,6 +27,7 @@
         vm.contentType = {};
         vm.labels = {};
         vm.submitButtonKey = "buttons_save";
+        vm.generateModelsKey = "buttons_saveAndGenerateModels";
 
         vm.page = {};
         vm.page.loading = false;
@@ -59,6 +60,7 @@
                 create = $scope.model.create;
                 noTemplate = $scope.model.notemplate;
                 vm.submitButtonKey = "buttons_saveAndClose";
+                vm.generateModelsKey = "buttons_generateModelsAndClose";
             }
         }
 
@@ -185,7 +187,7 @@
                     alias: "save",
                     hotKey: "ctrl+s",
                     hotKeyWhenHidden: true,
-                    labelKey: "buttons_save",
+                    labelKey: vm.submitButtonKey,
                     letter: "S",
                     type: "submit",
                     handler: function () { vm.save(); }
@@ -194,13 +196,13 @@
                     alias: "saveAndGenerateModels",
                     hotKey: "ctrl+g",
                     hotKeyWhenHidden: true,
-                    labelKey: "buttons_saveAndGenerateModels",
+                    labelKey: vm.generateModelsKey,
                     letter: "G",
                     handler: function () {
 
                         vm.page.saveButtonState = "busy";
 
-                        vm.saveInternal().then(function (result) {
+                        saveInternal().then(function (result) {
 
                             vm.page.saveButtonState = "busy";
 

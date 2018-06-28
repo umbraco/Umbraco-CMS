@@ -27,6 +27,7 @@
         vm.page.saveButtonState = "init";
         vm.labels = {};
         vm.saveButtonKey = "buttons_save";
+        vm.generateModelsKey = "buttons_saveAndGenerateModels";
 
         onInit();
 
@@ -36,6 +37,7 @@
                 mediaTypeId = $scope.model.id;
                 create = $scope.model.create;
                 vm.saveButtonKey = "buttons_saveAndClose";
+                vm.generateModelsKey = "buttons_generateModelsAndClose";
             }
         }
 
@@ -154,7 +156,7 @@
                 vm.page.defaultButton = {
                     hotKey: "ctrl+s",
                     hotKeyWhenHidden: true,
-                    labelKey: "buttons_save",
+                    labelKey: vm.saveButtonKey,
                     letter: "S",
                     type: "submit",
                     handler: function () { vm.save(); }
@@ -162,7 +164,7 @@
                 vm.page.subButtons = [{
                     hotKey: "ctrl+g",
                     hotKeyWhenHidden: true,
-                    labelKey: "buttons_saveAndGenerateModels",
+                    labelKey: vm.generateModelsKey,
                     letter: "G",
                     handler: function () {
 

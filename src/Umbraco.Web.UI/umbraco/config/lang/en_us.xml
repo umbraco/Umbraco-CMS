@@ -127,7 +127,7 @@
         <key alias="relations">Edit relations</key>
         <key alias="returnToList">Return to list</key>
         <key alias="save">Save</key>
-        <key alias="saveAndClose">Save and Close</key>
+        <key alias="saveAndClose">Save and close</key>
         <key alias="saveAndPublish">Publish</key>
         <key alias="saveAndPublishMany">Publish…</key>
         <key alias="saveAndSchedule">Save and schedule</key>
@@ -139,6 +139,7 @@
         <key alias="styleShow">Show styles</key>
         <key alias="tableInsert">Insert table</key>
         <key alias="generateModels">Generate models</key>
+        <key alias="generateModelsAndClose">Generate models and close</key>
         <key alias="saveAndGenerateModels">Save and generate models</key>
         <key alias="undo">Undo</key>
         <key alias="redo">Redo</key>
