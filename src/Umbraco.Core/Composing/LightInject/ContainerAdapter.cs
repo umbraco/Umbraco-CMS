@@ -23,6 +23,11 @@ namespace Umbraco.Core.Composing.LightInject
             container.Register(f => factory(this));
         }
 
+        public void Register<T, TService>(Func<IContainer, T, TService> factory)
+        {
+            container.Register<T, TService>((f, x) => factory(this, x));
+        }
+
         public T RegisterCollectionBuilder<T>()
         {
             return container.RegisterCollectionBuilder<T>();
@@ -43,7 +48,7 @@ namespace Umbraco.Core.Composing.LightInject
             return container.GetInstance<T>();
         }
 
-        public T GetInstance<T>(params object[] args)
+        public T GetInstance<T>(object[] args)
         {
             return (T)container.GetInstance(typeof(T), args);
         }

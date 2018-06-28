@@ -306,7 +306,7 @@ namespace Umbraco.Core.IO
                 // fixme - switch to using container. where are these registered?
 
                 //var fs = (IFileSystem) Activator.CreateInstance(typeof(TFileSystem), shadowWrapper);
-                var fs = Current.Container.GetInstance<TFileSystem>((IFileSystem)shadowWrapper);
+                var fs = Current.Container.GetInstance<TFileSystem>(new object[] { (IFileSystem)shadowWrapper });
                 _wrappers.Add(shadowWrapper); // keeping a reference to the wrapper
                 return fs;
             });

@@ -14,7 +14,8 @@ namespace Umbraco.Core.Composing
         object ConcreteContainer { get; }
         void RegisterSingleton<T>(Func<IContainer, T> factory);
         void Register<T>(Func<IContainer, T> factory);
+        void Register<T, TService>(Func<IContainer, T, TService> factory);
         T RegisterCollectionBuilder<T>();
-        T GetInstance<T>(params object[] args);
+        T GetInstance<T>(object[] args);
     }
 }
