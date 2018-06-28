@@ -286,6 +286,7 @@
         <key alias="discardChanges">Discard changes</key>
         <key alias="unsavedChanges">You have unsaved changes</key>
         <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+        <key alias="confirmUnpublish">Unpublishing will remove this page and all its descendants from the site.</key>
     </area>
     <area alias="bulk">
         <key alias="done">Done</key>
