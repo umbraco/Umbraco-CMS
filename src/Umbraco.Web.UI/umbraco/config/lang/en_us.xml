@@ -305,6 +305,7 @@
         <key alias="discardChanges">Discard changes</key>
         <key alias="unsavedChanges">You have unsaved changes</key>
         <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+        <key alias="confirmUnpublish">Unpublishing will remove this page and all its descendants from the site.</key>
     </area>
     <area alias="bulk">
         <key alias="done">Done</key>
@@ -905,6 +906,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="forgottenPassword">Forgotten password?</key>
         <key alias="forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</key>
         <key alias="requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</key>
+        <key alias="showPassword">Show password</key>
+        <key alias="hidePassword">Hide password</key>
         <key alias="returnToLogin">Return to login form</key>
         <key alias="setPasswordInstruction">Please provide a new password</key>
         <key alias="setPasswordConfirmation">Your Password has been updated</key>
@@ -2069,6 +2072,10 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="xmlDataIntegrityCheckMembers">Members - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
         <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
         <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid: %2%</key>
+
+        <key alias="databaseSchemaValidationCheckDatabaseOk">Database - The database schema is correct for this version of Umbraco</key>
+        <key alias="databaseSchemaValidationCheckDatabaseErrors">%0% problems were detected with your database schema (Check the log for details)</key>
+        <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Some errors were detected while validating the database schema against the current version of Umbraco.</key>
 
         <key alias="httpsCheckValidCertificate">Your website's certificate is valid.</key>
         <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>

@@ -338,10 +338,12 @@
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\TourController.cs" />
     <Compile Include="Features\EnabledFeatures.cs" />
+    <Compile Include="HealthCheck\Checks\DataIntegrity\DatabaseSchemaValidationHealthCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
     <Compile Include="Models\BackOfficeTourFilter.cs" />
     <Compile Include="Models\ContentEditing\BackOfficePreview.cs" />
+    <Compile Include="Models\ContentEditing\DocumentTypeCollectionDisplay.cs" />
     <Compile Include="Models\Mapping\AutoMapperExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
     <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />
