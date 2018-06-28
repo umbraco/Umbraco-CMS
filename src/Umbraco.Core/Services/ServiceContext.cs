@@ -165,7 +165,7 @@ namespace Umbraco.Core.Services
             CacheHelper cache,
             RepositoryFactory repositoryFactory,
             ILogger logger,
-            IEventMessagesFactory eventMessagesFactory, 
+            IEventMessagesFactory eventMessagesFactory,
             IdkMap idkMap)
         {
             EventMessagesFactory = eventMessagesFactory;

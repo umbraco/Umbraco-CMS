@@ -100,9 +100,6 @@
         </key>
         <key alias="setDomains">Domains</key>
     </area>
-    <area alias="auditTrails">
-        <key alias="atViewingFor">Viewing for</key>
-    </area>
     <area alias="buttons">
         <key alias="clearSelection">Clear selection</key>
         <key alias="select">Select</key>
@@ -140,6 +137,27 @@
         <key alias="saveAndGenerateModels">Save and generate models</key>
         <key alias="undo">Undo</key>
         <key alias="redo">Redo</key>
+    </area>
+    <area alias="auditTrails">
+        <key alias="atViewingFor">Viewing for</key>
+        <key alias="delete">Delete Content performed by user</key>
+        <key alias="unpublish">UnPublish performed by user</key>
+        <key alias="publish">Save and Publish performed by user</key>
+        <key alias="save">Save Content performed by user</key>
+        <key alias="move">Move Content performed by user</key>
+        <key alias="copy">Copy Content performed by user</key>
+        <key alias="rollback">Content rollback performed by user</key>
+        <key alias="sendtopublish">Content Send To Publish performed by user</key>
+        <key alias="sendtotranslate">Content Send To Translation performed by user</key>
+        <key alias="smallCopy">Copy</key>
+        <key alias="smallPublish">Publish</key>
+        <key alias="smallMove">Move</key>
+        <key alias="smallSave">Save</key>
+        <key alias="smallDelete">Delete</key>
+        <key alias="smallUnPublish">Unpublish</key>
+        <key alias="smallRollBack">Rollback</key>
+        <key alias="smallSendToPublish">Send To Publish</key>
+        <key alias="smallSendToTranslate">Send To Translation</key>
     </area>
     <area alias="changeDocType">
         <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
@@ -1654,7 +1672,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="isSensitiveDataDescription">Hide this property value from content editors that don't have access to view sensitive information</key>
         <key alias="showOnMemberProfile">Show on member profile</key>
         <key alias="showOnMemberProfileDescription">Allow this property value to be displayed on the member profile page</key>
-        
+
         <key alias="tabHasNoSortOrder">tab has no sort order</key>
         
 		<key alias="compositionUsageHeading">Where is this composition used?</key>

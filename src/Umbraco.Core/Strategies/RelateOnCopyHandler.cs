@@ -26,7 +26,8 @@ namespace Umbraco.Core.Strategies
                     relationType = new RelationType(new Guid(Constants.ObjectTypes.Document),
                         new Guid(Constants.ObjectTypes.Document),
                         Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
-                        Constants.Conventions.RelationTypes.RelateDocumentOnCopyName) { IsBidirectional = true };
+                        Constants.Conventions.RelationTypes.RelateDocumentOnCopyName)
+                    { IsBidirectional = true };
 
                     relationService.Save(relationType);
                 }

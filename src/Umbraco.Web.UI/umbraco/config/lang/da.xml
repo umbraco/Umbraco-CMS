@@ -95,9 +95,6 @@
     </key>
     <key alias="setDomains">Domæner</key>
   </area>
-  <area alias="auditTrails">
-    <key alias="atViewingFor">For</key>
-  </area>
   <area alias="buttons">
     <key alias="clearSelection">Ryd valg</key>
     <key alias="select">Vælg</key>
@@ -136,6 +133,27 @@
     <key alias="undo">Fortryd</key>
     <key alias="redo">Genskab</key>
   </area>
+  <area alias="auditTrails">
+    <key alias="atViewingFor">For</key>
+    <key alias="delete">Brugeren har slettet indholdet</key>
+    <key alias="unpublish">Brugeren har afpubliceret indholdet</key>
+    <key alias="publish">Brugeren har gemt og udgivet indholdet</key>
+    <key alias="save">Brugeren har gemt indholdet</key>
+    <key alias="move">Brugeren har flyttet indholdet</key>
+    <key alias="copy">Brugeren har kopieret indholdet</key>
+    <key alias="rollback">Brugeren har tilbagerullet indholdet til en tidligere tilstand</key>
+    <key alias="sendtopublish">Brugeren har sendt indholdet til udgivelse</key>
+    <key alias="sendtotranslate">Brugeren har sendt indholdet til oversættelse</key>
+    <key alias="smallCopy">Kopieret</key>
+    <key alias="smallPublish">Udgivet</key>
+    <key alias="smallMove">Flyttet</key>
+    <key alias="smallSave">Gemt</key>
+    <key alias="smallDelete">Slettet</key>
+    <key alias="smallUnPublish">Afpubliceret</key>
+    <key alias="smallRollBack">Indhold tilbagerullet</key>
+    <key alias="smallSendToPublish">Sendt til udgivelse</key>
+    <key alias="smallSendToTranslate">Sendt til oversættelse</key>
+  </area>  
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
     <key alias="changeDocTypeInstruction2">Kontroller derefter, at alle egenskaber bliver overført rigtigt til den nye dokumenttype, og klik derefter på Gem.</key>
@@ -191,6 +209,9 @@
     <key alias="parentNotPublishedAnomaly">Upd: dette dokument er udgiver, men er ikke i cachen (intern fejl)</key>
     <key alias="getUrlException">Kunne ikke hente url'en</key>
     <key alias="routeError">Dette dokument er udgivet, men dets url ville kollidere med indholdet %0%</key>
+    <key alias="publish">Udgiv</key>
+    <key alias="published">Udgivet</key>
+    <key alias="publishedPendingChanges">Udgivet (Ventede ændringer)</key>    
     <key alias="publish">Udgivet</key>
     <key alias="publishStatus">Udgivelsesstatus</key>
     <key alias="releaseDate">Udgivelsesdato</key>
@@ -204,6 +225,7 @@
     <key alias="altTextOptional">Alternativ tekst (valgfri)</key>
     <key alias="type">Type</key>
     <key alias="unPublish">Afpublicér</key>
+    <key alias="unpublished">Afpubliceret</key>
     <key alias="updateDate">Sidst redigeret</key>
     <key alias="updateDateDesc" version="7.0">Tidspunkt for seneste redigering</key>
     <key alias="uploadClear">Fjern fil</key>
