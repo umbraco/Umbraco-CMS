@@ -462,9 +462,9 @@
                             <umb-button
                                 ng-if="vm.newUser.resetPasswordValue"
                                 umb-clipboard
-                                umb-clipboard-success="vm.copySuccess()"
-                                umb-clipboard-error="vm.copyError()"
-                                umb-clipboard-text="vm.newUser.resetPasswordValue"
+                                umb-clipboard-success="{{vm.copySuccess()}}"
+                                umb-clipboard-error="{{vm.copyError()}}"
+                                umb-clipboard-text="{{vm.newUser.resetPasswordValue}}"
                                 state="vm.page.copyPasswordButtonState"
                                 type="button"
                                 label-key="general_copy" size="xs">

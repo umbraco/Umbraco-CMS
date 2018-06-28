@@ -104,33 +104,33 @@
             assetsService.loadJs("lib/clipboard/clipboard.min.js", scope)
                 .then(function () {
 
-                    if(scope.umbClipboardTarget) {
-                        target.setAttribute("data-clipboard-target", scope.umbClipboardTarget);
+                    if(attrs.umbClipboardTarget) {
+                        target.setAttribute("data-clipboard-target", attrs.umbClipboardTarget);
                     }
 
-                    if(scope.umbClipboardAction) {
-                        target.setAttribute("data-clipboard-action", scope.umbClipboardAction);
+                    if(attrs.umbClipboardAction) {
+                        target.setAttribute("data-clipboard-action", attrs.umbClipboardAction);
                     }
 
-                    if(scope.umbClipboardText) {
-                        target.setAttribute("data-clipboard-text", scope.umbClipboardText);
+                    if(attrs.umbClipboardText) {
+                        target.setAttribute("data-clipboard-text", attrs.umbClipboardText);
                     }
 
-                    clipboard = new Clipboard(target);
+                    clipboard = new ClipboardJS(target);
 
                     clipboard.on('success', function (e) {
                         e.clearSelection();
-                        if (scope.umbClipboardSuccess) {
+                        if (attrs.umbClipboardSuccess) {
                             scope.$apply(function () {
-                                scope.umbClipboardSuccess({ e: e });
+                                attrs.umbClipboardSuccess({ e: e });
                             });
                         }
                     });
 
                     clipboard.on('error', function (e) {
-                        if (scope.umbClipboardError) {
+                        if (attrs.umbClipboardError) {
                             scope.$apply(function () {
-                                scope.umbClipboardError({ e: e });
+                                attrs.umbClipboardError({ e: e });
                             });
                         }
                     });
@@ -148,13 +148,6 @@
 
         var directive = {
             restrict: 'A',
-            scope: {
-                umbClipboardSuccess: '&?',
-                umbClipboardError: '&?',
-                umbClipboardTarget: "@?",
-                umbClipboardAction: "@?",
-                umbClipboardText: "=?"
-            },
             link: link
         };
 
