@@ -6,9 +6,6 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.PublishedContent.StronglyTypedModels;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 
@@ -21,14 +18,7 @@ namespace Umbraco.Tests.PublishedContent
     public class PublishedContentTests : PublishedContentTestBase
     {
         private PluginManager _pluginManager;
-
-        private class StrongModel : PublishedContentModel
-        {
-            private StrongModel(IPublishedContent content) : base(content)
-            {
-            }
-        }
-
+        
         public override void Initialize()
         {
             // required so we can access property.Value
