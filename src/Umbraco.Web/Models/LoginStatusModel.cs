@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models
         {
             if (doLookup && Current.UmbracoContext != null)
             {
-                var helper = new MembershipHelper(Current.UmbracoContext);
+                var helper = Current.Container.GetInstance<MembershipHelper>();
                 var model = helper.GetCurrentLoginStatus();
                 if (model != null)
                 {

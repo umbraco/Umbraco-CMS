@@ -70,6 +70,8 @@ namespace Umbraco.Web.Runtime
             //it still needs to use the install controller so we can't do that
             composition.Container.RegisterFrom<InstallerCompositionRoot>();
 
+            composition.Container.RegisterFrom<HelperCompositionRoot>();
+
             // register accessors for cultures
             composition.Container.RegisterSingleton<IDefaultCultureAccessor, DefaultCultureAccessor>();
             composition.Container.RegisterSingleton<IVariationContextAccessor, HttpContextVariationContextAccessor>();

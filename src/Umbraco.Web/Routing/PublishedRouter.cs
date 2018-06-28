@@ -7,6 +7,7 @@ using System.IO;
 using System.Web.Security;
 using umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -633,7 +634,7 @@ namespace Umbraco.Web.Routing
             {
                 _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Page is protected, check for access");
 
-                var membershipHelper = new MembershipHelper(request.UmbracoContext);
+                var membershipHelper = Current.Container.GetInstance<MembershipHelper>();
 
                 if (membershipHelper.IsLoggedIn() == false)
                 {
