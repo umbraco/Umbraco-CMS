@@ -152,9 +152,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //Save to db
             var template = (Template)entity;
             template.AddingEntity();
-
-            var factory = new TemplateFactory(NodeObjectTypeId);
-            var dto = factory.BuildDto(template);
+            
+            var dto = TemplateFactory.BuildDto(template, NodeObjectTypeId, template.Id);
 
             //Create the (base) node data - umbracoNode
             var nodeDto = dto.NodeDto;
@@ -226,8 +225,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //Save updated entity to db
 
             template.UpdateDate = DateTime.Now;
-            var factory = new TemplateFactory(templateDto.PrimaryKey, NodeObjectTypeId);
-            var dto = factory.BuildDto(template);
+            ;
+            var dto = TemplateFactory.BuildDto(template, NodeObjectTypeId, templateDto.PrimaryKey);
 
             Database.Update(dto.NodeDto);
             Database.Update(dto);
@@ -355,8 +354,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         /// <returns></returns>
         private ITemplate MapFromDto(TemplateDto dto, IUmbracoEntity[] axisDefinitions)
         {
-            var factory = new TemplateFactory();
-            var template = factory.BuildEntity(dto, axisDefinitions, file => GetFileContent((Template) file, false));
+
+            var template = TemplateFactory.BuildEntity(dto, axisDefinitions, file => GetFileContent((Template) file, false));
 
             if (dto.NodeDto.ParentId > 0)
             {
