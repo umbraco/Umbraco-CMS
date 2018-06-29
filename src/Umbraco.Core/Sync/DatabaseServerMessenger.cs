@@ -142,7 +142,7 @@ namespace Umbraco.Core.Sync
                     var idle =_syncIdle.WaitOne(5000);
                     if (idle == false)
                     {
-                        Logger.Warn<DatabaseServerMessenger>(() => "The wait lock timed out, application is shutting down. The current instruction batch will be re-processed.");
+                        Logger.Warn<DatabaseServerMessenger>("The wait lock timed out, application is shutting down. The current instruction batch will be re-processed.");
                     }
                 },
                 weight);
@@ -178,7 +178,7 @@ namespace Umbraco.Core.Sync
                 {
                     // we haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new
                     // server and it will need to rebuild it's own caches, eg Lucene or the xml cache file.
-                    Logger.Warn<DatabaseServerMessenger>(() => "No last synced Id found, this generally means this is a new server/install."
+                    Logger.Warn<DatabaseServerMessenger>("No last synced Id found, this generally means this is a new server/install."
                         + " The server will build its caches and indexes, and then adjust its last synced Id to the latest found in"
                         + " the database and maintain cache updates based on that Id.");
 

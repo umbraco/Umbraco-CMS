@@ -315,7 +315,7 @@ namespace Umbraco.Core.Runtime
             catch (Exception e)
             {
                 // can connect to the database but cannot access the migration table... need to install
-                logger.Warn<CoreRuntime>(e, () => "Could not check the upgrade state.");
+                logger.Warn<CoreRuntime>(e, "Could not check the upgrade state.");
                 logger.Debug<CoreRuntime>("Could not check the upgrade state, need to install Umbraco.");
                 _state.Level = RuntimeLevel.Install;
                 return;
