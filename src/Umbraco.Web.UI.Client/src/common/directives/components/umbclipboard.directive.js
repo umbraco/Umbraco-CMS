@@ -94,51 +94,53 @@
 (function () {
     'use strict';
 
-    function umbClipboardDirective($timeout, assetsService) {
+    function umbClipboardDirective($timeout, assetsService, $parse) {
 
         function link(scope, element, attrs, ctrl) {
 
             var clipboard;
             var target = element[0];
-            
+
             assetsService.loadJs("lib/clipboard/clipboard.min.js", scope)
                 .then(function () {
 
-                    if(attrs.umbClipboardTarget) {
+
+                    if (attrs.umbClipboardTarget) {
                         target.setAttribute("data-clipboard-target", attrs.umbClipboardTarget);
                     }
 
-                    if(attrs.umbClipboardAction) {
+                    if (attrs.umbClipboardAction) {
                         target.setAttribute("data-clipboard-action", attrs.umbClipboardAction);
                     }
 
-                    if(attrs.umbClipboardText) {
+                    if (attrs.umbClipboardText) {
                         target.setAttribute("data-clipboard-text", attrs.umbClipboardText);
                     }
 
                     clipboard = new ClipboardJS(target);
 
+                    var expressionHandlerSuccess = $parse(attrs.umbClipboardSuccess);
                     clipboard.on('success', function (e) {
                         e.clearSelection();
                         if (attrs.umbClipboardSuccess) {
-                            scope.$apply(function () {
-                                attrs.umbClipboardSuccess({ e: e });
-                            });
+
+                            expressionHandlerSuccess(scope, { msg: "success" });
                         }
+
                     });
 
+                    var expressionHandlerError = $parse(attrs.umbClipboardError);
                     clipboard.on('error', function (e) {
                         if (attrs.umbClipboardError) {
-                            scope.$apply(function () {
-                                attrs.umbClipboardError({ e: e });
-                            });
+
+                            expressionHandlerError(scope, { msg: "error" });
                         }
                     });
 
                 });
 
             // clean up
-            scope.$on('$destroy', function(){
+            scope.$on('$destroy', function () {
                 clipboard.destroy();
             });
 
