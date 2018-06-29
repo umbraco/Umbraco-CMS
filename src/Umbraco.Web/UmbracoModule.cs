@@ -4,10 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Web;
-using System.Web.Mvc;
 using System.Web.Routing;
-using LightInject;
-using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -24,35 +21,75 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.PublishedCache;
 
+
+// fixme
+// need an UmbracoInjectedModules that is declared in web.config
+// need a web.config configuration section w/ modules = umbraco.webServer/modules
+// so it's all explicit
+
 [assembly: PreApplicationStartMethod(typeof(Umbraco.Web.ContainerUmbracoModule), "Start")]
 namespace Umbraco.Web
 {
+    // fixme
+    // name that one UmbracoModule, and the nested one UmbracoRequestModule - deals with front-end requests
+    public class UmbracoModules : IHttpModule
+    {
+        private readonly List<IHttpModule> _modules = new List<IHttpModule>();
+
+        /// <inheritdoc />
+        public void Init(HttpApplication context)
+        {
+            // fixme - need to get moduleTypes from some sort of Umbraco configuration
+
+            foreach (var moduleType in moduleTypes)
+            {
+                var module = (IHttpModule) Current.Container.GetInstance(moduleType);
+                _modules.Add(module);
+                module.Init(context);
+            }
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            foreach (var module in _modules)
+                module.Dispose();
+        }
+    }
+
     public class ContainerUmbracoModule : IHttpModule
     {
-        private UmbracoModule umbracoModule;
+        private static readonly Type[] ModuleTypes =
+        {
+            typeof(UmbracoModule)
+        };
+
+        private readonly List<IHttpModule> _modules = new List<IHttpModule>();
 
         public static void Start()
         {
-            DynamicModuleUtility.RegisterModule(typeof(ContainerUmbracoModule));
-        }
-
-        public ContainerUmbracoModule()
-        {
-            
+            // registers the ContainerUmbracoModule (without having to have it in web.config)
+            // fixme - in which order? is it going to be first or last?
+            // fixme - do we need to remove the original UmbracoModule from web.config then?
+            HttpApplication.RegisterModule(typeof(ContainerUmbracoModule));
         }
 
         public void Init(HttpApplication context)
         {
-            // Should be extended with lazy list of modules from registry
-            // Example here: https://haacked.com/archive/2011/06/03/dependency-injection-with-asp-net-httpmodules.aspx/
+            // see: https://haacked.com/archive/2011/06/03/dependency-injection-with-asp-net-httpmodules.aspx/
 
-            umbracoModule = Current.Container.GetInstance<UmbracoModule>();
-            umbracoModule.Init(context);
+            foreach (var moduleType in ModuleTypes)
+            {
+                var module = (IHttpModule) Current.Container.GetInstance(moduleType);
+                _modules.Add(module);
+                module.Init(context);
+            }
         }
 
         public void Dispose()
         {
-            umbracoModule.Dispose();
+            foreach (var module in _modules)
+                module.Dispose();
         }
     }
 
@@ -66,31 +103,29 @@ namespace Umbraco.Web
     {
         #region Dependencies
 
-        // modules are *not* instanciated by the container so we have to
-        // get our dependencies injected manually, through properties, in
-        // Init(). works for dependencies that are singletons.
+        // fixme these dont need to be publish and properties anymore?!
 
-        public IUmbracoSettingsSection UmbracoSettings { get; set; }
+        public IUmbracoSettingsSection UmbracoSettings { get; }
 
-        public IGlobalSettings GlobalSettings { get; set; }
+        public IGlobalSettings GlobalSettings { get; }
 
-        public IUmbracoContextAccessor UmbracoContextAccessor { get; set; }
+        public IUmbracoContextAccessor UmbracoContextAccessor { get; }
 
-        public IPublishedSnapshotService PublishedSnapshotService { get; set; }
+        public IPublishedSnapshotService PublishedSnapshotService { get; }
 
-        public IUserService UserService { get; set; }
+        public IUserService UserService { get; }
 
-        public UrlProviderCollection UrlProviders { get; set; }
+        public UrlProviderCollection UrlProviders { get; }
 
-        public IRuntimeState Runtime { get; set; }
+        public IRuntimeState Runtime { get; }
 
-        public ILogger Logger { get; set; }
+        public ILogger Logger { get; }
 
-        internal PublishedRouter PublishedRouter { get; set; }
+        internal PublishedRouter PublishedRouter { get; }
 
-        internal IUmbracoDatabaseFactory DatabaseFactory { get; set; }
+        internal IUmbracoDatabaseFactory DatabaseFactory { get; }
 
-        internal IVariationContextAccessor VariationContextAccessor { get; set; }
+        internal IVariationContextAccessor VariationContextAccessor { get; }
 
         #endregion
 
@@ -105,8 +140,7 @@ namespace Umbraco.Web
             ILogger logger,
             PublishedRouter publishedRouter,
             IUmbracoDatabaseFactory databaseFactory,
-            IVariationContextAccessor variationContextAccessor
-            )
+            IVariationContextAccessor variationContextAccessor)
         {
             _combinedRouteCollection = new Lazy<RouteCollection>(CreateRouteCollection);
 
@@ -558,7 +592,7 @@ namespace Umbraco.Web
         /// <param name="app"></param>
         public void Init(HttpApplication app)
         {
-            if (Core.Composing.Current.RuntimeState.Level == RuntimeLevel.BootFailed)
+            if (Core.Composing.Current.RuntimeState.Level == RuntimeLevel.BootFailed) // fixme inject the runtimeState!
             {
                 // there's nothing we can do really
                 app.BeginRequest += (sender, args) =>
@@ -589,6 +623,7 @@ namespace Umbraco.Web
                 return;
             }
 
+            // fixme
             // modules **are** instanciated by the container so we **don't** have to
             // get our dependencies injected manually, through properties.
             //Core.Composing.Current.Container.InjectProperties(this);

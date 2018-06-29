@@ -270,7 +270,7 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton(factory => umbracoSettings.Templates);
 
             // fixme - The whole MediaFileSystem coupling thing seems broken. 
-            Container.Register<IFileSystem, MediaFileSystem>((factory, fileSystem) => new MediaFileSystem(fileSystem, factory.GetInstance<IContentSection>(), factory.GetInstance<ILogger>()));
+            Container.Register<IFileSystem, MediaFileSystem>((factory, fileSystem) => new MediaFileSystem(fileSystem, factory.GetInstance<IContentSection>(), factory.GetInstance<IMediaPathScheme>(),  factory.GetInstance<ILogger>()));
             Container.RegisterConstructorDependency((factory, parameterInfo) => factory.GetInstance<FileSystems>().MediaFileSystem);
 
             Container.RegisterSingleton<IExamineManager>(factory => ExamineManager.Instance);

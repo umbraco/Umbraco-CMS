@@ -46,7 +46,7 @@ namespace Umbraco.Core.Runtime
 
             // register filesystems
 
-            composition.Container.Register<IFileSystem, MediaFileSystem>((f, wrappedFileSystem) => new MediaFileSystem(wrappedFileSystem, f.GetInstance<IContentSection>(), f.GetInstance<ILogger>()));
+            composition.Container.Register<IFileSystem, MediaFileSystem>((f, wrappedFileSystem) => new MediaFileSystem(wrappedFileSystem, f.GetInstance<IContentSection>(), f.GetInstance<IMediaPathScheme>(), f.GetInstance<ILogger>()));
             composition.Container.RegisterConstructorDependency((factory, parameterInfo) => factory.GetInstance<FileSystems>().MediaFileSystem);
 
             composition.Container.RegisterSingleton<FileSystems>();

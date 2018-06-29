@@ -1,61 +1,56 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LightInject;
 
 namespace Umbraco.Core.Composing.LightInject
 {
-    public class ContainerAdapter : IContainer
+    /// <summary>
+    /// Implements <see cref="IContainer"/> for LightInject.
+    /// </summary>
+    public class ContainerAdapter : IContainer // fixme rename LightInjectContainer?
     {
-        private readonly IServiceContainer container;
+        private readonly IServiceContainer _container;
 
-        public object ConcreteContainer => container;
-
-        public void RegisterSingleton<T>(Func<IContainer, T> factory)
-        {
-            container.RegisterSingleton(f => factory(this));
-        }
-
-        public void Register<T>(Func<IContainer, T> factory)
-        {
-            container.Register(f => factory(this));
-        }
-
-        public void Register<T, TService>(Func<IContainer, T, TService> factory)
-        {
-            container.Register<T, TService>((f, x) => factory(this, x));
-        }
-
-        public T RegisterCollectionBuilder<T>()
-        {
-            return container.RegisterCollectionBuilder<T>();
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContainerAdapter"/> with a LightInject container.
+        /// </summary>
         public ContainerAdapter(IServiceContainer container)
         {
-            this.container = container;
+            _container = container;
         }
 
+        // fixme
+        public object ConcreteContainer => _container;
+
+        /// <inheritdoc />
+        public void RegisterSingleton<T>(Func<IContainer, T> factory)
+            => _container.RegisterSingleton(f => factory(this));
+
+        /// <inheritdoc />
+        public void Register<T>(Func<IContainer, T> factory)
+            => _container.Register(f => factory(this));
+
+        /// <inheritdoc />
+        public void Register<T, TService>(Func<IContainer, T, TService> factory)
+            => _container.Register<T, TService>((f, x) => factory(this, x));
+
+        /// <inheritdoc />
+        public T RegisterCollectionBuilder<T>()
+            => _container.RegisterCollectionBuilder<T>();
+
+        /// <inheritdoc />
         public T TryGetInstance<T>()
-        {
-            return container.TryGetInstance<T>();
-        }
+            => _container.TryGetInstance<T>();
 
+        /// <inheritdoc />
         public T GetInstance<T>()
-        {
-            return container.GetInstance<T>();
-        }
+            => _container.GetInstance<T>();
 
+        /// <inheritdoc />
         public T GetInstance<T>(object[] args)
-        {
-            return (T)container.GetInstance(typeof(T), args);
-        }
+            => (T) _container.GetInstance(typeof(T), args);
 
+        /// <inheritdoc />
         public object GetInstance(Type type)
-        {
-            return container.GetInstance(type);
-        }
+            => _container.GetInstance(type);
     }
 }

@@ -22,6 +22,7 @@ namespace Umbraco.Core.Composing.CompositionRoots
             // register cache helpers
             // the main cache helper is registered by CoreBootManager and is used by most repositories
             // the disabled one is used by those repositories that have an annotated ctor parameter
+            // fixme refactor: use a DisabledCacheHelper class (or interface?) so that injection does not depend on name and we can have simple ctor injection
             container.RegisterSingleton(factory => CacheHelper.CreateDisabledCacheHelper(), DisabledCache);
 
             // resolve ctor dependency from GetInstance() runtimeArguments, if possible - 'factory' is

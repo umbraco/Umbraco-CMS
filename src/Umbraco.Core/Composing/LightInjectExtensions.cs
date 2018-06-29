@@ -44,6 +44,7 @@ namespace Umbraco.Core.Composing
             container.ScopeManagerProvider = new MixedLightInjectScopeManagerProvider();
 
             // self-register
+            // fixme - WHERE is this used, and should it be a generic container, not LightInject's?
             container.Register<IServiceContainer>(_ => container);
 
             // configure the current container

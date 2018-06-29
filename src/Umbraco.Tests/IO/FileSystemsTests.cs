@@ -33,7 +33,7 @@ namespace Umbraco.Tests.IO
             _container.Register(_ => Mock.Of<IDataTypeService>());
             _container.Register(_ => Mock.Of<IContentSection>());
 
-            _container.Register<IFileSystem, MediaFileSystem>((f, x) => new MediaFileSystem(x, f.GetInstance<IContentSection>(), f.GetInstance<ILogger>()));
+            _container.Register<IFileSystem, MediaFileSystem>((f, x) => new MediaFileSystem(x, f.GetInstance<IContentSection>(), f.GetInstance<IMediaPathScheme>(), f.GetInstance<ILogger>()));
             _container.Register<IFileSystem, NonConfiguredTypeFileSystem>((f, x) => new NonConfiguredTypeFileSystem(x));
         
             // make sure we start clean
