@@ -667,7 +667,7 @@ namespace Umbraco.Web.Scheduling
                 if (_terminating == false)
                 {
                     _terminating = true;
-                    _logger.Info<BackgroundTaskRunner>(_logPrefix + "Terminating" + (immediate ? " (immediate)" : ""));
+                    _logger.Info<BackgroundTaskRunner>(() => $"{_logPrefix}Terminating{(immediate ? immediate.ToString() : "")}");
                     onTerminating = true;
                 }
             }
@@ -681,7 +681,7 @@ namespace Umbraco.Web.Scheduling
                 // processing, call the UnregisterObject method, and then return or it can return immediately and complete
                 // processing asynchronously before calling the UnregisterObject method.
 
-                _logger.Info<BackgroundTaskRunner>(_logPrefix + "Waiting for tasks to complete");
+                _logger.Info<BackgroundTaskRunner>(() => _logPrefix + "Waiting for tasks to complete");
                 Shutdown(false, false); // do not accept any more tasks, flush the queue, do not wait
 
                 // raise the completed event only after the running threading task has completed
@@ -700,7 +700,7 @@ namespace Umbraco.Web.Scheduling
                 // immediate parameter is true, the registered object must call the UnregisterObject method before returning;
                 // otherwise, its registration will be removed by the application manager.
 
-                _logger.Info<BackgroundTaskRunner>(_logPrefix + "Cancelling tasks");
+                _logger.Info<BackgroundTaskRunner>(() => _logPrefix + "Cancelling tasks");
                 Shutdown(true, true); // cancel all tasks, wait for the current one to end
                 Terminate(true);
             }
@@ -723,7 +723,7 @@ namespace Umbraco.Web.Scheduling
                 terminatedSource = _terminatedSource;
             }
 
-            _logger.Info<BackgroundTaskRunner>(_logPrefix + "Tasks " + (immediate ? "cancelled" : "completed") + ", terminated");
+            _logger.Info<BackgroundTaskRunner>(() => _logPrefix + "Tasks " + (immediate ? "cancelled" : "completed") + ", terminated");
 
             OnEvent(Terminated, "Terminated");
 

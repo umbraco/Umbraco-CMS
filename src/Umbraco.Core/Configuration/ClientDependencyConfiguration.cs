@@ -79,7 +79,7 @@ namespace Umbraco.Core.Configuration
                     versionAttribute.SetValue(newVersion);
                     clientDependencyConfigXml.Save(_fileName, SaveOptions.DisableFormatting);
 
-                    _logger.Info<ClientDependencyConfiguration>(string.Format("Updated version number from {0} to {1}", oldVersion, newVersion));
+                    _logger.Info<ClientDependencyConfiguration>(() => $"Updated version number from {oldVersion} to {newVersion}");
                     return true;
                 }
             }
@@ -113,7 +113,7 @@ namespace Umbraco.Core.Configuration
                     versionAttribute.SetValue(newVersion);
                     clientDependencyConfigXml.Save(_fileName, SaveOptions.DisableFormatting);
 
-                    _logger.Info<ClientDependencyConfiguration>(string.Format("Updated version number from {0} to {1}", oldVersion, newVersion));
+                    _logger.Info<ClientDependencyConfiguration>(() => $"Updated version number from {oldVersion} to {newVersion}");
                     return true;
                 }
             }

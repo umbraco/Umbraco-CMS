@@ -525,11 +525,8 @@ namespace Umbraco.Web.Security.Providers
 
             if (member == null)
             {
-                Current.Logger.Info<UmbracoMembershipProviderBase>(
-                    string.Format(
-                        "Login attempt failed for username {0} from IP address {1}, the user does not exist",
-                        username,
-                        GetCurrentRequestIpAddress()));
+                Current.Logger.Info<UmbracoMembershipProviderBase>(() => 
+                        $"Login attempt failed for username {username} from IP address {GetCurrentRequestIpAddress()}, the user does not exist" );
 
                 return new ValidateUserResult
                 {
@@ -539,11 +536,8 @@ namespace Umbraco.Web.Security.Providers
 
             if (member.IsApproved == false)
             {
-                Current.Logger.Info<UmbracoMembershipProviderBase>(
-                    string.Format(
-                        "Login attempt failed for username {0} from IP address {1}, the user is not approved",
-                        username,
-                        GetCurrentRequestIpAddress()));
+                Current.Logger.Info<UmbracoMembershipProviderBase>(() => 
+                        $"Login attempt failed for username {username} from IP address {GetCurrentRequestIpAddress()}, the user is not approved");
 
                 return new ValidateUserResult
                 {
@@ -553,11 +547,8 @@ namespace Umbraco.Web.Security.Providers
             }
             if (member.IsLockedOut)
             {
-                Current.Logger.Info<UmbracoMembershipProviderBase>(
-                    string.Format(
-                        "Login attempt failed for username {0} from IP address {1}, the user is locked",
-                        username,
-                        GetCurrentRequestIpAddress()));
+                Current.Logger.Info<UmbracoMembershipProviderBase>(() => 
+                        $"Login attempt failed for username {username} from IP address {GetCurrentRequestIpAddress()}, the user is locked");
 
                 return new ValidateUserResult
                 {
@@ -581,19 +572,13 @@ namespace Umbraco.Web.Security.Providers
                     member.IsLockedOut = true;
                     member.LastLockoutDate = DateTime.Now;
 
-                    Current.Logger.Info<UmbracoMembershipProviderBase>(
-                        string.Format(
-                            "Login attempt failed for username {0} from IP address {1}, the user is now locked out, max invalid password attempts exceeded",
-                            username,
-                            GetCurrentRequestIpAddress()));
+                    Current.Logger.Info<UmbracoMembershipProviderBase>(() => 
+                            $"Login attempt failed for username {username} from IP address {GetCurrentRequestIpAddress()}, the user is now locked out, max invalid password attempts exceeded");
                 }
                 else
                 {
-                    Current.Logger.Info<UmbracoMembershipProviderBase>(
-                        string.Format(
-                            "Login attempt failed for username {0} from IP address {1}",
-                            username,
-                            GetCurrentRequestIpAddress()));
+                    Current.Logger.Info<UmbracoMembershipProviderBase>(() => 
+                            $"Login attempt failed for username {username} from IP address {GetCurrentRequestIpAddress()}");
                 }
             }
             else
@@ -606,11 +591,8 @@ namespace Umbraco.Web.Security.Providers
 
                 member.LastLoginDate = DateTime.Now;
 
-                Current.Logger.Info<UmbracoMembershipProviderBase>(
-                        string.Format(
-                            "Login attempt succeeded for username {0} from IP address {1}",
-                            username,
-                            GetCurrentRequestIpAddress()));
+                Current.Logger.Info<UmbracoMembershipProviderBase>(() => 
+                            $"Login attempt succeeded for username {username} from IP address {GetCurrentRequestIpAddress()}");
             }
 
             //don't raise events for this! It just sets the member dates, if we do raise events this will

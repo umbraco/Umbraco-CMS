@@ -31,7 +31,7 @@ namespace Umbraco.Web.Macros
             // note: we are not setting the 'CurrentNode' property on the control anymore,
             // as that was an INode which is gone in v8. Use UmbracoContext to access the
             // current content.
-            Current.Logger.Info<UserControlMacroEngine>($"Loaded control \"{filename}\" with ID \"{control.ID}\".");
+            Current.Logger.Info<UserControlMacroEngine>(() => $"Loaded control \"{filename}\" with ID \"{control.ID}\".");
             UpdateControlProperties(control, model);
 
             return new MacroContent { Control = control };
