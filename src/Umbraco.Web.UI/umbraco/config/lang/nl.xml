@@ -221,6 +221,7 @@
     <key alias="discardChanges">Negeer wijzigingen</key>
     <key alias="unsavedChanges">Wijzigingen niet opgeslagen</key>
     <key alias="unsavedChangesWarning">Weet je zeker dat deze pagina wilt verlaten? - er zijn onopgeslagen wijzigingen</key>
+    <key alias="confirmUnpublish">Depubliceren zal deze pagina en alle onderliggend paginas verwijderen van de site.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
