@@ -16,14 +16,6 @@ namespace Umbraco.Web._Legacy.Actions
         private static readonly ActionCopy m_instance = new ActionCopy();
 #pragma warning restore 612,618
 
-        /// <summary>
-        /// A public constructor exists ONLY for backwards compatibility in regards to 3rd party add-ons.
-        /// All Umbraco assemblies should use the singleton instantiation (this.Instance)
-        /// When this applicatio is refactored, this constuctor should be made private.
-        /// </summary>
-        [Obsolete("Use the singleton instantiation instead of a constructor")]
-        public ActionCopy() { }
-
         public static ActionCopy Instance
         {
             get { return m_instance; }
