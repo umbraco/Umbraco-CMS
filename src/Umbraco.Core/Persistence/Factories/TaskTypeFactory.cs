@@ -3,9 +3,9 @@ using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class TaskTypeFactory
+    internal static class TaskTypeFactory
     {
-        public TaskType BuildEntity(TaskTypeDto dto)
+        public static TaskType BuildEntity(TaskTypeDto dto)
         {
             var entity = new TaskType(dto.Alias) {Id = dto.Id};
             // reset dirty initial properties (U4-1946)
@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Factories
             return entity;
         }
 
-        public TaskTypeDto BuildDto(TaskType entity)
+        public static TaskTypeDto BuildDto(TaskType entity)
         {
             var dto = new TaskTypeDto
             {
