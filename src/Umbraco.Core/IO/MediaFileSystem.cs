@@ -29,6 +29,7 @@ namespace Umbraco.Core.IO
             ContentConfig = contentConfig;
             Logger = logger;
             MediaPathScheme = mediaPathScheme;
+            MediaPathScheme.Initialize(this);
 
             UploadAutoFillProperties = new UploadAutoFillProperties(this, Logger, ContentConfig);
         }
