@@ -74,7 +74,7 @@ namespace Umbraco.Web.Macros
                     try
                     {
                         controlProperty.SetValue(control, tryConvert.Result, null);
-                        Current.Logger.Debug<UserControlMacroEngine>($"Set property \"{modelProperty.Key}\" value \"{modelProperty.Value}\".");
+                        Current.Logger.Debug<UserControlMacroEngine>(() => $"Set property \"{modelProperty.Key}\" value \"{modelProperty.Value}\".");
                     }
                     catch (Exception e)
                     {

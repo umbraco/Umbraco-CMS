@@ -315,7 +315,7 @@ namespace Umbraco.Web.Scheduling
             _shutdownToken = _shutdownTokenSource.Token;
             _runningTask = Task.Run(async () => await Pump().ConfigureAwait(false), _shutdownToken);
 
-            _logger.Debug<BackgroundTaskRunner>(_logPrefix + "Starting");
+            _logger.Debug<BackgroundTaskRunner>(() => _logPrefix + "Starting");
         }
 
         /// <summary>
@@ -414,7 +414,7 @@ namespace Umbraco.Web.Scheduling
                     if (_shutdownToken.IsCancellationRequested == false && _tasks.Count > 0) continue;
 
                     // if we really have nothing to do, stop
-                    _logger.Debug<BackgroundTaskRunner>(_logPrefix + "Stopping");
+                    _logger.Debug<BackgroundTaskRunner>(() => _logPrefix + "Stopping");
 
                     if (_options.PreserveRunningTask == false)
                         _runningTask = null;
