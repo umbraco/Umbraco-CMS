@@ -136,10 +136,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var id = Convert.ToInt32(Database.Insert(dto));
             dictionaryItem.Id = id;
 
-            var translationFactory = new DictionaryTranslationFactory(dictionaryItem.Key);
             foreach (var translation in dictionaryItem.Translations)
             {
-                var textDto = translationFactory.BuildDto(translation);
+                var textDto = DictionaryTranslationFactory.BuildDto(translation, dictionaryItem.Key);
                 translation.Id = Convert.ToInt32(Database.Insert(textDto));
                 translation.Key = dictionaryItem.Key;
             }
@@ -158,10 +157,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             Database.Update(dto);
 
-            var translationFactory = new DictionaryTranslationFactory(entity.Key);
             foreach (var translation in entity.Translations)
             {
-                var textDto = translationFactory.BuildDto(translation);
+                var textDto = DictionaryTranslationFactory.BuildDto(translation, entity.Key);
                 if (translation.HasIdentity)
                 {
                     Database.Update(textDto);
@@ -216,10 +214,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var entity = DictionaryItemFactory.BuildEntity(dto);
 
-            var f = new DictionaryTranslationFactory(dto.UniqueId);
             entity.Translations = dto.LanguageTextDtos.EmptyNull()
                 .Where(x => x.LanguageId > 0)
-                .Select(x => f.BuildEntity(x))
+                .Select(x => DictionaryTranslationFactory.BuildEntity(x, dto.UniqueId))
                 .ToList();
 
             return entity;
