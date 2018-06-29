@@ -130,9 +130,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             foreach (var translation in dictionaryItem.Translations)
                 translation.Value = translation.Value.ToValidXmlString();
-
-            var factory = new DictionaryItemFactory();
-            var dto = factory.BuildDto(dictionaryItem);
+            
+            var dto = DictionaryItemFactory.BuildDto(dictionaryItem);
 
             var id = Convert.ToInt32(Database.Insert(dto));
             dictionaryItem.Id = id;
@@ -154,9 +153,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             foreach (var translation in entity.Translations)
                 translation.Value = translation.Value.ToValidXmlString();
-
-            var factory = new DictionaryItemFactory();
-            var dto = factory.BuildDto(entity);
+            
+            var dto = DictionaryItemFactory.BuildDto(entity);
 
             Database.Update(dto);
 
@@ -216,8 +214,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected IDictionaryItem ConvertFromDto(DictionaryDto dto)
         {
-            var factory = new DictionaryItemFactory();
-            var entity = factory.BuildEntity(dto);
+            var entity = DictionaryItemFactory.BuildEntity(dto);
 
             var f = new DictionaryTranslationFactory(dto.UniqueId);
             entity.Translations = dto.LanguageTextDtos.EmptyNull()
