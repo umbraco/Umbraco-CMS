@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using AutoMapper;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -178,6 +181,14 @@ namespace Umbraco.Web.Editors
             else
             {
                 //create
+
+                // file might already be on disk, if so grab the content to avoid overwriting
+                string content = Services.FileService.GetViewContent(display.Alias);
+                if (string.IsNullOrEmpty(content) == false)
+                {
+                    display.Content = content;
+                }
+
                 ITemplate master = null;
                 if (string.IsNullOrEmpty(display.MasterTemplateAlias) == false)
                 {
