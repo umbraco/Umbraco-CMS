@@ -119,8 +119,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected void PersistNewBaseContentType(IContentTypeComposition entity)
         {
-            var factory = new ContentTypeFactory();
-            var dto = factory.BuildContentTypeDto(entity);
+
+            var dto = ContentTypeFactory.BuildContentTypeDto(entity);
 
             //Cannot add a duplicate content type type
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsContentType
@@ -235,8 +235,8 @@ AND umbracoNode.nodeObjectType = @objectType",
 
         protected void PersistUpdatedBaseContentType(IContentTypeComposition entity)
         {
-            var factory = new ContentTypeFactory();
-            var dto = factory.BuildContentTypeDto(entity);
+
+            var dto = ContentTypeFactory.BuildContentTypeDto(entity);
 
             // ensure the alias is not used already
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsContentType
@@ -870,10 +870,8 @@ AND umbracoNode.id <> @id",
                     }
                 };
 
-                //now create the content type object
-
-                var factory = new ContentTypeFactory();
-                var mediaType = factory.BuildMediaTypeEntity(contentTypeDto);
+                //now create the content type object;
+                var mediaType = ContentTypeFactory.BuildMediaTypeEntity(contentTypeDto);
 
                 //map the allowed content types
                 mediaType.AllowedContentTypes = currAllowedContentTypes;
@@ -1052,9 +1050,7 @@ AND umbracoNode.id <> @id",
                 };
 
                 //now create the content type object
-
-                var factory = new ContentTypeFactory();
-                var contentType = factory.BuildContentTypeEntity(dtDto.ContentTypeDto);
+                var contentType = ContentTypeFactory.BuildContentTypeEntity(dtDto.ContentTypeDto);
 
                 // NOTE
                 // that was done by the factory but makes little sense, moved here, so
