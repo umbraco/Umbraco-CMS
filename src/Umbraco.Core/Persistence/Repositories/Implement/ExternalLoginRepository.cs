@@ -52,8 +52,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (dto == null)
                 return null;
 
-            var factory = new ExternalLoginFactory();
-            var entity = factory.BuildEntity(dto);
+            var entity = ExternalLoginFactory.BuildEntity(dto);
 
             // reset dirty initial properties (U4-1946)
             entity.ResetDirtyProperties(false);
@@ -85,8 +84,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private IEnumerable<IIdentityUserLogin> ConvertFromDtos(IEnumerable<ExternalLoginDto> dtos)
         {
-            var factory = new ExternalLoginFactory();
-            foreach (var entity in dtos.Select(factory.BuildEntity))
+            foreach (var entity in dtos.Select(ExternalLoginFactory.BuildEntity))
             {
                 // reset dirty initial properties (U4-1946)
                 ((BeingDirtyBase)entity).ResetDirtyProperties(false);
@@ -143,8 +141,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             ((EntityBase)entity).AddingEntity();
 
-            var factory = new ExternalLoginFactory();
-            var dto = factory.BuildDto(entity);
+            var dto = ExternalLoginFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
@@ -155,9 +152,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(IIdentityUserLogin entity)
         {
             ((EntityBase)entity).UpdatingEntity();
-
-            var factory = new ExternalLoginFactory();
-            var dto = factory.BuildDto(entity);
+            
+            var dto = ExternalLoginFactory.BuildDto(entity);
 
             Database.Update(dto);
 
