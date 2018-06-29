@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Web;
 using System.Web.Http;
-using LightInject;
 using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -36,50 +36,42 @@ namespace Umbraco.Web.WebApi
         /// <summary>
         /// Gets or sets the Umbraco context.
         /// </summary>
-        [Inject]
-        public virtual IGlobalSettings GlobalSettings { get; set; }
+        public virtual IGlobalSettings GlobalSettings { get; }
 
         /// <summary>
         /// Gets or sets the Umbraco context.
         /// </summary>
-        [Inject]
-        public virtual UmbracoContext UmbracoContext { get; set; }
+        public virtual UmbracoContext UmbracoContext { get; }
 
         /// <summary>
         /// Gets or sets the sql context.
         /// </summary>
-        [Inject]
-        public ISqlContext SqlContext { get; set; }
+        public ISqlContext SqlContext { get; }
 
         /// <summary>
         /// Gets or sets the services context.
         /// </summary>
-        [Inject]
-        public ServiceContext Services { get; set; }
+        public ServiceContext Services { get; }
 
         /// <summary>
         /// Gets or sets the application cache.
         /// </summary>
-        [Inject]
-        public CacheHelper ApplicationCache { get; set; }
+        public CacheHelper ApplicationCache { get; }
 
         /// <summary>
         /// Gets or sets the logger.
         /// </summary>
-        [Inject]
-        public ILogger Logger { get; set; }
+        public ILogger Logger { get; }
 
         /// <summary>
         /// Gets or sets the profiling logger.
         /// </summary>
-        [Inject]
-        public ProfilingLogger ProfilingLogger { get; set; }
+        public ProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
         /// Gets or sets the runtime state.
         /// </summary>
-        [Inject]
-        internal IRuntimeState RuntimeState { get; set; }
+        internal IRuntimeState RuntimeState { get; }
 
         /// <summary>
         /// Gets the application url.
@@ -101,6 +93,33 @@ namespace Umbraco.Web.WebApi
         /// Gets the web security helper.
         /// </summary>
         public WebSecurity Security => UmbracoContext.Security;
+
+        protected UmbracoApiControllerBase()
+            : this(
+                  Current.Container.GetInstance<IGlobalSettings>(),
+                  Current.Container.GetInstance<UmbracoContext>(),
+                  Current.Container.GetInstance<ISqlContext>(),
+                  Current.Container.GetInstance<ServiceContext>(),
+                  Current.Container.GetInstance<CacheHelper>(),
+                  Current.Container.GetInstance<ILogger>(),
+                  Current.Container.GetInstance<ProfilingLogger>(),
+                  Current.Container.GetInstance<IRuntimeState>()
+            )
+        {
+        }
+
+        // fixme - Inject fewer things? (Aggregate more)
+        protected UmbracoApiControllerBase(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger, IRuntimeState runtimeState)
+        {
+            GlobalSettings = globalSettings;
+            UmbracoContext = umbracoContext;
+            SqlContext = sqlContext;
+            Services = services;
+            ApplicationCache = applicationCache;
+            Logger = logger;
+            ProfilingLogger = profilingLogger;
+            RuntimeState = runtimeState;
+        }
 
         /// <summary>
         /// Tries to get the current HttpContext.

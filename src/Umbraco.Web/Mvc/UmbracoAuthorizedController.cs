@@ -1,4 +1,10 @@
-﻿namespace Umbraco.Web.Mvc
+﻿using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
+
+namespace Umbraco.Web.Mvc
 {
     /// <summary>
     /// Provides a base class for authorized Umbraco controllers.
@@ -10,5 +16,13 @@
     [UmbracoAuthorize]
     [DisableBrowserCache]
     public abstract class UmbracoAuthorizedController : UmbracoController
-    { }
+    {
+        protected UmbracoAuthorizedController()
+        {
+        }
+
+        protected UmbracoAuthorizedController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger) : base(globalSettings, umbracoContext, databaseFactory, services, applicationCache, logger, profilingLogger)
+        {
+        }
+    }
 }

@@ -3,8 +3,6 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using System.Linq;
-using Umbraco.Core.IO;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Net.Http;
@@ -16,6 +14,8 @@ using Umbraco.Core.Cache;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
@@ -27,6 +27,15 @@ namespace Umbraco.Web.Editors
     [WebApi.UmbracoAuthorize]
     public class DashboardController : UmbracoApiController
     {
+        public DashboardController()
+        {
+        }
+
+        public DashboardController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, profilingLogger, runtimeState)
+        {
+        }
+
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [ValidateAngularAntiForgeryToken]
         public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")

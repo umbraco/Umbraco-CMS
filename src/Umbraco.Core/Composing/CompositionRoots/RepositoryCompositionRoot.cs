@@ -1,8 +1,12 @@
 ﻿using System;
 using LightInject;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Composing.CompositionRoots
 {
@@ -36,7 +40,7 @@ namespace Umbraco.Core.Composing.CompositionRoots
             // some repositories have an annotated ctor parameter to pick the right cache helper
 
             // repositories
-            container.RegisterSingleton<IAuditRepository, AuditRepository>();
+            container.RegisterSingleton<IAuditRepository>(f => new AuditRepository(f.GetInstance<IScopeAccessor>(), f.GetInstance<CacheHelper>(DisabledCache), f.GetInstance<ILogger>()));
             container.RegisterSingleton<IAuditEntryRepository, AuditEntryRepository>();
             container.RegisterSingleton<IContentTypeRepository, ContentTypeRepository>();
             container.RegisterSingleton<IDataTypeContainerRepository, DataTypeContainerRepository>();
@@ -59,23 +63,30 @@ namespace Umbraco.Core.Composing.CompositionRoots
             container.RegisterSingleton<INotificationsRepository, NotificationsRepository>();
             container.RegisterSingleton<IPublicAccessRepository, PublicAccessRepository>();
             container.RegisterSingleton<IRedirectUrlRepository, RedirectUrlRepository>();
-            container.RegisterSingleton<IRelationRepository, RelationRepository>();
+            container.RegisterSingleton<IRelationRepository>(f => new RelationRepository(f.GetInstance<IScopeAccessor>(), f.GetInstance<CacheHelper>(DisabledCache), f.GetInstance<ILogger>(), f.GetInstance<IRelationTypeRepository>()));
             container.RegisterSingleton<IRelationTypeRepository, RelationTypeRepository>();
             container.RegisterSingleton<IServerRegistrationRepository, ServerRegistrationRepository>();
             container.RegisterSingleton<ITagRepository, TagRepository>();
-            container.RegisterSingleton<ITaskRepository, TaskRepository>();
-            container.RegisterSingleton<ITaskTypeRepository, TaskTypeRepository>();
-            container.RegisterSingleton<ITemplateRepository, TemplateRepository>();
+            container.RegisterSingleton<ITaskRepository>(f => new TaskRepository(f.GetInstance<IScopeAccessor>(), f.GetInstance<CacheHelper>(DisabledCache), f.GetInstance<ILogger>()));
+            container.RegisterSingleton<ITaskTypeRepository>(f => new TaskTypeRepository(f.GetInstance<IScopeAccessor>(), f.GetInstance<CacheHelper>(DisabledCache), f.GetInstance<ILogger>()));
+            container.RegisterSingleton<ITemplateRepository>(f => new TemplateRepository(
+                f.GetInstance<IScopeAccessor>(),
+                f.GetInstance<CacheHelper>(),
+                f.GetInstance<ILogger>(),
+                f.GetInstance<ITemplatesSection>(),
+                f.GetInstance<IFileSystem>(Constants.Composing.FileSystems.MasterpageFileSystem),
+                f.GetInstance<IFileSystem>(Constants.Composing.FileSystems.ViewFileSystem)
+            ));
             container.RegisterSingleton<IUserGroupRepository, UserGroupRepository>();
             container.RegisterSingleton<IUserRepository, UserRepository>();
             container.RegisterSingleton<IConsentRepository, ConsentRepository>();
 
             // repositories that depend on a filesystem
             // these have an annotated ctor parameter to pick the right file system
-            container.RegisterSingleton<IPartialViewMacroRepository, PartialViewMacroRepository>();
-            container.RegisterSingleton<IPartialViewRepository, PartialViewRepository>();
-            container.RegisterSingleton<IScriptRepository, ScriptRepository>();
-            container.RegisterSingleton<IStylesheetRepository, StylesheetRepository>();
+            container.RegisterSingleton<IPartialViewMacroRepository>(f => new PartialViewMacroRepository(f.GetInstance<IFileSystem>("PartialViewMacroFileSystem")));
+            container.RegisterSingleton<IPartialViewRepository>(f => new PartialViewRepository(f.GetInstance<IFileSystem>("PartialViewFileSystem")));
+            container.RegisterSingleton<IScriptRepository>(f => new ScriptRepository(f.GetInstance<IFileSystem>("ScriptFileSystem"), f.GetInstance<IContentSection>()));
+            container.RegisterSingleton<IStylesheetRepository>(f => new StylesheetRepository(f.GetInstance<IFileSystem>("StylesheetFileSystem")));
         }
     }
 }

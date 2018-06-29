@@ -109,6 +109,7 @@
     <Compile Include="Cache\ContentCacheRefresher.cs" />
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
     <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
+    <Compile Include="Composing\CompositionRoots\HelperCompositionRoot.cs" />
     <Compile Include="Composing\CompositionRoots\InstallerCompositionRoot.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\Current.cs" />

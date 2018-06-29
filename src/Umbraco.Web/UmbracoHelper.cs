@@ -160,7 +160,7 @@ namespace Umbraco.Web
         /// Gets the membership helper.
         /// </summary>
         public MembershipHelper MembershipHelper => _membershipHelper
-            ?? (_membershipHelper = new MembershipHelper(UmbracoContext));
+            ?? (_membershipHelper = Current.Container.GetInstance<MembershipHelper>());
 
         /// <summary>
         /// Gets the url provider.

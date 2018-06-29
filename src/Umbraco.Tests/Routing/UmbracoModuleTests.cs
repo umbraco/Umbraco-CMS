@@ -11,6 +11,14 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
+using Umbraco.Web.PublishedCache;
+using Umbraco.Web.Routing;
+
+// fixme - abstract container
+using LightInject;
 
 namespace Umbraco.Tests.Routing
 {
@@ -24,12 +32,22 @@ namespace Umbraco.Tests.Routing
         {
             base.SetUp();
 
+            // fixme - be able to get the UmbracoModule from the container. any reason settings were from testobjects?
             //create the module
             _module = new UmbracoModule
-            {
-                GlobalSettings = TestObjects.GetGlobalSettings(),
-                Logger = Mock.Of<ILogger>()
-            };
+            (
+                TestObjects.GetUmbracoSettings(),
+                TestObjects.GetGlobalSettings(),
+                Mock.Of<IUmbracoContextAccessor>(),
+                Container.GetInstance<IPublishedSnapshotService>(),
+                Container.GetInstance<IUserService>(),
+                new UrlProviderCollection(new IUrlProvider[0]),
+                Container.GetInstance<IRuntimeState>(),
+                Mock.Of<ILogger>(),
+                null, // fixme - PublishedRouter complexities...
+                Container.GetInstance<IUmbracoDatabaseFactory>(),
+                Mock.Of<IVariationContextAccessor>()
+            );
             var runtime = new RuntimeState(_module.Logger, new Lazy<IServerRegistrar>(), new Lazy<MainDom>(), Mock.Of<IUmbracoSettingsSection>(), _module.GlobalSettings);
 
             _module.Runtime = runtime;

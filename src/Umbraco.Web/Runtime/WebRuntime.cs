@@ -56,6 +56,8 @@ namespace Umbraco.Web.Runtime
         {
             base.Compose(container);
 
+            container.Register<UmbracoModule>();
+
             // replace CoreRuntime's IProfiler registration
             container.RegisterSingleton(_ => _webProfiler);
 

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 using NPoco;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing.CompositionRoots;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -17,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class TaskRepository : NPocoRepositoryBase<int, Task>, ITaskRepository
     {
-        public TaskRepository(IScopeAccessor scopeAccessor, [Inject(RepositoryCompositionRoot.DisabledCache)] CacheHelper cache, ILogger logger)
+        public TaskRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 

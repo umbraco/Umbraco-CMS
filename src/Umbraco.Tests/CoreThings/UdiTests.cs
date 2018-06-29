@@ -27,7 +27,7 @@ namespace Umbraco.Tests.CoreThings
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
             container.Setup(x => x.GetInstance(typeof (TypeLoader))).Returns(
                 new TypeLoader(NullCacheProvider.Instance, globalSettings, new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
-            Current.Container = container.Object;
+            Current.Container = new Core.Composing.LightInject.ContainerAdapter(container.Object);
 
             Udi.ResetUdiTypes();
         }

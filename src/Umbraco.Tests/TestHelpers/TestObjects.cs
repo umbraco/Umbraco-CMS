@@ -10,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -116,7 +117,7 @@ namespace Umbraco.Tests.TestHelpers
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (eventMessagesFactory == null) throw new ArgumentNullException(nameof(eventMessagesFactory));
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>());
+            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), Mock.Of<IContentSection>(), Mock.Of<ILogger>());
 
             var externalLoginService = GetLazyService<IExternalLoginService>(container, c => new ExternalLoginService(scopeProvider, logger, eventMessagesFactory, GetRepo<IExternalLoginRepository>(c)));
             var publicAccessService = GetLazyService<IPublicAccessService>(container, c => new PublicAccessService(scopeProvider, logger, eventMessagesFactory, GetRepo<IPublicAccessRepository>(c)));

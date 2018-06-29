@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Security;
-using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -34,69 +33,53 @@ namespace Umbraco.Web.Security
         private readonly IPublishedMemberCache _memberCache;
         private readonly UmbracoContext _umbracoContext;
 
-        [Inject]
-        private IMemberService MemberService { get; set; }
+        private IMemberService MemberService { get; }
 
-        [Inject]
-        private IMemberTypeService MemberTypeService { get; set; }
+        private IMemberTypeService MemberTypeService { get; }
 
-        [Inject]
-        private IUserService UserService { get; set; }
+        private IUserService UserService { get; }
 
-        [Inject]
-        private IPublicAccessService PublicAccessService { get; set; }
+        private IPublicAccessService PublicAccessService { get; }
+        public CacheHelper CacheHelper { get; }
 
-        [Inject]
-        private CacheHelper ApplicationCache { get; set; }
+        private CacheHelper ApplicationCache { get; }
 
-        [Inject]
-        private ILogger Logger { get; set; }
+        private ILogger Logger { get; }
 
-        [Inject]
-        private PublishedRouter Router { get; set; }
+        private PublishedRouter Router { get; }
 
         #region Constructors
 
-        // used here and there for IMember operations (not front-end stuff, no need for _memberCache)
-
-        [Obsolete("Use the constructor specifying an UmbracoContext")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public MembershipHelper(HttpContextBase httpContext)
+        public MembershipHelper
+        (
+            IUmbracoContextAccessor accessor,
+            MembershipProvider membershipProvider,
+            RoleProvider roleProvider,
+            IMemberService memberService,
+            IMemberTypeService memberTypeService,
+            IUserService userService,
+            IPublicAccessService publicAccessService,
+            CacheHelper cacheHelper,
+            ILogger logger,
+            PublishedRouter router
+        )
         {
-            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
-            _httpContext = httpContext;
-            _membershipProvider = MPE.GetMembersMembershipProvider();
-            _roleProvider = Roles.Enabled ? Roles.Provider : new MembersRoleProvider(MemberService);
-
-            // _memberCache remains null - not supposed to use it
-            // alternatively we'd need to get if from the 'current' UmbracoContext?
-
-            // helpers are *not* instanciated by the container so we have to
-            // get our dependencies injected manually, through properties.
-            Current.Container.InjectProperties(this);
-        }
-
-        // used everywhere
-        public MembershipHelper(UmbracoContext umbracoContext)
-            : this(umbracoContext, MPE.GetMembersMembershipProvider(), Roles.Enabled ? Roles.Provider : new MembersRoleProvider(Current.Services.MemberService))
-        { }
-
-        // used in tests and (this)
-        public MembershipHelper(UmbracoContext umbracoContext, MembershipProvider membershipProvider, RoleProvider roleProvider)
-        {
-            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
+            if (accessor.UmbracoContext == null) throw new ArgumentNullException(nameof(accessor));
             if (membershipProvider == null) throw new ArgumentNullException(nameof(membershipProvider));
             if (roleProvider == null) throw new ArgumentNullException(nameof(roleProvider));
+            MemberService = memberService;
+            MemberTypeService = memberTypeService;
+            UserService = userService;
+            PublicAccessService = publicAccessService;
+            CacheHelper = cacheHelper;
+            Logger = logger;
+            Router = router;
 
-            _httpContext = umbracoContext.HttpContext;
-            _umbracoContext = umbracoContext;
+            _httpContext = accessor.UmbracoContext.HttpContext;
+            _umbracoContext = accessor.UmbracoContext;
             _membershipProvider = membershipProvider;
             _roleProvider = roleProvider;
-            _memberCache = umbracoContext.PublishedSnapshot.Members;
-
-            // helpers are *not* instanciated by the container so we have to
-            // get our dependencies injected manually, through properties.
-            Current.Container.InjectProperties(this);
+            _memberCache = accessor.UmbracoContext.PublishedSnapshot.Members;
         }
 
         #endregion

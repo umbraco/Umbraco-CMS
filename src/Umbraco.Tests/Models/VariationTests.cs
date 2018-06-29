@@ -4,6 +4,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -29,7 +30,7 @@ namespace Umbraco.Tests.Models
 
             Current.Reset();
             var container = Mock.Of<IServiceContainer>();
-            Current.Container = container;
+            Current.Container = new ContainerAdapter(container);
 
             var dataEditors = new DataEditorCollection(new IDataEditor[]
             {

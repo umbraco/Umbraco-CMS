@@ -166,9 +166,11 @@
     <Compile Include="Composing\HideFromTypeFinderAttribute.cs" />
     <Compile Include="Composing\IBuilderCollection.cs" />
     <Compile Include="Composing\ICollectionBuilder.cs" />
+    <Compile Include="Composing\IContainer.cs" />
     <Compile Include="Composing\IDiscoverable.cs" />
     <Compile Include="Composing\LazyCollectionBuilderBase.cs" />
     <Compile Include="Composing\LightInjectExtensions.cs" />
+    <Compile Include="Composing\LightInject\ContainerAdapter.cs" />
     <Compile Include="Composing\MixedLightInjectScopeManagerProvider.cs" />
     <Compile Include="Composing\OrderedCollectionBuilderBase.cs" />
     <Compile Include="Composing\TypeFinder.cs" />

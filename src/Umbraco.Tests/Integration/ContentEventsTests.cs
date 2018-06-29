@@ -22,6 +22,7 @@ using static Umbraco.Tests.Cache.DistributedCache.DistributedCacheTests;
 namespace Umbraco.Tests.Integration
 {
     [TestFixture]
+    [Category("Slow")]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ContentEventsTests : TestWithSomeContentBase
     {

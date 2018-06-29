@@ -47,7 +47,7 @@ namespace Umbraco.Core.Composing
             container.Register<IServiceContainer>(_ => container);
 
             // configure the current container
-            Current.Container = container;
+            Current.Container = new LightInject.ContainerAdapter(container);
         }
 
         private class AssemblyScanner : IAssemblyScanner

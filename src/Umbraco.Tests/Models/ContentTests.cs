@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using Moq;
+using LightInject;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -38,6 +39,7 @@ namespace Umbraco.Tests.Models
             base.Compose();
 
             Container.Register(_ => Mock.Of<ILogger>());
+            Container.Register<IFileSystem, MediaFileSystem>((factory, fileSystem) => new MediaFileSystem(fileSystem, factory.GetInstance<IContentSection>(), factory.GetInstance<ILogger>()));
             Container.Register<FileSystems>();
             Container.Register(_ => Mock.Of<IDataTypeService>());
             Container.Register(_ => Mock.Of<IContentSection>());

@@ -57,7 +57,7 @@ namespace Umbraco.Web.Security
             {
                 return false;
             }
-            var helper = new MembershipHelper(Current.UmbracoContext);
+            var helper = Current.Container.GetInstance<MembershipHelper>();
             return helper.IsMemberAuthorized(allowAll, allowTypes, allowGroups, allowMembers);
         }
 

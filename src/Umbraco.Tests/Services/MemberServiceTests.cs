@@ -24,6 +24,7 @@ using Umbraco.Web.Security.Providers;
 namespace Umbraco.Tests.Services
 {
     [TestFixture]
+    [Category("Slow")]
     [Apartment(ApartmentState.STA)]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true, WithApplication = true)]
     public class MemberServiceTests : TestWithSomeContentBase

@@ -302,7 +302,11 @@ namespace Umbraco.Core.IO
                 // could be optimized by having FileSystemWrapper inherit from ShadowWrapper, maybe
                 var innerFs = GetUnderlyingFileSystemNoCache(alias, fallback);
                 var shadowWrapper = new ShadowWrapper(innerFs, "typed/" + alias, () => IsScoped());
-                var fs = (IFileSystem) Activator.CreateInstance(typeof(TFileSystem), shadowWrapper);
+
+                // fixme - switch to using container. where are these registered?
+
+                //var fs = (IFileSystem) Activator.CreateInstance(typeof(TFileSystem), shadowWrapper);
+                var fs = Current.Container.GetInstance<TFileSystem>(new object[] { (IFileSystem)shadowWrapper });
                 _wrappers.Add(shadowWrapper); // keeping a reference to the wrapper
                 return fs;
             });
@@ -314,7 +318,7 @@ namespace Umbraco.Core.IO
 
             // validate the ctor
             var constructor = fsType.GetConstructors().SingleOrDefault(x
-                => x.GetParameters().Length == 1 && TypeHelper.IsTypeAssignableFrom<IFileSystem>(x.GetParameters().Single().ParameterType));
+                => x.GetParameters().Length >= 1 && TypeHelper.IsTypeAssignableFrom<IFileSystem>(x.GetParameters().First().ParameterType));
             if (constructor == null)
                 throw new InvalidOperationException("Type " + fsType.FullName + " must inherit from FileSystemWrapper and have a constructor that accepts one parameter of type " + typeof(IFileSystem).FullName + ".");
 

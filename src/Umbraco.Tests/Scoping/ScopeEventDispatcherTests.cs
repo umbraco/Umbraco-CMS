@@ -13,6 +13,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Services;
 
@@ -31,9 +32,14 @@ namespace Umbraco.Tests.Scoping
             DoThing2 = null;
             DoThing3 = null;
 
-            Current.Container = new ServiceContainer();
+            var lightinjectContainer = new ServiceContainer();
+            Current.Container = new ContainerAdapter(lightinjectContainer);
 
-            _testObjects = new TestObjects(Current.Container);
+            _testObjects = new TestObjects(lightinjectContainer);
+
+            // fixme - move to container factory?
+            Current.Container.RegisterSingleton(f => (IServiceContainer)Current.Container.ConcreteContainer);
+
             Current.Container.RegisterSingleton(f => Current.Container);
             Current.Container.RegisterSingleton(factory => new FileSystems(factory.TryGetInstance<ILogger>()));
             Current.Container.RegisterCollectionBuilder<MapperCollectionBuilder>();

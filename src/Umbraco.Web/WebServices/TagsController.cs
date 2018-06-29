@@ -1,4 +1,10 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebApi;
 
@@ -13,6 +19,15 @@ namespace Umbraco.Web.WebServices
     /// </remarks>
     public class TagsController : UmbracoApiController
     {
+        public TagsController()
+        {
+        }
+
+        public TagsController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, profilingLogger, runtimeState)
+        {
+        }
+
         /// <summary>
         /// Get every tag stored in the database (with optional group)
         /// </summary>

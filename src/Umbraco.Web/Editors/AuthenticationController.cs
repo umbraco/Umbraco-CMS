@@ -11,8 +11,8 @@ using System.Web.Mvc;
 using AutoMapper;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
@@ -26,6 +26,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Web.Composing;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 
@@ -51,6 +52,15 @@ namespace Umbraco.Web.Editors
         protected BackOfficeSignInManager SignInManager
         {
             get { return _signInManager ?? (_signInManager = TryGetOwinContext().Result.GetBackOfficeSignInManager()); }
+        }
+
+        public AuthenticationController()
+        {
+        }
+
+        public AuthenticationController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger, IRuntimeState runtimeState)
+            : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, profilingLogger, runtimeState)
+        {
         }
 
         /// <summary>
