@@ -229,7 +229,7 @@ namespace umbraco
             try
             {
                 var currentId = UmbracoContext.Current.PageId.Value;
-                return GetItem(currentId, alias);
+                return GetItem(currentId, alias);                
             }
             catch (Exception ItemException)
             {
