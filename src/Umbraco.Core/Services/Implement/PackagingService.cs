@@ -718,10 +718,7 @@ namespace Umbraco.Core.Services.Implement
                 // This means that the property will not be created.
                 if (dataTypeDefinition == null)
                 {
-                    _logger.Warn<PackagingService>(() => $"Packager: Error handling creation of PropertyType '{property.Element("Name").Value}'. "
-                                                         + $"Could not find DataTypeDefintion with unique id '{dataTypeDefinitionId}' nor one referencing the DataType with a "
-                                                         + $"property editor alias (or legacy control id) '{property.Element("Type").Value.Trim()}'. "
-                                                         + $"Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.");
+                    _logger.Warn<PackagingService>(() => $"Packager: Error handling creation of PropertyType '{property.Element("Name").Value}'. Could not find DataTypeDefintion with unique id '{dataTypeDefinitionId}' nor one referencing the DataType with a property editor alias (or legacy control id) '{property.Element("Type").Value.Trim()}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.");
 
                     //convert to a label!
                     dataTypeDefinition = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.Aliases.NoEdit).FirstOrDefault();
