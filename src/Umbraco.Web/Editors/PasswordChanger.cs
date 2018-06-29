@@ -188,7 +188,7 @@ namespace Umbraco.Web.Editors
                 }
                 catch (Exception ex)
                 {
-                    _logger.Warn<PasswordChanger>(ex, "Could not reset member password");
+                    _logger.Warn<PasswordChanger>(ex, () => "Could not reset member password");
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not reset password, error: " + ex.Message + " (see log for full details)", new[] { "resetPassword" }) });
                 }
             }
@@ -213,7 +213,7 @@ namespace Umbraco.Web.Editors
                 }
                 catch (Exception ex)
                 {
-                    _logger.Warn<PasswordChanger>(ex, "Could not change member password");
+                    _logger.Warn<PasswordChanger>(ex, () => "Could not change member password");
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
                 }
             }
@@ -242,7 +242,7 @@ namespace Umbraco.Web.Editors
                 }
                 catch (Exception ex)
                 {
-                    _logger.Warn<PasswordChanger>(ex, "Could not change member password");
+                    _logger.Warn<PasswordChanger>(ex, () => "Could not change member password");
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
                 }
             }
@@ -274,14 +274,14 @@ namespace Umbraco.Web.Editors
                 }
                 catch (Exception ex1)
                 {
-                    _logger.Warn<PasswordChanger>(ex1, "Could not change member password");
+                    _logger.Warn<PasswordChanger>(ex1, () => "Could not change member password");
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex1.Message + " (see log for full details)", new[] { "value" }) });
                 }
 
             }
             catch (Exception ex2)
             {
-                _logger.Warn<PasswordChanger>(ex2, "Could not retrieve member password");
+                _logger.Warn<PasswordChanger>(ex2, () => "Could not retrieve member password");
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex2.Message + " (see log for full details)", new[] { "value" }) });
             }
         }

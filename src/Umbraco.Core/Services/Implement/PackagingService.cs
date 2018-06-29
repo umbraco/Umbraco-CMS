@@ -631,10 +631,7 @@ namespace Umbraco.Core.Services.Implement
                     }
                     else
                     {
-                        _logger.Warn<PackagingService>(
-                            string.Format(
-                                "Packager: Error handling allowed templates. Template with alias '{0}' could not be found.",
-                                alias));
+                        _logger.Warn<PackagingService>(() => $"Packager: Error handling allowed templates. Template with alias '{alias}' could not be found.");
                     }
                 }
 
@@ -650,10 +647,7 @@ namespace Umbraco.Core.Services.Implement
                 }
                 else
                 {
-                    _logger.Warn<PackagingService>(
-                        string.Format(
-                            "Packager: Error handling default template. Default template with alias '{0}' could not be found.",
-                            defaultTemplateElement.Value));
+                    _logger.Warn<PackagingService>(() => $"Packager: Error handling default template. Default template with alias '{defaultTemplateElement.Value}' could not be found.");
                 }
             }
         }
@@ -724,11 +718,10 @@ namespace Umbraco.Core.Services.Implement
                 // This means that the property will not be created.
                 if (dataTypeDefinition == null)
                 {
-                    _logger.Warn<PackagingService>(
-                        string.Format("Packager: Error handling creation of PropertyType '{0}'. Could not find DataTypeDefintion with unique id '{1}' nor one referencing the DataType with a property editor alias (or legacy control id) '{2}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
-                                      property.Element("Name").Value,
-                                      dataTypeDefinitionId,
-                                      property.Element("Type").Value.Trim()));
+                    _logger.Warn<PackagingService>(() => $"Packager: Error handling creation of PropertyType '{property.Element("Name").Value}'. "
+                                                         + $"Could not find DataTypeDefintion with unique id '{dataTypeDefinitionId}' nor one referencing the DataType with a "
+                                                         + $"property editor alias (or legacy control id) '{property.Element("Type").Value.Trim()}'. "
+                                                         + $"Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.");
 
                     //convert to a label!
                     dataTypeDefinition = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.Aliases.NoEdit).FirstOrDefault();
@@ -772,7 +765,7 @@ namespace Umbraco.Core.Services.Implement
                 var allowedChild = _importedContentTypes.ContainsKey(alias) ? _importedContentTypes[alias] : _contentTypeService.Get(alias);
                 if (allowedChild == null)
                 {
-                    _logger.Warn<PackagingService>($"Packager: Error handling DocumentType structure. DocumentType with alias '{alias}' could not be found and was not added to the structure for '{contentType.Alias}'.");
+                    _logger.Warn<PackagingService>(() => $"Packager: Error handling DocumentType structure. DocumentType with alias '{alias}' could not be found and was not added to the structure for '{contentType.Alias}'.");
                     continue;
                 }
 

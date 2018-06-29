@@ -78,12 +78,12 @@ namespace Umbraco.Web.Macros
                     }
                     catch (Exception e)
                     {
-                        Current.Logger.Warn<UserControlMacroEngine>(e, $"Failed to set property \"{modelProperty.Key}\" value \"{modelProperty.Value}\".");
+                        Current.Logger.Warn<UserControlMacroEngine>(e, () => $"Failed to set property \"{modelProperty.Key}\" value \"{modelProperty.Value}\".");
                     }
                 }
                 else
                 {
-                    Current.Logger.Warn<UserControlMacroEngine>($"Failed to set property \"{modelProperty.Key}\" value \"{modelProperty.Value}\".");
+                    Current.Logger.Warn<UserControlMacroEngine>(() => $"Failed to set property \"{modelProperty.Key}\" value \"{modelProperty.Value}\".");
                 }
             }
         }

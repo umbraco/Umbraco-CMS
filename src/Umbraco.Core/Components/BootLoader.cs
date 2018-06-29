@@ -347,7 +347,7 @@ namespace Umbraco.Core.Components
         {
             if (_booted == false)
             {
-                _proflog.Logger.Warn<BootLoader>("Cannot terminate, has not booted.");
+                _proflog.Logger.Warn<BootLoader>(() => "Cannot terminate, has not booted.");
                 return;
             }
 

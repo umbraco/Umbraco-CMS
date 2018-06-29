@@ -333,7 +333,7 @@ namespace Umbraco.Core.Services.Implement
                     // if we are upgrading and an exception occurs, log and swallow it
                     if (_isUpgrading == false) throw;
 
-                    Logger.Warn<UserService>(ex, "An error occurred attempting to save a user instance during upgrade, normally this warning can be ignored");
+                    Logger.Warn<UserService>(ex, () => "An error occurred attempting to save a user instance during upgrade, normally this warning can be ignored");
 
                     // we don't want the uow to rollback its scope!
                     scope.Complete();
