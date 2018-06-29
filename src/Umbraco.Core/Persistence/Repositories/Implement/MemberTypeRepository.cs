@@ -245,15 +245,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         new { ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId });
                 entity.SortOrder = maxSortOrder + 1;
             }
-
-            var factory = new ContentTypeFactory();
-
+            
             EnsureExplicitDataTypeForBuiltInProperties(entity);
             PersistUpdatedBaseContentType(entity);
 
             // remove and insert - handle cmsMemberType table
             Database.Delete<MemberTypeDto>("WHERE NodeId = @Id", new { Id = entity.Id });
-            var memberTypeDtos = factory.BuildMemberTypeDtos(entity);
+            var memberTypeDtos = ContentTypeFactory.BuildMemberTypeDtos(entity);
             foreach (var memberTypeDto in memberTypeDtos)
             {
                 Database.Insert(memberTypeDto);
