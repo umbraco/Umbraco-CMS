@@ -601,25 +601,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         }
 
 
-        internal XPathNodeIterator GetMediaXPathNodeIterator(int mediaId, bool deep)
-        {
-            var media = Current.Services.MediaService.GetById(mediaId);
-            if (media == null) return null;
-
-            var serialized = EntityXmlSerializer.Serialize(
-                Current.Services.MediaService,
-                Current.Services.DataTypeService,
-                Current.Services.UserService,
-                Current.Services.LocalizationService,
-                Current.UrlSegmentProviders,
-                media,
-                deep);
-
-            return serialized.CreateNavigator().Select("/");
-        }
-
-
-
         internal void Resync()
         {
             // clear recursive properties cached by XmlPublishedContent.GetProperty
