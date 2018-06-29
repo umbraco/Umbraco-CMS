@@ -64,7 +64,7 @@ namespace Umbraco.Web.Macros
                 var controlProperty = type.GetProperty(modelProperty.Key);
                 if (controlProperty == null)
                 {
-                    Current.Logger.Warn<UserControlMacroEngine>($"Control property \"{modelProperty.Key}\" doesn't exist or isn't accessible, skip.");
+                    Current.Logger.Warn<UserControlMacroEngine>(() => $"Control property \"{modelProperty.Key}\" doesn't exist or isn't accessible, skip.");
                     continue;
                 }
 

@@ -40,8 +40,7 @@ namespace Umbraco.Web
 
             if (_databaseFactory.CanConnect == false)
             {
-                Logger.Warn<BatchedDatabaseServerMessenger>(
-                    "Cannot connect to the database, distributed calls will not be enabled for this server.");
+                Logger.Warn<BatchedDatabaseServerMessenger>("Cannot connect to the database, distributed calls will not be enabled for this server.");
             }
             else
             {
