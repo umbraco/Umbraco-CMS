@@ -576,7 +576,7 @@ namespace Umbraco.Web.Editors
             var mediaService = Services.MediaService;
 
             var f = mediaService.CreateMedia(folder.Name, intParentId, Constants.Conventions.MediaTypes.Folder);
-            mediaService.Save(f, Security.CurrentUser.Id);
+            ((IMediaServiceOperations)(mediaService)).Save(f, Security.CurrentUser.Id);
 
             return ContextMapper.Map<IMedia, MediaItemDisplay>(f, UmbracoContext);
         }
@@ -637,7 +637,7 @@ namespace Umbraco.Web.Editors
                         {
                             //if null, create a folder
                             folderMediaItem = mediaService.CreateMedia(folderName, -1, Constants.Conventions.MediaTypes.Folder);
-                            mediaService.Save(folderMediaItem);
+                            ((IMediaServiceOperations)(mediaService)).Save(folderMediaItem);
                         }
                     }
                     else
@@ -657,7 +657,7 @@ namespace Umbraco.Web.Editors
                         {
                             //if null, create a folder
                             folderMediaItem = mediaService.CreateMedia(folderName, mediaRoot, Constants.Conventions.MediaTypes.Folder);
-                            mediaService.Save(folderMediaItem);
+                            ((IMediaServiceOperations)(mediaService)).Save(folderMediaItem);
                         }
                     }
                     //set the media root to the folder id so uploaded files will end there.

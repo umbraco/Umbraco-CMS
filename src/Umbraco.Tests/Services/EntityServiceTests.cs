@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -220,11 +221,11 @@ namespace Umbraco.Tests.Services
             var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
 
             var root = MockedMedia.CreateMediaFolder(folderType, -1);
-            ServiceContext.MediaService.Save(root);
+            ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(root);
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
-                ServiceContext.MediaService.Save(c1);
+                ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(c1);
             }
 
             var service = ServiceContext.EntityService;
@@ -245,18 +246,18 @@ namespace Umbraco.Tests.Services
             var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
 
             var root = MockedMedia.CreateMediaFolder(folderType, -1);
-            ServiceContext.MediaService.Save(root);
+            ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(root);
             var count = 0;
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
-                ServiceContext.MediaService.Save(c1);
+                ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(c1);
                 count++;
 
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedMedia.CreateMediaImage(imageMediaType, c1.Id);
-                    ServiceContext.MediaService.Save(c2);
+                    ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(c2);
                     count++;
                 }
             }
@@ -279,12 +280,12 @@ namespace Umbraco.Tests.Services
             var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
 
             var root = MockedMedia.CreateMediaFolder(folderType, -1);
-            ServiceContext.MediaService.Save(root);
+            ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(root);
             var toDelete = new List<IMedia>();
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
-                ServiceContext.MediaService.Save(c1);
+                ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(c1);
 
                 if (i % 2 == 0)
                 {
@@ -294,13 +295,13 @@ namespace Umbraco.Tests.Services
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedMedia.CreateMediaImage(imageMediaType, c1.Id);
-                    ServiceContext.MediaService.Save(c2);
+                    ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(c2);
                 }
             }
 
             foreach (var content in toDelete)
             {
-                ServiceContext.MediaService.MoveToRecycleBin(content);
+                ((IMediaServiceOperations)(ServiceContext.MediaService)).MoveToRecycleBin(content);
             }
 
             var service = ServiceContext.EntityService;
@@ -324,12 +325,12 @@ namespace Umbraco.Tests.Services
             var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
 
             var root = MockedMedia.CreateMediaFolder(folderType, -1);
-            ServiceContext.MediaService.Save(root);
+            ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(root);
             var toDelete = new List<IMedia>();
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
-                ServiceContext.MediaService.Save(c1);
+                ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(c1);
 
                 if (i % 2 == 0)
                 {
@@ -339,17 +340,17 @@ namespace Umbraco.Tests.Services
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedMedia.CreateMediaImage(imageMediaType, c1.Id);
-                    ServiceContext.MediaService.Save(c2);
+                    ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(c2);
                 }
             }
 
             foreach (var content in toDelete)
             {
-                ServiceContext.MediaService.MoveToRecycleBin(content);
+                ((IMediaServiceOperations)(ServiceContext.MediaService)).MoveToRecycleBin(content);
             }
 
             var service = ServiceContext.EntityService;
-
+            
             long total;
             //search at root to see if it returns recycled
             var entities = service.GetPagedDescendants(UmbracoObjectTypes.Media, 0, 1000, out total, includeTrashed: false)
@@ -369,19 +370,19 @@ namespace Umbraco.Tests.Services
             var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
 
             var root = MockedMedia.CreateMediaFolder(folderType, -1);
-            ServiceContext.MediaService.Save(root);
+            ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(root);
 
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedMedia.CreateMediaImage(imageMediaType, root.Id);
                 c1.Name = "ssss" + Guid.NewGuid();
-                ServiceContext.MediaService.Save(c1);
+                ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(c1);
 
                 for (int j = 0; j < 5; j++)
                 {
                     var c2 = MockedMedia.CreateMediaImage(imageMediaType, c1.Id);
                     c2.Name = "tttt" + Guid.NewGuid();
-                    ServiceContext.MediaService.Save(c2);
+                    ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(c2);
                 }
             }
 
@@ -725,23 +726,23 @@ namespace Umbraco.Tests.Services
                 //Create and Save folder-Media -> 1050
                 var folderMediaType = ServiceContext.MediaTypeService.Get(1031);
                 var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
-                ServiceContext.MediaService.Save(folder, 0);
+                ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(folder, 0);
                 folderId = folder.Id;
 
                 //Create and Save image-Media -> 1051
                 var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
                 var image = MockedMedia.CreateMediaImage(imageMediaType, folder.Id);
-                ServiceContext.MediaService.Save(image, 0);
+                ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(image, 0);
 
                 //Create and Save file-Media -> 1052
                 var fileMediaType = ServiceContext.MediaTypeService.Get(1033);
                 var file = MockedMedia.CreateMediaFile(fileMediaType, folder.Id);
-                ServiceContext.MediaService.Save(file, 0);
+                ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(file, 0);
 
                 var subfolder = MockedMedia.CreateMediaFolder(folderMediaType, folder.Id);
-                ServiceContext.MediaService.Save(subfolder, 0);
+                ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(subfolder, 0);
                 var subfolder2 = MockedMedia.CreateMediaFolder(folderMediaType, subfolder.Id);
-                ServiceContext.MediaService.Save(subfolder2, 0);
+                ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(subfolder2, 0);
             }
         }
     }

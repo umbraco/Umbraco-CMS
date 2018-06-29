@@ -9,6 +9,7 @@ using Umbraco.Web.WebServices;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.UI;
+using Umbraco.Core.Services;
 
 namespace umbraco.presentation.webservices
 {
@@ -84,7 +85,7 @@ namespace umbraco.presentation.webservices
                         AuthorizeRequest(Constants.Applications.Media.ToString(), true);
                         var media = Current.Services.MediaService.GetById(intNodeId);
                         if (media != null)
-                            Current.Services.MediaService.Delete(media);
+                            ((IMediaServiceOperations)(Current.Services.MediaService)).Delete(media);
                         break;
                     case "content":
                     case "contentRecycleBin":

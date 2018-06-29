@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
@@ -573,17 +574,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             //Create and Save folder-Media -> (NodeDto.NodeIdSeed)
             var folderMediaType = ServiceContext.MediaTypeService.Get(1031);
             var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
-            ServiceContext.MediaService.Save(folder, 0);
+            ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(folder, 0);
 
             //Create and Save image-Media -> (NodeDto.NodeIdSeed + 1)
             var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
             var image = MockedMedia.CreateMediaImage(imageMediaType, folder.Id);
-            ServiceContext.MediaService.Save(image, 0);
+            ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(image, 0);
 
             //Create and Save file-Media -> (NodeDto.NodeIdSeed + 2)
             var fileMediaType = ServiceContext.MediaTypeService.Get(1033);
             var file = MockedMedia.CreateMediaFile(fileMediaType, folder.Id);
-            ServiceContext.MediaService.Save(file, 0);
+            ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(file, 0);
         }
     }
 }

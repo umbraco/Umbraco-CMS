@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Services
             using (var scope = ScopeProvider.CreateScope())
             {
                 scope.Database.Execute("SET LOCK_TIMEOUT 60000");
-                service.Save(media);
+                ((IMediaServiceOperations)(service)).Save(media);
                 scope.Complete();
             }
         }

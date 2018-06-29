@@ -237,14 +237,7 @@ namespace Umbraco.Core.Services
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
         void Move(IMedia media, int parentId, int userId = 0);
-
-        /// <summary>
-        /// Deletes an <see cref="IMedia"/> object by moving it to the Recycle Bin
-        /// </summary>
-        /// <param name="media">The <see cref="IMedia"/> to delete</param>
-        /// <param name="userId">Id of the User deleting the Media</param>
-        void MoveToRecycleBin(IMedia media, int userId = 0);
-
+        
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
         /// </summary>
@@ -265,34 +258,7 @@ namespace Umbraco.Core.Services
         /// <param name="mediaTypeIds">Ids of the <see cref="IMediaType"/>s</param>
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
         void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = 0);
-
-        /// <summary>
-        /// Permanently deletes an <see cref="IMedia"/> object
-        /// </summary>
-        /// <remarks>
-        /// Please note that this method will completely remove the Media from the database,
-        /// but current not from the file system.
-        /// </remarks>
-        /// <param name="media">The <see cref="IMedia"/> to delete</param>
-        /// <param name="userId">Id of the User deleting the Media</param>
-        void Delete(IMedia media, int userId = 0);
-
-        /// <summary>
-        /// Saves a single <see cref="IMedia"/> object
-        /// </summary>
-        /// <param name="media">The <see cref="IMedia"/> to save</param>
-        /// <param name="userId">Id of the User saving the Media</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        void Save(IMedia media, int userId = 0, bool raiseEvents = true);
-
-        /// <summary>
-        /// Saves a collection of <see cref="IMedia"/> objects
-        /// </summary>
-        /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
-        /// <param name="userId">Id of the User saving the Media</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        void Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true);
-
+        
         /// <summary>
         /// Gets an <see cref="IMedia"/> object by its 'UniqueId'
         /// </summary>

@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Services
                 {
                     var contentType = contentTypes[index];
                     var contentItem = MockedMedia.CreateSimpleMedia(contentType, "MyName_" + index + "_" + i, parentId);
-                    ServiceContext.MediaService.Save(contentItem);
+                    ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(contentItem);
                     parentId = contentItem.Id;
 
                     ids.Add(contentItem.Id);
@@ -133,7 +133,7 @@ namespace Umbraco.Tests.Services
                     {
                         var contentType = contentTypes[index];
                         var contentItem = MockedMedia.CreateSimpleMedia(contentType, "MyName_" + index + "_" + i, parentId);
-                        ServiceContext.MediaService.Save(contentItem);
+                        ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(contentItem);
                         parentId = contentItem.Id;
 
                         ids.Add(contentItem.Id);

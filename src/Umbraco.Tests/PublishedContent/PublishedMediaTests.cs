@@ -22,6 +22,7 @@ using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Tests.Testing;
 using LightInject;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -91,7 +92,7 @@ namespace Umbraco.Tests.PublishedContent
             ServiceContext.MediaTypeService.Save(mType);
             var media = MockedMedia.CreateMediaImage(mType, -1);
             media.Properties["content"].SetValue("<div>This is some content</div>");
-            ServiceContext.MediaService.Save(media);
+            ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(media);
 
             var publishedMedia = GetNode(media.Id);
 
