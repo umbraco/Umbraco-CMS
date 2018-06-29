@@ -212,14 +212,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 entity.AddPropertyType(standardPropertyType.Value, Constants.Conventions.Member.StandardPropertiesGroupName);
             }
-
-            var factory = new ContentTypeFactory();
-
+            
             EnsureExplicitDataTypeForBuiltInProperties(entity);
             PersistNewBaseContentType(entity);
 
             //Handles the MemberTypeDto (cmsMemberType table)
-            var memberTypeDtos = factory.BuildMemberTypeDtos(entity);
+            var memberTypeDtos = ContentTypeFactory.BuildMemberTypeDtos(entity);
             foreach (var memberTypeDto in memberTypeDtos)
             {
                 Database.Insert(memberTypeDto);
