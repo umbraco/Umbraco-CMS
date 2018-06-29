@@ -147,11 +147,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(SettingsSection.Content.PreviewBadge == @"<a id=""umbracoPreviewBadge"" style=""position: absolute; top: 0; right: 0; border: 0; width: 149px; height: 149px; background: url('{0}/assets/img/preview-mode-badge.png') no-repeat;"" href=""{0}/endPreview.aspx?redir={1}""><span style=""display:none;"">In Preview Mode - click to end</span></a>");
         }
         [Test]
-        public void UmbracoLibraryCacheDuration()
-        {
-            Assert.IsTrue(SettingsSection.Content.UmbracoLibraryCacheDuration == 1800);
-        }
-        [Test]
         public void ResolveUrlsFromTextString()
         {
             Assert.IsFalse(SettingsSection.Content.ResolveUrlsFromTextString);
