@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class PublicAccessEntryFactory
+    internal static class PublicAccessEntryFactory
     {
-        public PublicAccessEntry BuildEntity(AccessDto dto)
+        public static PublicAccessEntry BuildEntity(AccessDto dto)
         {
             var entity = new PublicAccessEntry(dto.Id, dto.NodeId, dto.LoginNodeId, dto.NoAccessNodeId,
                 dto.Rules.Select(x => new PublicAccessRule(x.Id, x.AccessId)
@@ -27,7 +26,7 @@ namespace Umbraco.Core.Persistence.Factories
             return entity;
         }
 
-        public AccessDto BuildDto(PublicAccessEntry entity)
+        public static AccessDto BuildDto(PublicAccessEntry entity)
         {
             var dto = new AccessDto
             {

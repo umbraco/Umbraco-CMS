@@ -55,8 +55,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 throw new NotImplementedException();
 
             var dtos = Database.Fetch<RelationTypeDto>(sql);
-            var factory = new RelationTypeFactory();
-            return dtos.Select(x => DtoToEntity(x, factory));
+            
+            return dtos.Select(x => DtoToEntity(x));
         }
 
         public IEnumerable<IRelationType> GetMany(params Guid[] ids)
@@ -75,13 +75,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var sql = translator.Translate();
 
             var dtos = Database.Fetch<RelationTypeDto>(sql);
-            var factory = new RelationTypeFactory();
-            return dtos.Select(x => DtoToEntity(x, factory));
+  
+            return dtos.Select(x => DtoToEntity(x));
         }
 
-        private static IRelationType DtoToEntity(RelationTypeDto dto, RelationTypeFactory factory)
+        private static IRelationType DtoToEntity(RelationTypeDto dto)
         {
-            var entity = factory.BuildEntity(dto);
+            var entity = RelationTypeFactory.BuildEntity(dto);
 
             // reset dirty initial properties (U4-1946)
             ((BeingDirtyBase) entity).ResetDirtyProperties(false);
@@ -134,9 +134,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistNewItem(IRelationType entity)
         {
             ((EntityBase)entity).AddingEntity();
-
-            var factory = new RelationTypeFactory();
-            var dto = factory.BuildDto(entity);
+            
+            var dto = RelationTypeFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
@@ -147,9 +146,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(IRelationType entity)
         {
             ((EntityBase)entity).UpdatingEntity();
-
-            var factory = new RelationTypeFactory();
-            var dto = factory.BuildDto(entity);
+            
+            var dto = RelationTypeFactory.BuildDto(entity);
             Database.Update(dto);
 
             entity.ResetDirtyProperties();
