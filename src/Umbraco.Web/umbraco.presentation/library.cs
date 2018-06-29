@@ -228,8 +228,8 @@ namespace umbraco
         {
             try
             {
-                int currentID = int.Parse(HttpContext.Current.Items["pageID"].ToString());
-                return GetItem(currentID, alias);
+                var currentId = UmbracoContext.Current.PageId.Value;
+                return GetItem(currentId, alias);
             }
             catch (Exception ItemException)
             {
@@ -983,10 +983,10 @@ namespace umbraco
             try
             {
                 var nav = UmbracoContext.Current.ContentCache.CreateNavigator();
-                pageId = HttpContext.Current.Items["pageID"]?.ToString();
+                pageId = UmbracoContext.Current.PageId.ToString();
 
-                if (pageId == null)
-                    throw new NullReferenceException("pageID not found in the current HTTP context");
+                if (string.IsNullOrEmpty(pageId))
+                    throw new NullReferenceException("PageId not found in the current Umbraco context");
 
                 nav.MoveToId(pageId);
                 return nav.Select(".");
