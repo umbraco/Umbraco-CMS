@@ -66,7 +66,7 @@ namespace Umbraco.Web.HealthCheck
                 }
                 else
                 {
-                    Logger.Warn<HealthCheckResults>($"    Checks for '{checkName}' completed with errors.");
+                    Logger.Warn<HealthCheckResults>(() => $"    Checks for '{checkName}' completed with errors.");
                 }
 
                 foreach (var checkResult in checkResults)
