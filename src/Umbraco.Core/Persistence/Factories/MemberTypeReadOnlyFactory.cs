@@ -147,8 +147,6 @@ namespace Umbraco.Core.Persistence.Factories
             return propertyGroups;
         }
 
-
-
         private static List<PropertyType> GetPropertyTypes(MemberTypeReadOnlyDto dto, MemberType memberType, Dictionary<string, PropertyType> standardProps)
         {
             //Find PropertyTypes that does not belong to a PropertyTypeGroup
@@ -190,11 +188,6 @@ namespace Umbraco.Core.Persistence.Factories
                 propertyTypes.Add(propertyType);
             }
             return propertyTypes;
-        }
-
-        public static MemberTypeReadOnlyDto BuildDto(IMemberType entity)
-        {
-            throw new System.NotImplementedException();
         }
 
     }
