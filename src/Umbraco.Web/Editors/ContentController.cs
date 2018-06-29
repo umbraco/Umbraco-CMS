@@ -459,11 +459,6 @@ namespace Umbraco.Web.Editors
             return pagedResult;
         }
 
-        [Obsolete("Dont use this, it is incorrectly named, use HasPermission instead")]
-        public bool GetHasPermission(string permissionToCheck, int nodeId)
-        {
-            return HasPermission(permissionToCheck, nodeId);
-        }
 
         /// <summary>
         /// Returns permissions for all nodes passed in for the current user

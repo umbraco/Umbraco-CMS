@@ -487,11 +487,6 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Returns a template as a template node which can be traversed (parent, children)
-        /// </summary>
-        /// <param name="alias"></param>
-        /// <returns></returns>
         [Obsolete("Use GetDescendants instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public TemplateNode GetTemplateNode(string alias)

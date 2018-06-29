@@ -225,12 +225,6 @@ namespace Umbraco.Web.Editors
             };
         }
 
-        [Obsolete("Use GetyById instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public EntityBasic GetByKey(Guid id, UmbracoEntityTypes type)
-        {
-            return GetResultForKey(id, type);
-        }
 
         /// <summary>
         /// Gets an entity by a xpath query
@@ -391,16 +385,6 @@ namespace Umbraco.Web.Editors
         }
         #endregion
 
-        [Obsolete("Use GetyByIds instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public IEnumerable<EntityBasic> GetByKeys([FromUri]Guid[] ids, UmbracoEntityTypes type)
-        {
-            if (ids == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-            return GetResultForKeys(ids, type);
-        }
 
         public IEnumerable<EntityBasic> GetChildren(int id, UmbracoEntityTypes type)
         {

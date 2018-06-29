@@ -8,11 +8,6 @@ namespace Umbraco.Core.Models
     /// </summary>
     public class ContentTypeSort : IValueObject, IDeepCloneable
     {
-        [Obsolete("This parameterless constructor should never be used")]
-        public ContentTypeSort()
-        {
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Object"/> class.
         /// </summary>

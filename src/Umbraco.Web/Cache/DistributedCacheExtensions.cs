@@ -175,17 +175,7 @@ namespace Umbraco.Web.Cache
             dc.Remove(MemberCacheRefresher.UniqueId, x => x.Id, members);
         }
 
-        [Obsolete("Use the RefreshMemberCache with strongly typed IMember objects instead")]
-        public static void RefreshMemberCache(this DistributedCache dc, int memberId)
-        {
-            dc.Refresh(MemberCacheRefresher.UniqueId, memberId);
-        }
 
-        [Obsolete("Use the RemoveMemberCache with strongly typed IMember objects instead")]
-        public static void RemoveMemberCache(this DistributedCache dc, int memberId)
-        {
-            dc.Remove(MemberCacheRefresher.UniqueId, memberId);
-        }
 
         #endregion
 

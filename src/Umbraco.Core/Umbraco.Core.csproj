@@ -314,6 +314,7 @@
     <Compile Include="IO\MediaPathSchemes\TwoGuidsMediaPathScheme.cs" />
     <Compile Include="KeyValuePairExtensions.cs" />
     <Compile Include="Logging\RollingFileCleanupAppender.cs" />
+    <Compile Include="Migrations\Expressions\Delete\Index\IDeleteIndexOnColumnBuilder.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\Upgrade\V_7_10_0\RenamePreviewFolder.cs" />
     <Compile Include="Migrations\Upgrade\V_7_8_0\AddIndexToPropertyTypeAliasColumn.cs" />
@@ -543,7 +544,6 @@
     <Compile Include="ListExtensions.cs" />
     <Compile Include="Logging\AppDomainTokenConverter.cs" />
     <Compile Include="Logging\AsyncForwardingAppenderBase.cs" />
-    <Compile Include="Logging\AsynchronousRollingFileAppender.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\ImageProcessorLogger.cs" />
@@ -1039,7 +1039,6 @@
     <Compile Include="Migrations\Expressions\Delete\Data\IDeleteDataBuilder.cs" />
     <Compile Include="Migrations\Expressions\Delete\Index\DeleteIndexBuilder.cs" />
     <Compile Include="Migrations\Expressions\Delete\Index\IDeleteIndexForTableBuilder.cs" />
-    <Compile Include="Migrations\Expressions\Delete\Index\IDeleteIndexOnColumnBuilder.cs" />
     <Compile Include="Migrations\Expressions\Execute\ExecuteBuilder.cs" />
     <Compile Include="Migrations\Expressions\Execute\Expressions\ExecuteSqlStatementExpression.cs" />
     <Compile Include="Migrations\Expressions\Execute\IExecuteBuilder.cs" />

@@ -57,25 +57,7 @@ namespace Umbraco.Web.Security
 
         #region Constructors
 
-        // used here and there for IMember operations (not front-end stuff, no need for _memberCache)
-
-        [Obsolete("Use the constructor specifying an UmbracoContext")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public MembershipHelper(HttpContextBase httpContext)
-        {
-            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
-            _httpContext = httpContext;
-            _membershipProvider = MPE.GetMembersMembershipProvider();
-            _roleProvider = Roles.Enabled ? Roles.Provider : new MembersRoleProvider(MemberService);
-
-            // _memberCache remains null - not supposed to use it
-            // alternatively we'd need to get if from the 'current' UmbracoContext?
-
-            // helpers are *not* instanciated by the container so we have to
-            // get our dependencies injected manually, through properties.
-            Current.Container.InjectProperties(this);
-        }
-
+      
         // used everywhere
         public MembershipHelper(UmbracoContext umbracoContext)
             : this(umbracoContext, MPE.GetMembersMembershipProvider(), Roles.Enabled ? Roles.Provider : new MembersRoleProvider(Current.Services.MemberService))

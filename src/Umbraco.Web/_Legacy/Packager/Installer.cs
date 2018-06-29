@@ -115,11 +115,6 @@ namespace umbraco.cms.businesslogic.packager
             ContainsStyleSheeConflicts = false;
         }
 
-        [Obsolete("Use the ctor with all parameters")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public Installer(string name, string version, string url, string license, string licenseUrl, string author, string authorUrl, int requirementsMajor, int requirementsMinor, int requirementsPatch, string readme, string control)
-        {
-        }
 
         /// <summary>
         /// Constructor
