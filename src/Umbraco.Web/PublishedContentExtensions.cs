@@ -1091,13 +1091,13 @@ namespace Umbraco.Web
             return content.Children(predicate).FirstOrDefault();
         }
 
-        public static IPublishedContent FirstChild<T>(this IPublishedContent content)
+        public static T FirstChild<T>(this IPublishedContent content)
             where T : class, IPublishedContent
         {
             return content.Children<T>().FirstOrDefault();
         }
 
-        public static IPublishedContent FirstChild<T>(this IPublishedContent content, Func<IPublishedContent, bool> predicate)
+        public static T FirstChild<T>(this IPublishedContent content, Func<T, bool> predicate)
             where T : class, IPublishedContent
         {
             return content.Children<T>().FirstOrDefault(predicate);
