@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading;
 using System.Web;
-using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
@@ -42,14 +40,14 @@ namespace Umbraco.Core.Runtime
         }
 
         /// <inheritdoc/>
-        public virtual void Boot(ServiceContainer concreteContainer, IContainer container)
+        public virtual void Boot(LightInject.ServiceContainer concreteContainer, IContainer container)
         {
             // some components may want to initialize with the UmbracoApplicationBase
             // well, they should not - we should not do this
             // TODO remove this eventually.
-            concreteContainer.RegisterInstance(_app);
+            container.RegisterInstance(_app);
 
-            Compose(concreteContainer);
+            Compose(concreteContainer, container);
 
             // prepare essential stuff
 
@@ -57,12 +55,12 @@ namespace Umbraco.Core.Runtime
             if (string.IsNullOrWhiteSpace(path) == false)
                 IOHelper.SetRootDirectory(path);
 
-            _state = (RuntimeState) concreteContainer.GetInstance<IRuntimeState>();
+            _state = (RuntimeState) container.GetInstance<IRuntimeState>();
             _state.Level = RuntimeLevel.Boot;
 
-            Logger = concreteContainer.GetInstance<ILogger>();
-            Profiler = concreteContainer.GetInstance<IProfiler>();
-            ProfilingLogger = concreteContainer.GetInstance<ProfilingLogger>();
+            Logger = container.GetInstance<ILogger>();
+            Profiler = container.GetInstance<IProfiler>();
+            ProfilingLogger = container.GetInstance<ProfilingLogger>();
 
             // the boot loader boots using a container scope, so anything that is PerScope will
             // be disposed after the boot loader has booted, and anything else will remain.
@@ -85,10 +83,10 @@ namespace Umbraco.Core.Runtime
                 {
                     Logger.Debug<CoreRuntime>($"Runtime: {GetType().FullName}");
 
-                    AquireMainDom(concreteContainer);
-                    DetermineRuntimeLevel(concreteContainer);
+                    AquireMainDom(container);
+                    DetermineRuntimeLevel(container);
                     var componentTypes = ResolveComponentTypes();
-                    _bootLoader = new BootLoader(concreteContainer);
+                    _bootLoader = new BootLoader(concreteContainer, container);
                     _bootLoader.Boot(componentTypes, _state.Level);
                 }
                 catch (Exception e)
@@ -114,7 +112,7 @@ namespace Umbraco.Core.Runtime
             //sa.Scope?.Dispose();
         }
 
-        private void AquireMainDom(IServiceFactory container)
+        private void AquireMainDom(IContainer container)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Aquired."))
             {
@@ -132,7 +130,7 @@ namespace Umbraco.Core.Runtime
         }
 
         // internal for tests
-        internal void DetermineRuntimeLevel(IServiceFactory container)
+        internal void DetermineRuntimeLevel(IContainer container)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined."))
             {
@@ -185,7 +183,7 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Composes the runtime.
         /// </summary>
-        public virtual void Compose(ServiceContainer container)
+        public virtual void Compose(LightInject.ServiceContainer concreteContainer, IContainer container)
         {
             // compose the very essential things that are needed to bootstrap, before anything else,
             // and only these things - the rest should be composed in runtime components

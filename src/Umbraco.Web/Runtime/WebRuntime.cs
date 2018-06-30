@@ -52,17 +52,17 @@ namespace Umbraco.Web.Runtime
         }
 
         /// <inheritdoc/>
-        public override void Compose(ServiceContainer container)
+        public override void Compose(ServiceContainer concreteContainer, IContainer container)
         {
-            base.Compose(container);
+            base.Compose(concreteContainer, container);
 
-            container.Register<UmbracoModule>();
+            concreteContainer.Register<UmbracoModule>();
 
             // replace CoreRuntime's IProfiler registration
-            container.RegisterSingleton(_ => _webProfiler);
+            concreteContainer.RegisterSingleton(_ => _webProfiler);
 
             // replace CoreRuntime's CacheHelper registration
-            container.RegisterSingleton(_ => new CacheHelper(
+            concreteContainer.RegisterSingleton(_ => new CacheHelper(
                 // we need to have the dep clone runtime cache provider to ensure
                 // all entities are cached properly (cloned in and cloned out)
                 new DeepCloneRuntimeCacheProvider(new HttpRuntimeCacheProvider(HttpRuntime.Cache)),
@@ -74,7 +74,7 @@ namespace Umbraco.Web.Runtime
                     // all entities are cached properly (cloned in and cloned out)
                     new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
 
-            container.RegisterSingleton<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
+            concreteContainer.RegisterSingleton<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
         }
 
         #region Getters

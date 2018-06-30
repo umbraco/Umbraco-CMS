@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using LightInject;
 using Umbraco.Core.Collections;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
@@ -15,7 +16,8 @@ namespace Umbraco.Core.Components
 
     internal class BootLoader
     {
-        private readonly IServiceContainer _container;
+        private readonly IServiceContainer concreteContainer;
+        private readonly IContainer container;
         private readonly ProfilingLogger _proflog;
         private readonly ILogger _logger;
         private IUmbracoComponent[] _components;
@@ -26,10 +28,11 @@ namespace Umbraco.Core.Components
         /// <summary>
         /// Initializes a new instance of the <see cref="BootLoader"/> class.
         /// </summary>
-        /// <param name="container">The application container.</param>
-        public BootLoader(IServiceContainer container)
+        /// <param name="concreteContainer">The application container.</param>
+        public BootLoader(IServiceContainer concreteContainer, IContainer container)
         {
-            _container = container ?? throw new ArgumentNullException(nameof(container));
+            this.concreteContainer = concreteContainer; // ?? throw new ArgumentNullException(nameof(container));
+            this.container = container;
             _proflog = container.GetInstance<ProfilingLogger>();
             _logger = container.GetInstance<ILogger>();
         }
@@ -49,7 +52,7 @@ namespace Umbraco.Core.Components
             InstanciateComponents(orderedComponentTypes);
             ComposeComponents(level);
 
-            using (var scope = _container.GetInstance<IScopeProvider>().CreateScope())
+            using (var scope = container.GetInstance<IScopeProvider>().CreateScope())
             {
                 InitializeComponents();
                 scope.Complete();
@@ -288,7 +291,7 @@ namespace Umbraco.Core.Components
         {
             using (_proflog.DebugDuration<BootLoader>($"Composing components. (log when >{LogThresholdMilliseconds}ms)", "Composed components."))
             {
-                var composition = new Composition(_container, level);
+                var composition = new Composition(concreteContainer, level);
                 foreach (var component in _components)
                 {
                     var componentType = component.GetType();
@@ -305,7 +308,7 @@ namespace Umbraco.Core.Components
             // use a container scope to ensure that PerScope instances are disposed
             // components that require instances that should not survive should register them with PerScope lifetime
             using (_proflog.DebugDuration<BootLoader>($"Initializing components. (log when >{LogThresholdMilliseconds}ms)", "Initialized components."))
-            using (_container.BeginScope())
+            using (container.BeginScope())
             {
                 foreach (var component in _components)
                 {
@@ -332,7 +335,7 @@ namespace Umbraco.Core.Components
 
             try
             {
-                param = _container.TryGetInstance(parameterType);
+                param = container.TryGetInstance(parameterType);
             }
             catch (Exception e)
             {

@@ -7,9 +7,9 @@ namespace Umbraco.Core.Composing.CompositionRoots
     /// <summary>
     /// Sets up IoC container for Umbraco configuration classes
     /// </summary>
-    public sealed class ConfigurationCompositionRoot : ICompositionRoot
+    public sealed class ConfigurationCompositionRoot : IRegistrationBundle
     {
-        public void Compose(IServiceRegistry container)
+        public void Compose(IContainer container)
         {
             container.Register(factory => UmbracoConfig.For.UmbracoSettings());
             container.Register(factory => factory.GetInstance<IUmbracoSettingsSection>().Content);

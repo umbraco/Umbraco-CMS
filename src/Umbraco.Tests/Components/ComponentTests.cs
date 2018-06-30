@@ -6,6 +6,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Components;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -21,7 +22,7 @@ namespace Umbraco.Tests.Components
         private static readonly List<Type> Composed = new List<Type>();
         private static readonly List<string> Initialized = new List<string>();
 
-        private static IServiceContainer MockContainer(Action<Mock<IServiceContainer>> setup = null)
+        private static IContainer MockContainer(Action<Mock<IContainer>> setup = null)
         {
             // fixme use IUmbracoDatabaseFactory vs UmbracoDatabaseFactory, clean it all up!
 
@@ -32,11 +33,11 @@ namespace Umbraco.Tests.Components
             var fs = new FileSystems(logger);
             var p = new ScopeProvider(f, fs, logger);
 
-            var mock = new Mock<IServiceContainer>();
-            mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
-            mock.Setup(x => x.GetInstance(typeof (ProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
-            mock.Setup(x => x.GetInstance(typeof (IUmbracoDatabaseFactory))).Returns(f);
-            mock.Setup(x => x.GetInstance(typeof (IScopeProvider))).Returns(p);
+            var mock = new Mock<IContainer>();
+            mock.Setup(x => x.GetInstance<ILogger>()).Returns(logger);
+            mock.Setup(x => x.GetInstance<ProfilingLogger>()).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
+            mock.Setup(x => x.GetInstance<IUmbracoDatabaseFactory>()).Returns(f);
+            mock.Setup(x => x.GetInstance<IScopeProvider>()).Returns(p);
             setup?.Invoke(mock);
             return mock.Object;
         }
@@ -46,7 +47,7 @@ namespace Umbraco.Tests.Components
         {
             var container = MockContainer();
 
-            var loader = new BootLoader(container);
+            var loader = new BootLoader(null, container);
             Composed.Clear();
             // 2 is Core and requires 4
             // 3 is User - goes away with RuntimeLevel.Unknown
@@ -60,7 +61,7 @@ namespace Umbraco.Tests.Components
         {
             var container = MockContainer();
 
-            var loader = new BootLoader(container);
+            var loader = new BootLoader(null, container);
             Composed.Clear();
             // 2 is Core and requires 4
             // 3 is User - stays with RuntimeLevel.Run
@@ -74,7 +75,7 @@ namespace Umbraco.Tests.Components
         {
             var container = MockContainer();
 
-            var loader = new BootLoader(container);
+            var loader = new BootLoader(null, container);
             Composed.Clear();
             // 21 is required by 20
             // => reorder components accordingly
@@ -87,7 +88,7 @@ namespace Umbraco.Tests.Components
         {
             var container = MockContainer();
 
-            var loader = new BootLoader(container);
+            var loader = new BootLoader(null, container);
             Composed.Clear();
             // i23 requires 22
             // 24, 25 implement i23
@@ -102,7 +103,7 @@ namespace Umbraco.Tests.Components
         {
             var container = MockContainer();
 
-            var thing = new BootLoader(container);
+            var thing = new BootLoader(null, container);
             Composed.Clear();
             try
             {
@@ -123,7 +124,7 @@ namespace Umbraco.Tests.Components
         {
             var container = MockContainer();
 
-            var thing = new BootLoader(container);
+            var thing = new BootLoader(null, container);
             Composed.Clear();
             // 2 is Core and requires 4
             // 13 is required by 1
@@ -141,7 +142,7 @@ namespace Umbraco.Tests.Components
                 m.Setup(x => x.TryGetInstance(It.Is<Type>(t => t == typeof (ISomeResource)))).Returns(() => new SomeResource());
             });
 
-            var thing = new BootLoader(container);
+            var thing = new BootLoader(null, container);
             Composed.Clear();
             thing.Boot(new[] { typeof(Component1), typeof(Component5) }, RuntimeLevel.Unknown);
             Assert.AreEqual(2, Composed.Count);
@@ -156,7 +157,7 @@ namespace Umbraco.Tests.Components
         {
             var container = MockContainer();
 
-            var thing = new BootLoader(container);
+            var thing = new BootLoader(null, container);
             Composed.Clear();
             thing.Boot(new[] { typeof(Component6), typeof(Component7), typeof(Component8) }, RuntimeLevel.Unknown);
             Assert.AreEqual(2, Composed.Count);
@@ -169,7 +170,7 @@ namespace Umbraco.Tests.Components
         {
             var container = MockContainer();
 
-            var thing = new BootLoader(container);
+            var thing = new BootLoader(null, container);
             Composed.Clear();
             thing.Boot(new[] { typeof(Component9), typeof(Component2), typeof(Component4) }, RuntimeLevel.Unknown);
             Assert.AreEqual(2, Composed.Count);
@@ -183,7 +184,7 @@ namespace Umbraco.Tests.Components
         {
             var container = MockContainer();
 
-            var thing = new BootLoader(container);
+            var thing = new BootLoader(null, container);
             Composed.Clear();
             thing.Boot(new[] { typeof(Component9), typeof(Component2), typeof(Component4) }, RuntimeLevel.Run);
             Assert.AreEqual(3, Composed.Count);
@@ -197,21 +198,21 @@ namespace Umbraco.Tests.Components
         {
             var container = MockContainer();
 
-            var thing = new BootLoader(container);
+            var thing = new BootLoader(null, container);
             Composed.Clear();
             thing.Boot(new[] { typeof(Component10) }, RuntimeLevel.Unknown);
             Assert.AreEqual(1, Composed.Count);
             Assert.AreEqual(typeof(Component10), Composed[0]);
 
-            thing = new BootLoader(container);
+            thing = new BootLoader(null, container);
             Composed.Clear();
             Assert.Throws<Exception>(() => thing.Boot(new[] { typeof(Component11) }, RuntimeLevel.Unknown));
 
-            thing = new BootLoader(container);
+            thing = new BootLoader(null, container);
             Composed.Clear();
             Assert.Throws<Exception>(() => thing.Boot(new[] { typeof(Component2) }, RuntimeLevel.Unknown));
 
-            thing = new BootLoader(container);
+            thing = new BootLoader(null, container);
             Composed.Clear();
             thing.Boot(new[] { typeof(Component12) }, RuntimeLevel.Unknown);
             Assert.AreEqual(1, Composed.Count);
@@ -223,7 +224,7 @@ namespace Umbraco.Tests.Components
         {
             var container = MockContainer();
 
-            var thing = new BootLoader(container);
+            var thing = new BootLoader(null, container);
             Composed.Clear();
             thing.Boot(new[] { typeof(Component6), typeof(Component8) }, RuntimeLevel.Unknown); // 8 disables 7 which is not in the list
             Assert.AreEqual(2, Composed.Count);

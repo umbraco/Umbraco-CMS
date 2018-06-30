@@ -166,6 +166,7 @@
     <Compile Include="Composing\HideFromTypeFinderAttribute.cs" />
     <Compile Include="Composing\IBuilderCollection.cs" />
     <Compile Include="Composing\ICollectionBuilder.cs" />
+    <Compile Include="Composing\IRegistrationBundle.cs" />
     <Compile Include="Composing\IContainer.cs" />
     <Compile Include="Composing\IDiscoverable.cs" />
     <Compile Include="Composing\LazyCollectionBuilderBase.cs" />
