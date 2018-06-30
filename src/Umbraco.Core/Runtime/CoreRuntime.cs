@@ -42,14 +42,14 @@ namespace Umbraco.Core.Runtime
         }
 
         /// <inheritdoc/>
-        public virtual void Boot(ServiceContainer container)
+        public virtual void Boot(ServiceContainer concreteContainer, IContainer container)
         {
             // some components may want to initialize with the UmbracoApplicationBase
             // well, they should not - we should not do this
             // TODO remove this eventually.
-            container.RegisterInstance(_app);
+            concreteContainer.RegisterInstance(_app);
 
-            Compose(container);
+            Compose(concreteContainer);
 
             // prepare essential stuff
 
@@ -57,12 +57,12 @@ namespace Umbraco.Core.Runtime
             if (string.IsNullOrWhiteSpace(path) == false)
                 IOHelper.SetRootDirectory(path);
 
-            _state = (RuntimeState) container.GetInstance<IRuntimeState>();
+            _state = (RuntimeState) concreteContainer.GetInstance<IRuntimeState>();
             _state.Level = RuntimeLevel.Boot;
 
-            Logger = container.GetInstance<ILogger>();
-            Profiler = container.GetInstance<IProfiler>();
-            ProfilingLogger = container.GetInstance<ProfilingLogger>();
+            Logger = concreteContainer.GetInstance<ILogger>();
+            Profiler = concreteContainer.GetInstance<IProfiler>();
+            ProfilingLogger = concreteContainer.GetInstance<ProfilingLogger>();
 
             // the boot loader boots using a container scope, so anything that is PerScope will
             // be disposed after the boot loader has booted, and anything else will remain.
@@ -85,10 +85,10 @@ namespace Umbraco.Core.Runtime
                 {
                     Logger.Debug<CoreRuntime>($"Runtime: {GetType().FullName}");
 
-                    AquireMainDom(container);
-                    DetermineRuntimeLevel(container);
+                    AquireMainDom(concreteContainer);
+                    DetermineRuntimeLevel(concreteContainer);
                     var componentTypes = ResolveComponentTypes();
-                    _bootLoader = new BootLoader(container);
+                    _bootLoader = new BootLoader(concreteContainer);
                     _bootLoader.Boot(componentTypes, _state.Level);
                 }
                 catch (Exception e)

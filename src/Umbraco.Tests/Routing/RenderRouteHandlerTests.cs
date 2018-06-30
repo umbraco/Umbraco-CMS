@@ -51,16 +51,16 @@ namespace Umbraco.Tests.Routing
                 : base(umbracoApplication)
             { }
 
-            public override void Boot(ServiceContainer container)
+            public override void Boot(ServiceContainer concreteContainer, IContainer container)
             {
                 // do it before anything else - this is the only place where it's possible
                 var logger = Mock.Of<ILogger>();
-                container.RegisterInstance<ILogger>(logger);
+                concreteContainer.RegisterInstance<ILogger>(logger);
                 var profiler = Mock.Of<IProfiler>();
-                container.RegisterInstance<IProfiler>(profiler);
-                container.RegisterInstance<ProfilingLogger>(new ProfilingLogger(logger, profiler));
+                concreteContainer.RegisterInstance<IProfiler>(profiler);
+                concreteContainer.RegisterInstance<ProfilingLogger>(new ProfilingLogger(logger, profiler));
 
-                base.Boot(container);
+                base.Boot(concreteContainer, container);
             }
         }
 

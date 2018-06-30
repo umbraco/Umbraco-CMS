@@ -58,16 +58,21 @@ namespace Umbraco.Core
         {
             // ******** THIS IS WHERE EVERYTHING BEGINS ********
 
+            // fixme - Abstract Container Factory
+            // If container is null in factory, create lightinject one. Could be tricky to invert when LI in higher lvl assembly.
+            // Then container should be possible to set using PreApplicationStart
+
             // create the container for the application, and configure.
             // the boot manager is responsible for registrations
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore(); // also sets Current.Container
+            var concreteContainer = new ServiceContainer();
+            concreteContainer.ConfigureUmbracoCore(); // also sets Current.Container
+            var container = Current.Container;
 
             // register the essential stuff,
             // ie the global application logger
             // (profiler etc depend on boot manager)
             var logger = GetLogger();
-            container.RegisterInstance(logger);
+            concreteContainer.RegisterInstance(logger);
             // now it is ok to use Current.Logger
 
             ConfigureUnhandledException(logger);
@@ -75,7 +80,7 @@ namespace Umbraco.Core
 
             // get runtime & boot
             _runtime = GetRuntime();
-            _runtime.Boot(container);
+            _runtime.Boot(concreteContainer, container);
         }
 
         protected virtual void ConfigureUnhandledException(ILogger logger)
