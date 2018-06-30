@@ -2,22 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
-using System.Text;
-using System.Web;
 using System.Web.Http.Routing;
+using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
-using Umbraco.Core.IO;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Web.Models.Trees;
-using umbraco;
-
-using umbraco.cms.presentation.Trees;
-using umbraco.controls.Tree;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models;
-using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.Actions;
+using Umbraco.Web.Composing;
+using Umbraco.Web.Models.Trees;
 
 namespace Umbraco.Web.Trees
 {
@@ -280,11 +273,6 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "dialogs/importDocumentType.aspx",
                             Current.Services.TextService.Localize("actions/importDocumentType")));
-                case "UmbClientMgr.appActions().actionExport()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/exportDocumentType.aspx?nodeId=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            ""));
                 case "UmbClientMgr.appActions().actionAudit()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(

@@ -1,5 +1,4 @@
 ﻿using System;
-using Umbraco.Web.UI.Pages;
 
 namespace Umbraco.Web._Legacy.Actions
 {
@@ -38,10 +37,7 @@ namespace Umbraco.Web._Legacy.Actions
 
         public string JsFunctionName
         {
-            get
-            {
-                return string.Format("{0}.actionExport()", ClientTools.Scripts.GetAppActions);
-            }
+            get { return ""; }
         }
 
         public string JsSource
@@ -56,7 +52,7 @@ namespace Umbraco.Web._Legacy.Actions
         {
             get
             {
-                return "exportDocumentType";
+                return "export";
             }
         }
 

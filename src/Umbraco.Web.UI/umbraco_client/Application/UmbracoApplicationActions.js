@@ -302,14 +302,6 @@ Umbraco.Application.Actions = function() {
             }
         },
 
-        actionExport: function() {
-            /// <summary></summary>
-
-            if (UmbClientMgr.mainTree().getActionNode().nodeType != '') {
-                this.openDialog("Export", "dialogs/exportDocumentType.aspx?nodeId=" + UmbClientMgr.mainTree().getActionNode().nodeId + "&rnd=" + this._utils.generateRandom(), 320, 205);
-            }
-        },
-
         actionAudit: function() {
             /// <summary></summary>
 
