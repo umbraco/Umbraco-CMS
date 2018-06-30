@@ -693,6 +693,16 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
   <area alias="colorpicker">
     <key alias="noColors">Sie haben keine freigegeben Farben konfiguriert</key>
   </area>
+  <area alias="contentPicker">
+    <key alias="pickedTrashedItem">Sie haben einen aktuell gelöschten Inhalt oder den Papierkorb ausgewählt</key>
+    <key alias="pickedTrashedItems">Sie haben Inhaltselemente ausgewählt, die gerade gelöscht wurden oder sich im Papierkorb befinden</key>
+  </area>
+  <area alias="mediaPicker">
+    <key alias="pickedTrashedItem">Sie haben einen gerade gelöschten Medienartikel oder den Papierkorb ausgewählt</key>
+    <key alias="pickedTrashedItems">Sie haben gerade gelöschte Medienelemente oder den Papierkorb ausgewählt</key>
+    <key alias="deletedItem">Gelöschter Artikel</key>
+    <key alias="trashed">Gelöscht</key>
+  </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">Externen Link eingeben</key>
     <key alias="chooseInternal">Internen Link auswählen</key>

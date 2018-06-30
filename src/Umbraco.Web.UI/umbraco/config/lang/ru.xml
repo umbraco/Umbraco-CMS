@@ -265,6 +265,10 @@
     <key alias="addTextBox">Добавить новое поле текста</key>
     <key alias="removeTextBox">Удалить это поле текста</key>
   </area>
+  <area alias="contentPicker">
+    <key alias="pickedTrashedItem">Выбран элемент содержимого, который в настоящее время удален или находится в корзине</key>
+    <key alias="pickedTrashedItems">Выбраны элементы содержимого, которые в настоящее время удалены или находятся в корзине</key>
+  </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Композиции</key>
     <key alias="noTabs">Вы не добавили ни одной вкладки</key>
@@ -987,6 +991,12 @@
     <key alias="onlyAllowedFiles">Разрешены только типы файлов: </key>
     <key alias="maxFileSize">Максимально допустимый размер файла: </key>
     <key alias="mediaRoot">Начальный узел медиа</key>
+  </area>
+  <area alias="mediaPicker">
+      <key alias="pickedTrashedItem">Выбран медиа-элемент, который в настоящее время удален или находится в корзине</key>
+      <key alias="pickedTrashedItems">Выбраны медиа-элементы, которые в настоящее время удалены или находятся в корзине</key>
+      <key alias="deletedItem">Удаленный элемент</key>
+      <key alias="trashed">Удаленный</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Создать нового участника</key>

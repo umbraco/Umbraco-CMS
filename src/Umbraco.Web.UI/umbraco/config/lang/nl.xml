@@ -876,6 +876,16 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
   <area alias="colorpicker">
     <key alias="noColors">Je hebt geen goedgekeurde kleuren geconfigureerd</key>
   </area>
+  <area alias="contentPicker">
+    <key alias="pickedTrashedItem">U hebt een inhouditem gekozen dat momenteel is verwijderd of in de prullenbak</key>
+    <key alias="pickedTrashedItems">U hebt inhouditems geselecteerd die momenteel zijn verwijderd of in de prullenbak</key>
+  </area>
+  <area alias="mediaPicker">
+    <key alias="pickedTrashedItem">U hebt een media-item gekozen dat momenteel is verwijderd of in de prullenbak</key>
+    <key alias="pickedTrashedItems">U hebt media-items geselecteerd die momenteel zijn verwijderd of in de prullenbak</key>
+    <key alias="deletedItem">Verwijderde item</key>
+    <key alias="trashed">Vernield</key>
+  </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">Externe link toevoegen</key>
     <key alias="chooseInternal">Interne link toevoegen</key>    

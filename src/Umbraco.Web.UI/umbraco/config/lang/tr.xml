@@ -772,7 +772,17 @@ To manage your website, simply open the Umbraco back office and start adding con
     </key>
   </area>
   <area alias="colorpicker">
-    <key alias="noColors">You have not configured any approved colours</key>
+    <key alias="noColors">Onaylanmış renkleri yapılandırmadınız</key>
+  </area>
+  <area alias="contentPicker">
+    <key alias="pickedTrashedItem">Şu anda silinmiş bir içerik öğesi veya geri dönüşüm kutusu seçtiniz</key>
+    <key alias="pickedTrashedItems">Şu anda silinmiş veya geri dönüşüm kutusunda bulunan içerik öğeleri seçtiniz</key>
+  </area>
+  <area alias="mediaPicker">
+    <key alias="pickedTrashedItem">Şu anda silinmiş bir medya öğesi veya geri dönüşüm kutusu seçtiniz</key>
+    <key alias="pickedTrashedItems">Şu anda silinmiş medya öğelerini veya geri dönüşüm kutusuna aldınız</key>
+    <key alias="deletedItem">Öğe silindi</key>
+    <key alias="trashed">Çöpe atılmış</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">harici bağlantı gir</key>

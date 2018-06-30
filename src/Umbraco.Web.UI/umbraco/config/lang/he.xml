@@ -620,6 +620,19 @@ To manage your website, simply open the Umbraco back office and start adding con
       הינך יכולה לפרסם את כל תתי העמודים על ידי סימון  <em>פרסם את העמוד את כל תתי העמודים</em> למטה.
       ]]></key>
   </area>
+  <area alias="colorpicker">
+     <key alias="noColors">לא הגדרת תצורה של צבעים מאושרים</key>
+  </area>
+  <area alias="contentPicker">
+     <key alias="pickedTrashedItem">בחרת פריט תוכן שנמחק כרגע או בסל המיחזור</key>
+     <key alias="pickedTrashedItems">בחרתם פריטי תוכן שנמחקו כעת או בסל המיחזור</key>
+  </area>
+  <area alias="mediaPicker">
+    <key alias="pickedTrashedItem">בחרת פריט מדיה שנמחק כרגע או בסל המיחזור</key>
+    <key alias="pickedTrashedItems">בחרת את פריטי המדיה שנמחקו כעת או בסל המיחזור</key>
+    <key alias="deletedItem">פריט שנמחק</key>
+    <key alias="trashed">מועך</key>
+  </area>
   <area alias="relatedlinks">
     <key alias="addExternal">הוסף קישור חיצוני</key>
     <key alias="addInternal">הוסף קישור פנימי</key>

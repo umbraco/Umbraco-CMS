@@ -709,6 +709,16 @@
   <area alias="colorpicker">
     <key alias="noColors">Nenakonfigurovali jste žádné schválené barvy</key>
   </area>
+  <area alias="contentPicker">
+    <key alias="pickedTrashedItem">Zvolili jste aktuálně smazanou položku obsahu nebo v koši</key>
+    <key alias="pickedTrashedItems">Zvolili jste aktuálně smazané položky obsahu nebo v koši</key>
+  </area>
+  <area alias="mediaPicker">
+    <key alias="pickedTrashedItem">Zvolili jste aktuálně smazanou mediální položku nebo v koši</key>
+    <key alias="pickedTrashedItems">Zvolili jste aktuálně smazané mediální položky nebo v koši</key>
+    <key alias="deletedItem">Odstraněná položka</key>
+    <key alias="trashed">Zničeno</key>
+  </area>
   <area alias="relatedlinks">
     <key alias="addExternal">Přidat vnější odkaz</key>
     <key alias="addInternal">Přidat vnitřní odkaz</key>

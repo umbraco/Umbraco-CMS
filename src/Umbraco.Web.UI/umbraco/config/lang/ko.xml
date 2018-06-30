@@ -602,6 +602,19 @@
     이 페이지와 모든 서브페이지를 아래 <em>모든 자식문서 발행</em>을 체크하여 발행할 수 있습니다.
     ]]></key>
   </area>
+  <area alias="colorpicker">
+    <key alias="noColors">승인 된 색상을 구성하지 않았습니다.</key>
+  </area>
+  <area alias="contentPicker">
+    <key alias="pickedTrashedItem">현재 삭제되었거나 휴지통에있는 컨텐트 항목을 선택했습니다.</key>
+    <key alias="pickedTrashedItems">현재 삭제되었거나 휴지통에있는 콘텐츠 항목을 선택했습니다.</key>
+  </area>
+  <area alias="mediaPicker">
+    <key alias="pickedTrashedItem">현재 삭제되거나 휴지통에있는 미디어 항목을 선택했습니다.</key>
+    <key alias="pickedTrashedItems">현재 삭제되거나 휴지통에있는 미디어 항목을 선택했습니다.</key>
+    <key alias="deletedItem">삭제 된 항목</key>
+    <key alias="trashed">휴지통</key>
+  </area>
   <area alias="relatedlinks">
     <key alias="addExternal">외부링크 추가</key>
     <key alias="addInternal">내부링크 추가</key>
