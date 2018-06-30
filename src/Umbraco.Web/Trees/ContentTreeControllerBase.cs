@@ -96,6 +96,12 @@ namespace Umbraco.Web.Trees
                 return null;
 
             var treeNode = GetSingleTreeNode(e, parentId, queryStrings);
+            if (treeNode == null)
+            {
+                //this means that the user has NO access to this node via permissions! They at least need to have browse permissions to see
+                //the node so we need to return null;
+                return null;
+            }
             if (hasPathAccess == false)
             {
                 treeNode.AdditionalData["noAccess"] = true;
@@ -189,8 +195,7 @@ namespace Umbraco.Web.Trees
         {
             // try to parse id as an integer else use GetEntityFromId
             // which will grok Guids, Udis, etc and let use obtain the id
-            int entityId;
-            if (int.TryParse(id, out entityId) == false)
+            if (int.TryParse(id, out var entityId) == false)
             {
                 var entity = GetEntityFromId(id);
                 if (entity == null)
@@ -198,16 +203,7 @@ namespace Umbraco.Web.Trees
                 entityId = entity.Id;
             }
 
-            // if a request is made for the root node but user has no access to
-            // root node, return start nodes instead
-            if (entityId == Constants.System.Root && UserStartNodes.Contains(Constants.System.Root) == false)
-            {
-                return UserStartNodes.Length > 0
-                    ? Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes)
-                    : Enumerable.Empty<IUmbracoEntity>();
-            }
-
-            return Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToArray();
+            return Services.EntityService.GetChildren(entityId, UmbracoObjectType).ToList();
         }
 
         /// <summary>
@@ -279,6 +275,37 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
+        /// Check to see if we should return children of a container node
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is required in case a user has custom start nodes that are children of a list view since in that case we'll need to render the tree node. In normal cases we don't render
+        /// children of a list view.
+        /// </remarks>
+        protected bool ShouldRenderChildrenOfContainer(IUmbracoEntity e)
+        {
+            var isContainer = e.IsContainer();
+
+            var renderChildren = e.HasChildren() && (isContainer == false);
+
+            //Here we need to figure out if the node is a container and if so check if the user has a custom start node, then check if that start node is a child
+            // of this container node. If that is true, the HasChildren must be true so that the tree node still renders even though this current node is a container/list view.
+            if (isContainer && UserStartNodes.Length > 0 && UserStartNodes.Contains(Constants.System.Root) == false)
+            {                    
+                var startNodes = Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes);
+                //if any of these start nodes' parent is current, then we need to render children normally so we need to switch some logic and tell
+                // the UI that this node does have children and that it isn't a container
+                if (startNodes.Any(x => x.ParentId == e.Id))
+                {
+                    renderChildren = true;
+                }
+            }
+
+            return renderChildren;
+        }
+
+        /// <summary>
         /// Before we make a call to get the tree nodes we have to check if they can actually be rendered
         /// </summary>
         /// <param name="id"></param>
@@ -294,7 +321,7 @@ namespace Umbraco.Web.Trees
             //before we get the children we need to see if this is a container node
 
             //test if the parent is a listview / container
-            if (current != null && current.IsContainer())
+            if (current != null && ShouldRenderChildrenOfContainer(current) == false)
             {
                 //no children!
                 return new TreeNodeCollection();

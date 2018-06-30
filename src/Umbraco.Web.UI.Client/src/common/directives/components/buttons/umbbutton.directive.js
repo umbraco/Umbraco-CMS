@@ -67,97 +67,97 @@ Use this directive to render an umbraco button. The directive can be used to gen
 @param {boolean=} disabled Set to <code>true</code> to disable the button.
 **/
 
-(function() {
-   'use strict';
+(function () {
+    'use strict';
 
-   function ButtonDirective($timeout) {
+    function ButtonDirective($timeout) {
 
-      function link(scope, el, attr, ctrl) {
+        function link(scope, el, attr, ctrl) {
 
-         scope.style = null;
+            scope.style = null;
+            scope.innerState = "init";
 
-         function activate() {
+            function activate() {
 
-             scope.blockElement = false;
+                scope.blockElement = false;
 
-            if (!scope.state) {
-               scope.state = "init";
-            }
+                if (scope.buttonStyle) {
 
-            if (scope.buttonStyle) {
+                    // make it possible to pass in multiple styles
+                    if (scope.buttonStyle.startsWith("[") && scope.buttonStyle.endsWith("]")) {
 
-                // make it possible to pass in multiple styles
-                if(scope.buttonStyle.startsWith("[") && scope.buttonStyle.endsWith("]")) {
-                    
-                    // when using an attr it will always be a string so we need to remove square brackets
-                    // and turn it into and array
-                    var withoutBrackets = scope.buttonStyle.replace(/[\[\]']+/g,'');
-                    // split array by , + make sure to catch whitespaces
-                    var array = withoutBrackets.split(/\s?,\s?/g);
-                    
-                    angular.forEach(array, function(item){
-                        scope.style = scope.style + " " + "btn-" + item;
-                        if(item === "block") {
+                        // when using an attr it will always be a string so we need to remove square brackets
+                        // and turn it into and array
+                        var withoutBrackets = scope.buttonStyle.replace(/[\[\]']+/g, '');
+                        // split array by , + make sure to catch whitespaces
+                        var array = withoutBrackets.split(/\s?,\s?/g);
+
+                        angular.forEach(array, function (item) {
+                            scope.style = scope.style + " " + "btn-" + item;
+                            if (item === "block") {
+                                scope.blockElement = true;
+                            }
+                        });
+
+                    } else {
+                        scope.style = "btn-" + scope.buttonStyle;
+                        if (scope.buttonStyle === "block") {
                             scope.blockElement = true;
                         }
-                    });
-
-                } else {
-                    scope.style = "btn-" + scope.buttonStyle;
-                    if(scope.buttonStyle === "block") {
-                        scope.blockElement = true;
                     }
+
                 }
 
             }
 
-         }
+            activate();
 
-         activate();
+            var unbindStateWatcher = scope.$watch('state', function (newValue, oldValue) {
+                if (newValue) {
+                    scope.innerState = newValue;
+                }
 
-         var unbindStateWatcher = scope.$watch('state', function(newValue, oldValue) {
+                if (newValue === 'success' || newValue === 'error') {
+                    $timeout(function () {
+                        scope.innerState = 'init';
+                    }, 2000);
+                }
 
-            if (newValue === 'success' || newValue === 'error') {
-               $timeout(function() {
-                  scope.state = 'init';
-               }, 2000);
+            });
+
+            scope.$on('$destroy', function () {
+                unbindStateWatcher();
+            });
+
+        }
+
+        var directive = {
+            transclude: true,
+            restrict: 'E',
+            replace: true,
+            templateUrl: 'views/components/buttons/umb-button.html',
+            link: link,
+            scope: {
+                action: "&?",
+                href: "@?",
+                type: "@",
+                buttonStyle: "@?",
+                state: "=?",
+                shortcut: "@?",
+                shortcutWhenHidden: "@",
+                label: "@?",
+                labelKey: "@?",
+                icon: "@?",
+                disabled: "=",
+                size: "@?",
+                alias: "@?"
             }
+        };
 
-         });
+        return directive;
 
-         scope.$on('$destroy', function() {
-            unbindStateWatcher();
-         });
+    }
 
-      }
-
-      var directive = {
-         transclude: true,
-         restrict: 'E',
-         replace: true,
-         templateUrl: 'views/components/buttons/umb-button.html',
-         link: link,
-         scope: {
-            action: "&?",
-            href: "@?",
-            type: "@",
-            buttonStyle: "@?",
-            state: "=?",
-            shortcut: "@?",
-            shortcutWhenHidden: "@",
-            label: "@?",
-            labelKey: "@?",
-            icon: "@?",
-            disabled: "=",
-            size: "@?",
-            alias: "@?"
-         }
-      };
-
-      return directive;
-
-   }
-
-   angular.module('umbraco.directives').directive('umbButton', ButtonDirective);
+    angular.module('umbraco.directives').directive('umbButton', ButtonDirective);
 
 })();

@@ -20,6 +20,7 @@ namespace Umbraco.Core.Scoping
         public NoScope(ScopeProvider scopeProvider)
         {
             _scopeProvider = scopeProvider;
+            Timestamp = DateTime.Now;
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
 #endif
@@ -27,6 +28,8 @@ namespace Umbraco.Core.Scoping
 
         private readonly Guid _instanceId = Guid.NewGuid();
         public Guid InstanceId { get { return _instanceId; } }
+
+        public DateTime Timestamp { get; }
 
         /// <inheritdoc />
         public bool CallContext { get { return false; } }

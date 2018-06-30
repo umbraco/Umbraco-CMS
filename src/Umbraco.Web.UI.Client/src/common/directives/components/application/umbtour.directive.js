@@ -25,6 +25,7 @@ The tour object consist of two parts - The overall tour configuration and a list
     "group": "My Custom Group" // Used to group tours in the help drawer
     "groupOrder": 200 // Control the order of tour groups
     "allowDisable": // Adds a "Don't" show this tour again"-button to the intro step
+    "culture" : // From v7.11+. Specifies the culture of the tour (eg. en-US), if set the tour will only be shown to users with this culture set on their profile. If omitted or left empty the tour will be visible to all users
     "requiredSections":["content", "media", "mySection"] // Sections that the tour will access while running, if the user does not have access to the required tour sections, the tour will not load.   
     "steps": [] // tour steps - see next example
 }
@@ -303,6 +304,12 @@ In the following example you see how to run some custom logic before a step goes
                 scope.elementNotFound = false;                
 
                 $timeout(function () {
+                    // clear element when step as marked as intro, so it always displays in the center
+                    if (scope.model.currentStep && scope.model.currentStep.type === "intro") {
+                        scope.model.currentStep.element = null;
+                        scope.model.currentStep.eventElement = null;
+                        scope.model.currentStep.event = null;
+                    }
 
                     // if an element isn't set - show the popover in the center
                     if(scope.model.currentStep && !scope.model.currentStep.element) {

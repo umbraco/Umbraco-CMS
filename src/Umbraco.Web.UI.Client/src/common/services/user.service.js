@@ -278,8 +278,6 @@ angular.module('umbraco.services')
 
             /** Loads the Moment.js Locale for the current user. */
             loadMomentLocaleForCurrentUser: function () {
-                var deferred = $q.defer();
-
 
                 function loadLocales(currentUser, supportedLocales) {
                     var locale = currentUser.locale.toLowerCase();
@@ -294,11 +292,14 @@ angular.module('umbraco.services')
                                 localeUrls.push('lib/moment/' + majorLocale);
                             }
                         }
-                        assetsService.load(localeUrls).then(function () {
-                            deferred.resolve(localeUrls);
-                        });
-                    } else {
-                        deferred.resolve(['']);
+                        return assetsService.load(localeUrls, $rootScope);
+                    }
+                    else {
+                        //return a noop promise
+                        var deferred = $q.defer();
+                        var promise = deferred.promise;
+                        deferred.resolve(true);
+                        return promise;
                     }
                 }
 
@@ -307,11 +308,11 @@ angular.module('umbraco.services')
                     supportedLocales: javascriptLibraryService.getSupportedLocalesForMoment()
                 }
 
-                $q.all(promises).then(function (values) {
-                    loadLocales(values.currentUser, values.supportedLocales);
+                return $q.all(promises).then(function (values) {
+                    return loadLocales(values.currentUser, values.supportedLocales);
                 });
                 
-                return deferred.promise;
+                
 
             },
 

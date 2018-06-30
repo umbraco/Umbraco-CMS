@@ -9,6 +9,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Scoping;
 using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Web
@@ -21,9 +22,12 @@ namespace Umbraco.Web
     /// </remarks>
     public class BatchedDatabaseServerMessenger : DatabaseServerMessenger
     {
+        private readonly ApplicationContext _appContext;
+
         public BatchedDatabaseServerMessenger(ApplicationContext appContext, bool enableDistCalls, DatabaseServerMessengerOptions options)
             : base(appContext, enableDistCalls, options)
         {
+            _appContext = appContext;
             Scheduler.Initializing += Scheduler_Initializing;
         }
 
@@ -42,7 +46,7 @@ namespace Umbraco.Web
                 //start the background task runner for processing instructions
                 const int delayMilliseconds = 60000;
                 var instructionProcessingRunner = new BackgroundTaskRunner<IBackgroundTask>("InstructionProcessing", ApplicationContext.ProfilingLogger.Logger);
-                var instructionProcessingTask = new InstructionProcessing(instructionProcessingRunner, this, delayMilliseconds, Options.ThrottleSeconds * 1000);
+                var instructionProcessingTask = new InstructionProcessing(instructionProcessingRunner, this, _appContext.ScopeProvider, delayMilliseconds, Options.ThrottleSeconds * 1000);
                 instructionProcessingRunner.TryAdd(instructionProcessingTask);
                 e.Add(instructionProcessingTask);
             }
@@ -73,18 +77,31 @@ namespace Umbraco.Web
         private class InstructionProcessing : RecurringTaskBase
         {
             private readonly DatabaseServerMessenger _messenger;
+            private readonly IScopeProvider _scopeProvider;
 
             public InstructionProcessing(IBackgroundTaskRunner<RecurringTaskBase> runner,
                 DatabaseServerMessenger messenger,
+                IScopeProvider scopeProvider,
                 int delayMilliseconds, int periodMilliseconds)
                 : base(runner, delayMilliseconds, periodMilliseconds)
             {
                 _messenger = messenger;
+                _scopeProvider = scopeProvider;
             }
 
             public override bool PerformRun()
             {
-                _messenger.Sync();
+                // beware!
+                // DatabaseServerMessenger uses _appContext.DatabaseContext.Database without creating
+                // scopes, and since we are running in a background task, there will be no ambient
+                // scope (as would be the case within a web request), and so we would end up creating
+                // (and leaking) a NoScope instance, which is bad - better make sure we have a true
+                // scope here! - see U4-11207
+                using (var scope = _scopeProvider.CreateScope())
+                {
+                    _messenger.Sync();
+                    scope.Complete();
+                }
                 //return true to repeat
                 return true;
             }
@@ -121,14 +138,17 @@ namespace Umbraco.Web
             batch.Clear();
 
             //Write the instructions but only create JSON blobs with a max instruction count equal to MaxProcessingInstructionCount
-            foreach (var instructionsBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
+            using (var scope = _appContext.ScopeProvider.CreateScope())
             {
-                WriteInstructions(instructionsBatch);
+                foreach (var instructionsBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
+                {
+                    WriteInstructions(scope, instructionsBatch);
+                }
+                scope.Complete();
             }
-            
         }
 
-        private void WriteInstructions(IEnumerable<RefreshInstruction> instructions)
+        private void WriteInstructions(IScope scope, IEnumerable<RefreshInstruction> instructions)
         {
             var dto = new CacheInstructionDto
             {
@@ -137,8 +157,7 @@ namespace Umbraco.Web
                 OriginIdentity = LocalIdentity,
                 InstructionCount = instructions.Sum(x => x.JsonIdCount)
             };
-
-            ApplicationContext.DatabaseContext.Database.Insert(dto);
+            scope.Database.Insert(dto);
         }
 
         protected ICollection<RefreshInstructionEnvelope> GetBatch(bool create)
@@ -179,16 +198,19 @@ namespace Umbraco.Web
             if (batch == null)
             {
                 //only write the json blob with a maximum count of the MaxProcessingInstructionCount
-                foreach (var maxBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
+                using (var scope = _appContext.ScopeProvider.CreateScope())
                 {
-                    WriteInstructions(maxBatch);
+                    foreach (var maxBatch in instructions.InGroupsOf(Options.MaxProcessingInstructionCount))
+                    {
+                        WriteInstructions(scope, maxBatch);
+                    }
+                    scope.Complete();
                 }
             }
             else
             {
                 batch.Add(new RefreshInstructionEnvelope(servers, refresher, instructions));
             }
-                
-        }        
+        }
     }
 }

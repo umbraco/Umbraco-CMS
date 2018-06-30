@@ -105,7 +105,7 @@
         vm.init = function () {
 
             //we need to load this somewhere, for now its here.
-            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css");
+            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css", $scope);
 
             //load templates - used in the master template picker
             templateResource.getAll()
@@ -516,9 +516,13 @@
             var availableMasterTemplates = [];
 
             // filter out the current template and the selected master template
-            angular.forEach(vm.templates, function(template){
-                if(template.alias !== vm.template.alias && template.alias !== vm.template.masterTemplateAlias) {
-                    availableMasterTemplates.push(template);
+            angular.forEach(vm.templates, function (template) {
+                if (template.alias !== vm.template.alias && template.alias !== vm.template.masterTemplateAlias) {
+                    var templatePathArray = template.path.split(',');
+                    // filter descendant templates of current template
+                    if (templatePathArray.indexOf(String(vm.template.id)) === -1) {
+                        availableMasterTemplates.push(template);
+                    }
                 }
             });
 
