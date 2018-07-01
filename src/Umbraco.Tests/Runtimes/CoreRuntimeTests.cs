@@ -83,18 +83,18 @@ namespace Umbraco.Tests.Runtimes
                 : base(umbracoApplication)
             { }
 
-            public override void Compose(ServiceContainer concreteContainer, IContainer container)
+            public override void Compose(IContainer container)
             {
-                base.Compose(concreteContainer, container);
+                base.Compose(container);
 
                 // the application's profiler and profiling logger are
                 // registered by CoreRuntime.Compose() but can be
                 // overriden afterwards - they haven't been resolved yet
-                concreteContainer.RegisterSingleton<IProfiler>(_ => new TestProfiler());
-                concreteContainer.RegisterSingleton(factory => new ProfilingLogger(factory.GetInstance<ILogger>(), factory.GetInstance<IProfiler>()));
+                container.RegisterSingleton<IProfiler>(_ => new TestProfiler());
+                container.RegisterSingleton(factory => new ProfilingLogger(factory.GetInstance<ILogger>(), factory.GetInstance<IProfiler>()));
 
                 // must override the database factory
-                concreteContainer.RegisterSingleton(_ => GetDatabaseFactory());
+                container.RegisterSingleton(_ => GetDatabaseFactory());
             }
 
             // must override the database factory

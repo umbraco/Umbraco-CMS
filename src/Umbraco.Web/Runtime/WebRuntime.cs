@@ -52,9 +52,9 @@ namespace Umbraco.Web.Runtime
         }
 
         /// <inheritdoc/>
-        public override void Compose(ServiceContainer concreteContainer, IContainer container)
+        public override void Compose(IContainer container)
         {
-            base.Compose(concreteContainer, container);
+            base.Compose(container);
 
             container.Register<UmbracoModule>();
 

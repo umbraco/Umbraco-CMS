@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using LightInject;
 using Umbraco.Core.Collections;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
@@ -16,7 +15,6 @@ namespace Umbraco.Core.Components
 
     internal class BootLoader
     {
-        private readonly IServiceContainer concreteContainer;
         private readonly IContainer container;
         private readonly ProfilingLogger _proflog;
         private readonly ILogger _logger;
@@ -28,11 +26,9 @@ namespace Umbraco.Core.Components
         /// <summary>
         /// Initializes a new instance of the <see cref="BootLoader"/> class.
         /// </summary>
-        /// <param name="concreteContainer">The concrete application container.</param>
         /// <param name="container">The abstract container.</param>
-        public BootLoader(IServiceContainer concreteContainer, IContainer container)
+        public BootLoader(IContainer container)
         {
-            this.concreteContainer = concreteContainer; // ?? throw new ArgumentNullException(nameof(container));
             this.container = container;
             _proflog = container.GetInstance<ProfilingLogger>();
             _logger = container.GetInstance<ILogger>();

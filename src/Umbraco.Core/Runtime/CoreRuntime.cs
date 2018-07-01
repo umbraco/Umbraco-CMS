@@ -47,7 +47,7 @@ namespace Umbraco.Core.Runtime
             // TODO remove this eventually.
             container.RegisterInstance(_app);
 
-            Compose(concreteContainer, container);
+            Compose(container);
 
             // prepare essential stuff
 
@@ -86,7 +86,7 @@ namespace Umbraco.Core.Runtime
                     AquireMainDom(container);
                     DetermineRuntimeLevel(container);
                     var componentTypes = ResolveComponentTypes();
-                    _bootLoader = new BootLoader(concreteContainer, container);
+                    _bootLoader = new BootLoader(container);
                     _bootLoader.Boot(componentTypes, _state.Level);
                 }
                 catch (Exception e)
@@ -183,7 +183,7 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Composes the runtime.
         /// </summary>
-        public virtual void Compose(LightInject.ServiceContainer concreteContainer, IContainer container)
+        public virtual void Compose(IContainer container)
         {
             // compose the very essential things that are needed to bootstrap, before anything else,
             // and only these things - the rest should be composed in runtime components
