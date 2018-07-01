@@ -29,7 +29,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public static void When_truncating_a_string_ending_with_a_space_we_should_trim_the_space_before_appending_the_ellipsis()
+        public static void When_truncating_a_string_ends_with_a_space_we_should_trim_the_space_before_appending_the_ellipsis()
         {
             var helper = new UmbracoHelper();
 
