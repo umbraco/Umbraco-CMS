@@ -1,24 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Web;
-using System.Web.Security;
 using System.Xml.XPath;
 using Umbraco.Core;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Xml;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Web.Mvc;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
+using Umbraco.Core.Xml;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
@@ -894,7 +890,7 @@ namespace Umbraco.Web
         {
             return StringUtilities.ReplaceLineBreaksForHtml(text);
         }
-        
+
         /// <summary>
         /// Generates a hash based on the text string passed in.  This method will detect the
         /// security requirements (is FIPS enabled) and return an appropriate hash.
@@ -1059,7 +1055,7 @@ namespace Umbraco.Web
         }
 
         #endregion
-        
+
         /// <summary>
         /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which
         /// Umbraco can decrypt during the routing process in order to delegate the request to a specific MVC Controller.
