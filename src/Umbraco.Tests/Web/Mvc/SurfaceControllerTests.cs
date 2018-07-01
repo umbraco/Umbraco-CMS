@@ -95,7 +95,6 @@ namespace Umbraco.Tests.Web.Mvc
 
             var controller = new TestSurfaceController(umbracoContext);
             Container.Register(_ => umbracoContext);
-            Container.InjectProperties(controller);
 
             Assert.IsNotNull(controller.Umbraco);
         }

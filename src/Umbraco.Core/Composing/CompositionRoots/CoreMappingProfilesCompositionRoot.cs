@@ -1,11 +1,10 @@
-﻿using LightInject;
-using Umbraco.Core.Models.Identity;
+﻿using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Composing.CompositionRoots
 {
-    public sealed class CoreMappingProfilesCompositionRoot : ICompositionRoot
+    public sealed class CoreMappingProfilesCompositionRoot : IRegistrationBundle
     {
-        public void Compose(IServiceRegistry container)
+        public void Compose(IContainer container)
         {
             container.Register<IdentityProfile>();
         }

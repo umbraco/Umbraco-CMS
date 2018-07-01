@@ -1,5 +1,4 @@
 ﻿using System;
-using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;

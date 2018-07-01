@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Testing
         // test feature, and no test "base" class should be. only actual test feature classes
         // should be marked with that attribute.
 
-        protected ServiceContainer Container { get; private set; }
+        protected IContainer Container { get; private set; }
 
         protected UmbracoTestAttribute Options { get; private set; }
 
@@ -114,10 +114,12 @@ namespace Umbraco.Tests.Testing
             // but hey, never know, better avoid garbage-in
             Reset();
 
-            Container = new ServiceContainer();
-            Container.ConfigureUmbracoCore();
+            var concreteContainer = new ServiceContainer();
+            concreteContainer.ConfigureUmbracoCore();
 
-            TestObjects = new TestObjects(Container);
+            TestObjects = new TestObjects(concreteContainer);
+
+            Container = Current.Container;
 
             // get/merge the attributes marking the method and/or the classes
             Options = TestOptionAttributeBase.GetTestOptions<UmbracoTestAttribute>();
@@ -223,12 +225,12 @@ namespace Umbraco.Tests.Testing
             });
         }
 
-        protected virtual TypeLoader CreatePluginManager(IServiceFactory f)
+        protected virtual TypeLoader CreatePluginManager(IContainer f)
         {
             return CreateCommonPluginManager(f);
         }
 
-        private static TypeLoader CreateCommonPluginManager(IServiceFactory f)
+        private static TypeLoader CreateCommonPluginManager(IContainer f)
         {
             return new TypeLoader(f.GetInstance<CacheHelper>().RuntimeCache, f.GetInstance<IGlobalSettings>(), f.GetInstance<ProfilingLogger>(), false)
             {
@@ -271,7 +273,7 @@ namespace Umbraco.Tests.Testing
 
             // fixme - The whole MediaFileSystem coupling thing seems broken. 
             Container.Register<IFileSystem, MediaFileSystem>((factory, fileSystem) => new MediaFileSystem(fileSystem, factory.GetInstance<IContentSection>(), factory.GetInstance<ILogger>()));
-            Container.RegisterConstructorDependency((factory, parameterInfo) => factory.GetInstance<FileSystems>().MediaFileSystem);
+            Container.RegisterConstructorDependency((factory) => factory.GetInstance<FileSystems>().MediaFileSystem);
 
             Container.RegisterSingleton<IExamineManager>(factory => ExamineManager.Instance);
 

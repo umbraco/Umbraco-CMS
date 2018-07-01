@@ -1,11 +1,8 @@
 ﻿using System;
-using LightInject;
 using Umbraco.Core.Composing;
 using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Core.Macros;
 using Umbraco.Web.Editors;
 using Umbraco.Web.HealthCheck;
-using Umbraco.Web.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
@@ -91,7 +88,7 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a last chance finder.</param>
-        public static void SetContentLastChanceFinder(this Composition composition, Func<IServiceFactory, IContentLastChanceFinder> factory)
+        public static void SetContentLastChanceFinder(this Composition composition, Func<IContainer, IContentLastChanceFinder> factory)
         {
             composition.Container.RegisterSingleton(factory);
         }
@@ -132,7 +129,7 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a published snapshot service.</param>
-        public static void SetPublishedSnapshotService(this Composition composition, Func<IServiceFactory, IPublishedSnapshotService> factory)
+        public static void SetPublishedSnapshotService(this Composition composition, Func<IContainer, IPublishedSnapshotService> factory)
         {
             composition.Container.RegisterSingleton(factory);
         }
@@ -163,7 +160,7 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a helper.</param>
-        public static void SetSiteDomainHelper(this Composition composition, Func<IServiceFactory, ISiteDomainHelper> factory)
+        public static void SetSiteDomainHelper(this Composition composition, Func<IContainer, ISiteDomainHelper> factory)
         {
             composition.Container.RegisterSingleton(factory);
         }

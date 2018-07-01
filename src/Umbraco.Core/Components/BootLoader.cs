@@ -28,7 +28,8 @@ namespace Umbraco.Core.Components
         /// <summary>
         /// Initializes a new instance of the <see cref="BootLoader"/> class.
         /// </summary>
-        /// <param name="concreteContainer">The application container.</param>
+        /// <param name="concreteContainer">The concrete application container.</param>
+        /// <param name="container">The abstract container.</param>
         public BootLoader(IServiceContainer concreteContainer, IContainer container)
         {
             this.concreteContainer = concreteContainer; // ?? throw new ArgumentNullException(nameof(container));
@@ -291,7 +292,7 @@ namespace Umbraco.Core.Components
         {
             using (_proflog.DebugDuration<BootLoader>($"Composing components. (log when >{LogThresholdMilliseconds}ms)", "Composed components."))
             {
-                var composition = new Composition(concreteContainer, level);
+                var composition = new Composition(container, level);
                 foreach (var component in _components)
                 {
                     var componentType = component.GetType();

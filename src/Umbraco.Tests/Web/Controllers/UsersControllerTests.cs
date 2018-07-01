@@ -68,7 +68,6 @@ namespace Umbraco.Tests.Web.Controllers
                     .Returns((int id) => id == 1234 ? new User(1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]) : null);
 
                 var usersController = new UsersController();
-                Container.InjectProperties(usersController);
                 return usersController;
             }
 
@@ -125,7 +124,6 @@ namespace Umbraco.Tests.Web.Controllers
             ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
             {
                 var usersController = new UsersController();
-                Container.InjectProperties(usersController);
                 return usersController;
             }
 
@@ -153,7 +151,6 @@ namespace Umbraco.Tests.Web.Controllers
                     .Returns(() => users);
 
                 var usersController = new UsersController();
-                Container.InjectProperties(usersController);
                 return usersController;
             }
 

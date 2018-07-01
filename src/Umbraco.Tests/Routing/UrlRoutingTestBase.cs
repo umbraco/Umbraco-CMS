@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
@@ -39,7 +40,7 @@ namespace Umbraco.Tests.Routing
         protected ServiceContext GetServiceContext()
         {
             // get the mocked service context to get the mocked domain service
-            var serviceContext = TestObjects.GetServiceContextMock(Container);
+            var serviceContext = TestObjects.GetServiceContextMock((IServiceContainer)Container.ConcreteContainer);
 
             //setup mock domain service
             var domainService = Mock.Get(serviceContext.DomainService);

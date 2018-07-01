@@ -1,6 +1,5 @@
-﻿using LightInject;
+﻿using Umbraco.Core.Composing;
 using Umbraco.Web.Install;
-using Umbraco.Web.Install.Controllers;
 using Umbraco.Web.Install.InstallSteps;
 using Umbraco.Web.Install.Models;
 
@@ -9,10 +8,12 @@ namespace Umbraco.Web.Composing.CompositionRoots
     /// <summary>
     /// A composition root for dealing with the installer and installer steps
     /// </summary>
-    public sealed class InstallerCompositionRoot : ICompositionRoot
+    public sealed class InstallerCompositionRoot : IRegistrationBundle
     {
-        public void Compose(IServiceRegistry container)
+        public void Compose(IContainer container)
         {
+            // fixme - Implement ordered composition instead of abusing DI container?
+            // this creates an unnecessary requirement for containers.
             //register the installer steps in order
             container.RegisterOrdered(typeof(InstallSetupStep),
                 new[]
@@ -31,7 +32,7 @@ namespace Umbraco.Web.Composing.CompositionRoots
                     //typeof(StarterKitCleanupStep),
 
                     typeof(SetUmbracoVersionStep)
-                }, type => new PerScopeLifetime());
+                }, type => Lifetime.PerScope);
 
             container.Register<InstallStepCollection>();
             container.Register<InstallHelper>();

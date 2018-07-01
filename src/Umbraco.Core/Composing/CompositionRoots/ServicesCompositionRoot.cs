@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
@@ -11,9 +10,9 @@ using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Core.Composing.CompositionRoots
 {
-    public sealed class ServicesCompositionRoot : ICompositionRoot
+    public sealed class ServicesCompositionRoot : IRegistrationBundle
     {
-        public void Compose(IServiceRegistry container)
+        public void Compose(IContainer container)
         {
             // register a transient messages factory, which will be replaced by the web
             // boot manager when running in a web context

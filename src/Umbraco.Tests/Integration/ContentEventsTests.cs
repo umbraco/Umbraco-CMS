@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Integration
             base.Compose();
 
             Container.Register<IServerRegistrar>(_ => new TestServerRegistrar()); // localhost-only
-            Container.Register<IServerMessenger, LocalServerMessenger>(new PerContainerLifetime());
+            Container.Register<IServerMessenger, LocalServerMessenger>(Lifetime.Singleton);
 
             Container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add<ContentTypeCacheRefresher>()

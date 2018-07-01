@@ -1,4 +1,4 @@
-﻿using LightInject;
+﻿using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Components
 {
@@ -17,7 +17,7 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="container">A container.</param>
         /// <param name="level">The runtime level.</param>
-        public Composition(IServiceContainer container, RuntimeLevel level)
+        public Composition(IContainer container, RuntimeLevel level)
         {
             Container = container;
             RuntimeLevel = level;
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Components
         /// Gets the container.
         /// </summary>
         /// <remarks>Use with care!</remarks>
-        public IServiceContainer Container { get; }
+        public IContainer Container { get; }
 
         /// <summary>
         /// Gets the runtime level.

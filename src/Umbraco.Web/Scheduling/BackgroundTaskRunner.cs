@@ -6,7 +6,6 @@ using System.Web.Hosting;
 using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
-using LightInject;
 
 namespace Umbraco.Web.Scheduling
 {

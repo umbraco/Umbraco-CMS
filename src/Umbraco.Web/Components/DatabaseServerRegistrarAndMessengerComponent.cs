@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Examine;
-using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;
@@ -17,7 +14,6 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Scheduling;
-using Umbraco.Examine;
 using Umbraco.Web.Search;
 
 namespace Umbraco.Web.Components

@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Web;
-using LightInject;
-using Semver;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -15,11 +12,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Install.InstallSteps;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install

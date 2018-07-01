@@ -1,11 +1,11 @@
-﻿using LightInject;
+﻿using Umbraco.Core.Composing;
 using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Web.Composing.CompositionRoots
 {
-    public sealed class WebMappingProfilesCompositionRoot : ICompositionRoot
+    public sealed class WebMappingProfilesCompositionRoot : IRegistrationBundle
     {
-        public void Compose(IServiceRegistry container)
+        public void Compose(IContainer container)
         {
             container.Register<AuditMapperProfile>();
             container.Register<CodeFileMapperProfile>();

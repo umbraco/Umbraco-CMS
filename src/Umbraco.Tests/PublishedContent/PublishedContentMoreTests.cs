@@ -45,7 +45,7 @@ namespace Umbraco.Tests.PublishedContent
             Container.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
         }
 
-        protected override TypeLoader CreatePluginManager(IServiceFactory f)
+        protected override TypeLoader CreatePluginManager(IContainer f)
         {
             var pluginManager = base.CreatePluginManager(f);
 

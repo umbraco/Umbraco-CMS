@@ -46,7 +46,7 @@ namespace Umbraco.Core.Runtime
             // register filesystems
 
             composition.Container.Register<IFileSystem, MediaFileSystem>((f, wrappedFileSystem) => new MediaFileSystem(wrappedFileSystem, f.GetInstance<IContentSection>(), f.GetInstance<ILogger>()));
-            composition.Container.RegisterConstructorDependency((factory, parameterInfo) => factory.GetInstance<FileSystems>().MediaFileSystem);
+            composition.Container.RegisterConstructorDependency((factory) => factory.GetInstance<FileSystems>().MediaFileSystem);
 
             composition.Container.RegisterSingleton<FileSystems>();
             composition.Container.RegisterSingleton(factory => factory.GetInstance<FileSystems>().MediaFileSystem);
@@ -106,7 +106,7 @@ namespace Umbraco.Core.Runtime
             composition.Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append(factory => factory.GetInstance<TypeLoader>().GetTypes<IPropertyValueConverter>());
 
-            composition.Container.Register<IPublishedContentTypeFactory, PublishedContentTypeFactory>(new PerContainerLifetime());
+            composition.Container.Register<IPublishedContentTypeFactory, PublishedContentTypeFactory>(Lifetime.Singleton);
 
             composition.Container.RegisterSingleton<IShortStringHelper>(factory
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IUmbracoSettingsSection>())));

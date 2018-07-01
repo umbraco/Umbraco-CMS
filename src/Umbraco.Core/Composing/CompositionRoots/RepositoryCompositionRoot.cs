@@ -1,6 +1,4 @@
-﻿using System;
-using LightInject;
-using Umbraco.Core.Cache;
+﻿using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -13,11 +11,11 @@ namespace Umbraco.Core.Composing.CompositionRoots
     /// <summary>
     /// Sets the IoC container for the umbraco data layer/repositories/sql/database/etc...
     /// </summary>
-    public sealed class RepositoryCompositionRoot : ICompositionRoot
+    public sealed class RepositoryCompositionRoot : IRegistrationBundle
     {
         public const string DisabledCache = "DisabledCache";
 
-        public void Compose(IServiceRegistry container)
+        public void Compose(IContainer container)
         {
             // register cache helpers
             // the main cache helper is registered by CoreBootManager and is used by most repositories

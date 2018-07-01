@@ -91,17 +91,17 @@ namespace Umbraco.Web.Runtime
 
             // register a per-request HttpContextBase object
             // is per-request so only one wrapper is created per request
-            composition.Container.Register<HttpContextBase>(factory => new HttpContextWrapper(factory.GetInstance<IHttpContextAccessor>().HttpContext), new PerRequestLifeTime());
+            composition.Container.Register<HttpContextBase>(factory => new HttpContextWrapper(factory.GetInstance<IHttpContextAccessor>().HttpContext), Lifetime.PerRequest);
 
             // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
             composition.Container.RegisterSingleton<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
 
             // register a per-request UmbracoContext object
             // no real need to be per request but assuming it is faster
-            composition.Container.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, new PerRequestLifeTime());
+            composition.Container.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, Lifetime.PerRequest);
 
             // register the umbraco helper
-            composition.Container.Register<UmbracoHelper>(new PerRequestLifeTime());
+            composition.Container.Register<UmbracoHelper>(Lifetime.PerRequest);
 
             // register distributed cache
             composition.Container.RegisterSingleton(f => new DistributedCache());
@@ -114,16 +114,9 @@ namespace Umbraco.Web.Runtime
 
             composition.Container.RegisterSingleton<IExamineManager>(factory => ExamineManager.Instance);
 
-            // IoC setup for LightInject for MVC/WebApi
-            // see comments on MixedLightInjectScopeManagerProvider for explainations of what we are doing here
-            if (!(composition.Container.ScopeManagerProvider is MixedLightInjectScopeManagerProvider smp))
-                throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
-            composition.Container.EnableMvc(); // does container.EnablePerWebRequestScope()
-            composition.Container.ScopeManagerProvider = smp; // reverts - we will do it last (in WebRuntime)
-
-            composition.Container.RegisterMvcControllers(typeLoader, GetType().Assembly);
-            composition.Container.EnableWebApi(GlobalConfiguration.Configuration);
-            composition.Container.RegisterApiControllers(typeLoader, GetType().Assembly);
+            // fixme - move out of the middle of this method.
+            // make well abstracted extension point for this.
+            LightinjectSpecificRegistrations(composition, typeLoader);
 
             composition.Container.RegisterCollectionBuilder<SearchableTreeCollectionBuilder>()
                 .Add(() => typeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
@@ -198,10 +191,26 @@ namespace Umbraco.Web.Runtime
             composition.Container.Register(_ => UmbracoConfig.For.UmbracoSettings().WebRouting);
 
             // register preview SignalR hub
-            composition.Container.Register(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>(), new PerContainerLifetime());
+            // fixme - this is also registered in PreviewHubComponent
+            composition.Container.Register(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>(), Lifetime.Singleton);
 
             // register properties fallback
             composition.Container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
+        }
+
+        private void LightinjectSpecificRegistrations(Composition composition, TypeLoader typeLoader)
+        {
+// IoC setup for LightInject for MVC/WebApi
+            // see comments on MixedLightInjectScopeManagerProvider for explainations of what we are doing here
+            var concreteContainer = ((IServiceContainer) composition.Container.ConcreteContainer);
+            if (!(concreteContainer.ScopeManagerProvider is MixedLightInjectScopeManagerProvider smp))
+                throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
+            concreteContainer.EnableMvc(); // does container.EnablePerWebRequestScope()
+            concreteContainer.ScopeManagerProvider = smp; // reverts - we will do it last (in WebRuntime)
+
+            concreteContainer.RegisterMvcControllers(typeLoader, GetType().Assembly);
+            concreteContainer.EnableWebApi(GlobalConfiguration.Configuration);
+            concreteContainer.RegisterApiControllers(typeLoader, GetType().Assembly);
         }
 
         internal void Initialize(

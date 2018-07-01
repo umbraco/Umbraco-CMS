@@ -12,7 +12,6 @@ using Umbraco.Web.Routing;
 using umbraco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Services;
-using LightInject;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Templates

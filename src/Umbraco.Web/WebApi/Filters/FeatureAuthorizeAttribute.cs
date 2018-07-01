@@ -1,6 +1,5 @@
 ﻿using System.Web.Http;
 using System.Web.Http.Controllers;
-using LightInject;
 using Umbraco.Core.Composing;
 using Umbraco.Web.Features;
 

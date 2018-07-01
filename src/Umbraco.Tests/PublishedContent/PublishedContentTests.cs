@@ -72,7 +72,7 @@ namespace Umbraco.Tests.PublishedContent
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
         }
 
-        protected override TypeLoader CreatePluginManager(IServiceFactory f)
+        protected override TypeLoader CreatePluginManager(IContainer f)
         {
             var pluginManager = base.CreatePluginManager(f);
 

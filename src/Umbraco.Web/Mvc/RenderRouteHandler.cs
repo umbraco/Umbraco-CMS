@@ -12,7 +12,6 @@ using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using System.Collections.Generic;
 using Current = Umbraco.Web.Composing.Current;
-using LightInject;
 using Umbraco.Web.Features;
 
 namespace Umbraco.Web.Mvc

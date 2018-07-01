@@ -1,5 +1,4 @@
-﻿using LightInject;
-using Umbraco.Core.Configuration;
+﻿using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Core.Composing.CompositionRoots
