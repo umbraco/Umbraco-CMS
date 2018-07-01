@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using Umbraco.Core.CodeAnnotations;
+﻿using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.Cache
 {
@@ -11,14 +9,6 @@ namespace Umbraco.Core.Cache
     {
         public const string ApplicationTreeCacheKey = "ApplicationTreeCache";
         public const string ApplicationsCacheKey = "ApplicationCache";
-
-        [Obsolete("This is no longer used and will be removed from the codebase in the future")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public const string UserTypeCacheKey = "UserTypeCache";
-
-        [Obsolete("This is no longer used and will be removed from the codebase in the future - it is referenced but no cache is stored against this key")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public const string ContentItemCacheKey = "contentItem";
 
         [UmbracoWillObsolete("This cache key is only used for the legacy 'library' caching, remove in v8")]
         public const string MediaCacheKey = "UL_GetMedia";

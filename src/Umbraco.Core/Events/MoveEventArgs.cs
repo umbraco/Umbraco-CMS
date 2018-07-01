@@ -88,15 +88,6 @@ namespace Umbraco.Core.Events
             EventObject = moveInfo.First().Entity;
         }
 
-        [Obsolete("Use the overload that specifies the MoveEventInfo object")]
-        public MoveEventArgs(TEntity eventObject, bool canCancel, int parentId)
-            : base(eventObject, canCancel)
-        { }
-
-        [Obsolete("Use the overload that specifies the MoveEventInfo object")]
-        public MoveEventArgs(TEntity eventObject, int parentId)
-            : base(eventObject)
-        { }
 
         /// <summary>
         /// Gets all MoveEventInfo objects used to create the object
@@ -117,15 +108,6 @@ namespace Umbraco.Core.Events
                 //assign the legacy props
                 EventObject = first.Entity;
             }
-        }
-
-        /// <summary>
-        /// The entity being moved
-        /// </summary>
-        [Obsolete("Retrieve the entity object from the MoveInfoCollection property instead")]
-        public TEntity Entity
-        {
-            get { return EventObject; }
         }
 
         public bool Equals(MoveEventArgs<TEntity> other)

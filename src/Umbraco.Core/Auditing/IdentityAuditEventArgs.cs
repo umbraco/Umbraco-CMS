@@ -46,19 +46,6 @@ namespace Umbraco.Core.Auditing
         /// </summary>
         public string Username { get; private set; }
 
-        [Obsolete("Use the method that has the affectedUser parameter instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public IdentityAuditEventArgs(AuditEvent action, string ipAddress, int performingUser = -1)
-        {
-            DateTimeUtc = DateTime.UtcNow;
-            Action = action;
-
-            IpAddress = ipAddress;
-
-            PerformingUser = performingUser == -1
-                ? GetCurrentRequestBackofficeUserId()
-                : performingUser;
-        }
 
         /// <summary>
         /// Default constructor
