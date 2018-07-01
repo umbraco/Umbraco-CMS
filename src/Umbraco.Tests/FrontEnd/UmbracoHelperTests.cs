@@ -16,59 +16,50 @@ namespace Umbraco.Tests.FrontEnd
     [TestFixture]
     public class UmbracoHelperTests
     {
-        [Test]
-        public void Truncate_Simple()
-        {
-            var text = "Hello world, this is some text <a href='blah'>with a link</a>";
+        private const string SAMPLE = "Hello world, this is some text <a href='blah'>with a link</a>";
 
+        [Test]
+        public static void Truncate_Simple()
+        {
             var helper = new UmbracoHelper();
 
-            var result = helper.Truncate(text, 25).ToString();
-
-            Assert.AreEqual("Hello world, this is some&hellip;", result);
-        }
-
-        /// <summary>
-        /// If a truncated string ends with a space, we should trim the space before appending the ellipsis.
-        /// </summary>
-        [Test]
-        public void Truncate_Simple_With_Trimming()
-        {
-            var text = "Hello world, this is some text <a href='blah'>with a link</a>";
-
-            var helper = new UmbracoHelper();
-
-            var result = helper.Truncate(text, 26).ToString();
+            var result = helper.Truncate(SAMPLE, 25).ToString();
 
             Assert.AreEqual("Hello world, this is some&hellip;", result);
         }
 
         [Test]
-        public void Truncate_Inside_Word()
+        public static void When_truncating_a_string_ending_with_a_space_we_should_trim_the_space_before_appending_the_ellipsis()
         {
-            var text = "Hello world, this is some text <a href='blah'>with a link</a>";
-
             var helper = new UmbracoHelper();
 
-            var result = helper.Truncate(text, 24).ToString();
+            var result = helper.Truncate(SAMPLE, 26).ToString();
+
+            Assert.AreEqual("Hello world, this is some&hellip;", result);
+        }
+
+        [Test]
+        public static void Truncate_Inside_Word()
+        {
+            var helper = new UmbracoHelper();
+
+            var result = helper.Truncate(SAMPLE, 24).ToString();
 
             Assert.AreEqual("Hello world, this is som&hellip;", result);
         }
 
         [Test]
-        public void Truncate_With_Tag()
+        public static void Truncate_With_Tag()
         {
-            var text = "Hello world, this is some text <a href='blah'>with a link</a>";
-
             var helper = new UmbracoHelper();
 
-            var result = helper.Truncate(text, 35).ToString();
+            var result = helper.Truncate(SAMPLE, 35).ToString();
 
             Assert.AreEqual("Hello world, this is some text <a href='blah'>with&hellip;</a>", result);
         }
 
         [Test]
-        public void Create_Encrypted_RouteString_From_Anonymous_Object()
+        public static void Create_Encrypted_RouteString_From_Anonymous_Object()
         {
             var additionalRouteValues = new
             {
@@ -77,15 +68,23 @@ namespace Umbraco.Tests.FrontEnd
                 Key3 = "Value3",
                 keY4 = "valuE4"
             };
-            var encryptedRouteString = UmbracoHelper.CreateEncryptedRouteString("FormController", "FormAction", "", additionalRouteValues);
-            var result = encryptedRouteString.DecryptWithMachineKey();
-            var expectedResult = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
 
-            Assert.AreEqual(expectedResult, result);
+            var encryptedRouteString = UmbracoHelper.CreateEncryptedRouteString(
+                "FormController",
+                "FormAction",
+                "",
+                additionalRouteValues
+                );
+
+            var result = encryptedRouteString.DecryptWithMachineKey();
+
+            const string EXPECTED_RESULT = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
+
+            Assert.AreEqual(EXPECTED_RESULT, result);
         }
 
         [Test]
-        public void Create_Encrypted_RouteString_From_Dictionary()
+        public static void Create_Encrypted_RouteString_From_Dictionary()
         {
             var additionalRouteValues = new Dictionary<string, object>()
             {
@@ -94,29 +93,35 @@ namespace Umbraco.Tests.FrontEnd
                 {"Key3", "Value3"},
                 {"keY4", "valuE4"}
             };
-            var encryptedRouteString = UmbracoHelper.CreateEncryptedRouteString("FormController", "FormAction", "", additionalRouteValues);
-            var result = encryptedRouteString.DecryptWithMachineKey();
-            var expectedResult = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
 
-            Assert.AreEqual(expectedResult, result);
+            var encryptedRouteString = UmbracoHelper.CreateEncryptedRouteString(
+                "FormController",
+                "FormAction",
+                "",
+                additionalRouteValues
+                );
+
+            var result = encryptedRouteString.DecryptWithMachineKey();
+
+            const string EXPECTED_RESULT = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
+
+            Assert.AreEqual(EXPECTED_RESULT, result);
         }
 
         [Test]
-        public void Truncate_By_Words()
+        public static void Truncate_By_Words()
         {
-            var text = "Hello world, this is some text <a href='blah'>with a link</a>";
-
             var helper = new UmbracoHelper();
 
-            var result = helper.TruncateByWords(text, 4).ToString();
+            var result = helper.TruncateByWords(SAMPLE, 4).ToString();
 
             Assert.AreEqual("Hello world, this is&hellip;", result);
         }
 
         [Test]
-        public void Truncate_By_Words_With_Tag()
+        public static void Truncate_By_Words_With_Tag()
         {
-            var text = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
+            const string text = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
 
             var helper = new UmbracoHelper();
 
@@ -126,21 +131,19 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public void Truncate_By_Words_Mid_Tag()
+        public static void Truncate_By_Words_Mid_Tag()
         {
-            var text = "Hello world, this is some text <a href='blah'>with a link</a>";
-
             var helper = new UmbracoHelper();
 
-            var result = helper.TruncateByWords(text, 7).ToString();
+            var result = helper.TruncateByWords(SAMPLE, 7).ToString();
 
             Assert.AreEqual("Hello world, this is some text <a href='blah'>with&hellip;</a>", result);
         }
 
         [Test]
-        public void Strip_All_Html()
+        public static void Strip_All_Html()
         {
-            var text = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
+            const string text = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
 
             var helper = new UmbracoHelper();
 
@@ -150,9 +153,9 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public void Strip_Specific_Html()
+        public static void Strip_Specific_Html()
         {
-            var text = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
+            const string text = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
 
             string[] tags = { "b" };
 
@@ -164,9 +167,9 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public void Strip_Invalid_Html()
+        public static void Strip_Invalid_Html()
         {
-            var text = "Hello world, <bthis</b> is some text <a href='blah'>with a link</a>";
+            const string text = "Hello world, <bthis</b> is some text <a href='blah'>with a link</a>";
 
             var helper = new UmbracoHelper();
 
