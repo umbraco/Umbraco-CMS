@@ -16,33 +16,6 @@ namespace Umbraco.Tests.FrontEnd
     [TestFixture]
     public class UmbracoHelperTests
     {
-        [SetUp]
-        public void SetUp()
-        {
-            // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
-            var container = new Mock<IServiceContainer>();
-            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
-
-            container
-                .Setup(x => x.GetInstance(typeof(TypeLoader)))
-                .Returns(new TypeLoader(
-                    NullCacheProvider.Instance,
-                    globalSettings,
-                    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())
-                    )
-                );
-
-            Current.Container = container.Object;
-
-            Udi.ResetUdiTypes();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Current.Reset();
-        }
-
         [Test]
         public void Truncate_Simple()
         {
@@ -341,15 +314,11 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         // ------- UDI Conversion Tests
-        /// <remarks>
-        /// This requires PluginManager.Current to be initialised before
-        /// running.
-        /// </remarks>
         [Test]
-        public static void Converting_boxed_udi_to_a_udi_returns_original_udi_value()
+        public void Converting_boxed_udi_to_a_udi_returns_original_udi_value()
         {
             // Arrange
-            Udi.ResetUdiTypes();
+            SetUpUdiTests();
             Udi sample = new GuidUdi(Constants.UdiEntityType.AnyGuid, Guid.NewGuid());
 
             // Act
@@ -359,19 +328,17 @@ namespace Umbraco.Tests.FrontEnd
                 );
 
             // Assert
+            TearDownUdiTests();
+
             Assert.IsTrue(success);
             Assert.That(result, Is.EqualTo(sample));
         }
 
-        /// <remarks>
-        /// This requires PluginManager.Current to be initialised before
-        /// running.
-        /// </remarks>
         [Test]
-        public static void Converting_string_udi_to_a_udi_returns_original_udi_value()
+        public void Converting_string_udi_to_a_udi_returns_original_udi_value()
         {
             // Arrange
-            Udi.ResetUdiTypes();
+            SetUpUdiTests();
             Udi sample = new GuidUdi(Constants.UdiEntityType.AnyGuid, Guid.NewGuid());
 
             // Act
@@ -381,42 +348,37 @@ namespace Umbraco.Tests.FrontEnd
                 );
 
             // Assert
+            TearDownUdiTests();
+
             Assert.IsTrue(success, "Conversion of UDI failed.");
             Assert.That(result, Is.EqualTo(sample));
         }
 
-        /// <remarks>
-        /// This requires PluginManager.Current to be initialised before
-        /// running.
-        /// </remarks>
         [Test]
-        public static void Converting_hello_to_a_udi_returns_false()
+        public void Converting_hello_to_a_udi_returns_false()
         {
             // Arrange
-            Udi.ResetUdiTypes();
-            const string sample = "Hello";
+            SetUpUdiTests();
+            const string SAMPLE = "Hello";
 
             // Act
             bool success = UmbracoHelper.ConvertIdObjectToUdi(
-                sample,
+                SAMPLE,
                 out Udi result
                 );
 
             // Assert
+            TearDownUdiTests();
+
             Assert.IsFalse(success);
             Assert.That(result, Is.Null);
         }
 
-        /// <remarks>
-        /// This requires PluginManager.Current to be initialised before
-        /// running.
-        /// </remarks>
         [Test]
-        public static void Converting_unsupported_object_to_a_udi_returns_false()
+        public void Converting_unsupported_object_to_a_udi_returns_false()
         {
             // Arrange
-            Udi.ResetUdiTypes();
-
+            SetUpUdiTests();
             var clearlyWillNotConvertToGuid = new StringBuilder(0);
 
             // Act
@@ -426,8 +388,32 @@ namespace Umbraco.Tests.FrontEnd
                 );
 
             // Assert
+            TearDownUdiTests();
+
             Assert.IsFalse(success);
             Assert.That(result, Is.Null);
         }
+
+        public void SetUpUdiTests()
+        {
+            // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
+            var container = new Mock<IServiceContainer>();
+            var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
+
+            container
+                .Setup(x => x.GetInstance(typeof(TypeLoader)))
+                .Returns(new TypeLoader(
+                    NullCacheProvider.Instance,
+                    globalSettings,
+                    new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())
+                    )
+                );
+
+            Current.Container = container.Object;
+
+            Udi.ResetUdiTypes();
+        }
+
+        public void TearDownUdiTests() => Current.Reset();
     }
 }
