@@ -258,11 +258,6 @@ namespace umbraco.presentation.developer.packages
             }
         }
 
-        [Obsolete("This is not used")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        protected void generateXML(object sender, EventArgs e)
-        {
-        }
 
         private void SavePackage(bool showNotification)
         {

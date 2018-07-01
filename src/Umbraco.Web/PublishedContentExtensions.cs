@@ -37,16 +37,6 @@ namespace Umbraco.Web
             return content.Url;
         }
 
-        /// <summary>
-        /// Gets the absolute url for the content.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <returns>The absolute url for the content.</returns>
-        //[Obsolete("UrlWithDomain() is obsolete, use the UrlAbsolute() method instead.")]
-        public static string UrlWithDomain(this IPublishedContent content)
-        {
-            return content.UrlAbsolute();
-        }
 
         /// <summary>
         /// Gets the absolute url for the content.
