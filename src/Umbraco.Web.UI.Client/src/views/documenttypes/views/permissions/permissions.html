@@ -26,21 +26,15 @@
                 </div>
 
                 <div class="sub-view-column-right">
-                    <umb-child-selector selected-children="vm.selectedChildren"
-                                        available-children="vm.contentTypes"
-                                        parent-name="model.name"
-                                        parent-icon="model.icon"
-                                        parent-id="model.id"
-                                        on-add="vm.addChild"
-                                        on-remove="vm.removeChild">
+                    <umb-child-selector
+                        selected-children="vm.selectedChildren"
+                        available-children="vm.contentTypes"
+                        parent-name="model.name"
+                        parent-icon="model.icon"
+                        parent-id="model.id"
+                        on-add="vm.addChild"
+                        on-remove="vm.removeChild">
                     </umb-child-selector>
-
-                    <umb-overlay ng-if="vm.childNodeSelectorOverlay.show"
-                                model="vm.childNodeSelectorOverlay"
-                                position="target"
-                                view="vm.childNodeSelectorOverlay.view">
-                    </umb-overlay>
-
                 </div>
 
             </div>
