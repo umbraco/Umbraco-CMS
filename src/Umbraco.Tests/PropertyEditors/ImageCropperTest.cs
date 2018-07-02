@@ -9,6 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -72,6 +73,7 @@ namespace Umbraco.Tests.PropertyEditors
 
                 container.Register<ILogger, PerContainerLifetime>(f => Mock.Of<ILogger>());
                 container.Register<IContentSection, PerContainerLifetime>(f => Mock.Of<IContentSection>());
+                container.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
                 var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>());
 
                 var dataTypeService = new TestObjects.TestDataTypeService(

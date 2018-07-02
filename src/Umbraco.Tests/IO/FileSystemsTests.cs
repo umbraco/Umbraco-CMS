@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
+using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
@@ -32,6 +33,7 @@ namespace Umbraco.Tests.IO
             _container.Register<FileSystems>();
             _container.Register(_ => Mock.Of<IDataTypeService>());
             _container.Register(_ => Mock.Of<IContentSection>());
+            _container.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
 
             // make sure we start clean
             // because some tests will create corrupt or weird filesystems

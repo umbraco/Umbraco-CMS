@@ -119,8 +119,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected void PersistNewBaseContentType(IContentTypeComposition entity)
         {
-            var factory = new ContentTypeFactory();
-            var dto = factory.BuildContentTypeDto(entity);
+
+            var dto = ContentTypeFactory.BuildContentTypeDto(entity);
 
             //Cannot add a duplicate content type type
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsContentType
@@ -191,13 +191,12 @@ AND umbracoNode.nodeObjectType = @objectType",
                                         SortOrder = allowedContentType.SortOrder
                                     });
             }
-
-            var propertyFactory = new PropertyGroupFactory(nodeDto.NodeId);
-
+            
+        
             //Insert Tabs
             foreach (var propertyGroup in entity.PropertyGroups)
             {
-                var tabDto = propertyFactory.BuildGroupDto(propertyGroup);
+                var tabDto = PropertyGroupFactory.BuildGroupDto(propertyGroup, nodeDto.NodeId);
                 var primaryKey = Convert.ToInt32(Database.Insert(tabDto));
                 propertyGroup.Id = primaryKey;//Set Id on PropertyGroup
 
@@ -222,7 +221,7 @@ AND umbracoNode.nodeObjectType = @objectType",
                 {
                     AssignDataTypeFromPropertyEditor(propertyType);
                 }
-                var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(tabId, propertyType);
+                var propertyTypeDto = PropertyGroupFactory.BuildPropertyTypeDto(tabId, propertyType, nodeDto.NodeId);
                 int typePrimaryKey = Convert.ToInt32(Database.Insert(propertyTypeDto));
                 propertyType.Id = typePrimaryKey; //Set Id on new PropertyType
 
@@ -235,8 +234,8 @@ AND umbracoNode.nodeObjectType = @objectType",
 
         protected void PersistUpdatedBaseContentType(IContentTypeComposition entity)
         {
-            var factory = new ContentTypeFactory();
-            var dto = factory.BuildContentTypeDto(entity);
+
+            var dto = ContentTypeFactory.BuildContentTypeDto(entity);
 
             // ensure the alias is not used already
             var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsContentType
@@ -384,13 +383,12 @@ AND umbracoNode.id <> @id",
                     Database.Delete<PropertyTypeGroupDto>("WHERE id IN (@ids)", new { ids = groupsToDelete });
                 }
             }
-            var propertyGroupFactory = new PropertyGroupFactory(entity.Id);
 
             // insert or update groups, assign properties
             foreach (var propertyGroup in entity.PropertyGroups)
             {
                 // insert or update group
-                var groupDto = propertyGroupFactory.BuildGroupDto(propertyGroup);
+                var groupDto = PropertyGroupFactory.BuildGroupDto(propertyGroup,entity.Id);
                 var groupId = propertyGroup.HasIdentity
                     ? Database.Update(groupDto)
                     : Convert.ToInt32(Database.Insert(groupDto));
@@ -419,7 +417,7 @@ AND umbracoNode.id <> @id",
                 ValidateAlias(propertyType);
 
                 // insert or update property
-                var propertyTypeDto = propertyGroupFactory.BuildPropertyTypeDto(groupId, propertyType);
+                var propertyTypeDto = PropertyGroupFactory.BuildPropertyTypeDto(groupId, propertyType, entity.Id);
                 var typeId = propertyType.HasIdentity
                     ? Database.Update(propertyTypeDto)
                     : Convert.ToInt32(Database.Insert(propertyTypeDto));
@@ -480,8 +478,8 @@ AND umbracoNode.id <> @id",
             var dtos = Database
                 .Fetch<PropertyTypeGroupDto>(sql);
 
-            var propertyGroupFactory = new PropertyGroupFactory(id, createDate, updateDate, CreatePropertyType);
-            var propertyGroups = propertyGroupFactory.BuildEntity(dtos, IsPublishing);
+            var propertyGroups = PropertyGroupFactory.BuildEntity(dtos, IsPublishing, id, createDate, updateDate,CreatePropertyType);
+
             return new PropertyGroupCollection(propertyGroups);
         }
 
@@ -563,7 +561,7 @@ AND umbracoNode.id <> @id",
                 }
                 else
                 {
-                    Logger.Warn<ContentTypeRepositoryBase<TEntity>>("Could not assign a data type for the property type " + propertyType.Alias + " since no data type was found with a property editor " + propertyType.PropertyEditorAlias);
+                    Logger.Warn<ContentTypeRepositoryBase<TEntity>>(() => $"Could not assign a data type for the property type {propertyType.Alias} since no data type was found with a property editor {propertyType.PropertyEditorAlias}");
                 }
             }
         }
@@ -870,10 +868,8 @@ AND umbracoNode.id <> @id",
                     }
                 };
 
-                //now create the content type object
-
-                var factory = new ContentTypeFactory();
-                var mediaType = factory.BuildMediaTypeEntity(contentTypeDto);
+                //now create the content type object;
+                var mediaType = ContentTypeFactory.BuildMediaTypeEntity(contentTypeDto);
 
                 //map the allowed content types
                 mediaType.AllowedContentTypes = currAllowedContentTypes;
@@ -1052,9 +1048,7 @@ AND umbracoNode.id <> @id",
                 };
 
                 //now create the content type object
-
-                var factory = new ContentTypeFactory();
-                var contentType = factory.BuildContentTypeEntity(dtDto.ContentTypeDto);
+                var contentType = ContentTypeFactory.BuildContentTypeEntity(dtDto.ContentTypeDto);
 
                 // NOTE
                 // that was done by the factory but makes little sense, moved here, so

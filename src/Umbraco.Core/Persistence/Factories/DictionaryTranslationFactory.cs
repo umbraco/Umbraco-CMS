@@ -4,20 +4,13 @@ using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class DictionaryTranslationFactory
+    internal static class DictionaryTranslationFactory
     {
-        private readonly Guid _uniqueId;
-
-        public DictionaryTranslationFactory(Guid uniqueId)
-        {
-            _uniqueId = uniqueId;
-        }
-
         #region Implementation of IEntityFactory<DictionaryTranslation,LanguageTextDto>
 
-        public IDictionaryTranslation BuildEntity(LanguageTextDto dto)
+        public static IDictionaryTranslation BuildEntity(LanguageTextDto dto, Guid uniqueId)
         {
-            var item = new DictionaryTranslation(dto.LanguageId, dto.Value, _uniqueId);
+            var item = new DictionaryTranslation(dto.LanguageId, dto.Value, uniqueId);
 
             try
             {
@@ -35,12 +28,12 @@ namespace Umbraco.Core.Persistence.Factories
             }
         }
 
-        public LanguageTextDto BuildDto(IDictionaryTranslation entity)
+        public static LanguageTextDto BuildDto(IDictionaryTranslation entity, Guid uniqueId)
         {
             var text = new LanguageTextDto
                            {
                                LanguageId = entity.LanguageId,
-                               UniqueId = _uniqueId,
+                               UniqueId = uniqueId,
                                Value = entity.Value
                            };
 

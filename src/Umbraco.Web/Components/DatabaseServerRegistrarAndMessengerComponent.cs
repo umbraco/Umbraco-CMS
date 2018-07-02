@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Examine;
 using LightInject;
@@ -17,7 +15,6 @@ using Umbraco.Web.Cache;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Scheduling;
-using Umbraco.Examine;
 using Umbraco.Web.Search;
 
 namespace Umbraco.Web.Components
@@ -34,6 +31,11 @@ namespace Umbraco.Web.Components
     /// probably is not the "current request address" - especially in multi-domains configurations.</para>
     /// </remarks>
     [RuntimeLevel(MinLevel = RuntimeLevel.Run)]
+
+    // during Initialize / Startup, we end up checking Examine, which needs to be initialized beforehand
+    // todo - should not be a strong dependency on "examine" but on an "indexing component"
+    [RequireComponent(typeof(ExamineComponent))]
+
     public sealed class DatabaseServerRegistrarAndMessengerComponent : UmbracoComponentBase, IUmbracoCoreComponent
     {
         private object _locker = new object();

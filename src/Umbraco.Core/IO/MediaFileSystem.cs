@@ -31,6 +31,7 @@ namespace Umbraco.Core.IO
             // due to how FileSystems is written at the moment, the ctor cannot be used to inject
             // dependencies, so we have to rely on property injection for anything we might need
             Current.Container.InjectProperties(this);
+            MediaPathScheme.Initialize(this);
 
             UploadAutoFillProperties = new UploadAutoFillProperties(this, Logger, ContentConfig);
         }

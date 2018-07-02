@@ -24,7 +24,6 @@
     'lib/angular-local-storage/angular-local-storage.min.js',
 
     'lib/bootstrap/js/bootstrap.2.3.2.min.js',
-    'lib/bootstrap-tabdrop/bootstrap-tabdrop.js',
     'lib/umbraco/Extensions.js',
 
     'lib/umbraco/NamespaceManager.js',

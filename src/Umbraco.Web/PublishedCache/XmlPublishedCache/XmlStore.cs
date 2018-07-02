@@ -1038,7 +1038,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             {
                 foreach (var payload in payloads)
                 {
-                    Current.Logger.Debug<XmlStore>($"Notified {payload.ChangeTypes} for content {payload.Id}.");
+                    Current.Logger.Debug<XmlStore>(() => $"Notified {payload.ChangeTypes} for content {payload.Id}.");
 
                     if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
                     {
@@ -1071,7 +1071,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                     if (content == null || content.Published == false || content.Trashed)
                     {
                         // no published version
-                        Current.Logger.Debug<XmlStore>($"Notified, content {payload.Id} has no published version.");
+                        Current.Logger.Debug<XmlStore>(() => $"Notified, content {payload.Id} has no published version.");
                         if (current != null)
                         {
                             // remove from xml if exists
@@ -1109,7 +1109,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                             if (dtos.MoveNext() == false)
                             {
                                 // gone fishing, remove (possible race condition)
-                                Current.Logger.Debug<XmlStore>($"Notifified, content {payload.Id} gone fishing.");
+                                Current.Logger.Debug<XmlStore>(() => $"Notifified, content {payload.Id} gone fishing.");
                                 if (current != null)
                                 {
                                     // remove from xml if exists
@@ -1222,7 +1222,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 .ToArray();
 
             foreach (var payload in payloads)
-                Current.Logger.Debug<XmlStore>($"Notified {payload.ChangeTypes} for content type {payload.Id}.");
+                Current.Logger.Debug<XmlStore>(() => $"Notified {payload.ChangeTypes} for content type {payload.Id}.");
 
             if (ids.Length > 0) // must have refreshes, not only removes
                 RefreshContentTypes(ids);
@@ -1241,7 +1241,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 _contentTypeCache.ClearDataType(payload.Id);
 
             foreach (var payload in payloads)
-                Current.Logger.Debug<XmlStore>($"Notified {(payload.Removed ? "Removed" : "Refreshed")} for data type {payload.Id}.");
+                Current.Logger.Debug<XmlStore>(() => $"Notified {(payload.Removed ? "Removed" : "Refreshed")} for data type {payload.Id}.");
 
             // that's all we need to do as the changes have NO impact whatsoever on the Xml content
 

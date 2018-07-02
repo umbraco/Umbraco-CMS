@@ -166,7 +166,7 @@ namespace Umbraco.Web.WebServices
             var msg = ValidateLuceneIndexer(indexerName, out LuceneIndexer indexer);
             if (msg.IsSuccessStatusCode)
             {
-                _logger.Info<ExamineManagementApiController>($"Rebuilding index '{indexerName}'");
+                _logger.Info<ExamineManagementApiController>(() => $"Rebuilding index '{indexerName}'");
 
                 //remove it in case there's a handler there alraedy
                 indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
@@ -203,7 +203,7 @@ namespace Umbraco.Web.WebServices
             //ensure it's not listening anymore
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
 
-            _logger.Info<ExamineManagementApiController>($"Rebuilding index '{indexer.Name}' done, {indexer.CommitCount} items committed (can differ from the number of items in the index)");
+            _logger.Info<ExamineManagementApiController>(() => $"Rebuilding index '{indexer.Name}' done, {indexer.CommitCount} items committed (can differ from the number of items in the index)");
 
             var cacheKey = "temp_indexing_op_" + indexer.Name;
             _runtimeCacheProvider.ClearCacheItem(cacheKey);

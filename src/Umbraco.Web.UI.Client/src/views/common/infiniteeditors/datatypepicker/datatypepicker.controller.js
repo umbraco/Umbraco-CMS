@@ -23,6 +23,7 @@
         vm.tabs = [];
         vm.labels = {};
 
+        vm.onTabChange = onTabChange;
         vm.filterItems = filterItems;
         vm.showDetailsOverlay = showDetailsOverlay;
         vm.hideDetailsOverlay = hideDetailsOverlay;
@@ -104,6 +105,13 @@
                 vm.loading = false;
                 vm.showTabs = true;
             }
+        }
+
+        function onTabChange(selectedTab) {
+            vm.tabs.forEach(function(tab) {
+                tab.active = false;
+            });
+            selectedTab.active = true;
         }
 
         function filterItems() {
