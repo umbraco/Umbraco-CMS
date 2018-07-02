@@ -533,8 +533,8 @@
 
         // methods for infinite editing
         $scope.close = function() {
-            if($scope.model.close) {
-                $scope.model.close($scope.model);
+            if($scope.infiniteModel.close) {
+                $scope.infiniteModel.close($scope.infiniteModel);
             }
         };
 
@@ -563,7 +563,7 @@
                 getMethod: "&",
                 getScaffoldMethod: "&?",
                 culture: "=?",
-                model: "=?"
+                infiniteModel: "=?"
             }
         };
 

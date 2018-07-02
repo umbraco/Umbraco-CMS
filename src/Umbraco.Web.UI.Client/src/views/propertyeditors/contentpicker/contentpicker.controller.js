@@ -242,6 +242,19 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         $scope.renderModel = [];
     };
 
+    $scope.openContentEditor = function(node) {
+        var contentEditor = {
+            id: node.id,
+            submit: function(model) {
+                editorService.close();
+            },
+            close: function() {
+                editorService.close();
+            }
+        };
+        editorService.contentEditor(contentEditor);
+    };
+
     $scope.openMiniEditor = function(node) {
         miniEditorHelper.launchMiniEditor(node).then(function(updatedNode){
             // update the node
