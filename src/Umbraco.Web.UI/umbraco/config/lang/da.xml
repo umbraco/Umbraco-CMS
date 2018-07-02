@@ -95,9 +95,6 @@
     </key>
     <key alias="setDomains">Domæner</key>
   </area>
-  <area alias="auditTrails">
-    <key alias="atViewingFor">For</key>
-  </area>
   <area alias="buttons">
     <key alias="clearSelection">Ryd valg</key>
     <key alias="select">Vælg</key>
@@ -136,6 +133,27 @@
     <key alias="undo">Fortryd</key>
     <key alias="redo">Genskab</key>
   </area>
+  <area alias="auditTrails">
+    <key alias="atViewingFor">For</key>
+    <key alias="delete">Brugeren har slettet indholdet</key>
+    <key alias="unpublish">Brugeren har afpubliceret indholdet</key>
+    <key alias="publish">Brugeren har gemt og udgivet indholdet</key>
+    <key alias="save">Brugeren har gemt indholdet</key>
+    <key alias="move">Brugeren har flyttet indholdet</key>
+    <key alias="copy">Brugeren har kopieret indholdet</key>
+    <key alias="rollback">Brugeren har tilbagerullet indholdet til en tidligere tilstand</key>
+    <key alias="sendtopublish">Brugeren har sendt indholdet til udgivelse</key>
+    <key alias="sendtotranslate">Brugeren har sendt indholdet til oversættelse</key>
+    <key alias="smallCopy">Kopieret</key>
+    <key alias="smallPublish">Udgivet</key>
+    <key alias="smallMove">Flyttet</key>
+    <key alias="smallSave">Gemt</key>
+    <key alias="smallDelete">Slettet</key>
+    <key alias="smallUnPublish">Afpubliceret</key>
+    <key alias="smallRollBack">Indhold tilbagerullet</key>
+    <key alias="smallSendToPublish">Sendt til udgivelse</key>
+    <key alias="smallSendToTranslate">Sendt til oversættelse</key>
+  </area>  
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
     <key alias="changeDocTypeInstruction2">Kontroller derefter, at alle egenskaber bliver overført rigtigt til den nye dokumenttype, og klik derefter på Gem.</key>
@@ -191,6 +209,9 @@
     <key alias="parentNotPublishedAnomaly">Upd: dette dokument er udgiver, men er ikke i cachen (intern fejl)</key>
     <key alias="getUrlException">Kunne ikke hente url'en</key>
     <key alias="routeError">Dette dokument er udgivet, men dets url ville kollidere med indholdet %0%</key>
+    <key alias="publish">Udgiv</key>
+    <key alias="published">Udgivet</key>
+    <key alias="publishedPendingChanges">Udgivet (Ventede ændringer)</key>    
     <key alias="publish">Udgivet</key>
     <key alias="publishStatus">Udgivelsesstatus</key>
     <key alias="releaseDate">Udgivelsesdato</key>
@@ -204,6 +225,7 @@
     <key alias="altTextOptional">Alternativ tekst (valgfri)</key>
     <key alias="type">Type</key>
     <key alias="unPublish">Afpublicér</key>
+    <key alias="unpublished">Afpubliceret</key>
     <key alias="updateDate">Sidst redigeret</key>
     <key alias="updateDateDesc" version="7.0">Tidspunkt for seneste redigering</key>
     <key alias="uploadClear">Fjern fil</key>
@@ -763,6 +785,8 @@
     <key alias="forgottenPassword">Glemt adgangskode?</key>
     <key alias="forgottenPasswordInstruction">En e-mail vil blive sendt til den angivne adresse med et link til at nulstille din adgangskode</key>
     <key alias="requestPasswordResetConfirmation">En e-mail med instruktioner for nulstilling af adgangskoden vil blive sendt til den angivne adresse, hvis det matcher vores optegnelser</key>
+    <key alias="showPassword">Vis adgangskode</key>
+    <key alias="hidePassword">Skjul adgangskode</key>
     <key alias="returnToLogin">Tilbage til login formular</key>
     <key alias="setPasswordInstruction">Angiv en ny adgangskode</key>
     <key alias="setPasswordConfirmation">Din adgangskode er blevet opdateret</key>
@@ -1221,11 +1245,11 @@ Mange hilsner fra Umbraco robotten
   
   <area alias="grid">
     <key alias="rte">Rich Text Editor</key>
-    <key alias="media">Image</key>
+    <key alias="media">Billede</key>
     <key alias="macro">Macro</key>
     <key alias="embed">Embed</key>
-    <key alias="headline">Headline</key>
-    <key alias="quote">Quote</key>  
+    <key alias="headline">Overskrift</key>
+    <key alias="quote">Citat</key>  
     <key alias="insertControl">Vælg indholdstype</key>
     <key alias="chooseLayout">Vælg layout</key>
     <key alias="addRows">Tilføj række</key>
@@ -1241,9 +1265,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="placeholderImageCaption">Billedtekst...</key>
     <key alias="placeholderWriteHere">Skriv her...</key>
 
-    <key alias="gridLayouts">Gitterlayout</key>
-    <key alias="gridLayoutsDetail">Et layout er det overordnede arbejdsområde til dit gitter - du vil typisk kun behøve ét eller to</key>
-    <key alias="addGridLayout">Tilføj gitterlayout</key>
+    <key alias="gridLayouts">Grid layout</key>
+    <key alias="gridLayoutsDetail">Et layout er det overordnede arbejdsområde til dit grid - du vil typisk kun behøve ét eller to</key>
+    <key alias="addGridLayout">Tilføj grid layout</key>
     <key alias="addGridLayoutDetail">Juster dit layout ved at justere kolonnebredder og tilføj yderligere sektioner</key>
 
     <key alias="rowConfigurations">Rækkekonfigurationer</key>
@@ -1252,7 +1276,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="addRowConfigurationDetail">Juster rækken ved at indstille cellebredder og tilføje yderligere celler</key>
 
     <key alias="columns">Kolonner</key>
-    <key alias="columnsDetails">Det totale antaller kolonner i gitteret</key>
+    <key alias="columnsDetails">Det totale antal kolonner i dit grid</key>
 
     <key alias="settings">Indstillinger</key>
     <key alias="settingsDetails">Konfigurer, hvilket indstillinger, brugeren kan ændre</key>
@@ -1352,10 +1376,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="preContent">Indsæt før felt</key>
     <key alias="recursive">Rekursivt</key>
     <key alias="standardFields">Standard felter</key>
-    <key alias="uppercase">Uppercase</key>
+    <key alias="uppercase">Store bogstaver</key>
     <key alias="urlEncode">URL encode</key>
     <key alias="urlEncodeHelp">Hvis indholdet af felterne skal sendes til en url, skal denne slåes til så specialtegn formateres</key>
-    <key alias="usedIfAllEmpty">Denne tekst vil blive brugt hvis ovenstående felter er tomme</key>
+    <key alias="usedIfAllEmpty">Denne tekst bruges hvis ovenstående felter er tomme</key>
     <key alias="usedIfEmpty">Dette felt vil blive brugt hvis ovenstående felt er tomt</key>
     <key alias="withTime">Ja, med klokkeslæt. Dato/tid separator: </key>
   </area>
@@ -1539,7 +1563,7 @@ Mange hilsner fra Umbraco robotten
     </key>
   </area>
   <area alias="validation">
-    <key alias="validation">Validation</key>
+    <key alias="validation">Validering</key>
     <key alias="validateAsEmail">Valider som e-mail</key>
     <key alias="validateAsNumber">Valider som tal</key>
     <key alias="validateAsUrl">Valider som Url</key>
