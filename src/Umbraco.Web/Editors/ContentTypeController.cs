@@ -285,7 +285,11 @@ namespace Umbraco.Web.Editors
             IEnumerable<IContentType> types;
             if (contentId == Constants.System.Root)
             {
-                types = Services.ContentTypeService.GetAll().Where(x => x.AllowedAsRoot).ToList();
+                types = Services.ContentTypeService.GetAll().ToList();
+
+                //if no allowed root types are set, just return everything
+                if (types.Any(x => x.AllowedAsRoot))
+                    types = types.Where(x => x.AllowedAsRoot);
             }
             else
             {

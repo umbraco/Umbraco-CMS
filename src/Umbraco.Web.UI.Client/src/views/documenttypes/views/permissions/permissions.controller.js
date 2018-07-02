@@ -9,7 +9,7 @@
 (function() {
     'use strict';
 
-    function PermissionsController($scope, contentTypeResource, iconHelper, contentTypeHelper, localizationService, overlayService) {
+    function PermissionsController($scope, contentTypeResource, iconHelper, contentTypeHelper, localizationService) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
@@ -52,25 +52,20 @@
         }
 
         function addChild($event) {
-            var childNodeSelectorOverlay = {
+            vm.childNodeSelectorOverlay = {
                 view: "itempicker",
                 title: childNodeSelectorOverlayTitle,
                 availableItems: vm.contentTypes,
                 selectedItems: vm.selectedChildren,
-                position: "target",
                 event: $event,
+                show: true,
                 submit: function(model) {
                     vm.selectedChildren.push(model.selectedItem);
                     $scope.model.allowedContentTypes.push(model.selectedItem.id);
-                    overlayService.close();
-                },
-                close: function() {
-                    overlayService.close();
+                    vm.childNodeSelectorOverlay.show = false;
+                    vm.childNodeSelectorOverlay = null;
                 }
             };
-
-            overlayService.open(childNodeSelectorOverlay);
-
         }
 
         function removeChild(selectedChild, index) {

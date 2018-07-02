@@ -48,7 +48,7 @@ namespace Umbraco.Web.PublishedCache
         /// </summary>
         public void ClearAll()
         {
-            _logger.Debug<PublishedContentTypeCache>(() => "Clear all.");
+            _logger.Debug<PublishedContentTypeCache>("Clear all.");
 
             try
             {

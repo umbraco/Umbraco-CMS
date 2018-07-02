@@ -95,7 +95,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 }
                 else
                 {
-                    _logger.Warn<RelatedLinksValueConverter>(() => $"Related Links value converter skipped a link as the node has been unpublished/deleted (Internal Link NodeId: {relatedLink.Link}, Link Caption: \"{relatedLink.Caption}\")");
+                    _logger.Warn<RelatedLinksValueConverter>($"Related Links value converter skipped a link as the node has been unpublished/deleted (Internal Link NodeId: {relatedLink.Link}, Link Caption: \"{relatedLink.Caption}\")");
                 }
             }
 

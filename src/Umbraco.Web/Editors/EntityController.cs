@@ -391,6 +391,17 @@ namespace Umbraco.Web.Editors
         }
         #endregion
 
+        [Obsolete("Use GetyByIds instead")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public IEnumerable<EntityBasic> GetByKeys([FromUri]Guid[] ids, UmbracoEntityTypes type)
+        {
+            if (ids == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return GetResultForKeys(ids, type);
+        }
+
         public IEnumerable<EntityBasic> GetChildren(int id, UmbracoEntityTypes type)
         {
             return GetResultForChildren(id, type);

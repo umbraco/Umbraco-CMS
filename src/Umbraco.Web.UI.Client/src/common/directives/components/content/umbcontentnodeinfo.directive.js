@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper, editorService) {
+    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper) {
 
         function link(scope, element, attrs, ctrl) {
 
@@ -11,18 +11,8 @@
             scope.publishStatus = {};
 
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
-            scope.allowChangeDocumentType = false;
             
             function onInit() {
-
-                userService.getCurrentUser().then(function(user){
-                        // only allow change of media type if user has access to the settings sections
-                        angular.forEach(user.sections, function(section){
-                            if(section.alias === "settings") {
-                                scope.allowChangeDocumentType = true;
-                            }
-                        });
-                    });
 
                 var keys = [
                     "general_deleted", 
@@ -41,6 +31,8 @@
                         setNodePublishStatus(scope.node);
 
                     });
+
+                scope.allowOpen = true;
 
                 scope.datePickerConfig = {
                     pickDate: true,
@@ -75,17 +67,9 @@
                 loadAuditTrail();
             };
 
-            scope.openDocumentType = function (documentType) {
-                var editor = {
-                    id: documentType.id,
-                    submit: function(model) {
-                        editorService.close();
-                    },
-                    close: function() {
-                        editorService.close();
-                    }
-                };
-                editorService.documentTypeEditor(editor);
+            scope.openDocumentType = function (documentType) {               
+                var url = "/settings/documenttypes/edit/" + documentType.id;
+                $location.url(url);
             };
 
             scope.updateTemplate = function (templateAlias) {

@@ -6,9 +6,8 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, $q, appState, mediaResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper, editorState, umbRequestHelper, $http, eventsService) {
+function mediaEditController($scope, $routeParams, appState, mediaResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper, editorState, umbRequestHelper, $http) {
     
-    var evts = [];
     var nodeId = null;
     var create = false;
     var infiniteMode = $scope.model && $scope.model.infiniteMode;
@@ -85,10 +84,47 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
             });
     }
     else {
+
         $scope.page.loading = true;
-        loadMedia()
-            .then(function(){
+
+        mediaResource.getById(nodeId)
+            .then(function (data) {
+
+                $scope.content = data;
+                
+                if (data.isChildOfListView && data.trashed === false) {
+                    $scope.page.listViewPath = ($routeParams.page)
+                        ? "/media/media/edit/" + data.parentId + "?page=" + $routeParams.page
+                        : "/media/media/edit/" + data.parentId;
+                }
+
+                editorState.set($scope.content);
+
+                //in one particular special case, after we've created a new item we redirect back to the edit
+                // route but there might be server validation errors in the collection which we need to display
+                // after the redirect, so we will bind all subscriptions which will show the server validation errors
+                // if there are any and then clear them so the collection no longer persists them.
+                serverValidationManager.executeAndClearAllSubscriptions();
+
+                if(!infiniteMode) {
+                    syncTreeNode($scope.content, data.path, true); 
+                }
+               
+                if ($scope.content.parentId && $scope.content.parentId != -1) {
+                    //We fetch all ancestors of the node to generate the footer breadcrump navigation
+                    entityResource.getAncestors(nodeId, "media")
+                        .then(function (anc) {
+                            $scope.ancestors = anc;
+                        });
+                }
+
+                // We don't get the info tab from the server from version 7.8 so we need to manually add it
+                //contentEditingHelper.addInfoTab($scope.content.tabs);
+
+                init($scope.content);
+
                 $scope.page.loading = false;
+
             });
     }
 
@@ -201,72 +237,13 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
         
     };
 
-    function loadMedia() {
-
-        return mediaResource.getById(nodeId)
-            .then(function (data) {
-
-                $scope.content = data;
-                
-                if (data.isChildOfListView && data.trashed === false) {
-                    $scope.page.listViewPath = ($routeParams.page)
-                        ? "/media/media/edit/" + data.parentId + "?page=" + $routeParams.page
-                        : "/media/media/edit/" + data.parentId;
-                }
-
-                editorState.set($scope.content);
-
-                //in one particular special case, after we've created a new item we redirect back to the edit
-                // route but there might be server validation errors in the collection which we need to display
-                // after the redirect, so we will bind all subscriptions which will show the server validation errors
-                // if there are any and then clear them so the collection no longer persists them.
-                serverValidationManager.executeAndClearAllSubscriptions();
-
-                if(!infiniteMode) {
-                    syncTreeNode($scope.content, data.path, true); 
-                }
-               
-                if ($scope.content.parentId && $scope.content.parentId != -1) {
-                    //We fetch all ancestors of the node to generate the footer breadcrump navigation
-                    entityResource.getAncestors(nodeId, "media")
-                        .then(function (anc) {
-                            $scope.ancestors = anc;
-                        });
-                }
-
-                // We don't get the info tab from the server from version 7.8 so we need to manually add it
-                //contentEditingHelper.addInfoTab($scope.content.tabs);
-
-                init($scope.content);
-
-                $scope.page.loading = false;
-
-                $q.resolve($scope.content);
-
-            });
-
-    }
-
     $scope.close = function() {
         if($scope.model.close) {
             $scope.model.close($scope.model);
         }
     };
 
-    evts.push(eventsService.on("editors.mediaType.saved", function(name, args) {
-        // if this media item uses the updated media type we need to reload the media item
-        if(args && args.mediaType && args.mediaType.key === $scope.content.contentType.key) {
-            loadMedia();
-        }
-    }));
-
-    //ensure to unregister from all events!
-    $scope.$on('$destroy', function () {
-        for (var e in evts) {
-            eventsService.unsubscribe(evts[e]);
-        }
-    });
-
 }
 
-angular.module("umbraco").controller("Umbraco.Editors.Media.EditController", mediaEditController);
+angular.module("umbraco")
+    .controller("Umbraco.Editors.Media.EditController", mediaEditController);

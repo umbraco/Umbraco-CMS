@@ -6,17 +6,31 @@ using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal static class PropertyGroupFactory
+    internal class PropertyGroupFactory
     {
-        
+        private readonly int _contentTypeId;
+        private readonly DateTime _createDate;
+        private readonly DateTime _updateDate;
+        //a callback to create a property type which can be injected via a contructor
+        private readonly Func<string, ValueStorageType, string, PropertyType> _propertyTypeCtor;
+
+        public PropertyGroupFactory(int contentTypeId)
+        {
+            _contentTypeId = contentTypeId;
+            _propertyTypeCtor = (propertyEditorAlias, dbType, alias) => new PropertyType(propertyEditorAlias, dbType);
+        }
+
+        public PropertyGroupFactory(int contentTypeId, DateTime createDate, DateTime updateDate, Func<string, ValueStorageType, string, PropertyType> propertyTypeCtor)
+        {
+            _contentTypeId = contentTypeId;
+            _createDate = createDate;
+            _updateDate = updateDate;
+            _propertyTypeCtor = propertyTypeCtor;
+        }
+
         #region Implementation of IEntityFactory<IEnumerable<PropertyGroup>,IEnumerable<TabDto>>
 
-        public static IEnumerable<PropertyGroup> BuildEntity(IEnumerable<PropertyTypeGroupDto> groupDtos,
-                                                             bool isPublishing,
-                                                             int contentTypeId,
-                                                             DateTime createDate,
-                                                             DateTime updateDate,
-                                                             Func<string, ValueStorageType, string, PropertyType> propertyTypeCtor)
+        public IEnumerable<PropertyGroup> BuildEntity(IEnumerable<PropertyTypeGroupDto> groupDtos, bool isPublishing)
         {
             // groupDtos contains all the groups, those that are defined on the current
             // content type, and those that are inherited from composition content types
@@ -31,7 +45,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                     // if the group is defined on the current content type,
                     // assign its identifier, else it will be zero
-                    if (groupDto.ContentTypeNodeId == contentTypeId)
+                    if (groupDto.ContentTypeNodeId == _contentTypeId)
                         group.Id = groupDto.Id;
 
                     group.Name = groupDto.Text;
@@ -44,7 +58,7 @@ namespace Umbraco.Core.Persistence.Factories
                     foreach (var typeDto in typeDtos)
                     {
                         var tempGroupDto = groupDto;
-                        var propertyType = propertyTypeCtor(typeDto.DataTypeDto.EditorAlias,
+                        var propertyType = _propertyTypeCtor(typeDto.DataTypeDto.EditorAlias,
                             typeDto.DataTypeDto.DbType.EnumParse<ValueStorageType>(true),
                             typeDto.Alias);
 
@@ -62,9 +76,9 @@ namespace Umbraco.Core.Persistence.Factories
                             propertyType.SortOrder = typeDto.SortOrder;
                             propertyType.ValidationRegExp = typeDto.ValidationRegExp;
                             propertyType.PropertyGroupId = new Lazy<int>(() => tempGroupDto.Id);
-                            propertyType.CreateDate = createDate;
-                            propertyType.UpdateDate = updateDate;
-                            propertyType.Variations = (ContentVariation)typeDto.Variations;
+                            propertyType.CreateDate = _createDate;
+                            propertyType.UpdateDate = _updateDate;
+                            propertyType.Variations = (ContentVariation) typeDto.Variations;
 
                             // reset dirty initial properties (U4-1946)
                             propertyType.ResetDirtyProperties(false);
@@ -89,37 +103,37 @@ namespace Umbraco.Core.Persistence.Factories
             return propertyGroups;
         }
 
-        public static IEnumerable<PropertyTypeGroupDto> BuildDto(IEnumerable<PropertyGroup> entity)
+        public IEnumerable<PropertyTypeGroupDto> BuildDto(IEnumerable<PropertyGroup> entity)
         {
             return entity.Select(BuildGroupDto).ToList();
         }
 
         #endregion
 
-        internal static PropertyTypeGroupDto BuildGroupDto(PropertyGroup propertyGroup, int contentTypeId)
+        internal PropertyTypeGroupDto BuildGroupDto(PropertyGroup propertyGroup)
         {
             var dto = new PropertyTypeGroupDto
-            {
-                ContentTypeNodeId = contentTypeId,
-                SortOrder = propertyGroup.SortOrder,
-                Text = propertyGroup.Name,
-                UniqueId = propertyGroup.Key
-            };
+                             {
+                                 ContentTypeNodeId = _contentTypeId,
+                                 SortOrder = propertyGroup.SortOrder,
+                                 Text = propertyGroup.Name,
+                                 UniqueId = propertyGroup.Key
+                             };
 
             if (propertyGroup.HasIdentity)
                 dto.Id = propertyGroup.Id;
 
-            dto.PropertyTypeDtos = propertyGroup.PropertyTypes.Select(propertyType => BuildPropertyTypeDto(propertyGroup.Id, propertyType, contentTypeId)).ToList();
+            dto.PropertyTypeDtos = propertyGroup.PropertyTypes.Select(propertyType => BuildPropertyTypeDto(propertyGroup.Id, propertyType)).ToList();
 
             return dto;
         }
 
-        internal static PropertyTypeDto BuildPropertyTypeDto(int tabId, PropertyType propertyType, int contentTypeId)
+        internal PropertyTypeDto BuildPropertyTypeDto(int tabId, PropertyType propertyType)
         {
             var propertyTypeDto = new PropertyTypeDto
             {
                 Alias = propertyType.Alias,
-                ContentTypeId = contentTypeId,
+                ContentTypeId = _contentTypeId,
                 DataTypeId = propertyType.DataTypeId,
                 Description = propertyType.Description,
                 Mandatory = propertyType.Mandatory,
@@ -127,7 +141,7 @@ namespace Umbraco.Core.Persistence.Factories
                 SortOrder = propertyType.SortOrder,
                 ValidationRegExp = propertyType.ValidationRegExp,
                 UniqueId = propertyType.Key,
-                Variations = (byte)propertyType.Variations
+                Variations = (byte) propertyType.Variations
             };
 
             if (tabId != default)

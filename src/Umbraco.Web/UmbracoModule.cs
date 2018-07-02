@@ -594,7 +594,7 @@ namespace Umbraco.Web
 
                 if (UmbracoContext.Current != null && UmbracoContext.Current.IsFrontEndUmbracoRequest)
                 {
-                    Logger.Debug<UmbracoModule>(() => $"End Request. ({DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds}ms)");
+                    Logger.Debug<UmbracoModule>($"End Request. ({DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds}ms)");
                 }
 
                 OnEndRequest(new UmbracoRequestEventArgs(UmbracoContext.Current, new HttpContextWrapper(httpContext)));

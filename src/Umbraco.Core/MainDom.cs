@@ -117,7 +117,7 @@ namespace Umbraco.Core
 
             lock (_locko)
             {
-                _logger.Debug<MainDom>(() => "Signaled" + (_signaled ? " (again)" : "") + " (" + source + ").");
+                _logger.Debug<MainDom>("Signaled" + (_signaled ? " (again)" : "") + " (" + source + ").");
                 if (_signaled) return;
                 if (_isMainDom == false) return; // probably not needed
                 _signaled = true;

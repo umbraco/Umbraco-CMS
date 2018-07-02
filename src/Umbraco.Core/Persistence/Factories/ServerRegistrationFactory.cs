@@ -3,9 +3,9 @@ using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal static class ServerRegistrationFactory
+    internal class ServerRegistrationFactory
     {
-        public static ServerRegistration BuildEntity(ServerRegistrationDto dto)
+        public ServerRegistration BuildEntity(ServerRegistrationDto dto)
         {
             var model = new ServerRegistration(dto.Id, dto.ServerAddress, dto.ServerIdentity, dto.DateRegistered, dto.DateAccessed, dto.IsActive, dto.IsMaster);
             // reset dirty initial properties (U4-1946)
@@ -13,7 +13,7 @@ namespace Umbraco.Core.Persistence.Factories
             return model;
         }
 
-        public static ServerRegistrationDto BuildDto(IServerRegistration entity)
+        public ServerRegistrationDto BuildDto(IServerRegistration entity)
         {
             var dto = new ServerRegistrationDto
             {

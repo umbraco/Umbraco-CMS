@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace umbraco.presentation.Web.UI
+﻿namespace umbraco.presentation.Web.UI
 {
     /// <summary>
     /// Summary description for ContentPage.
@@ -9,14 +7,12 @@ namespace umbraco.presentation.Web.UI
     {
         private int _id = 0;
 
-        public int UmbracoNodeId
-        {
+        public int UmbracoNodeId {
             set
             {
                 _id = value;
-                System.Web.HttpContext.Current.Items["pageID"] = _id;
             }
-            get {return _id;}
+            get { return _id; }
         }
         public ContentPage()
         {

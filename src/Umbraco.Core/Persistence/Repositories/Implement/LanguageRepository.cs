@@ -139,8 +139,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 IsolatedCache.ClearAllCache();
             }
 
-;
-            var dto = LanguageFactory.BuildDto(entity);
+            var factory = new LanguageFactory();
+            var dto = factory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
@@ -163,8 +163,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 //We need to clear the whole cache since all languages will be updated
                 IsolatedCache.ClearAllCache();
             }
-            
-            var dto = LanguageFactory.BuildDto(entity);
+
+            var factory = new LanguageFactory();
+            var dto = factory.BuildDto(entity);
 
             Database.Update(dto);
 
@@ -196,7 +197,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected ILanguage ConvertFromDto(LanguageDto dto)
         {
-            var entity = LanguageFactory.BuildEntity(dto);
+            var factory = new LanguageFactory();
+            var entity = factory.BuildEntity(dto);
             return entity;
         }
         

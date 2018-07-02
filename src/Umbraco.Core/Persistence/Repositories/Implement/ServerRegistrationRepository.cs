@@ -56,8 +56,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override IEnumerable<IServerRegistration> PerformGetAll(params int[] ids)
         {
+            var factory = new ServerRegistrationFactory();
             return Database.Fetch<ServerRegistrationDto>("WHERE id > 0")
-                .Select(x => ServerRegistrationFactory.BuildEntity(x));
+                .Select(x => factory.BuildEntity(x));
         }
 
         protected override IEnumerable<IServerRegistration> PerformGetByQuery(IQuery<IServerRegistration> query)
@@ -99,7 +100,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             ((ServerRegistration)entity).AddingEntity();
 
-            var dto = ServerRegistrationFactory.BuildDto(entity);
+            var factory = new ServerRegistrationFactory();
+            var dto = factory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
@@ -110,8 +112,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(IServerRegistration entity)
         {
             ((ServerRegistration)entity).UpdatingEntity();
-            
-            var dto = ServerRegistrationFactory.BuildDto(entity);
+
+            var factory = new ServerRegistrationFactory();
+            var dto = factory.BuildDto(entity);
 
             Database.Update(dto);
 

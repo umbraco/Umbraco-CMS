@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -13,11 +14,11 @@ namespace Umbraco.Core.Persistence.Factories
     // IMediaType (media types)
     // IMemberType (member types)
     //
-    internal static class ContentTypeFactory
+    internal class ContentTypeFactory
     {
         #region IContentType
 
-        public static IContentType BuildContentTypeEntity(ContentTypeDto dto)
+        public IContentType BuildContentTypeEntity(ContentTypeDto dto)
         {
             var contentType = new ContentType(dto.NodeDto.ParentId);
 
@@ -41,7 +42,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region IMediaType
 
-        public static IMediaType BuildMediaTypeEntity(ContentTypeDto dto)
+        public IMediaType BuildMediaTypeEntity(ContentTypeDto dto)
         {
             var contentType = new MediaType(dto.NodeDto.ParentId);
             try
@@ -65,12 +66,12 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region IMemberType
 
-        public static IMemberType BuildMemberTypeEntity(ContentTypeDto dto)
+        public IMemberType BuildMemberTypeEntity(ContentTypeDto dto)
         {
             throw new NotImplementedException();
         }
 
-        public static IEnumerable<MemberTypeDto> BuildMemberTypeDtos(IMemberType entity)
+        public IEnumerable<MemberTypeDto> BuildMemberTypeDtos(IMemberType entity)
         {
             var memberType = entity as MemberType;
             if (memberType == null || memberType.PropertyTypes.Any() == false)
@@ -111,7 +112,7 @@ namespace Umbraco.Core.Persistence.Factories
             entity.Variations = (ContentVariation) dto.Variations;
         }
 
-        public static ContentTypeDto BuildContentTypeDto(IContentTypeBase entity)
+        public ContentTypeDto BuildContentTypeDto(IContentTypeBase entity)
         {
             Guid nodeObjectType;
             if (entity is IContentType)

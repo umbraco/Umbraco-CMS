@@ -62,8 +62,7 @@
                             
                             <div class="history-item__break">
                                 <umb-badge
-                                    style="margin-right: 5px;"
-                                    size="xxs"
+                                    size="xs"
                                     color="{{item.logTypeColor}}">
                                     {{ item.logType }}
                                 </umb-badge>
@@ -179,9 +178,9 @@
 
                 <umb-control-group data-element="node-info-document-type" label="@content_documentType">
                     <umb-node-preview style="max-width: 100%; margin-bottom: 0;"
-                                      icon="node.icon"
-                                      name="node.contentTypeName"
-                                      allow-open="allowChangeDocumentType"
+                                      icon="documentType.icon"
+                                      name="documentType.name"
+                                      allow-open="allowOpen"
                                       on-open="openDocumentType(documentType)">
                     </umb-node-preview>
                 </umb-control-group>

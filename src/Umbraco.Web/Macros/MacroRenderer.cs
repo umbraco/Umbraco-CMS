@@ -304,7 +304,7 @@ namespace Umbraco.Web.Macros
             {
                 Exceptions.Add(e);
 
-                _plogger.Logger.Warn<MacroRenderer>(e, () => $"Failed {msgIn}");
+                _plogger.Logger.Warn<MacroRenderer>(e, "Failed " + msgIn);
 
                 var macroErrorEventArgs = new MacroErrorEventArgs
                 {

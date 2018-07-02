@@ -228,8 +228,8 @@ namespace umbraco
         {
             try
             {
-                int currentID = int.Parse(HttpContext.Current.Items["pageID"].ToString());
-                return GetItem(currentID, alias);
+                var currentId = UmbracoContext.Current.PageId.Value;
+                return GetItem(currentId, alias);
             }
             catch (Exception ItemException)
             {
@@ -252,8 +252,8 @@ namespace umbraco
                 {
                     var xml = Current.ApplicationCache.RuntimeCache.GetCacheItem<XElement>(
                         $"{CacheKeys.MediaCacheKey}_{MediaId}_{deep}",
-                        timeout:        TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
-                        getCacheItem:   () => GetMediaDo(MediaId, deep).Item1);
+                        timeout: TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
+                        getCacheItem: () => GetMediaDo(MediaId, deep).Item1);
 
                     if (xml != null)
                     {
@@ -270,7 +270,7 @@ namespace umbraco
                     return xml.CreateNavigator().Select("/");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Current.Logger.Error<library>("An error occurred looking up media", ex);
             }
@@ -313,8 +313,8 @@ namespace umbraco
                     var xml = Current.ApplicationCache.RuntimeCache.GetCacheItem<XElement>(
                         string.Format(
                             "{0}_{1}", CacheKeys.MemberLibraryCacheKey, MemberId),
-                        timeout:        TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
-                        getCacheItem:   () => GetMemberDo(MemberId));
+                        timeout: TimeSpan.FromSeconds(UmbracoConfig.For.UmbracoSettings().Content.UmbracoLibraryCacheDuration),
+                        getCacheItem: () => GetMemberDo(MemberId));
 
                     if (xml != null)
                     {
@@ -601,7 +601,7 @@ namespace umbraco
         public static bool CultureExists(string cultureName)
         {
             CultureInfo[] ci = CultureInfo.GetCultures(CultureTypes.AllCultures);
-            CultureInfo c = Array.Find(ci, delegate(CultureInfo culture) { return culture.Name == cultureName; });
+            CultureInfo c = Array.Find(ci, delegate (CultureInfo culture) { return culture.Name == cultureName; });
             return c != null;
         }
 
@@ -983,10 +983,10 @@ namespace umbraco
             try
             {
                 var nav = UmbracoContext.Current.ContentCache.CreateNavigator();
-                pageId = HttpContext.Current.Items["pageID"]?.ToString();
+                pageId = UmbracoContext.Current.PageId.ToString();
 
-                if (pageId == null)
-                    throw new NullReferenceException("pageID not found in the current HTTP context");
+                if (string.IsNullOrEmpty(pageId))
+                    throw new NullReferenceException("PageId not found in the current Umbraco context");
 
                 nav.MoveToId(pageId);
                 return nav.Select(".");

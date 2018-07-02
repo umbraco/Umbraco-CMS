@@ -59,18 +59,6 @@
                 createButtons(args.node);
             }));
 
-            evts.push(eventsService.on("editors.documentType.saved", function (name, args) {
-                // if this content item uses the updated doc type we need to reload the content item
-                if(args && args.documentType && args.documentType.key === content.documentType.key) {
-                    if ($scope.page.culture) {
-                        loadContent($scope.page.culture);
-                    }
-                    else {
-                        loadContent();
-                    }
-                }
-            }));
-
             // We don't get the info tab from the server from version 7.8 so we need to manually add it
             //contentEditingHelper.addInfoTab($scope.content.tabs);
 
@@ -137,8 +125,10 @@
          */
         function loadContent(culture) {
 
+            $scope.page.loading = true;
+
             //we are editing so get the content item from the server
-            return $scope.getMethod()($scope.contentId, culture)
+            $scope.getMethod()($scope.contentId, culture)
                 .then(function (data) {
 
                     $scope.content = data;
@@ -161,7 +151,7 @@
 
                     resetLastListPageNumber($scope.content);
 
-                    return $q.resolve($scope.content);
+                    $scope.page.loading = false;
 
                 });
 
@@ -267,16 +257,11 @@
         else {
 
             //Browse content nodes based on the selected tree language variant
-            $scope.page.loading = true;
             if ($scope.page.culture) {
-                loadContent($scope.page.culture).then(function(){
-                    $scope.page.loading = false;
-                });
+                loadContent($scope.page.culture);
             }
             else {
-                loadContent().then(function(){
-                    $scope.page.loading = false;
-                });
+                loadContent();
             }
         }
 

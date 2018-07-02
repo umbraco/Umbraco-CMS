@@ -4,11 +4,11 @@ using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal static class DictionaryItemFactory
+    internal class DictionaryItemFactory
     {
         #region Implementation of IEntityFactory<DictionaryItem,DictionaryDto>
 
-        public static IDictionaryItem BuildEntity(DictionaryDto dto)
+        public IDictionaryItem BuildEntity(DictionaryDto dto)
         {
             var item = new DictionaryItem(dto.Parent, dto.Key);
 
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Factories
             }
         }
 
-        public static DictionaryDto BuildDto(IDictionaryItem entity)
+        public DictionaryDto BuildDto(IDictionaryItem entity)
         {
             return new DictionaryDto
                        {
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         #endregion
 
-        private static List<LanguageTextDto> BuildLanguageTextDtos(IDictionaryItem entity)
+        private List<LanguageTextDto> BuildLanguageTextDtos(IDictionaryItem entity)
         {
             var list = new List<LanguageTextDto>();
             foreach (var translation in entity.Translations)

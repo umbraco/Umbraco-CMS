@@ -629,7 +629,7 @@ namespace Umbraco.Core.Services.Implement
                             try
                             {
                                 if (Sendmail != null) Sendmail(s, request.Mail, _logger); else s.Send(request.Mail);
-                                _logger.Debug<NotificationService>(() => string.Format("Notification \"{0}\" sent to {1} ({2})", request.Action, request.UserName, request.Email));
+                                _logger.Debug<NotificationService>(string.Format("Notification \"{0}\" sent to {1} ({2})", request.Action, request.UserName, request.Email));
                             }
                             catch (Exception ex)
                             {

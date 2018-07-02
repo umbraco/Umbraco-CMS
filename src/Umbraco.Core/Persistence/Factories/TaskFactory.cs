@@ -6,9 +6,9 @@ namespace Umbraco.Core.Persistence.Factories
     /// <summary>
     /// Creates the model mappings for Tasks
     /// </summary>
-    internal static class TaskFactory
+    internal class TaskFactory
     {
-        public static Task BuildEntity(TaskDto dto)
+        public Task BuildEntity(TaskDto dto)
         {
             var entity = new Task(new TaskType(dto.TaskTypeDto.Alias) { Id = dto.TaskTypeDto.Id });
 
@@ -34,7 +34,7 @@ namespace Umbraco.Core.Persistence.Factories
             }
         }
 
-        public static TaskDto BuildDto(Task entity)
+        public TaskDto BuildDto(Task entity)
         {
             var dto = new TaskDto
             {

@@ -4,19 +4,19 @@ using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal static class MemberGroupFactory
+    internal class MemberGroupFactory
     {
 
-        private static readonly Guid _nodeObjectTypeId;
+        private readonly Guid _nodeObjectTypeId;
 
-         static MemberGroupFactory()
+        public MemberGroupFactory()
         {
             _nodeObjectTypeId = Constants.ObjectTypes.MemberGroup;
         }
 
         #region Implementation of IEntityFactory<ITemplate,TemplateDto>
 
-        public static IMemberGroup BuildEntity(NodeDto dto)
+        public IMemberGroup BuildEntity(NodeDto dto)
         {
             var group = new MemberGroup();
 
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Factories
             }
         }
 
-        public static NodeDto BuildDto(IMemberGroup entity)
+        public NodeDto BuildDto(IMemberGroup entity)
         {
             var dto = new NodeDto
             {

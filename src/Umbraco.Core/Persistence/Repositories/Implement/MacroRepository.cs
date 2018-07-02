@@ -40,8 +40,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (macroDto == null)
                 return null;
-            
-            var entity = MacroFactory.BuildEntity(macroDto);
+
+            var factory = new MacroFactory();
+            var entity = factory.BuildEntity(macroDto);
 
             // reset dirty initial properties (U4-1946)
             ((BeingDirtyBase)entity).ResetDirtyProperties(false);
@@ -78,8 +79,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private IEnumerable<IMacro> ConvertFromDtos(IEnumerable<MacroDto> dtos)
         {
-
-            foreach (var entity in dtos.Select(MacroFactory.BuildEntity))
+            var factory = new MacroFactory();
+            foreach (var entity in dtos.Select(factory.BuildEntity))
             {
                 // reset dirty initial properties (U4-1946)
                 ((BeingDirtyBase)entity).ResetDirtyProperties(false);
@@ -134,7 +135,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             ((EntityBase)entity).AddingEntity();
 
-            var dto = MacroFactory.BuildDto(entity);
+            var factory = new MacroFactory();
+            var dto = factory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
@@ -153,8 +155,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(IMacro entity)
         {
             ((EntityBase)entity).UpdatingEntity();
-;
-            var dto = MacroFactory.BuildDto(entity);
+
+            var factory = new MacroFactory();
+            var dto = factory.BuildDto(entity);
 
             Database.Update(dto);
 

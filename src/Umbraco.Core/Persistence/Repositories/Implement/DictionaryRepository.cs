@@ -130,15 +130,17 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             foreach (var translation in dictionaryItem.Translations)
                 translation.Value = translation.Value.ToValidXmlString();
-            
-            var dto = DictionaryItemFactory.BuildDto(dictionaryItem);
+
+            var factory = new DictionaryItemFactory();
+            var dto = factory.BuildDto(dictionaryItem);
 
             var id = Convert.ToInt32(Database.Insert(dto));
             dictionaryItem.Id = id;
 
+            var translationFactory = new DictionaryTranslationFactory(dictionaryItem.Key);
             foreach (var translation in dictionaryItem.Translations)
             {
-                var textDto = DictionaryTranslationFactory.BuildDto(translation, dictionaryItem.Key);
+                var textDto = translationFactory.BuildDto(translation);
                 translation.Id = Convert.ToInt32(Database.Insert(textDto));
                 translation.Key = dictionaryItem.Key;
             }
@@ -152,14 +154,16 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             foreach (var translation in entity.Translations)
                 translation.Value = translation.Value.ToValidXmlString();
-            
-            var dto = DictionaryItemFactory.BuildDto(entity);
+
+            var factory = new DictionaryItemFactory();
+            var dto = factory.BuildDto(entity);
 
             Database.Update(dto);
 
+            var translationFactory = new DictionaryTranslationFactory(entity.Key);
             foreach (var translation in entity.Translations)
             {
-                var textDto = DictionaryTranslationFactory.BuildDto(translation, entity.Key);
+                var textDto = translationFactory.BuildDto(translation);
                 if (translation.HasIdentity)
                 {
                     Database.Update(textDto);
@@ -212,11 +216,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected IDictionaryItem ConvertFromDto(DictionaryDto dto)
         {
-            var entity = DictionaryItemFactory.BuildEntity(dto);
+            var factory = new DictionaryItemFactory();
+            var entity = factory.BuildEntity(dto);
 
+            var f = new DictionaryTranslationFactory(dto.UniqueId);
             entity.Translations = dto.LanguageTextDtos.EmptyNull()
                 .Where(x => x.LanguageId > 0)
-                .Select(x => DictionaryTranslationFactory.BuildEntity(x, dto.UniqueId))
+                .Select(x => f.BuildEntity(x))
                 .ToList();
 
             return entity;

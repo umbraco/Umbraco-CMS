@@ -35,7 +35,7 @@ namespace Umbraco.Core.Publishing
             var counter = 0;
             var contentForRelease = _contentService.GetContentForRelease().ToArray();
             if (contentForRelease.Length > 0)
-                _logger.Debug<ScheduledPublisher>(() => $"There's {contentForRelease.Length} item(s) of content to be published");
+                _logger.Debug<ScheduledPublisher>($"There's {contentForRelease.Length} item(s) of content to be published");
             foreach (var d in contentForRelease)
             {
                 try
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Publishing
                     d.ReleaseDate = null;
                     d.TryPublishValues(); // fixme variants?
                     var result = _contentService.SaveAndPublish(d, _userService.GetProfileById(d.WriterId).Id);
-                    _logger.Debug<ContentService>(() => $"Result of publish attempt: {result.Result}");
+                    _logger.Debug<ContentService>($"Result of publish attempt: {result.Result}");
                     if (result.Success == false)
                     {
                         _logger.Error<ScheduledPublisher>($"Error publishing node {d.Id}");
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Publishing
 
             var contentForExpiration = _contentService.GetContentForExpiration().ToArray();
             if (contentForExpiration.Length > 0)
-                _logger.Debug<ScheduledPublisher>(() => $"There's {contentForExpiration.Length} item(s) of content to be unpublished");
+                _logger.Debug<ScheduledPublisher>($"There's {contentForExpiration.Length} item(s) of content to be unpublished");
             foreach (var d in contentForExpiration)
             {
                 try

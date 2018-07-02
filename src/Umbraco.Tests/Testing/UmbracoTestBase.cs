@@ -15,7 +15,6 @@ using Umbraco.Core.Composing.CompositionRoots;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
-using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.PublishedContent;
@@ -189,8 +188,6 @@ namespace Umbraco.Tests.Testing
 
             Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
             Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
-
-            Container.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
         }
 
         protected virtual void ComposeCacheHelper()

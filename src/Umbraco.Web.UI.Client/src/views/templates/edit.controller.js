@@ -323,7 +323,6 @@
         vm.selectMasterTemplate = selectMasterTemplate;
         vm.getMasterTemplateName = getMasterTemplateName;
         vm.removeMasterTemplate = removeMasterTemplate;
-        vm.closeShortcuts = closeShortcuts;
 
         function openInsertOverlay() {
 
@@ -717,10 +716,6 @@
             } else if(state === "pristine") {
                 currentForm.$setPristine();
             }
-        }
-
-        function closeShortcuts() {
-            vm.showKeyboardShortcut = false;
         }
     
         vm.init();

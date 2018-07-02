@@ -110,54 +110,20 @@ When this combination is hit an overview is opened with shortcuts based on the m
 (function () {
     'use strict';
 
-    function KeyboardShortcutsOverviewDirective(platformService, overlayService) {
+    function KeyboardShortcutsOverviewDirective(platformService) {
 
         function link(scope, el, attr, ctrl) {
 
             var eventBindings = [];
             var isMac = platformService.isMac();
-            var overlay = null;
 
             scope.toggleShortcutsOverlay = function () {
-
-                if(overlay) {
-                    scope.close();
-                } else {
-                    scope.open();
-                }
-
-                if(scope.onToggle) {
-                    scope.onToggle();
-                }
-
-            };
-
-            scope.open = function() {
-                if(!overlay) {
-                    overlay = {
-                        title: "Keyboard shortcuts",
-                        view: "keyboardshortcuts",
-                        hideSubmitButton: true,
-                        shortcuts: scope.model,
-                        close: function() {
-                            scope.close();
-                        }
-                    };
-                    overlayService.open(overlay);
-                }
-            };
-
-            scope.close = function() {
-                if(overlay) {
-                    overlayService.close();
-                    overlay = null;
-                    if(scope.onClose) {
-                        scope.onClose();
-                    }
-                }
+                scope.showOverlay = !scope.showOverlay;
+                scope.onToggle();
             };
 
             function onInit() {
+
                 angular.forEach(scope.model, function (shortcutGroup) {
                     angular.forEach(shortcutGroup.shortcuts, function (shortcut) {
 
@@ -186,22 +152,6 @@ When this combination is hit an overview is opened with shortcuts based on the m
                 }
             }));
 
-            eventBindings.push(scope.$watch('showOverlay', function(newValue, oldValue){
-
-                if(newValue === oldValue) {
-                    return;
-                }
-
-                if(newValue === true) {
-                    scope.open();
-                }
-
-                if(newValue === false) {
-                    scope.close();
-                }
-
-            }));
-
             // clean up
             scope.$on('$destroy', function () {
                 // unbind watchers
@@ -220,8 +170,7 @@ When this combination is hit an overview is opened with shortcuts based on the m
             scope: {
                 model: "=",
                 onToggle: "&",
-                showOverlay: "=?",
-                onClose: "&"
+                showOverlay: "=?"
             }
         };
 

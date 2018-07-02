@@ -226,7 +226,7 @@ namespace Umbraco.Core.IO
             }
             catch (FileNotFoundException ex)
             {
-                Current.Logger.Info<PhysicalFileSystem>(() => $"DeleteFile failed with FileNotFoundException: {ex.InnerException}");
+                Current.Logger.Info<PhysicalFileSystem>(string.Format("DeleteFile failed with FileNotFoundException: {0}", ex.InnerException));
             }
         }
 
