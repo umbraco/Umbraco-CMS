@@ -91,6 +91,13 @@ namespace Umbraco.Core.Logging
             return _startupProfiler;
         }
 
+        // obsolete but that's the one that's called ;-(
+        [Obsolete]
+        public override MiniProfiler Start(ProfileLevel level, string sessionName = null)
+        {
+            return Start(sessionName);
+        }
+
         /// <summary>
         /// Gets the current profiler.
         /// </summary>
