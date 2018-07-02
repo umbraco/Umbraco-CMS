@@ -7,13 +7,12 @@
     {
         private int _id = 0;
 
-        public int UmbracoNodeId
-        {
+        public int UmbracoNodeId {
             set
             {
                 _id = value;
             }
-            get {return _id;}
+            get { return _id; }
         }
         public ContentPage()
         {
