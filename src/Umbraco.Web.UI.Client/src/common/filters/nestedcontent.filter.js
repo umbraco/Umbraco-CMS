@@ -62,7 +62,7 @@ angular.module("umbraco.filters").filter("ncNodeName", function (editorState, en
         return formatLabel(ncNodeNameCache.keys[lookupId], ids.length);
     };
 
-}).filter("ncRichtext", function () {
+}).filter("ncRichText", function () {
     return function(input) {
         return $("<div/>").html(input).text();
     };
