@@ -13,7 +13,7 @@
  * @param {any} miniEditorHelper
  * @param {any} localizationService
  */
-function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, miniEditorHelper, localizationService) {
+function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, miniEditorHelper, localizationService, editorService) {
 
     var unsubscribe;
 
@@ -185,28 +185,24 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     //dialog
-    $scope.openContentPicker = function() {
-      $scope.contentPickerOverlay = dialogOptions;
-      $scope.contentPickerOverlay.show = true;
+    $scope.openContentPicker = function () {
+        $scope.contentPicker = dialogOptions;
 
-      $scope.contentPickerOverlay.submit = function(model) {
+        $scope.contentPicker.submit = function (model) {
+            if (angular.isArray(model.selection)) {
+                _.each(model.selection, function (item, i) {
+                    $scope.add(item);
+                });
+            }
+            angularHelper.getCurrentForm($scope).$setDirty();
+            editorService.close();
+        }
 
-          if (angular.isArray(model.selection)) {
-             _.each(model.selection, function (item, i) {
-                  $scope.add(item);
-             });
-          }
+        $scope.contentPicker.close = function () {
+            editorService.close();
+        }
 
-          angularHelper.getCurrentForm($scope).$setDirty();
-
-          $scope.contentPickerOverlay.show = false;
-          $scope.contentPickerOverlay = null;
-      }
-
-      $scope.contentPickerOverlay.close = function(oldModel) {
-          $scope.contentPickerOverlay.show = false;
-          $scope.contentPickerOverlay = null;
-      }
+        editorService.contentPicker($scope.contentPicker);
 
     };
 
