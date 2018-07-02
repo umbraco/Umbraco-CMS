@@ -183,7 +183,7 @@
             mediaPicker: mediaPicker,
             iconPicker: iconPicker,
             documentTypeEditor: documentTypeEditor,
-            mediaTypeEditor
+            mediaTypeEditor: mediaTypeEditor
         };
 
         return service;
