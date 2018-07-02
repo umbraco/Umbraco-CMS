@@ -9,6 +9,13 @@ var ncNodeNameCache = {
 
 angular.module("umbraco.filters").filter("ncNodeName", function (editorState, entityResource) {
 
+    function formatLabel(firstNodeName, totalNodes) {
+        return totalNodes <= 1
+            ? firstNodeName
+            // If there is more than one item selected, append the additional number of items selected to hint that
+            : firstNodeName + " (+" + (totalNodes - 1) + ")";
+    }
+
     return function (input) {
 
         // Check we have a value at all
@@ -31,7 +38,7 @@ angular.module("umbraco.filters").filter("ncNodeName", function (editorState, en
 
         // See if there is a value in the cache and use that
         if (ncNodeNameCache.keys[lookupId]) {
-            return ncNodeNameCache.keys[lookupId];
+            return formatLabel(ncNodeNameCache.keys[lookupId], ids.length);
         }
 
         // No value, so go fetch one 
@@ -47,13 +54,12 @@ angular.module("umbraco.filters").filter("ncNodeName", function (editorState, en
         entityResource.getById(lookupId, type)
             .then(
                 function (ent) {
-                    // If there is more than one item selected, append ", ..." to the header to hint that
-                    ncNodeNameCache.keys[lookupId] = ent.name + (ids.length > 1 ? ", ..." : "");
+                    ncNodeNameCache.keys[lookupId] = ent.name;
                 }
             );
 
         // Return the current value for now
-        return ncNodeNameCache.keys[lookupId];
+        return formatLabel(ncNodeNameCache.keys[lookupId], ids.length);
     };
 
 }).filter("ncRichtext", function () {
