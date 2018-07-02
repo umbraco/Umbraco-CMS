@@ -87,6 +87,21 @@
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#contentPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a content picker in infinite editing, the submit callback returns an array of selected items
+         * @returns {Object} editor object
+         */
+        function contentPicker(editor) {
+            editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#mediaEditor
          * @methodOf umbraco.services.editorService
          *
@@ -180,6 +195,7 @@
             close: close,
             mediaEditor: mediaEditor,
             contentEditor: contentEditor,
+            contentPicker: contentPicker,
             mediaPicker: mediaPicker,
             iconPicker: iconPicker,
             documentTypeEditor: documentTypeEditor,
