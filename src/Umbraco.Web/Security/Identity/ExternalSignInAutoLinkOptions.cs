@@ -55,7 +55,6 @@ namespace Umbraco.Web.Security.Identity
             return _defaultUserGroups;
         }
 
-     
         private readonly bool _autoLinkExternalAccount;
 
         /// <summary>

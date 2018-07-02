@@ -21,7 +21,6 @@ namespace Umbraco.Web.Models
             MacroAlias = macroAlias;
             MacroId = macroId;
         }
-
        
         public IPublishedContent Content { get; private set; }
         public string MacroName { get; private set; }

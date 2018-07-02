@@ -227,7 +227,6 @@ namespace Umbraco.Core.Services.Implement
             Save(membershipUser);
         }
 
-
         [Obsolete("ASP.NET Identity APIs like the BackOfficeUserManager should be used to manage passwords, this will not work with correct security practices because you would need the existing password")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void SavePassword(IUser user, string password)
