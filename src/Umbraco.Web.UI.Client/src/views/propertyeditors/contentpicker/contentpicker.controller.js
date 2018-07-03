@@ -10,10 +10,9 @@
  * @param {any} angularHelper
  * @param {any} navigationService
  * @param {any} $location
- * @param {any} miniEditorHelper
  * @param {any} localizationService
  */
-function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, miniEditorHelper, localizationService, editorService) {
+function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, localizationService, editorService) {
 
     var unsubscribe;
 
