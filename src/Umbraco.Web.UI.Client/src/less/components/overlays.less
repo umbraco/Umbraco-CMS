@@ -109,14 +109,24 @@
     width: 400px;
     height: 400px;
     box-sizing: border-box;
+    border-radius: @baseBorderRadius;
 }
 
 .umb-overlay.umb-overlay-target .umb-overlay-header {
+    border: none;
+    background: transparent;
+    padding: 20px 20px 0 20px;
     text-align: center;
 }
 
 .umb-overlay.umb-overlay-target .umb-overlay-container {
-    padding: 10px;
+    padding: 20px;
+}
+
+.umb-overlay.umb-overlay-target .umb-overlay-drawer {
+    border: none;
+    background: transparent;
+    padding: 0 20px 20px 20px;
 }
 
 /* ---------- OVERLAY RIGHT ---------- */

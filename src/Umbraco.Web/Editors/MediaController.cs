@@ -176,20 +176,6 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns media items known to be of a "Folder" type
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [Obsolete("This is no longer used and shouldn't be because it performs poorly when there are a lot of media items")]
-        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>))]
-        public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildFolders(int id = -1)
-        {
-            //we are only allowing a max of 500 to be returned here, if more is required it needs to be paged
-            var result = GetChildFolders(id, 1, 500);
-            return result.Items;
-        }
-
-        /// <summary>
         /// Returns a paged result of media items known to be of a "Folder" type
         /// </summary>
         /// <param name="id"></param>

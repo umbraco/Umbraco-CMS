@@ -111,7 +111,7 @@ namespace Umbraco.Core.Components
             catch (Exception e)
             {
                 // in case of an error, force-dump everything to log
-                _logger.Info<BootLoader>(GetComponentsReport(requirements));
+                _logger.Info<BootLoader>(() => GetComponentsReport(requirements));
                 _logger.Error<BootLoader>("Failed to sort components.", e);
                 throw;
             }

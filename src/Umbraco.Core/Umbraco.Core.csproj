@@ -899,7 +899,6 @@
     <Compile Include="Persistence\Factories\ContentBaseFactory.cs" />
     <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
     <Compile Include="Persistence\Factories\MemberTypeReadOnlyFactory.cs" />
-    <Compile Include="Persistence\Factories\ModelFactoryConfiguration.cs" />
     <Compile Include="Persistence\Factories\PropertyFactory.cs" />
     <Compile Include="Persistence\Factories\PropertyGroupFactory.cs" />
     <Compile Include="Persistence\Factories\PublicAccessEntryFactory.cs" />
