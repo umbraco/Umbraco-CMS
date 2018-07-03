@@ -22,7 +22,8 @@
         $scope.page.isNew = $scope.isNew ? true : false;
         $scope.page.buttonGroupState = "init";
         $scope.page.culture = $scope.culture;
-        $scope.page.hideActionsMenu = infiniteMode;
+        $scope.page.hideActionsMenu = infiniteMode ? true : false;
+        $scope.page.hideChangeVariant = infiniteMode ? true : false;
         $scope.allowOpen = true;
 
         // add all editors to an editors array to support split view 

@@ -322,6 +322,7 @@ Use this directive to construct a header inside the main editor window.
                 hideDescription: "@",
                 descriptionLocked: "@",
                 variants: "=",
+                hideChangeVariant: "<?",
                 navigation: "=",
                 key: "=",
                 onBack: "&?",
