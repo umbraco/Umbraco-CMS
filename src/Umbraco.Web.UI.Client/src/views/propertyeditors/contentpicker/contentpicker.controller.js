@@ -246,6 +246,14 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         var contentEditor = {
             id: node.id,
             submit: function(model) {
+                // update the node
+                node.name = model.contentNode.name;
+                node.published = model.contentNode.hasPublishedVersion;
+                if(entityType !== "Member") {
+                    entityResource.getUrl(model.contentNode.id, entityType).then(function(data){
+                        node.url = data;
+                    });
+                }
                 editorService.close();
             },
             close: function() {

@@ -515,6 +515,18 @@
             }, 500);
         };
 
+        /* publish method used in infinite editing */
+        $scope.publishAndClose = function(content) {
+            $scope.publishAndCloseButtonState = "busy";
+            performSave({ saveMethod: contentResource.publish, action: "publish" }).then(function(){
+                if($scope.infiniteModel.submit) {
+                    $scope.infiniteModel.contentNode = content;
+                    $scope.infiniteModel.submit($scope.infiniteModel);
+                }
+                $scope.publishAndCloseButtonState = "success";
+            }).catch(angular.noop);;
+        };
+
         function moveNode(node, target) {
 
             contentResource.move({ "parentId": target.id, "id": node.id })

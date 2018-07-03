@@ -62,7 +62,7 @@
                         ng-if="infiniteModel.infiniteMode"
                         action="close()"
                         button-style="link"
-                        label="Close"
+                        label-key="general_close"
                         type="button">
                     </umb-button>
 
@@ -76,8 +76,17 @@
                         label-key="buttons_showPage">
                     </umb-button>
 
+                    <umb-button
+                        ng-if="infiniteModel.infiniteMode"
+                        action="publishAndClose(content)"
+                        button-style="primary"
+                        state="publishAndCloseButtonState"
+                        label="Publish and close"
+                        type="button">
+                    </umb-button>
+
                     <umb-button-group 
-                        ng-if="defaultButton && !content.trashed" 
+                        ng-if="defaultButton && !content.trashed && !infiniteModel.infiniteMode" 
                         button-style="success"
                         default-button="defaultButton" 
                         sub-buttons="subButtons" 
