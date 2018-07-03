@@ -263,19 +263,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         editorService.contentEditor(contentEditor);
     };
 
-    $scope.openMiniEditor = function(node) {
-        miniEditorHelper.launchMiniEditor(node).then(function(updatedNode){
-            // update the node
-            node.name = updatedNode.name;
-            node.published = updatedNode.hasPublishedVersion;
-            if(entityType !== "Member") {
-                entityResource.getUrl(updatedNode.id, entityType).then(function(data){
-                    node.url = data;
-                });
-            }
-        });
-    };
-
     //when the scope is destroyed we need to unsubscribe
     $scope.$on('$destroy', function () {
         if(unsubscribe) {
