@@ -34,8 +34,12 @@
         };
 
         function init(content) {
-
-            createButtons(content);
+            
+            if(infiniteMode) {
+                createInfiniteModeButtons(content);
+            } else {
+                createButtons(content);
+            }
 
             editorState.set($scope.content);
 
@@ -187,6 +191,23 @@
 
             $scope.defaultButton = buttons.defaultButton;
             $scope.subButtons = buttons.subButtons;
+
+        }
+
+        // create infinite editing buttons
+        function createInfiniteModeButtons(content) {
+
+            $scope.page.allowInfinitePublishAndClose = false;
+            $scope.page.allowInfiniteSaveAndClose = false;
+
+            // check for publish rights
+            if(_.contains(content.allowedActions, "U")) {
+                $scope.page.allowInfinitePublishAndClose = true;
+
+            // check for save rights
+            } else if( _.contains(content.allowedActions, "A")) {
+                $scope.page.allowInfiniteSaveAndClose = true;
+            }
 
         }
 
@@ -524,6 +545,18 @@
                     $scope.infiniteModel.submit($scope.infiniteModel);
                 }
                 $scope.publishAndCloseButtonState = "success";
+            }).catch(angular.noop);;
+        };
+
+        /* save method used in infinite editing */
+        $scope.saveAndClose = function(content) {
+            $scope.saveAndCloseButtonState = "busy";
+            performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function(){
+                if($scope.infiniteModel.submit) {
+                    $scope.infiniteModel.contentNode = content;
+                    $scope.infiniteModel.submit($scope.infiniteModel);
+                }
+                $scope.saveAndCloseButtonState = "success";
             }).catch(angular.noop);;
         };
 

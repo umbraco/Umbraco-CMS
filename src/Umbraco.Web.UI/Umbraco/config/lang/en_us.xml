@@ -124,6 +124,7 @@
         <key alias="listNumeric">Numeric List</key>
         <key alias="macroInsert">Insert macro</key>
         <key alias="pictureInsert">Insert picture</key>
+        <key alias="publishAndClose">Publish and close</key>
         <key alias="relations">Edit relations</key>
         <key alias="returnToList">Return to list</key>
         <key alias="save">Save</key>

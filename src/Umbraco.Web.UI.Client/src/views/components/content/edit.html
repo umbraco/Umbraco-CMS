@@ -68,21 +68,12 @@
 
                     <umb-button 
                         alias="preview" 
-                        ng-if="!page.isNew && content.allowPreview" 
+                        ng-if="!page.isNew && content.allowPreview"
                         type="button" 
                         button-style="info" 
                         action="preview(content)"
                         label="Preview page" 
                         label-key="buttons_showPage">
-                    </umb-button>
-
-                    <umb-button
-                        ng-if="infiniteModel.infiniteMode"
-                        action="publishAndClose(content)"
-                        button-style="primary"
-                        state="publishAndCloseButtonState"
-                        label="Publish and close"
-                        type="button">
                     </umb-button>
 
                     <umb-button-group 
@@ -94,6 +85,24 @@
                         direction="up"
                         float="right">
                     </umb-button-group>
+
+                    <umb-button
+                        ng-if="infiniteModel.infiniteMode && page.allowInfiniteSaveAndClose"
+                        action="saveAndClose(content)"
+                        button-style="primary"
+                        state="saveAndCloseButtonState"
+                        label-key="buttons_saveAndClose"
+                        type="button">
+                    </umb-button>
+
+                    <umb-button
+                        ng-if="infiniteModel.infiniteMode && page.allowInfinitePublishAndClose"
+                        action="publishAndClose(content)"
+                        button-style="primary"
+                        state="publishAndCloseButtonState"
+                        label-key="buttons_publishAndClose"
+                        type="button">
+                    </umb-button>
 
                     <umb-button 
                         alias="restore" 
