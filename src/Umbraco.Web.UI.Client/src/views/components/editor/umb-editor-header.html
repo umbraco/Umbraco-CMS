@@ -102,7 +102,7 @@
             </umb-editor-navigation>
         </div>
 
-        <div ng-if="menu.currentNode && splitViewOpen !== true" style="margin-left: 20px;">
+        <div ng-if="menu.currentNode && splitViewOpen !== true && hideMenu !== true" style="margin-left: 20px;">
             <umb-editor-menu
                 data-element="editor-actions"
                 current-node="menu.currentNode"
