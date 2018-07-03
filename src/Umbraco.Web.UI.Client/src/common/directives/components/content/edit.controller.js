@@ -7,6 +7,7 @@
         keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource, overlayService, localizationService) {
 
         var evts = [];
+        var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
 
         //setup scope vars
         $scope.defaultButton = null;
@@ -21,7 +22,7 @@
         $scope.page.isNew = $scope.isNew ? true : false;
         $scope.page.buttonGroupState = "init";
         $scope.page.culture = $scope.culture;
-        $scope.page.hideActionsMenu = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
+        $scope.page.hideActionsMenu = infiniteMode;
         $scope.allowOpen = true;
 
         // add all editors to an editors array to support split view 
@@ -158,7 +159,9 @@
                     // if there are any and then clear them so the collection no longer persists them.
                     serverValidationManager.executeAndClearAllSubscriptions();
 
-                    syncTreeNode($scope.content, data.path, true);
+                    if(!infiniteMode) {
+                        syncTreeNode($scope.content, data.path, true);
+                    }
 
                     resetLastListPageNumber($scope.content);
 
@@ -222,7 +225,10 @@
             }).then(function (data) {
                 //success            
                 init($scope.content);
-                syncTreeNode($scope.content, data.path);
+
+                if(!infiniteMode) {
+                    syncTreeNode($scope.content, data.path);
+                }
 
                 $scope.page.buttonGroupState = "success";
                 return $q.when(data);
@@ -312,7 +318,9 @@
 
                         init($scope.content);
 
-                        syncTreeNode($scope.content, data.path);
+                        if(!infiniteMode) {
+                            syncTreeNode($scope.content, data.path);
+                        }
 
                         $scope.page.buttonGroupState = "success";
 
@@ -517,7 +525,9 @@
                     }
 
                     // sync the destination node
-                    navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false });
+                    if(!infiniteMode) {
+                        navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false });
+                    }
 
                     $scope.page.buttonRestore = "success";
                     notificationsService.success("Successfully restored " + node.name + " to " + target.name);
