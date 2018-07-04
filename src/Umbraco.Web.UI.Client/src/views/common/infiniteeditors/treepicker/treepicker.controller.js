@@ -99,7 +99,7 @@ angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
                     });
                 }
             }
-            else if (vm.treeAlias === "member" || vm.section) {
+            else if (vm.treeAlias === "member" || vm.section === "member") {
                 vm.entityType = "Member";
                 if (!$scope.model.title) {
                     localizationService.localize("defaultdialogs_selectMember").then(function(value){
