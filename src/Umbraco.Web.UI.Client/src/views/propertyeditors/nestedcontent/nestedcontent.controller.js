@@ -56,11 +56,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
     function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper) {
 
-        //$scope.model.config.contentTypes;
-        //$scope.model.config.minItems;
-        //$scope.model.config.maxItems;
-        //console.log($scope);
-
         var inited = false;
 
         _.each($scope.model.config.contentTypes, function (contentType) {
