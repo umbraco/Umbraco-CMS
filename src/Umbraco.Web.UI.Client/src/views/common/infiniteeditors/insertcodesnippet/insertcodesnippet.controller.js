@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function InsertOverlayController($scope, localizationService) {
+    function InsertOverlayController($scope, localizationService, editorService) {
 
         var vm = this;
 
@@ -9,6 +9,7 @@
         vm.openPageFieldOverlay = openPageFieldOverlay;
         vm.openDictionaryItemOverlay = openDictionaryItemOverlay;
         vm.openPartialOverlay = openPartialOverlay;
+        vm.close = close;
 
         function onInit() {
             
@@ -88,8 +89,7 @@
                 var subtitle = values[1];
                 var emptyStateMessage = values[2];
 
-                vm.dictionaryItemOverlay = {
-                    view: "treepicker",
+                var dictionaryItemPicker = {
                     section: "settings",
                     treeAlias: "dictionary",
                     entityType: "dictionary",
@@ -97,25 +97,22 @@
                     title: title,
                     subtitle: subtitle,
                     emptyStateMessage: emptyStateMessage,
-                    show: true,
                     select: function(node){
-    
                         $scope.model.insert = {
                             "type": "dictionary",
                             "node": node
                         };
-    
                         $scope.model.submit($scope.model);
-    
-                        vm.dictionaryItemOverlay.show = false;
-                        vm.dictionaryItemOverlay = null;
+                        editorService.close();
                     },
     
-                    close: function(model) {
-                        vm.dictionaryItemOverlay.show = false;
-                        vm.dictionaryItemOverlay = null;
+                    close: function() {
+                        editorService.close();
                     }
                 };
+
+                editorService.treePicker(dictionaryItemPicker);
+
             });
         }
 
@@ -123,8 +120,7 @@
             localizationService.localize("template_insertPartialView").then(function(value){
                 var title = value;
 
-                vm.partialItemOverlay = {
-                    view: "treepicker",
+                var partialItemPicker = {
                     section: "settings",
                     treeAlias: "partialViews",
                     entityType: "partialView",
@@ -136,32 +132,32 @@
                         }
                     },
                     filterCssClass: "not-allowed",
-                    show: true,
-                    select: function(node){
-                        
+                    select: function(node) {
                         $scope.model.insert = {
                             "type": "partial",
                             "node": node
                         };
-    
-                        $scope.model.submit($scope.model);
-    
-                        vm.partialItemOverlay.show = false;
-                        vm.partialItemOverlay = null;
+                        $scope.model.submit($scope.model); 
+                        editorService.close();
                     },
-    
-                    close: function (model) {
-                        vm.partialItemOverlay.show = false;
-                        vm.partialItemOverlay = null;
+                    close: function () {
+                        editorService.close();
                     }
                 };
 
+                editorService.treePicker(partialItemPicker);
             });
+        }
+
+        function close() {
+            if($scope.model.close) {
+                $scope.model.close();
+            }
         }
 
         onInit();
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Overlays.InsertOverlay", InsertOverlayController);
+    angular.module("umbraco").controller("Umbraco.Editors.InsertOverlay", InsertOverlayController);
 })();

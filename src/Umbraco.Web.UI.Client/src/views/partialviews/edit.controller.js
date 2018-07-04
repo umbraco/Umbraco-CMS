@@ -126,16 +126,12 @@
         }
 
         function openInsertOverlay() {
-
-            vm.insertOverlay = {
-                view: "insert",
+            var insertOverlay = {
                 allowedTypes: {
                     macro: true,
                     dictionary: true,
                     umbracoField: true
                 },
-                hideSubmitButton: true,
-                show: true,
                 submit: function(model) {
 
                     switch(model.insert.type) {
@@ -143,30 +139,24 @@
                             var macroObject = macroService.collectValueData(model.insert.selectedMacro, model.insert.macroParams, "Mvc");
                             insert(macroObject.syntax);
                             break;
-
                         case "dictionary":
                         	var code = templateHelper.getInsertDictionarySnippet(model.insert.node.name);
                         	insert(code);
                             break;
-                            
                         case "umbracoField":
                             insert(model.insert.umbracoField);
                             break;
                     }
-
-                    vm.insertOverlay.show = false;
-                    vm.insertOverlay = null;
-
+                    editorService.close();
                 },
-                close: function(oldModel) {
+                close: function() {
                     // close the dialog
-                    vm.insertOverlay.show = false;
-                    vm.insertOverlay = null;
+                    editorService.close();
                     // focus editor
                     vm.editor.focus();
                 }
             };
-
+            editorService.insertCodeSnippet(insertOverlay);
         }
 
 

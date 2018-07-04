@@ -203,6 +203,12 @@
             open(editor);
         }
 
+        function insertCodeSnippet(editor) {
+            editor.view = "views/common/infiniteeditors/insertcodesnippet/insertcodesnippet.html";
+            editor.size = "small";
+            open(editor);
+        }
+
         var service = {
             getEditors: getEditors,
             open: open,
@@ -215,7 +221,8 @@
             documentTypeEditor: documentTypeEditor,
             mediaTypeEditor: mediaTypeEditor,
             queryBuilder: queryBuilder,
-            treePicker: treePicker
+            treePicker: treePicker,
+            insertCodeSnippet: insertCodeSnippet
         };
 
         return service;
