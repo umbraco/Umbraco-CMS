@@ -3,7 +3,7 @@
 angular.module('umbraco')
     .controller("Umbraco.PrevalueEditors.TreePickerController",
 
-    function ($scope, dialogService, entityResource, $log, iconHelper) {
+    function ($scope, dialogService, entityResource, $log, iconHelper, editorService) {
         $scope.renderModel = [];
         $scope.ids = [];
 
@@ -12,7 +12,6 @@ angular.module('umbraco')
         $scope.sortable = false;
 
         var config = {
-            view: "treepicker",
             multiPicker: false,
             entityType: "Document",
             type: "content",
@@ -51,28 +50,24 @@ angular.module('umbraco')
         }
 
         $scope.openContentPicker = function () {
-            $scope.treePickerOverlay = config;
-            $scope.treePickerOverlay.section = config.type;
-            $scope.treePickerOverlay.show = true;
+            var treePicker = config;
+            treePicker.section = config.type;
 
-            $scope.treePickerOverlay.submit = function (model) {
-
+            treePicker.submit = function (model) {
                 if (config.multiPicker) {
                     populate(model.selection);
                 } else {
                     populate(model.selection[0]);
                 }
-
-                $scope.treePickerOverlay.show = false;
-                $scope.treePickerOverlay = null;
+                editorService.close();
             };
 
-            $scope.treePickerOverlay.close = function (oldModel) {
-                $scope.treePickerOverlay.show = false;
-                $scope.treePickerOverlay = null;
+            treePicker.close = function () {
+                editorService.close();
             };
 
-        }
+            editorService.treePicker(treePicker);
+        };
 
         $scope.remove = function (index) {
             $scope.renderModel.splice(index, 1);
