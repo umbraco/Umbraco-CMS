@@ -116,7 +116,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     //the dialog options for the picker
     var dialogOptions = {
-        view: "treepicker",
         multiPicker: $scope.model.config.multiPicker,
         entityType: entityType,
         filterCssClass: "not-allowed not-published",
