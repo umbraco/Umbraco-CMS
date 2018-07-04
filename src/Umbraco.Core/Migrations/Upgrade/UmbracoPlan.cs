@@ -2,7 +2,6 @@
 using System.Configuration;
 using Semver;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade.V_7_12_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
 
@@ -18,13 +17,6 @@ namespace Umbraco.Core.Migrations.Upgrade
         /// </summary>
         public UmbracoPlan()
             : base(Constants.System.UmbracoUpgradePlanName)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoPlan"/> class.
-        /// </summary>
-        public UmbracoPlan(IMigrationBuilder migrationBuilder, ILogger logger)
-            : base(Constants.System.UmbracoUpgradePlanName, migrationBuilder, logger)
         { }
 
         /// <inheritdoc />

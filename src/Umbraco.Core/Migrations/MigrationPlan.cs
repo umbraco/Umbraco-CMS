@@ -12,8 +12,6 @@ namespace Umbraco.Core.Migrations
     /// </summary>
     public class MigrationPlan
     {
-        private readonly IMigrationBuilder _migrationBuilder;
-        private readonly ILogger _logger;
         private readonly Dictionary<string, Transition> _transitions = new Dictionary<string, Transition>();
 
         private string _prevState;
@@ -23,31 +21,10 @@ namespace Umbraco.Core.Migrations
         /// Initializes a new instance of the <see cref="MigrationPlan"/> class.
         /// </summary>
         /// <param name="name">The name of the plan.</param>
-        /// <remarks>The plan cannot be executed. Use this constructor e.g. when only validating the plan,
-        /// or trying to get its final state, without actually needing to execute it.</remarks>
         public MigrationPlan(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
             Name = name;
-
-            // ReSharper disable once VirtualMemberCallInConstructor
-            // (accepted)
-            DefinePlan();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MigrationPlan"/> class.
-        /// </summary>
-        /// <param name="name">The name of the plan.</param>
-        /// <param name="migrationBuilder">A migration builder.</param>
-        /// <param name="logger">A logger.</param>
-        /// <remarks>The plan can be executed.</remarks>
-        public MigrationPlan(string name, IMigrationBuilder migrationBuilder, ILogger logger)
-        {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
-            Name = name;
-            _migrationBuilder = migrationBuilder ?? throw new ArgumentNullException(nameof(migrationBuilder));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // ReSharper disable once VirtualMemberCallInConstructor
             // (accepted)
@@ -253,43 +230,48 @@ namespace Umbraco.Core.Migrations
         /// </summary>
         /// <param name="scope">A scope.</param>
         /// <param name="fromState">The state to start execution at.</param>
+        /// <param name="migrationBuilder">A migration builder.</param>
+        /// <param name="logger">A logger.</param>
         /// <returns>The final state.</returns>
         /// <remarks>The plan executes within the scope, which must then be completed.</remarks>
-        public string Execute(IScope scope, string fromState)
+        public string Execute(IScope scope, string fromState, IMigrationBuilder migrationBuilder, ILogger logger)
         {
             Validate();
 
-            if (_migrationBuilder == null || _logger == null)
-                throw new InvalidOperationException("Cannot execute a non-executing plan.");
+            if (migrationBuilder == null || logger == null)
+                throw new InvalidOperationException("Cannot execute a non-executable plan.");
 
-            _logger.Info<MigrationPlan>("Starting '{MigrationName}'...", Name);
+            logger.Info<MigrationPlan>("Starting '{MigrationName}'...", Name);
 
             var origState = fromState ?? string.Empty;
 
-            _logger.Info<MigrationPlan>("At {OrigState}", string.IsNullOrWhiteSpace(origState) ? "origin": origState);
+            logger.Info<MigrationPlan>("At {OrigState}", string.IsNullOrWhiteSpace(origState) ? "origin": origState);
 
             if (!_transitions.TryGetValue(origState, out var transition))
                 throw new Exception($"Unknown state \"{origState}\".");
 
-            var context = new MigrationContext(scope.Database, _logger);
+            var context = new MigrationContext(scope.Database, logger);
 
             while (transition != null)
             {
-                var migration = _migrationBuilder.Build(transition.MigrationType, context);
+                var migration = migrationBuilder.Build(transition.MigrationType, context);
                 migration.Migrate();
 
                 var nextState = transition.TargetState;
                 origState = nextState;
 
-                _logger.Info<MigrationPlan>("At {OrigState}", origState);
+                logger.Info<MigrationPlan>("At {OrigState}", origState);
 
                 if (!_transitions.TryGetValue(origState, out transition))
                     throw new Exception($"Unknown state \"{origState}\".");
             }
 
-            _logger.Info<MigrationPlan>("Done (pending scope completion).");
+            logger.Info<MigrationPlan>("Done (pending scope completion).");
 
-            // fixme - what about post-migrations?
+            // safety check
+            if (origState != _finalState)
+                throw new Exception($"Internal error, reached state {origState} which is not final state {_finalState}");
+
             return origState;
         }
 

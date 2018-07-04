@@ -34,12 +34,12 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger,
-                    new MigrationPlan("test",  builder, logger)
+                var upgrader = new MigrationTests.TestUpgrader(
+                    new MigrationPlan("test")
                         .From(string.Empty)
                         .To<CreateTableOfTDtoMigration>("done"));
 
-                upgrader.Execute();
+                upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger);
 
                 var helper = new DatabaseSchemaCreator(scope.Database, logger);
                 var exists = helper.TableExists("umbracoUser");
@@ -72,13 +72,13 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger,
-                    new MigrationPlan("test", builder, logger)
+                var upgrader = new MigrationTests.TestUpgrader(
+                    new MigrationPlan("test")
                         .From(string.Empty)
                         .To<CreateTableOfTDtoMigration>("a")
                         .To<DeleteKeysAndIndexesMigration>("done"));
 
-                upgrader.Execute();
+                upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger);
                 scope.Complete();
             }
         }
@@ -108,14 +108,14 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger,
-                    new MigrationPlan("test",  builder, logger)
+                var upgrader = new MigrationTests.TestUpgrader(
+                    new MigrationPlan("test")
                         .From(string.Empty)
                         .To<CreateTableOfTDtoMigration>("a")
                         .To<DeleteKeysAndIndexesMigration>("b")
                         .To<CreateKeysAndIndexesOfTDtoMigration>("done"));
 
-                upgrader.Execute();
+                upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger);
                 scope.Complete();
             }
         }
@@ -145,14 +145,14 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger,
-                    new MigrationPlan("test",  builder, logger)
+                var upgrader = new MigrationTests.TestUpgrader(
+                    new MigrationPlan("test")
                         .From(string.Empty)
                         .To<CreateTableOfTDtoMigration>("a")
                         .To<DeleteKeysAndIndexesMigration>("b")
                         .To<CreateKeysAndIndexesMigration>("done"));
 
-                upgrader.Execute();
+                upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger);
                 scope.Complete();
             }
         }
@@ -180,13 +180,13 @@ namespace Umbraco.Tests.Migrations
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var upgrader = new MigrationTests.TestUpgrader(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger,
-                    new MigrationPlan("test", builder, logger)
+                var upgrader = new MigrationTests.TestUpgrader(
+                    new MigrationPlan("test")
                         .From(string.Empty)
                         .To<CreateTableOfTDtoMigration>("a")
                         .To<CreateColumnMigration>("done"));
 
-                upgrader.Execute();
+                upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), logger);
                 scope.Complete();
             }
         }

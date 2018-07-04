@@ -8,37 +8,37 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
+    /// <summary>
+    /// Represents the Umbraco upgrader.
+    /// </summary>
     public class UmbracoUpgrader : Upgrader
     {
-        private readonly PostMigrationCollection _postMigrations;
+        private PostMigrationCollection _postMigrations;
 
-        public UmbracoUpgrader(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, PostMigrationCollection postMigrations, ILogger logger)
-            : base(scopeProvider, migrationBuilder, keyValueService, logger)
+        /// <inheritdoc />
+        protected override MigrationPlan CreatePlan() => new UmbracoPlan();
+
+        /// <summary>
+        /// Executes.
+        /// </summary>
+        public void Execute(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, ILogger logger, PostMigrationCollection postMigrations)
         {
-            _postMigrations = postMigrations ?? throw new ArgumentNullException(nameof(postMigrations));
+            _postMigrations = postMigrations;
+            Execute(scopeProvider, migrationBuilder, keyValueService, logger);
         }
 
-        protected override MigrationPlan CreatePlan()
+        /// <inheritdoc />
+        public override void AfterMigrations(IScope scope, ILogger logger)
         {
-            return new UmbracoPlan(MigrationBuilder, Logger);
-        }
-
-        protected (SemVersion, SemVersion) GetVersions()
-        {
-            // assume we have something in web.config that makes some sense
-            if (!SemVersion.TryParse(ConfigurationManager.AppSettings["umbracoConfigurationStatus"], out var currentVersion))
+            // assume we have something in web.config that makes some sense = the origin version
+            if (!SemVersion.TryParse(ConfigurationManager.AppSettings["umbracoConfigurationStatus"], out var originVersion))
                 throw new InvalidOperationException("Could not get current version from web.config umbracoConfigurationStatus appSetting.");
 
-            return (currentVersion, UmbracoVersion.SemanticVersion);
-        }
-
-        public override void AfterMigrations(IScope scope)
-        {
-            // run post-migrations
-            var (originVersion, targetVersion) = GetVersions();
+            // target version is the code version
+            var targetVersion = UmbracoVersion.SemanticVersion;
 
             foreach (var postMigration in _postMigrations)
-                postMigration.Execute(Name, scope, originVersion, targetVersion, Logger);
+                postMigration.Execute(Name, scope, originVersion, targetVersion, logger);
         }
     }
 }

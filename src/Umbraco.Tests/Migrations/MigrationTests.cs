@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Configuration;
 using System.Data;
 using Moq;
 using NUnit.Framework;
 using Semver;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Upgrade;
@@ -20,8 +22,7 @@ namespace Umbraco.Tests.Migrations
         {
             private readonly MigrationPlan _plan;
 
-            public TestUpgrader(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, ILogger logger, MigrationPlan plan)
-                : base(scopeProvider, migrationBuilder, keyValueService, logger)
+            public TestUpgrader(MigrationPlan plan)
             {
                 _plan = plan;
             }
@@ -34,22 +35,27 @@ namespace Umbraco.Tests.Migrations
 
         public class TestUpgraderWithPostMigrations : TestUpgrader
         {
-            private readonly PostMigrationCollection _postMigrations;
+            private PostMigrationCollection _postMigrations;
 
-            public TestUpgraderWithPostMigrations(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, ILogger logger, PostMigrationCollection postMigrations, MigrationPlan plan)
-                : base(scopeProvider, migrationBuilder, keyValueService, logger, plan)
+            public TestUpgraderWithPostMigrations(MigrationPlan plan)
+                : base(plan)
+            { }
+
+            public void Execute(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, ILogger logger, PostMigrationCollection postMigrations)
             {
                 _postMigrations = postMigrations;
+                Execute(scopeProvider, migrationBuilder, keyValueService, logger);
             }
 
-            public override void AfterMigrations(IScope scope)
+            public override void AfterMigrations(IScope scope, ILogger logger)
             {
                 // run post-migrations
                 var originVersion = new SemVersion(0);
                 var targetVersion = new SemVersion(0);
 
+                // run post-migrations
                 foreach (var postMigration in _postMigrations)
-                    postMigration.Execute(Name, scope, originVersion, targetVersion, Logger);
+                    postMigration.Execute(Name, scope, originVersion, targetVersion, logger);
             }
         }
 
