@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function partialViewMacrosEditController($scope, $routeParams, codefileResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, angularHelper, $timeout, contentEditingHelper, localizationService, templateHelper, macroResource) {
+    function partialViewMacrosEditController($scope, $routeParams, codefileResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, angularHelper, $timeout, contentEditingHelper, localizationService, templateHelper, macroResource, editorService) {
 
         var vm = this;
 
@@ -224,56 +224,46 @@
                 var title = values[0];
                 var emptyStateMessage = values[1];
 
-                vm.dictionaryItemOverlay = {
-                    view: "treepicker",
+                var dictionaryPicker = {
                     section: "settings",
                     treeAlias: "dictionary",
                     entityType: "dictionary",
                     multiPicker: false,
-                    show: true,
                     title: title,
                     emptyStateMessage: emptyStateMessage,
                     select: function(node){
-
                         var code = templateHelper.getInsertDictionarySnippet(node.name);
                         insert(code);
-
-                        vm.dictionaryItemOverlay.show = false;
-                        vm.dictionaryItemOverlay = null;
+                        editorService.close();
                     },
                     close: function (model) {
                         // close dialog
-                        vm.dictionaryItemOverlay.show = false;
-                        vm.dictionaryItemOverlay = null;
+                        editorService.close();
                         // focus editor
                         vm.editor.focus();
                     }
                 };
 
+                editorService.treePicker(dictionaryPicker);
+
             });
         }
 
         function openQueryBuilderOverlay() {
-            vm.queryBuilderOverlay = {
-                view: "querybuilder",
-                show: true,
+            var queryBuilder = {
                 submit: function (model) {
-
                     var code = templateHelper.getQuerySnippet(model.result.queryExpression);
                     insert(code);
-
-                    vm.queryBuilderOverlay.show = false;
-                    vm.queryBuilderOverlay = null;
+                    editorService.close();
                 },
-
                 close: function (model) {
                     // close dialog
-                    vm.queryBuilderOverlay.show = false;
-                    vm.queryBuilderOverlay = null;
+                    editorService.close();
                     // focus editor
                     vm.editor.focus();
                 }
             };
+            editorService.queryBuilder(queryBuilder);
         }
 
         /* Local functions */
