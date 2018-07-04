@@ -203,6 +203,12 @@
             open(editor);
         }
 
+        function nodePermissions(editor) {
+            editor.view = "views/common/infiniteeditors/nodepermissions/nodepermissions.html";
+            editor.size = "small";
+            open(editor);
+        }
+
         function insertCodeSnippet(editor) {
             editor.view = "views/common/infiniteeditors/insertcodesnippet/insertcodesnippet.html";
             editor.size = "small";
@@ -222,6 +228,7 @@
             mediaTypeEditor: mediaTypeEditor,
             queryBuilder: queryBuilder,
             treePicker: treePicker,
+            nodePermissions: nodePermissions,
             insertCodeSnippet: insertCodeSnippet
         };
 
