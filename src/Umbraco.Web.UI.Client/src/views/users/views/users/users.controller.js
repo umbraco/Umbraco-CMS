@@ -69,7 +69,7 @@
         if (Umbraco.Sys.ServerVariables.umbracoSettings.showUserInvite) {
             vm.defaultButton = {
                 labelKey: "user_inviteUser",
-                handler: function() {
+                handler: function () {
                     vm.setUsersViewState('inviteUser');
                 }
             };
@@ -135,7 +135,7 @@
             getUsers();
 
             // Get user groups
-            userGroupsResource.getUserGroups({ onlyCurrentUserGroups: false}).then(function (userGroups) {
+            userGroupsResource.getUserGroups({ onlyCurrentUserGroups: false }).then(function (userGroups) {
                 vm.userGroups = userGroups;
             });
 
@@ -540,12 +540,32 @@
 
         // copy to clip board success
         function copySuccess() {
-            vm.page.copyPasswordButtonState = "success";
+
+            if (vm.page.copyPasswordButtonState != "success") {
+
+                vm.page.copyPasswordButtonState = "success";
+
+                $timeout(function () {
+                    resetClipboardButtonState()
+                }, 1000);
+            }
+
         }
 
         // copy to clip board error
         function copyError() {
-            vm.page.copyPasswordButtonState = "error";
+            if (vm.page.copyPasswordButtonState != "error") {
+
+                vm.page.copyPasswordButtonState = "error";
+
+                $timeout(function () {
+                    resetClipboardButtonState()
+                }, 1000);
+            }
+        }
+
+        function resetClipboardButtonState() {
+            vm.page.copyPasswordButtonState = "init";
         }
 
         function goToUser(userId) {
@@ -594,7 +614,7 @@
                     var localOffset = new Date().getTimezoneOffset();
                     var serverTimeNeedsOffsetting = (-serverOffset !== localOffset);
 
-                    if(serverTimeNeedsOffsetting) {
+                    if (serverTimeNeedsOffsetting) {
                         dateVal = dateHelper.convertToLocalMomentTime(user.lastLoginDate, serverOffset);
                     } else {
                         dateVal = moment(user.lastLoginDate, "YYYY-MM-DD HH:mm:ss");
