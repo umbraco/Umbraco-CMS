@@ -1,6 +1,6 @@
 ﻿angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RelatedLinksController",
-        function ($rootScope, $scope, dialogService, iconHelper) {
+        function ($rootScope, $scope, dialogService, iconHelper, editorService) {
 
             if (!$scope.model.value) {
                 $scope.model.value = [];
@@ -18,61 +18,47 @@
             $scope.currentEditLink = null;
             $scope.hasError = false;
 
-            $scope.internal = function($event) {
-               $scope.currentEditLink = null;
+            $scope.internal = function ($event) {
+                $scope.currentEditLink = null;
 
-                $scope.contentPickerOverlay = {
-                    view: "treepicker",
+                var contentPicker = {
                     section: "content",
                     treeAlias: "content",
                     multiPicker: false,
-                    show: true,
-                    idType: $scope.model.config.idType ? $scope.model.config.idType : "int"
+                    idType: $scope.model.config.idType ? $scope.model.config.idType : "int",
+                    submit: function (model) {
+                        select(model.selection[0]);
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
                 };
 
-               $scope.contentPickerOverlay.submit = function(model) {
+                editorService.treePicker(contentPicker);
 
-                  select(model.selection[0]);
-
-                  $scope.contentPickerOverlay.show = false;
-                  $scope.contentPickerOverlay = null;
-               };
-
-               $scope.contentPickerOverlay.close = function(oldModel) {
-                  $scope.contentPickerOverlay.show = false;
-                  $scope.contentPickerOverlay = null;
-               };
-
-               $event.preventDefault();
+                $event.preventDefault();
             };
 
             $scope.selectInternal = function ($event, link) {
-               $scope.currentEditLink = link;
+                $scope.currentEditLink = link;
 
-                $scope.contentPickerOverlay = {
-                    view: "treepicker",
+                var contentPicker = {
                     section: "content",
                     treeAlias: "content",
                     multiPicker: false,
-                    show: true,
-                    idType: $scope.model.config.idType ? $scope.model.config.idType : "int"
+                    idType: $scope.model.config.idType ? $scope.model.config.idType : "int",
+                    submit: function (model) {
+                        select(model.selection[0]);
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
                 };
-               
-               $scope.contentPickerOverlay.submit = function(model) {
+                editorService.treePicker(contentPicker);
 
-                  select(model.selection[0]);
-
-                  $scope.contentPickerOverlay.show = false;
-                  $scope.contentPickerOverlay = null;
-               };
-
-               $scope.contentPickerOverlay.close = function(oldModel) {
-                  $scope.contentPickerOverlay.show = false;
-                  $scope.contentPickerOverlay = null;
-               };
-
-               $event.preventDefault();
-
+                $event.preventDefault();
             };
 
             $scope.edit = function (idx) {
