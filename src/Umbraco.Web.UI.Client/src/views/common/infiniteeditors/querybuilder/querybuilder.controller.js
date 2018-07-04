@@ -221,6 +221,6 @@
             });
     }
 
-    angular.module("umbraco").controller("Umbraco.Overlays.QueryBuilderController", QueryBuilderOverlayController);
+    angular.module("umbraco").controller("Umbraco.Editors.QueryBuilderController", QueryBuilderOverlayController);
 
 })();
