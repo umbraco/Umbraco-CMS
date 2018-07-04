@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using Moq;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations;
 using Umbraco.Core.Migrations.Upgrade;
@@ -139,6 +141,40 @@ namespace Umbraco.Tests.Migrations
             plan.Validate();
             Console.WriteLine(plan.FinalState);
             Assert.IsFalse(string.IsNullOrWhiteSpace(plan.FinalState));
+        }
+
+        [Test]
+        public void CanCopyChain()
+        {
+            var plan = new MigrationPlan("default");
+            plan
+                .From(string.Empty)
+                .To("aaa")
+                .To("bbb")
+                .To("ccc")
+                .To("ddd")
+                .To("eee");
+
+            plan
+                .From("xxx")
+                .To("yyy", "bbb", "ddd")
+                .To("eee");
+
+            WritePlanToConsole(plan);
+
+            plan.Validate();
+            Assert.AreEqual("eee", plan.FollowPath("xxx"));
+            Assert.AreEqual("yyy", plan.FollowPath("xxx", "yyy"));
+        }
+
+        private void WritePlanToConsole(MigrationPlan plan)
+        {
+            var final = plan.Transitions.First(x => x.Value == null).Key;
+
+            Console.WriteLine("plan \"{0}\" to final state \"{1}\":", plan.Name, final);
+            foreach (var (_, transition) in plan.Transitions)
+                if (transition != null)
+                    Console.WriteLine(transition);
         }
 
         public class DeleteRedirectUrlTable : MigrationBase

@@ -4,6 +4,7 @@ using System.Linq;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
+using Type = System.Type;
 
 namespace Umbraco.Core.Migrations
 {
@@ -30,6 +31,11 @@ namespace Umbraco.Core.Migrations
             // (accepted)
             DefinePlan();
         }
+
+        /// <summary>
+        /// Gets the transitions.
+        /// </summary>
+        public IReadOnlyDictionary<string, Transition> Transitions => _transitions;
 
         /// <summary>
         /// Defines the plan.
@@ -238,8 +244,8 @@ namespace Umbraco.Core.Migrations
         {
             Validate();
 
-            if (migrationBuilder == null || logger == null)
-                throw new InvalidOperationException("Cannot execute a non-executable plan.");
+            if (migrationBuilder == null) throw new ArgumentNullException(nameof(migrationBuilder));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
 
             logger.Info<MigrationPlan>("Starting '{MigrationName}'...", Name);
 
@@ -276,9 +282,46 @@ namespace Umbraco.Core.Migrations
         }
 
         /// <summary>
+        /// Follows a path (for tests and debugging).
+        /// </summary>
+        /// <remarks>Does the same thing Execute does, but does not actually execute migrations.</remarks>
+        internal string FollowPath(string fromState, string toState = null)
+        {
+            toState = toState.NullOrWhiteSpaceAsNull();
+
+            Validate();
+
+            var origState = fromState ?? string.Empty;
+
+            if (!_transitions.TryGetValue(origState, out var transition))
+                throw new Exception($"Unknown state \"{origState}\".");
+
+            while (transition != null)
+            {
+                var nextState = transition.TargetState;
+                origState = nextState;
+
+                if (nextState == toState)
+                {
+                    transition = null;
+                    continue;
+                }
+
+                if (!_transitions.TryGetValue(origState, out transition))
+                    throw new Exception($"Unknown state \"{origState}\".");
+            }
+
+            // safety check
+            if (origState != (toState ?? _finalState))
+                throw new Exception($"Internal error, reached state {origState} which is not state {toState ?? _finalState}");
+
+            return origState;
+        }
+
+        /// <summary>
         /// Represents a plan transition.
         /// </summary>
-        private class Transition
+        public class Transition
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="Transition"/> class.

@@ -41,6 +41,11 @@ namespace Umbraco.Core.Migrations.Upgrade
         /// <param name="logger">A logger.</param>
         public void Execute(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, ILogger logger)
         {
+            if (scopeProvider == null) throw new ArgumentNullException(nameof(scopeProvider));
+            if (migrationBuilder == null) throw new ArgumentNullException(nameof(migrationBuilder));
+            if (keyValueService == null) throw new ArgumentNullException(nameof(keyValueService));
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+
             var plan = Plan;
 
             using (var scope = scopeProvider.CreateScope())
