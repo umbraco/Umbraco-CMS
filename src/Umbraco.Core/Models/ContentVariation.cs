@@ -33,32 +33,5 @@ namespace Umbraco.Core.Models
         /// Values vary by culture and segment.
         /// </summary>
         CultureAndSegment = Culture | Segment
-
-
-        // fixme - remove once we have a migration for DB values!
-        ///// <summary>
-        ///// Unknown.
-        ///// </summary>
-        //Unknown = 0,
-
-        ///// <summary>
-        ///// Accepts values for the invariant culture and the neutral segment.
-        ///// </summary>
-        //InvariantNeutral = 1,
-
-        ///// <summary>
-        ///// Accepts values for a specified culture and the neutral segment.
-        ///// </summary>
-        //CultureNeutral = 2,
-
-        ///// <summary>
-        ///// Accepts values for the invariant culture and a specified segment.
-        ///// </summary>
-        //InvariantSegment = 4,
-
-        ///// <summary>
-        ///// Accepts values for a specified culture and a specified segment.
-        ///// </summary>
-        //CultureSegment = 8
     }
 }

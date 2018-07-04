@@ -9,35 +9,87 @@ namespace Umbraco.Core
     /// </summary>
     public static class ContentVariationExtensions
     {
-        // fixme document
+        /// <summary>
+        /// Determines whether the content type is invariant.
+        /// </summary>
         public static bool VariesByNothing(this IContentTypeBase contentType) => contentType.Variations.VariesByNothing();
+
+        /// <summary>
+        /// Determines whether the content type varies by culture.
+        /// </summary>
+        /// <remarks>And then it could also vary by segment.</remarks>
         public static bool VariesByCulture(this IContentTypeBase contentType) => contentType.Variations.VariesByCulture();
+
+        /// <summary>
+        /// Determines whether the content type varies by segment.
+        /// </summary>
+        /// <remarks>And then it could also vary by culture.</remarks>
         public static bool VariesBySegment(this IContentTypeBase contentType) => contentType.Variations.VariesBySegment();
+
+        /// <summary>
+        /// Determines whether the content type varies by culture and segment.
+        /// </summary>
         public static bool VariesByCultureAndSegment(this IContentTypeBase contentType) => contentType.Variations.VariesByCultureAndSegment();
 
+        /// <summary>
+        /// Determines whether the property type is invariant.
+        /// </summary>
         public static bool VariesByNothing(this PropertyType propertyType) => propertyType.Variations.VariesByNothing();
+
+        /// <summary>
+        /// Determines whether the property type varies by culture.
+        /// </summary>
+        /// <remarks>And then it could also vary by segment.</remarks>
         public static bool VariesByCulture(this PropertyType propertyType) => propertyType.Variations.VariesByCulture();
+
+        /// <summary>
+        /// Determines whether the property type varies by segment.
+        /// </summary>
+        /// <remarks>And then it could also vary by culture.</remarks>
         public static bool VariesBySegment(this PropertyType propertyType) => propertyType.Variations.VariesBySegment();
+
+        /// <summary>
+        /// Determines whether the property type varies by culture and segment.
+        /// </summary>
         public static bool VariesByCultureAndSegment(this PropertyType propertyType) => propertyType.Variations.VariesByCultureAndSegment();
 
+        /// <summary>
+        /// Determines whether the content type is invariant.
+        /// </summary>
         public static bool VariesByNothing(this PublishedContentType contentType) => contentType.Variations.VariesByNothing();
+
+        /// <summary>
+        /// Determines whether the content type varies by culture.
+        /// </summary>
+        /// <remarks>And then it could also vary by segment.</remarks>
         public static bool VariesByCulture(this PublishedContentType contentType) => contentType.Variations.VariesByCulture();
+
+        /// <summary>
+        /// Determines whether the content type varies by segment.
+        /// </summary>
+        /// <remarks>And then it could also vary by culture.</remarks>
         public static bool VariesBySegment(this PublishedContentType contentType) => contentType.Variations.VariesBySegment();
+
+        /// <summary>
+        /// Determines whether the content type varies by culture and segment.
+        /// </summary>
         public static bool VariesByCultureAndSegment(this PublishedContentType contentType) => contentType.Variations.VariesByCultureAndSegment();
 
         /// <summary>
-        /// Determines whether a variation varies by nothing.
+        /// Determines whether a variation is invariant.
         /// </summary>
         public static bool VariesByNothing(this ContentVariation variation) => variation == ContentVariation.Nothing;
 
         /// <summary>
         /// Determines whether a variation varies by culture.
         /// </summary>
+        /// <remarks>And then it could also vary by segment.</remarks>
         public static bool VariesByCulture(this ContentVariation variation) => (variation & ContentVariation.Culture) > 0;
 
         /// <summary>
         /// Determines whether a variation varies by segment.
         /// </summary>
+        /// <remarks>And then it could also vary by culture.</remarks>
         public static bool VariesBySegment(this ContentVariation variation) => (variation & ContentVariation.Segment) > 0;
 
         /// <summary>

@@ -320,7 +320,7 @@ namespace Umbraco.Core.Models
 
             // the values we want to publish should be valid
             if (ValidateProperties(culture).Any())
-                return false; // fixme - should return an attempt with error results
+                return false;
 
             var alsoInvariant = false;
             if (culture == "*") // all cultures

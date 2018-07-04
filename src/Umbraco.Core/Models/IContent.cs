@@ -170,8 +170,6 @@ namespace Umbraco.Core.Models
         /// <returns>A value indicating whether the culture can be published.</returns>
         /// <remarks>
         /// <para>Fails if values cannot be published, e.g. if some values are not valid.</para>
-        /// <para>Sets the property values but not the published name for the specified culture,
-        /// thus not explicitely publishing the culture.</para> fixme uhuh?
         /// <para>Publishing must be finalized via the content service SavePublishing method.</para>
         /// </remarks>
         // fixme - should return an attempt with error results
@@ -181,9 +179,7 @@ namespace Umbraco.Core.Models
         /// Registers a culture to be unpublished.
         /// </summary>
         /// <remarks>
-        /// <para>Clears the property values but not the published name for the specified culture,
-        /// thus leaving the culture published.</para> fixme wtf?
-        /// <para>Publishing must be finalized via the content service SavePublishing method.</para>
+        /// <para>Unpublishing must be finalized via the content service SavePublishing method.</para>
         /// </remarks>
         void UnpublishCulture(string culture = "*");
     }

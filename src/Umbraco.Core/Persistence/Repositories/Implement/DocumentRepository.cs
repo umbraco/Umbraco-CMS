@@ -515,7 +515,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 var deleteDocumentVariations = Sql().Delete<DocumentCultureVariationDto>().Where<DocumentCultureVariationDto>(x => x.NodeId == content.Id);
                 Database.Execute(deleteDocumentVariations);
 
-                // fixme is we'd like to use the native NPoco InsertBulk here but it causes problems (not sure exaclty all scenarios)
+                // fixme NPoco InsertBulk issue?
+                // we should use the native NPoco InsertBulk here but it causes problems (not sure exaclty all scenarios)
                 // but by using SQL Server and updating a variants name will cause: Unable to cast object of type
                 // 'Umbraco.Core.Persistence.FaultHandling.RetryDbConnection' to type 'System.Data.SqlClient.SqlConnection'.
                 // (same in PersistNewItem above)
@@ -1104,13 +1105,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // ensure that that invariant name is unique
             EnsureInvariantNameIsUnique(content);
 
-            // now that we have an invariant name, which is unique,
-            // if publishing, ensure that we have an invariant publish name
-            // invariant content = must be there, else throw - then must follow the invariant name
-            // variant content = update with invariant name
-            // fixme wtf is this we never needed it, PublishName derives from Name when publishing!
-            //if (publishing) EnsureInvariantPublishName(content);
-
             // and finally,
             // ensure that each culture has a unique node name
             // no published name = not published
@@ -1147,24 +1141,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             content.Name = EnsureUniqueNodeName(content.ParentId, content.Name, content.Id);
         }
 
-        //private void EnsureInvariantPublishName(Content content)
-        //{
-        //    if (content.ContentType.VariesByCulture())
-        //    {
-        //        // content varies by culture, reuse name as publish name
-        //        content.UpdatePublishName(null, content.Name);
-        //    }
-        //    else
-        //    {
-        //        // content is invariant, and invariant content must have an explicit invariant name
-        //        if (string.IsNullOrWhiteSpace(content.PublishName))
-        //            throw new InvalidOperationException("Cannot save content with an empty name.");
-        //        // and then, must follow the name itself
-        //        if (content.PublishName != content.Name)
-        //            content.UpdatePublishName(null, content.Name);
-        //    }
-        //}
-
         protected override string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
         {
             return EnsureUniqueNaming == false ? nodeName : base.EnsureUniqueNodeName(parentId, nodeName, id);
@@ -1193,6 +1169,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (names.Count == 0) return;
 
+            // note: the code below means we are going to unique-ify every culture names, regardless
+            // of whether the name has changed (ie the culture has been updated) - some saving culture
+            // fr-FR could cause culture en-UK name to change - not sure that is clean
+
             foreach(var (culture, name) in content.CultureNames)
             {
                 var langId = LanguageRepository.GetIdByIsoCode(culture);
@@ -1207,7 +1187,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // update the name, and the publish name if published
                 content.SetCultureName(uniqueName, culture);
-                if (publishing && content.PublishNames.ContainsKey(culture)) // fixme but what about those cultures we are NOT publishing NOW?! they shouldn't change their name!
+                if (publishing && content.PublishNames.ContainsKey(culture))
                     content.SetPublishInfo(culture, uniqueName, DateTime.Now);
             }
         }
