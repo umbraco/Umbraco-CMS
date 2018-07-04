@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserEditController($scope, eventsService, $q, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper) {
+    function UserEditController($scope, eventsService, $q, $timeout, $location, $routeParams, formHelper, usersResource, userService, contentEditingHelper, localizationService, notificationsService, mediaHelper, Upload, umbRequestHelper, usersHelper, authResource, dateHelper, editorService) {
 
         var vm = this;
 
@@ -222,15 +222,13 @@
         }
 
         function openContentPicker() {
-            vm.contentPicker = {
+            var contentPicker = {
                 title: vm.labels.selectContentStartNode,
-                view: "treepicker",
                 section: "content",
                 treeAlias: "content",
                 multiPicker: true,
                 selection: vm.user.startContentIds,
                 hideHeader: false,
-                show: true,
                 submit: function (model) {
                     // select items
                     if (model.selection) {
@@ -242,22 +240,18 @@
                             multiSelectItem(item, vm.user.startContentIds);
                         });
                     }
-                    // close overlay
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    // close overlay
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                close: function () {
+                    editorService.close();
                 }
             };
+            editorService.treePicker(contentPicker);
         }
 
         function openMediaPicker() {
-            vm.mediaPicker = {
+            var mediaPicker = {
                 title: vm.labels.selectMediaStartNode,
-                view: "treepicker",
                 section: "media",
                 treeAlias: "media",
                 entityType: "media",
@@ -276,15 +270,14 @@
                         });
                     }
                     // close overlay
-                    vm.mediaPicker.show = false;
-                    vm.mediaPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
+                close: function () {
                     // close overlay
-                    vm.mediaPicker.show = false;
-                    vm.mediaPicker = null;
+                    editorService.close();
                 }
             };
+            editorService.treePicker(mediaPicker);
         }
 
         function multiSelectItem(item, selection) {
