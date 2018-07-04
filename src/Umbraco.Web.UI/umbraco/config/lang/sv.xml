@@ -114,16 +114,6 @@
   <area alias="colorpicker">
     <key alias="noColors">Du har inte konfigurerat några giltiga färger</key>
   </area>
-  <area alias="contentPicker">
-    <key alias="pickedTrashedItem">Du har valt ett innehållsobjekt som för närvarande är raderat eller i papperskorgen</key>
-    <key alias="pickedTrashedItems">Du har plockat innehållsobjekt som för närvarande är raderade eller i papperskorg</key>
-  </area>
-  <area alias="mediaPicker">
-    <key alias="pickedTrashedItem">Du har valt ett medieobjekt som för närvarande är raderat eller i papperskorgen</key>
-    <key alias="pickedTrashedItems">Du har plockat medieobjekt som för närvarande är raderade eller i papperskorg</key>
-    <key alias="deletedItem">Raderat objekt</key>
-    <key alias="trashed">Raderade</key>
-  </area>    
   <area alias="content">
     <key alias="about">Om denna sida</key>
     <key alias="alias">Alias</key>

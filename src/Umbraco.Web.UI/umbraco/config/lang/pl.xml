@@ -1011,16 +1011,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
   <area alias="colorpicker">
     <key alias="noColors">Nie skonfigurowałeś żadnych zaakceptowanych kolorów</key>
   </area>
-  <area alias="contentPicker">
-    <key alias="pickedTrashedItem">Wybrałeś element treści aktualnie usunięty lub w koszu</key>
-    <key alias="pickedTrashedItems">Wybrałeś elementy treści aktualnie usunięte lub w koszu</key>
-  </area>
-  <area alias="mediaPicker">
-    <key alias="pickedTrashedItem">Wybrałeś element multimedialny, który został usunięty lub znajduje się w koszu</key>
-    <key alias="pickedTrashedItems">Wybrane elementy multimedialne zostały usunięte lub znajdują się w koszu</key>
-    <key alias="deletedItem">Usunięty element</key>
-    <key alias="trashed">Usunięto</key>
-  </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">Wpisz link zewnętrzny</key>
     <key alias="chooseInternal">Wybierz link wewnętrzny</key>

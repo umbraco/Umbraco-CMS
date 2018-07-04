@@ -814,16 +814,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
   <area alias="colorpicker">
     <key alias="noColors">設定済みの色はありません。</key>
   </area>
-  <area alias="contentPicker">
-    <key alias="pickedTrashedItem">現在削除されている、またはごみ箱にあるコンテンツアイテムを選択しました</key>
-    <key alias="pickedTrashedItems">現在削除されているコンテンツアイテムまたはごみ箱にコンテンツアイテムが選択されています</key>
-  </area>
-  <area alias="mediaPicker">
-    <key alias="pickedTrashedItem">現在削除されているメディアアイテム、またはごみ箱にあるメディアアイテムを選択しました</key>
-    <key alias="pickedTrashedItems">現在削除されているメディアアイテム、またはごみ箱にあるメディアアイテムを選択しました</key>
-    <key alias="deletedItem">削除されたアイテム</key>
-    <key alias="trashed">ゴミ箱</key>
-  </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">外部リンクを入力</key>
 	<key alias="chooseInternal">内部リンクを選択</key>

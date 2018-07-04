@@ -1027,7 +1027,6 @@
         <key alias="pickedTrashedItem">Has seleccionado un elemento borrado o en la papelera de reciclaje</key>
         <key alias="pickedTrashedItems">Has seleccionado unos elementos borrados o en la papelera de reciclaje</key>
         <key alias="deletedItem">Elemento borrado</key>
-        <key alias="trashed">Destrozado</key>
     </area>
     <area alias="relatedlinks">
         <key alias="enterExternal">añadir un enlace externo</key>

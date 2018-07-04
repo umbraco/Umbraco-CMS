@@ -938,16 +938,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   <area alias="colorpicker">
     <key alias="noColors">Vous n'avez configuré aucune couleur approuvée</key>
   </area>
-  <area alias="contentPicker">
-    <key alias="pickedTrashedItem">Vous avez sélectionné un élément de contenu actuellement supprimé ou dans la corbeille</key>
-    <key alias="pickedTrashedItems">Vous avez sélectionné des éléments de contenu actuellement supprimés ou dans la corbeille</key>
-  </area>
-  <area alias="mediaPicker">
-    <key alias="pickedTrashedItem">Vous avez sélectionné un élément multimédia actuellement supprimé ou dans la corbeille</key>
-    <key alias="pickedTrashedItems">Vous avez sélectionné des éléments multimédias actuellement supprimés ou dans la corbeille</key>
-    <key alias="deletedItem">Élément supprimé</key>
-    <key alias="trashed">Supprimé</key>
-  </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">introduire un lien externe</key>
     <key alias="chooseInternal">choisir une page interne</key>

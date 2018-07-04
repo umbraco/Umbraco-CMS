@@ -832,16 +832,6 @@
   <area alias="colorpicker">
     <key alias="noColors">您尚未設定任何許可顏色</key>
   </area>
-  <area alias="contentPicker">
-    <key alias="pickedTrashedItem">您已選擇當前已刪除的內容項或在回收站中</key>
-    <key alias="pickedTrashedItems">您已選擇當前已刪除的內容項或在回收站中</key>
-  </area>
-  <area alias="mediaPicker">
-    <key alias="pickedTrashedItem">您選擇了當前已刪除的媒體項目或回收站中的媒體項目</key>
-    <key alias="pickedTrashedItems">您已挑選當前已刪除的媒體項目或回收站中的媒體項目</key>
-    <key alias="deletedItem">已刪除的項目</key>
-    <key alias="trashed">丟棄</key>
-  </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">輸入外部連結</key>
     <key alias="chooseInternal">選擇內部連結</key>

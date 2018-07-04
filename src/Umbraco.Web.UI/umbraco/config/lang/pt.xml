@@ -590,19 +590,6 @@ Você pode remover com segurança do seu sistema clicando em "desinstalar pacote
     <key alias="publishHelp"><![CDATA[Clique em <em>ok</em> para publicar <strong>%0%</strong> e assim fazer com que seu conteúdo se torne disponível. <br /><br />
 Você pode publicar esta página e todas suas sub-páginas ao selecionar <em>publicar todos filhos</em> abaixo.]]></key>
   </area>
-  <area alias="colorpicker">
-    <key alias="noColors">Você não configurou nenhuma cor aprovada</key>
-  </area>
-  <area alias="contentPicker">
-    <key alias="pickedTrashedItem">Você escolheu um item de conteúdo atualmente excluído ou na lixeira</key>
-    <key alias="pickedTrashedItems">Você selecionou itens de conteúdo excluídos atualmente ou na lixeira</key>
-  </area>
-  <area alias="mediaPicker">
-    <key alias="pickedTrashedItem">Você selecionou um item de mídia atualmente excluído ou na lixeira</key>
-    <key alias="pickedTrashedItems">Você selecionou itens de mídia excluídos atualmente ou na lixeira</key>
-    <key alias="deletedItem">Item excluído</key>
-    <key alias="trashed">Lixeira</key>
-  </area>
   <area alias="relatedlinks">
     <key alias="addExternal">Adicionar link externo</key>
     <key alias="addInternal">Adicionar link interno</key>
