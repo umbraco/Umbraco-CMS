@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Newtonsoft.Json;
 using NPoco;
-using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
@@ -22,6 +20,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         {
             // delete *all* keys and indexes - because of FKs
             Delete.KeysAndIndexes().Do();
+            if (!Context.PostMigrations.Contains(typeof(Post.CreateKeysAndIndexes)))
+                Context.PostMigrations.Add(typeof(Post.CreateKeysAndIndexes));
 
             // drop and create columns
             Delete.Column("pk").FromTable("cmsDataType").Do();
@@ -31,16 +31,12 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             // create column
             AddColumn<DataTypeDto>(Constants.DatabaseSchema.Tables.DataType, "config");
-            Execute.Sql(Sql().Update<DataTypeDto>(u => u.Set(x => x.Configuration, string.Empty)).SQL).Do();
-
-            // re-create *all* keys and indexes
-            foreach (var x in DatabaseSchemaCreator.OrderedTables)
-                Create.KeysAndIndexes(x).Do();
+            Execute.Sql(Sql().Update<DataTypeDto>(u => u.Set(x => x.Configuration, string.Empty))).Do();
 
             // renames
             Execute.Sql(Sql()
                 .Update<DataTypeDto>(u => u.Set(x => x.EditorAlias, "Umbraco.ColorPicker"))
-                .Where<DataTypeDto>(x => x.EditorAlias == "Umbraco.ColorPickerAlias").SQL).Do();
+                .Where<DataTypeDto>(x => x.EditorAlias == "Umbraco.ColorPickerAlias")).Do();
 
             // from preValues to configuration...
             var sql = Sql()

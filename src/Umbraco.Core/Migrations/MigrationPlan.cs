@@ -328,6 +328,13 @@ namespace Umbraco.Core.Migrations
                 postMigration.Migrate();
             }
 
+            foreach (var postMigrationType in context.PostMigrations)
+            {
+                logger.Info<MigrationPlan>($"Post: {postMigrationType.FullName}.");
+                var migration = migrationBuilder.Build(postMigrationType, context);
+                migration.Migrate();
+            }
+
             logger.Info<MigrationPlan>("Done (pending scope completion).");
 
             // safety check

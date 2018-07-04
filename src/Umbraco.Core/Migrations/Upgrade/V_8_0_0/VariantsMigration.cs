@@ -20,6 +20,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         {
             // delete *all* keys and indexes - because of FKs
             Delete.KeysAndIndexes().Do();
+            if (!Context.PostMigrations.Contains(typeof(Post.CreateKeysAndIndexes)))
+                Context.PostMigrations.Add(typeof(Post.CreateKeysAndIndexes));
 
             MigratePropertyData();
             MigrateContentAndPropertyTypes();
@@ -46,10 +48,6 @@ HAVING COUNT(v2.id) <> 1").Any())
                 Debugger.Break();
                 throw new Exception("Migration failed: missing or duplicate 'current' content versions.");
             }
-
-            // re-create *all* keys and indexes
-            foreach (var x in DatabaseSchemaCreator.OrderedTables)
-                Create.KeysAndIndexes(x).Do();
         }
 
         private void MigratePropertyData()
