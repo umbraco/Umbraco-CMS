@@ -467,13 +467,11 @@
             localizationService.localize("template_insertPartialView").then(function(value){
                 var title = value;
 
-                vm.partialItemOverlay = {
-                    view: "treepicker",
+                var partialItem = {
                     section: "settings", 
                     treeAlias: "partialViews",
                     entityType: "partialView",
                     multiPicker: false,
-                    show: true,
                     title: title,
                     filter: function(i) {
                         if(i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
@@ -482,21 +480,19 @@
                     },
                     filterCssClass: "not-allowed",
                     select: function(node){
-                        
                         var code = templateHelper.getInsertPartialSnippet(node.parentId, node.name);
                         insert(code);
-    
-                        vm.partialItemOverlay.show = false;
-                        vm.partialItemOverlay = null;
+                        editorService.close();
                     },
                     close: function (model) {
                         // close dialog
-                        vm.partialItemOverlay.show = false;
-                        vm.partialItemOverlay = null;
+                        editorService.close();
                         // focus editor
                         vm.editor.focus();
                     }
                 };
+
+                editorService.treePicker(partialItem);
             });
         }
 
