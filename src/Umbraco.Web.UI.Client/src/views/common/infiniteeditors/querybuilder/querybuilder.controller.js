@@ -1,7 +1,7 @@
 (function() {
     "use strict";
 
-    function QueryBuilderOverlayController($scope, templateQueryResource, localizationService) {
+    function QueryBuilderOverlayController($scope, templateQueryResource, localizationService, editorService) {
 
         var everything = "";
         var myWebsite = "";
@@ -31,6 +31,8 @@
         vm.setFilterTerm = setFilterTerm;
         vm.changeConstraintValue = changeConstraintValue;
         vm.datePickerChange = datePickerChange;
+        vm.submit = submit;
+        vm.close = close;
 
         function onInit() {
 
@@ -87,33 +89,24 @@
         }
 
         function chooseSource(query) {
-            vm.contentPickerOverlay = {
-                view: "treepicker",
-                section: "content",
-                treeAlias: "content",
-                show: true,
+            var contentPicker = {
                 submit: function(model) {
-
                     var selectedNodeId = model.selection[0].id;
                     var selectedNodeName = model.selection[0].name;
-
                     if (selectedNodeId > 0) {
                         query.source = { id: selectedNodeId, name: selectedNodeName };
                     } else {
                         query.source.name = myWebsite;
                         delete query.source.id;
                     }
-
                     throttledFunc();
-
-                    vm.contentPickerOverlay.show = false;
-                    vm.contentPickerOverlay = null;
+                    editorService.close();
                 },
-                close: function(oldModel) {
-                    vm.contentPickerOverlay.show = false;
-                    vm.contentPickerOverlay = null;
+                close: function() {
+                    editorService.close();
                 }
             };
+            editorService.contentPicker(contentPicker);
         }
 
         function getPropertyOperators(property) {
@@ -191,6 +184,18 @@
             if (event.date && event.date.isValid()) {
                 filter.constraintValue = event.date.format(vm.datePickerConfig.format);
                 throttledFunc();
+            }
+        }
+
+        function submit(model) {
+            if($scope.model.submit) {
+                $scope.model.submit(model);
+            }
+        }
+
+        function close() {
+            if($scope.model.close) {
+                $scope.model.close();
             }
         }
 

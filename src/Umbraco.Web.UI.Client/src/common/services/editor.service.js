@@ -97,6 +97,8 @@
         function contentPicker(editor) {
             editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
             editor.size = "small";
+            editor.section = "content";
+            editor.treeAlias = "content";
             open(editor);
         }
 
@@ -189,6 +191,18 @@
             open(editor);
         }
 
+        function queryBuilder(editor) {
+            editor.view = "views/common/infiniteeditors/querybuilder/querybuilder.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        function treePicker(editor) {
+            editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
         var service = {
             getEditors: getEditors,
             open: open,
@@ -199,7 +213,9 @@
             mediaPicker: mediaPicker,
             iconPicker: iconPicker,
             documentTypeEditor: documentTypeEditor,
-            mediaTypeEditor: mediaTypeEditor
+            mediaTypeEditor: mediaTypeEditor,
+            queryBuilder: queryBuilder,
+            treePicker: treePicker
         };
 
         return service;
