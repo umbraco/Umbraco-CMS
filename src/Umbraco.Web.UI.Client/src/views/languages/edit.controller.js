@@ -56,6 +56,20 @@
 
             });
 
+            $scope.properties = {
+                fallbackLanguage: {
+                    alias: "fallbackLanguage",
+                    description: "To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.",
+                    label: "Fall back language"
+                }
+            };
+
+            vm.loading = true;
+            languageResource.getAll().then(function (languages) {
+                vm.availableLanguages = languages;
+                vm.loading = false;
+            });
+
             if(!$routeParams.create) {
 
                 vm.loading = true;

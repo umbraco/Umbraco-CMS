@@ -33,5 +33,11 @@ namespace Umbraco.Core.Models
         /// If true, a variant node cannot be published unless this language variant is created
         /// </summary>
         bool Mandatory { get; set; }
+
+        /// <summary>
+        /// Defines the fallback language that can be used in multi-lingual scenarios to provide
+        /// content if the requested language does not have it published.
+        /// </summary>
+        ILanguage FallbackLanguage { get; set; }
     }
 }

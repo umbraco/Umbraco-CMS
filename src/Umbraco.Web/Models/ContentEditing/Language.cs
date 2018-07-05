@@ -24,5 +24,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "isMandatory")]
         public bool Mandatory { get; set; }
+
+        [DataMember(Name = "fallbackLanguage")]
+        public Language FallbackLanguage { get; set; }
     }
 }

@@ -22,12 +22,14 @@
                 "treeHeaders_languages",
                 "general_mandatory",
                 "general_default",
+                "languages_fallsbackToLabel"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (values) {
                 vm.labels.languages = values[0];
                 vm.labels.mandatory = values[1];
                 vm.labels.general = values[2];
+                vm.labels.fallsbackTo = values[3];
                 // set page name
                 vm.page.name = vm.labels.languages;
             });
