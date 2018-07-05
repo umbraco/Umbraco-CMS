@@ -219,6 +219,7 @@ namespace Umbraco.Web.Editors
             // so to do that here, we'll need to check if this current user is an admin and if not we should exclude all user who are
             // also admins
 
+            var hideDisabledUsers = UmbracoConfig.For.UmbracoSettings().Security.HideDisabledUsersInBackoffice;
             var excludeUserGroups = new string[0];
             var isAdmin = Security.CurrentUser.IsAdmin();
             if (isAdmin == false)
@@ -241,7 +242,7 @@ namespace Umbraco.Web.Editors
                 filterQuery.Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
             }
 
-            if (UmbracoConfig.For.UmbracoSettings().Security.HideDisabledUsersInBackoffice)
+            if (hideDisabledUsers)
             {
                 filterQuery.Where(user => !user.IsApproved);
             }
@@ -249,11 +250,14 @@ namespace Umbraco.Web.Editors
             long pageIndex = pageNumber - 1;
             long total;
             var result = Services.UserService.GetAll(pageIndex, pageSize, out total, orderBy, orderDirection, userStates, userGroups, excludeUserGroups, filterQuery);
-            
+
             var paged = new PagedUserResult(total, pageNumber, pageSize)
             {
                 Items = Mapper.Map<IEnumerable<UserBasic>>(result),
-                UserStates = Services.UserService.GetUserStates()
+                UserStates = hideDisabledUsers
+                                 ? Services.UserService.GetUserStates().Where(state => state.Key != UserState.Disabled)
+                                           .ToDictionary(state => state.Key, state => state.Value)
+                                 : Services.UserService.GetUserStates()
             };
 
             return paged;
