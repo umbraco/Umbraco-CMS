@@ -415,8 +415,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (_contentTypesById.TryGetValue(kit.ContentTypeId, out LinkedNode<PublishedContentType> link) == false || link.Value == null)
                 return false;
 
+            // check whether parent is published
+            var canBePublished = ParentPublishedLocked(kit);
+
             // and use
-            kit.Build(link.Value, _publishedSnapshotAccessor, _variationContextAccessor);
+            kit.Build(link.Value, _publishedSnapshotAccessor, _variationContextAccessor, canBePublished);
 
             return true;
         }
@@ -641,6 +644,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return true;
             var link = GetParentLink(kit.Node);
             return link?.Value != null;
+        }
+
+        private bool ParentPublishedLocked(ContentNodeKit kit)
+        {
+            if (kit.Node.ParentContentId < 0)
+                return true;
+            var link = GetParentLink(kit.Node);
+            var node = link?.Value;
+            return node?.Published != null;
         }
 
         private void AddToParentLocked(ContentNode content)
