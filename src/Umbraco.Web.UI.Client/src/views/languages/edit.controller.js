@@ -29,7 +29,10 @@
                 "languages_mandatoryLanguageHelp",
                 "languages_defaultLanguage",
                 "languages_defaultLanguageHelp",
-                "languages_addLanguage"
+                "languages_addLanguage",
+                "languages_noFallbackLanguageOption",
+                "languages_fallbackLanguageDescription",
+                "languages_fallbackLanguage"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (values) {
@@ -39,6 +42,15 @@
                 vm.labels.defaultLanguage = values[3];
                 vm.labels.defaultLanguageHelp = values[4];
                 vm.labels.addLanguage = values[5];
+                vm.labels.noFallbackLanguageOption = values[6];
+
+                $scope.properties = {
+                    fallbackLanguage: {
+                        alias: "fallbackLanguage",
+                        description: values[7],
+                        label: values[8]
+                    }
+                };
 
                 if($routeParams.create) {
                     vm.page.name = vm.labels.addLanguage;
@@ -56,21 +68,15 @@
 
             });
 
-            $scope.properties = {
-                fallbackLanguage: {
-                    alias: "fallbackLanguage",
-                    description: "To allow multi-lingual content to fall back to another language if not present in the requested language, select it here.",
-                    label: "Fall back language"
-                }
-            };
-
             vm.loading = true;
             languageResource.getAll().then(function (languages) {
-                vm.availableLanguages = languages;
+                vm.availableLanguages = languages.filter(function (l) {
+                    return $routeParams.id != l.id;
+                });
                 vm.loading = false;
             });
 
-            if(!$routeParams.create) {
+            if (!$routeParams.create) {
 
                 vm.loading = true;
 
