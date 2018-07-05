@@ -1003,7 +1003,7 @@ namespace Umbraco.Web.Editors
 
             if (foundContent == null)
                 HandleContentNotFound(id);
-           
+
             var unpublishResult = Services.ContentService.Unpublish(foundContent, culture: culture, userId: Security.GetUserId().ResultOr(0));
 
             var content = MapToDisplay(foundContent, culture);
@@ -1019,7 +1019,7 @@ namespace Umbraco.Web.Editors
 
                 content.AddSuccessNotification(
                     Services.TextService.Localize("content/unPublish"),
-                    unpublishResult.Result == UnpublishResultType.SuccessVariant
+                    unpublishResult.Result == UnpublishResultType.SuccessCulture
                         ? Services.TextService.Localize("speechBubbles/contentVariationUnpublished", new[] { culture })
                         : Services.TextService.Localize("speechBubbles/contentUnpublished"));
 
@@ -1288,6 +1288,5 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
-
     }
 }

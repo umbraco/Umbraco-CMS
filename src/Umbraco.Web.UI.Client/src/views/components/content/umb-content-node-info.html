@@ -1,19 +1,22 @@
 <div class="umb-package-details">
-    
+
     <div class="umb-package-details__main-content">
-        
+
         <umb-box data-element="node-info-urls">
             <umb-box-header title-key="general_links"></umb-box-header>
             <umb-box-content class="block-form">
                 <ul class="nav nav-stacked" style="margin-bottom: 0;">
                     <li ng-repeat="url in node.urls">
-                        <a ng-if="node.published" href="{{url}}" target="_blank">
-                            <i class="icon icon-window-popin"></i>
-                            <span>{{url}}</span>
-                        </a>
-                        <div ng-if="!node.published">
-                            <i class="icon icon-window-popin"></i>
-                            <span>{{url}}</span>
+                        <span ng-if="url.isUrl">
+                            <a href="{{url.text}}" target="_blank">
+                                <i class="icon icon-window-popin"></i>
+                                <span>{{url.text}}</span>
+                            </a>
+                            <span ng-if="url.culture" style="font-size: 13px; color: #cccccc; margin-left: 20px;">{{url.culture}}</span>
+                        </span>
+                        <div ng-if="!url.isUrl" style="margin-top: 4px;">
+                            <span>{{url.text}}</span>
+                            <span ng-if="url.culture" style="font-size: 13px; color: #cccccc; margin-left: 20px;">{{url.culture}}</span>
                         </div>
                     </li>
                 </ul>
@@ -23,12 +26,12 @@
         <umb-box data-element="node-info-history">
             <umb-box-header title-key="general_history"></umb-box-header>
             <umb-box-content class="block-form">
-                
+
                 <div style="position: relative;">
 
                     <div ng-if="loadingAuditTrail" style="background: rgba(255, 255, 255, 0.8); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
                     <umb-load-indicator ng-if="loadingAuditTrail"></umb-load-indicator>
-                    
+
                     <div ng-if="auditTrail.length === 0" style="padding: 10px;">
                         <umb-empty-state
                             position="center"
@@ -39,10 +42,10 @@
 
                     <div class="history">
 
-                        <div ng-if="auditTrail.length > 1" class="history-line"></div>                            
-                    
+                        <div ng-if="auditTrail.length > 1" class="history-line"></div>
+
                         <div class="history-item" ng-repeat="item in auditTrail">
-                            
+
                             <div class="history-item__break">
                                 <div class="history-item__avatar">
                                     <umb-avatar
@@ -59,7 +62,7 @@
                                     <div class="history-item__date">{{item.timestampFormatted}}</div>
                                 </div>
                             </div>
-                            
+
                             <div class="history-item__break">
                                 <umb-badge
                                     style="margin-right: 5px;"
@@ -69,7 +72,7 @@
                                 </umb-badge>
                                 <span>{{ item.comment }}</span>
                             </div>
-                            
+
                         </div>
                     </div>
 
@@ -84,8 +87,8 @@
                     </umb-pagination>
                 </div>
 
-            </umb-box-content>    
-        </umb-box>           
+            </umb-box-content>
+        </umb-box>
     </div>
 
     <div class="umb-package-details__sidebar">
@@ -96,15 +99,15 @@
                 <div class="date-wrapper">
 
                     <div class="flex items-center flex-column">
-                        
+
 
                         <umb-date-time-picker
                             data-element="node-info-publish"
                             options="datePickerConfig"
                             on-change="datePickerChange(event, 'publish')">
-                            
+
                             <div class="date-container">
-                                
+
                                 <div class="date-container__title">
                                     <localize key="content_releaseDate"></localize>
                                 </div>
@@ -115,12 +118,12 @@
                                     <div class="date-wrapper__date">{{node.releaseDateDay}} {{node.releaseDateTime}}</div>
                                 </div>
 
-                                <a href="" ng-if="!node.releaseDate" class="bold" style="color: #00aea2; text-decoration: underline;"><localize key="content_setDate">Set date</localize></a>                                                    
-                                
+                                <a href="" ng-if="!node.releaseDate" class="bold" style="color: #00aea2; text-decoration: underline;"><localize key="content_setDate">Set date</localize></a>
+
                             </div>
 
                         </umb-date-time-picker>
-                        
+
                         <a ng-if="node.releaseDate" ng-click="clearPublishDate()" href="" style="text-decoration: underline;">
                             <small><localize key="content_removeDate">Clear date</localize></small>
                         </a>
@@ -140,7 +143,7 @@
                                 <div class="date-container__title">
                                     <localize key="content_unpublishDate"></localize>
                                 </div>
-                                
+
                                 <div class="date-container__date" ng-if="node.removeDate">
                                     <div class="date-wrapper__date">{{node.removeDateMonth}} {{node.removeDateYear}}</div>
                                     <div class="date-wrapper__number">{{node.removeDateDayNumber}}</div>
@@ -159,7 +162,7 @@
                     </div>
 
                 </div>
-                
+
 
             </umb-box-content>
         </umb-box>
@@ -200,7 +203,7 @@
                     <small>{{ node.key }}</small>
                 </umb-control-group>
 
-            </umb-box-content>    
+            </umb-box-content>
         </umb-box>
     </div>
 </div>

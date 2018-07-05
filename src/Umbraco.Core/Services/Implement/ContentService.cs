@@ -891,7 +891,7 @@ namespace Umbraco.Core.Services.Implement
                 }
                 var changeType = TreeChangeTypes.RefreshNode;
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                Audit(AuditType.Save, "Save Content performed by user", userId, content.Id);
+                Audit(AuditType.Save, "Saved by user", userId, content.Id);
                 scope.Complete();
             }
 
@@ -931,7 +931,7 @@ namespace Umbraco.Core.Services.Implement
                     scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
                 }
                 scope.Events.Dispatch(TreeChanged, this, treeChanges.ToEventArgs());
-                Audit(AuditType.Save, "Bulk Save content performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
+                Audit(AuditType.Save, "Bulk-saved by user", userId == -1 ? 0 : userId, Constants.System.Root);
 
                 scope.Complete();
             }
@@ -988,6 +988,8 @@ namespace Umbraco.Core.Services.Implement
         {
             var evtMsgs = EventMessagesFactory.Get();
 
+            culture = culture.NullOrWhiteSpaceAsNull();
+
             var publishedState = content.PublishedState;
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
                 throw new InvalidOperationException($"Cannot save-and-publish (un)publishing content, use the dedicated {nameof(SavePublishing)} method.");
@@ -996,12 +998,12 @@ namespace Umbraco.Core.Services.Implement
             // cannot accept a specific culture for invariant content type (but '*' is ok)
             if (content.ContentType.VariesByCulture())
             {
-                if (culture.IsNullOrWhiteSpace())
+                if (culture == null)
                     throw new NotSupportedException("Invariant culture is not supported by variant content types.");
             }
             else
             {
-                if (!culture.IsNullOrWhiteSpace() && culture != "*")
+                if (culture != null && culture != "*")
                     throw new NotSupportedException($"Culture \"{culture}\" is not supported by invariant content types.");
             }
 
@@ -1010,7 +1012,7 @@ namespace Umbraco.Core.Services.Implement
                 return new UnpublishResult(UnpublishResultType.SuccessAlready, evtMsgs, content);
 
             // all cultures = unpublish whole
-            if (culture == "*")
+            if (culture == "*" || (!content.ContentType.VariesByCulture() && culture == null))
             {
                 ((Content) content).PublishedState = PublishedState.Unpublishing;
             }
@@ -1031,9 +1033,21 @@ namespace Umbraco.Core.Services.Implement
                 var saved = SavePublishing(content, userId);
                 if (saved.Success)
                 {
-                    Audit(AuditType.UnPublish, $"Unpublish variation culture: \"{culture ?? string.Empty}\" performed by user", userId, content.Id);
+                    UnpublishResultType result;
+                    if (culture == "*" || culture == null)
+                    {
+                        Audit(AuditType.UnPublish, "Unpublished by user", userId, content.Id);
+                        result = UnpublishResultType.Success;
+                    }
+                    else
+                    {
+                        Audit(AuditType.UnPublish, $"Culture \"{culture}\" unpublished by user", userId, content.Id);
+                        if (!content.Published)
+                            Audit(AuditType.UnPublish, $"Unpublished (culture \"{culture}\" is mandatory) by user", userId, content.Id);
+                        result = content.Published ? UnpublishResultType.SuccessCulture : UnpublishResultType.SuccessMandatoryCulture;
+                    }
                     scope.Complete();
-                    return new UnpublishResult(UnpublishResultType.SuccessVariant, evtMsgs, content);
+                    return new UnpublishResult(result, evtMsgs, content);
                 }
 
                 // failed - map result
@@ -1156,7 +1170,7 @@ namespace Umbraco.Core.Services.Implement
                         // events and audit
                         scope.Events.Dispatch(UnPublished, this, new PublishEventArgs<IContent>(content, false, false), "UnPublished");
                         scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
-                        Audit(AuditType.UnPublish, "UnPublish performed by user", userId, content.Id);
+                        Audit(AuditType.UnPublish, "Unpublished by user", userId, content.Id);
                         scope.Complete();
                         return new PublishResult(PublishResultType.Success, evtMsgs, content);
                     }
@@ -1187,7 +1201,7 @@ namespace Umbraco.Core.Services.Implement
                             scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(descendants, false, false), "Published");
                         }
 
-                        Audit(AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
+                        Audit(AuditType.Publish, "Published by user", userId, content.Id);
                         scope.Complete();
                         return publishResult;
                     }
@@ -1321,7 +1335,7 @@ namespace Umbraco.Core.Services.Implement
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(document, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(publishedDocuments, false, false), "Published");
-                Audit(AuditType.Publish, "SaveAndPublishBranch performed by user", userId, document.Id);
+                Audit(AuditType.Publish, "Branch published by user", userId, document.Id);
 
                 scope.Complete();
             }
@@ -1390,7 +1404,7 @@ namespace Umbraco.Core.Services.Implement
                 DeleteLocked(scope, content);
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.Remove).ToEventArgs());
-                Audit(AuditType.Delete, "Delete Content performed by user", userId, content.Id);
+                Audit(AuditType.Delete, "Deleted by user", userId, content.Id);
 
                 scope.Complete();
             }
@@ -1458,7 +1472,7 @@ namespace Umbraco.Core.Services.Implement
 
                 deleteRevisionsEventArgs.CanCancel = false;
                 scope.Events.Dispatch(DeletedVersions, this, deleteRevisionsEventArgs);
-                Audit(AuditType.Delete, "Delete Content by version date performed by user", userId, Constants.System.Root);
+                Audit(AuditType.Delete, "Delete (by version date) by user", userId, Constants.System.Root);
 
                 scope.Complete();
             }
@@ -1495,7 +1509,7 @@ namespace Umbraco.Core.Services.Implement
                     _documentRepository.DeleteVersion(versionId);
 
                 scope.Events.Dispatch(DeletedVersions, this, new DeleteRevisionsEventArgs(id, false,/* specificVersion:*/ versionId));
-                Audit(AuditType.Delete, "Delete Content by version performed by user", userId, Constants.System.Root);
+                Audit(AuditType.Delete, "Delete (by version) by user", userId, Constants.System.Root);
 
                 scope.Complete();
             }
@@ -1540,7 +1554,7 @@ namespace Umbraco.Core.Services.Implement
                 moveEventArgs.CanCancel = false;
                 moveEventArgs.MoveInfoCollection = moveInfo;
                 scope.Events.Dispatch(Trashed, this, moveEventArgs, nameof(Trashed));
-                Audit(AuditType.Move, "Move Content to Recycle Bin performed by user", userId, content.Id);
+                Audit(AuditType.Move, "Moved to Recycle Bin by user", userId, content.Id);
 
                 scope.Complete();
             }
@@ -1612,7 +1626,7 @@ namespace Umbraco.Core.Services.Implement
                 moveEventArgs.MoveInfoCollection = moveInfo;
                 moveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(Moved, this, moveEventArgs, nameof(Moved));
-                Audit(AuditType.Move, "Move Content performed by user", userId, content.Id);
+                Audit(AuditType.Move, "Moved by user", userId, content.Id);
 
                 scope.Complete();
             }
@@ -1709,7 +1723,7 @@ namespace Umbraco.Core.Services.Implement
                 recycleBinEventArgs.RecycleBinEmptiedSuccessfully = true; // oh my?!
                 scope.Events.Dispatch(EmptiedRecycleBin, this, recycleBinEventArgs);
                 scope.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.Remove)).ToEventArgs());
-                Audit(AuditType.Delete, "Empty Content Recycle Bin performed by user", 0, Constants.System.RecycleBinContent);
+                Audit(AuditType.Delete, "Recycle Bin emptied by user", 0, Constants.System.RecycleBinContent);
 
                 scope.Complete();
             }

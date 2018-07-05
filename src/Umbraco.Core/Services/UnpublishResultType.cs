@@ -18,7 +18,7 @@
         /// <summary>
         /// The specified variant was unpublished, the content item itself remains published.
         /// </summary>
-        SuccessVariant = 2,
+        SuccessCulture = 2,
 
         /// <summary>
         /// The specified variant was a mandatory culture therefore it was unpublished and the content item itself is unpublished

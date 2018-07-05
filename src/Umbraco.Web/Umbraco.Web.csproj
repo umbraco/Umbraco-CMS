@@ -395,6 +395,7 @@
     <Compile Include="Routing\ContentFinderCollectionBuilder.cs" />
     <Compile Include="Routing\Domain.cs" />
     <Compile Include="Routing\IContentLastChanceFinder.cs" />
+    <Compile Include="Routing\UrlInfo.cs" />
     <Compile Include="Routing\UrlProviderCollection.cs" />
     <Compile Include="Routing\UrlProviderCollectionBuilder.cs" />
     <Compile Include="Scheduling\HealthCheckNotifier.cs" />

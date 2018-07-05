@@ -165,9 +165,11 @@
         <key alias="noMediaLink">This media item has no link</key>
         <key alias="otherElements">Properties</key>
         <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
+        <key alias="parentCultureNotPublished">This culture is published but is not visible because it is unpublished on parent '%0%'</key>
         <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
         <key alias="getUrlException">Could not get the url</key>
         <key alias="routeError">This document is published but its url would collide with content %0%</key>
+        <key alias="routeErrorCannotRoute">This document is published but its url cannot be routed</key>
         <key alias="publish">Publish</key>
         <key alias="published">Published</key>
         <key alias="publishedPendingChanges">Published (pending changes)</key>
