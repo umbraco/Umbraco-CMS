@@ -12,6 +12,8 @@
         vm.selectUser = selectUser;
         vm.searchUsers = searchUsers;
         vm.changePageNumber = changePageNumber;
+        vm.submit = submit;
+        vm.close = close;
 
         //////////
 
@@ -102,10 +104,22 @@
             getUsers();
         }
 
+        function submit(model) {
+            if($scope.model.submit) {
+                $scope.model.submit(model);
+            }
+        }
+
+        function close() {
+            if($scope.model.close) {
+                $scope.model.close();
+            }
+        }
+
         onInit();
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Overlays.UserPickerController", UserPickerController);
+    angular.module("umbraco").controller("Umbraco.Editors.UserPickerController", UserPickerController);
 
 })();

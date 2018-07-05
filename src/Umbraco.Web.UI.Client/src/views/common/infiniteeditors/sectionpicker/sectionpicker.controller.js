@@ -9,6 +9,8 @@
         vm.loading = false;
 
         vm.selectSection = selectSection;
+        vm.submit = submit;
+        vm.close = close;
 
         //////////
 
@@ -80,10 +82,22 @@
             });
         }
 
+        function submit(model) {
+            if($scope.model.submit) {
+                $scope.model.submit(model);
+            }
+        }
+
+        function close() {
+            if($scope.model.close) {
+                $scope.model.close();
+            }
+        }
+
         onInit();
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Overlays.SectionPickerController", SectionPickerController);
+    angular.module("umbraco").controller("Umbraco.Editors.SectionPickerController", SectionPickerController);
 
 })();

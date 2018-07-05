@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UsersController($scope, $timeout, $location, $routeParams, usersResource, userGroupsResource, userService, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper) {
+    function UsersController($scope, $timeout, $location, $routeParams, usersResource, userGroupsResource, userService, localizationService, contentEditingHelper, usersHelper, formHelper, notificationsService, dateHelper, editorService) {
 
         var vm = this;
         var localizeSaving = localizationService.localize("general_saving");
@@ -300,16 +300,13 @@
             return _.find(users, function (u) { return u.id === userId });
         }
 
-        function openBulkUserGroupPicker(event) {
+        function openBulkUserGroupPicker() {
             var firstSelectedUser = getUserFromArrayById(vm.selection[0], vm.users);
 
             vm.selectedBulkUserGroups = _.clone(firstSelectedUser.userGroups);
 
-            vm.userGroupPicker = {
-                view: "usergrouppicker",
+            var userGroupPicker = {
                 selection: vm.selectedBulkUserGroups,
-                closeButtonLabelKey: "general_cancel",
-                show: true,
                 submit: function (model) {
                     usersResource.setUserGroupsOnUsers(model.selection, vm.selection).then(function (data) {
                         // sorting to ensure they show up in right order when updating the UI
@@ -323,42 +320,36 @@
                                 user.userGroups = vm.selectedBulkUserGroups;
                             });
                         vm.selectedBulkUserGroups = [];
-                        vm.userGroupPicker.show = false;
-                        vm.userGroupPicker = null;
+                        editorService.close();
                         clearSelection();
                     }, angular.noop);
                 },
-                close: function (oldModel) {
+                close: function () {
                     vm.selectedBulkUserGroups = [];
-                    vm.userGroupPicker.show = false;
-                    vm.userGroupPicker = null;
+                    editorService.close();
                 }
             };
+            editorService.userGroupPicker(userGroupPicker);
         }
 
-        function openUserGroupPicker(event) {
-            vm.userGroupPicker = {
-                view: "usergrouppicker",
+        function openUserGroupPicker() {
+            var oldSelection = angular.copy(vm.newUser.userGroups);
+            var userGroupPicker = {
                 selection: vm.newUser.userGroups,
-                closeButtonLabelKey: "general_cancel",
-                show: true,
                 submit: function (model) {
                     // apply changes
                     if (model.selection) {
                         vm.newUser.userGroups = model.selection;
                     }
-                    vm.userGroupPicker.show = false;
-                    vm.userGroupPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
+                close: function () {
                     // rollback on close
-                    if (oldModel.selection) {
-                        vm.newUser.userGroups = oldModel.selection;
-                    }
-                    vm.userGroupPicker.show = false;
-                    vm.userGroupPicker = null;
+                    vm.newUser.userGroups = oldSelection;
+                    editorService.close();
                 }
             };
+            editorService.userGroupPicker(userGroupPicker);
         }
 
         function removeSelectedUserGroup(index, selection) {

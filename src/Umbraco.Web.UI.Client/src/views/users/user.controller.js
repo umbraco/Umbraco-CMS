@@ -197,28 +197,23 @@
         }
 
         function openUserGroupPicker() {
-            vm.userGroupPicker = {
-                view: "usergrouppicker",
+            var oldSelection = angular.copy(vm.user.userGroups);
+            var userGroupPicker = {
                 selection: vm.user.userGroups,
-                closeButtonLabel: vm.labels.cancel,
-                show: true,
                 submit: function (model) {
                     // apply changes
                     if (model.selection) {
                         vm.user.userGroups = model.selection;
                     }
-                    vm.userGroupPicker.show = false;
-                    vm.userGroupPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    // rollback on close
-                    if (oldModel.selection) {
-                        vm.user.userGroups = oldModel.selection;
-                    }
-                    vm.userGroupPicker.show = false;
-                    vm.userGroupPicker = null;
+                close: function () {
+                    // roll back the selection
+                    vm.user.userGroups = oldSelection;
+                    editorService.close();
                 }
             };
+            editorService.userGroupPicker(userGroupPicker);
         }
 
         function openContentPicker() {

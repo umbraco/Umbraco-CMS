@@ -104,23 +104,18 @@
         }
 
         function openSectionPicker() {
-            vm.sectionPicker = {
-                view: "sectionpicker",
+            var oldSelection = angular.copy(vm.userGroup.sections);
+            var sectionPicker = {
                 selection: vm.userGroup.sections,
-                closeButtonLabel: vm.labels.cancel,
-                show: true,
                 submit: function (model) {
-                    vm.sectionPicker.show = false;
-                    vm.sectionPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    if (oldModel.selection) {
-                        vm.userGroup.sections = oldModel.selection;
-                    }
-                    vm.sectionPicker.show = false;
-                    vm.sectionPicker = null;
+                close: function () {
+                    vm.userGroup.sections = oldSelection;
+                    editorService.close();
                 }
             };
+            editorService.sectionPicker(sectionPicker);
         }
 
         function openContentPicker() {
@@ -173,19 +168,18 @@
         }
 
         function openUserPicker() {
-            vm.userPicker = {
-                view: "userpicker",
+            var oldSelection = angular.copy(vm.userGroup.users);
+            var userPicker = {
                 selection: vm.userGroup.users,
-                show: true,
-                submit: function (model) {
-                    vm.userPicker.show = false;
-                    vm.userPicker = null;
+                submit: function () {
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    vm.userPicker.show = false;
-                    vm.userPicker = null;
+                close: function () {
+                    vm.userGroup.users = oldSelection;
+                    editorService.close();
                 }
             };
+            editorService.userPicker(userPicker);
         }
 
         /**

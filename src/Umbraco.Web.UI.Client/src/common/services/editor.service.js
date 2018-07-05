@@ -215,6 +215,57 @@
             open(editor);
         }
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#userGroupPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the user group picker in infinite editing, the submit callback returns an array of the selected user groups
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function userGroupPicker(editor) {
+            editor.view = "views/common/infiniteeditors/usergrouppicker/usergrouppicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#sectionPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the section picker in infinite editing, the submit callback returns an array of the selected sections
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function sectionPicker(editor) {
+            editor.view = "views/common/infiniteeditors/sectionpicker/sectionpicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#sectionPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the section picker in infinite editing, the submit callback returns an array of the selected users
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function userPicker(editor) {
+            editor.view = "views/common/infiniteeditors/userpicker/userpicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
         var service = {
             getEditors: getEditors,
             open: open,
@@ -229,7 +280,10 @@
             queryBuilder: queryBuilder,
             treePicker: treePicker,
             nodePermissions: nodePermissions,
-            insertCodeSnippet: insertCodeSnippet
+            insertCodeSnippet: insertCodeSnippet,
+            userGroupPicker: userGroupPicker,
+            sectionPicker: sectionPicker,
+            userPicker: userPicker
         };
 
         return service;
