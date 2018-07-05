@@ -772,7 +772,7 @@ namespace Umbraco.Web.Editors
                 {
                     //can only save
                     var saveResult = Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id);
-                    publishStatus = new PublishResult(PublishResultType.Failed, null, contentItem.PersistedContent);
+                    publishStatus = new PublishResult(PublishResultType.FailedCannotPublish, null, contentItem.PersistedContent);
                     wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
                 }
             }
@@ -1150,7 +1150,7 @@ namespace Umbraco.Web.Editors
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedByParent",
-                                    new[] { string.Format("{0} ({1})", status.Content.Name, status.Content.Id) }).Trim());
+                                new[] { $"{status.Content.Name} ({status.Content.Id})" }).Trim());
                     break;
                 case PublishResultType.FailedCancelledByEvent:
                     AddCancelMessage(display, "publish", "speechBubbles/contentPublishedFailedByEvent");
@@ -1159,32 +1159,36 @@ namespace Umbraco.Web.Editors
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedAwaitingRelease",
-                                    new[] { string.Format("{0} ({1})", status.Content.Name, status.Content.Id) }).Trim());
+                                new[] { $"{status.Content.Name} ({status.Content.Id})" }).Trim());
                     break;
                 case PublishResultType.FailedHasExpired:
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedExpired",
-                                    new[]
-                                    {
-                                                                string.Format("{0} ({1})", status.Content.Name, status.Content.Id),
-                                    }).Trim());
+                                new[] { $"{status.Content.Name} ({status.Content.Id})", }).Trim());
                     break;
                 case PublishResultType.FailedIsTrashed:
-                    //TODO: We should add proper error messaging for this!
+                    display.AddWarningNotification(
+                        Services.TextService.Localize("publish"),
+                        "publish/contentPublishedFailedIsTrashed"); // fixme properly localize!
                     break;
                 case PublishResultType.FailedContentInvalid:
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedInvalid",
-                                    new[]
-                                    {
-                                                                string.Format("{0} ({1})", status.Content.Name, status.Content.Id),
-                                                                string.Join(",", status.InvalidProperties.Select(x => x.Alias))
-                                    }).Trim());
+                                new[]
+                                {
+                                    $"{status.Content.Name} ({status.Content.Id})",
+                                    string.Join(",", status.InvalidProperties.Select(x => x.Alias))
+                                }).Trim());
+                    break;
+                case PublishResultType.FailedByCulture:
+                    display.AddWarningNotification(
+                        Services.TextService.Localize("publish"),
+                        "publish/contentPublishedFailedByCulture"); // fixme properly localize!
                     break;
                 default:
-                    throw new IndexOutOfRangeException();
+                    throw new IndexOutOfRangeException($"PublishedResultType \"{status.Result}\" was not expected.");
             }
         }
 

@@ -1055,27 +1055,31 @@ namespace Umbraco.Core.Services.Implement
             if (content.PublishedState != PublishedState.Publishing && content.PublishedState != PublishedState.Unpublishing)
                 ((Content) content).PublishedState = PublishedState.Publishing;
 
+            // state here is either Publishing or Unpublishing
+            var publishing = content.PublishedState == PublishedState.Publishing;
+            var unpublishing = content.PublishedState == PublishedState.Unpublishing;
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 // is the content going to end up published, or unpublished?
-                bool publishing, unpublishing;
-                if (content.ContentType.VariesByCulture())
+                if (publishing && content.ContentType.VariesByCulture())
                 {
                     var publishedCultures = content.PublishedCultures.ToList();
-                    var cannotBePublished= publishedCultures.Count == 0; // no published cultures = cannot be published
+                    var cannotBePublished = publishedCultures.Count == 0; // no published cultures = cannot be published
                     if (!cannotBePublished)
                     {
                         var mandatoryCultures = _languageRepository.GetMany().Where(x => x.Mandatory).Select(x => x.IsoCode);
-                        cannotBePublished = mandatoryCultures.Any(x => !publishedCultures.Contains(x)); // missing mandatory culture = cannot be published
+                        cannotBePublished = mandatoryCultures.Any(x => !publishedCultures.Contains(x, StringComparer.OrdinalIgnoreCase)); // missing mandatory culture = cannot be published
                     }
-                    unpublishing = content.Published && cannotBePublished; // if we cannot be published, and we are published, we unpublish
-                    publishing = !cannotBePublished; // if we can be published, we publish
-                }
-                else
-                {
-                    // invariant: we can publish, no culture problem, no need to unpublish
-                    publishing = content.PublishedState == PublishedState.Publishing;
-                    unpublishing = content.PublishedState == PublishedState.Unpublishing;
+
+                    if (cannotBePublished)
+                    {
+                        publishing = false;
+                        unpublishing = content.Published; // if not published yet, nothing to do
+
+                        // we may end up in a state where we won't publish nor unpublish
+                        // keep going, though, as we want to save anways
+                    }
                 }
 
                 var isNew = !content.HasIdentity;
@@ -1160,7 +1164,7 @@ namespace Umbraco.Core.Services.Implement
                     // or, failed
                     scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
                     scope.Complete(); // compete the save
-                    return new PublishResult(PublishResultType.Failed, evtMsgs, content); // bah
+                    return new PublishResult(PublishResultType.FailedToUnpublish, evtMsgs, content); // bah
                 }
 
                 if (publishing) // we have tried to publish
@@ -1194,12 +1198,15 @@ namespace Umbraco.Core.Services.Implement
                     return publishResult;
                 }
 
-                // we haven't tried anything - assume that is bad (may need to reconsider the case of unpublishing
-                // a culture, and the culture or content item was already unpublished...) - bah
+                // both publishing and unpublishing are false
+                // this means that we wanted to publish, in a variant scenario, a document that
+                // was not published yet, and we could not, due to cultures issues
+                //
+                // raise event (we saved), report
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
                 scope.Complete(); // compete the save
-                return new PublishResult(PublishResultType.Failed, evtMsgs, content);
+                return new PublishResult(PublishResultType.FailedByCulture, evtMsgs, content);
             }
         }
 
