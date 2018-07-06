@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Models
 
             Current.Reset();
             var container = Mock.Of<IServiceContainer>();
-            Current.Container = new ContainerAdapter(container);
+            Current.Container = new LightInjectContainer(container);
 
             var dataEditors = new DataEditorCollection(new IDataEditor[]
             {

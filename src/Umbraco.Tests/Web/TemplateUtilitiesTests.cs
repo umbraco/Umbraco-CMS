@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Web
             container.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
                 new TypeLoader(NullCacheProvider.Instance, SettingsForTests.GenerateMockGlobalSettings(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
             container.Setup(x => x.GetInstance(typeof (ServiceContext))).Returns(serviceContext);
-            Current.Container = new ContainerAdapter(container.Object);
+            Current.Container = new LightInjectContainer(container.Object);
 
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
 

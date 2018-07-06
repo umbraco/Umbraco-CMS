@@ -4,21 +4,21 @@ using LightInject;
 namespace Umbraco.Core.Composing.LightInject
 {
     /// <summary>
-    /// Implements <see cref="IContainer"/> for LightInject.
+    /// Implements <see cref="IContainer"/> with LightInject.
     /// </summary>
-    public class ContainerAdapter : IContainer // fixme rename LightInjectContainer?
+    public class LightInjectContainer : IContainer
     {
         private readonly IServiceContainer _container;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ContainerAdapter"/> with a LightInject container.
+        /// Initializes a new instance of the <see cref="LightInjectContainer"/> with a LightInject container.
         /// </summary>
-        public ContainerAdapter(IServiceContainer container)
+        public LightInjectContainer(IServiceContainer container)
         {
             _container = container;
         }
 
-        // fixme
+        /// <inheritdoc />
         public object ConcreteContainer => _container;
 
         /// <inheritdoc />

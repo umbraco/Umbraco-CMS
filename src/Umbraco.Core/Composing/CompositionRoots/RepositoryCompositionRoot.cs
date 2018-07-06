@@ -21,9 +21,8 @@ namespace Umbraco.Core.Composing.CompositionRoots
         {
             // register cache helpers
             // the main cache helper is registered by CoreBootManager and is used by most repositories
-            // the disabled one is used by those repositories that have an annotated ctor parameter
-            // fixme refactor: use a DisabledCacheHelper class (or interface?) so that injection does not depend on name and we can have simple ctor injection
-            container.RegisterSingleton(factory => CacheHelper.CreateDisabledCacheHelper(), DisabledCache);
+            // the disabled one is used by those repositories that require it
+            container.RegisterSingleton<DisabledCacheHelper>();
 
             // resolve ctor dependency from GetInstance() runtimeArguments, if possible - 'factory' is
             // the container, 'info' describes the ctor argument, and 'args' contains the args that
@@ -41,7 +40,7 @@ namespace Umbraco.Core.Composing.CompositionRoots
             // some repositories have an annotated ctor parameter to pick the right cache helper
 
             // repositories
-            container.RegisterSingleton<IAuditRepository>(f => new AuditRepository(f.GetInstance<IScopeAccessor>(), f.GetInstance<CacheHelper>(DisabledCache), f.GetInstance<ILogger>()));
+            container.RegisterSingleton<IAuditRepository, AuditRepository>();
             container.RegisterSingleton<IAuditEntryRepository, AuditEntryRepository>();
             container.RegisterSingleton<IContentTypeRepository, ContentTypeRepository>();
             container.RegisterSingleton<IDataTypeContainerRepository, DataTypeContainerRepository>();
@@ -64,13 +63,13 @@ namespace Umbraco.Core.Composing.CompositionRoots
             container.RegisterSingleton<INotificationsRepository, NotificationsRepository>();
             container.RegisterSingleton<IPublicAccessRepository, PublicAccessRepository>();
             container.RegisterSingleton<IRedirectUrlRepository, RedirectUrlRepository>();
-            container.RegisterSingleton<IRelationRepository>(f => new RelationRepository(f.GetInstance<IScopeAccessor>(), f.GetInstance<CacheHelper>(DisabledCache), f.GetInstance<ILogger>(), f.GetInstance<IRelationTypeRepository>()));
+            container.RegisterSingleton<IRelationRepository, RelationRepository>();
             container.RegisterSingleton<IRelationTypeRepository, RelationTypeRepository>();
             container.RegisterSingleton<IServerRegistrationRepository, ServerRegistrationRepository>();
             container.RegisterSingleton<ITagRepository, TagRepository>();
-            container.RegisterSingleton<ITaskRepository>(f => new TaskRepository(f.GetInstance<IScopeAccessor>(), f.GetInstance<CacheHelper>(DisabledCache), f.GetInstance<ILogger>()));
-            container.RegisterSingleton<ITaskTypeRepository>(f => new TaskTypeRepository(f.GetInstance<IScopeAccessor>(), f.GetInstance<CacheHelper>(DisabledCache), f.GetInstance<ILogger>()));
-            container.RegisterSingleton<ITemplateRepository>(f => new TemplateRepository(
+            container.RegisterSingleton<ITaskRepository, TaskRepository>();
+            container.RegisterSingleton<ITaskTypeRepository, TaskTypeRepository>();
+            container.RegisterSingleton<ITemplateRepository>(f => new TemplateRepository( // fixme type the FS too! or?
                 f.GetInstance<IScopeAccessor>(),
                 f.GetInstance<CacheHelper>(),
                 f.GetInstance<ILogger>(),

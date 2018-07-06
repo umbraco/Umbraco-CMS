@@ -7,7 +7,7 @@ using System.Web.Caching;
 namespace Umbraco.Core.Cache
 {
     /// <summary>
-    /// Class that is exposed by the ApplicationContext for application wide caching purposes
+    /// Represents the application-wide caches.
     /// </summary>
     public class CacheHelper
     {
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Cache
             // do *not* return NoCache
             // NoCache is a special instance that is detected by RepositoryBase and disables all cache policies
             // CreateDisabledCacheHelper is used in tests to use no cache, *but* keep all cache policies
-            return new CacheHelper(NullCacheProvider.Instance, NullCacheProvider.Instance, NullCacheProvider.Instance, new IsolatedRuntimeCache(_ => NullCacheProvider.Instance));
+            return new DisabledCacheHelper();
         }
 
         /// <summary>
@@ -43,7 +43,6 @@ namespace Umbraco.Core.Cache
         /// <summary>
         /// Initializes a new instance for use in the web
         /// </summary>
-        /// <param name="cache"></param>
         public CacheHelper(System.Web.Caching.Cache cache)
             : this(
                 new HttpRuntimeCacheProvider(cache),
@@ -53,37 +52,19 @@ namespace Umbraco.Core.Cache
         {
         }
 
-        [Obsolete("Use the constructor the specifies all dependencies")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public CacheHelper(
-            IRuntimeCacheProvider httpCacheProvider,
-            ICacheProvider staticCacheProvider,
-            ICacheProvider requestCacheProvider)
-            : this(httpCacheProvider, staticCacheProvider, requestCacheProvider, new IsolatedRuntimeCache(t => new ObjectCacheRuntimeCacheProvider()))
-        {
-        }
-
         /// <summary>
         /// Initializes a new instance based on the provided providers
         /// </summary>
-        /// <param name="httpCacheProvider"></param>
-        /// <param name="staticCacheProvider"></param>
-        /// <param name="requestCacheProvider"></param>
-        /// <param name="isolatedCacheManager"></param>
         public CacheHelper(
             IRuntimeCacheProvider httpCacheProvider,
             ICacheProvider staticCacheProvider,
             ICacheProvider requestCacheProvider,
             IsolatedRuntimeCache isolatedCacheManager)
         {
-            if (httpCacheProvider == null) throw new ArgumentNullException("httpCacheProvider");
-            if (staticCacheProvider == null) throw new ArgumentNullException("staticCacheProvider");
-            if (requestCacheProvider == null) throw new ArgumentNullException("requestCacheProvider");
-            if (isolatedCacheManager == null) throw new ArgumentNullException("isolatedCacheManager");
-            RuntimeCache = httpCacheProvider;
-            StaticCache = staticCacheProvider;
-            RequestCache = requestCacheProvider;
-            IsolatedRuntimeCache = isolatedCacheManager;
+            RuntimeCache = httpCacheProvider ?? throw new ArgumentNullException(nameof(httpCacheProvider));
+            StaticCache = staticCacheProvider ?? throw new ArgumentNullException(nameof(staticCacheProvider));
+            RequestCache = requestCacheProvider ?? throw new ArgumentNullException(nameof(requestCacheProvider));
+            IsolatedRuntimeCache = isolatedCacheManager ?? throw new ArgumentNullException(nameof(isolatedCacheManager));
         }
 
         /// <summary>

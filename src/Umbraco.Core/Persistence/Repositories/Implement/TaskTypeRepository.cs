@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class TaskTypeRepository : NPocoRepositoryBase<int, TaskType>, ITaskTypeRepository
     {
-        public TaskTypeRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public TaskTypeRepository(IScopeAccessor scopeAccessor, DisabledCacheHelper cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var taskDto = Database.Fetch<TaskTypeDto>(SqlContext.SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             if (taskDto == null)
                 return null;
-            
+
             var entity = TaskTypeFactory.BuildEntity(taskDto);
             return entity;
         }
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 sql.Where("cmsTaskType.id IN (@ids)", new { ids });
             }
-            
+
             var dtos = Database.Fetch<TaskTypeDto>(sql);
             return dtos.Select(TaskTypeFactory.BuildEntity);
         }
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<TaskType>(sqlClause, query);
             var sql = translator.Translate();
-            
+
             var dtos = Database.Fetch<TaskTypeDto>(sql);
             return dtos.Select(TaskTypeFactory.BuildEntity);
         }
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 throw new InvalidOperationException("A task type already exists with the given alias " + entity.Alias);
             }
-            
+
             var dto = TaskTypeFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(TaskType entity)
         {
             entity.UpdatingEntity();
-            
+
             var dto = TaskTypeFactory.BuildDto(entity);
 
             Database.Update(dto);

@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Scoping
             DoThing3 = null;
 
             var lightinjectContainer = new ServiceContainer();
-            Current.Container = new ContainerAdapter(lightinjectContainer);
+            Current.Container = new LightInjectContainer(lightinjectContainer);
 
             _testObjects = new TestObjects(lightinjectContainer);
 

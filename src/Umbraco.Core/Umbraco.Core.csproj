@@ -106,6 +106,7 @@
     <Compile Include="Cache\DefaultRepositoryCachePolicy.cs" />
     <Compile Include="Cache\DictionaryCacheProvider.cs" />
     <Compile Include="Cache\DictionaryCacheProviderBase.cs" />
+    <Compile Include="Cache\DisabledCacheHelper.cs" />
     <Compile Include="Cache\FullDataSetRepositoryCachePolicy.cs" />
     <Compile Include="Cache\HttpRequestCacheProvider.cs" />
     <Compile Include="Cache\HttpRuntimeCacheProvider.cs" />
@@ -170,7 +171,7 @@
     <Compile Include="Composing\IDiscoverable.cs" />
     <Compile Include="Composing\LazyCollectionBuilderBase.cs" />
     <Compile Include="Composing\LightInjectExtensions.cs" />
-    <Compile Include="Composing\LightInject\ContainerAdapter.cs" />
+    <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Composing\MixedLightInjectScopeManagerProvider.cs" />
     <Compile Include="Composing\OrderedCollectionBuilderBase.cs" />
     <Compile Include="Composing\TypeFinder.cs" />

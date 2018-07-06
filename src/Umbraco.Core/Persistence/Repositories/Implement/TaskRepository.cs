@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class TaskRepository : NPocoRepositoryBase<int, Task>, ITaskRepository
     {
-        public TaskRepository(IScopeAccessor scopeAccessor, CacheHelper cache, ILogger logger)
+        public TaskRepository(IScopeAccessor scopeAccessor, DisabledCacheHelper cache, ILogger logger)
             : base(scopeAccessor, cache, logger)
         { }
 
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var taskDto = Database.Fetch<TaskDto>(SqlContext.SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             if (taskDto == null)
                 return null;
-            
+
             var entity = TaskFactory.BuildEntity(taskDto);
             return entity;
         }
@@ -40,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 sql.Where("cmsTask.id IN (@ids)", new { ids = ids });
             }
-            
+
             var dtos = Database.Fetch<TaskDto>(sql);
             return dtos.Select(TaskFactory.BuildEntity);
         }
@@ -102,7 +102,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 entity.TaskType.Id = taskType.Id;
             }
-            
+
             var dto = TaskFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
@@ -114,7 +114,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(Task entity)
         {
             entity.UpdatingEntity();
-            
+
             var dto = TaskFactory.BuildDto(entity);
 
             Database.Update(dto);
@@ -131,7 +131,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             var dtos = Database.Fetch<TaskDto>(sql);
-     
+
             return dtos.Select(TaskFactory.BuildEntity);
         }
 
