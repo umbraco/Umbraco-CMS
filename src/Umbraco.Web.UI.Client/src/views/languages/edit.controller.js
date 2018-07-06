@@ -52,7 +52,7 @@
                     }
                 };
 
-                if($routeParams.create) {
+                if ($routeParams.create) {
                     vm.page.name = vm.labels.addLanguage;
                     languageResource.getCultures().then(function (culturesDictionary) {
                         var cultures = [];
@@ -65,7 +65,6 @@
                         vm.availableCultures = cultures;
                     });
                 }
-
             });
 
             vm.loading = true;
@@ -99,10 +98,25 @@
             });
         }
 
+        function setCultureForFallbackLanguage(lang) {
+            for (var i = 0; i < vm.availableLanguages.length; i++) {
+                if (vm.availableLanguages[i].id === lang.id) {
+                    lang.culture = vm.availableLanguages[i].culture;
+                    break;
+                }
+            }
+        }
+
         function save() {
 
             if (formHelper.submitForm({ scope: $scope })) {
                 vm.page.saveButtonState = "busy";
+
+                // We need to attach the ISO code to the fall-back language to pass
+                // server-side validation.
+                if (vm.language.fallbackLanguage) {
+                    setCultureForFallbackLanguage(vm.language.fallbackLanguage);
+                }
 
                 languageResource.save(vm.language).then(function (lang) {
 

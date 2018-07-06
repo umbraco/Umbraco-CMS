@@ -34,7 +34,7 @@
                 vm.page.name = vm.labels.languages;
             });
 
-            languageResource.getAll().then(function(languages) {
+            languageResource.getAll().then(function (languages) {
                 vm.languages = languages;
                 vm.loading = false;
             });

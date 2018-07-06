@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -8,8 +7,6 @@ using System.Web.Http;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -136,21 +133,38 @@ namespace Umbraco.Web.Editors
                 }
 
                 //create it
-                var newLang = new Umbraco.Core.Models.Language(culture.Name)
+                var newLang = new Core.Models.Language(culture.Name)
                 {
                     CultureName = culture.DisplayName,
                     IsDefaultVariantLanguage = language.IsDefaultVariantLanguage,
-                    Mandatory = language.Mandatory
+                    Mandatory = language.Mandatory,
                 };
+
+                AssociateFallbackLanguage(language, newLang);
                 Services.LocalizationService.Save(newLang);
                 return Mapper.Map<Language>(newLang);
             }
 
             found.Mandatory = language.Mandatory;
             found.IsDefaultVariantLanguage = language.IsDefaultVariantLanguage;
+            AssociateFallbackLanguage(language, found);
             Services.LocalizationService.Save(found);
             return Mapper.Map<Language>(found);
         }
-        
+
+        private static void AssociateFallbackLanguage(Language submittedLanguage, ILanguage languageToCreateOrUpdate)
+        {
+            if (submittedLanguage.FallbackLanguage == null)
+            {
+                return;
+            }
+
+            var fallbackLanguageCulture = CultureInfo.GetCultureInfo(submittedLanguage.FallbackLanguage.IsoCode);
+            languageToCreateOrUpdate.FallbackLanguage = new Core.Models.Language(fallbackLanguageCulture.Name)
+                {
+                    Id = submittedLanguage.FallbackLanguage.Id,
+                    CultureName = fallbackLanguageCulture.DisplayName
+                };
+        }
     }
 }

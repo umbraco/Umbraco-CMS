@@ -144,14 +144,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 IsolatedCache.ClearAllCache();
             }
 
-;
             var dto = LanguageFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
 
             entity.ResetDirtyProperties();
-
         }
 
         protected override void PersistUpdatedItem(ILanguage entity)

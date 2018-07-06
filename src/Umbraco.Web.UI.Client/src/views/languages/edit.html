@@ -68,7 +68,6 @@
                             <div>
                                 <select name="fallbackLanguage"
                                         ng-model="vm.language.fallbackLanguage.id"
-                                        required
                                         ng-options="l.id as l.name for l in vm.availableLanguages">
                                     <option value="">{{vm.labels.noFallbackLanguageOption}}</option>
                                 </select>

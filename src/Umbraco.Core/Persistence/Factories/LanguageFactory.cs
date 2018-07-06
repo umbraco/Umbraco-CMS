@@ -18,7 +18,14 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var dto = new LanguageDto { CultureName = entity.CultureName, IsoCode = entity.IsoCode, IsDefaultVariantLanguage = entity.IsDefaultVariantLanguage, Mandatory = entity.Mandatory };
             if (entity.HasIdentity)
+            {
                 dto.Id = short.Parse(entity.Id.ToString(CultureInfo.InvariantCulture));
+            }
+
+            if (entity.FallbackLanguage != null)
+            {
+                dto.FallbackLanguageId = entity.FallbackLanguage.Id;
+            }
 
             return dto;
         }
