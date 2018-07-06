@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Routing
     [Apartment(ApartmentState.STA)]
     public class UmbracoModuleTests : BaseWebTest
     {
-        private UmbracoModule _module;
+        private UmbracoInjectedModule _module;
 
         public override void SetUp()
         {
@@ -34,23 +34,23 @@ namespace Umbraco.Tests.Routing
 
             // fixme - be able to get the UmbracoModule from the container. any reason settings were from testobjects?
             //create the module
-            _module = new UmbracoModule
+            var logger = Mock.Of<ILogger>();
+            var globalSettings = TestObjects.GetGlobalSettings();
+            var runtime = new RuntimeState(logger, new Lazy<IServerRegistrar>(), new Lazy<MainDom>(), Mock.Of<IUmbracoSettingsSection>(), globalSettings);
+
+            _module = new UmbracoInjectedModule
             (
-                TestObjects.GetUmbracoSettings(),
-                TestObjects.GetGlobalSettings(),
+                globalSettings,
                 Mock.Of<IUmbracoContextAccessor>(),
                 Container.GetInstance<IPublishedSnapshotService>(),
                 Container.GetInstance<IUserService>(),
                 new UrlProviderCollection(new IUrlProvider[0]),
-                Container.GetInstance<IRuntimeState>(),
-                Mock.Of<ILogger>(),
+                runtime,
+                logger,
                 null, // fixme - PublishedRouter complexities...
-                Container.GetInstance<IUmbracoDatabaseFactory>(),
                 Mock.Of<IVariationContextAccessor>()
             );
-            var runtime = new RuntimeState(_module.Logger, new Lazy<IServerRegistrar>(), new Lazy<MainDom>(), Mock.Of<IUmbracoSettingsSection>(), _module.GlobalSettings);
 
-            _module.Runtime = runtime;
             runtime.Level = RuntimeLevel.Run;
             
 
