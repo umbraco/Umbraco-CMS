@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Umbraco.Core.Composing
 {
@@ -13,6 +9,11 @@ namespace Umbraco.Core.Composing
     /// </summary>
     public interface IContainer
     {
+        /// <summary>
+        /// Gets the concrete container.
+        /// </summary>
+        object ConcreteContainer { get; }
+
         /// <summary>
         /// Gets an instance.
         /// </summary>
@@ -54,14 +55,11 @@ namespace Umbraco.Core.Composing
         /// <typeparam name="T">The type of the collection builder.</typeparam>
         /// <returns>A collection builder of the specified type.</returns>
         T RegisterCollectionBuilder<T>();
-
-        // fixme move away!
-        object ConcreteContainer { get; }
     }
 
-    // fixme would be nicer
-    //public interface IContainer<T> : IContainer
-    //{
-    //    T ConcreteContainer { get; }
-    //}
+    public interface IRegistry
+    {
+        // everything register should be here
+        // should a registry also be a container?
+    }
 }
