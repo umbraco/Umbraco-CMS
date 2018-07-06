@@ -6,10 +6,10 @@
 				Restore <strong>{{currentNode.name}}</strong> to under <strong>{{target.name}}</strong>?
 			</p>
 
-			<div class="alert alert-error" ng-show="error != null">
-				<h4>{{error.errorMsg}}</h4>
-				<p>{{error.data.Message}}</p>
-			</div>
+            <div class="alert alert-error" ng-show="error != null">
+                <div><strong>{{error.errorMsg}}</strong></div>
+                <div>{{error.data.Message}}</div>
+            </div>
 
 			<div class="alert alert-success" ng-show="success == true">
 				<p><strong>{{currentNode.name}}</strong> was moved underneath <strong>{{target.name}}</strong></p>
