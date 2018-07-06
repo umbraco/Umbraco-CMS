@@ -15,7 +15,7 @@
                               allow-remove="allowRemoveButton"
                               allow-open="model.config.showOpenButton && allowOpenButton && !dialogEditor"
                               on-remove="remove($index)"
-                              on-open="openMiniEditor(node)">
+                              on-open="openContentEditor(node)">
             </umb-node-preview>
         </div>
 
@@ -76,12 +76,5 @@
         </div>
 
     </ng-form>
-
-    <umb-overlay
-      ng-if="contentPickerOverlay.show"
-      model="contentPickerOverlay"
-      view="contentPickerOverlay.view"
-      position="right">
-    </umb-overlay>
 
 </div>

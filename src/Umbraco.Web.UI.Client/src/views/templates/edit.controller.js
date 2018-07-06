@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function TemplatesEditController($scope, $routeParams, $timeout, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, treeService, contentEditingHelper, localizationService, angularHelper, templateHelper) {
+    function TemplatesEditController($scope, $routeParams, $timeout, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, treeService, contentEditingHelper, localizationService, angularHelper, templateHelper, editorService) {
 
         var vm = this;
         var oldMasterTemplateAlias = null;
@@ -326,56 +326,42 @@
         vm.closeShortcuts = closeShortcuts;
 
         function openInsertOverlay() {
-
-            vm.insertOverlay = {
-                view: "insert",
+            var insertOverlay = {
                 allowedTypes: {
                     macro: true,
                     dictionary: true,
                     partial: true,
                     umbracoField: true
                 },
-                hideSubmitButton: true,
-                show: true,
                 submit: function(model) {
-
                     switch(model.insert.type) {
-
                         case "macro":
                             var macroObject = macroService.collectValueData(model.insert.selectedMacro, model.insert.macroParams, "Mvc");
                             insert(macroObject.syntax);
                             break;
-
                         case "dictionary":
                         	var code = templateHelper.getInsertDictionarySnippet(model.insert.node.name);
                         	insert(code);
                             break;
-
                         case "partial":
                             var code = templateHelper.getInsertPartialSnippet(model.insert.node.parentId, model.insert.node.name);
                             insert(code);
                             break;
-                            
                         case "umbracoField":
                             insert(model.insert.umbracoField);
                             break;
                     }
-
-                    vm.insertOverlay.show = false;
-                    vm.insertOverlay = null;
-
+                    editorService.close();
                 },
                 close: function(oldModel) {
                     // close the dialog
-                    vm.insertOverlay.show = false;
-                    vm.insertOverlay = null;
+                    editorService.close();
                     // focus editor
                     vm.editor.focus();
                 }
             };
-
+            editorService.insertCodeSnippet(insertOverlay);
         }
-
 
         function openMacroOverlay() {
 
@@ -436,30 +422,27 @@
                 var title = values[0];
                 var emptyStateMessage = values[1];
 
-                vm.dictionaryItemOverlay = {
-                    view: "treepicker",
+                var dictionaryItem = {
                     section: "settings",
                     treeAlias: "dictionary",
                     entityType: "dictionary",
                     multiPicker: false,
-                    show: true,
                     title: title,
                     emptyStateMessage: emptyStateMessage,
                     select: function(node){
                         var code = templateHelper.getInsertDictionarySnippet(node.name);
                         insert(code);
-    
-                        vm.dictionaryItemOverlay.show = false;
-                        vm.dictionaryItemOverlay = null;
+                        editorService.close();
                     },
                     close: function (model) {
                         // close dialog
-                        vm.dictionaryItemOverlay.show = false;
-                        vm.dictionaryItemOverlay = null;
+                        editorService.close();
                         // focus editor
                         vm.editor.focus();
                     }
                 };
+
+                editorService.treePicker(dictionaryItem);
 
             });
 
@@ -470,13 +453,11 @@
             localizationService.localize("template_insertPartialView").then(function(value){
                 var title = value;
 
-                vm.partialItemOverlay = {
-                    view: "treepicker",
+                var partialItem = {
                     section: "settings", 
                     treeAlias: "partialViews",
                     entityType: "partialView",
                     multiPicker: false,
-                    show: true,
                     title: title,
                     filter: function(i) {
                         if(i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
@@ -485,45 +466,36 @@
                     },
                     filterCssClass: "not-allowed",
                     select: function(node){
-                        
                         var code = templateHelper.getInsertPartialSnippet(node.parentId, node.name);
                         insert(code);
-    
-                        vm.partialItemOverlay.show = false;
-                        vm.partialItemOverlay = null;
+                        editorService.close();
                     },
                     close: function (model) {
                         // close dialog
-                        vm.partialItemOverlay.show = false;
-                        vm.partialItemOverlay = null;
+                        editorService.close();
                         // focus editor
                         vm.editor.focus();
                     }
                 };
+
+                editorService.treePicker(partialItem);
             });
         }
 
         function openQueryBuilderOverlay() {
-            vm.queryBuilderOverlay = {
-                view: "querybuilder",
-                show: true,
+            var queryBuilder = {
                 submit: function (model) {
-
                     var code = templateHelper.getQuerySnippet(model.result.queryExpression);
                     insert(code);
-                    
-                    vm.queryBuilderOverlay.show = false;
-                    vm.queryBuilderOverlay = null;
+                    editorService.close();
                 },
-
-                close: function (model) {
-                    // close dialog
-                    vm.queryBuilderOverlay.show = false;
-                    vm.queryBuilderOverlay = null;
+                close: function () {
+                    editorService.close();
                     // focus editor
                     vm.editor.focus();   
                 }
             };
+            editorService.queryBuilder(queryBuilder);
         }
 
 

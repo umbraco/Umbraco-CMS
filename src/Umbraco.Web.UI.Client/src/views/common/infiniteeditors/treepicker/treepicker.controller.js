@@ -1,5 +1,5 @@
 //used for the media picker dialog
-angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
+angular.module("umbraco").controller("Umbraco.Editors.TreePickerController",
     function ($scope,
         $q,
         entityResource,
@@ -63,6 +63,8 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         vm.hideSearch = hideSearch;
         vm.closeMiniListView = closeMiniListView;
         vm.selectListViewNode = selectListViewNode;
+        vm.submit = submit;
+        vm.close = close;
 
         function initDialogTree() {
             vm.dialogTreeApi.callbacks.treeLoaded(treeLoadedHandler);
@@ -97,7 +99,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     });
                 }
             }
-            else if (vm.treeAlias === "member" || vm.section) {
+            else if (vm.treeAlias === "member" || vm.section === "member") {
                 vm.entityType = "Member";
                 if (!$scope.model.title) {
                     localizationService.localize("defaultdialogs_selectMember").then(function(value){
@@ -608,6 +610,18 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
         function closeMiniListView() {
             vm.miniListView = undefined;
+        }
+
+        function submit(model) {
+            if($scope.model.submit) {
+                $scope.model.submit(model);
+            }
+        }
+
+        function close() {
+            if($scope.model.close) {
+                $scope.model.close();
+            }
         }
         
         //initialize

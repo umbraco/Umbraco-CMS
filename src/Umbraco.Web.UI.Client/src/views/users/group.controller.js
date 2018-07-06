@@ -1,9 +1,10 @@
 (function () {
     "use strict";
 
-    function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper) {
+    function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper, editorService) {
 
         var vm = this;
+        var contentPickerOpen = false;
 
         vm.page = {};        
         vm.page.rootIcon = "icon-folder";
@@ -103,34 +104,27 @@
         }
 
         function openSectionPicker() {
-            vm.sectionPicker = {
-                view: "sectionpicker",
+            var oldSelection = angular.copy(vm.userGroup.sections);
+            var sectionPicker = {
                 selection: vm.userGroup.sections,
-                closeButtonLabel: vm.labels.cancel,
-                show: true,
                 submit: function (model) {
-                    vm.sectionPicker.show = false;
-                    vm.sectionPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    if (oldModel.selection) {
-                        vm.userGroup.sections = oldModel.selection;
-                    }
-                    vm.sectionPicker.show = false;
-                    vm.sectionPicker = null;
+                close: function () {
+                    vm.userGroup.sections = oldSelection;
+                    editorService.close();
                 }
             };
+            editorService.sectionPicker(sectionPicker);
         }
 
         function openContentPicker() {
-            vm.contentPicker = {
+            var contentPicker = {
                 title: vm.labels.selectContentStartNode,
-                view: "treepicker",
                 section: "content",
                 treeAlias: "content",
                 hideSubmitButton: true,
                 hideHeader: false,
-                show: true,
                 submit: function (model) {
                     if (model.selection) {
                         vm.userGroup.contentStartNode = model.selection[0];
@@ -139,26 +133,23 @@
                             vm.userGroup.contentStartNode.icon = "icon-folder";
                         }
                     }
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                close: function () {
+                    editorService.close();
                 }
             };
+            editorService.treePicker(contentPicker);
         }
 
         function openMediaPicker() {
-            vm.contentPicker = {
+            var mediaPicker = {
                 title: vm.labels.selectMediaStartNode,
-                view: "treepicker",
                 section: "media",
                 treeAlias: "media",
                 entityType: "media",
                 hideSubmitButton: true,
                 hideHeader: false,
-                show: true,
                 submit: function (model) {
                     if (model.selection) {
                         vm.userGroup.mediaStartNode = model.selection[0];
@@ -167,30 +158,28 @@
                             vm.userGroup.mediaStartNode.icon = "icon-folder";
                         }
                     }
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                close: function () {
+                    editorService.close();
                 }
             };
+            editorService.treePicker(mediaPicker);
         }
 
         function openUserPicker() {
-            vm.userPicker = {
-                view: "userpicker",
+            var oldSelection = angular.copy(vm.userGroup.users);
+            var userPicker = {
                 selection: vm.userGroup.users,
-                show: true,
-                submit: function (model) {
-                    vm.userPicker.show = false;
-                    vm.userPicker = null;
+                submit: function () {
+                    editorService.close();
                 },
-                close: function (oldModel) {
-                    vm.userPicker.show = false;
-                    vm.userPicker = null;
+                close: function () {
+                    vm.userGroup.users = oldSelection;
+                    editorService.close();
                 }
             };
+            editorService.userPicker(userPicker);
         }
 
         /**
@@ -216,13 +205,11 @@
         }
 
         function openGranularPermissionsPicker() {
-            vm.contentPicker = {
+            var contentPicker = {
                 title: vm.labels.selectNode,
-                view: "treepicker",
                 section: "content",
                 treeAlias: "content",
                 hideSubmitButton: true,
-                show: true,
                 submit: function (model) {
                     if (model.selection) {
                         var node = model.selection[0];
@@ -234,11 +221,12 @@
                         setPermissionsForNode(node);
                     }
                 },
-                close: function (oldModel) {
-                    vm.contentPicker.show = false;
-                    vm.contentPicker = null;
+                close: function () {
+                    editorService.close();
                 }
             };
+            editorService.treePicker(contentPicker);
+            contentPickerOpen = true;
         }
 
         function setPermissionsForNode(node) {
@@ -249,9 +237,7 @@
             }
 
             vm.nodePermissions = {
-                view: "nodepermissions",
                 node: node,
-                show: true,
                 submit: function (model) {
 
                     if (model && model.node && model.node.permissions) {
@@ -271,20 +257,21 @@
                         }
                     }
 
-                    // close node permisssions overlay
-                    vm.nodePermissions.show = false;
-                    vm.nodePermissions = null;
-                    // close content picker overlay
-                    if(vm.contentPicker) {
-                        vm.contentPicker.show = false;
-                        vm.contentPicker = null;
+                    editorService.close();
+
+                    if(contentPickerOpen) {
+                        editorService.close();
+                        contentPickerOpen = false;
                     }
+
                 },
-                close: function (oldModel) {
-                    vm.nodePermissions.show = false;
-                    vm.nodePermissions = null;
+                close: function () {
+                    editorService.close();
                 }
             };
+
+            editorService.nodePermissions(vm.nodePermissions);
+
         }
 
         function removeSelectedItem(index, selection) {

@@ -7,6 +7,7 @@
         keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource, overlayService, localizationService) {
 
         var evts = [];
+        var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
 
         //setup scope vars
         $scope.defaultButton = null;
@@ -21,6 +22,8 @@
         $scope.page.isNew = $scope.isNew ? true : false;
         $scope.page.buttonGroupState = "init";
         $scope.page.culture = $scope.culture;
+        $scope.page.hideActionsMenu = infiniteMode ? true : false;
+        $scope.page.hideChangeVariant = infiniteMode ? true : false;
         $scope.allowOpen = true;
 
         // add all editors to an editors array to support split view 
@@ -31,8 +34,12 @@
         };
 
         function init(content) {
-
-            createButtons(content);
+            
+            if(infiniteMode) {
+                createInfiniteModeButtons(content);
+            } else {
+                createButtons(content);
+            }
 
             editorState.set($scope.content);
 
@@ -157,7 +164,9 @@
                     // if there are any and then clear them so the collection no longer persists them.
                     serverValidationManager.executeAndClearAllSubscriptions();
 
-                    syncTreeNode($scope.content, data.path, true);
+                    if(!infiniteMode) {
+                        syncTreeNode($scope.content, data.path, true);
+                    }
 
                     resetLastListPageNumber($scope.content);
 
@@ -182,6 +191,23 @@
 
             $scope.defaultButton = buttons.defaultButton;
             $scope.subButtons = buttons.subButtons;
+
+        }
+
+        // create infinite editing buttons
+        function createInfiniteModeButtons(content) {
+
+            $scope.page.allowInfinitePublishAndClose = false;
+            $scope.page.allowInfiniteSaveAndClose = false;
+
+            // check for publish rights
+            if(_.contains(content.allowedActions, "U")) {
+                $scope.page.allowInfinitePublishAndClose = true;
+
+            // check for save rights
+            } else if( _.contains(content.allowedActions, "A")) {
+                $scope.page.allowInfiniteSaveAndClose = true;
+            }
 
         }
 
@@ -221,7 +247,10 @@
             }).then(function (data) {
                 //success            
                 init($scope.content);
-                syncTreeNode($scope.content, data.path);
+
+                if(!infiniteMode) {
+                    syncTreeNode($scope.content, data.path);
+                }
 
                 $scope.page.buttonGroupState = "success";
                 return $q.when(data);
@@ -311,7 +340,9 @@
 
                         init($scope.content);
 
-                        syncTreeNode($scope.content, data.path);
+                        if(!infiniteMode) {
+                            syncTreeNode($scope.content, data.path);
+                        }
 
                         $scope.page.buttonGroupState = "success";
 
@@ -505,6 +536,30 @@
             }, 500);
         };
 
+        /* publish method used in infinite editing */
+        $scope.publishAndClose = function(content) {
+            $scope.publishAndCloseButtonState = "busy";
+            performSave({ saveMethod: contentResource.publish, action: "publish" }).then(function(){
+                if($scope.infiniteModel.submit) {
+                    $scope.infiniteModel.contentNode = content;
+                    $scope.infiniteModel.submit($scope.infiniteModel);
+                }
+                $scope.publishAndCloseButtonState = "success";
+            }).catch(angular.noop);;
+        };
+
+        /* save method used in infinite editing */
+        $scope.saveAndClose = function(content) {
+            $scope.saveAndCloseButtonState = "busy";
+            performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function(){
+                if($scope.infiniteModel.submit) {
+                    $scope.infiniteModel.contentNode = content;
+                    $scope.infiniteModel.submit($scope.infiniteModel);
+                }
+                $scope.saveAndCloseButtonState = "success";
+            }).catch(angular.noop);;
+        };
+
         function moveNode(node, target) {
 
             contentResource.move({ "parentId": target.id, "id": node.id })
@@ -516,7 +571,9 @@
                     }
 
                     // sync the destination node
-                    navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false });
+                    if(!infiniteMode) {
+                        navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false });
+                    }
 
                     $scope.page.buttonRestore = "success";
                     notificationsService.success("Successfully restored " + node.name + " to " + target.name);
@@ -533,8 +590,8 @@
 
         // methods for infinite editing
         $scope.close = function() {
-            if($scope.model.close) {
-                $scope.model.close($scope.model);
+            if($scope.infiniteModel.close) {
+                $scope.infiniteModel.close($scope.infiniteModel);
             }
         };
 
@@ -563,7 +620,7 @@
                 getMethod: "&",
                 getScaffoldMethod: "&?",
                 culture: "=?",
-                model: "=?"
+                infiniteModel: "=?"
             }
         };
 

@@ -9,6 +9,8 @@
         vm.loading = false;
 
         vm.selectUserGroup = selectUserGroup;
+        vm.submit = submit;
+        vm.close = close;
 
         //////////
 
@@ -75,10 +77,22 @@
 
         }
 
+        function submit(model) {
+            if($scope.model.submit) {
+                $scope.model.submit(model);
+            }
+        }
+
+        function close() {
+            if($scope.model.close) {
+                $scope.model.close();
+            }
+        }
+
         onInit();
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Overlays.UserGroupPickerController", UserGroupPickerController);
+    angular.module("umbraco").controller("Umbraco.Editors.UserGroupPickerController", UserGroupPickerController);
 
 })();
