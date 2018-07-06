@@ -46,6 +46,7 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("fallbackLanguageId")]
         [ForeignKey(typeof(LanguageDto), Column = "id")]
         [Index(IndexTypes.NonClustered)]
+        [NullSetting(NullSetting = NullSettings.Null)]
         public int? FallbackLanguageId { get; set; }
     }
 }

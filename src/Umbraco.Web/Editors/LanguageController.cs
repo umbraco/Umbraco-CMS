@@ -66,12 +66,11 @@ namespace Umbraco.Web.Editors
                 }   
                 else if (allLangs.All(x => !x.IsDefaultVariantLanguage))
                 {
-                    //if no language has the default flag, then the defaul language is the one with the lowest id
+                    //if no language has the default flag, then the default language is the one with the lowest id
                     model.IsDefaultVariantLanguage = allLangs[0].Id == lang.Id;
                     model.Mandatory = allLangs[0].Id == lang.Id;
                 }
             }
-            
 
             return model;
         }
@@ -159,7 +158,7 @@ namespace Umbraco.Web.Editors
             found.IsDefaultVariantLanguage = language.IsDefaultVariantLanguage;
             AssociateFallbackLanguage(language, found);
 
-            if (UpdatedFallbackLanguageCreatesCircularPath(found))
+            if (DoesUpdatedFallbackLanguageCreateACircularPath(found))
             {
                 ModelState.AddModelError("FallbackLanguage", "The selected fall back language '" + found.FallbackLanguage.CultureName + "' would create a circular path.");
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
@@ -185,7 +184,7 @@ namespace Umbraco.Web.Editors
                 };
         }
 
-        private bool UpdatedFallbackLanguageCreatesCircularPath(ILanguage language)
+        private bool DoesUpdatedFallbackLanguageCreateACircularPath(ILanguage language)
         {
             if (language.FallbackLanguage == null)
             {
@@ -198,6 +197,7 @@ namespace Umbraco.Web.Editors
             {
                 if (fallbackLanguage.Id == language.Id)
                 {
+                    // We've found the current language in the path of fall back languages, so we have a circular path.
                     return true;
                 }
 
