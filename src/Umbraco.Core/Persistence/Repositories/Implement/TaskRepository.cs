@@ -27,9 +27,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var taskDto = Database.Fetch<TaskDto>(SqlContext.SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             if (taskDto == null)
                 return null;
-
-            var factory = new TaskFactory();
-            var entity = factory.BuildEntity(taskDto);
+            
+            var entity = TaskFactory.BuildEntity(taskDto);
             return entity;
         }
 
@@ -41,10 +40,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 sql.Where("cmsTask.id IN (@ids)", new { ids = ids });
             }
-
-            var factory = new TaskFactory();
+            
             var dtos = Database.Fetch<TaskDto>(sql);
-            return dtos.Select(factory.BuildEntity);
+            return dtos.Select(TaskFactory.BuildEntity);
         }
 
         protected override IEnumerable<Task> PerformGetByQuery(IQuery<Task> query)
@@ -53,9 +51,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var translator = new SqlTranslator<Task>(sqlClause, query);
             var sql = translator.Translate();
 
-            var factory = new TaskFactory();
             var dtos = Database.Fetch<TaskDto>(sql);
-            return dtos.Select(factory.BuildEntity);
+            return dtos.Select(TaskFactory.BuildEntity);
         }
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
@@ -105,9 +102,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 entity.TaskType.Id = taskType.Id;
             }
-
-            var factory = new TaskFactory();
-            var dto = factory.BuildDto(entity);
+            
+            var dto = TaskFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
@@ -118,9 +114,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(Task entity)
         {
             entity.UpdatingEntity();
-
-            var factory = new TaskFactory();
-            var dto = factory.BuildDto(entity);
+            
+            var dto = TaskFactory.BuildDto(entity);
 
             Database.Update(dto);
 
@@ -136,8 +131,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             var dtos = Database.Fetch<TaskDto>(sql);
-            var factory = new TaskFactory();
-            return dtos.Select(factory.BuildEntity);
+     
+            return dtos.Select(TaskFactory.BuildEntity);
         }
 
         private Sql<ISqlContext> GetGetTasksQuery(int? assignedUser = null, int? ownerUser = null, string taskTypeAlias = null, bool includeClosed = false)

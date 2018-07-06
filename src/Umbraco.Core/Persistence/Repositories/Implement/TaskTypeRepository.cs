@@ -26,9 +26,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var taskDto = Database.Fetch<TaskTypeDto>(SqlContext.SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             if (taskDto == null)
                 return null;
-
-            var factory = new TaskTypeFactory();
-            var entity = factory.BuildEntity(taskDto);
+            
+            var entity = TaskTypeFactory.BuildEntity(taskDto);
             return entity;
         }
 
@@ -40,10 +39,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 sql.Where("cmsTaskType.id IN (@ids)", new { ids });
             }
-
-            var factory = new TaskTypeFactory();
+            
             var dtos = Database.Fetch<TaskTypeDto>(sql);
-            return dtos.Select(factory.BuildEntity);
+            return dtos.Select(TaskTypeFactory.BuildEntity);
         }
 
         protected override IEnumerable<TaskType> PerformGetByQuery(IQuery<TaskType> query)
@@ -51,10 +49,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<TaskType>(sqlClause, query);
             var sql = translator.Translate();
-
-            var factory = new TaskTypeFactory();
+            
             var dtos = Database.Fetch<TaskTypeDto>(sql);
-            return dtos.Select(factory.BuildEntity);
+            return dtos.Select(TaskTypeFactory.BuildEntity);
         }
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
@@ -91,9 +88,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 throw new InvalidOperationException("A task type already exists with the given alias " + entity.Alias);
             }
-
-            var factory = new TaskTypeFactory();
-            var dto = factory.BuildDto(entity);
+            
+            var dto = TaskTypeFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
@@ -104,9 +100,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistUpdatedItem(TaskType entity)
         {
             entity.UpdatingEntity();
-
-            var factory = new TaskTypeFactory();
-            var dto = factory.BuildDto(entity);
+            
+            var dto = TaskTypeFactory.BuildDto(entity);
 
             Database.Update(dto);
 

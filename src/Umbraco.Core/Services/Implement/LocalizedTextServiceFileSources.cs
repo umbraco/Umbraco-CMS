@@ -88,8 +88,7 @@ namespace Umbraco.Core.Services.Implement
                                         }
                                         catch (CultureNotFoundException)
                                         {
-                                            Current.Logger.Warn<LocalizedTextServiceFileSources>(
-                                                string.Format("The culture {0} found in the file {1} is not a valid culture", cultureVal, fileInfo.FullName));
+                                            Current.Logger.Warn<LocalizedTextServiceFileSources>(() => $"The culture {cultureVal} found in the file {fileInfo.FullName} is not a valid culture");
                                             //If the culture in the file is invalid, we'll just hope the file name is a valid culture below, otherwise
                                             // an exception will be thrown.
                                         }

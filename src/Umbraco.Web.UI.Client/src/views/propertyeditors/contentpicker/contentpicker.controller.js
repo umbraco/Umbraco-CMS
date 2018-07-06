@@ -10,10 +10,9 @@
  * @param {any} angularHelper
  * @param {any} navigationService
  * @param {any} $location
- * @param {any} miniEditorHelper
  * @param {any} localizationService
  */
-function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, miniEditorHelper, localizationService) {
+function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, localizationService, editorService) {
 
     var unsubscribe;
 
@@ -117,7 +116,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     //the dialog options for the picker
     var dialogOptions = {
-        view: "treepicker",
         multiPicker: $scope.model.config.multiPicker,
         entityType: entityType,
         filterCssClass: "not-allowed not-published",
@@ -185,28 +183,24 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     }
 
     //dialog
-    $scope.openContentPicker = function() {
-      $scope.contentPickerOverlay = dialogOptions;
-      $scope.contentPickerOverlay.show = true;
+    $scope.openContentPicker = function () {
+        $scope.contentPicker = dialogOptions;
 
-      $scope.contentPickerOverlay.submit = function(model) {
+        $scope.contentPicker.submit = function (model) {
+            if (angular.isArray(model.selection)) {
+                _.each(model.selection, function (item, i) {
+                    $scope.add(item);
+                });
+            }
+            angularHelper.getCurrentForm($scope).$setDirty();
+            editorService.close();
+        }
 
-          if (angular.isArray(model.selection)) {
-             _.each(model.selection, function (item, i) {
-                  $scope.add(item);
-             });
-          }
+        $scope.contentPicker.close = function () {
+            editorService.close();
+        }
 
-          angularHelper.getCurrentForm($scope).$setDirty();
-
-          $scope.contentPickerOverlay.show = false;
-          $scope.contentPickerOverlay = null;
-      }
-
-      $scope.contentPickerOverlay.close = function(oldModel) {
-          $scope.contentPickerOverlay.show = false;
-          $scope.contentPickerOverlay = null;
-      }
+        editorService.contentPicker($scope.contentPicker);
 
     };
 
@@ -246,17 +240,25 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         $scope.renderModel = [];
     };
 
-    $scope.openMiniEditor = function(node) {
-        miniEditorHelper.launchMiniEditor(node).then(function(updatedNode){
-            // update the node
-            node.name = updatedNode.name;
-            node.published = updatedNode.hasPublishedVersion;
-            if(entityType !== "Member") {
-                entityResource.getUrl(updatedNode.id, entityType).then(function(data){
-                    node.url = data;
-                });
+    $scope.openContentEditor = function(node) {
+        var contentEditor = {
+            id: node.id,
+            submit: function(model) {
+                // update the node
+                node.name = model.contentNode.name;
+                node.published = model.contentNode.hasPublishedVersion;
+                if(entityType !== "Member") {
+                    entityResource.getUrl(model.contentNode.id, entityType).then(function(data){
+                        node.url = data;
+                    });
+                }
+                editorService.close();
+            },
+            close: function() {
+                editorService.close();
             }
-        });
+        };
+        editorService.contentEditor(contentEditor);
     };
 
     //when the scope is destroyed we need to unsubscribe

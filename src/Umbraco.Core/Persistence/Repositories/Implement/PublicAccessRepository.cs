@@ -39,10 +39,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             sql.OrderBy<AccessDto>(x => x.NodeId);
-
-            var factory = new PublicAccessEntryFactory();
+            
             var dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
-            return dtos.Select(factory.BuildEntity);
+            return dtos.Select(PublicAccessEntryFactory.BuildEntity);
         }
 
         protected override IEnumerable<PublicAccessEntry> PerformGetByQuery(IQuery<PublicAccessEntry> query)
@@ -50,10 +49,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<PublicAccessEntry>(sqlClause, query);
             var sql = translator.Translate();
-
-            var factory = new PublicAccessEntryFactory();
+            
             var dtos = Database.FetchOneToMany<AccessDto>(x => x.Rules, sql);
-            return dtos.Select(factory.BuildEntity);
+            return dtos.Select(PublicAccessEntryFactory.BuildEntity);
         }
 
        protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
@@ -87,9 +85,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             entity.AddingEntity();
             foreach (var rule in entity.Rules)
                 rule.AddingEntity();
-
-            var factory = new PublicAccessEntryFactory();
-            var dto = factory.BuildDto(entity);
+            
+            var dto = PublicAccessEntryFactory.BuildDto(entity);
 
             Database.Insert(dto);
             //update the id so HasEntity is correct
@@ -118,9 +115,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 else
                     rule.AddingEntity();
             }
-
-            var factory = new PublicAccessEntryFactory();
-            var dto = factory.BuildDto(entity);
+            
+            var dto = PublicAccessEntryFactory.BuildDto(entity);
 
             Database.Update(dto);
 

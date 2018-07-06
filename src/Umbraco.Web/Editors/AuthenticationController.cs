@@ -416,7 +416,7 @@ namespace Umbraco.Web.Editors
                 var lockedOut = await UserManager.IsLockedOutAsync(model.UserId);
                 if (lockedOut)
                 {
-                    Logger.Info<AuthenticationController>(
+                    Logger.Info<AuthenticationController>(() => 
                         $"User {model.UserId} is currently locked out, unlocking and resetting AccessFailedCount");
 
                     //var user = await UserManager.FindByIdAsync(model.UserId);
@@ -455,7 +455,7 @@ namespace Umbraco.Web.Editors
                 Core.Constants.Security.BackOfficeAuthenticationType,
                 Core.Constants.Security.BackOfficeExternalAuthenticationType);
 
-            Logger.Info<AuthenticationController>($"User {(User.Identity == null ? "UNKNOWN" : User.Identity.Name)} from IP address {owinContext.Request.RemoteIpAddress} has logged out");
+            Logger.Info<AuthenticationController>(() => $"User {(User.Identity == null ? "UNKNOWN" : User.Identity.Name)} from IP address {owinContext.Request.RemoteIpAddress} has logged out");
 
             if (UserManager != null)
             {

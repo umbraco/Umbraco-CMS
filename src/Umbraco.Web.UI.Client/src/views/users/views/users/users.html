@@ -441,33 +441,30 @@
                 <!-- New password -->
                 <div>
                     <label class="bold"><localize key="user_password">Password</localize></label>
-                    <div class="flex items-center justify-between" style="background-color: #f3f3f5; padding: 10px 20px; border-radius: 3px; margin-bottom: 30px;">
+                    <div class="flex items-center justify-between" style="background-color: #ffffff; padding: 10px 20px; border-radius: 3px; margin-bottom: 30px;">
                         <div ng-show="vm.newUser.showPassword">{{vm.newUser.resetPasswordValue}}</div>
                         <div ng-show="!vm.newUser.showPassword">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
                         <div>
-                            <umb-button
-                                ng-if="!vm.newUser.showPassword"
-                                type="button"
-                                action="vm.toggleNewUserPassword()"
-                                label-key="general_show"
-                                size="xs">
+                            <umb-button ng-if="!vm.newUser.showPassword"
+                                        type="button"
+                                        action="vm.toggleNewUserPassword()"
+                                        label-key="general_show"
+                                        size="xs">
                             </umb-button>
-                            <umb-button
-                                ng-if="vm.newUser.showPassword"
-                                type="button"
-                                action="vm.toggleNewUserPassword()"
-                                label-key="general_hide"
-                                size="xs">
+                            <umb-button ng-if="vm.newUser.showPassword"
+                                        type="button"
+                                        action="vm.toggleNewUserPassword()"
+                                        label-key="general_hide"
+                                        size="xs">
                             </umb-button>
-                            <umb-button
-                                ng-if="vm.newUser.resetPasswordValue"
-                                umb-clipboard
-                                umb-clipboard-success="vm.copySuccess()"
-                                umb-clipboard-error="vm.copyError()"
-                                umb-clipboard-text="vm.newUser.resetPasswordValue"
-                                state="vm.page.copyPasswordButtonState"
-                                type="button"
-                                label-key="general_copy" size="xs">
+                            <umb-button ng-if="vm.newUser.resetPasswordValue"
+                                        umb-clipboard
+                                        umb-clipboard-success="vm.copySuccess(e)"
+                                        umb-clipboard-error="vm.copyError(e)"
+                                        umb-clipboard-text="{{vm.newUser.resetPasswordValue}}"
+                                        state="vm.page.copyPasswordButtonState"
+                                        type="button"
+                                        label-key="general_copy" size="xs">
                             </umb-button>
                         </div>
                     </div>
@@ -540,12 +537,5 @@
         </div>
 
     </div>
-
-    <umb-overlay
-        ng-if="vm.userGroupPicker.show"
-        model="vm.userGroupPicker"
-        view="vm.userGroupPicker.view"
-        position="right">
-    </umb-overlay>
 
 </div>

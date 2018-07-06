@@ -3,9 +3,9 @@ using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class ExternalLoginFactory
+    internal static class ExternalLoginFactory
     {
-        public IIdentityUserLogin BuildEntity(ExternalLoginDto dto)
+        public static IIdentityUserLogin BuildEntity(ExternalLoginDto dto)
         {
             var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, dto.UserId, dto.CreateDate);
 
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Factories
             return entity;
         }
 
-        public ExternalLoginDto BuildDto(IIdentityUserLogin entity)
+        public static ExternalLoginDto BuildDto(IIdentityUserLogin entity)
         {
             var dto = new ExternalLoginDto
             {

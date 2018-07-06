@@ -300,7 +300,7 @@ namespace Umbraco.Web.Security
             if (member == null)
             {
                 //this should not happen
-                Current.Logger.Warn<MembershipHelper>("The member validated but then no member was returned with the username " + username);
+                Current.Logger.Warn<MembershipHelper>(() => $"The member validated but then no member was returned with the username {username}");
                 return false;
             }
             //Log them in

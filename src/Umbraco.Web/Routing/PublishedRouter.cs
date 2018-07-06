@@ -479,7 +479,7 @@ namespace Umbraco.Web.Routing
                 //iterate but return on first one that finds it
                 var found = _contentFinders.Any(finder =>
                 {
-                    _logger.Debug<PublishedRouter>("Finder " + finder.GetType().FullName);
+                    _logger.Debug<PublishedRouter>(() => "Finder " + finder.GetType().FullName);
                     return finder.TryFindContent(request);
                 });
             }
@@ -593,23 +593,23 @@ namespace Umbraco.Web.Routing
             if (valid == false)
             {
                 // bad redirect - log and display the current page (legacy behavior)
-                _logger.Debug<PublishedRouter>($"{tracePrefix}Failed to redirect to id={request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue()}: value is not an int nor a GuidUdi.");
+                _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Failed to redirect to id={request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue()}: value is not an int nor a GuidUdi.");
             }
 
             if (internalRedirectNode == null)
             {
-                _logger.Debug<PublishedRouter>($"{tracePrefix}Failed to redirect to id={request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue()}: no such published document.");
+                _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Failed to redirect to id={request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue()}: no such published document.");
             }
             else if (internalRedirectId == request.PublishedContent.Id)
             {
                 // redirect to self
-                _logger.Debug<PublishedRouter>($"{tracePrefix}Redirecting to self, ignore");
+                _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Redirecting to self, ignore");
             }
             else
             {
                 request.SetInternalRedirectPublishedContent(internalRedirectNode); // don't use .PublishedContent here
                 redirect = true;
-                _logger.Debug<PublishedRouter>($"{tracePrefix}Redirecting to id={internalRedirectId}");
+                _logger.Debug<PublishedRouter>(() => $"{tracePrefix}Redirecting to id={internalRedirectId}");
             }
 
             return redirect;
