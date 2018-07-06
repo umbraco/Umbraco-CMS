@@ -148,6 +148,13 @@ namespace Umbraco.Web.Editors
             found.Mandatory = language.Mandatory;
             found.IsDefaultVariantLanguage = language.IsDefaultVariantLanguage;
             AssociateFallbackLanguage(language, found);
+
+            if (UpdatedFallbackLanguageCreatesCircularPath(found))
+            {
+                ModelState.AddModelError("FallbackLanguage", "The selected fall back language '" + found.FallbackLanguage.CultureName + "' would create a circular path.");
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+            }
+
             Services.LocalizationService.Save(found);
             return Mapper.Map<Language>(found);
         }
@@ -156,6 +163,7 @@ namespace Umbraco.Web.Editors
         {
             if (submittedLanguage.FallbackLanguage == null)
             {
+                languageToCreateOrUpdate.FallbackLanguage = null;
                 return;
             }
 
@@ -165,6 +173,28 @@ namespace Umbraco.Web.Editors
                     Id = submittedLanguage.FallbackLanguage.Id,
                     CultureName = fallbackLanguageCulture.DisplayName
                 };
+        }
+
+        private bool UpdatedFallbackLanguageCreatesCircularPath(ILanguage language)
+        {
+            if (language.FallbackLanguage == null)
+            {
+                return false;
+            }
+
+            var languages = Services.LocalizationService.GetAllLanguages().ToArray();
+            var fallbackLanguage = language.FallbackLanguage;
+            while (fallbackLanguage != null)
+            {
+                if (fallbackLanguage.Id == language.Id)
+                {
+                    return true;
+                }
+
+                fallbackLanguage = languages.Single(x => x.Id == fallbackLanguage.Id).FallbackLanguage;
+            }
+
+            return false;
         }
     }
 }

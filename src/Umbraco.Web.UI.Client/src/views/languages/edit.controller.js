@@ -112,6 +112,11 @@
             if (formHelper.submitForm({ scope: $scope })) {
                 vm.page.saveButtonState = "busy";
 
+                // Handle selection of no fall-back language (should pass null)
+                if (!vm.language.fallbackLanguage.id) {
+                    vm.language.fallbackLanguage = null;
+                }
+
                 // We need to attach the ISO code to the fall-back language to pass
                 // server-side validation.
                 if (vm.language.fallbackLanguage) {
