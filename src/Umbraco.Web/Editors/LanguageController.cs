@@ -85,13 +85,23 @@ namespace Umbraco.Web.Editors
         public IHttpActionResult DeleteLanguage(int id)
         {
             var language = Services.LocalizationService.GetLanguageById(id);
-            if (language == null) return NotFound();
+            if (language == null)
+            {
+                return NotFound();
+            }
 
-            var totalLangs = Services.LocalizationService.GetAllLanguages().Count();
+            var langs = Services.LocalizationService.GetAllLanguages().ToArray();
+            var totalLangs = langs.Length;
 
             if (language.IsDefaultVariantLanguage || totalLangs == 1)
             {
-                var message = $"Language '{language.IsoCode}' is currently set to 'default' or it is the only installed language and can not be deleted.";
+                var message = $"Language '{language.CultureName}' is currently set to 'default' or it is the only installed language and cannot be deleted.";
+                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(message));
+            }
+
+            if (language.FallbackLanguage != null && langs.Any(x => x.FallbackLanguage?.Id == language.Id))
+            {
+                var message = $"Language '{language.CultureName}' is defined as a fall-back language for one or more other languages, and so cannot be deleted.";
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(message));
             }
 
