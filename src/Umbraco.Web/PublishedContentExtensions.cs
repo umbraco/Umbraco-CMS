@@ -159,8 +159,9 @@ namespace Umbraco.Web
         /// <param name="alias">The property alias.</param>
         /// <param name="culture">The variation language.</param>
         /// <param name="segment">The variation segment.</param>
-        /// <param name="recurse">A value indicating whether to recurse.</param>
         /// <param name="defaultValue">The default value.</param>
+        /// <param name="recurse">A value indicating whether to recurse.</param>
+        /// <param name="fallbackPriority">Flag indicating priority order of fallback paths in cases when content does not exist and a fall back method is used.</param>
         /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
         /// <remarks>
         /// <para>Recursively means: walking up the tree from <paramref name="content"/>, get the first value that can be found.</para>
@@ -169,14 +170,14 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(this IPublishedContent content, string alias,  string culture = null, string segment = null,  object defaultValue = default, bool recurse = false)
+        public static object Value(this IPublishedContent content, string alias,  string culture = null, string segment = null,  object defaultValue = default, bool recurse = false, PublishedValueFallbackPriority fallbackPriority = PublishedValueFallbackPriority.RecursiveTree)
         {
             var property = content.GetProperty(alias);
 
             if (property != null && property.HasValue(culture, segment))
                 return property.GetValue(culture, segment);
 
-            return PublishedValueFallback.GetValue(content, alias, culture, segment, defaultValue, recurse);
+            return PublishedValueFallback.GetValue(content, alias, culture, segment, defaultValue, recurse, fallbackPriority);
         }
 
         #endregion
@@ -193,6 +194,7 @@ namespace Umbraco.Web
         /// <param name="segment">The variation segment.</param>
         /// <param name="defaultValue">The default value.</param>
         /// <param name="recurse">A value indicating whether to recurse.</param>
+        /// <param name="fallbackPriority">Flag indicating priority order of fallback paths in cases when content does not exist and a fall back method is used.</param>
         /// <returns>The value of the content's property identified by the alias, converted to the specified type.</returns>
         /// <remarks>
         /// <para>Recursively means: walking up the tree from <paramref name="content"/>, get the first value that can be found.</para>
@@ -201,18 +203,18 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T Value<T>(this IPublishedContent content, string alias, string culture = null, string segment = null, T defaultValue = default, bool recurse = false)
+        public static T Value<T>(this IPublishedContent content, string alias, string culture = null, string segment = null, T defaultValue = default, bool recurse = false, PublishedValueFallbackPriority fallbackPriority = PublishedValueFallbackPriority.RecursiveTree)
         {
             var property = content.GetProperty(alias);
 
             if (property != null && property.HasValue(culture, segment))
                 return property.Value<T>(culture, segment);
 
-            return PublishedValueFallback.GetValue<T>(content, alias, culture, segment, defaultValue, recurse);
+            return PublishedValueFallback.GetValue<T>(content, alias, culture, segment, defaultValue, recurse, fallbackPriority);
         }
 
         // fixme - .Value() refactoring - in progress
-        public static IHtmlString Value<T>(this IPublishedContent content, string aliases, Func<T, string> format, string alt = "", bool recurse = false)
+        public static IHtmlString Value<T>(this IPublishedContent content, string aliases, Func<T, string> format, string alt = "", bool recurse = false, PublishedValueFallbackPriority fallbackPriority = PublishedValueFallbackPriority.RecursiveTree)
         {
             var aliasesA = aliases.Split(',');
             if (aliasesA.Length == 0)
