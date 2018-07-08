@@ -1,5 +1,4 @@
-﻿using LightInject;
-using Umbraco.Core.Models;
+﻿using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 
@@ -14,11 +13,12 @@ namespace Umbraco.Web.Models.PublishedContent
     /// </remarks>
     public class PublishedValueLanguageFallback : PublishedValueFallback
     {
-        /// <summary>
-        /// Gets or sets the services context.
-        /// </summary>
-        [Inject]
-        public ServiceContext Services { get; set; }
+        private readonly ILocalizationService _localizationService;
+
+        public PublishedValueLanguageFallback(ILocalizationService localizationService)
+        {
+            _localizationService = localizationService;
+        }
 
         /// <inheritdoc />
         public override object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue)
@@ -122,8 +122,7 @@ namespace Umbraco.Web.Models.PublishedContent
                 return false;
             }
 
-            var localizationService = Services.LocalizationService;
-            var language = localizationService.GetLanguageByIsoCode(culture);
+            var language = _localizationService.GetLanguageByIsoCode(culture);
             if (language.FallbackLanguage == null)
             {
                 value = defaultValue;
@@ -139,7 +138,7 @@ namespace Umbraco.Web.Models.PublishedContent
                     return true;
                 }
 
-                fallbackLanguage = GetNextFallbackLanguage(fallbackLanguage, localizationService);
+                fallbackLanguage = GetNextFallbackLanguage(fallbackLanguage);
             }
 
             value = defaultValue;
@@ -154,8 +153,7 @@ namespace Umbraco.Web.Models.PublishedContent
                 return false;
             }
 
-            var localizationService = Services.LocalizationService;
-            var language = localizationService.GetLanguageByIsoCode(culture);
+            var language = _localizationService.GetLanguageByIsoCode(culture);
             if (language.FallbackLanguage == null)
             {
                 value = defaultValue;
@@ -171,7 +169,7 @@ namespace Umbraco.Web.Models.PublishedContent
                     return true;
                 }
 
-                fallbackLanguage = GetNextFallbackLanguage(fallbackLanguage, localizationService);
+                fallbackLanguage = GetNextFallbackLanguage(fallbackLanguage);
             }
 
             value = defaultValue;
@@ -186,8 +184,7 @@ namespace Umbraco.Web.Models.PublishedContent
                 return false;
             }
 
-            var localizationService = Services.LocalizationService;
-            var language = localizationService.GetLanguageByIsoCode(culture);
+            var language = _localizationService.GetLanguageByIsoCode(culture);
             if (language.FallbackLanguage == null)
             {
                 value = defaultValue;
@@ -203,16 +200,18 @@ namespace Umbraco.Web.Models.PublishedContent
                     return true;
                 }
 
-                fallbackLanguage = GetNextFallbackLanguage(fallbackLanguage, localizationService);
+                fallbackLanguage = GetNextFallbackLanguage(fallbackLanguage);
             }
 
             value = defaultValue;
             return false;
         }
 
-        private static ILanguage GetNextFallbackLanguage(ILanguage fallbackLanguage, ILocalizationService localizationService)
+        private ILanguage GetNextFallbackLanguage(ILanguage fallbackLanguage)
         {
-            fallbackLanguage = localizationService.GetLanguageById(fallbackLanguage.Id); // Ensures reference to next fall-back language is loaded if it exists
+            // Ensure reference to next fall-back language is loaded if it exists
+            fallbackLanguage = _localizationService.GetLanguageById(fallbackLanguage.Id);
+
             return fallbackLanguage.FallbackLanguage;
         }
     }
