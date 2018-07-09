@@ -26,11 +26,9 @@
 function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     /** internal method process the saving of data and post processing the result */
-    function saveContentItem(content, action, files) {
+  function saveContentItem(content, action, files, restApiUrl) {
         return umbRequestHelper.postSaveContent({
-            restApiUrl: umbRequestHelper.getApiUrl(
-                   "contentApiBaseUrl",
-                   "PostSave"),
+          restApiUrl: restApiUrl,
             content: content,
             action: action,
             files: files,
@@ -41,6 +39,25 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
     }
 
     return {
+
+
+      savePermissions: function (saveModel) {
+        if (!saveModel) {
+          throw "saveModel cannot be null";
+        }
+        if (!saveModel.contentId) {
+          throw "saveModel.contentId cannot be null";
+        }
+        if (!saveModel.permissions) {
+          throw "saveModel.permissions cannot be null";
+        }
+
+        return umbRequestHelper.resourcePromise(
+          $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostSaveUserGroupPermissions"),
+            saveModel),
+          'Failed to save permissions');
+      },
+
 
         getRecycleBin: function () {
             return umbRequestHelper.resourcePromise(
@@ -269,6 +286,16 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                    'Failed to delete item ' + id);
         },
 
+        deleteBlueprint: function (id) {
+          return umbRequestHelper.resourcePromise(
+            $http.post(
+              umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "DeleteBlueprint",
+                [{ id: id }])),
+            'Failed to delete blueprint ' + id);
+        },
+
         /**
           * @ngdoc method
           * @name umbraco.resources.contentResource#getById
@@ -298,6 +325,16 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                               "GetById",
                               [{ id: id }])),
                   'Failed to retrieve data for content id ' + id);
+        },
+
+        getBlueprintById: function (id) {
+          return umbRequestHelper.resourcePromise(
+            $http.get(
+              umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "GetBlueprintById",
+                [{ id: id }])),
+            'Failed to retrieve data for content id ' + id);
         },
 
         /**
@@ -381,6 +418,17 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                   'Failed to retrieve data for empty content item type ' + alias);
         },
 
+        getBlueprintScaffold: function (parentId, blueprintId) {
+
+          return umbRequestHelper.resourcePromise(
+            $http.get(
+              umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                      "GetEmpty",
+                      [{ blueprintId: blueprintId }, { parentId: parentId}])),
+            'Failed to retrieve blueprint for id ' + blueprintId);
+        },
+
         /**
           * @ngdoc method
           * @name umbraco.resources.contentResource#getNiceUrl
@@ -440,6 +488,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getChildren: function (parentId, options) {
 
             var defaults = {
+                includeProperties: [],
                 pageSize: 0,
                 pageNumber: 0,
                 filter: '',
@@ -483,6 +532,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         "GetChildren",
                         {
                             id: parentId,
+                            includeProperties: _.pluck(options.includeProperties, 'alias').join(","),
                             pageNumber: options.pageNumber,
                             pageSize: options.pageSize,
                             orderBy: options.orderBy,
@@ -525,6 +575,15 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                    'Failed to check permission for item ' + id);
         },
 
+        getDetailedPermissions: function (contentId) {
+          return umbRequestHelper.resourcePromise(
+            $http.get(
+              umbRequestHelper.getApiUrl(
+                "contentApiBaseUrl",
+                "GetDetailedPermissions", { contentId: contentId })),
+            'Failed to retrieve permissions for content item ' + contentId);
+        },
+
         getPermissions: function (nodeIds) {
             return umbRequestHelper.resourcePromise(
                 $http.post(
@@ -564,9 +623,18 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           */
         save: function (content, isNew, files) {
-            return saveContentItem(content, "save" + (isNew ? "New" : ""), files);
+          var endpoint = umbRequestHelper.getApiUrl(
+            "contentApiBaseUrl",
+            "PostSave");
+          return saveContentItem(content, "save" + (isNew ? "New" : ""), files, endpoint);
         },
 
+        saveBlueprint: function (content, isNew, files) {
+          var endpoint = umbRequestHelper.getApiUrl(
+            "contentApiBaseUrl",
+            "PostSaveBlueprint");
+          return saveContentItem(content, "save" + (isNew ? "New" : ""), files, endpoint);
+        },
 
         /**
           * @ngdoc method
@@ -597,7 +665,10 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           */
         publish: function (content, isNew, files) {
-            return saveContentItem(content, "publish" + (isNew ? "New" : ""), files);
+          var endpoint = umbRequestHelper.getApiUrl(
+            "contentApiBaseUrl",
+            "PostSave");
+          return saveContentItem(content, "publish" + (isNew ? "New" : ""), files, endpoint);
         },
 
 
@@ -628,7 +699,10 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           *
           */
         sendToPublish: function (content, isNew, files) {
-            return saveContentItem(content, "sendPublish" + (isNew ? "New" : ""), files);
+          var endpoint = umbRequestHelper.getApiUrl(
+            "contentApiBaseUrl",
+            "PostSave");
+          return saveContentItem(content, "sendPublish" + (isNew ? "New" : ""), files, endpoint);
         },
 
         /**
@@ -665,6 +739,17 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                                                 [{ id: id }])),
                                     'Failed to publish content with id ' + id);
 
+        },
+
+        createBlueprintFromContent: function (contentId, name) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl("contentApiBaseUrl", "CreateBlueprintFromContent", {
+                        contentId: contentId, name: name
+                    })
+                ),
+                "Failed to create blueprint from content with id " + contentId
+            );
         }
 
 

@@ -11,7 +11,7 @@
                     <span ng-if="property.validation.mandatory">
                         <strong class="umb-control-required">*</strong>
                     </span>
-                    <small ng-bind-html="property.description"></small>
+                    <small ng-bind-html="property.description | preserveNewLineInHtml"></small>
                 </label>
 
                 <div class="controls" ng-transclude>

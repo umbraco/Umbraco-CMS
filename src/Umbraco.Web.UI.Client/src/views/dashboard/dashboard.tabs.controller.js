@@ -18,10 +18,25 @@ function startUpVideosDashboardController($scope, xmlhelper, $log, $http) {
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupVideosController", startUpVideosDashboardController);
 
 
-function startUpDynamicContentController(dashboardResource, assetsService) {
+function startUpDynamicContentController($timeout, $scope, dashboardResource, assetsService, tourService, eventsService) {
     var vm = this;
+    var evts = [];
+
     vm.loading = true;
     vm.showDefault = false;
+    
+    vm.startTour = startTour;
+
+    function onInit() {
+        // load tours
+        tourService.getGroupedTours().then(function(groupedTours) {
+            vm.tours = groupedTours;
+        });
+    }
+
+    function startTour(tour) {
+        tourService.startTour(tour);
+    }
 
     // default dashboard content
     vm.defaultDashboard = {
@@ -67,9 +82,20 @@ function startUpDynamicContentController(dashboardResource, assetsService) {
         ]
     };
 
+    evts.push(eventsService.on("appState.tour.complete", function (name, completedTour) {
+        $timeout(function(){
+            angular.forEach(vm.tours, function (tourGroup) {
+                angular.forEach(tourGroup, function (tour) {
+                    if(tour.alias === completedTour.alias) {
+                        tour.completed = true;
+                    }
+                });
+            });
+        });
+    }));
     
     //proxy remote css through the local server
-    assetsService.loadCss( dashboardResource.getRemoteDashboardCssUrl("content") );
+    assetsService.loadCss(dashboardResource.getRemoteDashboardCssUrl("content"), $scope);
     dashboardResource.getRemoteDashboardContent("content").then(
         function (data) {
 
@@ -90,6 +116,10 @@ function startUpDynamicContentController(dashboardResource, assetsService) {
             vm.loading = false;
             vm.showDefault = true;
         });
+
+    
+    onInit();
+
 }
 
 angular.module("umbraco").controller("Umbraco.Dashboard.StartUpDynamicContentController", startUpDynamicContentController);
@@ -278,8 +308,8 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, $location, co
 
         currentUser = user;
 
-        // check if the user start node is the dashboard
-        if(currentUser.startMediaId === -1) {
+        // check if the user has access to the root which they will require to see this dashboard
+        if (currentUser.startMediaIds.indexOf(-1) >= 0) {
 
             //get the system media listview
             contentTypeResource.getPropertyTypeScaffold(-96)
@@ -303,9 +333,9 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, $location, co
 
             });
 
-        } else {
+        } else if (currentUser.startMediaIds.length > 0){
             // redirect to start node
-            $location.path("/media/media/edit/" + currentUser.startMediaId);
+            $location.path("/media/media/edit/" + (currentUser.startMediaIds.length === 0 ? -1 : currentUser.startMediaIds[0]));
         }
 
     });

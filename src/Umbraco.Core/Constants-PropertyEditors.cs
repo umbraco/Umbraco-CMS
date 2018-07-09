@@ -122,6 +122,11 @@ namespace Umbraco.Core
             /// Alias for the Dropdown list, publishing keys datatype.
             /// </summary>
             public const string DropdownlistPublishingKeysAlias = "Umbraco.DropdownlistPublishingKeys";
+            
+            /// <summary>
+            /// Alias for the "new" Dropdown list, that replaces the old four deprecated ones and works as other list based property editors
+            /// </summary>
+            public const string DropDownListFlexibleAlias = "Umbraco.DropDown.Flexible";
 
             /// <summary>
             /// Guid for the Folder browser datatype.
@@ -436,6 +441,11 @@ namespace Umbraco.Core
             /// Alias for the email address property editor
             /// </summary>
             public const string EmailAddressAlias = "Umbraco.EmailAddress";
+
+            /// <summary>
+            /// Alias for the nested content property editor.
+            /// </summary>
+            public const string NestedContentAlias = "Umbraco.NestedContent";
 
             public static class PreValueKeys
             {

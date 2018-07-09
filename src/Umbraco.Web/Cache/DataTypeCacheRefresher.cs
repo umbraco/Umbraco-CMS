@@ -3,9 +3,11 @@ using System.Web.Script.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using System.Linq;
+using Newtonsoft.Json;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.PropertyEditors.ValueConverters;
 
 
@@ -13,12 +15,12 @@ namespace Umbraco.Web.Cache
 {
     /// <summary>
     /// A cache refresher to ensure member cache is updated when members change
-    /// </summary>    
+    /// </summary>
     public sealed class DataTypeCacheRefresher : JsonCacheRefresherBase<DataTypeCacheRefresher>
     {
 
         #region Static helpers
-        
+
         /// <summary>
         /// Converts the json to a JsonPayload object
         /// </summary>
@@ -26,10 +28,9 @@ namespace Umbraco.Web.Cache
         /// <returns></returns>
         private static JsonPayload[] DeserializeFromJsonPayload(string json)
         {
-            var serializer = new JavaScriptSerializer();
-            var jsonObject = serializer.Deserialize<JsonPayload[]>(json);
+            var jsonObject = JsonConvert.DeserializeObject<JsonPayload[]>(json);
             return jsonObject;
-        }   
+        }
 
         /// <summary>
         /// Creates the custom Json payload used to refresh cache amongst the servers
@@ -38,12 +39,11 @@ namespace Umbraco.Web.Cache
         /// <returns></returns>
         internal static string SerializeToJsonPayload(params IDataTypeDefinition[] dataTypes)
         {
-            var serializer = new JavaScriptSerializer();
             var items = dataTypes.Select(FromDataTypeDefinition).ToArray();
-            var json = serializer.Serialize(items);
+            var json = JsonConvert.SerializeObject(items);
             return json;
         }
-   
+
         /// <summary>
         /// Converts a macro to a jsonPayload object
         /// </summary>
@@ -58,7 +58,7 @@ namespace Umbraco.Web.Cache
             };
             return payload;
         }
-        
+
         #endregion
 
         #region Sub classes
@@ -93,7 +93,7 @@ namespace Umbraco.Web.Cache
             //we need to clear the ContentType runtime cache since that is what caches the
             // db data type to store the value against and anytime a datatype changes, this also might change
             // we basically need to clear all sorts of runtime caches here because so many things depend upon a data type
-            
+
             ClearAllIsolatedCacheByEntityType<IContent>();
             ClearAllIsolatedCacheByEntityType<IContentType>();
             ClearAllIsolatedCacheByEntityType<IMedia>();
@@ -110,10 +110,11 @@ namespace Umbraco.Web.Cache
 
                 ApplicationContext.Current.Services.IdkMap.ClearCache(payload.Id);
                 PublishedContentType.ClearDataType(payload.Id);
+                NestedContentHelper.ClearCache(payload.Id);
             }
 
             TagsValueConverter.ClearCaches();
-            MultipleMediaPickerPropertyConverter.ClearCaches();
+            LegacyMediaPickerPropertyConverter.ClearCaches();
             SliderValueConverter.ClearCaches();
             MediaPickerPropertyConverter.ClearCaches();
 

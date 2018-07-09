@@ -76,260 +76,257 @@ namespace Umbraco.Core.Events
         {
             if (_events == null)
                 return Enumerable.Empty<IEventDefinition>();
-            
+
+            IReadOnlyList<IEventDefinition> events;
             switch (filter)
             {
                 case EventDefinitionFilter.All:
-                    return FilterSupersededAndUpdateToLatestEntity(_events);
+                    events = _events;
+                    break;
                 case EventDefinitionFilter.FirstIn:
                     var l1 = new OrderedHashSet<IEventDefinition>();
                     foreach (var e in _events)
-                    {
                         l1.Add(e);
-                    }
-                    return FilterSupersededAndUpdateToLatestEntity(l1);
+                    events = l1;
+                    break;
                 case EventDefinitionFilter.LastIn:
                     var l2 = new OrderedHashSet<IEventDefinition>(keepOldest: false);
                     foreach (var e in _events)
-                    {
                         l2.Add(e);
-                    }
-                    return FilterSupersededAndUpdateToLatestEntity(l2);
+                    events = l2;
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException("filter", filter, null);
             }
+
+            return FilterSupersededAndUpdateToLatestEntity(events);
         }
-        
-        private class EventDefinitionTypeData
+
+        private class EventDefinitionInfos
         {
             public IEventDefinition EventDefinition { get; set; }
-            public Type EventArgType { get; set; }
-            public SupersedeEventAttribute[] SupersedeAttributes { get; set; }
+            public Type[] SupersedeTypes { get; set; }
         }
-        
-        /// <summary>
-        /// This will iterate over the events (latest first) and filter out any events or entities in event args that are included 
-        /// in more recent events that Supersede previous ones. For example, If an Entity has been Saved and then Deleted, we don't want
-        /// to raise the Saved event (well actually we just don't want to include it in the args for that saved event)
-        /// </summary>
-        /// <param name="events"></param>
-        /// <returns></returns>
-        private static IEnumerable<IEventDefinition> FilterSupersededAndUpdateToLatestEntity(IReadOnlyList<IEventDefinition> events)
+
+        // fixme
+        // this is way too convoluted, the superceede attribute is used only on DeleteEventargs to specify
+        // that it superceeds save, publish, move and copy - BUT - publish event args is also used for
+        // unpublishing and should NOT be superceeded - so really it should not be managed at event args
+        // level but at event level
+        //
+        // what we want is:
+        // if an entity is deleted, then all Saved, Moved, Copied, Published events prior to this should
+        // not trigger for the entity - and even though, does it make any sense? making a copy of an entity
+        // should ... trigger?
+        //
+        // not going to refactor it all - we probably want to *always* trigger event but tell people that
+        // due to scopes, they should not expected eg a saved entity to still be around - however, now,
+        // going to write a ugly condition to deal with U4-10764
+
+        // iterates over the events (latest first) and filter out any events or entities in event args that are included
+        // in more recent events that Supersede previous ones. For example, If an Entity has been Saved and then Deleted, we don't want
+        // to raise the Saved event (well actually we just don't want to include it in the args for that saved event)
+        internal static IEnumerable<IEventDefinition> FilterSupersededAndUpdateToLatestEntity(IReadOnlyList<IEventDefinition> events)
         {
-            //used to keep the 'latest' entity and associated event definition data
-            var allEntities = new List<Tuple<IEntity, EventDefinitionTypeData>>();
+            // keeps the 'latest' entity and associated event data
+            var entities = new List<Tuple<IEntity, EventDefinitionInfos>>();
 
-            //tracks all CancellableObjectEventArgs instances in the events which is the only type of args we can work with
-            var cancelableArgs = new List<CancellableObjectEventArgs>();
-
+            // collects the event definitions
+            // collects the arguments in result, that require their entities to be updated
             var result = new List<IEventDefinition>();
+            var resultArgs = new List<CancellableObjectEventArgs>();
 
-            //This will eagerly load all of the event arg types and their attributes so we don't have to continuously look this data up
-            var allArgTypesWithAttributes = events.Select(x => x.Args.GetType())
+            // eagerly fetch superceeded arg types for each arg type
+            var argTypeSuperceeding = events.Select(x => x.Args.GetType())
                 .Distinct()
-                .ToDictionary(x => x, x => x.GetCustomAttributes<SupersedeEventAttribute>(false).ToArray());
-               
-            //Iterate all events and collect the actual entities in them and relates them to their corresponding EventDefinitionTypeData
-            //we'll process the list in reverse because events are added in the order they are raised and we want to filter out
-            //any entities from event args that are not longer relevant 
-            //(i.e. if an item is Deleted after it's Saved, we won't include the item in the Saved args)
+                .ToDictionary(x => x, x => x.GetCustomAttributes<SupersedeEventAttribute>(false).Select(y => y.SupersededEventArgsType).ToArray());
+
+            // iterate over all events and filter
+            //
+            // process the list in reverse, because events are added in the order they are raised and we want to keep
+            // the latest (most recent) entities and filter out what is not relevant anymore (too old), eg if an entity
+            // is Deleted after being Saved, we want to filter out the Saved event
             for (var index = events.Count - 1; index >= 0; index--)
             {
-                var eventDefinition = events[index];
+                var def = events[index];
 
-                var argType = eventDefinition.Args.GetType();
-                var attributes = allArgTypesWithAttributes[eventDefinition.Args.GetType()];
-
-                var meta = new EventDefinitionTypeData
+                var infos = new EventDefinitionInfos
                 {
-                    EventDefinition = eventDefinition,
-                    EventArgType = argType,
-                    SupersedeAttributes = attributes
+                    EventDefinition = def,
+                    SupersedeTypes = argTypeSuperceeding[def.Args.GetType()]
                 };
 
-                var args = eventDefinition.Args as CancellableObjectEventArgs;
-                if (args != null)
+                var args = def.Args as CancellableObjectEventArgs;
+                if (args == null)
                 {
-                    var list = TypeHelper.CreateGenericEnumerableFromObject(args.EventObject);
-
-                    if (list == null)
+                    // not a cancellable event arg, include event definition in result
+                    result.Add(def);
+                }
+                else
+                {
+                    // event object can either be a single object or an enumerable of objects
+                    // try to get as an enumerable, get null if it's not
+                    var eventObjects = TypeHelper.CreateGenericEnumerableFromObject(args.EventObject);
+                    if (eventObjects == null)
                     {
-                        //extract the event object
-                        var obj = args.EventObject as IEntity;
-                        if (obj != null)
+                        // single object, cast as an IEntity
+                        // if cannot cast, cannot filter, nothing - just include event definition in result
+                        var eventEntity = args.EventObject as IEntity;
+                        if (eventEntity == null)
                         {
-                            //Now check if this entity already exists in other event args that supersede this current event arg type
-                            if (IsFiltered(obj, meta, allEntities) == false)
-                            {
-                                //if it's not filtered we can adde these args to the response
-                                cancelableArgs.Add(args);
-                                result.Add(eventDefinition);
-                                //track the entity
-                                allEntities.Add(Tuple.Create(obj, meta));
-                            }
+                            result.Add(def);
+                            continue;
                         }
-                        else
+
+                        // look for this entity in superceding event args
+                        // found = must be removed (ie not added), else track
+                        if (IsSuperceeded(eventEntity, infos, entities) == false)
                         {
-                            //Can't retrieve the entity so cant' filter or inspect, just add to the output
-                            result.Add(eventDefinition);                            
+                            // track
+                            entities.Add(Tuple.Create(eventEntity, infos));
+
+                            // track result arguments
+                            // include event definition in result
+                            resultArgs.Add(args);
+                            result.Add(def);
                         }
                     }
                     else
                     {
+                        // enumerable of objects
                         var toRemove = new List<IEntity>();
-                        foreach (var entity in list)
+                        foreach (var eventObject in eventObjects)
                         {
-                            //extract the event object
-                            var obj = entity as IEntity;
-                            if (obj != null)
-                            {
-                                //Now check if this entity already exists in other event args that supersede this current event arg type
-                                if (IsFiltered(obj, meta, allEntities))
-                                {
-                                    //track it to be removed
-                                    toRemove.Add(obj);
-                                }
-                                else
-                                {
-                                    //track the entity, it's not filtered
-                                    allEntities.Add(Tuple.Create(obj, meta));
-                                }
-                            }
+                            // extract the event object, cast as an IEntity
+                            // if cannot cast, cannot filter, nothing to do - just leave it in the list & continue
+                            var eventEntity = eventObject as IEntity;
+                            if (eventEntity == null)
+                                continue;
+
+                            // look for this entity in superceding event args
+                            // found = must be removed, else track
+                            if (IsSuperceeded(eventEntity, infos, entities))
+                                toRemove.Add(eventEntity);
                             else
-                            {
-                                //we don't need to do anything here, we can't cast to IEntity so we cannot filter, so it will just remain in the list
-                            }
+                                entities.Add(Tuple.Create(eventEntity, infos));
                         }
 
-                        //remove anything that has been filtered
+                        // remove superceded entities
                         foreach (var entity in toRemove)
-                        {
-                            list.Remove(entity);
-                        }
+                            eventObjects.Remove(entity);
 
-                        //track the event and include in the response if there's still entities remaining in the list
-                        if (list.Count > 0)
+                        // if there are still entities in the list, keep the event definition
+                        if (eventObjects.Count > 0)
                         {
                             if (toRemove.Count > 0)
                             {
-                                //re-assign if the items have changed
-                                args.EventObject = list;
+                                // re-assign if changed
+                                args.EventObject = eventObjects;
                             }
-                            cancelableArgs.Add(args);
-                            result.Add(eventDefinition);
+
+                            // track result arguments
+                            // include event definition in result
+                            resultArgs.Add(args);
+                            result.Add(def);
                         }
                     }
                 }
-                else
-                {
-                    //it's not a cancelable event arg so we just include it in the result
-                    result.Add(eventDefinition);
-                }
             }
 
-            //Now we'll deal with ensuring that only the latest(non stale) entities are used throughout all event args
-            UpdateToLatestEntities(allEntities, cancelableArgs);
+            // go over all args in result, and update them with the latest instanceof each entity
+            UpdateToLatestEntities(entities, resultArgs);
 
-            //we need to reverse the result since we've been adding by latest added events first!
+            // reverse, since we processed the list in reverse
             result.Reverse();
 
             return result;
         }
 
-        private static void UpdateToLatestEntities(IEnumerable<Tuple<IEntity, EventDefinitionTypeData>> allEntities, IEnumerable<CancellableObjectEventArgs> cancelableArgs)
+        // edits event args to use the latest instance of each entity
+        private static void UpdateToLatestEntities(IEnumerable<Tuple<IEntity, EventDefinitionInfos>> entities, IEnumerable<CancellableObjectEventArgs> args)
         {
-            //Now we'll deal with ensuring that only the latest(non stale) entities are used throughout all event args
-
+            // get the latest entities
+            // ordered hash set + keepOldest will keep the latest inserted entity (in case of duplicates)
             var latestEntities = new OrderedHashSet<IEntity>(keepOldest: true);
-            foreach (var entity in allEntities.OrderByDescending(entity => entity.Item1.UpdateDate))
-            {
+            foreach (var entity in entities.OrderByDescending(entity => entity.Item1.UpdateDate))
                 latestEntities.Add(entity.Item1);
-            }
 
-            foreach (var args in cancelableArgs)
+            foreach (var arg in args)
             {
-                var list = TypeHelper.CreateGenericEnumerableFromObject(args.EventObject);
-                if (list == null)
+                // event object can either be a single object or an enumerable of objects
+                // try to get as an enumerable, get null if it's not
+                var eventObjects = TypeHelper.CreateGenericEnumerableFromObject(arg.EventObject);
+                if (eventObjects == null)
                 {
-                    //try to find the args entity in the latest entity - based on the equality operators, this will 
-                    //match by Id since that is the default equality checker for IEntity. If one is found, than it is 
-                    //the most recent entity instance so update the args with that instance so we don't emit a stale instance.
-                    var foundEntity = latestEntities.FirstOrDefault(x => Equals(x, args.EventObject));
+                    // single object
+                    // look for a more recent entity for that object, and replace if any
+                    // works by "equalling" entities ie the more recent one "equals" this one (though different object)
+                    var foundEntity = latestEntities.FirstOrDefault(x => Equals(x, arg.EventObject));
                     if (foundEntity != null)
-                    {
-                        args.EventObject = foundEntity;
-                    }
+                        arg.EventObject = foundEntity;
                 }
                 else
                 {
+                    // enumerable of objects
+                    // same as above but for each object
                     var updated = false;
-
-                    for (int i = 0; i < list.Count; i++)
+                    for (var i = 0; i < eventObjects.Count; i++)
                     {
-                        //try to find the args entity in the latest entity - based on the equality operators, this will 
-                        //match by Id since that is the default equality checker for IEntity. If one is found, than it is 
-                        //the most recent entity instance so update the args with that instance so we don't emit a stale instance.
-                        var foundEntity = latestEntities.FirstOrDefault(x => Equals(x, list[i]));
-                        if (foundEntity != null)
-                        {
-                            list[i] = foundEntity;
-                            updated = true;
-                        }
+                        var foundEntity = latestEntities.FirstOrDefault(x => Equals(x, eventObjects[i]));
+                        if (foundEntity == null) continue;
+                        eventObjects[i] = foundEntity;
+                        updated = true;
                     }
 
                     if (updated)
-                    {
-                        args.EventObject = list;
-                    }
+                        arg.EventObject = eventObjects;
                 }
             }
         }
 
-        /// <summary>
-        /// This will check against all of the processed entity/events (allEntities) to see if this entity already exists in 
-        /// event args that supersede the event args being passed in and if so returns true.
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="eventDef"></param>
-        /// <param name="allEntities"></param>
-        /// <returns></returns>
-        private static bool IsFiltered(
-            IEntity entity,
-            EventDefinitionTypeData eventDef,
-            List<Tuple<IEntity, EventDefinitionTypeData>> allEntities)
+        // determines if a given entity, appearing in a given event definition, should be filtered out,
+        // considering the entities that have already been visited - an entity is filtered out if it
+        // appears in another even definition, which superceedes this event definition.
+        private static bool IsSuperceeded(IEntity entity, EventDefinitionInfos infos, List<Tuple<IEntity, EventDefinitionInfos>> entities)
         {
-            var argType = eventDef.EventDefinition.Args.GetType();
+            //var argType = meta.EventArgsType;
+            var argType = infos.EventDefinition.Args.GetType();
 
-            //check if the entity is found in any processed event data that could possible supersede this one
-            var foundByEntity = allEntities
-                .Where(x => x.Item2.SupersedeAttributes.Length > 0
-                            //if it's the same arg type than it cannot supersede                
-                            && x.Item2.EventArgType != argType
-                            && Equals(x.Item1, entity))
+            // look for other instances of the same entity, coming from an event args that supercedes other event args,
+            // ie is marked with the attribute, and is not this event args (cannot supersede itself)
+            var superceeding = entities
+                .Where(x => x.Item2.SupersedeTypes.Length > 0 // has the attribute
+                    && x.Item2.EventDefinition.Args.GetType() != argType // is not the same
+                    && Equals(x.Item1, entity)) // same entity
                 .ToArray();
 
-            //no args have been processed with this entity so it should not be filtered
-            if (foundByEntity.Length == 0)
+            // first time we see this entity = not filtered
+            if (superceeding.Length == 0)
                 return false;
 
+            // fixme see notes above
+            // delete event args does NOT superceedes 'unpublished' event
+            if (argType.IsGenericType && argType.GetGenericTypeDefinition() == typeof(PublishEventArgs<>) && infos.EventDefinition.EventName == "UnPublished")
+                return false;
+
+            // found occurences, need to determine if this event args is superceded
             if (argType.IsGenericType)
             {
-                var supercededBy = foundByEntity
-                    .FirstOrDefault(x =>
-                        x.Item2.SupersedeAttributes.Any(y =>
-                            //if the attribute type is a generic type def then compare with the generic type def of the event arg
-                                (y.SupersededEventArgsType.IsGenericTypeDefinition && y.SupersededEventArgsType == argType.GetGenericTypeDefinition())
-                                //if the attribute type is not a generic type def then compare with the normal type of the event arg
-                                || (y.SupersededEventArgsType.IsGenericTypeDefinition == false && y.SupersededEventArgsType == argType)));
+                // generic, must compare type arguments
+                var supercededBy = superceeding.FirstOrDefault(x =>
+                    x.Item2.SupersedeTypes.Any(y =>
+                        // superceeding a generic type which has the same generic type definition
+                        // fixme no matter the generic type parameters? could be different?
+                        y.IsGenericTypeDefinition && y == argType.GetGenericTypeDefinition()
+                        // or superceeding a non-generic type which is ... fixme how is this ever possible? argType *is* generic?
+                        || y.IsGenericTypeDefinition == false && y == argType));
                 return supercededBy != null;
             }
             else
             {
-                var supercededBy = foundByEntity
-                    .FirstOrDefault(x =>
-                        x.Item2.SupersedeAttributes.Any(y =>
-                            //since the event arg type is not a generic type, then we just compare type 1:1
-                                y.SupersededEventArgsType == argType));
+                // non-generic, can compare types 1:1
+                var supercededBy = superceeding.FirstOrDefault(x =>
+                    x.Item2.SupersedeTypes.Any(y => y == argType));
                 return supercededBy != null;
             }
         }

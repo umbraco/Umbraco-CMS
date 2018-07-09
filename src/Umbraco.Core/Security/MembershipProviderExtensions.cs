@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Principal;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Security;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Security
@@ -23,6 +18,9 @@ namespace Umbraco.Core.Security
         /// <param name="provider"></param>
         /// <param name="userService"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// An Admin can always reset the password
+        /// </remarks>
         internal static bool CanResetPassword(this MembershipProvider provider, IUserService userService)
         {
             if (provider == null) throw new ArgumentNullException("provider");
@@ -31,13 +29,14 @@ namespace Umbraco.Core.Security
 
             if (userService == null) return canReset;
 
-            //we need to check for the special case in which a user is an admin - in which acse they can reset the password even if EnablePasswordReset == false
+            //we need to check for the special case in which a user is an admin - in which case they can reset the password even if EnablePasswordReset == false
             if (provider.EnablePasswordReset == false)
             {
                 var identity = Thread.CurrentPrincipal.GetUmbracoIdentity();
                 if (identity != null)
                 {
-                    var user = userService.GetByUsername(identity.Username);
+                    var user = userService.GetUserById(identity.Id.TryConvertTo<int>().Result);
+                    if (user == null) throw new InvalidOperationException("No user with username " + identity.Username + " found");
                     var userIsAdmin = user.IsAdmin();
                     if (userIsAdmin)
                     {
@@ -70,7 +69,7 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Method to get the Umbraco Members membership provider based on it's alias
+        /// Method to get the Umbraco Members membership provider based on its alias
         /// </summary>
         /// <returns></returns>
         public static MembershipProvider GetMembersMembershipProvider()
@@ -83,7 +82,7 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Method to get the Umbraco Users membership provider based on it's alias
+        /// Method to get the Umbraco Users membership provider based on its alias
         /// </summary>
         /// <returns></returns>
         public static MembershipProvider GetUsersMembershipProvider()
@@ -167,6 +166,5 @@ namespace Umbraco.Core.Security
         {
             return (UmbracoMembershipProviderBase)membershipProvider;
         }
-
     }
 }

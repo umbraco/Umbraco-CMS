@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
-	function ($scope, eventsService, contentResource, navigationService, appState, treeService, localizationService, notificationsService) {
+	function ($scope, userService, eventsService, contentResource, navigationService, appState, treeService, localizationService, notificationsService) {
 
 	    var dialogOptions = $scope.dialogOptions;
 	    var searchText = "Search...";
@@ -15,9 +15,21 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 	        showSearch: false,
 	        results: [],
 	        selectedSearchResults: []
-	    }
+        }
+        $scope.treeModel = {
+            hideHeader: false
+        }
+        userService.getCurrentUser().then(function (userData) {
+            $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;
+        });
 
 	    var node = dialogOptions.currentNode;
+
+        function treeLoadedHandler(ev, args) {
+            if (node && node.path) {
+                $scope.dialogTreeEventHandler.syncTree({ path: node.path, activate: false });
+            }
+        }
 
 	    function nodeSelectHandler(ev, args) {
 
@@ -105,10 +117,12 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
                 });
 	    };
 
+	    $scope.dialogTreeEventHandler.bind("treeLoaded", treeLoadedHandler);
 	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
 	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
 
 	    $scope.$on('$destroy', function () {
+	        $scope.dialogTreeEventHandler.unbind("treeLoaded", treeLoadedHandler);
 	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
 	        $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
 	    });

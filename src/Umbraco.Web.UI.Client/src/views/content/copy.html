@@ -48,7 +48,7 @@
                     <div ng-hide="searchInfo.showSearch">
                         <umb-tree
                             section="content"
-                            hideheader="false"
+                            hideheader="{{treeModel.hideHeader}}"
                             hideoptions="true"
                             isdialog="true"
                             eventhandler="dialogTreeEventHandler"

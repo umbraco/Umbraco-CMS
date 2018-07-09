@@ -31,13 +31,11 @@ namespace Umbraco.Tests.Cache
 
                 new EventDefinition<ISectionService, EventArgs>(null, ServiceContext.SectionService, new EventArgs(), "Deleted"),
                 new EventDefinition<ISectionService, EventArgs>(null, ServiceContext.SectionService, new EventArgs(), "New"),
-
-                new EventDefinition<IUserService, SaveEventArgs<IUserType>>(null, ServiceContext.UserService, new SaveEventArgs<IUserType>(Enumerable.Empty<IUserType>())),
-                new EventDefinition<IUserService, DeleteEventArgs<IUserType>>(null, ServiceContext.UserService, new DeleteEventArgs<IUserType>(Enumerable.Empty<IUserType>())),
-
+                
                 new EventDefinition<IUserService, SaveEventArgs<IUser>>(null, ServiceContext.UserService, new SaveEventArgs<IUser>(Enumerable.Empty<IUser>())),
                 new EventDefinition<IUserService, DeleteEventArgs<IUser>>(null, ServiceContext.UserService, new DeleteEventArgs<IUser>(Enumerable.Empty<IUser>())),
-                new EventDefinition<IUserService, DeleteEventArgs<IUser>>(null, ServiceContext.UserService, new DeleteEventArgs<IUser>(Enumerable.Empty<IUser>())),
+                new EventDefinition<IUserService, SaveEventArgs<IUserGroup>>(null, ServiceContext.UserService, new SaveEventArgs<IUserGroup>(Enumerable.Empty<IUserGroup>())),
+                new EventDefinition<IUserService, DeleteEventArgs<IUserGroup>>(null, ServiceContext.UserService, new DeleteEventArgs<IUserGroup>(Enumerable.Empty<IUserGroup>())),
 
                 new EventDefinition<ILocalizationService, SaveEventArgs<IDictionaryItem>>(null, ServiceContext.LocalizationService, new SaveEventArgs<IDictionaryItem>(Enumerable.Empty<IDictionaryItem>())),
                 new EventDefinition<ILocalizationService, DeleteEventArgs<IDictionaryItem>>(null, ServiceContext.LocalizationService, new DeleteEventArgs<IDictionaryItem>(Enumerable.Empty<IDictionaryItem>())),
@@ -80,8 +78,10 @@ namespace Umbraco.Tests.Cache
                 new EventDefinition<IMediaService, MoveEventArgs<IMedia>>(null, ServiceContext.MediaService, new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(null, "", -1)), "Trashed"),
                 new EventDefinition<IMediaService, RecycleBinEventArgs>(null, ServiceContext.MediaService, new RecycleBinEventArgs(Guid.NewGuid(), new Dictionary<int, IEnumerable<Property>>(), true)),
 
-                new EventDefinition<IContentService, SaveEventArgs<IContent>>(null, ServiceContext.ContentService, new SaveEventArgs<IContent>(Enumerable.Empty<IContent>())),
-                new EventDefinition<IContentService, DeleteEventArgs<IContent>>(null, ServiceContext.ContentService, new DeleteEventArgs<IContent>(Enumerable.Empty<IContent>())),
+                new EventDefinition<IContentService, SaveEventArgs<IContent>>(null, ServiceContext.ContentService, new SaveEventArgs<IContent>(Enumerable.Empty<IContent>()), "Saved"),
+                new EventDefinition<IContentService, SaveEventArgs<IContent>>(null, ServiceContext.ContentService, new SaveEventArgs<IContent>(Enumerable.Empty<IContent>()), "SavedBlueprint"),
+                new EventDefinition<IContentService, DeleteEventArgs<IContent>>(null, ServiceContext.ContentService, new DeleteEventArgs<IContent>(Enumerable.Empty<IContent>()), "Deleted"),
+                new EventDefinition<IContentService, DeleteEventArgs<IContent>>(null, ServiceContext.ContentService, new DeleteEventArgs<IContent>(Enumerable.Empty<IContent>()), "DeletedBlueprint"),
                 new EventDefinition<IContentService, CopyEventArgs<IContent>>(null, ServiceContext.ContentService, new CopyEventArgs<IContent>(null, null, -1)),
                 new EventDefinition<IContentService, MoveEventArgs<IContent>>(null, ServiceContext.ContentService, new MoveEventArgs<IContent>(new MoveEventInfo<IContent>(null, "", -1)), "Trashed"),
                 new EventDefinition<IContentService, RecycleBinEventArgs>(null, ServiceContext.ContentService, new RecycleBinEventArgs(Guid.NewGuid(), new Dictionary<int, IEnumerable<Property>>(), true)),

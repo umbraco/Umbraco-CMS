@@ -8,13 +8,13 @@
                                                    
 ----------------------------------------------------
 
-*** IMPORTANT NOTICE FOR 7.6 UPGRADES ***
+*** IMPORTANT NOTICE FOR UPGRADES FROM VERSIONS BELOW 7.7.0 ***
 
 Be sure to read the version specific upgrade information before proceeding:
-https://our.umbraco.org/documentation/Getting-Started/Setup/Upgrading/version-specific#version-7-6-0
+https://our.umbraco.org/documentation/Getting-Started/Setup/Upgrading/version-specific#version-7-7-0
 
-You will most likely need to make some changes to your web.config and you will need to be 
-aware of the breaking changes listed there to see if these affect your installation.
+Depending on the version you are upgrading from, you may need to make some changes to your web.config
+and you will need to be aware of the breaking changes listed there to see if these affect your installation.
 
 
 Don't forget to build!

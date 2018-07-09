@@ -17,6 +17,10 @@ namespace Umbraco.Core.Services
         void DeletePartialViewMacroFolder(string folderPath);
         IPartialView GetPartialView(string path);
         IPartialView GetPartialViewMacro(string path);
+        [Obsolete("MacroScripts are obsolete - this is for backwards compatibility with upgraded sites.")]
+        IPartialView GetMacroScript(string path);
+        [Obsolete("UserControls are obsolete - this is for backwards compatibility with upgraded sites.")]
+        IUserControl GetUserControl(string path);
         IEnumerable<IPartialView> GetPartialViewMacros(params string[] names);
         IXsltFile GetXsltFile(string path);
         IEnumerable<IXsltFile> GetXsltFiles(params string[] names);
@@ -264,6 +268,27 @@ namespace Umbraco.Core.Services
         long GetTemplateFileSize(string filepath);
 
         /// <summary>
+        /// Gets the content of a macroscript as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the macroscript.</param>
+        /// <returns>The content of the macroscript.</returns>
+        Stream GetMacroScriptFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a macroscript.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the macroscript.</param>
+        /// <param name="content">The content of the macroscript.</param>
+        void SetMacroScriptFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the size of a macroscript.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the macroscript.</param>
+        /// <returns>The size of the macroscript.</returns>
+        long GetMacroScriptFileSize(string filepath);
+
+        /// <summary>
         /// Gets the content of a stylesheet as a stream.
         /// </summary>
         /// <param name="filepath">The filesystem path to the stylesheet.</param>
@@ -304,6 +329,27 @@ namespace Umbraco.Core.Services
         /// <param name="filepath">The filesystem path to the script file.</param>
         /// <returns>The size of the script file.</returns>
         long GetScriptFileSize(string filepath);
+
+        /// <summary>
+        /// Gets the content of a usercontrol as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the usercontrol.</param>
+        /// <returns>The content of the usercontrol.</returns>
+        Stream GetUserControlFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a usercontrol.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the usercontrol.</param>
+        /// <param name="content">The content of the usercontrol.</param>
+        void SetUserControlFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the size of a usercontrol.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the usercontrol.</param>
+        /// <returns>The size of the usercontrol.</returns>
+        long GetUserControlFileSize(string filepath);
 
         /// <summary>
         /// Gets the content of a XSLT file as a stream.

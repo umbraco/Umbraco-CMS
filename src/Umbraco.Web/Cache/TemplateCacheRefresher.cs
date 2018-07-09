@@ -24,18 +24,12 @@ namespace Umbraco.Web.Cache
 
         public override string Name
         {
-            get
-            {
-                return "Template cache refresher";
-            }
+            get { return "Template cache refresher"; }
         }
 
         public override Guid UniqueIdentifier
         {
-            get
-            {
-                return new Guid(DistributedCache.TemplateRefresherId);
-            }
+            get { return DistributedCache.TemplateRefresherGuid; }
         }
 
         public override void Refresh(int id)

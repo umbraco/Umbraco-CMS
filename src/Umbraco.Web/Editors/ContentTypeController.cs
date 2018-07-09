@@ -133,6 +133,22 @@ namespace Umbraco.Web.Editors
                 });
             return Request.CreateResponse(result);
         }
+        /// <summary>
+        /// Returns where a particular composition has been used
+        /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public HttpResponseMessage GetWhereCompositionIsUsedInContentTypes(GetAvailableCompositionsFilter filter)
+        {
+            var result = PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType)
+                .Select(x => new
+                {
+                    contentType = x
+                });
+            return Request.CreateResponse(result);
+        }
 
         [UmbracoTreeAuthorize(
             Constants.Trees.DocumentTypes, Constants.Trees.Content,
@@ -180,6 +196,73 @@ namespace Umbraco.Web.Editors
             return result
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+        }
+
+        public HttpResponseMessage PostRenameContainer(int id, string name)
+        {
+            var result = Services.ContentTypeService.RenameContentTypeContainer(id, name, Security.CurrentUser.Id);
+
+            return result
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
+                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+        }
+        
+        public DocumentTypeCollectionDisplay PostCreateCollection(int parentId, string collectionName, string collectionItemName, string collectionIcon, string collectionItemIcon)
+        {
+            var storeInContainer = false;
+            var allowUnderDocType = -1;
+            // check if it's a folder
+            if (Services.ContentTypeService.GetContentType(parentId) == null)
+            {
+                storeInContainer = true;
+            } else
+            {
+                // if it's not a container, we'll change the parentid to the root,
+                // and use the parent id as the doc type the collection should be allowed under
+                allowUnderDocType = parentId;
+                parentId = -1;
+            }
+
+            // create item doctype
+            var itemDocType = new ContentType(parentId);
+            itemDocType.Name = collectionItemName;
+            itemDocType.Alias = collectionItemName.ToSafeAlias();
+            itemDocType.Icon = collectionItemIcon;
+            Services.ContentTypeService.Save(itemDocType);
+
+            // create collection doctype
+            var collectionDocType = new ContentType(parentId);
+            collectionDocType.Name = collectionName;
+            collectionDocType.Alias = collectionName.ToSafeAlias();
+            collectionDocType.Icon = collectionIcon;
+            collectionDocType.IsContainer = true;
+            collectionDocType.AllowedContentTypes = new List<ContentTypeSort>()
+            {
+                new ContentTypeSort(itemDocType.Id, 0)
+            };
+            Services.ContentTypeService.Save(collectionDocType);
+
+            // test if the parent id exist and then allow the collection underneath
+            if (storeInContainer == false && allowUnderDocType != -1)
+            {
+                var parentCt = Services.ContentTypeService.GetContentType(allowUnderDocType);
+                if (parentCt != null)
+                {
+                    var allowedCts = parentCt.AllowedContentTypes.ToList();
+                    allowedCts.Add(new ContentTypeSort(collectionDocType.Id, allowedCts.Count()));
+                    parentCt.AllowedContentTypes = allowedCts;
+                    Services.ContentTypeService.Save(parentCt);
+                } else
+                {
+                }
+            }
+
+
+            return new DocumentTypeCollectionDisplay
+            {
+                CollectionId = collectionDocType.Id,
+                ItemId = itemDocType.Id
+            };
         }
 
         public DocumentTypeDisplay PostSave(DocumentTypeSave contentTypeSave)
@@ -302,6 +385,17 @@ namespace Umbraco.Web.Editors
             {
                 basic.Name = localizedTextService.UmbracoDictionaryTranslate(basic.Name);
                 basic.Description = localizedTextService.UmbracoDictionaryTranslate(basic.Description);
+            }
+
+            //map the blueprints
+            var blueprints = Services.ContentService.GetBlueprintsForContentTypes(types.Select(x => x.Id).ToArray()).ToArray();
+            foreach (var basic in basics)
+            {
+                var docTypeBluePrints = blueprints.Where(x => x.ContentTypeId == (int) basic.Id).ToArray();
+                foreach (var blueprint in docTypeBluePrints)
+                {
+                    basic.Blueprints[blueprint.Id] = blueprint.Name;
+                }
             }
 
             return basics;

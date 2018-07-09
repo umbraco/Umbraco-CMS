@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.UnitOfWork
 	/// <summary>
 	/// Represents a scoped unit of work.
 	/// </summary>
-	internal class ScopeUnitOfWork : DisposableObject, IScopeUnitOfWork
+	internal class ScopeUnitOfWork : DisposableObjectSlim, IScopeUnitOfWork
     {
         private readonly Queue<Operation> _operations = new Queue<Operation>();
 	    private readonly IsolationLevel _isolationLevel;

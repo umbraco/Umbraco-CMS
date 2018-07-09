@@ -1,7 +1,18 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 
-function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, miniEditorHelper) {
+function contentPickerController($scope, entityResource, editorState, iconHelper, $routeParams, angularHelper, navigationService, $location, miniEditorHelper, localizationService) {
+
+    var unsubscribe;
+
+    function subscribe() {
+        unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+            var currIds = _.map($scope.renderModel, function (i) {
+                return $scope.model.config.idType === "udi" ? i.udi : i.id;
+            });
+            $scope.model.value = trim(currIds.join(), ",");
+        });
+    }
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -47,7 +58,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     $scope.renderModel = [];
 	    
-    $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;
+    $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor === true;    
 
     //the default pre-values
     var defaultConfig = {
@@ -55,6 +66,8 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         showOpenButton: false,
         showEditButton: false,
         showPathOnHover: false,
+        maxNumber: 1,
+        minNumber : 0,
         startNode: {
             query: "",
             type: "content",
@@ -80,7 +93,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
     $scope.model.config.showOpenButton = ($scope.model.config.showOpenButton === "1" ? true : false);
     $scope.model.config.showEditButton = ($scope.model.config.showEditButton === "1" ? true : false);
     $scope.model.config.showPathOnHover = ($scope.model.config.showPathOnHover === "1" ? true : false);
- 
+    
     var entityType = $scope.model.config.startNode.type === "member"
         ? "Member"
         : $scope.model.config.startNode.type === "media"
@@ -96,6 +109,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         entityType: entityType,
         filterCssClass: "not-allowed not-published",
         startNodeId: null,
+        currentNode: editorState ? editorState.current : null,
         callback: function (data) {
             if (angular.isArray(data)) {
                 _.each(data, function (item, i) {
@@ -142,7 +156,6 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             return false;
         }
     }
-
 
     if ($routeParams.section === "settings" && $routeParams.tree === "documentTypes") {
         //if the content-picker is being rendered inside the document-type editor, we don't need to process the startnode query
@@ -231,19 +244,13 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             }
         });
     };
-        
-    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
-        var currIds = _.map($scope.renderModel, function (i) {
-            return $scope.model.config.idType === "udi" ? i.udi : i.id;
-        });
-        $scope.model.value = trim(currIds.join(), ",");
-    });
 
     //when the scope is destroyed we need to unsubscribe
     $scope.$on('$destroy', function () {
-        unsubscribe();
+        if(unsubscribe) {
+            unsubscribe();
+        }
     });
-
     
     var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
 
@@ -266,14 +273,14 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
             //everything is loaded, start the watch on the model
             startWatch();
-
+            subscribe();
         });
     }
     else {
         //everything is loaded, start the watch on the model
         startWatch();
+        subscribe();
     }
-    
 
     function setEntityUrl(entity) {
 
@@ -282,8 +289,12 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             entityResource.getUrl(entity.id, entityType).then(function(data){
                 // update url                
                 angular.forEach($scope.renderModel, function(item){
-                    if(item.id === entity.id) {
-                        item.url = data;
+                    if (item.id === entity.id) {
+                        if (entity.trashed) {
+                            item.url = localizationService.dictionary.general_recycleBin;
+                        } else {
+                            item.url = data;
+                        }
                     }
                 });
             });
@@ -325,6 +336,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
             "icon": item.icon,
             "path": item.path,
             "url": item.url,
+            "trashed": item.trashed,
             "published": (item.metaData && item.metaData.IsPublished === false && entityType === "Document") ? false : true
             // only content supports published/unpublished content so we set everything else to published so the UI looks correct 
         });

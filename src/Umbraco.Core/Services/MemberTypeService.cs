@@ -80,7 +80,8 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMemberType>(memberType)))
+                    var saveEventArgs = new SaveEventArgs<IMemberType>(memberType);
+                    if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -101,7 +102,8 @@ namespace Umbraco.Core.Services
                     UpdateContentXmlStructure(memberType);
                     uow.Commit(); // actually commit uow
 
-                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMemberType>(memberType, false));
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(Saved, this, saveEventArgs);
                 }
             }
         }
@@ -114,7 +116,8 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = UowProvider.GetUnitOfWork())
                 {
-                    if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMemberType>(asArray)))
+                    var saveEventArgs = new SaveEventArgs<IMemberType>(asArray);
+                    if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -131,8 +134,8 @@ namespace Umbraco.Core.Services
 
                     UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
                     uow.Commit(); // actually commit uow
-
-                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IMemberType>(asArray, false));
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(Saved, this, saveEventArgs);
                 }
             }
 
@@ -142,10 +145,11 @@ namespace Umbraco.Core.Services
         {
             using (new WriteLock(Locker))
             {
+                var deleteEventArgs = new DeleteEventArgs<IMemberType>(memberType);
                 using (var scope = UowProvider.ScopeProvider.CreateScope())
                 {
-                    scope.Complete(); // always
-                    if (scope.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMemberType>(memberType)))
+                    scope.Complete(); // always                    
+                    if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                         return;
                 }
 
@@ -157,7 +161,8 @@ namespace Umbraco.Core.Services
                     repository.Delete(memberType);
                     uow.Commit();
 
-                    uow.Events.Dispatch(Deleted, this, new DeleteEventArgs<IMemberType>(memberType, false));
+                    deleteEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(Deleted, this, deleteEventArgs);
                 }
             }
         }
@@ -168,10 +173,11 @@ namespace Umbraco.Core.Services
 
             using (new WriteLock(Locker))
             {
+                var deleteEventArgs = new DeleteEventArgs<IMemberType>(asArray);
                 using (var scope = UowProvider.ScopeProvider.CreateScope())
                 {
-                    scope.Complete(); // always
-                    if (scope.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IMemberType>(asArray)))
+                    scope.Complete(); // always                    
+                    if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                         return;
                 }
 
@@ -189,8 +195,8 @@ namespace Umbraco.Core.Services
                     }
 
                     uow.Commit();
-
-                    uow.Events.Dispatch(Deleted, this, new DeleteEventArgs<IMemberType>(asArray, false));
+                    deleteEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(Deleted, this, deleteEventArgs);
                 }
             }
         }

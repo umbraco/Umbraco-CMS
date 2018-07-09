@@ -72,12 +72,55 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             return GetUmbracoMedia(nodeId);
         }
 
+        public virtual IPublishedContent GetById(UmbracoContext umbracoContext, bool preview, Guid nodeKey)
+        {
+            // TODO optimize with Examine?
+            var mapAttempt = ApplicationContext.Current.Services.IdkMap.GetIdForKey(nodeKey, UmbracoObjectTypes.Media);
+            return mapAttempt ? GetById(umbracoContext, preview, mapAttempt.Result) : null;
+        }
+
         public virtual IEnumerable<IPublishedContent> GetAtRoot(UmbracoContext umbracoContext, bool preview)
         {
-            //TODO: We should be able to look these ids first in Examine!
+            var searchProvider = GetSearchProviderSafe();
+
+            if (searchProvider != null)
+            {
+                try
+                {
+                    // first check in Examine for the cache values
+                    // +(+parentID:-1) +__IndexType:media
+
+                    var criteria = searchProvider.CreateSearchCriteria("media");
+                    var filter = criteria.ParentId(-1).Not().Field(UmbracoContentIndexer.IndexPathFieldName, "-1,-21,".MultipleCharacterWildcard());
+
+                    var result = searchProvider.Search(filter.Compile());
+                    if (result != null)
+                        return result.Select(x => CreateFromCacheValues(ConvertFromSearchResult(x)));
+                }
+                catch (Exception ex)
+                {
+                    if (ex is FileNotFoundException)
+                    {
+                        //Currently examine is throwing FileNotFound exceptions when we have a loadbalanced filestore and a node is published in umbraco
+                        //See this thread: http://examine.cdodeplex.com/discussions/264341
+                        //Catch the exception here for the time being, and just fallback to GetMedia
+                        //TODO: Need to fix examine in LB scenarios!
+                        LogHelper.Error<PublishedMediaCache>("Could not load data from Examine index for media", ex);
+                    }
+                    else if (ex is AlreadyClosedException)
+                    {
+                        //If the app domain is shutting down and the site is under heavy load the index reader will be closed and it really cannot
+                        //be re-opened since the app domain is shutting down. In this case we have no option but to try to load the data from the db.
+                        LogHelper.Error<PublishedMediaCache>("Could not load data from Examine index for media, the app domain is most likely in a shutdown state", ex);
+                    }
+                    else throw;
+                }
+            }
+
+            //something went wrong, fetch from the db
 
             var rootMedia = _applicationContext.Services.MediaService.GetRootMedia();
-            return rootMedia.Select(m => GetUmbracoMedia(m.Id));
+            return rootMedia.Select(m => CreateFromCacheValues(ConvertFromIMedia(m)));
         }
 
         public virtual IPublishedContent GetSingleByXPath(UmbracoContext umbracoContext, bool preview, string xpath, XPathVariable[] vars)

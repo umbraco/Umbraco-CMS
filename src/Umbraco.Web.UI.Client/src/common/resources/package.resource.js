@@ -123,6 +123,16 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
               'Failed to install package. Error during the step "InstallFiles" ');
         }, 
 
+        checkRestart: function (package) {
+
+          return umbRequestHelper.resourcePromise(
+            $http.post(
+              umbRequestHelper.getApiUrl(
+                "packageInstallApiBaseUrl",
+                "CheckRestart"), package),
+            'Failed to install package. Error during the step "CheckRestart" ');
+        }, 
+
         installData: function (package) {
            
             return umbRequestHelper.resourcePromise(

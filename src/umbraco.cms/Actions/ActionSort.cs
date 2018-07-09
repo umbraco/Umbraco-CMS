@@ -1,13 +1,16 @@
 using System;
 using umbraco.interfaces;
 using umbraco.BasePages;
+using Umbraco.Core;
+using Umbraco.Core.CodeAnnotations;
 
 namespace umbraco.BusinessLogic.Actions
 {
-	/// <summary>
-	/// This action is invoked when children to a document, media, member is being sorted
-	/// </summary>
-	public class ActionSort : IAction
+    /// <summary>
+    /// This action is invoked when children to a document, media, member is being sorted
+    /// </summary>
+    [ActionMetadata(Constants.Conventions.PermissionCategories.StructureCategory)]
+    public class ActionSort : IAction
 	{
 		//create singleton
 #pragma warning disable 612,618

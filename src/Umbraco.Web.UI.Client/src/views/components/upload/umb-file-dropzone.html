@@ -1,4 +1,4 @@
-<div class="umb-file-dropzone-directive">
+<div data-element="dropzone" class="umb-file-dropzone-directive">
 
 <ng-form name="uploadForm">
 
@@ -23,7 +23,9 @@
 
 
             <!-- Select files -->
-            <div class="file-select"
+            <div 
+                 data-element="button-uploadMedia"
+                 class="file-select"
                  ngf-select
                  ng-model="filesHolder"
                  ngf-change="handleFiles($files, $event)"

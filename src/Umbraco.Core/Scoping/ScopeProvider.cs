@@ -2,10 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Web;
 using Umbraco.Core.Events;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 #if DEBUG_SCOPES
 using System.Linq;
@@ -66,21 +68,37 @@ namespace Umbraco.Core.Scoping
         // tests, any other things (see https://msdn.microsoft.com/en-us/library/dn458353(v=vs.110).aspx),
         // but we don't want to make all of our objects serializable since they are *not* meant to be
         // used in cross-AppDomain scenario anyways.
+        //
         // in addition, whatever goes into the logical call context is serialized back and forth any
-        // time cross-AppDomain code executes, so if we put an "object" there, we'll can *another*
-        // "object" instance - and so we cannot use a random object as a key.
+        // time cross-AppDomain code executes, so if we put an "object" there, we'll get *another*
+        // "object" instance back - and so we cannot use a random object as a key.
+        //
         // so what we do is: we register a guid in the call context, and we keep a table mapping those
         // guids to the actual objects. the guid serializes back and forth without causing any issue,
         // and we can retrieve the actual objects from the table.
-        // only issue: how are we supposed to clear the table? we can't, really. objects should take
-        // care of de-registering themselves from context.
-        // everything we use does, except the NoScope scope, which just stays there
         //
-        // during tests, NoScope can to into call context... nothing much we can do about it
+        // so far, the only objects that go into this table are scopes (using ScopeItemKey) and
+        // scope contexts (using ContextItemKey).
 
         private static readonly object StaticCallContextObjectsLock = new object();
         private static readonly Dictionary<Guid, object> StaticCallContextObjects
              = new Dictionary<Guid, object>();
+
+        // normal scopes and scope contexts take greate care removing themselves when disposed, so it
+        // is all safe. OTOH the NoScope *CANNOT* remove itself, this is by design, it *WILL* leak and
+        // there is little (nothing) we can do about it - NoScope exists for backward compatibility
+        // reasons and relying on it is greatly discouraged.
+        //
+        // however... we can *try* at protecting the app against memory leaks, by collecting NoScope
+        // instances that are too old. if anything actually *need* to retain a NoScope instance for
+        // a long time, it will break. but that's probably ok. so: the constants below define how
+        // long a NoScope instance can stay in the table before being removed, and how often we should
+        // collect the table - and collecting happens anytime SetCallContextObject is invoked
+
+        private static readonly TimeSpan StaticCallContextNoScopeLifeSpan = TimeSpan.FromMinutes(30);
+        private static readonly TimeSpan StaticCallContextCollectPeriod = TimeSpan.FromMinutes(4);
+        private static DateTime _staticCallContextLastCollect = DateTime.MinValue;
+
 
 #if DEBUG_SCOPES
         public Dictionary<Guid, object> CallContextObjects
@@ -156,6 +174,7 @@ namespace Umbraco.Core.Scoping
                     //Logging.LogHelper.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif
                     StaticCallContextObjects.Remove(objectKey);
+                    CollectStaticCallContextObjectsLocked();
                 }
             }
             else
@@ -171,9 +190,35 @@ namespace Umbraco.Core.Scoping
                     //Logging.LogHelper.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif
                     StaticCallContextObjects.Add(objectKey, value);
+                    CollectStaticCallContextObjectsLocked();
                 }
                 CallContext.LogicalSetData(key, objectKey);
             }
+        }
+
+        private static void CollectStaticCallContextObjectsLocked()
+        {
+            // is it time to collect?
+            var now = DateTime.Now;
+            if (now - _staticCallContextLastCollect <= StaticCallContextCollectPeriod)
+                return;
+
+            // disable warning: this method is invoked from within a lock
+            // ReSharper disable InconsistentlySynchronizedField
+            var threshold = now.Add(-StaticCallContextNoScopeLifeSpan);
+            var guids = StaticCallContextObjects
+                .Where(x => x.Value is NoScope noScope && noScope.Timestamp < threshold)
+                .Select(x => x.Key)
+                .ToList();
+            if (guids.Count > 0)
+            {
+                LogHelper.Warn<ScopeProvider>($"Collected {guids.Count} NoScope instances from StaticCallContextObjects.");
+                foreach (var guid in guids)
+                    StaticCallContextObjects.Remove(guid);
+            }
+            // ReSharper restore InconsistentlySynchronizedField
+
+            _staticCallContextLastCollect = now;
         }
 
         // this is for tests exclusively until we have a proper accessor in v8

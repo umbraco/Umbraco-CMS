@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("This is no longer used and will be removed in future versions")]
     internal class HelpElement : ConfigurationElement, IHelpSection
     {
         [ConfigurationProperty("defaultUrl", DefaultValue = "http://our.umbraco.org/wiki/umbraco-help/{0}/{1}")]

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Text;
@@ -29,10 +30,8 @@ using Umbraco.Core;
 
 namespace umbraco
 {
-	/// <summary>
-	/// Handles loading of the xslt files into the application tree
-	/// </summary>
-    [Tree(Constants.Applications.Developer, "xslt", "XSLT Files", sortOrder: 5)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("This is no longer used and will be removed from the codebase in the future")]
     public class loadXslt : FileSystemTree
 	{
 

@@ -31,6 +31,29 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return member;
         }
 
+        public static Member CreateSimpleMember(IMemberType contentType, string name, string email, string username, Guid? key = null)
+        {
+            var member = new Member(name, email, username, contentType)
+            {
+                CreatorId = 0,
+                Email = email,
+                Username = username
+            };
+
+            if (key.HasValue)
+            {
+                member.Key = key.Value;
+            }
+
+            member.SetValue("title", name + " member");
+            member.SetValue("bodyText", "This is a subpage");
+            member.SetValue("author", "John Doe");
+
+            member.ResetDirtyProperties(false);
+
+            return member;
+        }
+
         public static IEnumerable<IMember> CreateSimpleMember(IMemberType memberType, int amount, Action<int, IMember> onCreating = null)
         {
             var list = new List<IMember>();

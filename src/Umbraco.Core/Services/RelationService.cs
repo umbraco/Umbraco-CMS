@@ -395,6 +395,39 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Relates two objects by their entity Ids.
+        /// </summary>
+        /// <param name="parentId">Id of the parent</param>
+        /// <param name="childId">Id of the child</param>
+        /// <param name="relationType">The type of relation to create</param>
+        /// <returns>The created <see cref="Relation"/></returns>
+        public IRelation Relate(int parentId, int childId, IRelationType relationType)
+        {
+            // Ensure that the RelationType has an indentity before using it to relate two entities
+            if (relationType.HasIdentity == false)
+                Save(relationType);
+
+            var relation = new Relation(parentId, childId, relationType);
+
+            using (var uow = UowProvider.GetUnitOfWork())
+            {
+                var saveEventArgs = new SaveEventArgs<IRelation>(relation);
+                if (uow.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
+                {
+                    uow.Commit();
+                    return relation;
+                }
+
+                var repository = RepositoryFactory.CreateRelationRepository(uow);
+                repository.AddOrUpdate(relation);
+                uow.Commit();
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(SavedRelation, this, saveEventArgs);
+                return relation;
+            }
+        }
+
+        /// <summary>
         /// Relates two objects that are based on the <see cref="IUmbracoEntity"/> interface.
         /// </summary>
         /// <param name="parent">Parent entity</param>
@@ -403,26 +436,23 @@ namespace Umbraco.Core.Services
         /// <returns>The created <see cref="Relation"/></returns>
         public IRelation Relate(IUmbracoEntity parent, IUmbracoEntity child, IRelationType relationType)
         {
-            //Ensure that the RelationType has an indentity before using it to relate two entities
-            if (relationType.HasIdentity == false)
-                Save(relationType);
+            return Relate(parent.Id, child.Id, relationType);
+        }
 
-            var relation = new Relation(parent.Id, child.Id, relationType);
+        /// <summary>
+        /// Relates two objects by their entity Ids.
+        /// </summary>
+        /// <param name="parentId">Id of the parent</param>
+        /// <param name="childId">Id of the child</param>
+        /// <param name="relationTypeAlias">Alias of the type of relation to create</param>
+        /// <returns>The created <see cref="Relation"/></returns>
+        public IRelation Relate(int parentId, int childId, string relationTypeAlias)
+        {
+            var relationType = GetRelationTypeByAlias(relationTypeAlias);
+            if (relationType == null || string.IsNullOrEmpty(relationType.Alias))
+                throw new ArgumentNullException(string.Format("No RelationType with Alias '{0}' exists.", relationTypeAlias));
 
-            using (var uow = UowProvider.GetUnitOfWork())
-            {
-                var repository = RepositoryFactory.CreateRelationRepository(uow);
-                if (uow.Events.DispatchCancelable(SavingRelation, this, new SaveEventArgs<IRelation>(relation)))
-                {
-                    uow.Commit();
-                    return relation;
-                }
-
-                repository.AddOrUpdate(relation);
-                uow.Commit();
-                uow.Events.Dispatch(SavedRelation, this, new SaveEventArgs<IRelation>(relation, false));
-                return relation;
-            }
+            return Relate(parentId, childId, relationType);
         }
 
         /// <summary>
@@ -438,22 +468,7 @@ namespace Umbraco.Core.Services
             if (relationType == null || string.IsNullOrEmpty(relationType.Alias))
                 throw new ArgumentNullException(string.Format("No RelationType with Alias '{0}' exists.", relationTypeAlias));
 
-            var relation = new Relation(parent.Id, child.Id, relationType);
-
-            using (var uow = UowProvider.GetUnitOfWork())
-            {
-                if (uow.Events.DispatchCancelable(SavingRelation, this, new SaveEventArgs<IRelation>(relation)))
-                {
-                    uow.Commit();
-                    return relation;
-                }
-                var repository = RepositoryFactory.CreateRelationRepository(uow);
-                repository.AddOrUpdate(relation);
-                uow.Commit();
-
-                uow.Events.Dispatch(SavedRelation, this, new SaveEventArgs<IRelation>(relation, false));
-                return relation;
-            }
+            return Relate(parent.Id, child.Id, relationType);
         }
 
         /// <summary>
@@ -568,7 +583,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(SavingRelation, this, new SaveEventArgs<IRelation>(relation)))
+                var saveEventArgs = new SaveEventArgs<IRelation>(relation);
+                if (uow.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -576,7 +592,8 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateRelationRepository(uow);
                 repository.AddOrUpdate(relation);
                 uow.Commit();
-                uow.Events.Dispatch(SavedRelation, this, new SaveEventArgs<IRelation>(relation, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(SavedRelation, this, saveEventArgs);
             }
         }
 
@@ -588,7 +605,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(SavingRelationType, this, new SaveEventArgs<IRelationType>(relationType)))
+                var saveEventArgs = new SaveEventArgs<IRelationType>(relationType);
+                if (uow.Events.DispatchCancelable(SavingRelationType, this, saveEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -596,7 +614,8 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateRelationTypeRepository(uow);
                 repository.AddOrUpdate(relationType);
                 uow.Commit();
-                uow.Events.Dispatch(SavedRelationType, this, new SaveEventArgs<IRelationType>(relationType, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(SavedRelationType, this, saveEventArgs);
             }
         }
 
@@ -608,7 +627,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(DeletingRelation, this, new DeleteEventArgs<IRelation>(relation)))
+                var deleteEventArgs = new DeleteEventArgs<IRelation>(relation);
+                if (uow.Events.DispatchCancelable(DeletingRelation, this, deleteEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -616,7 +636,8 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateRelationRepository(uow);
                 repository.Delete(relation);
                 uow.Commit();
-                uow.Events.Dispatch(DeletedRelation, this, new DeleteEventArgs<IRelation>(relation, false));
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(DeletedRelation, this, deleteEventArgs);
             }
         }
 
@@ -628,7 +649,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(DeletingRelationType, this, new DeleteEventArgs<IRelationType>(relationType)))
+                var deleteEventArgs = new DeleteEventArgs<IRelationType>(relationType);
+                if (uow.Events.DispatchCancelable(DeletingRelationType, this, deleteEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -636,7 +658,8 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateRelationTypeRepository(uow);
                 repository.Delete(relationType);
                 uow.Commit();
-                uow.Events.Dispatch(DeletedRelationType, this, new DeleteEventArgs<IRelationType>(relationType, false));
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(DeletedRelationType, this, deleteEventArgs);
             }
         }
 

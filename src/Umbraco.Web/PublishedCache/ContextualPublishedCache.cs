@@ -47,8 +47,7 @@ namespace Umbraco.Web.PublishedCache
         /// <remarks>Considers published or unpublished content depending on context.</remarks>
         public IPublishedContent GetById(Guid contentId)
         {
-            var intId = UmbracoContext.Application.Services.EntityService.GetIdForKey(contentId, UmbracoObjectTypes.Document);
-            return GetById(intId.Success ? intId.Result : -1);
+            return GetById(UmbracoContext.InPreviewMode, contentId);
         }
 
         /// <summary>
@@ -58,6 +57,15 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="contentId">The content unique identifier.</param>
         /// <returns>The content, or null.</returns>
         public abstract IPublishedContent GetById(bool preview, int contentId);
+
+        // same with Guid
+        // cannot make this public nor abstract without breaking backward compatibility
+        public virtual IPublishedContent GetById(bool preview, Guid contentKey)
+        {
+            // original implementation - override in concrete classes
+            var intId = UmbracoContext.Application.Services.EntityService.GetIdForKey(contentKey, UmbracoObjectTypes.Document);
+            return GetById(intId.Success ? intId.Result : -1);
+        }
 
         /// <summary>
         /// Gets content at root.

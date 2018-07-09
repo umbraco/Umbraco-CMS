@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.Editors.Media.EditController">
+<div data-element="editor-media" ng-controller="Umbraco.Editors.Media.EditController">
 
    <umb-load-indicator ng-if="page.loading"></umb-load-indicator>
 
@@ -22,10 +22,21 @@
             <umb-tabs-content view="true" class="form-horizontal">
                <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
 
-                  <umb-property property="property" ng-repeat="property in tab.properties">
-                     <umb-editor model="property"></umb-editor>
-                  </umb-property>
-
+                    <!-- Other tabs than info -->
+                    <div ng-if="tab.id !== -1 && tab.alias !== '_umb_infoTab'">
+                        <umb-property data-element="property-{{property.alias}}" property="property" ng-repeat="property in tab.properties">
+                            <umb-editor model="property"></umb-editor>
+                        </umb-property>
+                    </div>
+                    
+                    <!-- Info tab -->
+                    <div ng-if="tab.id === -1 && tab.alias === '_umb_infoTab'">
+                        <umb-media-node-info
+                            ng-if="content"
+                            node="content">
+                        </umb-media-node-info>
+                    </div>
+                
                </umb-tab>
             </umb-tabs-content>
 
@@ -47,6 +58,7 @@
             <umb-editor-footer-content-right>
 
                <umb-button
+                  alias="returnToList"
                   ng-if="page.listViewPath"
                   type="link"
                   href="#{{page.listViewPath}}"
@@ -55,6 +67,7 @@
                </umb-button>
 
                <umb-button
+                  alias="save"
                   type="submit"
                   label="Save"
                   label-key="buttons_save"

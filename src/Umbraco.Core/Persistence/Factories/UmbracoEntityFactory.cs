@@ -36,7 +36,7 @@ namespace Umbraco.Core.Persistence.Factories
                 entity.DisableChangeTracking();
 
                 entity.CreateDate = d.createDate;
-                entity.CreatorId = d.nodeUser;
+                entity.CreatorId = d.nodeUser == null ? 0 : d.nodeUser;
                 entity.Id = d.id;
                 entity.Key = d.uniqueID;
                 entity.Level = d.level;

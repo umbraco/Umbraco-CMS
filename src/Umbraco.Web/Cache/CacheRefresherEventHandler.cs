@@ -58,16 +58,18 @@ namespace Umbraco.Web.Cache
                  () => SectionService.Deleted -= SectionService_Deleted);
             Bind(() => SectionService.New += SectionService_New,
                  () => SectionService.New -= SectionService_New);
-
-            // bind to user and user type events
-            Bind(() => UserService.SavedUserType += UserService_SavedUserType,
-                 () => UserService.SavedUserType -= UserService_SavedUserType);
-            Bind(() => UserService.DeletedUserType += UserService_DeletedUserType,
-                 () => UserService.DeletedUserType -= UserService_DeletedUserType);
+            
+            // bind to user and user / user group events
+            Bind(() => UserService.SavedUserGroup += UserService_SavedUserGroup,
+                 () => UserService.SavedUserGroup -= UserService_SavedUserGroup);
+            Bind(() => UserService.DeletedUserGroup += UserService_DeletedUserGroup,
+                 () => UserService.DeletedUserGroup -= UserService_DeletedUserGroup);
             Bind(() => UserService.SavedUser += UserService_SavedUser,
                  () => UserService.SavedUser -= UserService_SavedUser);
             Bind(() => UserService.DeletedUser += UserService_DeletedUser,
                  () => UserService.DeletedUser -= UserService_DeletedUser);
+            Bind(() => UserService.UserGroupPermissionsAssigned += UserService_UserGroupPermissionsAssigned,
+                 () => UserService.UserGroupPermissionsAssigned -= UserService_UserGroupPermissionsAssigned);
 
             // bind to dictionary events
             Bind(() => LocalizationService.DeletedDictionaryItem += LocalizationService_DeletedDictionaryItem,
@@ -113,19 +115,7 @@ namespace Umbraco.Web.Cache
             Bind(() => MemberTypeService.Deleted += MemberTypeService_Deleted,
                  () => MemberTypeService.Deleted -= MemberTypeService_Deleted);
 
-            // bind to permission events
-            // we should wrap legacy permissions so we can get rid of this
-            // fixme - the method names here (PermissionNew...) are not supported
-            // by the event handling mechanism for scopes and deploy, and not sure
-            // how to fix with the generic repository
-            Bind(() => Permission.New += PermissionNew,
-                 () => Permission.New -= PermissionNew);
-            Bind(() => Permission.Updated += PermissionUpdated,
-                 () => Permission.Updated -= PermissionUpdated);
-            Bind(() => Permission.Deleted += PermissionDeleted,
-                 () => Permission.Deleted -= PermissionDeleted);
-            Bind(() => PermissionRepository<IContent>.AssignedPermissions += CacheRefresherEventHandler_AssignedPermissions,
-                 () => PermissionRepository<IContent>.AssignedPermissions -= CacheRefresherEventHandler_AssignedPermissions);
+           
 
             // bind to template events
             Bind(() => FileService.SavedTemplate += FileService_SavedTemplate,
@@ -181,6 +171,11 @@ namespace Umbraco.Web.Cache
                  () => ContentService.Published -= ContentService_Published);
             Bind(() => ContentService.UnPublished += ContentService_UnPublished,
                  () => ContentService.UnPublished -= ContentService_UnPublished);
+
+            Bind(() => ContentService.SavedBlueprint += ContentService_SavedBlueprint,
+                 () => ContentService.SavedBlueprint -= ContentService_SavedBlueprint);
+            Bind(() => ContentService.DeletedBlueprint += ContentService_DeletedBlueprint,
+                 () => ContentService.DeletedBlueprint -= ContentService_DeletedBlueprint);
 
             // bind to public access events
             Bind(() => PublicAccessService.Saved += PublicAccessService_Saved,
@@ -360,13 +355,6 @@ namespace Umbraco.Web.Cache
         /// </remarks>
         static void ContentService_Copied(IContentService sender, CopyEventArgs<IContent> e)
         {
-            //check if permissions have changed
-            var permissionsChanged = ((Content)e.Copy).WasPropertyDirty("PermissionsChanged");
-            if (permissionsChanged)
-            {
-                DistributedCache.Instance.RefreshAllUserPermissionsCache();
-            }
-
             //run the un-published cache refresher since copied content is not published
             DistributedCache.Instance.RefreshUnpublishedPageCache(e.Copy);
         }
@@ -381,6 +369,11 @@ namespace Umbraco.Web.Cache
             DistributedCache.Instance.RemoveUnpublishedPageCache(e.DeletedEntities.ToArray());
         }
 
+        static void ContentService_DeletedBlueprint(IContentService sender, DeleteEventArgs<IContent> e)
+        {
+            DistributedCache.Instance.RemoveUnpublishedPageCache(e.DeletedEntities.ToArray());
+        }
+
         /// <summary>
         /// Handles cache refreshing for when content is saved (not published)
         /// </summary>
@@ -388,33 +381,10 @@ namespace Umbraco.Web.Cache
         /// <param name="e"></param>
         /// <remarks>
         /// When an entity is saved we need to notify other servers about the change in order for the Examine indexes to
-        /// stay up-to-date for unpublished content.
-        ///
-        /// When an entity is created new permissions may be assigned to it based on it's parent, if that is the
-        /// case then we need to clear all user permissions cache.
+        /// stay up-to-date for unpublished content.        
         /// </remarks>
         static void ContentService_Saved(IContentService sender, SaveEventArgs<IContent> e)
         {
-            var clearUserPermissions = false;
-            e.SavedEntities.ForEach(x =>
-            {
-                //check if it is new
-                if (x.IsNewEntity())
-                {
-                    //check if permissions have changed
-                    var permissionsChanged = ((Content)x).WasPropertyDirty("PermissionsChanged");
-                    if (permissionsChanged)
-                    {
-                        clearUserPermissions = true;
-                    }
-                }
-            });
-
-            if (clearUserPermissions)
-            {
-                DistributedCache.Instance.RefreshAllUserPermissionsCache();
-            }
-
             //filter out the entities that have only been saved (not newly published) since
             // newly published ones will be synced with the published page cache refresher
             var unpublished = e.SavedEntities.Where(x => x.JustPublished() == false);
@@ -422,6 +392,10 @@ namespace Umbraco.Web.Cache
             DistributedCache.Instance.RefreshUnpublishedPageCache(unpublished.ToArray());
         }
 
+        static void ContentService_SavedBlueprint(IContentService sender, SaveEventArgs<IContent> e)
+        {
+            DistributedCache.Instance.RefreshUnpublishedPageCache(e.SavedEntities.ToArray());
+        }
 
         #endregion
 
@@ -452,19 +426,6 @@ namespace Umbraco.Web.Cache
         {
             DistributedCache.Instance.RefreshAllApplicationCache();
         }
-        #endregion
-
-        #region UserType event handlers
-        static void UserService_DeletedUserType(IUserService sender, DeleteEventArgs<IUserType> e)
-        {
-            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserTypeCache(x.Id));
-        }
-
-        static void UserService_SavedUserType(IUserService sender, SaveEventArgs<IUserType> e)
-        {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshUserTypeCache(x.Id));
-        }
-
         #endregion
 
         #region Dictionary event handlers
@@ -612,25 +573,14 @@ namespace Umbraco.Web.Cache
 
         #region User/permissions event handlers
 
-        static void CacheRefresherEventHandler_AssignedPermissions(PermissionRepository<IContent> sender, SaveEventArgs<EntityPermission> e)
+        static void UserService_UserGroupPermissionsAssigned(IUserService sender, SaveEventArgs<EntityPermission> e)
         {
-            var userIds = e.SavedEntities.Select(x => x.UserId).Distinct();
-            userIds.ForEach(x => DistributedCache.Instance.RefreshUserPermissionsCache(x));
-        }
-
-        static void PermissionDeleted(UserPermission sender, DeleteEventArgs e)
-        {
-            InvalidateCacheForPermissionsChange(sender);
-        }
-
-        static void PermissionUpdated(UserPermission sender, SaveEventArgs e)
-        {
-            InvalidateCacheForPermissionsChange(sender);
-        }
-
-        static void PermissionNew(UserPermission sender, NewEventArgs e)
-        {
-            InvalidateCacheForPermissionsChange(sender);
+            //TODO: Not sure if we need this yet depends if we start caching permissions
+            //var groupIds = e.SavedEntities.Select(x => x.UserGroupId).Distinct();
+            //foreach (var groupId in groupIds)
+            //{
+            //    DistributedCache.Instance.RefreshUserGroupPermissionsCache(groupId);
+            //}
         }
 
         static void UserService_SavedUser(IUserService sender, SaveEventArgs<IUser> e)
@@ -643,21 +593,16 @@ namespace Umbraco.Web.Cache
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserCache(x.Id));
         }
 
-        private static void InvalidateCacheForPermissionsChange(UserPermission sender)
+        static void UserService_SavedUserGroup(IUserService sender, SaveEventArgs<IUserGroup> e)
         {
-            if (sender.User != null)
-            {
-                DistributedCache.Instance.RefreshUserPermissionsCache(sender.User.Id);
-            }
-            else if (sender.UserId > -1)
-            {
-                DistributedCache.Instance.RefreshUserPermissionsCache(sender.UserId);
-            }
-            else if (sender.NodeIds.Any())
-            {
-                DistributedCache.Instance.RefreshAllUserPermissionsCache();
-            }
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshUserGroupCache(x.Id));
         }
+
+        static void UserService_DeletedUserGroup(IUserService sender, DeleteEventArgs<IUserGroup> e)
+        {
+            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserGroupCache(x.Id));
+        }
+        
 
         #endregion
 
@@ -670,7 +615,10 @@ namespace Umbraco.Web.Cache
         /// <param name="e"></param>
         static void FileService_DeletedTemplate(IFileService sender, DeleteEventArgs<ITemplate> e)
         {
-            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveTemplateCache(x.Id));
+            foreach (var x in e.DeletedEntities)
+            {
+                DistributedCache.Instance.RemoveTemplateCache(x.Id);
+            }
         }
 
         /// <summary>
@@ -680,7 +628,10 @@ namespace Umbraco.Web.Cache
         /// <param name="e"></param>
         static void FileService_SavedTemplate(IFileService sender, SaveEventArgs<ITemplate> e)
         {
-            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshTemplateCache(x.Id));
+            foreach (var x in e.SavedEntities)
+            {
+                DistributedCache.Instance.RefreshTemplateCache(x.Id);
+            }
         }
 
         #endregion
@@ -816,16 +767,14 @@ namespace Umbraco.Web.Cache
                 {
                     var handler = FindHandler(e);
                     if (handler == null) continue;
-
                     handler.Invoke(null, new[] { e.Sender, e.Args });
                 }
             }
             finally
             {
                 if (tempContext != null)
-                    tempContext.Dispose();
+                    tempContext.Dispose(); // nulls the ThreadStatic context
             }
-            
         }
 
         /// <summary>
@@ -856,13 +805,13 @@ namespace Umbraco.Web.Cache
         /// <summary>
         /// Used to cache all found event handlers
         /// </summary>
-        private static readonly ConcurrentDictionary<IEventDefinition, MethodInfo> FoundHandlers = new ConcurrentDictionary<IEventDefinition, MethodInfo>();
+        private static readonly ConcurrentDictionary<string, MethodInfo> FoundHandlers = new ConcurrentDictionary<string, MethodInfo>();
 
         internal static MethodInfo FindHandler(IEventDefinition eventDefinition)
         {
             var name = eventDefinition.Sender.GetType().Name + "_" + eventDefinition.EventName;
 
-            return FoundHandlers.GetOrAdd(eventDefinition, _ => CandidateHandlers.Value.FirstOrDefault(x => x.Name == name));
+            return FoundHandlers.GetOrAdd(name, n => CandidateHandlers.Value.FirstOrDefault(x => x.Name == n));
         }
     }
 }

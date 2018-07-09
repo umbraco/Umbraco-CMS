@@ -48,14 +48,19 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 CreateUmbracoUserData();
             }
 
-            if (tableName.Equals("umbracoUserType"))
+            if (tableName.Equals("umbracoUserGroup"))
             {
-                CreateUmbracoUserTypeData();
+                CreateUmbracoUserGroupData();
             }
 
-            if (tableName.Equals("umbracoUser2app"))
+            if (tableName.Equals("umbracoUser2UserGroup"))
             {
-                CreateUmbracoUser2AppData();
+                CreateUmbracoUser2UserGroupData();
+            }
+
+            if (tableName.Equals("umbracoUserGroup2App"))
+            {
+                CreateUmbracoUserGroup2AppData();
             }
 
             if (tableName.Equals("cmsPropertyTypeGroup"))
@@ -164,27 +169,41 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateUmbracoUserData()
         {
-            _database.Insert("umbracoUser", "id", false, new UserDto { Id = 0, Disabled = false, NoConsole = false, Type = 1, ContentStartId = -1, MediaStartId = -1, UserName = "Administrator", Login = "admin", Password = "default", Email = "", UserLanguage = "en" });
-            //_database.Update<UserDto>("SET id = @IdAfter WHERE id = @IdBefore AND userLogin = @Login", new { IdAfter = 0, IdBefore = 1, Login = "admin" });
+            _database.Insert("umbracoUser", "id", false, new UserDto { Id = 0, Disabled = false, NoConsole = false, UserName = "Administrator", Login = "admin", Password = "default", Email = "", UserLanguage = "en-US", CreateDate = DateTime.Now, UpdateDate = DateTime.Now });
         }
         
-        private void CreateUmbracoUserTypeData()
+        private void CreateUmbracoUserGroupData()
         {
-            _database.Insert("umbracoUserType", "id", false, new UserTypeDto { Id = 1, Alias = "admin", Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F7" });
-            _database.Insert("umbracoUserType", "id", false, new UserTypeDto { Id = 2, Alias = "writer", Name = "Writer", DefaultPermissions = "CAH:F" });
-            _database.Insert("umbracoUserType", "id", false, new UserTypeDto { Id = 3, Alias = "editor", Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:5F" });
-            _database.Insert("umbracoUserType", "id", false, new UserTypeDto { Id = 4, Alias = "translator", Name = "Translator", DefaultPermissions = "AF" });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 1, StartMediaId = -1, StartContentId = -1, Alias = Constants.Security.AdminGroupAlias, Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F7ï", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-medal" });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 2, StartMediaId = -1, StartContentId = -1, Alias = "writer", Name = "Writers", DefaultPermissions = "CAH:F", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-edit" });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 3, StartMediaId = -1, StartContentId = -1, Alias = "editor", Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:5Fï", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-tools" });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 4, StartMediaId = -1, StartContentId = -1, Alias = Constants.Security.TranslatorGroupAlias, Name = "Translators", DefaultPermissions = "AF", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-globe" });
+            _database.Insert("umbracoUserGroup", "id", false, new UserGroupDto { Id = 5, StartMediaId = -1, StartContentId = -1, Alias = Constants.Security.SensitiveDataGroupAlias, Name = "Sensitive data", DefaultPermissions = "", CreateDate = DateTime.Now, UpdateDate = DateTime.Now, Icon = "icon-lock" });
         }
 
-        private void CreateUmbracoUser2AppData()
+        private void CreateUmbracoUser2UserGroupData()
         {
-            _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Content });
-            _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Developer });
-            _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Media });
-            _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Members });
-            _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Settings });
-            _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Users });
-            _database.Insert("umbracoUser2app", "user", false, new User2AppDto { UserId = 0, AppAlias = Constants.Applications.Forms });
+            _database.Insert(new User2UserGroupDto { UserGroupId = 1, UserId = 0 }); //add admin to admins
+            _database.Insert(new User2UserGroupDto { UserGroupId = 5, UserId = 0 }); //add admin to sensitive data
+        }
+
+        private void CreateUmbracoUserGroup2AppData()
+        {
+            _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Content });
+            _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Developer });
+            _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Media });
+            _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Members });
+            _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Settings });            
+            _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Users });
+            _database.Insert(new UserGroup2AppDto { UserGroupId = 1, AppAlias = Constants.Applications.Forms });
+            
+            _database.Insert(new UserGroup2AppDto { UserGroupId = 2, AppAlias = Constants.Applications.Content });
+
+            _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Content });
+            _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Media });
+            _database.Insert(new UserGroup2AppDto { UserGroupId = 3, AppAlias = Constants.Applications.Forms });
+
+            _database.Insert(new UserGroup2AppDto { UserGroupId = 4, AppAlias = Constants.Applications.Translation });
         }
         
         private void CreateCmsPropertyTypeGroupData()

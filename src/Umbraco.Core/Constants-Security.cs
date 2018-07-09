@@ -8,12 +8,19 @@ namespace Umbraco.Core
         public static class Security
         {
 
+            public const string AdminGroupAlias = "admin";
+            public const string SensitiveDataGroupAlias = "sensitiveData";
+            public const string TranslatorGroupAlias = "translator";
+
             public const string BackOfficeAuthenticationType = "UmbracoBackOffice";
             public const string BackOfficeExternalAuthenticationType = "UmbracoExternalCookie";
             public const string BackOfficeExternalCookieName = "UMB_EXTLOGIN";
             public const string BackOfficeTokenAuthenticationType = "UmbracoBackOfficeToken";
             public const string BackOfficeTwoFactorAuthenticationType = "UmbracoTwoFactorCookie";
 
+            internal const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
+            internal const string ForceReAuthFlag = "umbraco-force-auth";
+            
             /// <summary>
             /// The prefix used for external identity providers for their authentication type
             /// </summary>

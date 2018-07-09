@@ -47,11 +47,8 @@
                         completeSave(saved);
                     }, function(err) {
                         //show any notifications
-                        if (angular.isArray(err.data.notifications)) {
-                            for (var i = 0; i < err.data.notifications.length; i++) {
-                                notificationsService.showNotification(err.data.notifications[i]);
-                            }
-                        }
+                        formHelper.showNotifications(err.data);    
+                        
                     });
                 } else {
                     completeSave(saved);
@@ -252,7 +249,7 @@
 
         function init() {
             //we need to load this somewhere, for now its here.
-            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css");
+            assetsService.loadCss("lib/ace-razor-mode/theme/razor_chrome.css", $scope);
 
             if ($routeParams.create) {
 

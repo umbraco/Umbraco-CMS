@@ -1393,15 +1393,25 @@ namespace umbraco
         /// <returns>An XpathNodeIterator containing the current page as Xml.</returns>
         public static XPathNodeIterator GetXmlNodeCurrent()
         {
+            var pageId = "";
+
             try
             {
                 var nav = Umbraco.Web.UmbracoContext.Current.ContentCache.GetXPathNavigator();
-                nav.MoveToId(HttpContext.Current.Items["pageID"].ToString());
+                var pageIdItem = HttpContext.Current.Items["pageID"];
+
+                if (pageIdItem == null)
+                {
+                    throw new NullReferenceException("pageID not found in the current HTTP context");
+                }
+
+                pageId = pageIdItem.ToString();
+                nav.MoveToId(pageId);
                 return nav.Select(".");
             }
             catch (Exception ex)
             {
-                LogHelper.Error<library>("Could not retrieve current xml node", ex);
+                LogHelper.Error<library>(string.Concat("Could not retrieve current xml node for page Id ",pageId), ex);
             }
 
             XmlDocument xd = new XmlDocument();
@@ -1604,6 +1614,7 @@ namespace umbraco
         {
             try
             {
+                var mailSender = new EmailSender();
                 using (var mail = new MailMessage())
                 {
                     mail.From = new MailAddress(fromMail.Trim());
@@ -1612,8 +1623,7 @@ namespace umbraco
                     mail.Subject = subject;
                     mail.IsBodyHtml = isHtml;
                     mail.Body = body;
-                    using (var smtpClient = new SmtpClient())
-                        smtpClient.Send(mail);
+                    mailSender.Send(mail);
                 }
             }
             catch (Exception ee)

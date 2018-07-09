@@ -55,8 +55,10 @@ namespace Umbraco.Core.Cache
         [Obsolete("This is no longer used and will be removed from the codebase in the future")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public const string UserCacheKey = "UmbracoUser";
-        
-        public const string UserPermissionsCacheKey = "UmbracoUserPermissions";
+
+        [Obsolete("This is no longer used and will be removed from the codebase in the future")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public const string UserGroupPermissionsCacheKey = "UmbracoUserGroupPermissions";
 
         [UmbracoWillObsolete("This cache key is only used for legacy business logic caching, remove in v8")]
         public const string ContentTypeCacheKey = "UmbracoContentType";

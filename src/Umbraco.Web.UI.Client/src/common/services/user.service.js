@@ -1,10 +1,10 @@
 angular.module('umbraco.services')
-    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, dialogService, $timeout, angularHelper, $http) {
+    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, assetsService, dialogService, $timeout, angularHelper, $http, javascriptLibraryService) {
 
         var currentUser = null;
         var lastUserId = null;
         var loginDialog = null;
-        
+
         //this tracks the last date/time that the user's remainingAuthSeconds was updated from the server
         // this is used so that we know when to go and get the user's remaining seconds directly.
         var lastServerTimeoutSet = null;
@@ -26,7 +26,7 @@ angular.module('umbraco.services')
                     }
                 });
             }
-        }          
+        }
 
         function onLoginDialogClose(success) {
             loginDialog = null;
@@ -183,7 +183,7 @@ angular.module('umbraco.services')
             /** Internal method to display the login dialog */
             _showLoginDialog: function () {
                 openLoginDialog();
-            },            
+            },
             /** Returns a promise, sends a request to the server to check if the current cookie is authorized  */
             isAuthenticated: function () {
                 //if we've got a current user then just return true
@@ -201,12 +201,12 @@ angular.module('umbraco.services')
                 return authResource.performLogin(login, password)
                     .then(this.setAuthenticationSuccessful);
             },
-            setAuthenticationSuccessful:function (data) {
+            setAuthenticationSuccessful: function (data) {
 
                 //when it's successful, return the user data
                 setCurrentUser(data);
 
-                        var result = { user: data, authenticated: true, lastUserId: lastUserId, loginType: "credentials" };
+                var result = { user: data, authenticated: true, lastUserId: lastUserId, loginType: "credentials" };
 
                 //broadcast a global event
                 eventsService.emit("app.authenticated", result);
@@ -218,11 +218,31 @@ angular.module('umbraco.services')
             logout: function () {
 
                 return authResource.performLogout()
-                    .then(function(data) {
+                    .then(function (data) {
                         userAuthExpired();
                         //done!
                         return null;
                     });
+            },
+
+            /** Refreshes the current user data with the data stored for the user on the server and returns it */
+            refreshCurrentUser: function () {
+                var deferred = $q.defer();
+
+                authResource.getCurrentUser()
+                    .then(function (data) {
+
+                        var result = { user: data, authenticated: true, lastUserId: lastUserId, loginType: "implicit" };
+
+                        setCurrentUser(data);
+
+                        deferred.resolve(currentUser);
+                    }, function () {
+                        //it failed, so they are not logged in
+                        deferred.reject();
+                    });
+
+                return deferred.promise;
             },
 
             /** Returns the current user object in a promise  */
@@ -235,16 +255,6 @@ angular.module('umbraco.services')
 
                             var result = { user: data, authenticated: true, lastUserId: lastUserId, loginType: "implicit" };
 
-                            //TODO: This is a mega backwards compatibility hack... These variables SHOULD NOT exist in the server variables
-                            // since they are not supposed to be dynamic but I accidentally added them there in 7.1.5 IIRC so some people might
-                            // now be relying on this :(
-                            if (Umbraco && Umbraco.Sys && Umbraco.Sys.ServerVariables) {
-                                Umbraco.Sys.ServerVariables["security"] = {
-                                    startContentId: data.startContentId,
-                                    startMediaId: data.startMediaId
-                                };
-                            }
-
                             if (args && args.broadcastEvent) {
                                 //broadcast a global event, will inform listening controllers to load in the user specific data
                                 eventsService.emit("app.authenticated", result);
@@ -253,6 +263,9 @@ angular.module('umbraco.services')
                             setCurrentUser(data);
 
                             deferred.resolve(currentUser);
+                        }, function () {
+                            //it failed, so they are not logged in
+                            deferred.reject();
                         });
 
                 }
@@ -261,6 +274,46 @@ angular.module('umbraco.services')
                 }
 
                 return deferred.promise;
+            },
+
+            /** Loads the Moment.js Locale for the current user. */
+            loadMomentLocaleForCurrentUser: function () {
+
+                function loadLocales(currentUser, supportedLocales) {
+                    var locale = currentUser.locale.toLowerCase();
+                    if (locale !== 'en-us') {
+                        var localeUrls = [];
+                        if (supportedLocales.indexOf(locale + '.js') > -1) {
+                            localeUrls.push('lib/moment/' + locale + '.js');
+                        }
+                        if (locale.indexOf('-') > -1) {
+                            var majorLocale = locale.split('-')[0] + '.js';
+                            if (supportedLocales.indexOf(majorLocale) > -1) {
+                                localeUrls.push('lib/moment/' + majorLocale);
+                            }
+                        }
+                        return assetsService.load(localeUrls, $rootScope);
+                    }
+                    else {
+                        //return a noop promise
+                        var deferred = $q.defer();
+                        var promise = deferred.promise;
+                        deferred.resolve(true);
+                        return promise;
+                    }
+                }
+
+                var promises = {
+                    currentUser: this.getCurrentUser(),
+                    supportedLocales: javascriptLibraryService.getSupportedLocalesForMoment()
+                }
+
+                return $q.all(promises).then(function (values) {
+                    return loadLocales(values.currentUser, values.supportedLocales);
+                });
+                
+                
+
             },
 
             /** Called whenever a server request is made that contains a x-umb-user-seconds response header for which we can update the user's remaining timeout seconds */

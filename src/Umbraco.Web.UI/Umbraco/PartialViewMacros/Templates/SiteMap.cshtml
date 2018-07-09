@@ -1,13 +1,15 @@
+@using Umbraco.Core.Models
+@using Umbraco.Web
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
 @*
-    This snippet makes a list of links of all visible pages of the site, as nested unordered html lists.
+    This snippet makes a list of links of all visible pages of the site, as nested unordered HTML lists.
 
     How it works:
     - It uses a custom Razor helper called Traverse() to select and display the markup and links.
 *@
 
-@{ var selection = CurrentPage.Site(); }
+@{ var selection = Model.Content.Site(); }
 
 <div class="sitemap">
     @* Render the sitemap by passing the root node to the traverse helper, below *@
@@ -15,17 +17,17 @@
 </div>
 
 
-@* Helper method to travers through all descendants *@
-@helper Traverse(dynamic node)
+@* Helper method to traverse through all descendants *@
+@helper Traverse(IPublishedContent node)
 {
     @* Update the level to reflect how deep you want the sitemap to go *@
-    var maxLevelForSitemap = 4;
+    const int maxLevelForSitemap = 4;
 
     @* Select visible children *@
-    var selection = node.Children.Where("Visible").Where("Level <= " + maxLevelForSitemap);
+    var selection = node.Children.Where(x => x.IsVisible() && x.Level <= maxLevelForSitemap).ToArray();
 
     @* If any items are returned, render a list *@
-    if (selection.Any())
+    if (selection.Length > 0)
     {
         <ul>
             @foreach (var item in selection)

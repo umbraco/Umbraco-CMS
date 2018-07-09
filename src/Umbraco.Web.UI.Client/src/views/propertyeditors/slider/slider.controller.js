@@ -92,7 +92,6 @@
         $scope.model.config.ticksPositions = _.map($scope.model.config.ticksPositions.split(','), function (item) {
             return parseInt(item.trim());
         });
-        console.log($scope.model.config.ticksPositions);
     }
 
     if (!$scope.model.config.ticksLabels) {
@@ -127,7 +126,7 @@
                 var i2 = parseFloat($scope.model.config.initVal2);
                 sliderVal = [
                     isNaN(i1) ? $scope.model.config.minVal : (i1 >= $scope.model.config.minVal ? i1 : $scope.model.config.minVal),
-                    isNaN(i2) ? $scope.model.config.maxVal : (i2 > i1 ? (i2 <= $scope.model.config.maxVal ? i2 : $scope.model.config.maxVal) : $scope.model.config.maxVal)
+                    isNaN(i2) ? $scope.model.config.maxVal : (i2 >= i1 ? (i2 <= $scope.model.config.maxVal ? i2 : $scope.model.config.maxVal) : $scope.model.config.maxVal)
                 ];
             }
             else {
@@ -212,7 +211,7 @@
         });
 
     //load the separate css for the editor to avoid it blocking our js loading
-    assetsService.loadCss("lib/slider/bootstrap-slider.css");
-    assetsService.loadCss("lib/slider/bootstrap-slider-custom.css");
+    assetsService.loadCss("lib/slider/bootstrap-slider.css", $scope);
+    assetsService.loadCss("lib/slider/bootstrap-slider-custom.css", $scope);
 }
 angular.module("umbraco").controller("Umbraco.PropertyEditors.SliderController", sliderController);

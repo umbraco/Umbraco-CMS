@@ -10,9 +10,7 @@ using System.Web.Http;
 using System.Xml;
 using umbraco;
 using umbraco.cms.businesslogic.packager;
-using umbraco.cms.businesslogic.packager.repositories;
 using umbraco.cms.presentation.Trees;
-using umbraco.presentation.developer.packages;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -543,6 +541,26 @@ namespace Umbraco.Web.Editors
             var ins = new global::umbraco.cms.businesslogic.packager.Installer(Security.CurrentUser.Id);
             ins.LoadConfig(IOHelper.MapPath(model.TemporaryDirectoryPath));
             ins.InstallFiles(model.Id, IOHelper.MapPath(model.TemporaryDirectoryPath));
+
+            //set a restarting marker and reset the app pool
+            ApplicationContext.RestartApplicationPool(Request.TryGetHttpContext().Result);
+            
+            model.IsRestarting = true;
+
+            return model;
+        }
+
+        [HttpPost]
+        public PackageInstallModel CheckRestart(PackageInstallModel model)
+        {
+            if (model.IsRestarting == false) return model;
+
+            //check for the key, if it's not there we're are restarted
+            if (Request.TryGetHttpContext().Result.Application.AllKeys.Contains("AppPoolRestarting") == false)
+            {
+                //reset it
+                model.IsRestarting = false;
+            }
             return model;
         }
 

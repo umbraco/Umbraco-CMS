@@ -27,22 +27,18 @@
     <key alias="unpublish">Depubliceren</key>
     <key alias="refreshNode">Nodes opnieuw inladen</key>
     <key alias="republish">Herpubliceer de site</key>
-	<key alias="SetPermissionsForThePage">Stel rechten voor pagina %0% in</key>
-    <key alias="chooseWhereToMove">Waarheen verplaatsen/</key>
-    <key alias="toInTheTreeStructureBelow">Naar de onderstaande boomstructuur</key>
-	<key alias="restore" version="7.3.0">Herstellen</key>
+    <key alias="SetPermissionsForThePage">Stel rechten voor pagina %0% in</key>
+    <key alias="restore" version="7.3.0">Herstellen</key>
     <key alias="rights">Rechten</key>
     <key alias="rollback">Vorige versies</key>
     <key alias="sendtopublish">Klaar voor publicatie</key>
     <key alias="sendToTranslate">Klaar voor vertalen</key>
     <key alias="sort">Sorteren</key>
-    <key alias="toPublish">Klaar voor publicatie</key>
     <key alias="translate">Vertalen</key>
     <key alias="update">Bijwerken</key>
-    <key alias="defaultValue">Standaardwaarde</key>
   </area>
   <area alias="assignDomain">
-    <key alias="permissionDenied">Permission denied.</key>
+    <key alias="permissionDenied">Toegang geweigerd.</key>
     <key alias="addNew">Nieuw domein toevoegen</key>
     <key alias="remove">verwijderen</key>
     <key alias="invalidNode">Ongeldige node.</key>
@@ -172,10 +168,17 @@
     <key alias="urls">Link naar het document</key>
     <key alias="memberof">Lid van groep(en)</key>
     <key alias="notmemberof">Geen lid van groep(en)</key>    
-    <key alias="childItems" version="7.0">Kinderen</key>
+    <key alias="childItems" version="7.0">Subitems</key>
     <key alias="target" version="7.0">Doel</key>
 	<key alias="scheduledPublishServerTime">Dit betekend de volgende tijd op de server:</key>
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Wat houd dit in?</a>]]></key>
+    <key alias="nestedContentDeleteItem">Ben je er zeker van dat je dit item wilt verwijderen?</key>
+    <key alias="nestedContentEditorNotSupported">Eigenschap %0% gebruikt editor %1% welke niet wordt ondersteund door Nested Content.</key>
+    <key alias="addTextBox">Voeg nog een tekstvak toe</key>
+    <key alias="removeTextBox">Verwijder dit tekstvak</key>
+    <key alias="contentRoot">Content root</key>
+    <key alias="isSensitiveValue">Deze waarde is verborgen. Indien u toegang nodig heeft om deze waarde te bekijken, contacteer dan uw website administrator.</key>
+    <key alias="isSensitiveValue_short">Deze waarde is verborgen</key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Klik om te uploaden</key>
@@ -189,6 +192,10 @@
   <area alias="member">
     <key alias="createNewMember">Maak nieuwe member aan</key>
     <key alias="allMembers">Alle Members</key>
+  </area>
+  <area alias="member">
+    <key alias="createNewMember">Nieuw lid aanmaken</key>
+    <key alias="allMembers">Alle Leden</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Waar wil je de nieuwe %0% aanmaken?</key>
@@ -214,6 +221,7 @@
     <key alias="discardChanges">Negeer wijzigingen</key>
     <key alias="unsavedChanges">Wijzigingen niet opgeslagen</key>
     <key alias="unsavedChangesWarning">Weet je zeker dat deze pagina wilt verlaten? - er zijn onopgeslagen wijzigingen</key>
+    <key alias="confirmUnpublish">Depubliceren zal deze pagina en alle onderliggend paginas verwijderen van de site.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
@@ -244,6 +252,8 @@
     <key alias="copiedItemOfItems">item %0% van de %1% gekopieerd</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Link Titel</key>
+    <key alias="urlLinkPicker">Link</key>
     <key alias="anchorInsert">Naam</key>
     <key alias="assignDomain">Beheer domeinnamen</key>
     <key alias="closeThisWindow">Sluit dit venster</key>
@@ -450,7 +460,7 @@
     <key alias="email">Email</key>
     <key alias="error">Fout</key>
     <key alias="findDocument">Vind</key>
-    <key alias="height">Hogte</key>
+    <key alias="height">Hoogte</key>
     <key alias="help">Help</key>
     <key alias="icon">Icoon</key>
     <key alias="import">Import</key>
@@ -581,7 +591,6 @@
     <key alias="defaultUserDisabled"><![CDATA[<strong>De default gebruiker is geblokkeerd of heeft geen toegang tot Umbraco!</strong></p><p>Geen verdere actie noodzakelijk. Klik <b>Volgende</b> om verder te gaan.]]></key>
     <key alias="defaultUserPassChanged"><![CDATA[<strong>Het wachtwoord van de default gebruiker is sinds installatie met succes veranderd.</strong></p><p>Geen verdere actie noodzakelijk. Klik <strong>Volgende</strong> om verder te gaan.]]></key>
     <key alias="defaultUserPasswordChanged">Het wachtwoord is veranderd!</key>
-    <key alias="defaultUserText"><![CDATA[<p> Umbraco maakt een default gebruiker aan met login <strong>('admin')</strong> and wachtwoord <strong>('default')</strong>. Het is <strong>belangrijk</strong> dat dit wachtwoord wordt veranderd in iets unieks. </p> <p> Deze stap controleert het password van de default gebruiker en adviseert of het veranderd dient te worden. </p>]]></key>
     <key alias="greatStart">Neem een jumpstart en bekijk onze introductie videos</key>
     <key alias="licenseText"><![CDATA[Door op de 'Volgende' knop te klikken (of door de UmbracoConfigurationStatus in web.config te veranderen), accepteer je de licentie voor deze software zoals in het onderstaande kader is te lezen. Deze Umbraco distributie bevat twee verschillende licensies: de open-source MIT licensie voor het framework en de Umbraco freeware licensie die de gebruikersinterface behelst.
 
@@ -730,7 +739,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="notAllowedByContentType">De huidige node is niet toegestaan onder de geselecteerde node vanwege het node type</key>
     <key alias="notAllowedByPath">De huidige node kan niet naar een van zijn subpagina’s worden verplaatst.</key>
     <key alias="notAllowedAtRoot">De huidige node kan niet worden gebruikt op root-niveau</key>
-    <key alias="notValid">Deze actie is niet toegestaan omdat je onvoldoende rechten hebt op 1 of meer kinderen.</key>
+    <key alias="notValid">Deze actie is niet toegestaan omdat je onvoldoende rechten hebt op 1 of meer subitems.</key>
     <key alias="relateToOriginal">Relateer gekopieerde items aan het origineel</key>
   </area>
   <area alias="notifications">
@@ -827,7 +836,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="removeSpecialFormattering">Plakken, en verwijder de opmaak (aanbevolen)</key>
   </area>
   <area alias="publicAccess">
-    <key alias="paAdvanced">Geavanceerd: Beveilig door de Member Groups te seecteren die toegang hebben op de pagina</key>
+    <key alias="paAdvanced">Geavanceerd: Beveilig door de Member Groups te selecteren die toegang hebben op de pagina</key>
     <key alias="paAdvancedHelp"><![CDATA[Als je toegang tot pagina's wilt regelen met behulp van role-based authenticatie,<br /> gebruik makend van Umbraco's member groups.]]></key>
     <key alias="paAdvancedNoGroups">Je moet eerst een membergroup maken voordat je kunt werken met role-based authentication.</key>
     <key alias="paErrorPage">Error Pagina</key>
@@ -862,14 +871,14 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
 		<key alias="contentPublishedFailedByParent"><![CDATA[
       %0% kon niet gepubliceerd worden, omdat de parent pagina niet gepubliceerd is.
     ]]></key>
-    <key alias="includeUnpublished">Inclusief ongepubliceerde kinderen</key>
+    <key alias="includeUnpublished">Inclusief ongepubliceerde subitems</key>
     <key alias="inProgress">Publicatie in uitvoering - even geduld...</key>
     <key alias="inProgressCounter">%0% van %1% pagina’s zijn gepubliceerd...</key>
     <key alias="nodePublish">%0% is gepubliceerd</key>
     <key alias="nodePublishAll">%0% en onderliggende pagina’s zijn gepubliceerd</key>
-    <key alias="publishAll">Publiceer %0% en alle kinderen</key>
+    <key alias="publishAll">Publiceer %0% en alle subitems</key>
     <key alias="publishHelp"><![CDATA[Klik <em>ok</em> om <strong>%0%</strong> te publiceren en de wijzigingen zichtbaar te maken voor bezoekers.<br/><br />
-      Je kunt deze pagina publiceren en alle onderliggende sub-pagina's door <em>publiceer alle kinderen</em> aan te vinken hieronder.
+      Je kunt deze pagina publiceren en alle onderliggende sub-pagina's door <em>publiceer alle subitems</em> aan te vinken hieronder.
       ]]></key>
   </area>
   <area alias="colorpicker">
@@ -948,7 +957,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Sorteren gereed.</key>
     <key alias="sortHelp">Sleep de pagina's omhoog of omlaag om de volgorde te veranderen. Of klik op de kolom-header om alle pagina's daarop te sorteren.</key>
-    <key alias="sortPleaseWait"><![CDATA[Een ogenblik geduld. Paginas worden gesorteerd, dit kan even duren.<br/> <br/> Sluit dit venster niet tijdens het sorteren]]></key>
+    <key alias="sortPleaseWait"><![CDATA[Een ogenblik geduld. Paginas worden gesorteerd, dit kan even duren.]]></key>
   </area>
   <area alias="speechBubbles">
 	<key alias="validationFailedHeader">Validatie</key>
@@ -1038,6 +1047,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="template">Sjabloon</key>
   </area>
   <area alias="grid">
+    <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>  
     <key alias="insertControl">Item toevoegen</key>
     <key alias="chooseLayout">Kies de indeling</key>
     <key alias="addRows">Kies een indeling voor deze pagina om content toe te kunnen voegen</key>
@@ -1076,7 +1091,9 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
 
     <key alias="allowAllEditors">Alle editors toelaten</key>
     <key alias="allowAllRowConfigurations">Alle rijconfiguraties toelaten</key>
-	<key alias="setAsDefault">Instellen als standaard</key>
+    <key alias="maxItems">Maximale artikelen</key>
+    <key alias="maxItemsDescription">Laat dit leeg of is ingesteld op -1 voor onbeperkt</key>
+	  <key alias="setAsDefault">Instellen als standaard</key>
     <key alias="chooseExtra">Kies extra</key>
     <key alias="chooseDefault">Kies standaard</key>
     <key alias="areAdded">zijn toegevoegd</key>
@@ -1137,7 +1154,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="thisEditorUpdateSettings">die gebruik maken van deze editor zullen geupdate worden met deze nieuwe instellingen</key>
 
     <key alias="memberCanEdit">Lid kan bewerken</key>
+    <key alias="memberCanEditDescription">Toestaan dat deze eigenschap kan worden gewijzigd door het lid op zijn profiel pagina.</key>
+    <key alias="isSensitiveData">Omvat gevoelige gegevens</key>
+    <key alias="isSensitiveDataDescription">Verberg deze eigenschap voor de content editor die geen toegang heeft tot het bekijken van gevoelige informatie.</key>
     <key alias="showOnMemberProfile">Toon in het profiel van leden</key>
+    <key alias="showOnMemberProfileDescription">Toelaten dat deze eigenschap wordt getoond op de profiel pagina van het lid.</key>
+    
     <key alias="tabHasNoSortOrder">tab heeft geen sorteervolgorde</key>
   </area>
 
@@ -1169,8 +1191,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="postContent">Invoegen na veld</key>
     <key alias="preContent">Invoegen voor veld</key>
     <key alias="recursive">Recursief</key>
-    <key alias="removeParagraph">Verwijder paragraaf tags</key>
-    <key alias="removeParagraphHelp"><![CDATA[Alle <P> tags aan het begin en einde van de tekst worden verwijderd]]></key>
     <key alias="standardFields">Standaard velden</key>
     <key alias="uppercase">Hoofdletters</key>
     <key alias="urlEncode">URL-encoderen</key>
@@ -1295,15 +1315,13 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="passwordInvalid">Ongeldig huidig wachtwoord</key>
     <key alias="passwordIsDifferent">Beide wachtwoorden waren niet hetzelfde. Probeer opnieuw!</key>
     <key alias="passwordMismatch">Beide wachtwoorden zijn niet hetzelfde!</key>
-    <key alias="permissionReplaceChildren">Vervang rechten op de subnodes</key>
+    <key alias="permissionReplaceChildren">Vervang rechten op de subitems</key>
     <key alias="permissionSelectedPages">U bent momenteel rechten aan het aanpassen voor volgende pagina's:</key>
     <key alias="permissionSelectPages">Selecteer pagina's om hun rechten aan te passen</key>
-    <key alias="searchAllChildren">Doorzoek alle subnodes</key>
+    <key alias="searchAllChildren">Doorzoek alle subitems</key>
     <key alias="startnode">Startnode in Content</key>
     <key alias="username">Gebruikersnaam</key>
     <key alias="userPermissions">Gebruikersrechten</key>
-    <key alias="usertype">Gebruikerstype</key>
-    <key alias="userTypes">Gebruikerstypes</key>
     <key alias="writer">Auteur</key>
 	<key alias="translator">Vertaler</key>
     <key alias="change">Wijzig</key>
@@ -1363,7 +1381,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
 
     <key alias="httpsCheckValidCertificate">Het cerficaat van de website is ongeldig.</key>
     <key alias="httpsCheckInvalidCertificate">Cerficaat validatie foutmelding: '%0%'</key>
-    <key alias="httpsCheckInvalidUrl">Fout bij pingen van URL %0% - '%1%'</key>
+    <key alias="healthCheckInvalidUrl">Fout bij pingen van URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">De site wordt momenteel %0% bekeken via HTTPS.</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">De appSetting 'umbracoUseSSL' in web.config staat op 'false'. Indien HTTPS gebruikt wordt moet deze op 'true' staan.</key>
     <key alias="httpsCheckConfigurationCheckResult">De appSetting 'umbracoUseSSL' in web.config is ingesteld op '%0%'. Cookies zijn %1% ingesteld als secure.</key>
@@ -1374,10 +1392,10 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="httpsCheckEnableHttpsDescription">Zet in de appSettings van de web.config de umbracoSSL instelling op 'true'.</key>
     <key alias="httpsCheckEnableHttpsSuccess">De appSetting 'umbracoUseSSL' is nu ingesteld op 'true', cookies zullen als 'secure' worden aangemerkt.</key>
 
-    <key alias="rectifyButton">Fix</key>
-    <key alias="cannotRectifyShouldNotEqual">Cannot fix a check with a value comparison type of 'ShouldNotEqual'.</key>
-    <key alias="cannotRectifyShouldEqualWithValue">Cannot fix a check with a value comparison type of 'ShouldEqual' with a provided value.</key>
-    <key alias="valueToRectifyNotProvided">Value to fix check not provided.</key>
+    <key alias="rectifyButton">Herstellen</key>
+    <key alias="cannotRectifyShouldNotEqual">Kan een controle met vergelijkingstype 'ShouldNotEqual' niet herstellen.</key>
+    <key alias="cannotRectifyShouldEqualWithValue">Kan een controle met vergelijkingstype 'ShouldNotEqual' en gedefinieerde waarde niet herstellen.</key>
+    <key alias="valueToRectifyNotProvided">Waarde om te herstellen niet gedefinieerd.</key>
 
     <key alias="compilationDebugCheckSuccessMessage">Debug compiliate mode staat uit.</key>
     <key alias="compilationDebugCheckErrorMessage">Debug compiliate mode staat momenteel aan. Wij raden aan deze instelling uit te zetten voor livegang.</key>
@@ -1403,10 +1421,10 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
 
     <key alias="clickJackingCheckHeaderFound"><![CDATA[De <strong>X-Frame-Options</strong> header of meta-tag om IFRAMEing door andere websites te voorkomen is aanwezig!]]></key>
     <key alias="clickJackingCheckHeaderNotFound"><![CDATA[De <strong>X-Frame-Options</strong> header of meta-tag om IFRAMEing door andere websites te voorkomen is NIET aanwezig.]]></key>
-    <key alias="clickJackingSetHeaderInConfig">Voorkom IFRAMEing via web.config</key>
+    <key alias="setHeaderInConfig">Voorkom IFRAMEing via web.config</key>
     <key alias="clickJackingSetHeaderInConfigDescription">Voegt de instelling toe aan de httpProtocol/customHeaders section in web.config om IFRAMEing door andere websites te voorkomen.</key>
     <key alias="clickJackingSetHeaderInConfigSuccess">De instelling om IFRAMEing door andere websites te voorkomen is toegevoegd aan de web.config!</key>
-    <key alias="clickJackingSetHeaderInConfigError">Web.config kon niet aangepast worden door error: %0%</key>
+    <key alias="setHeaderInConfigError">Web.config kon niet aangepast worden door error: %0%</key>
 
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found

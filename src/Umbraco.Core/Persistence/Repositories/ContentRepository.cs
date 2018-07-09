@@ -28,9 +28,10 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
         private readonly ITagRepository _tagRepository;
-        private readonly CacheHelper _cacheHelper;
         private readonly ContentPreviewRepository<IContent> _contentPreviewRepository;
         private readonly ContentXmlRepository<IContent> _contentXmlRepository;
+        private readonly PermissionRepository<IContent> _permissionRepository;
+        private readonly ContentByGuidReadRepository _contentByGuidReadRepository;
 
         public ContentRepository(IScopeUnitOfWork work, CacheHelper cacheHelper, ILogger logger, ISqlSyntaxProvider syntaxProvider, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagRepository tagRepository, IContentSection contentSection)
             : base(work, cacheHelper, logger, syntaxProvider, contentSection)
@@ -41,10 +42,10 @@ namespace Umbraco.Core.Persistence.Repositories
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
             _tagRepository = tagRepository;
-            _cacheHelper = cacheHelper;
             _contentPreviewRepository = new ContentPreviewRepository<IContent>(work, CacheHelper.NoCache, logger, syntaxProvider);
             _contentXmlRepository = new ContentXmlRepository<IContent>(work, CacheHelper.NoCache, logger, syntaxProvider);
-
+            _permissionRepository = new PermissionRepository<IContent>(UnitOfWork, cacheHelper, Logger, SqlSyntax);
+            _contentByGuidReadRepository = new ContentByGuidReadRepository(this, work, cacheHelper, logger, syntaxProvider);
             EnsureUniqueNaming = true;
         }
 
@@ -133,7 +134,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<ContentDto>(SqlSyntax)
                 .On<ContentVersionDto, ContentDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
                 .InnerJoin<NodeDto>(SqlSyntax)
-                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId);
+                .On<ContentDto, NodeDto>(SqlSyntax, left => left.NodeId, right => right.NodeId)
+                .InnerJoin<ContentTypeDto>()
+                .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId);
             //TODO: IF we want to enable querying on content type information this will need to be joined
             //.InnerJoin<ContentTypeDto>(SqlSyntax)
             //.On<ContentDto, ContentTypeDto>(SqlSyntax, left => left.ContentTypeId, right => right.NodeId, SqlSyntax);
@@ -182,7 +185,9 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM umbracoRedirectUrl WHERE contentKey IN (SELECT uniqueID FROM umbracoNode WHERE id = @Id)",
                                "DELETE FROM cmsTask WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
-                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUserGroup2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUserStartNode WHERE startNode = @Id",
+                               "UPDATE umbracoUserGroup SET startContentId = NULL WHERE startContentId = @Id",
                                "DELETE FROM umbracoRelation WHERE parentId = @Id",
                                "DELETE FROM umbracoRelation WHERE childId = @Id",
                                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
@@ -194,14 +199,14 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM cmsContentXml WHERE nodeId = @Id",
                                "DELETE FROM cmsContent WHERE nodeId = @Id",
                                "DELETE FROM umbracoAccess WHERE nodeId = @Id",
-                               "DELETE FROM umbracoNode WHERE id = @Id"
+                               "DELETE FROM umbracoNode WHERE id = @Id"                               
                            };
             return list;
         }
 
         protected override Guid NodeObjectTypeId
         {
-            get { return new Guid(Constants.ObjectTypes.Document); }
+            get { return Constants.ObjectTypes.DocumentGuid; }
         }
 
         #endregion
@@ -267,7 +272,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //now delete the items that shouldn't be there
             var sqlAllIds = translate(0, GetBaseQuery(BaseQueryType.Ids));
             var allContentIds = Database.Fetch<int>(sqlAllIds);
-            var docObjectType = Guid.Parse(Constants.ObjectTypes.Document);
+            var docObjectType = NodeObjectTypeId;
             var xmlIdsQuery = new Sql()
                 .Select("DISTINCT cmsContentXml.nodeId")
                 .From<ContentXmlDto>(SqlSyntax)
@@ -435,7 +440,24 @@ namespace Umbraco.Core.Persistence.Repositories
             nodeDto.Path = parent.Path;
             nodeDto.Level = short.Parse(level.ToString(CultureInfo.InvariantCulture));
             nodeDto.SortOrder = sortOrder;
-            var o = Database.IsNew(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+
+            // note:
+            // there used to be a check on Database.IsNew(nodeDto) here to either Insert or Update,
+            // but I cannot figure out what was the point, as the node should obviously be new if
+            // we reach that point - removed.
+
+            // see if there's a reserved identifier for this unique id
+            var sql = new Sql("SELECT id FROM umbracoNode WHERE uniqueID=@0 AND nodeObjectType=@1", nodeDto.UniqueId, Constants.ObjectTypes.IdReservationGuid);
+            var id = Database.ExecuteScalar<int>(sql);
+            if (id > 0)
+            {
+                nodeDto.NodeId = id;
+                Database.Update(nodeDto);
+            }
+            else
+            {
+                Database.Insert(nodeDto);
+            }
 
             //Update with new correct path
             nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
@@ -446,26 +468,7 @@ namespace Umbraco.Core.Persistence.Repositories
             entity.Id = nodeDto.NodeId; //Set Id on entity to ensure an Id is set
             entity.Path = nodeDto.Path;
             entity.SortOrder = sortOrder;
-            entity.Level = level;
-
-            //Assign the same permissions to it as the parent node
-            // http://issues.umbraco.org/issue/U4-2161
-            var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            var parentPermissions = permissionsRepo.GetPermissionsForEntity(entity.ParentId).ToArray();
-            //if there are parent permissions then assign them, otherwise leave null and permissions will become the
-            // user's default permissions.
-            if (parentPermissions.Any())
-            {
-                var userPermissions = (
-                    from perm in parentPermissions
-                    from p in perm.AssignedPermissions
-                    select new EntityPermissionSet.UserPermission(perm.UserId, p)).ToList();
-
-                permissionsRepo.ReplaceEntityPermissions(new EntityPermissionSet(entity.Id, userPermissions));
-                //flag the entity's permissions changed flag so we can track those changes.
-                //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
-                ((Content)entity).PermissionsChanged = true;
-            }
+            entity.Level = level;            
 
             //Create the Content specific data - cmsContent
             var contentDto = dto.ContentVersionDto.ContentDto;
@@ -746,6 +749,18 @@ namespace Umbraco.Core.Persistence.Repositories
             return ProcessQuery(translate(translatorFull), new PagingSqlQuery(translate(translatorIds)), true);
         }
 
+        public IEnumerable<IContent> GetBlueprints(IQuery<IContent> query)
+        {
+            Func<SqlTranslator<IContent>, Sql> translate = t => t.Translate();
+            
+            var sqlFull = GetBaseQuery(BaseQueryType.FullMultiple);
+            var translatorFull = new SqlTranslator<IContent>(sqlFull, query);
+            var sqlIds = GetBaseQuery(BaseQueryType.Ids);
+            var translatorIds = new SqlTranslator<IContent>(sqlIds, query);
+
+            return ProcessQuery(translate(translatorFull), new PagingSqlQuery(translate(translatorIds)), true);
+        }
+
         /// <summary>
         /// This builds the Xml document used for the XML cache
         /// </summary>
@@ -789,7 +804,7 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             XmlElement last = null;
 
             //NOTE: Query creates a reader - does not load all into memory
-            foreach (var row in Database.Query<dynamic>(sql, new { type = new Guid(Constants.ObjectTypes.Document) }))
+            foreach (var row in Database.Query<dynamic>(sql, new { type = NodeObjectTypeId }))
             {
                 string parentId = ((int)row.parentID).ToInvariantString();
                 string xml = row.xml;
@@ -820,17 +835,26 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
 
         }
 
-        public int CountPublished()
+        public int CountPublished(string contentTypeAlias = null)
         {
-            var sql = GetBaseQuery(true).Where<NodeDto>(x => x.Trashed == false)
+            if (contentTypeAlias.IsNullOrWhiteSpace())
+            {
+                var sql = GetBaseQuery(true).Where<NodeDto>(x => x.Trashed == false)
                 .Where<DocumentDto>(x => x.Published == true);
-            return Database.ExecuteScalar<int>(sql);
+                return Database.ExecuteScalar<int>(sql);
+            }
+            else
+            {
+                var sql = GetBaseQuery(true).Where<NodeDto>(x => x.Trashed == false)
+                .Where<DocumentDto>(x => x.Published == true)
+                .Where<ContentTypeDto>(x => x.Alias == contentTypeAlias);
+                return Database.ExecuteScalar<int>(sql);
+            }
         }
 
         public void ReplaceContentPermissions(EntityPermissionSet permissionSet)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            repo.ReplaceEntityPermissions(permissionSet);
+            _permissionRepository.ReplaceEntityPermissions(permissionSet);
         }
 
         public void ClearPublished(IContent content)
@@ -840,22 +864,25 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
         }
 
         /// <summary>
-        /// Assigns a single permission to the current content item for the specified user ids
+        /// Assigns a single permission to the current content item for the specified user group ids
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>
-        /// <param name="userIds"></param>
-        public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds)
-        {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            repo.AssignEntityPermission(entity, permission, userIds);
+        /// <param name="groupIds"></param>        
+        public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> groupIds)
+        {            
+            _permissionRepository.AssignEntityPermission(entity, permission, groupIds);
         }
 
-        public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
+        /// <summary>
+        /// Gets the explicit list of permissions for the content item
+        /// </summary>
+        /// <param name="entityId"></param>
+        /// <returns></returns>
+        public EntityPermissionCollection GetPermissionsForEntity(int entityId)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper, SqlSyntax);
-            return repo.GetPermissionsForEntity(entityId);
-        }
+            return _permissionRepository.GetPermissionsForEntity(entityId);
+        }        
 
         /// <summary>
         /// Adds/updates content/published xml
@@ -865,6 +892,15 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
         public void AddOrUpdateContentXml(IContent content, Func<IContent, XElement> xml)
         {
             _contentXmlRepository.AddOrUpdate(new ContentXmlEntity<IContent>(content, xml));
+        }
+
+        /// <summary>
+        /// Used to add/update a permission for a content item
+        /// </summary>
+        /// <param name="permission"></param>
+        public void AddOrUpdatePermissions(ContentPermissionSet permission)
+        {
+            _permissionRepository.AddOrUpdate(permission);
         }
 
         /// <summary>
@@ -908,9 +944,9 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             var filterSql = new Sql().Append("AND (cmsDocument.newest = 1)");
             if (filter != null)
             {
-                foreach (var filterClaus in filter.GetWhereClauses())
+                foreach (var filterClause in filter.GetWhereClauses())
                 {
-                    filterSql.Append(string.Format("AND ({0})", filterClaus.Item1), filterClaus.Item2);
+                    filterSql.Append(string.Format("AND ({0})", filterClause.Item1), filterClause.Item2);
                 }
             }
 
@@ -932,6 +968,113 @@ order by umbracoNode.{2}, umbracoNode.parentID, umbracoNode.sortOrder",
             get { return Constants.System.RecycleBinContent; }
         }
 
+        #endregion
+
+        #region Read Repository implementation for GUID keys
+        public IContent Get(Guid id)
+        {
+            return _contentByGuidReadRepository.Get(id);
+        }
+
+        IEnumerable<IContent> IReadRepository<Guid, IContent>.GetAll(params Guid[] ids)
+        {
+            return _contentByGuidReadRepository.GetAll(ids);
+        }
+
+        public bool Exists(Guid id)
+        {
+            return _contentByGuidReadRepository.Exists(id);
+        }
+
+        /// <summary>
+        /// A reading repository purely for looking up by GUID
+        /// </summary>
+        /// <remarks>
+        /// TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
+        /// Then we can do the same thing with repository instances and we wouldn't need to leave all these methods as not implemented because we wouldn't need to implement them
+        /// </remarks>
+        private class ContentByGuidReadRepository : PetaPocoRepositoryBase<Guid, IContent>
+        {
+            private readonly ContentRepository _outerRepo;
+
+            public ContentByGuidReadRepository(ContentRepository outerRepo,
+                IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+                : base(work, cache, logger, sqlSyntax)
+            {
+                _outerRepo = outerRepo;
+            }
+
+            protected override IContent PerformGet(Guid id)
+            {
+                var sql = _outerRepo.GetBaseQuery(BaseQueryType.FullSingle)
+                    .Where(GetBaseWhereClause(), new { Id = id })
+                    .Where<DocumentDto>(x => x.Newest, SqlSyntax)
+                    .OrderByDescending<ContentVersionDto>(x => x.VersionDate, SqlSyntax);
+
+                var dto = Database.Fetch<DocumentDto, ContentVersionDto, ContentDto, NodeDto, DocumentPublishedReadOnlyDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
+
+                if (dto == null)
+                    return null;
+
+                var content = _outerRepo.CreateContentFromDto(dto, sql);
+
+                return content;
+            }
+
+            protected override IEnumerable<IContent> PerformGetAll(params Guid[] ids)
+            {
+                Func<Sql, Sql> translate = s =>
+                {
+                    if (ids.Any())
+                    {
+                        s.Where("umbracoNode.uniqueID in (@ids)", new { ids });
+                    }
+                    //we only want the newest ones with this method
+                    s.Where<DocumentDto>(x => x.Newest, SqlSyntax);
+                    return s;
+                };
+
+                var sqlBaseFull = _outerRepo.GetBaseQuery(BaseQueryType.FullMultiple);
+                var sqlBaseIds = _outerRepo.GetBaseQuery(BaseQueryType.Ids);
+
+                return _outerRepo.ProcessQuery(translate(sqlBaseFull), new PagingSqlQuery(translate(sqlBaseIds)));
+            }
+
+            protected override Sql GetBaseQuery(bool isCount)
+            {
+                return _outerRepo.GetBaseQuery(isCount);
+            }
+
+            protected override string GetBaseWhereClause()
+            {
+                return "umbracoNode.uniqueID = @Id";
+            }
+
+            protected override Guid NodeObjectTypeId
+            {
+                get { return _outerRepo.NodeObjectTypeId; }
+            }
+
+            #region Not needed to implement
+
+            protected override IEnumerable<IContent> PerformGetByQuery(IQuery<IContent> query)
+            {
+                throw new NotImplementedException();
+            }
+            protected override IEnumerable<string> GetDeleteClauses()
+            {
+                throw new NotImplementedException();
+            }
+            protected override void PersistNewItem(IContent entity)
+            {
+                throw new NotImplementedException();
+            }
+            protected override void PersistUpdatedItem(IContent entity)
+            {
+                throw new NotImplementedException();
+            }
+            #endregion
+        }
         #endregion
 
         protected override string GetDatabaseFieldNameForOrderBy(string orderBy)
@@ -1122,31 +1265,10 @@ ORDER BY cmsContentVersion.id DESC
             if (EnsureUniqueNaming == false)
                 return nodeName;
 
-            var sql = new Sql();
-            sql.Select("*")
-               .From<NodeDto>()
-               .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId && x.ParentId == parentId && x.Text.StartsWith(nodeName));
+            var names = Database.Fetch<SimilarNodeName>("SELECT id, text AS name FROM umbracoNode WHERE nodeObjectType=@objectType AND parentId=@parentId",
+                new { objectType = NodeObjectTypeId, parentId });
 
-            int uniqueNumber = 1;
-            var currentName = nodeName;
-
-            var dtos = Database.Fetch<NodeDto>(sql);
-            if (dtos.Any())
-            {
-                var results = dtos.OrderBy(x => x.Text, new SimilarNodeNameComparer());
-                foreach (var dto in results)
-                {
-                    if (id != 0 && id == dto.NodeId) continue;
-
-                    if (dto.Text.ToLowerInvariant().Equals(currentName.ToLowerInvariant()))
-                    {
-                        currentName = nodeName + string.Format(" ({0})", uniqueNumber);
-                        uniqueNumber++;
-                    }
-                }
-            }
-
-            return currentName;
+            return SimilarNodeName.GetUniqueName(names, id, nodeName);
         }
 
         /// <summary>

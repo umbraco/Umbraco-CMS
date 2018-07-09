@@ -8,7 +8,7 @@
 
 
 
-// Sortabel
+// Sortable
 // -------------------------
 
 // sortable-helper
@@ -127,6 +127,16 @@
     position: relative;
     margin-bottom: 40px;
     padding-top: 10px;
+
+    &:hover {
+        background-color: @grayLighter;
+    }
+
+    &[ng-click],
+    &[data-ng-click],
+    &[x-ng-click] {
+        cursor: pointer;
+    }
 }
 
 .umb-grid .row-tools a {
@@ -280,7 +290,6 @@
 .umb-grid .umb-control {
     position: relative;
     display: block;
-    overflow: hidden;
     margin-left: 10px;
     margin-right: 10px;
     margin-bottom: 10px;
@@ -432,7 +441,7 @@
     background-color: @gray-10;
 
     .umb-row-title-bar {
-        cursor: default;
+        cursor: inherit;
     }
 
     .umb-row-title {
@@ -535,7 +544,7 @@
     color: @gray-3;
 }
 
-.umb-grid .umb-cell-rte textarea {
+.umb-grid .umb-cell-rte textarea.mceNoEditor {
     display: none !important;
 }
 
@@ -636,9 +645,19 @@
     clear: both;
 }
 
-.umb-grid .mce-btn button {
-    padding: 8px 6px;
-    line-height: inherit;
+.umb-grid .mce-btn {
+    button {
+        padding-top: 8px;
+        padding-bottom: 8px;
+        padding-left: 6px;
+        line-height: inherit;
+    }
+
+    &:not(.mce-menubtn) {
+        button {
+            padding-right: 6px;
+        }
+    }
 }
 
 .umb-grid .mce-toolbar {

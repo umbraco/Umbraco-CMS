@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("This is no longer used and will be removed in future versions")]
     internal class LinksCollection : ConfigurationElementCollection, IEnumerable<ILink>
     {
         protected override ConfigurationElement CreateNewElement()

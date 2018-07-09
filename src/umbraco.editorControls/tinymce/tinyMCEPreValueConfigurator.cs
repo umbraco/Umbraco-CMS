@@ -1,15 +1,15 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Collections;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
+using Umbraco.Core;
 
 namespace umbraco.editorControls.tinymce
 {
+
+
     [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class tinyMCEPreValueConfigurator : System.Web.UI.WebControls.PlaceHolder, interfaces.IDataPrevalue
     {
@@ -183,10 +183,11 @@ namespace umbraco.editorControls.tinymce
                     }
 
                     // add users
-                    foreach (BusinessLogic.UserType ut in BusinessLogic.UserType.getAll)
+                    var userService = ApplicationContext.Current.Services.UserService;
+                    foreach (var ug in userService.GetAllUserGroups())
                     {
-                        ListItem li = new ListItem(ut.Name, ut.Id.ToString());
-                        if (("," + _advancedUsers + ",").IndexOf("," + ut.Id.ToString() + ",") > -1)
+                        ListItem li = new ListItem(ug.Name, ug.Id.ToString());
+                        if (("," + _advancedUsers + ",").IndexOf("," + ug.Id + ",") > -1)
                             li.Selected = true;
 
                         _advancedUsersList.Items.Add(li);

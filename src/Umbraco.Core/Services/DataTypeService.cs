@@ -312,7 +312,9 @@ namespace Umbraco.Core.Services
             var moveInfo = new List<MoveEventInfo<IDataTypeDefinition>>();
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(Moving, this, new MoveEventArgs<IDataTypeDefinition>(evtMsgs, new MoveEventInfo<IDataTypeDefinition>(toMove, toMove.Path, parentId))))
+                var moveEventInfo = new MoveEventInfo<IDataTypeDefinition>(toMove, toMove.Path, parentId);
+                var moveEventArgs = new MoveEventArgs<IDataTypeDefinition>(evtMsgs, moveEventInfo);
+                if (uow.Events.DispatchCancelable(Moving, this, moveEventArgs))
                 {
                     uow.Commit();
                     return Attempt.Fail(new OperationStatus<MoveOperationStatusType>(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs));
@@ -338,7 +340,9 @@ namespace Umbraco.Core.Services
                         new OperationStatus<MoveOperationStatusType>(ex.Operation, evtMsgs));
                 }
                 uow.Commit();
-                uow.Events.Dispatch(Moved, this, new MoveEventArgs<IDataTypeDefinition>(false, evtMsgs, moveInfo.ToArray()));
+                moveEventArgs.MoveInfoCollection = moveInfo;
+                moveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Moved, this, moveEventArgs);
             }
 
             return Attempt.Succeed(
@@ -354,7 +358,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition)))
+                var saveEventArgs = new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition);
+                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -369,8 +374,8 @@ namespace Umbraco.Core.Services
 
                 dataTypeDefinition.CreatorId = userId;
                 repository.AddOrUpdate(dataTypeDefinition);
-
-                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Saved, this, saveEventArgs);
 
                 Audit(uow, AuditType.Save, "Save DataTypeDefinition performed by user", userId, dataTypeDefinition.Id);
                 uow.Commit();
@@ -397,9 +402,10 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
+                var saveEventArgs = new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions);
                 if (raiseEvents)
-                {
-                    if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions)))
+                {                    
+                    if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                     {
                         uow.Commit();
                         return;
@@ -415,7 +421,10 @@ namespace Umbraco.Core.Services
                 }
 
                 if (raiseEvents)
-                    uow.Events.Dispatch(Saved, this, new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinitions, false));
+                {
+                    saveEventArgs.CanCancel = false;
+                    uow.Events.Dispatch(Saved, this, saveEventArgs);
+                }
 
                 Audit(uow, AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, -1);
                 uow.Commit();
@@ -504,7 +513,8 @@ namespace Umbraco.Core.Services
         {
             using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition)))
+                var saveEventArgs = new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition);
+                if (uow.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -526,8 +536,8 @@ namespace Umbraco.Core.Services
 
                 Audit(uow, AuditType.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
                 uow.Commit();
-
-                uow.Events.Dispatch(Saved, this, new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false));
+                saveEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Saved, this, saveEventArgs);
             }
         }
 
@@ -544,7 +554,8 @@ namespace Umbraco.Core.Services
         {
 			using (var uow = UowProvider.GetUnitOfWork())
             {
-                if (uow.Events.DispatchCancelable(Deleting, this, new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition)))
+                var deleteEventArgs = new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition);
+                if (uow.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
                 {
                     uow.Commit();
                     return;
@@ -556,8 +567,8 @@ namespace Umbraco.Core.Services
 
                 Audit(uow, AuditType.Delete, "Delete DataTypeDefinition performed by user", userId, dataTypeDefinition.Id);
                 uow.Commit();
-
-                uow.Events.Dispatch(Deleted, this, new DeleteEventArgs<IDataTypeDefinition>(dataTypeDefinition, false));
+                deleteEventArgs.CanCancel = false;
+                uow.Events.Dispatch(Deleted, this, deleteEventArgs);
             }
         }
 

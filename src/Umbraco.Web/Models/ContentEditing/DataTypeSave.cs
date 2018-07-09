@@ -31,13 +31,13 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <summary>
         /// The real persisted data type
         /// </summary>
-        [JsonIgnore]
+        [IgnoreDataMember]
         internal IDataTypeDefinition PersistedDataType { get; set; }
 
         /// <summary>
         /// The PropertyEditor assigned
         /// </summary>
-        [JsonIgnore]
+        [IgnoreDataMember]
         internal PropertyEditor PropertyEditor { get; set; }
 
     }

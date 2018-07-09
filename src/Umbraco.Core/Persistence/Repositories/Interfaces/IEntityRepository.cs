@@ -17,6 +17,9 @@ namespace Umbraco.Core.Persistence.Repositories
         IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query);
         IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query, Guid objectTypeId);
 
+        IEnumerable<EntityPath> GetAllPaths(Guid objectTypeId, params int[] ids);
+        IEnumerable<EntityPath> GetAllPaths(Guid objectTypeId, params Guid[] keys);
+
         /// <summary>
         /// Gets paged results
         /// </summary>

@@ -7,7 +7,7 @@ ul.sections {
 	background: @purple;
 	height: 100%;
 	width: 80px;
-    border-right: 1px solid @purple;
+    border-right: 1px solid @purple-d1;
 }
 
 ul.sections li {
@@ -22,13 +22,16 @@ ul.sections li [class^="icon-"],
 ul.sections li [class*=" icon-"],
 ul.sections li img.icon-section {
 	font-size: 30px;
-    line-height: 20px; /* set line-height to ensure all icons use same line-height */
     display: inline-block;
 	margin: 1px 0 0 0;
 	color: @purple-l2;
 	-webkit-transition: all .3s linear;
 	-moz-transition: all .3s linear;
 	transition: all .3s linear;
+
+    &, &:before {
+        line-height: 20px !important; /* set line-height to ensure all icons use same line-height */
+    }
 }
 
 ul.sections:hover li [class^="icon-"], 
@@ -72,21 +75,22 @@ ul.sections li.avatar {
 	height: 75px;
 	padding: 22px 0 2px 0;
 	text-align: center;
-	margin: 0 0 0 -4px;
 	border-bottom: 1px solid @purple-d1;
 }
 
 ul.sections li.avatar a {
-	margin: 0 auto;
 	padding: 0;
-	width: 40px;
-	height: 40px;
 	border: none
 }
 
-ul.sections li.avatar a img {
+ul.sections li.avatar a div {
 	border-radius: 50%;
 	width: 30px;
+    margin:0 auto;
+}
+
+ul.sections li.avatar a span {
+	opacity: 1;
 }
 
 .faded ul.sections li {
@@ -123,7 +127,7 @@ ul.sections li.help {
 	bottom: 0;
 	left: 0;
 	display: block;
-	width: ~"(calc(~'100%' - ~'5px'))"; //subtract 4px orange border + 1px border-right for sections
+	width: calc(100% - 5px); //subtract 4px orange border + 1px border-right for sections
 }
 
 ul.sections li.help a {
@@ -168,7 +172,7 @@ ul.sections-tray {
 	width: 80px;
 
     & > li:first-child > a {
-        border-top: 1px solid @purple;
+        border-top: 1px solid @purple-d1;
     }
 
     & > li {

@@ -190,6 +190,7 @@
                     <a href="#" onclick="UmbClientMgr.openModalWindow('developer/packages/directoryBrowser.aspx?target=<%= packageControlPath.ClientID %>','Choose a file or a folder', true, 500, 400); return false;"
                         style="border: none;">
                          <i class="icon icon-folder"></i>
+                      </a>
                 </td>
             </tr>
         </table>
@@ -203,7 +204,7 @@
                         during installation and uninstallation.
                         <br />
                         All actions are formed as a xml node, containing data for the action to be performed.
-                        <a href="http://our.umbraco.org/wiki/reference/packaging/package-actions
+                        <a href="https://our.umbraco.org/documentation/Reference/Packaging/
 " target="_blank">Package actions documentation</a>
                     </p>
                     <asp:CustomValidator ID="actionsVal" runat="server" OnServerValidate="validateActions"

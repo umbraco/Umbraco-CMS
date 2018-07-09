@@ -3,43 +3,24 @@ using System.Collections.Generic;
 using System.Data.SqlServerCe;
 using System.IO;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnostics.Windows;
-using BenchmarkDotNet.Jobs;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations.Initial;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Tests.Benchmarks.Config;
 using Umbraco.Tests.TestHelpers;
 using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Tests.Benchmarks
 {
-    [Config(typeof(Config))]
+    [QuickRunWithMemoryDiagnoserConfig]
     public class BulkInsertBenchmarks
     {
-        private class Config : ManualConfig
-        {
-            public Config()
-            {
-                Add(new MemoryDiagnoser());
-                //Add(ExecutionValidator.FailOnError);
-
-                //The 'quick and dirty' settings, so it runs a little quicker
-                // see benchmarkdotnet FAQ
-                Add(Job.Default
-                    .WithLaunchCount(1) // benchmark process will be launched only once
-                    .WithIterationTime(100) // 100ms per iteration
-                    .WithWarmupCount(3) // 3 warmup iteration
-                    .WithTargetCount(3)); // 3 target iteration                
-            }
-        }
-
         private static byte[] _initDbBytes = null;
 
-        [Setup]
+        [GlobalSetup]
         public void Setup()
         {
             var logger = new DebugDiagnosticsLogger();
@@ -51,8 +32,8 @@ namespace Umbraco.Tests.Benchmarks
             SetupSqlCe(path, logger);
             SetupSqlServer(logger);
 
-            
-        }        
+
+        }
 
         private void SetupSqlServer(ILogger logger)
         {
@@ -75,7 +56,7 @@ namespace Umbraco.Tests.Benchmarks
 	[lastNotifiedDate] [datetime] NOT NULL,
 	[isActive] [bit] NOT NULL,
 	[isMaster] [bit] NOT NULL,
- CONSTRAINT [PK_umbracoServer] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_umbracoServer] PRIMARY KEY CLUSTERED
 (
 	[id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -87,7 +68,7 @@ namespace Umbraco.Tests.Benchmarks
             var dbName = string.Concat("Umb", Guid.NewGuid(), ".sdf");
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
             var sqlCeConnectionString = $"Datasource=|DataDirectory|\\{dbName};Flush Interval=1;";
-            
+
             _dbFile = Path.Combine(path, dbName);
 
             //only create the db one time
@@ -107,12 +88,12 @@ namespace Umbraco.Tests.Benchmarks
                     var creation = new DatabaseSchemaCreation(_dbSqlCe, logger, _sqlCeSyntax);
                     creation.InitializeDatabaseSchema();
                 }
-                _initDbBytes = File.ReadAllBytes(_dbFile);            
+                _initDbBytes = File.ReadAllBytes(_dbFile);
             }
             else
             {
                 File.WriteAllBytes(_dbFile, _initDbBytes);
-            }            
+            }
 
             //create the db
             _dbSqlCe = new UmbracoDatabase(
@@ -138,7 +119,7 @@ namespace Umbraco.Tests.Benchmarks
             return data;
         }
 
-        [Cleanup]
+        [GlobalCleanup]
         public void Cleanup()
         {
             _dbSqlCe.Dispose();

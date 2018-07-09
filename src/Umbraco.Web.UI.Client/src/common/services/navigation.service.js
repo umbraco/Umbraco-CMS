@@ -288,9 +288,12 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 throw "args.tree cannot be null";
             }
 
-            if (mainTreeEventHandler) {
-                //returns a promise
-                return mainTreeEventHandler.syncTree(args);
+            if (mainTreeEventHandler) {                
+               
+                if (mainTreeEventHandler.syncTree) {
+                    //returns a promise,
+                    return mainTreeEventHandler.syncTree(args);
+                }
             }
 
             //couldn't sync
@@ -522,37 +525,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             });
 
             return service.userDialog;
-        },
-
-        /**
-         * @ngdoc method
-         * @name umbraco.services.navigationService#showUserDialog
-         * @methodOf umbraco.services.navigationService
-         *
-         * @description
-         * Opens the user dialog, next to the sections navigation
-         * template is located in views/common/dialogs/user.html
-         */
-        showHelpDialog: function () {
-            // hide tray and close user dialog
-            service.hideTray();
-            if (service.userDialog) {
-                service.userDialog.close();
-            }
-
-            if(service.helpDialog){
-                service.helpDialog.close();
-                service.helpDialog = undefined;
-            }
-
-            service.helpDialog = dialogService.open(
-            {
-                template: "views/common/dialogs/help.html",
-                modalClass: "umb-modal-left",
-                show: true
-            });
-
-            return service.helpDialog;
         },
 
         /**

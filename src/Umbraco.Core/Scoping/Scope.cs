@@ -374,7 +374,7 @@ namespace Umbraco.Core.Scoping
             }
 
             var parent = ParentScope;
-            _scopeProvider.AmbientScope = parent;
+            _scopeProvider.AmbientScope = parent; // might be null = this is how scopes are removed from context objects
 
 #if DEBUG_SCOPES
             _scopeProvider.Disposed(this);

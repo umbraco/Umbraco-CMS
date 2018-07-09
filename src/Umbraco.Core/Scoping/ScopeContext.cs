@@ -116,5 +116,19 @@ namespace Umbraco.Core.Scoping
             Enlisted[key] = enlistedOfT;
             return enlistedOfT.Item;
         }
+
+        public T GetEnlisted<T>(string key)
+        {
+            var enlistedObjects = _enlisted;
+            if (enlistedObjects == null) return default (T);
+
+            IEnlistedObject enlisted;
+            if (enlistedObjects.TryGetValue(key, out enlisted) == false)
+                return default (T);
+
+            var enlistedAs = enlisted as EnlistedObject<T>;
+            if (enlistedAs == null) throw new InvalidOperationException("An item with the key exists, but with a different type.");
+            return enlistedAs.Item;
+        }
     }
 }
