@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services.Implement
     /// <summary>
     /// Represents the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
     /// </summary>
-    public class MediaService : ScopeRepositoryService, IMediaService, IMediaServiceOperations
+    public class MediaService : ScopeRepositoryService, IMediaService
     {
         private readonly IMediaRepository _mediaRepository;
         private readonly IMediaTypeRepository _mediaTypeRepository;
@@ -743,14 +743,13 @@ namespace Umbraco.Core.Services.Implement
 
         #region Save
 
-
         /// <summary>
         /// Saves a single <see cref="IMedia"/> object
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        Attempt<OperationResult> IMediaServiceOperations.Save(IMedia media, int userId, bool raiseEvents)
+        public Attempt<OperationResult> Save(IMedia media, int userId = 0, bool raiseEvents = true)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -797,18 +796,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        public void Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true)
-        {
-            ((IMediaServiceOperations) this).Save(medias, userId, raiseEvents);
-        }
-
-        /// <summary>
-        /// Saves a collection of <see cref="IMedia"/> objects
-        /// </summary>
-        /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
-        /// <param name="userId">Id of the User saving the Media</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        Attempt<OperationResult> IMediaServiceOperations.Save(IEnumerable<IMedia> medias, int userId, bool raiseEvents)
+        public Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var mediasA = medias.ToArray();
@@ -855,7 +843,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        Attempt<OperationResult> IMediaServiceOperations.Delete(IMedia media, int userId)
+        public Attempt<OperationResult> Delete(IMedia media, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -1010,7 +998,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        Attempt<OperationResult> IMediaServiceOperations.MoveToRecycleBin(IMedia media, int userId)
+        public Attempt<OperationResult> MoveToRecycleBin(IMedia media, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var moves = new List<Tuple<IMedia, string>>();
@@ -1056,7 +1044,7 @@ namespace Umbraco.Core.Services.Implement
             // if moving to the recycle bin then use the proper method
             if (parentId == Constants.System.RecycleBinMedia)
             {
-                ((IMediaServiceOperations)this).MoveToRecycleBin(media, userId);
+                MoveToRecycleBin(media, userId);
                 return;
             }
 

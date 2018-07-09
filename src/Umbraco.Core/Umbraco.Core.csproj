@@ -1424,7 +1424,6 @@
     <Compile Include="Services\Implement\ScopeRepositoryService.cs" />
     <Compile Include="Services\Implement\ServerRegistrationService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
-    <Compile Include="Services\ServiceWithResultExtensions.cs" />
     <Compile Include="Services\Implement\TagService.cs" />
     <Compile Include="Services\Implement\TaskService.cs" />
     <Compile Include="Services\Implement\UserService.cs" />
