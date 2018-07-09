@@ -287,7 +287,7 @@ namespace Umbraco.Web
         #region Membership
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the IsProtected method that only specifies path")]
+        [Obsolete("Use the IsProtected method that only specifies path. This can be removed when library.cs is removed.")]
         public bool IsProtected(int documentId, string path)
         {
             return IsProtected(path.EnsureEndsWith("," + documentId));
@@ -304,7 +304,7 @@ namespace Umbraco.Web
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the MemberHasAccess method that only specifies path")]
+        [Obsolete("Use the MemberHasAccess method that only specifies path. This can be removed when library.cs is removed.")]
         public bool MemberHasAccess(int nodeId, string path)
         {
             return MemberHasAccess(path.EnsureEndsWith("," + nodeId));

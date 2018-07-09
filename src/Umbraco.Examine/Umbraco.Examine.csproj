@@ -61,7 +61,6 @@
     <Compile Include="Config\IndexSets.cs" />
     <Compile Include="UmbracoExamineExtensions.cs" />
     <Compile Include="IndexTypes.cs" />
-    <Compile Include="LoggingLevel.cs" />
     <Compile Include="NoPrefixSimpleFsLockFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UmbracoContentIndexer.cs" />

@@ -127,11 +127,6 @@ namespace Umbraco.Core
 
             public static readonly Guid ContentItem = new Guid(Strings.ContentItem);
 
-            [Obsolete("This no longer exists in the database")]
-            internal static readonly Guid Stylesheet = new Guid(Strings.Stylesheet);
-
-            [Obsolete("This no longer exists in the database")]
-            internal static readonly Guid StylesheetProperty = new Guid(Strings.StylesheetProperty);
         }
     }
 }
