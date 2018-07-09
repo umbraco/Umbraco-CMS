@@ -743,16 +743,6 @@ namespace Umbraco.Core.Services.Implement
 
         #region Save
 
-        /// <summary>
-        /// Saves a single <see cref="IMedia"/> object
-        /// </summary>
-        /// <param name="media">The <see cref="IMedia"/> to save</param>
-        /// <param name="userId">Id of the User saving the Media</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        public void Save(IMedia media, int userId = 0, bool raiseEvents = true)
-        {
-            ((IMediaServiceOperations) this).Save(media, userId, raiseEvents);
-        }
 
         /// <summary>
         /// Saves a single <see cref="IMedia"/> object
@@ -859,21 +849,7 @@ namespace Umbraco.Core.Services.Implement
         #endregion
 
         #region Delete
-
-        /// <summary>
-        /// Permanently deletes an <see cref="IMedia"/> object as well as all of its Children.
-        /// </summary>
-        /// <remarks>
-        /// Please note that this method will completely remove the Media from the database,
-        /// as well as associated media files from the file system.
-        /// </remarks>
-        /// <param name="media">The <see cref="IMedia"/> to delete</param>
-        /// <param name="userId">Id of the User deleting the Media</param>
-        public void Delete(IMedia media, int userId = 0)
-        {
-            ((IMediaServiceOperations) this).Delete(media, userId);
-        }
-
+        
         /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
         /// </summary>
@@ -1034,16 +1010,6 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        public void MoveToRecycleBin(IMedia media, int userId = 0)
-        {
-            ((IMediaServiceOperations) this).MoveToRecycleBin(media, userId);
-        }
-
-        /// <summary>
-        /// Deletes an <see cref="IMedia"/> object by moving it to the Recycle Bin
-        /// </summary>
-        /// <param name="media">The <see cref="IMedia"/> to delete</param>
-        /// <param name="userId">Id of the User deleting the Media</param>
         Attempt<OperationResult> IMediaServiceOperations.MoveToRecycleBin(IMedia media, int userId)
         {
             var evtMsgs = EventMessagesFactory.Get();
@@ -1090,7 +1056,7 @@ namespace Umbraco.Core.Services.Implement
             // if moving to the recycle bin then use the proper method
             if (parentId == Constants.System.RecycleBinMedia)
             {
-                MoveToRecycleBin(media, userId);
+                ((IMediaServiceOperations)this).MoveToRecycleBin(media, userId);
                 return;
             }
 

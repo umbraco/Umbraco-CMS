@@ -10,6 +10,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -33,9 +34,9 @@ namespace Umbraco.Tests.Services
             for (int i = 0; i < 10; i++)
             {
                 var m1 = MockedMedia.CreateMediaImage(mediaType1, -1);
-                mediaService.Save(m1);
+                ((IMediaServiceOperations)(mediaService)).Save(m1);
                 var m2 = MockedMedia.CreateMediaImage(mediaType2, -1);
-                mediaService.Save(m2);
+                ((IMediaServiceOperations)(mediaService)).Save(m2);
             }
 
             long total;
@@ -73,7 +74,7 @@ namespace Umbraco.Tests.Services
             var media = mediaService.GetById(mediaItems.Item1.Id);
 
             // Act
-            mediaService.MoveToRecycleBin(media);
+            ((IMediaServiceOperations)mediaService).MoveToRecycleBin(media);
 
             // Assert
             Assert.That(media.ParentId, Is.EqualTo(-21));
@@ -109,7 +110,7 @@ namespace Umbraco.Tests.Services
             var media = mediaService.CreateMedia(string.Empty, -1, "video");
 
             // Act & Assert
-            Assert.Throws<ArgumentException>(() => mediaService.Save(media));
+            Assert.Throws<ArgumentException>(() => ((IMediaServiceOperations)(mediaService)).Save(media));
         }
 
         [Test]
@@ -120,7 +121,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MediaTypeService.Save(mediaType);
             var media = mediaService.CreateMedia("Test", -1, "video");
 
-            mediaService.Save(media);
+            ((IMediaServiceOperations)(mediaService)).Save(media);
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -136,7 +137,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MediaTypeService.Save(mediaType);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
-            mediaService.Save(media);
+            ((IMediaServiceOperations)(mediaService)).Save(media);
 
             var mediaPath = "/media/test-image.png";
             var resolvedMedia = mediaService.GetMediaByPath(mediaPath);
@@ -153,7 +154,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MediaTypeService.Save(mediaType);
 
             var media = MockedMedia.CreateMediaImageWithCrop(mediaType, -1);
-            mediaService.Save(media);
+            ((IMediaServiceOperations)(mediaService)).Save(media);
 
             var mediaPath = "/media/test-image.png";
             var resolvedMedia = mediaService.GetMediaByPath(mediaPath);
@@ -170,7 +171,7 @@ namespace Umbraco.Tests.Services
             for (int i = 0; i < 10; i++)
             {
                 var c1 = MockedMedia.CreateMediaImage(mediaType, -1);
-                ServiceContext.MediaService.Save(c1);
+                ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(c1);
             }
 
             var service = ServiceContext.MediaService;
@@ -193,17 +194,17 @@ namespace Umbraco.Tests.Services
             for (int i = 0; i < 9; i++)
             {
                 var m1 = MockedMedia.CreateMediaImage(mediaType, -1);
-                ServiceContext.MediaService.Save(m1);
+                ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(m1);
             }
 
             var mediaTypeForFolder = MockedContentTypes.CreateImageMediaType("Folder2");
             ServiceContext.MediaTypeService.Save(mediaTypeForFolder);
             var mediaFolder = MockedMedia.CreateMediaFolder(mediaTypeForFolder, -1);
-            ServiceContext.MediaService.Save(mediaFolder);
+            ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(mediaFolder);
             for (int i = 0; i < 10; i++)
             {
                 var m1 = MockedMedia.CreateMediaImage(mediaType, mediaFolder.Id);
-                ServiceContext.MediaService.Save(m1);
+                ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(m1);
             }
 
             var service = ServiceContext.MediaService;
@@ -231,26 +232,26 @@ namespace Umbraco.Tests.Services
             //Create and Save folder-Media -> 1050
             var folderMediaType = ServiceContext.MediaTypeService.Get(1031);
             var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
-            ServiceContext.MediaService.Save(folder);
+            ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(folder);
 
             //Create and Save folder-Media -> 1051
             var folder2 = MockedMedia.CreateMediaFolder(folderMediaType, -1);
-            ServiceContext.MediaService.Save(folder2);
+            ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(folder2);
 
             //Create and Save image-Media  -> 1052
             var imageMediaType = ServiceContext.MediaTypeService.Get(1032);
             var image = (Media)MockedMedia.CreateMediaImage(imageMediaType, 1050);
-            ServiceContext.MediaService.Save(image);
+            ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(image);
 
             //Create and Save folder-Media that is trashed -> 1053
             var folderTrashed = (Media)MockedMedia.CreateMediaFolder(folderMediaType, -21);
             folderTrashed.Trashed = true;
-            ServiceContext.MediaService.Save(folderTrashed);
+            ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(folderTrashed);
 
             //Create and Save image-Media child of folderTrashed -> 1054
             var imageTrashed = (Media)MockedMedia.CreateMediaImage(imageMediaType, folderTrashed.Id);
             imageTrashed.Trashed = true;
-            ServiceContext.MediaService.Save(imageTrashed);
+            ((IMediaServiceOperations)(ServiceContext.MediaService)).Save(imageTrashed);
 
 
             return new Tuple<IMedia, IMedia, IMedia, IMedia, IMedia>(folder, folder2, image, folderTrashed, imageTrashed);

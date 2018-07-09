@@ -9,6 +9,7 @@ using Umbraco.Web.WebServices;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.UI;
+using Umbraco.Core.Services;
 
 namespace umbraco.presentation.webservices
 {
