@@ -126,7 +126,6 @@ namespace Umbraco.Web.Trees
                 }
 
                 // add default actions for *all* users
-                menu.Items.Add<ActionRePublish>(Services.TextService.Localize("actions", ActionRePublish.Instance.Alias)).ConvertLegacyMenuItem(null, "content", "content");
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
 
                 return menu;
