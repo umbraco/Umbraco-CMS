@@ -23,15 +23,6 @@
                        no-dirty-check />
             </div>
 
-            <div class="upload-button">
-                <umb-button type="button"
-                            label-key="general_upload"
-                            action="upload()"
-                            disabled="lockedFolder"
-                            ng-if="acceptedMediatypes.length > 0">
-                </umb-button>
-            </div>
-
         </div>
 
         <div class="row umb-control-group" ng-show="!searchOptions.filter">
@@ -70,7 +61,6 @@
                            files-queued="onFilesQueue"
                            accept="{{acceptedFileTypes}}"
                            max-file-size="{{maxFileSize}}"
-                           hide-dropzone="{{!activeDrag && images.length > 0 || searchOptions.filter }}"
                            compact="{{ images.length > 0 }}">
         </umb-file-dropzone>
 
