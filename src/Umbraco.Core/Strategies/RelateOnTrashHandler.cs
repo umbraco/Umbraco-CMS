@@ -51,6 +51,7 @@ namespace Umbraco.Core.Strategies
         {
             var relationService = ApplicationContext.Current.Services.RelationService;
             var entityService = ApplicationContext.Current.Services.EntityService;
+            var textService = ApplicationContext.Current.Services.TextService;
             var relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
             var relationType = relationService.GetRelationTypeByAlias(relationTypeAlias);
 
@@ -81,7 +82,9 @@ namespace Umbraco.Core.Strategies
                     relationService.Save(relation);
 
                     ApplicationContext.Current.Services.AuditService.Add(AuditType.Delete,
-                        string.Format("Trashed content with Id: '{0}' related to original parent content with Id: '{1}'", item.Entity.Id, originalParentId),
+                        string.Format(textService.Localize(
+                                "recycleBin/contentTrashed"),
+                            item.Entity.Id, originalParentId),
                         item.Entity.WriterId,
                         item.Entity.Id);
                 }
@@ -94,6 +97,7 @@ namespace Umbraco.Core.Strategies
         {
             var relationService = ApplicationContext.Current.Services.RelationService;
             var entityService = ApplicationContext.Current.Services.EntityService;
+            var textService = ApplicationContext.Current.Services.TextService;
             var relationTypeAlias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
             var relationType = relationService.GetRelationTypeByAlias(relationTypeAlias);
 
@@ -124,7 +128,9 @@ namespace Umbraco.Core.Strategies
                     relationService.Save(relation);
 
                     ApplicationContext.Current.Services.AuditService.Add(AuditType.Delete,
-                        string.Format("Trashed media item with Id: '{0}' related to original parent media item with Id: '{1}'", item.Entity.Id, originalParentId),
+                        string.Format(textService.Localize(
+                                "recycleBin/mediaTrashed"),
+                            item.Entity.Id, originalParentId),
                         item.Entity.CreatorId,
                         item.Entity.Id);
                 }

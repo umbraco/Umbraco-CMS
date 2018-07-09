@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.Editors.Media.RestoreController",
-	function ($scope, relationResource, mediaResource, navigationService, appState, treeService) {
+    function ($scope, relationResource, mediaResource, navigationService, appState, treeService, localizationService) {
 		var dialogOptions = $scope.dialogOptions;
 
 		var node = dialogOptions.currentNode;
@@ -12,9 +12,9 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.RestoreController",
             if (data.length == 0) {
                 $scope.success = false;
                 $scope.error = {
-                    errorMsg: "Cannot automatically restore this item",
+                    errorMsg: localizationService.localize('recycleBin_itemCannotBeRestored'),
                     data: {
-                        Message: "There is no 'restore' relation found for this node. Use the Move menu item to move it manually."
+                        Message: localizationService.localize('recycleBin_noRestoreRelation')
                     }
                 }
                 return;
@@ -27,7 +27,20 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.RestoreController",
 
 			} else {
 			    mediaResource.getById($scope.relation.parentId).then(function (data) {
-					$scope.target = data;
+                    $scope.target = data;
+
+                    // make sure the target item isn't in the recycle bin
+                    if ($scope.target.path.indexOf("-20") !== -1) {
+                        $scope.error = {
+                            errorMsg: localizationService.localize('recycleBin_itemCannotBeRestored'),
+                            data: {
+                                Message: localizationService.localize('recycleBin_restoreUnderRecycled').then(function (value) {
+                                    value.replace('%0%', $scope.target.name);
+                                })
+                            }
+                        };
+                        $scope.success = false;
+                    }
 
 				}, function (err) {
 					$scope.success = false;
