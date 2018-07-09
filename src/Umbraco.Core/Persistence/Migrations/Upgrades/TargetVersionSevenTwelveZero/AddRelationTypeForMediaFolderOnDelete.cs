@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -15,58 +16,23 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZ
 
         public override void Up()
         {
-            var exists = Context.Database.FirstOrDefault<RelationTypeDtoCapture>("WHERE alias=@alias", new { alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias });
+            var exists = Context.Database.FirstOrDefault<RelationTypeDto>("WHERE alias=@alias", new { alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias });
             if (exists == null)
             {
-                Insert.IntoTable("umbracoRelationType").Row(new
+                var relationTypeDto = new RelationTypeDto
                 {
-                    dual = false,
-                    parentObjectType = Guid.Parse(Constants.ObjectTypes.Media),
-                    childObjectType = Guid.Parse(Constants.ObjectTypes.Media),
-                    name = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName,
-                    alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias
-                });
+                    Alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias,
+                    Name = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName,
+                    ChildObjectType = Guid.Parse(Constants.ObjectTypes.MediaType),
+                    ParentObjectType = Guid.Parse(Constants.ObjectTypes.MediaType),
+                    Dual = false
+                };
+
+                Context.Database.Insert(relationTypeDto);
             }
         }
 
         public override void Down()
         { }
-
-        // need to capture the DTO as it is modified in later migrations
-
-        [TableName("umbracoRelationType")]
-        [PrimaryKey("id")]
-        [ExplicitColumns]
-        internal class RelationTypeDtoCapture
-        {
-            public const int NodeIdSeed = 4;
-
-            [Column("id")]
-            [PrimaryKeyColumn(IdentitySeed = NodeIdSeed)]
-            public int Id { get; set; }
-
-            [Column("typeUniqueId")]
-            [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelationType_UniqueId")]
-            public Guid UniqueId { get; set; }
-
-            [Column("dual")]
-            public bool Dual { get; set; }
-
-            [Column("parentObjectType")]
-            public Guid ParentObjectType { get; set; }
-
-            [Column("childObjectType")]
-            public Guid ChildObjectType { get; set; }
-
-            [Column("name")]
-            [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelationType_name")]
-            public string Name { get; set; }
-
-            [Column("alias")]
-            [NullSetting(NullSetting = NullSettings.Null)]
-            [Length(100)]
-            [Index(IndexTypes.UniqueNonClustered, Name = "IX_umbracoRelationType_alias")]
-            public string Alias { get; set; }
-        }
     }
 }
