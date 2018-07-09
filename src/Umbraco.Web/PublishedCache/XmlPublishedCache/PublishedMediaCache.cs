@@ -493,12 +493,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <returns></returns>
         private IEnumerable<IPublishedContent> GetChildrenMedia(int parentId, XPathNavigator xpath = null)
         {
-            //if there is no navigator, try examine first, then re-look it up
+            // if there *is* a navigator, directly look it up
             if (xpath != null)
             {
                 return ToIPublishedContent(parentId, xpath);
             }
 
+            // otherwise, try examine first, then re-look it up
             var searchProvider = GetSearchProviderSafe();
 
             if (searchProvider != null)
@@ -545,7 +546,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 }
             }
 
-            //falling back to get media
+            // falling back to get media
+            // was library.GetMedia which had its own cache, but MediaService *also* caches
+            // so, library.GetMedia is gone and now we directly work with MediaService
+            // (code below copied from what library was doing)
             var media = Current.Services.MediaService.GetById(parentId);
             if (media == null)
             {
@@ -563,13 +567,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             var mediaIterator = serialized.CreateNavigator().Select("/");
 
-            if (mediaIterator.Current == null)
-            {
-                return Enumerable.Empty<IPublishedContent>();
-            }
-            xpath = mediaIterator.Current;
-
-            return ToIPublishedContent(parentId, xpath);
+            return mediaIterator.Current == null
+                ? Enumerable.Empty<IPublishedContent>()
+                : ToIPublishedContent(parentId, mediaIterator.Current);
         }
 
 

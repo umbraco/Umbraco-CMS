@@ -1190,9 +1190,6 @@
     <Compile Include="umbraco.presentation\item.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\library.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\page.cs">
       <SubType>Code</SubType>
     </Compile>
