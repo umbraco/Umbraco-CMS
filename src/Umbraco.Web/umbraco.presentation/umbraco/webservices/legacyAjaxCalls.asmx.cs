@@ -124,7 +124,9 @@ namespace umbraco.presentation.webservices
 
             AuthorizeRequest(true);
 
-            return library.NiceUrl(nodeId);
+            var umbHelper =  new UmbracoHelper(Current.UmbracoContext, Current.Services, Current.ApplicationCache);
+
+            return umbHelper.Url(nodeId);
         }
 
         [WebMethod]
