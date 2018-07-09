@@ -29,22 +29,27 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 
 	        //if we have a node ID, we fetch the current node to build the form data
 	        if ($scope.model.target.id || $scope.model.target.udi) {
+                
+                if ($scope.model.target.mode == 'content') {
+ 
+                    //will be either a udi or an int
+                    var id = $scope.model.target.udi ? $scope.model.target.udi : $scope.model.target.id;
 
-                //will be either a udi or an int
-                var id = $scope.model.target.udi ? $scope.model.target.udi : $scope.model.target.id;
+                    if (!$scope.model.target.path) {
 
-                if (!$scope.model.target.path) {
+                        entityResource.getPath(id, "Document").then(function (path) {
+                            $scope.model.target.path = path;
+                            //now sync the tree to this path
+                            $scope.dialogTreeEventHandler.syncTree({ path: $scope.model.target.path, tree: "content" });
+                        });
+                    }
+
+                    contentResource.getNiceUrl(id).then(function (url) {
+                        $scope.model.target.url = url;
+                    });
                     
-                    entityResource.getPath(id, "Document").then(function (path) {
-	                    $scope.model.target.path = path;
-	                    //now sync the tree to this path
-	                    $scope.dialogTreeEventHandler.syncTree({ path: $scope.model.target.path, tree: "content" });
-	                });
-	            }
+                }
 
-                contentResource.getNiceUrl(id).then(function (url) {
-	                $scope.model.target.url = url;
-	            });
 	        }
 	    }
 
