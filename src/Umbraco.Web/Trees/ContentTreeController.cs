@@ -48,7 +48,7 @@ namespace Umbraco.Web.Trees
         protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormDataCollection queryStrings)
         {
             var langId = queryStrings?["culture"];
-            
+
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(entity);
             if (CanUserAccessNode(entity, allowedUserOptions, langId))
             {
@@ -126,6 +126,8 @@ namespace Umbraco.Web.Trees
                 }
 
                 // add default actions for *all* users
+                // fixme - temp disable RePublish as the page itself (republish.aspx) has been temp disabled
+                //menu.Items.Add<ActionRePublish>(Services.TextService.Localize("actions", ActionRePublish.Instance.Alias)).ConvertLegacyMenuItem(null, "content", "content");
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
 
                 return menu;
@@ -204,7 +206,7 @@ namespace Umbraco.Web.Trees
             foreach (var entity in result)
                 EnsureName(entity, cultureVal);
 
-            return result; 
+            return result;
         }
 
         /// <summary>
