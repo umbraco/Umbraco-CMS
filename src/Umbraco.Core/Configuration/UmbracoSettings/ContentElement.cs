@@ -52,9 +52,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         [ConfigurationProperty("PreviewBadge")]
         internal InnerTextConfigurationElement<string> PreviewBadge => GetOptionalTextElement("PreviewBadge", DefaultPreviewBadge);
 
-        [ConfigurationProperty("UmbracoLibraryCacheDuration")]
-        internal InnerTextConfigurationElement<int> UmbracoLibraryCacheDuration => GetOptionalTextElement("UmbracoLibraryCacheDuration", 1800);
-
         [ConfigurationProperty("MacroErrors")]
         internal InnerTextConfigurationElement<MacroErrorBehaviour> MacroErrors => GetOptionalTextElement("MacroErrors", MacroErrorBehaviour.Inline);
 
@@ -120,8 +117,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         bool IContentSection.ForceSafeAliases => ForceSafeAliases;
 
         string IContentSection.PreviewBadge => PreviewBadge;
-
-        int IContentSection.UmbracoLibraryCacheDuration => UmbracoLibraryCacheDuration;
 
         MacroErrorBehaviour IContentSection.MacroErrorBehaviour => MacroErrors;
 
