@@ -11,7 +11,6 @@ namespace Umbraco.Core.Models
     /// be available or not, and published or not, individually. Varying by segment
     /// is a property-level thing.</para>
     /// </remarks>
-    [Flags]
     public enum ContentVariation : byte
     {
         /// <summary>
