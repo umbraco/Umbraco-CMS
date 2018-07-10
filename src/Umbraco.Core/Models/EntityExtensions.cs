@@ -4,15 +4,6 @@ namespace Umbraco.Core.Models
 {
     public static class EntityExtensions
     {
-
-        /// <summary>
-        /// Determines whether the entity was just created and persisted.
-        /// </summary>
-        public static bool IsNewEntity(this IRememberBeingDirty entity)
-        {
-            return entity.WasPropertyDirty("Id");
-        }
-
         /// <summary>
         /// Gets additional data.
         /// </summary>

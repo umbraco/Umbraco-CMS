@@ -81,7 +81,7 @@ namespace Umbraco.Core.Models.PublishedContent
             foreach ((var alias, (var dataTypeId, var editorAlias)) in BuiltinMemberProperties)
             {
                 if (aliases.Contains(alias)) continue;
-                propertyTypes.Add(factory.CreatePropertyType(this, alias, dataTypeId, ContentVariation.InvariantNeutral));
+                propertyTypes.Add(factory.CreatePropertyType(this, alias, dataTypeId, ContentVariation.Nothing));
             }
         }
 

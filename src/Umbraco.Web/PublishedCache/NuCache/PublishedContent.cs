@@ -178,10 +178,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             get
             {
-                if (!ContentType.Variations.Has(ContentVariation.CultureNeutral)) // fixme CultureSegment?
+                if (!ContentType.VariesByCulture())
                     return _contentData.Name;
 
-                var culture = VariationContextAccessor.VariationContext.Culture;
+                var culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
                 if (culture == "")
                     return _contentData.Name;
 
@@ -194,10 +194,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             get
             {
-                if (!ContentType.Variations.Has(ContentVariation.CultureNeutral)) // fixme CultureSegment?
+                if (!ContentType.VariesByCulture())
                     return _urlSegment;
 
-                var culture = VariationContextAccessor.VariationContext.Culture;
+                var culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
                 if (culture == "")
                     return _urlSegment;
 
@@ -244,7 +244,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             // handle context culture
             if (culture == null)
-                culture = VariationContextAccessor.VariationContext.Culture;
+                culture = VariationContextAccessor?.VariationContext?.Culture ?? "";
 
             // no invariant culture infos
             if (culture == "") return null;
@@ -258,7 +258,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             get
             {
-                if (!ContentType.Variations.Has(ContentVariation.CultureNeutral)) // fixme CultureSegment?
+                if (!ContentType.VariesByCulture())
                     return NoCultureInfos;
 
                 if (_cultureInfos != null) return _cultureInfos;

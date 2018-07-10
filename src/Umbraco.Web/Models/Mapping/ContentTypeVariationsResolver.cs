@@ -13,12 +13,10 @@ namespace Umbraco.Web.Models.Mapping
         public ContentVariation Resolve(TSource source, TDestination destination, ContentVariation destMember, ResolutionContext context)
         {
             //this will always be the case, a content type will always be allowed to be invariant
-            var result = ContentVariation.InvariantNeutral;
+            var result = ContentVariation.Nothing;
 
             if (source.AllowCultureVariant)
-            {
-                result |= ContentVariation.CultureNeutral;
-            }
+                result |= ContentVariation.Culture;
 
             return result;
         }

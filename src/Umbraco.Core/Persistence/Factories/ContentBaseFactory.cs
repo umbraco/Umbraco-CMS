@@ -159,8 +159,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// </summary>
         public static DocumentDto BuildDto(IContent entity, Guid objectType)
         {
-            var contentBase = (Content) entity;
-            var contentDto = BuildContentDto(contentBase, objectType);
+            var contentDto = BuildContentDto(entity, objectType);
 
             var dto = new DocumentDto
             {
@@ -170,7 +169,7 @@ namespace Umbraco.Core.Persistence.Factories
                 ExpiresDate = entity.ExpireDate,
 
                 ContentDto = contentDto,
-                DocumentVersionDto = BuildDocumentVersionDto(contentBase, contentDto)
+                DocumentVersionDto = BuildDocumentVersionDto(entity, contentDto)
             };
 
             return dto;
@@ -181,14 +180,13 @@ namespace Umbraco.Core.Persistence.Factories
         /// </summary>
         public static MediaDto BuildDto(IMedia entity)
         {
-            var contentBase = (Models.Media) entity;
-            var contentDto = BuildContentDto(contentBase, Constants.ObjectTypes.Media);
+            var contentDto = BuildContentDto(entity, Constants.ObjectTypes.Media);
 
             var dto = new MediaDto
             {
                 NodeId = entity.Id,
                 ContentDto = contentDto,
-                MediaVersionDto = BuildMediaVersionDto(contentBase, contentDto)
+                MediaVersionDto = BuildMediaVersionDto(entity, contentDto)
             };
 
             return dto;
@@ -199,8 +197,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// </summary>
         public static MemberDto BuildDto(IMember entity)
         {
-            var member = (Member) entity;
-            var contentDto = BuildContentDto(member, Constants.ObjectTypes.Member);
+            var contentDto = BuildContentDto(entity, Constants.ObjectTypes.Member);
 
             var dto = new MemberDto
             {
@@ -210,12 +207,12 @@ namespace Umbraco.Core.Persistence.Factories
                 Password = entity.RawPasswordValue,
 
                 ContentDto = contentDto,
-                ContentVersionDto = BuildContentVersionDto(member, contentDto)
+                ContentVersionDto = BuildContentVersionDto(entity, contentDto)
             };
             return dto;
         }
 
-        private static ContentDto BuildContentDto(ContentBase entity, Guid objectType)
+        private static ContentDto BuildContentDto(IContentBase entity, Guid objectType)
         {
             var dto = new ContentDto
             {
@@ -228,7 +225,7 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        private static NodeDto BuildNodeDto(ContentBase entity, Guid objectType)
+        private static NodeDto BuildNodeDto(IContentBase entity, Guid objectType)
         {
             var dto = new NodeDto
             {
@@ -250,7 +247,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         // always build the current / VersionPk dto
         // we're never going to build / save old versions (which are immutable)
-        private static ContentVersionDto BuildContentVersionDto(ContentBase entity, ContentDto contentDto)
+        private static ContentVersionDto BuildContentVersionDto(IContentBase entity, ContentDto contentDto)
         {
             var dto = new ContentVersionDto
             {
@@ -269,7 +266,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         // always build the current / VersionPk dto
         // we're never going to build / save old versions (which are immutable)
-        private static DocumentVersionDto BuildDocumentVersionDto(Content entity, ContentDto contentDto)
+        private static DocumentVersionDto BuildDocumentVersionDto(IContent entity, ContentDto contentDto)
         {
             var dto = new DocumentVersionDto
             {
@@ -283,7 +280,7 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        private static MediaVersionDto BuildMediaVersionDto(Models.Media entity, ContentDto contentDto)
+        private static MediaVersionDto BuildMediaVersionDto(IMedia entity, ContentDto contentDto)
         {
             // try to get a path from the string being stored for media
             // fixme - only considering umbracoFile ?!

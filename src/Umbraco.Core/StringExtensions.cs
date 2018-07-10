@@ -1504,7 +1504,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Turns an null-or-whitespace string into a null string.
         /// </summary>
-        public static string NullEmpty(this string text)
+        public static string NullOrWhiteSpaceAsNull(this string text)
             => string.IsNullOrWhiteSpace(text) ? null : text;
     }
 }

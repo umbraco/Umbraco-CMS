@@ -49,9 +49,31 @@ namespace Umbraco.Core.Models
         ContentVariation Variations { get; set; }
 
         /// <summary>
-        /// Validates that a variation is valid for the content type.
+        /// Validates that a combination of culture and segment is valid for the content type.
         /// </summary>
-        bool ValidateVariation(string culture, string segment, bool throwIfInvalid);
+        /// <param name="culture">The culture.</param>
+        /// <param name="segment">The segment.</param>
+        /// <param name="wildcards">A value indicating whether wilcards are supported.</param>
+        /// <returns>True if the combination is valid; otherwise false.</returns>
+        /// <remarks>
+        /// <para>The combination must match the content type variation exactly. For instance, if the content type varies by culture,
+        /// then an invariant culture would be invalid.</para>
+        /// </remarks>
+        bool SupportsVariation(string culture, string segment, bool wildcards = false);
+
+        /// <summary>
+        /// Validates that a combination of culture and segment is valid for the content type properties.
+        /// </summary>
+        /// <param name="culture">The culture.</param>
+        /// <param name="segment">The segment.</param>
+        /// <param name="wildcards">A value indicating whether wilcards are supported.</param>
+        /// <returns>True if the combination is valid; otherwise false.</returns>
+        /// <remarks>
+        /// <para>The combination must be valid for properties of the content type. For instance, if the content type varies by culture,
+        /// then an invariant culture is valid, because some properties may be invariant. On the other hand, if the content type is invariant,
+        /// then a variant culture is invalid, because no property could possibly vary by culture.</para>
+        /// </remarks>
+        bool SupportsPropertyVariation(string culture, string segment, bool wildcards = false);
 
         /// <summary>
         /// Gets or Sets a list of integer Ids of the ContentTypes allowed under the ContentType

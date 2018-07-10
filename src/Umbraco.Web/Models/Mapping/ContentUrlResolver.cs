@@ -8,7 +8,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    internal class ContentUrlResolver : IValueResolver<IContent, ContentItemDisplay, string[]>
+    internal class ContentUrlResolver : IValueResolver<IContent, ContentItemDisplay, UrlInfo[]>
     {
         private readonly ILocalizedTextService _textService;
         private readonly IContentService _contentService;
@@ -21,12 +21,12 @@ namespace Umbraco.Web.Models.Mapping
             _logger = logger;
         }
 
-        public string[] Resolve(IContent source, ContentItemDisplay destination, string[] destMember, ResolutionContext context)
+        public UrlInfo[] Resolve(IContent source, ContentItemDisplay destination, UrlInfo[] destMember, ResolutionContext context)
         {
             var umbracoContext = context.GetUmbracoContext(throwIfMissing: false);
 
             var urls = umbracoContext == null
-                ? new[] {"Cannot generate urls without a current Umbraco Context"}
+                ? new[] { UrlInfo.Message("Cannot generate urls without a current Umbraco Context") }
                 : source.GetContentUrls(umbracoContext.UrlProvider, _textService, _contentService, _logger).ToArray();
 
             return urls;

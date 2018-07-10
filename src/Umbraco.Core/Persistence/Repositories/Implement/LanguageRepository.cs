@@ -52,7 +52,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             sql.OrderBy<LanguageDto>(dto => dto.Id);
 
             // get languages
-            var languages = Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto).ToList();
+            var languages = Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto).OrderBy(x => x.Id).ToList();
+
+            // fix inconsistencies: there has to be a default language, and it has to be mandatory
+            var defaultLanguage = languages.FirstOrDefault(x => x.IsDefaultVariantLanguage) ?? languages.First();
+            defaultLanguage.IsDefaultVariantLanguage = true;
+            defaultLanguage.Mandatory = true;
 
             // initialize the code-id map
             lock (_codeIdMap)

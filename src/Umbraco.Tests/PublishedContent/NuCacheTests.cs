@@ -84,8 +84,8 @@ namespace Umbraco.Tests.PublishedContent
                 dataType
             };
 
-            var propertyType = new PropertyType("Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral };
-            var contentType = new ContentType(-1) { Id = 2, Alias = "alias-ct", Variations = ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral };
+            var propertyType = new PropertyType("Umbraco.Void.Editor", ValueStorageType.Nvarchar) { Alias = "prop", DataTypeId = 3, Variations = ContentVariation.Culture };
+            var contentType = new ContentType(-1) { Id = 2, Alias = "alias-ct", Variations = ContentVariation.Culture };
             contentType.AddPropertyType(propertyType);
 
             var contentTypes = new[]
@@ -195,16 +195,16 @@ namespace Umbraco.Tests.PublishedContent
             // but,
             // if the content type / property type does not vary, then it's all invariant again
             // modify the content type and property type, notify the snapshot service
-            contentType.Variations = ContentVariation.InvariantNeutral;
-            propertyType.Variations = ContentVariation.InvariantNeutral;
+            contentType.Variations = ContentVariation.Nothing;
+            propertyType.Variations = ContentVariation.Nothing;
             snapshotService.Notify(new[] { new ContentTypeCacheRefresher.JsonPayload("IContentType", publishedContent.ContentType.Id, ContentTypeChangeTypes.RefreshMain) });
 
             // get a new snapshot (nothing changed in the old one), get the published content again
             var anotherSnapshot = snapshotService.CreatePublishedSnapshot(previewToken: null);
             var againContent = anotherSnapshot.Content.GetById(1);
 
-            Assert.AreEqual(ContentVariation.InvariantNeutral, againContent.ContentType.Variations);
-            Assert.AreEqual(ContentVariation.InvariantNeutral, againContent.ContentType.GetPropertyType("prop").Variations);
+            Assert.AreEqual(ContentVariation.Nothing, againContent.ContentType.Variations);
+            Assert.AreEqual(ContentVariation.Nothing, againContent.ContentType.GetPropertyType("prop").Variations);
 
             // now, "no culture" means "invariant"
             Assert.AreEqual("It Works1!", againContent.Name);
