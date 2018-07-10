@@ -286,30 +286,6 @@ namespace Umbraco.Web
 
         #region Membership
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the IsProtected method that only specifies path")]
-        public bool IsProtected(int documentId, string path)
-        {
-            return IsProtected(path.EnsureEndsWith("," + documentId));
-        }
-
-        /// <summary>
-        /// Check if a document object is protected by the "Protect Pages" functionality in umbraco
-        /// </summary>
-        /// <param name="path">The full path of the document object to check</param>
-        /// <returns>True if the document object is protected</returns>
-        public bool IsProtected(string path)
-        {
-            return MembershipHelper.IsProtected(path);
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the MemberHasAccess method that only specifies path")]
-        public bool MemberHasAccess(int nodeId, string path)
-        {
-            return MemberHasAccess(path.EnsureEndsWith("," + nodeId));
-        }
-
         /// <summary>
         /// Check if the current user has access to a document
         /// </summary>
@@ -886,7 +862,7 @@ namespace Umbraco.Web
         {
             return StringUtilities.ReplaceLineBreaksForHtml(text);
         }
-        
+
         /// <summary>
         /// Generates a hash based on the text string passed in.  This method will detect the
         /// security requirements (is FIPS enabled) and return an appropriate hash.
@@ -1051,7 +1027,7 @@ namespace Umbraco.Web
         }
 
         #endregion
-        
+
         /// <summary>
         /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which
         /// Umbraco can decrypt during the routing process in order to delegate the request to a specific MVC Controller.

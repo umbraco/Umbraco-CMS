@@ -29,15 +29,6 @@ namespace Umbraco.Core.Models
             _allowedTemplates = new List<ITemplate>();
         }
 
-        /// <summary>
-        /// Constuctor for creating a ContentType with the parent as an inherited type.
-        /// </summary>
-        /// <remarks>Use this to ensure inheritance from parent.</remarks>
-        /// <param name="parent"></param>
-        [Obsolete("This method is obsolete, use ContentType(IContentType parent, string alias) instead.", false)]
-        public ContentType(IContentType parent) : this(parent, null)
-        {
-        }
 
         /// <summary>
         /// Constuctor for creating a ContentType with the parent as an inherited type.
