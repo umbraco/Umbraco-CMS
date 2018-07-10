@@ -164,7 +164,7 @@ namespace Umbraco.Web.Routing
                 l.Reverse();
                 var s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent.Id + ")";
 
-                urls.Add(UrlInfo.Message(textService.Localize("content/routeError", s), culture));
+                urls.Add(UrlInfo.Message(textService.Localize("content/routeError", new[] { s }), culture));
                 return true;
             }
 
