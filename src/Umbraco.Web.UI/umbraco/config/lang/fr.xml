@@ -46,6 +46,7 @@
     <key alias="setPermissions">Spécifier les permissions</key>
     <key alias="unlock">Débloquer</key>
     <key alias="createblueprint">Créer un modèle de contenu</key>
+	<key alias="resendInvite">Envoyer à nouveau l'invitation</key>
   </area>
   <area alias="actionCategories">
 	<key alias="content">Contenu</key>
@@ -100,9 +101,6 @@
 	</key>
     <key alias="setDomains">Domaines</key>
   </area>
-  <area alias="auditTrails">
-    <key alias="atViewingFor">Aperçu pour</key>
-  </area>
   <area alias="buttons">
     <key alias="clearSelection">Vider la sélection</key>
     <key alias="select">Choisir</key>
@@ -140,6 +138,27 @@
 	<key alias="saveAndGenerateModels">Sauver et générer les modèles</key>
     <key alias="undo">Défaire</key>
     <key alias="redo">Refaire</key>
+  </area>
+  <area alias="auditTrails">
+	<key alias="atViewingFor">Aperçu pour</key>
+	<key alias="delete">Suppressions de contenu réalisées par utilisateur</key>
+	<key alias="unpublish">Dépublications réalisées par utilisateur</key>
+	<key alias="publish">Sauvegardes et publications réalisées par utilisateur</key>
+	<key alias="save">Sauvegardes de contenu réalisées par utilisateur</key>
+	<key alias="move">Déplacements de contenu réalisés par utilisateur</key>
+	<key alias="copy">Copies de contenu réalisées par utilisateur</key>
+	<key alias="rollback">Récupérations de contenu réalisées par utilisateur</key>
+	<key alias="sendtopublish">Envois de contenu pour publication réalisés par utilisateur</key>
+	<key alias="sendtotranslate">Envois de contenu pour traduction réalisés par utilisateur</key>
+	<key alias="smallCopy">Copie</key>
+	<key alias="smallPublish">Publication</key>
+	<key alias="smallMove">Déplacement</key>
+	<key alias="smallSave">Sauvegarde</key>
+	<key alias="smallDelete">Suppression</key>
+	<key alias="smallUnPublish">Dépublication</key>
+	<key alias="smallRollBack">Récupération</key>
+	<key alias="smallSendToPublish">Envoi pour publication</key>
+	<key alias="smallSendToTranslate">Envoi pour traduction</key>
   </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">Pour changer le type de document du contenu séléctionné, faites d'abord un choix dans la liste des types valides à cet endroit.</key>
@@ -286,7 +305,8 @@
     <key alias="discardChanges">Invalider les changements</key>
     <key alias="unsavedChanges">Vous avez des changements en cours</key>
     <key alias="unsavedChangesWarning">Etes-vous certain(e) de vouloir quitter cette page? - vous avez des changements en cours</key>
-  </area>
+	<key alias="confirmUnpublish">La dépublication va supprimer cette page ainsi que tous ses descendants du site.</key> 
+ </area>
   <area alias="bulk">
     <key alias="done">Terminé</key>
 	
@@ -418,6 +438,7 @@
       La clé '%0%' existe déjà.
    ]]>
     </key>
+	<key alias="overviewTitle">Aperçu du dictionaire</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Votre nom d'utilisateur</key>
@@ -594,10 +615,10 @@
     <key alias="next">Suivant</key>
     <key alias="no">Non</key>
     <key alias="of">de</key>
-		<key alias="off">Off</key>
+	<key alias="off">Inactif</key>
     <key alias="ok">OK</key>
     <key alias="open">Ouvrir</key>
-		<key alias="on">On</key>
+	<key alias="on">Actif</key>
     <key alias="or">ou</key>
 	<key alias="orderBy">Trier par</key>
     <key alias="password">Mot de passe</key>
@@ -888,6 +909,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="forgottenPassword">Mot de passe oublié?</key>
     <key alias="forgottenPasswordInstruction">Un email contenant un lien pour ré-initialiser votre mot de passe sera envoyé à l'adresse spécifiée</key>
 	<key alias="requestPasswordResetConfirmation">Un email contenant les instructions de ré-initialisation de votre mot de passe sera envoyée à l'adresse spécifiée si elle correspond à nos informations.</key>
+	<key alias="showPassword">Montrer le mot de passe</key>
+	<key alias="hidePassword">Cacher le mot de passe</key>
 	<key alias="returnToLogin">Revenir au formulaire de connexion</key>
 	<key alias="setPasswordInstruction">Veuillez fournir un nouveau mot de passe</key>
 	<key alias="setPasswordConfirmation">Votre mot de passe a été mis à jour</key>
@@ -1419,6 +1442,9 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="unlockUserError">Une erreur est survenue lors du débloquage de l'utilisateur</key>
     <key alias="memberExportedSuccess">Le membre a été exporté vers le fichier</key>
     <key alias="memberExportedError">Une erreur est survenue lors de l'export du membre</key>
+	<key alias="deleteUserSuccess">L'utilisateur %0% a été supprimé</key>
+	<key alias="resendInviteHeader">Inviter l'utilisateur</key>
+	<key alias="resendInviteSuccess">L'invitation a été envoyée à nouveau à %0%</key>
  </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Utilise la syntaxe CSS. Ex : h1, .redHeader, .blueTex</key>
@@ -1997,8 +2023,11 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 				</table> 
 			</body>
     </html>]]>
-        </key>
+    </key>
     <key alias="invite">Inviter</key>
+	<key alias="defaultInvitationMessage">Nouvel envoi de l'invitation en cours...</key>
+	<key alias="deleteUser">Supprimer l'Utilisateur</key>
+	<key alias="deleteUserConfirmation">Etes-vous certain(e) de vouloir supprimer le compte de cet utilisateur?</key>
   </area>
 
   <area alias="validation">
@@ -2058,6 +2087,10 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="xmlDataIntegrityCheckMembers">Total XML : %0%, Total : %1%</key>
     <key alias="xmlDataIntegrityCheckMedia">Total XML : %0%, Total : %1%</key>
     <key alias="xmlDataIntegrityCheckContent">Total XML : %0%, Total publié : %1%</key>
+
+	<key alias="databaseSchemaValidationCheckDatabaseOk">Base de données - Le schéma de la base de données est correct pour cette version de Umbraco</key>
+	<key alias="databaseSchemaValidationCheckDatabaseErrors">%0% problèmes ont été détectés avec le schéma de votre base de données (Voyez le fichier log pour les détails)</key>
+	<key alias="databaseSchemaValidationCheckDatabaseLogMessage">Des erreurs ont été détectées lors de la validation du schéma de la base de données par rapport à la version actuelle de Umbraco.</key>
 
 	<key alias="httpsCheckValidCertificate">Le certificat de votre site a été marqué comme valide.</key>
     <key alias="httpsCheckInvalidCertificate">Erreur de validation du certificat : '%0%'</key>
