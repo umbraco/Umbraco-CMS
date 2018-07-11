@@ -1,125 +1,109 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
+using Umbraco.Web._Legacy.Actions;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Web._Legacy.Actions;
 
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Dictionary, null, sortOrder: 8)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Dictionary, null, sortOrder: 3)]
     public class DictionaryTreeController : TreeController
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
-            var node = base.CreateRootNode(queryStrings);
+            var root = base.CreateRootNode(queryStrings);
 
-            // For now, this is using the legacy webforms view but will need refactoring
-            // when the dictionary has been converted to Angular.
-            node.RoutePath = String.Format("{0}/framed/{1}", queryStrings.GetValue<string>("application"),
-                                           Uri.EscapeDataString("settings/DictionaryItemList.aspx"));
+            // the default section is settings, falling back to this if we can't
+            // figure out where we are from the querystring parameters
+            var section = Constants.Applications.Settings;
+            if (queryStrings["application"] != null)
+                section = queryStrings["application"];
 
-            return node;
+            // this will load in a custom UI instead of the dashboard for the root node
+            root.RoutePath = $"{section}/{Constants.Trees.Dictionary}/list";
+
+            return root;
         }
 
+        /// <summary>
+        /// The method called to render the contents of the tree structure
+        /// </summary>
+        /// <param name="id">The id of the tree item</param>
+        /// <param name="queryStrings">
+        /// All of the query string parameters passed from jsTree
+        /// </param>
+        /// <remarks>
+        /// We are allowing an arbitrary number of query strings to be pased in so that developers are able to persist custom data from the front-end
+        /// to the back end to be used in the query for model data.
+        /// </remarks>
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
-            var intId = ValidateId(id);
+            var intId = id.TryConvertTo<int>();
+            if (intId == false)
+                throw new InvalidOperationException("Id must be an integer");
 
             var nodes = new TreeNodeCollection();
-            nodes.AddRange(GetDictionaryItems(intId)
-                               .OrderBy(dictionaryItem => dictionaryItem.ItemKey)
-                               .Select(dictionaryItem => CreateTreeNode(id, queryStrings, dictionaryItem)));
+
+            if (id == Constants.System.Root.ToInvariantString())
+            {
+                nodes.AddRange(
+                    Services.LocalizationService.GetRootDictionaryItems().Select(
+                        x => CreateTreeNode(
+                            x.Id.ToInvariantString(),
+                            id,
+                            queryStrings,
+                            x.ItemKey,
+                            "icon-book-alt",
+                            Services.LocalizationService.GetDictionaryItemChildren(x.Key).Any())));
+            }
+            else
+            {
+                // maybe we should use the guid as url param to avoid the extra call for getting dictionary item
+                var parentDictionary = Services.LocalizationService.GetDictionaryItemById(intId.Result);
+                if (parentDictionary == null)
+                    return nodes;
+
+                nodes.AddRange(Services.LocalizationService.GetDictionaryItemChildren(parentDictionary.Key).ToList().OrderByDescending(item => item.Key).Select(
+                    x => CreateTreeNode(
+                        x.Id.ToInvariantString(),
+                        id,
+                        queryStrings,
+                        x.ItemKey,
+                        "icon-book-alt",
+                        Services.LocalizationService.GetDictionaryItemChildren(x.Key).Any())));
+            }
 
             return nodes;
         }
 
+        /// <summary>
+        /// Returns the menu structure for the node
+        /// </summary>
+        /// <param name="id">The id of the tree item</param>
+        /// <param name="queryStrings">
+        /// All of the query string parameters passed from jsTree
+        /// </param>
+        /// <returns></returns>
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
-            var intId = ValidateId(id);
-
             var menu = new MenuItemCollection();
 
-            if (intId == Constants.System.Root)
-            {
-                // Again, menu actions will need to use legacy views as this section hasn't been converted to Angular (yet!)
-                menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                    .ConvertLegacyMenuItem(null, "dictionary", queryStrings.GetValue<string>("application"));
+            menu.Items.Add<ActionNew>(Services.TextService.Localize($"actions/{ActionNew.Instance.Alias}"));
 
-                menu.Items.Add<RefreshNode, ActionRefresh>(
-                    Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
-            }
-            else
-            {
+            if (id != Constants.System.Root.ToInvariantString())
+                menu.Items.Add<ActionDelete>(Services.TextService.Localize(
+                    $"actions/{ActionDelete.Instance.Alias}"), true);
 
-                var dictionaryItem = Services.LocalizationService.GetDictionaryItemById(intId);
-                var entity = new EntitySlim
-                    {
-                        Id = dictionaryItem.Id,
-                        Level = 1,
-                        ParentId = -1,
-                        Name = dictionaryItem.ItemKey
-                    };
-
-                menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias))
-                    .ConvertLegacyMenuItem(entity, "dictionary", queryStrings.GetValue<string>("application"));
-
-                menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias))
-                    .ConvertLegacyMenuItem(null, "dictionary", queryStrings.GetValue<string>("application"));
-
-                menu.Items.Add<RefreshNode, ActionRefresh>(
-                    Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
-            }
+            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(
+                $"actions/{ActionRefresh.Instance.Alias}"), true);
 
             return menu;
-        }
-
-        private IEnumerable<IDictionaryItem> GetDictionaryItems(int id)
-        {
-            if (id > Constants.System.Root)
-            {
-                var dictionaryItem = Services.LocalizationService.GetDictionaryItemById(id);
-
-                if (dictionaryItem != null)
-                {
-                    return Services.LocalizationService.GetDictionaryItemChildren(dictionaryItem.Key);
-                }
-            }
-
-            return Services.LocalizationService.GetRootDictionaryItems();
-        }
-
-        private TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, IDictionaryItem dictionaryItem)
-        {
-            var hasChildren = Services.LocalizationService.GetDictionaryItemChildren(dictionaryItem.Key).Any();
-
-            // Again, menu actions will need to use legacy views as this section hasn't been converted to Angular (yet!)
-            var node = CreateTreeNode(dictionaryItem.Id.ToInvariantString(), id, queryStrings, dictionaryItem.ItemKey,
-                                      "icon-book-alt", hasChildren,
-                                      String.Format("{0}/framed/{1}", queryStrings.GetValue<string>("application"),
-                                                    Uri.EscapeDataString("settings/editDictionaryItem.aspx?id=" +
-                                                                         dictionaryItem.Id)));
-
-            return node;
-        }
-
-        private int ValidateId(string id)
-        {
-            var intId = id.TryConvertTo<int>();
-            if (intId == false)
-            {
-                throw new InvalidOperationException("Id must be an integer");
-            }
-
-            return intId.Result;
         }
     }
 }
