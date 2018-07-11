@@ -97,9 +97,6 @@
     </key>
     <key alias="setDomains">Domæner</key>
   </area>
-  <area alias="auditTrails">
-    <key alias="atViewingFor">For</key>
-  </area>
   <area alias="buttons">
     <key alias="clearSelection">Ryd valg</key>
     <key alias="select">Vælg</key>
@@ -128,8 +125,8 @@
     <key alias="saveAndSchedule">Gem og planlæg</key>
     <key alias="saveToPublish">Gem og send til udgivelse</key>
     <key alias="saveListView">Gem listevisning</key>
-    <key alias="showPage">Se siden</key>
-    <key alias="showPageDisabled">Preview er deaktiveret fordi der ikke er nogen skabelon tildelt</key>
+    <key alias="showPage">Forhåndsvisning</key>
+    <key alias="showPageDisabled">Forhåndsvisning er deaktiveret fordi der ikke er nogen skabelon tildelt</key>
     <key alias="styleChoose">Vælg formattering</key>
     <key alias="styleShow">Vis koder</key>
     <key alias="tableInsert">Indsæt tabel</key>
@@ -138,6 +135,27 @@
     <key alias="undo">Fortryd</key>
     <key alias="redo">Genskab</key>
   </area>
+  <area alias="auditTrails">
+    <key alias="atViewingFor">For</key>
+    <key alias="delete">Brugeren har slettet indholdet</key>
+    <key alias="unpublish">Brugeren har afpubliceret indholdet</key>
+    <key alias="publish">Brugeren har gemt og udgivet indholdet</key>
+    <key alias="save">Brugeren har gemt indholdet</key>
+    <key alias="move">Brugeren har flyttet indholdet</key>
+    <key alias="copy">Brugeren har kopieret indholdet</key>
+    <key alias="rollback">Brugeren har tilbagerullet indholdet til en tidligere tilstand</key>
+    <key alias="sendtopublish">Brugeren har sendt indholdet til udgivelse</key>
+    <key alias="sendtotranslate">Brugeren har sendt indholdet til oversættelse</key>
+    <key alias="smallCopy">Kopieret</key>
+    <key alias="smallPublish">Udgivet</key>
+    <key alias="smallMove">Flyttet</key>
+    <key alias="smallSave">Gemt</key>
+    <key alias="smallDelete">Slettet</key>
+    <key alias="smallUnPublish">Afpubliceret</key>
+    <key alias="smallRollBack">Indhold tilbagerullet</key>
+    <key alias="smallSendToPublish">Sendt til udgivelse</key>
+    <key alias="smallSendToTranslate">Sendt til oversættelse</key>
+  </area>  
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
     <key alias="changeDocTypeInstruction2">Kontroller derefter, at alle egenskaber bliver overført rigtigt til den nye dokumenttype, og klik derefter på Gem.</key>
@@ -193,7 +211,10 @@
     <key alias="parentNotPublishedAnomaly">Upd: dette dokument er udgiver, men er ikke i cachen (intern fejl)</key>
     <key alias="getUrlException">Kunne ikke hente url'en</key>
     <key alias="routeError">Dette dokument er udgivet, men dets url ville kollidere med indholdet %0%</key>
-    <key alias="publish">Udgivet</key>
+    <key alias="publish">Udgiv</key>
+    <key alias="published">Udgivet</key>
+    <key alias="publishedPendingChanges">Udgivet (Ventede ændringer)</key>    
+    
     <key alias="publishStatus">Udgivelsesstatus</key>
     <key alias="releaseDate">Udgivelsesdato</key>
     <key alias="unpublishDate">Afpubliceringsdato</key>
@@ -206,6 +227,7 @@
     <key alias="altTextOptional">Alternativ tekst (valgfri)</key>
     <key alias="type">Type</key>
     <key alias="unPublish">Afpublicér</key>
+    <key alias="unpublished">Afpubliceret</key>
     <key alias="updateDate">Sidst redigeret</key>
     <key alias="updateDateDesc" version="7.0">Tidspunkt for seneste redigering</key>
     <key alias="uploadClear">Fjern fil</key>
@@ -379,6 +401,7 @@
     <key alias="selectUsers">Vælg brugere</key>
     <key alias="noIconsFound">Ingen ikoner blev fundet</key>
     <key alias="noMacroParams">Der er ingen parametre for denne makro</key>
+    <key alias="noMacros">Der er ikke tilføjet nogen makroer</key>
     <key alias="linkYour">Link dit</key>
     <key alias="unLinkYour">Fjern link fra dit</key>
     <key alias="account">konto</key>
@@ -645,6 +668,16 @@
 
     <key alias="toggleListView">Brug listevisning</key>
     <key alias="toggleAllowAsRoot">Tillad på rodniveau</key>
+
+    <key alias="commentLine">Comment/Uncomment lines</key>
+    <key alias="removeLine">Remove line</key>
+    <key alias="copyLineUp">Copy Lines Up</key>
+    <key alias="copyLineDown">Copy Lines Down</key>
+    <key alias="moveLineUp">Move Lines Up</key>
+    <key alias="moveLineDown">Move Lines Down</key>
+
+    <key alias="generalHeader">General</key>
+    <key alias="editorHeader">Editor</key>
   </area>
 
   <area alias="graphicheadline">
@@ -752,6 +785,8 @@
     <key alias="forgottenPassword">Glemt adgangskode?</key>
     <key alias="forgottenPasswordInstruction">En e-mail vil blive sendt til den angivne adresse med et link til at nulstille din adgangskode</key>
     <key alias="requestPasswordResetConfirmation">En e-mail med instruktioner for nulstilling af adgangskoden vil blive sendt til den angivne adresse, hvis det matcher vores optegnelser</key>
+    <key alias="showPassword">Vis adgangskode</key>
+    <key alias="hidePassword">Skjul adgangskode</key>
     <key alias="returnToLogin">Tilbage til login formular</key>
     <key alias="setPasswordInstruction">Angiv en ny adgangskode</key>
     <key alias="setPasswordConfirmation">Din adgangskode er blevet opdateret</key>
@@ -888,7 +923,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="publicAccess">
     <key alias="paAdvanced">Rollebaseret beskyttelse</key>
     <key alias="paAdvancedHelp">Hvis du ønsker at kontrollere adgang til siden ved hjælp af rollebaseret godkendelse via Umbracos medlemsgrupper.</key>
-    <key alias="paAdvancedNoGroups"><![CDATA[Du skal oprette en medlemsgruppe før du kan bruge <br />rollebaseret godkendelse]]></key>
+    <key alias="paAdvancedNoGroups">Du skal oprette en medlemsgruppe før du kan bruge rollebaseret godkendelse</key>
     <key alias="paErrorPage">Fejlside</key>
     <key alias="paErrorPageHelp">Brugt når folk er logget ind, men ingen adgang</key>
     <key alias="paHowWould">Vælg hvordan siden skal beskyttes</key>
@@ -1093,31 +1128,131 @@ Mange hilsner fra Umbraco robotten
     <key alias="preview">Forhåndsvisning</key>
     <key alias="styles">Styles</key>
   </area>
+
   <area alias="template">
     <key alias="edittemplate">Rediger skabelon</key>
+
+    <key alias="insertSections">Sektioner</key>
     <key alias="insertContentArea">Indsæt indholdsområde</key>
-    <key alias="insertContentAreaPlaceHolder">Indsæt indholdsområdemarkering</key>
-    <key alias="insertDictionaryItem">Indsæt ordbogselement</key>
-    <key alias="insertMacro">Indsæt makro</key>
-    <key alias="insertPageField">Indsæt Umbraco sidefelt</key>
+    <key alias="insertContentAreaPlaceHolder">Indsæt pladsholder for indholdsområde</key>
+
+    <key alias="insert">Indsæt</key>
+    <key alias="insertDesc">Hvad vil du indsætte?</key>
+
+    <key alias="insertDictionaryItem">Oversættelse</key>
+    <key alias="insertDictionaryItemDesc">Indsætter en oversætbar tekst, som skifter efter det sprog, som websitet vises i.</key>
+
+    <key alias="insertMacro">Makro</key>
+    <key alias="insertMacroDesc">
+      En makro er et element, som kan have forskellige indstillinger, når det indsættes. 
+      Brug det som en genbrugelig del af dit design såsom gallerier, formularer og lister.
+    </key>
+
+    <key alias="insertPageField">Sideværdi</key>
+    <key alias="insertPageFieldDesc">
+      Viser værdien af et felt fra den nuværende side. Kan indstilles til at bruge rekursive værdier eller 
+      vise en standardværdi i tilfælde af, at feltet er tomt.
+    </key>
+
+    <key alias="insertPartialView">Partial view</key>
+    <key alias="insertPartialViewDesc">
+      Et Partial View er et skabelonelement, som kan indsættes i andre skabeloner og derved 
+      genbruges og deles på tværs af sideskabelonerne.
+    </key>
+
     <key alias="mastertemplate">Master skabelon</key>
     <key alias="quickGuide">Lynguide til Umbracos skabelontags</key>
+    <key alias="noMastertemplate">Ingen masterskabelon</key>
+    <key alias="noMaster">Ingen master</key>
+
+    <key alias="renderBody">Indsæt en underliggende skabelon</key>
+    <key alias="renderBodyDesc">
+      <![CDATA[
+      Henter indholdet af en underliggende skabelon ind, ved at 
+      indsætte et <code>@RenderBody()</code> element.
+      ]]>
+    </key>
+
+
+    <key alias="defineSection">Definer en sektion</key>
+    <key alias="defineSectionDesc">
+      <![CDATA[
+         Definerer en del af din skabelon som en navngivet sektion, ved at 
+         omkranse den i <code>@section { ... }</code>. Herefter kan denne sektion flettes ind i 
+         overliggende skabelon ved at indsætte et <code>@RenderSection</code> element.
+      ]]>
+    </key>
+
+    <key alias="renderSection">Indsæt en sektion</key>
+    <key alias="renderSectionDesc">
+      <![CDATA[
+      Henter indholdet af en sektion fra den underliggende skabelon ind, ved at indsætte et 
+      <code>@RenderSection(name)</code> element. Den underliggende skabelon skal have 
+      defineret en sektion via et <code>@section [name]{ ... }</code> element.
+      ]]>
+    </key>
+
+    <key alias="sectionName">Sektionsnavn</key>
+    <key alias="sectionMandatory">Sektionen er obligatorisk</key>
+    
+    <key alias="sectionMandatoryDesc">
+      Hvis obligatorisk, skal underskabelonen indeholde en <code>@section</code> -definition.
+    </key>
+
+
+    <key alias="queryBuilder">Query builder</key>
+    <key alias="itemsReturned">sider returneret, på</key>
+
+    <key alias="iWant">Returner</key>
+    <key alias="allContent">alt indhold</key>
+    <key alias="contentOfType">indhold af typen &quot;%0%&quot;</key>
+    
+    <key alias="from">fra</key>
+    <key alias="websiteRoot">mit website</key>
+    <key alias="where">hvor</key>
+    <key alias="and">og</key>
+
+    <key alias="is">er</key>
+    <key alias="isNot">ikke er</key>
+    <key alias="before">er før</key>
+    <key alias="beforeIncDate">er før (inkl. valgte dato)</key>
+    <key alias="after">er efter</key>
+    <key alias="afterIncDate">er efter (inkl. valgte dato)</key>
+    <key alias="equals">er</key>
+    <key alias="doesNotEqual">ikke er</key>
+    <key alias="contains">indeholder</key>
+    <key alias="doesNotContain">ikke indeholder</key>
+    <key alias="greaterThan">er større end</key>
+    <key alias="greaterThanEqual">er større end eller det samme som</key>
+    <key alias="lessThan">er mindre end</key>
+    <key alias="lessThanEqual">er mindre end eller det samme som</key>
+
+    <key alias="id">Id</key>
+    <key alias="name">Navn</key>
+    <key alias="createdDate">Oprettelsesdato</key>
+    <key alias="lastUpdatedDate">Sidste opdatering</key>
+
+    <key alias="orderBy">Sortér efter</key>
+    <key alias="ascending">stigende rækkefølge</key>
+    <key alias="descending">faldende rækkefølge</key>
+
     <key alias="template">Skabelon</key>
   </area>
+  
   <area alias="grid">
     <key alias="rte">Rich Text Editor</key>
-    <key alias="media">Image</key>
+    <key alias="media">Billede</key>
     <key alias="macro">Macro</key>
     <key alias="embed">Embed</key>
-    <key alias="headline">Headline</key>
-    <key alias="quote">Quote</key>  
+    <key alias="headline">Overskrift</key>
+    <key alias="quote">Citat</key>  
     <key alias="insertControl">Vælg indholdstype</key>
     <key alias="chooseLayout">Vælg layout</key>
     <key alias="addRows">Tilføj række</key>
     <key alias="addElement">Tilføj indhold</key>
     <key alias="dropElement">Slip indhold</key>
     <key alias="settingsApplied">Indstillinger tilføjet</key>
- 
+
     <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
     <key alias="contentAllowed">Indholdet er tilladt her</key>
 
@@ -1126,9 +1261,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="placeholderImageCaption">Billedtekst...</key>
     <key alias="placeholderWriteHere">Skriv her...</key>
 
-    <key alias="gridLayouts">Gitterlayout</key>
-    <key alias="gridLayoutsDetail">Et layout er det overordnede arbejdsområde til dit gitter - du vil typisk kun behøve ét eller to</key>
-    <key alias="addGridLayout">Tilføj gitterlayout</key>
+    <key alias="gridLayouts">Grid layout</key>
+    <key alias="gridLayoutsDetail">Et layout er det overordnede arbejdsområde til dit grid - du vil typisk kun behøve ét eller to</key>
+    <key alias="addGridLayout">Tilføj grid layout</key>
     <key alias="addGridLayoutDetail">Juster dit layout ved at justere kolonnebredder og tilføj yderligere sektioner</key>
 
     <key alias="rowConfigurations">Rækkekonfigurationer</key>
@@ -1137,7 +1272,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="addRowConfigurationDetail">Juster rækken ved at indstille cellebredder og tilføje yderligere celler</key>
 
     <key alias="columns">Kolonner</key>
-    <key alias="columnsDetails">Det totale antaller kolonner i gitteret</key>
+    <key alias="columnsDetails">Det totale antal kolonner i dit grid</key>
 
     <key alias="settings">Indstillinger</key>
     <key alias="settingsDetails">Konfigurer, hvilket indstillinger, brugeren kan ændre</key>
@@ -1239,10 +1374,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="removeParagraph">Fjern paragraf-tags</key>
     <key alias="removeParagraphHelp">Fjerner eventuelle &amp;lt;P&amp;gt; omkring teksten</key>
     <key alias="standardFields">Standard felter</key>
-    <key alias="uppercase">Uppercase</key>
+    <key alias="uppercase">Store bogstaver</key>
     <key alias="urlEncode">URL encode</key>
     <key alias="urlEncodeHelp">Hvis indholdet af felterne skal sendes til en url, skal denne slåes til så specialtegn formateres</key>
-    <key alias="usedIfAllEmpty">Denne tekst vil blive brugt hvis ovenstående felter er tomme</key>
+    <key alias="usedIfAllEmpty">Denne tekst bruges hvis ovenstående felter er tomme</key>
     <key alias="usedIfEmpty">Dette felt vil blive brugt hvis ovenstående felt er tomt</key>
     <key alias="withTime">Ja, med klokkeslæt. Dato/tid separator: </key>
   </area>
@@ -1298,6 +1433,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="relationTypes">Relationstyper</key>
     <key alias="packager">Pakker</key>
     <key alias="packages">Pakker</key>
+    <key alias="partialViews">Partial Views</key>
+    <key alias="partialViewMacros">Partial View Makro Filer</key>
     <key alias="python">Python</key>
     <key alias="repositories">Installer fra "repository"</key>
     <key alias="runway">Installer Runway</key>
@@ -1425,7 +1562,7 @@ Mange hilsner fra Umbraco robotten
     </key>
   </area>
   <area alias="validation">
-    <key alias="validation">Validation</key>
+    <key alias="validation">Validering</key>
     <key alias="validateAsEmail">Valider som e-mail</key>
     <key alias="validateAsNumber">Valider som tal</key>
     <key alias="validateAsUrl">Valider som Url</key>
@@ -1459,5 +1596,8 @@ Mange hilsner fra Umbraco robotten
   </area>
   <area alias="emptyStates">
     <key alias="emptyDictionaryTree">Ingen ordbog elementer at vælge imellem</key>
+  </area>
+  <area alias="textbox">
+    <key alias="characters_left">Karakterer tilbage</key>
   </area>
 </language>

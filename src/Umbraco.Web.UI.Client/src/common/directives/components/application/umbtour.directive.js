@@ -304,6 +304,12 @@ In the following example you see how to run some custom logic before a step goes
                 scope.elementNotFound = false;                
 
                 $timeout(function () {
+                    // clear element when step as marked as intro, so it always displays in the center
+                    if (scope.model.currentStep && scope.model.currentStep.type === "intro") {
+                        scope.model.currentStep.element = null;
+                        scope.model.currentStep.eventElement = null;
+                        scope.model.currentStep.event = null;
+                    }
 
                     // if an element isn't set - show the popover in the center
                     if(scope.model.currentStep && !scope.model.currentStep.element) {

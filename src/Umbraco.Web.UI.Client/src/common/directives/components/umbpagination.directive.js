@@ -176,7 +176,7 @@ Use this directive to generate a pagination.
              }
          };
 
-         var unbindPageNumberWatcher = scope.$watch('pageNumber', function(newValue, oldValue){
+         var unbindPageNumberWatcher =  scope.$watchCollection('[pageNumber, totalPages]', function (newValues, oldValues) {
             activate();
          });
 

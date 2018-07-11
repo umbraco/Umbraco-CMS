@@ -316,6 +316,7 @@
     <Compile Include="Logging\RollingFileCleanupAppender.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\Upgrade\V_7_10_0\RenamePreviewFolder.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_12_0\UpdateUmbracoConsent.cs" />
     <Compile Include="Migrations\Upgrade\V_7_8_0\AddIndexToPropertyTypeAliasColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_7_8_0\AddInstructionCountColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_7_8_0\AddMediaVersionTable.cs" />
@@ -402,6 +403,7 @@
     <Compile Include="PropertyEditors\PropertyEditorTagsExtensions.cs" />
     <Compile Include="PropertyEditors\SliderPropertyEditorConfiguration.cs" />
     <Compile Include="PropertyEditors\TagConfiguration.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\FlexibleDropdownPropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValue.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValueTypeConverter.cs" />
     <Compile Include="PropertyEditors\ValueListConfiguration.cs" />

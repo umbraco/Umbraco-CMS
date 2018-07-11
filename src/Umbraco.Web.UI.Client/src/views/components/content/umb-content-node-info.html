@@ -33,9 +33,8 @@
                     <umb-load-indicator ng-if="loadingAuditTrail"></umb-load-indicator>
 
                     <div ng-if="auditTrail.length === 0" style="padding: 10px;">
-                        <umb-empty-state
-                            position="center"
-                            size="small">
+                        <umb-empty-state position="center"
+                                         size="small">
                             <localize key="content_noChanges"></localize>
                         </umb-empty-state>
                     </div>
@@ -48,12 +47,11 @@
 
                             <div class="history-item__break">
                                 <div class="history-item__avatar">
-                                    <umb-avatar
-                                        color="secondary"
-                                        size="xs"
-                                        name="{{item.userName}}"
-                                        img-src="{{item.userAvatars[3]}}"
-                                        img-srcset="{{item.userAvatars[4]}} 2x, {{item.userAvatars[4]}} 3x">
+                                    <umb-avatar color="secondary"
+                                                size="xs"
+                                                name="{{item.userName}}"
+                                                img-src="{{item.userAvatars[3]}}"
+                                                img-srcset="{{item.userAvatars[4]}} 2x, {{item.userAvatars[4]}} 3x">
                                     </umb-avatar>
                                 </div>
 
@@ -64,13 +62,16 @@
                             </div>
 
                             <div class="history-item__break">
-                                <umb-badge
-                                    style="margin-right: 5px;"
-                                    size="xxs"
-                                    color="{{item.logTypeColor}}">
-                                    {{ item.logType }}
+                                <umb-badge size="xs"
+                                           color="{{item.logTypeColor}}">
+                                  
+                                    <localize key="auditTrails_small{{ item.logType }}">{{ item.logType }}</localize>
                                 </umb-badge>
-                                <span>{{ item.comment }}</span>
+                                <span>
+                                    <localize key="auditTrails_{{ item.logType | lowercase }}">{{ item.comment }}</localize>
+                                </span>
+
+                                
                             </div>
 
                         </div>
@@ -79,11 +80,10 @@
                 </div>
 
                 <div class="flex justify-center">
-                    <umb-pagination
-                        ng-if="auditTrailOptions.totalPages > 1"
-                        page-number="auditTrailOptions.pageNumber"
-                        total-pages="auditTrailOptions.totalPages"
-                        on-change="auditTrailPageChange(pageNumber)">
+                    <umb-pagination ng-if="auditTrailOptions.totalPages > 1"
+                                    page-number="auditTrailOptions.pageNumber"
+                                    total-pages="auditTrailOptions.totalPages"
+                                    on-change="auditTrailPageChange(pageNumber)">
                     </umb-pagination>
                 </div>
 
@@ -101,10 +101,9 @@
                     <div class="flex items-center flex-column">
 
 
-                        <umb-date-time-picker
-                            data-element="node-info-publish"
-                            options="datePickerConfig"
-                            on-change="datePickerChange(event, 'publish')">
+                        <umb-date-time-picker data-element="node-info-publish"
+                                              options="datePickerConfig"
+                                              on-change="datePickerChange(event, 'publish')">
 
                             <div class="date-container">
 
@@ -133,10 +132,9 @@
                     <div class="date-separate"></div>
 
                     <div class="flex items-center flex-column">
-                        <umb-date-time-picker
-                            data-element="node-info-unpublish"
-                            options="datePickerConfig"
-                            on-change="datePickerChange(event, 'unpublish')">
+                        <umb-date-time-picker data-element="node-info-unpublish"
+                                              options="datePickerConfig"
+                                              on-change="datePickerChange(event, 'unpublish')">
 
                             <div class="date-container">
 
@@ -184,12 +182,13 @@
                     <umb-node-preview style="max-width: 100%; margin-bottom: 0;"
                                       icon="node.icon"
                                       name="node.contentTypeName"
+                                      alias="documentType.alias"
                                       allow-open="allowChangeDocumentType"
                                       on-open="openDocumentType(documentType)">
                     </umb-node-preview>
                 </umb-control-group>
 
-                    <umb-control-group ng-if="disableTemplates == false" data-element="node-info-template" label="@template_template">
+                <umb-control-group ng-if="disableTemplates == false" data-element="node-info-template" label="@template_template">
                     <select class="input-block-level"
                             ng-model="node.template"
                             ng-options="key as value for (key, value) in availableTemplates"

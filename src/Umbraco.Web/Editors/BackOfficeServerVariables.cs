@@ -278,6 +278,10 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetPublishedStatusUrl())
                         },
                         {
+                            "dictionaryApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<DictionaryController>(
+                                controller => controller.DeleteById(int.MaxValue))
+						},
+                        {
                             "nuCacheStatusBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<NuCacheStatusController>(
                                 controller => controller.GetStatus())
                         },
@@ -293,6 +297,7 @@ namespace Umbraco.Web.Editors
                             "languageApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LanguageController>(
                                 controller => controller.GetAllLanguages())
                         }
+
                     }
                 },
                 {

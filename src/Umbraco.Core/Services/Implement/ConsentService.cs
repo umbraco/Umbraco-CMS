@@ -9,7 +9,7 @@ using Umbraco.Core.Scoping;
 namespace Umbraco.Core.Services.Implement
 {
     /// <summary>
-    /// Implements <see cref="IContentService"/>.
+    /// Implements <see cref="IConsentService"/>.
     /// </summary>
     internal class ConsentService : ScopeRepositoryService, IConsentService
     {

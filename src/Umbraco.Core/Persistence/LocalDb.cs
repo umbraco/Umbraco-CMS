@@ -141,7 +141,7 @@ namespace Umbraco.Core.Persistence
         {
             EnsureAvailable();
             var instances = GetInstances();
-            return instances != null && instances.Contains(instanceName);
+            return instances != null && instances.Contains(instanceName, StringComparer.OrdinalIgnoreCase);
         }
 
         /// <summary>

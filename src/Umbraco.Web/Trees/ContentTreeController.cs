@@ -55,12 +55,14 @@ namespace Umbraco.Web.Trees
                 //Special check to see if it ia a container, if so then we'll hide children.
                 var isContainer = entity.IsContainer;   // && (queryStrings.Get("isDialog") != "true");
 
+                var hasChildren = ShouldRenderChildrenOfContainer(entity);
+                
                 var node = CreateTreeNode(
                     entity,
                     Constants.ObjectTypes.Document,
                     parentId,
                     queryStrings,
-                    entity.HasChildren && !isContainer);
+                    hasChildren);
 
                 // entity is either a container, or a document
                 if (isContainer)
@@ -156,16 +158,13 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
 
-            var nodeMenu = GetAllNodeMenuItems(item);
-            var allowedMenuItems = GetAllowedUserMenuItemsForNode(item);
-
-            FilterUserAllowedMenuItems(nodeMenu, allowedMenuItems);
-
-            //if the media item is in the recycle bin, don't have a default menu, just show the regular menu
+            var nodeMenu = GetAllNodeMenuItems(item);            
+            
+            //if the content node is in the recycle bin, don't have a default menu, just show the regular menu
             if (item.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
                 nodeMenu.DefaultMenuAlias = null;
-                nodeMenu.Items.Insert(2, new MenuItem(ActionRestore.Instance, Services.TextService.Localize("actions", ActionRestore.Instance.Alias)));
+                nodeMenu = GetNodeMenuItemsForDeletedContent(item);
             }
             else
             {
@@ -173,6 +172,8 @@ namespace Umbraco.Web.Trees
                 nodeMenu.DefaultMenuAlias = ActionNew.Instance.Alias;
             }
 
+            var allowedMenuItems = GetAllowedUserMenuItemsForNode(item);
+            FilterUserAllowedMenuItems(nodeMenu, allowedMenuItems);
 
             return nodeMenu;
         }
@@ -244,6 +245,23 @@ namespace Umbraco.Web.Trees
             return menu;
         }
 
+        /// <summary>
+        /// Returns a collection of all menu items that can be on a deleted (in recycle bin) content node
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        protected MenuItemCollection GetNodeMenuItemsForDeletedContent(IUmbracoEntity item)
+        {
+            var menu = new MenuItemCollection();
+            menu.Items.Add<ActionRestore>(Services.TextService.Localize("actions", ActionRestore.Instance.Alias));
+            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
+
+            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
+
+            return menu;
+        }
+
+        
         /// <summary>
         /// set name according to variations
         /// </summary>

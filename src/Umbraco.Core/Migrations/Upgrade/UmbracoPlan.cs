@@ -4,6 +4,7 @@ using Semver;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade.V_7_10_0;
+using Umbraco.Core.Migrations.Upgrade.V_7_12_0;
 using Umbraco.Core.Migrations.Upgrade.V_7_5_0;
 using Umbraco.Core.Migrations.Upgrade.V_7_5_5;
 using Umbraco.Core.Migrations.Upgrade.V_7_6_0;
@@ -204,6 +205,9 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // mergin from 7.10.0
             Chain<RenamePreviewFolder>("{79591E91-01EA-43F7-AC58-7BD286DB1E77}");
+
+            // mergin from 7.12.0
+            Chain<UpdateUmbracoConsent>("{4BCD4198-6822-4D82-8C69-6CC4086DF46A}");
 
             // 8.0.0
             // AddVariationTables1 has been superceeded by AddVariationTables2

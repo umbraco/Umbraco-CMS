@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Web.Http;
 using System.Web.SessionState;
 using AutoMapper;
@@ -121,7 +123,18 @@ namespace Umbraco.Web.Editors
             //the 'easiest' way might be to create an IPublishedContent manually and populate the legacy 'page' object with that
             //and then set the legacy parameters.
 
+            // When rendering the macro in the backoffice the default setting would be to use the Culture of the logged in user.
+            // Since a Macro might contain thing thats related to the culture of the "IPublishedContent" (ie Dictionary keys) we want
+            // to set the current culture to the culture related to the content item. This is hacky but it works.
+            var publishedContent = UmbracoContext.ContentCache.GetById(doc.Id);
+            var culture = publishedContent?.GetCulture();
+            if (culture != null)
+            {
+                Thread.CurrentThread.CurrentCulture = Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo(culture.Culture);
+            }
+
             var legacyPage = new global::umbraco.page(doc, _variationContextAccessor);
+
             UmbracoContext.HttpContext.Items["pageID"] = doc.Id;
             UmbracoContext.HttpContext.Items["pageElements"] = legacyPage.Elements;
             UmbracoContext.HttpContext.Items[global::Umbraco.Core.Constants.Conventions.Url.AltTemplate] = null;

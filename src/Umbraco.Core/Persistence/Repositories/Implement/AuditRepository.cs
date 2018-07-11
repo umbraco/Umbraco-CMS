@@ -160,7 +160,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             totalRecords = page.TotalItems;
 
             var items = page.Items.Select(
-                dto => new AuditItem(dto.Id, dto.Comment, Enum<AuditType>.Parse(dto.Header), dto.UserId ?? Constants.Security.UnknownUserId)).ToArray();
+                dto => new AuditItem(dto.Id, dto.Comment, Enum<AuditType>.ParseOrNull(dto.Header) ?? AuditType.Custom, dto.UserId ?? Constants.Security.UnknownUserId)).ToArray();
 
             // map the DateStamp
             for (var i = 0; i < items.Length; i++)

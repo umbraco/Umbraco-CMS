@@ -172,6 +172,7 @@
 
                     return $q.resolve($scope.content);
 
+
                 });
 
         }
@@ -324,7 +325,7 @@
             }
 
             if (formHelper.submitForm({ scope: $scope, skipValidation: true })) {
-
+				
                 $scope.page.buttonGroupState = "busy";
 
                 contentResource.unPublish($scope.content.id, culture)

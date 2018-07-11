@@ -259,6 +259,8 @@ Use this directive to construct a header inside the main editor window.
 
             scope.openIconPicker = function() {
                 var iconPicker = {
+                    icon: scope.icon.split(' ')[0],
+                    color: scope.icon.split(' ')[1],
                     submit: function(model) {
                         if (model.icon) {
                             if (model.color) {

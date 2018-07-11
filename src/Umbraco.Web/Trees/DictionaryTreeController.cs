@@ -13,7 +13,7 @@ using Umbraco.Web._Legacy.Actions;
 namespace Umbraco.Web.Trees
 {
     [UmbracoTreeAuthorize(Constants.Trees.Dictionary)]
-    [Tree(Constants.Applications.Settings, Constants.Trees.Dictionary, null, sortOrder: 3)]
+    [Tree(Constants.Applications.Settings, Constants.Trees.Dictionary, null, sortOrder: 8)]
     [Mvc.PluginController("UmbracoTrees")]
     [CoreTree]
     public class DictionaryTreeController : TreeController
