@@ -123,7 +123,7 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<AddTypedLabels>("{3608CD41-792A-4E9A-A97D-42A5E797EE31}");
 
             // must chain to v8 final state (see at end of file)
-            Chain("{4CACE351-C6B9-4F0C-A6BA-85A02BBD39E4}");
+            Chain("{CF51B39B-9B9A-4740-BB7C-EAF606A7BFBF}");
 
 
             // UPGRADE FROM 7, MORE RECENT
@@ -221,10 +221,13 @@ namespace Umbraco.Core.Migrations.Upgrade
             //Chain<AddTypedLabels>("{65D6B71C-BDD5-4A2E-8D35-8896325E9151}"); // stephan added that one - need a path to final state
             Add<UserForeignKeys>("{65D6B71C-BDD5-4A2E-8D35-8896325E9151}", "{4CACE351-C6B9-4F0C-A6BA-85A02BBD39E4}");
 
+            // 8.0.0
+            Chain<FallbackLanguage>("{CF51B39B-9B9A-4740-BB7C-EAF606A7BFBF}");
+
             // FINAL STATE - MUST MATCH LAST ONE ABOVE !
             // whenever this changes, update all references in this file!
 
-            Add(string.Empty, "{4CACE351-C6B9-4F0C-A6BA-85A02BBD39E4}");
+            Add(string.Empty, "{CF51B39B-9B9A-4740-BB7C-EAF606A7BFBF}");
         }
     }
 }
