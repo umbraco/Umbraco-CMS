@@ -327,6 +327,7 @@
     <Compile Include="PropertyEditors\TrueFalseConfiguration.cs" />
     <Compile Include="PropertyEditors\TrueFalseConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\UserPickerConfiguration.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\FlexibleDropdownPropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentValueConverterBase.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentSingleValueConverter.cs" />
