@@ -26,18 +26,8 @@ namespace Umbraco.Core
 
                 [Obsolete("No longer supported, this is here for backwards compatibility only")]
                 public const string MemberIdRuleType = "MemberId";
-                [Obsolete("No longer supported, this is here for backwards compatibility only")]
-                public const string MemberGroupIdRuleType = "MemberGroupId";
             }
 
-            public static class Localization
-            {
-                /// <summary>
-                /// The root id for all top level dictionary items
-                /// </summary>
-                [Obsolete("There is no dictionary root item id anymore, it is simply null")]
-                public const string DictionaryItemRootId = "41c7638d-f529-4bff-853e-59a0c2fb1bde";
-            }
 
             public static class DataTypes
             {

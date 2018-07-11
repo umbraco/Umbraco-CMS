@@ -57,7 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <!-- note: NuGet deals with transitive references now -->
-    <PackageReference Include="AutoMapper" Version="6.2.2" />
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="ClientDependency" Version="1.9.6" />
     <PackageReference Include="HtmlAgilityPack" Version="1.7.2" />
     <PackageReference Include="ImageProcessor" Version="2.6.1.19" />

@@ -21,12 +21,6 @@ namespace Umbraco.Core.Security
             _defaultEmailSender = defaultEmailSender;
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the constructor specifying all dependencies")]
-        public EmailService()
-            : this(UmbracoConfig.For.UmbracoSettings().Content.NotificationEmailAddress, new EmailSender())
-        {
-        }
 
         public async Task SendAsync(IdentityMessage message)
         {

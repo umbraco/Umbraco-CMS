@@ -693,13 +693,6 @@ namespace Umbraco.Core
             return s.LastIndexOf(value, StringComparison.OrdinalIgnoreCase);
         }
 
-        [Obsolete("Use Guid.TryParse instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static bool IsGuid(this string str, bool withHyphens)
-        {
-            Guid g;
-            return Guid.TryParse(str, out g);
-        }
 
         /// <summary>
         /// Tries to parse a string into the supplied type by finding and using the Type's "Parse" method

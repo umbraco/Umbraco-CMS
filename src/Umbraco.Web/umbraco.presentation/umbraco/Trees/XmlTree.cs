@@ -5,12 +5,9 @@ using System.Xml.Schema;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Web.Script.Serialization;
-using Umbraco.Core.IO;
 using Umbraco.Web.Composing;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web._Legacy.Actions;
-using Action = Umbraco.Web._Legacy.Actions.Action;
 
 namespace umbraco.cms.presentation.Trees
 {
@@ -263,30 +260,7 @@ namespace umbraco.cms.presentation.Trees
             set { m_nodeType = value; }
         }
 
-        /// <summary>
-        /// Used by the content tree and flagged as true if the node is not published
-        /// </summary>
-        [Obsolete("Use the XmlTreeNode.NodeStyle object to set node styles")]
-        public bool? NotPublished
-        {
-            get { return m_notPublished; }
-            set { m_notPublished = value; }
-        }
 
-        /// <summary>
-        /// Used by the content tree and flagged as true if the node is protected
-        /// </summary>
-        [Obsolete("Use the XmlTreeNode.NodeStyle object to set node styles")]
-        public bool? IsProtected
-        {
-            get { return m_isProtected; }
-            set
-            {
-                m_isProtected = value;
-                if (m_isProtected.HasValue && m_isProtected.Value)
-                    this.Style.SecureNode();
-            }
-        }
 
         /// <summary>
         /// Returns the styling object used to add common styles to a node
@@ -353,17 +327,6 @@ namespace umbraco.cms.presentation.Trees
             }
         }
 
-        /// <summary>
-        /// Dims the color of the node
-        /// </summary>
-        ///<remarks>
-        ///This adds the class to the existing icon class as to not override anything.
-        ///</remarks>
-        [Obsolete("Use XmlTreeNode.Style to style nodes. Example: myNode.Style.DimNode();")]
-        public void DimNode()
-        {
-            this.Style.DimNode();
-        }
 
         #region IXmlSerializable Members
 
