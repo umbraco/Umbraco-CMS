@@ -7,11 +7,11 @@
             <umb-box-content class="block-form">
                 <ul class="nav nav-stacked" style="margin-bottom: 0;">
                     <li ng-repeat="url in node.urls">
-                        <a ng-if="node.published" href="{{url}}" target="_blank">
+                        <a ng-if="node.hasPublishedVersion" href="{{url}}" target="_blank">
                             <i class="icon icon-window-popin"></i>
                             <span>{{url}}</span>
                         </a>
-                        <div ng-if="!node.published">
+                        <div ng-if="!node.hasPublishedVersion">
                             <i class="icon icon-window-popin"></i>
                             <span>{{url}}</span>
                         </div>
