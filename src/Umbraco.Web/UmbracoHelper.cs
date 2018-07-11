@@ -1,24 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Web;
-using System.Web.Security;
 using System.Xml.XPath;
 using Umbraco.Core;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Xml;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Web.Mvc;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
+using Umbraco.Core.Xml;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
@@ -577,37 +573,38 @@ namespace Umbraco.Web
             return ContentQuery.ContentAtRoot();
         }
 
-        private static bool ConvertIdObjectToInt(object id, out int intId)
+        internal static bool ConvertIdObjectToInt(object id, out int intId)
         {
-            var s = id as string;
-            if (s != null)
+            switch (id)
             {
-                return int.TryParse(s, out intId);
-            }
+                case string s:
+                    return int.TryParse(s, out intId);
 
-            if (id is int)
-            {
-                intId = (int) id;
-                return true;
+                case int i:
+                    intId = i;
+                    return true;
+
+                default:
+                    intId = default;
+                    return false;
             }
-            intId = default(int);
-            return false;
         }
 
-        private static bool ConvertIdObjectToGuid(object id, out Guid guidId)
+        internal static bool ConvertIdObjectToGuid(object id, out Guid guidId)
         {
-            var s = id as string;
-            if (s != null)
+            switch (id)
             {
-                return Guid.TryParse(s, out guidId);
+                case string s:
+                    return Guid.TryParse(s, out guidId);
+
+                case Guid g:
+                    guidId = g;
+                    return true;
+
+                default:
+                    guidId = default;
+                    return false;
             }
-            if (id is Guid)
-            {
-                guidId = (Guid) id;
-                return true;
-            }
-            guidId = default(Guid);
-            return false;
         }
 
         private static bool ConvertIdsObjectToInts(IEnumerable<object> ids, out IEnumerable<int> intIds)
@@ -641,17 +638,21 @@ namespace Umbraco.Web
             return true;
         }
 
-        private static bool ConvertIdObjectToUdi(object id, out Udi guidId)
+        internal static bool ConvertIdObjectToUdi(object id, out Udi guidId)
         {
-            if (id is string s)
-                return Udi.TryParse(s, out guidId);
-            if (id is Udi)
+            switch (id)
             {
-                guidId = (Udi) id;
-                return true;
+                case string s:
+                    return Udi.TryParse(s, out guidId);
+
+                case Udi u:
+                    guidId = u;
+                    return true;
+
+                default:
+                    guidId = default;
+                    return false;
             }
-            guidId = null;
-            return false;
         }
 
         #endregion
