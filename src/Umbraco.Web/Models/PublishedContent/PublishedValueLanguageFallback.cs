@@ -15,9 +15,9 @@ namespace Umbraco.Web.Models.PublishedContent
     {
         private readonly ILocalizationService _localizationService;
 
-        public PublishedValueLanguageFallback(ILocalizationService localizationService)
+        public PublishedValueLanguageFallback(ServiceContext services)
         {
-            _localizationService = localizationService;
+            _localizationService = services.LocalizationService;
         }
 
         /// <inheritdoc />
