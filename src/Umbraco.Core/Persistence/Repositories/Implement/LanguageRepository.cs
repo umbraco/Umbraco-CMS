@@ -54,7 +54,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // get languages
             var dtos = Database.Fetch<LanguageDto>(sql);
             var languages = dtos.Select(ConvertFromDto).ToList();
-            PopulateFallbackLanguages(dtos, languages);
 
             // initialize the code-id map
             lock (_codeIdMap)
@@ -77,9 +76,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var translator = new SqlTranslator<ILanguage>(sqlClause, query);
             var sql = translator.Translate();
             var dtos = Database.Fetch<LanguageDto>(sql);
-            var languages = dtos.Select(ConvertFromDto).ToList();
-            PopulateFallbackLanguages(dtos, languages);
-            return languages;
+            return dtos.Select(ConvertFromDto).ToList();
         }
 
         #endregion
@@ -201,16 +198,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var entity = LanguageFactory.BuildEntity(dto);
             return entity;
-        }
-
-        private static void PopulateFallbackLanguages(List<LanguageDto> dtos, IList<ILanguage> languages)
-        {
-            foreach (var dto in dtos.Where(x => x.FallbackLanguageId.HasValue))
-            {
-                var language = languages.Single(x => x.Id == dto.Id);
-                // ReSharper disable once PossibleInvalidOperationException (DTOs with fallback languages have already been filtered in the loop condition)
-                language.FallbackLanguage = languages.Single(x => x.Id == dto.FallbackLanguageId.Value);
-            }
         }
 
         public ILanguage GetByIsoCode(string isoCode)

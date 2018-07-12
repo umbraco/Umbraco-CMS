@@ -39,15 +39,15 @@ namespace Umbraco.Tests.PublishedContent
                 {
                     new Language("en-US") { Id = 1, CultureName = "English", IsDefaultVariantLanguage = true },
                     new Language("fr") { Id = 2, CultureName = "French" },
-                    new Language("es") { Id = 3, CultureName = "Spanish" },
-                    new Language("it") { Id = 4, CultureName = "Italian" },
+                    new Language("es") { Id = 3, CultureName = "Spanish", FallbackLanguageId = 1 },
+                    new Language("it") { Id = 4, CultureName = "Italian", FallbackLanguageId = 3 },
                     new Language("de") { Id = 5, CultureName = "German" }
                 };
-            languages[2].FallbackLanguage = languages[0];
-            languages[3].FallbackLanguage = languages[2];
 
             var localizationService = Mock.Get(serviceContext.LocalizationService);
             localizationService.Setup(x => x.GetAllLanguages()).Returns(languages);
+            localizationService.Setup(x => x.GetLanguageById(It.IsAny<int>()))
+                .Returns((int id) => languages.SingleOrDefault(y => y.Id == id));
             localizationService.Setup(x => x.GetLanguageByIsoCode(It.IsAny<string>()))
                 .Returns((string c) => languages.SingleOrDefault(y => y.IsoCode == c));
         }

@@ -107,13 +107,6 @@ namespace Umbraco.Web.Models.PublishedContent
             return base.GetValue<T>(content, alias, culture, segment, defaultValue, recurse, fallbackPriority);
         }
 
-        private static bool ValueIsNotNullEmptyOrDefault<T>(T value, T defaultValue)
-        {
-            return value != null &&
-                string.IsNullOrEmpty(value.ToString()) == false &&
-                value.Equals(defaultValue) == false;
-        }
-
         private bool TryGetValueFromFallbackLanguage<T>(IPublishedProperty property, string culture, string segment, T defaultValue, out T value)
         {
             if (string.IsNullOrEmpty(culture))
@@ -123,22 +116,23 @@ namespace Umbraco.Web.Models.PublishedContent
             }
 
             var language = _localizationService.GetLanguageByIsoCode(culture);
-            if (language.FallbackLanguage == null)
+            if (language.FallbackLanguageId.HasValue == false)
             {
                 value = defaultValue;
                 return false;
             }
 
-            var fallbackLanguage = language.FallbackLanguage;
-            while (fallbackLanguage != null)
+            var fallbackLanguageId = language.FallbackLanguageId;
+            while (fallbackLanguageId.HasValue)
             {
+                var fallbackLanguage = GetLanguageById(fallbackLanguageId.Value);
                 value = property.Value(fallbackLanguage.IsoCode, segment, defaultValue);
                 if (ValueIsNotNullEmptyOrDefault(value, defaultValue))
                 {
                     return true;
                 }
 
-                fallbackLanguage = GetNextFallbackLanguage(fallbackLanguage);
+                fallbackLanguageId = fallbackLanguage.FallbackLanguageId;
             }
 
             value = defaultValue;
@@ -154,22 +148,23 @@ namespace Umbraco.Web.Models.PublishedContent
             }
 
             var language = _localizationService.GetLanguageByIsoCode(culture);
-            if (language.FallbackLanguage == null)
+            if (language.FallbackLanguageId.HasValue == false)
             {
                 value = defaultValue;
                 return false;
             }
 
-            var fallbackLanguage = language.FallbackLanguage;
-            while (fallbackLanguage != null)
+            var fallbackLanguageId = language.FallbackLanguageId;
+            while (fallbackLanguageId.HasValue)
             {
+                var fallbackLanguage = GetLanguageById(fallbackLanguageId.Value);
                 value = content.Value(alias, fallbackLanguage.IsoCode, segment, defaultValue);
                 if (ValueIsNotNullEmptyOrDefault(value, defaultValue))
                 {
                     return true;
                 }
 
-                fallbackLanguage = GetNextFallbackLanguage(fallbackLanguage);
+                fallbackLanguageId = fallbackLanguage.FallbackLanguageId;
             }
 
             value = defaultValue;
@@ -185,34 +180,39 @@ namespace Umbraco.Web.Models.PublishedContent
             }
 
             var language = _localizationService.GetLanguageByIsoCode(culture);
-            if (language.FallbackLanguage == null)
+            if (language.FallbackLanguageId.HasValue == false)
             {
                 value = defaultValue;
                 return false;
             }
 
-            var fallbackLanguage = language.FallbackLanguage;
-            while (fallbackLanguage != null)
+            var fallbackLanguageId = language.FallbackLanguageId;
+            while (fallbackLanguageId.HasValue)
             {
+                var fallbackLanguage = GetLanguageById(fallbackLanguageId.Value);
                 value = content.Value(alias, fallbackLanguage.IsoCode, segment, defaultValue, recurse);
                 if (ValueIsNotNullEmptyOrDefault(value, defaultValue))
                 {
                     return true;
                 }
 
-                fallbackLanguage = GetNextFallbackLanguage(fallbackLanguage);
+                fallbackLanguageId = fallbackLanguage.FallbackLanguageId;
             }
 
             value = defaultValue;
             return false;
         }
 
-        private ILanguage GetNextFallbackLanguage(ILanguage fallbackLanguage)
+        private ILanguage GetLanguageById(int id)
         {
-            // Ensure reference to next fall-back language is loaded if it exists
-            fallbackLanguage = _localizationService.GetLanguageById(fallbackLanguage.Id);
+            return _localizationService.GetLanguageById(id);
+        }
 
-            return fallbackLanguage.FallbackLanguage;
+        private static bool ValueIsNotNullEmptyOrDefault<T>(T value, T defaultValue)
+        {
+            return value != null &&
+                   string.IsNullOrEmpty(value.ToString()) == false &&
+                   value.Equals(defaultValue) == false;
         }
     }
 }

@@ -98,30 +98,10 @@
             });
         }
 
-        function setCultureForFallbackLanguage(lang) {
-            for (var i = 0; i < vm.availableLanguages.length; i++) {
-                if (vm.availableLanguages[i].id === lang.id) {
-                    lang.culture = vm.availableLanguages[i].culture;
-                    break;
-                }
-            }
-        }
-
         function save() {
 
             if (formHelper.submitForm({ scope: $scope })) {
                 vm.page.saveButtonState = "busy";
-
-                // Handle selection of no fall-back language (should pass null)
-                if (!vm.language.fallbackLanguage.id) {
-                    vm.language.fallbackLanguage = null;
-                }
-
-                // We need to attach the ISO code to the fall-back language to pass
-                // server-side validation.
-                if (vm.language.fallbackLanguage) {
-                    setCultureForFallbackLanguage(vm.language.fallbackLanguage);
-                }
 
                 languageResource.save(vm.language).then(function (lang) {
 

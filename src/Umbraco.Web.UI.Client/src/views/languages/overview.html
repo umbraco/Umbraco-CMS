@@ -36,7 +36,7 @@
                             <span ng-if="language.isDefault">- {{vm.labels.general}}</span>
                         </td>
                         <td><span ng-if="language.isMandatory">{{vm.labels.mandatory}}</span></td>
-                        <td><span ng-if="language.fallbackLanguage">{{vm.labels.fallsbackTo}}: {{language.fallbackLanguage.name}}</span></td>
+                        <td><span ng-if="language.fallbackLanguageId">{{vm.labels.fallsbackTo}}: {{vm.getLanguageById(language.fallbackLanguageId).name}}</span></td>
                         <td style="text-align: right;">
                             <umb-button
                                 ng-if="!language.isDefault"

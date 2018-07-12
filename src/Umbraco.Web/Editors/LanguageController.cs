@@ -98,7 +98,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(message));
             }
 
-            if (language.FallbackLanguage != null && langs.Any(x => x.FallbackLanguage?.Id == language.Id))
+            if (langs.Any(x => x.FallbackLanguageId.HasValue && x.FallbackLanguageId.Value == language.Id))
             {
                 var message = $"Language '{language.CultureName}' is defined as a fall-back language for one or more other languages, and so cannot be deleted.";
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(message));
@@ -147,20 +147,21 @@ namespace Umbraco.Web.Editors
                     CultureName = culture.DisplayName,
                     IsDefaultVariantLanguage = language.IsDefaultVariantLanguage,
                     Mandatory = language.Mandatory,
+                    FallbackLanguageId = language.FallbackLanguageId
                 };
 
-                AssociateFallbackLanguage(language, newLang);
                 Services.LocalizationService.Save(newLang);
                 return Mapper.Map<Language>(newLang);
             }
 
             found.Mandatory = language.Mandatory;
             found.IsDefaultVariantLanguage = language.IsDefaultVariantLanguage;
-            AssociateFallbackLanguage(language, found);
+            found.FallbackLanguageId = language.FallbackLanguageId;
 
-            if (DoesUpdatedFallbackLanguageCreateACircularPath(found))
+            string selectedFallbackLanguageCultureName;
+            if (DoesUpdatedFallbackLanguageCreateACircularPath(found, out selectedFallbackLanguageCultureName))
             {
-                ModelState.AddModelError("FallbackLanguage", "The selected fall back language '" + found.FallbackLanguage.CultureName + "' would create a circular path.");
+                ModelState.AddModelError("FallbackLanguage", "The selected fall back language '" + selectedFallbackLanguageCultureName + "' would create a circular path.");
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
 
@@ -168,43 +169,35 @@ namespace Umbraco.Web.Editors
             return Mapper.Map<Language>(found);
         }
 
-        private static void AssociateFallbackLanguage(Language submittedLanguage, ILanguage languageToCreateOrUpdate)
+        private bool DoesUpdatedFallbackLanguageCreateACircularPath(ILanguage language, out string selectedFallbackLanguageCultureName)
         {
-            if (submittedLanguage.FallbackLanguage == null)
+            if (language.FallbackLanguageId.HasValue == false)
             {
-                languageToCreateOrUpdate.FallbackLanguage = null;
-                return;
-            }
-
-            var fallbackLanguageCulture = CultureInfo.GetCultureInfo(submittedLanguage.FallbackLanguage.IsoCode);
-            languageToCreateOrUpdate.FallbackLanguage = new Core.Models.Language(fallbackLanguageCulture.Name)
-                {
-                    Id = submittedLanguage.FallbackLanguage.Id,
-                    CultureName = fallbackLanguageCulture.DisplayName
-                };
-        }
-
-        private bool DoesUpdatedFallbackLanguageCreateACircularPath(ILanguage language)
-        {
-            if (language.FallbackLanguage == null)
-            {
+                selectedFallbackLanguageCultureName = string.Empty;
                 return false;
             }
 
             var languages = Services.LocalizationService.GetAllLanguages().ToArray();
-            var fallbackLanguage = language.FallbackLanguage;
-            while (fallbackLanguage != null)
+            var fallbackLanguageId = language.FallbackLanguageId;
+            while (fallbackLanguageId.HasValue)
             {
-                if (fallbackLanguage.Id == language.Id)
+                if (fallbackLanguageId.Value == language.Id)
                 {
                     // We've found the current language in the path of fall back languages, so we have a circular path.
+                    selectedFallbackLanguageCultureName = GetLanguageFromCollectionById(languages, fallbackLanguageId.Value).CultureName;
                     return true;
                 }
 
-                fallbackLanguage = languages.Single(x => x.Id == fallbackLanguage.Id).FallbackLanguage;
+                fallbackLanguageId = GetLanguageFromCollectionById(languages, fallbackLanguageId.Value).FallbackLanguageId;
             }
 
+            selectedFallbackLanguageCultureName = string.Empty;
             return false;
+        }
+
+        private static ILanguage GetLanguageFromCollectionById(IEnumerable<ILanguage> languages, int id)
+        {
+            return languages.Single(x => x.Id == id);
         }
     }
 }

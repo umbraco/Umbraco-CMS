@@ -35,9 +35,9 @@ namespace Umbraco.Core.Models
         bool Mandatory { get; set; }
 
         /// <summary>
-        /// Defines the fallback language that can be used in multi-lingual scenarios to provide
+        /// Defines the id of a fallback language that can be used in multi-lingual scenarios to provide
         /// content if the requested language does not have it published.
         /// </summary>
-        ILanguage FallbackLanguage { get; set; }
+        int? FallbackLanguageId { get; set; }
     }
 }

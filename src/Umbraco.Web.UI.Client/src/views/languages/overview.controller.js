@@ -13,6 +13,16 @@
         vm.editLanguage = editLanguage;
         vm.deleteLanguage = deleteLanguage;
 
+        vm.getLanguageById = function(id) {
+            for (var i = 0; i < vm.languages.length; i++) {
+                if (vm.languages[i].id === id) {
+                    return vm.languages[i];
+                }
+            }
+
+            return null;
+        };
+
         function init() {
 
             vm.loading = true;
