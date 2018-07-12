@@ -3,10 +3,24 @@
 // --------------------------------------------------
 .umb-editor {
   min-width:66.6%;
+	
+	&-pull {
+		float:left;
+		width:66.6%;
+	}
+	
+	&-push {
+		float:right;
+	} 
 }
 
 .umb-editor-tiny {
   width: 60px;
+	
+	&.umb-editor-push {
+		width:30%;
+		min-width:0;
+	}
 }
 
 .umb-editor-small {
@@ -27,6 +41,27 @@
 .umb-codeeditor{
   width: 99%;
 }
+
+// displays property inline with preceeding
+.umb-property {
+	&--pull {
+		float:left;
+		width:60%;
+	}
+
+	&--push {
+		float:right;
+		width:35%;
+	}
+	
+	&--pull, &--push {
+		.umb-editor {
+			min-width:0;
+			width:100%;
+		}
+	}
+}
+
 
 //
 // Content picker
