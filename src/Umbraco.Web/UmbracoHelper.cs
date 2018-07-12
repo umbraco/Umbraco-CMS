@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Web;
-using System.Web.Mvc;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
@@ -672,7 +669,6 @@ namespace Umbraco.Web
                 default:
                     guidId = default;
                     return false;
-            }
             }
         }
 
