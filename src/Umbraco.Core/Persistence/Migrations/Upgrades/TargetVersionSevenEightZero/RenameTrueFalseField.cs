@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenEightZero
 {
-    [MigrationAttribute("7.8.0", 0, Constants.System.UmbracoMigrationName)]
+    [MigrationAttribute("7.12.0", 0, Constants.System.UmbracoMigrationName)]
     public class RenameTrueFalseField : MigrationBase
     {
         public RenameTrueFalseField(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
