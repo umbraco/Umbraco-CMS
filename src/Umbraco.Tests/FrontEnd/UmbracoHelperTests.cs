@@ -12,59 +12,51 @@ namespace Umbraco.Tests.FrontEnd
     public class UmbracoHelperTests
         : BaseUmbracoApplicationTest
     {
-        [Test]
-        public void Truncate_Simple()
-        {
-            var text = "Hello world, this is some text <a href='blah'>with a link</a>";
+        private const string SampleWithAnchorElement = "Hello world, this is some text <a href='blah'>with a link</a>";
+        private const string SampleWithBoldAndAnchorElements = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
 
+        [Test]
+        public static void Truncate_Simple()
+        {
             var helper = new UmbracoHelper();
 
-            var result = helper.Truncate(text, 25).ToString();
-
-            Assert.AreEqual("Hello world, this is some&hellip;", result);
-        }
-
-        /// <summary>
-        /// If a truncated string ends with a space, we should trim the space before appending the ellipsis.
-        /// </summary>
-        [Test]
-        public void Truncate_Simple_With_Trimming()
-        {
-            var text = "Hello world, this is some text <a href='blah'>with a link</a>";
-
-            var helper = new UmbracoHelper();
-
-            var result = helper.Truncate(text, 26).ToString();
+            var result = helper.Truncate(SampleWithAnchorElement, 25).ToString();
 
             Assert.AreEqual("Hello world, this is some&hellip;", result);
         }
 
         [Test]
-        public void Truncate_Inside_Word()
+        public static void When_Truncating_A_String_Ends_With_A_Space_We_Should_Trim_The_Space_Before_Appending_The_Ellipsis()
         {
-            var text = "Hello world, this is some text <a href='blah'>with a link</a>";
-
             var helper = new UmbracoHelper();
 
-            var result = helper.Truncate(text, 24).ToString();
+            var result = helper.Truncate(SampleWithAnchorElement, 26).ToString();
+
+            Assert.AreEqual("Hello world, this is some&hellip;", result);
+        }
+
+        [Test]
+        public static void Truncate_Inside_Word()
+        {
+            var helper = new UmbracoHelper();
+
+            var result = helper.Truncate(SampleWithAnchorElement, 24).ToString();
 
             Assert.AreEqual("Hello world, this is som&hellip;", result);
         }
 
         [Test]
-        public void Truncate_With_Tag()
+        public static void Truncate_With_Tag()
         {
-            var text = "Hello world, this is some text <a href='blah'>with a link</a>";
-
             var helper = new UmbracoHelper();
 
-            var result = helper.Truncate(text, 35).ToString();
+            var result = helper.Truncate(SampleWithAnchorElement, 35).ToString();
 
             Assert.AreEqual("Hello world, this is some text <a href='blah'>with&hellip;</a>", result);
         }
 
         [Test]
-        public void Create_Encrypted_RouteString_From_Anonymous_Object()
+        public static void Create_Encrypted_RouteString_From_Anonymous_Object()
         {
             var additionalRouteValues = new
             {
@@ -73,15 +65,22 @@ namespace Umbraco.Tests.FrontEnd
                 Key3 = "Value3",
                 keY4 = "valuE4"
             };
-            var encryptedRouteString = UmbracoHelper.CreateEncryptedRouteString("FormController", "FormAction", "", additionalRouteValues);
+
+            var encryptedRouteString = UmbracoHelper.CreateEncryptedRouteString(
+                "FormController",
+                "FormAction",
+                "",
+                additionalRouteValues
+                );
+
             var result = encryptedRouteString.DecryptWithMachineKey();
-            var expectedResult = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
+            const string expectedResult = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
 
             Assert.AreEqual(expectedResult, result);
         }
 
         [Test]
-        public void Create_Encrypted_RouteString_From_Dictionary()
+        public static void Create_Encrypted_RouteString_From_Dictionary()
         {
             var additionalRouteValues = new Dictionary<string, object>()
             {
@@ -90,77 +89,74 @@ namespace Umbraco.Tests.FrontEnd
                 {"Key3", "Value3"},
                 {"keY4", "valuE4"}
             };
-            var encryptedRouteString = UmbracoHelper.CreateEncryptedRouteString("FormController", "FormAction", "", additionalRouteValues);
+
+            var encryptedRouteString = UmbracoHelper.CreateEncryptedRouteString(
+                "FormController",
+                "FormAction",
+                "",
+                additionalRouteValues
+                );
+
             var result = encryptedRouteString.DecryptWithMachineKey();
-            var expectedResult = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
+            const string expectedResult = "c=FormController&a=FormAction&ar=&key1=value1&key2=value2&Key3=Value3&keY4=valuE4";
 
             Assert.AreEqual(expectedResult, result);
         }
 
         [Test]
-        public void Truncate_By_Words()
+        public static void Truncate_By_Words()
         {
-            var text = "Hello world, this is some text <a href='blah'>with a link</a>";
-
             var helper = new UmbracoHelper();
 
-            var result = helper.TruncateByWords(text, 4).ToString();
+            var result = helper.TruncateByWords(SampleWithAnchorElement, 4).ToString();
 
             Assert.AreEqual("Hello world, this is&hellip;", result);
         }
 
         [Test]
-        public void Truncate_By_Words_With_Tag()
+        public static void Truncate_By_Words_With_Tag()
         {
-            var text = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
-
             var helper = new UmbracoHelper();
 
-            var result = helper.TruncateByWords(text, 4).ToString();
+            var result = helper.TruncateByWords(SampleWithBoldAndAnchorElements, 4).ToString();
 
             Assert.AreEqual("Hello world, <b>this</b> is&hellip;", result);
         }
 
         [Test]
-        public void Truncate_By_Words_Mid_Tag()
+        public static void Truncate_By_Words_Mid_Tag()
         {
-            var text = "Hello world, this is some text <a href='blah'>with a link</a>";
-
             var helper = new UmbracoHelper();
 
-            var result = helper.TruncateByWords(text, 7).ToString();
+            var result = helper.TruncateByWords(SampleWithAnchorElement, 7).ToString();
 
             Assert.AreEqual("Hello world, this is some text <a href='blah'>with&hellip;</a>", result);
         }
 
         [Test]
-        public void Strip_All_Html()
+        public static void Strip_All_Html()
         {
-            var text = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
-
             var helper = new UmbracoHelper();
 
-            var result = helper.StripHtml(text, null).ToString();
+            var result = helper.StripHtml(SampleWithBoldAndAnchorElements, null).ToString();
 
             Assert.AreEqual("Hello world, this is some text with a link", result);
         }
 
         [Test]
-        public void Strip_Specific_Html()
+        public static void Strip_Specific_Html()
         {
-            var text = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
-
             string[] tags = { "b" };
 
             var helper = new UmbracoHelper();
 
-            var result = helper.StripHtml(text, tags).ToString();
+            var result = helper.StripHtml(SampleWithBoldAndAnchorElements, tags).ToString();
 
-            Assert.AreEqual("Hello world, this is some text <a href='blah'>with a link</a>", result);
+            Assert.AreEqual(SampleWithAnchorElement, result);
         }
 
         [Test]
-        public void Strip_Invalid_Html()
+        public static void Strip_Invalid_Html()
         {
             var text = "Hello world, <bthis</b> is some text <a href='blah'>with a link</a>";
 
@@ -173,7 +169,7 @@ namespace Umbraco.Tests.FrontEnd
 
         // ------- Int32 conversion tests
         [Test]
-        public static void Converting_boxed_34_to_an_int_returns_34()
+        public static void Converting_Boxed_34_To_An_Int_Returns_34()
         {
             // Arrange
             const int sample = 34;
@@ -190,7 +186,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public static void Converting_string_54_to_an_int_returns_54()
+        public static void Converting_String_54_To_An_Int_Returns_54()
         {
             // Arrange
             const string sample = "54";
@@ -207,7 +203,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public static void Converting_hello_to_an_int_returns_false()
+        public static void Converting_Hello_To_An_Int_Returns_False()
         {
             // Arrange
             const string sample = "Hello";
@@ -224,7 +220,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public static void Converting_unsupported_object_to_an_int_returns_false()
+        public static void Converting_Unsupported_Object_To_An_Int_Returns_False()
         {
             // Arrange
             var clearlyWillNotConvertToInt = new StringBuilder(0);
@@ -242,7 +238,7 @@ namespace Umbraco.Tests.FrontEnd
 
         // ------- GUID conversion tests
         [Test]
-        public static void Converting_boxed_guid_to_a_guid_returns_original_guid_value()
+        public static void Converting_Boxed_Guid_To_A_Guid_Returns_Original_Guid_Value()
         {
             // Arrange
             Guid sample = Guid.NewGuid();
@@ -259,7 +255,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public static void Converting_string_guid_to_a_guid_returns_original_guid_value()
+        public static void Converting_String_Guid_To_A_Guid_Returns_Original_Guid_Value()
         {
             // Arrange
             Guid sample = Guid.NewGuid();
@@ -276,7 +272,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public static void Converting_hello_to_a_guid_returns_false()
+        public static void Converting_Hello_To_A_Guid_Returns_False()
         {
             // Arrange
             const string sample = "Hello";
@@ -293,7 +289,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public static void Converting_unsupported_object_to_a_guid_returns_false()
+        public static void Converting_Unsupported_Object_To_A_Guid_Returns_False()
         {
             // Arrange
             var clearlyWillNotConvertToGuid = new StringBuilder(0);
@@ -311,11 +307,10 @@ namespace Umbraco.Tests.FrontEnd
 
         // ------- UDI Conversion Tests
         /// <remarks>
-        /// This requires PluginManager.Current to be initialised before
-        /// running.
+        /// This requires PluginManager.Current to be initialised before running.
         /// </remarks>
         [Test]
-        public static void Converting_boxed_udi_to_a_udi_returns_original_udi_value()
+        public static void Converting_Boxed_Udi_To_A_Udi_Returns_Original_Udi_Value()
         {
             // Arrange
             Udi.ResetUdiTypes();
@@ -333,11 +328,10 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         /// <remarks>
-        /// This requires PluginManager.Current to be initialised before
-        /// running.
+        /// This requires PluginManager.Current to be initialised before running.
         /// </remarks>
         [Test]
-        public static void Converting_string_udi_to_a_udi_returns_original_udi_value()
+        public static void Converting_String_Udi_To_A_Udi_Returns_Original_Udi_Value()
         {
             // Arrange
             Udi.ResetUdiTypes();
@@ -355,11 +349,10 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         /// <remarks>
-        /// This requires PluginManager.Current to be initialised before
-        /// running.
+        /// This requires PluginManager.Current to be initialised before running.
         /// </remarks>
         [Test]
-        public static void Converting_hello_to_a_udi_returns_false()
+        public static void Converting_Hello_To_A_Udi_Returns_False()
         {
             // Arrange
             Udi.ResetUdiTypes();
@@ -377,11 +370,10 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         /// <remarks>
-        /// This requires PluginManager.Current to be initialised before
-        /// running.
+        /// This requires PluginManager.Current to be initialised before running.
         /// </remarks>
         [Test]
-        public static void Converting_unsupported_object_to_a_udi_returns_false()
+        public static void Converting_Unsupported_Object_To_A_Udi_Returns_False()
         {
             // Arrange
             Udi.ResetUdiTypes();
