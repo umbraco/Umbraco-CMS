@@ -1,27 +1,17 @@
 <div class="umb-panel" ng-controller="Umbraco.Dialogs.LinkPickerController">
 	<div class="umb-panel-body no-header with-footer compact">
 		<umb-pane>
-			<umb-control-group label="@defaultdialogs_urlLinkPicker">
-			  	<input type="text"
-					localize="placeholder" 
-					placeholder="@general_url" 
-					class="umb-editor umb-textstring" 
-					ng-model="target.url"
-					style="float:left; min-width:0; width:60%"
-					ng-disabled="target.id"
-					 />
-				<input type="text"
-				   list="anchors"
-				   localize="placeholder"
-				   placeholder="@general_anchor"
-				   class="umb-editor umb-textstring"	
-				   style="float:right; min-width:0; width:30%"
-				   ng-model="target.anchor" />
+	<umb-control-group label="@defaultdialogs_urlLinkPicker" class="umb-property--pull">
+		<input type="text" localize="placeholder" placeholder="@general_url" class="umb-editor umb-textstring" ng-model="target.url" ng-disabled="target.id" />
+	</umb-control-group>
 
-				<datalist id="anchors">
+	<umb-control-group label="@defaultdialogs_anchorLinkPicker" class="umb-property--push">
+		<input type="text" list="anchors" localize="placeholder" placeholder="@placeholders_anchor" class="umb-editor umb-textstring" ng-model="target.anchor" />
+
+		<datalist id="anchors">
 					<option value="{{a}}" ng-repeat="a in anchorValues"></option>
 				</datalist>
-			</umb-control-group>
+	</umb-control-group>			
 
 			<umb-control-group label="@defaultdialogs_nodeNameLinkPicker">
 				<input type="text"

@@ -42,6 +42,27 @@
   width: 99%;
 }
 
+// displays property inline with preceeding
+.umb-property {
+	&--pull {
+		float:left;
+		width:60%;
+	}
+
+	&--push {
+		float:right;
+		width:35%;
+	}
+	
+	&--pull, &--push {
+		.umb-editor {
+			min-width:0;
+			width:100%;
+		}
+	}
+}
+
+
 //
 // Content picker
 // --------------------------------------------------
