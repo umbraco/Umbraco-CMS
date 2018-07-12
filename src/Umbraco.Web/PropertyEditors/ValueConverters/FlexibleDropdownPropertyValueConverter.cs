@@ -1,23 +1,18 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
     public class FlexibleDropdownPropertyValueConverter : PropertyValueConverterBase
     {
-        public FlexibleDropdownPropertyValueConverter()
-        {
-        }
-
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.EditorAlias.Equals(Umbraco.Core.Constants.PropertyEditors.Aliases.DropDownListFlexible);
+            return propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.DropDownListFlexible);
         }
 
         public override object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
@@ -51,7 +46,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             return propertyType.DataType.ConfigurationAs<DropDownFlexibleConfiguration>().Multiple
                        ? typeof(IEnumerable<string>)
                        : typeof(string);
-        }
-        
+        }        
     }
 }

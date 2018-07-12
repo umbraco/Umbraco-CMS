@@ -217,8 +217,6 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-
-
                 var rtQuery = Query<IRelationType>().Where(x => x.Alias == relationTypeAlias);
                 var relationType = _relationTypeRepository.Get(rtQuery).FirstOrDefault();
                 if (relationType == null)
@@ -244,7 +242,6 @@ namespace Umbraco.Core.Services.Implement
                 relationTypeIds = relationTypes.Select(x => x.Id).ToList();
             }
 
-
             return relationTypeIds.Count == 0
                 ? Enumerable.Empty<IRelation>()
                 : GetRelationsByListOfTypeIds(relationTypeIds);
@@ -264,7 +261,6 @@ namespace Umbraco.Core.Services.Implement
                 var relationTypes = _relationTypeRepository.Get(query);
                 relationTypeIds = relationTypes.Select(x => x.Id).ToList();
             }
-
 
             return relationTypeIds.Count == 0
                 ? Enumerable.Empty<IRelation>()
@@ -668,7 +664,6 @@ namespace Umbraco.Core.Services.Implement
             var relations = new List<IRelation>();
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-
                 foreach (var relationTypeId in relationTypeIds)
                 {
                     var id = relationTypeId;

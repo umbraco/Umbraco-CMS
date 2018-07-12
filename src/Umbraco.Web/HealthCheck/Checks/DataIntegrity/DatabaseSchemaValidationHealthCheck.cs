@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
@@ -15,13 +16,15 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
         Group = "Data Integrity")]
     public class DatabaseSchemaValidationHealthCheck : HealthCheck
     {
-        private readonly DatabaseContext _databaseContext;
+        private readonly DatabaseBuilder _databaseBuilder;
         private readonly ILocalizedTextService _textService;
+        private readonly ILogger _logger;
 
-        public DatabaseSchemaValidationHealthCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
+        public DatabaseSchemaValidationHealthCheck(DatabaseBuilder databaseBuilder, ILocalizedTextService textService, ILogger logger)
         {
-            _databaseContext = HealthCheckContext.ApplicationContext.DatabaseContext;
-            _textService = healthCheckContext.ApplicationContext.Services.TextService;
+            _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
+            _textService = textService ?? throw new ArgumentNullException(nameof(textService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
@@ -37,20 +40,23 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
 
         private HealthCheckStatus CheckDatabase()
         {
-            var results = _databaseContext.ValidateDatabaseSchema();
+            var results = _databaseBuilder.ValidateDatabaseSchema();
 
-            LogHelper.Warn(typeof(DatabaseSchemaValidationHealthCheck), _textService.Localize("databaseSchemaValidationCheckDatabaseLogMessage"));
+            _logger.Warn(typeof(DatabaseSchemaValidationHealthCheck), _textService.Localize("databaseSchemaValidationCheckDatabaseLogMessage"));
+
             foreach(var error in results.Errors)
             {
-                LogHelper.Warn(typeof(DatabaseSchemaValidationHealthCheck), error.Item1 + ": " + error.Item2);
+                _logger.Warn(typeof(DatabaseSchemaValidationHealthCheck), error.Item1 + ": " + error.Item2);
             }
 
             if(results.Errors.Count > 0)
+            {
                 return new HealthCheckStatus(_textService.Localize("healthcheck/databaseSchemaValidationCheckDatabaseErrors", new[] { results.Errors.Count.ToString() }))
                 {
                     ResultType = StatusResultType.Error,
                     View = "Umbraco.Dashboard.DatabaseSchemaValidationController"
                 };
+            }
 
             return new HealthCheckStatus(_textService.Localize("healthcheck/databaseSchemaValidationCheckDatabaseOk"))
             {

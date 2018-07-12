@@ -48,13 +48,12 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
                     //TODO: Change all singleton access to use ctor injection in v8!!!
                     //TODO: That would mean that property value converters would need to be request lifespan, hrm....
-                    bool isDebug = HttpContext.Current != null && HttpContext.Current.IsDebuggingEnabled;
                     var gridConfig = UmbracoConfig.For.GridConfig(
                         Current.ProfilingLogger.Logger,
                         Current.ApplicationCache.RuntimeCache,
                         new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins)),
                         new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config)),
-                        isDebug);
+                        Current.RuntimeState.Debug);
 
                     var sections = GetArray(obj, "sections");
                     foreach (var section in sections.Cast<JObject>())
