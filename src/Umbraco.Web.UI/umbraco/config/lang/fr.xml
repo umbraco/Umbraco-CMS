@@ -62,7 +62,7 @@
         <key alias="copy">Permettre de copier un noeud</key>
         <key alias="create">Permettre de créer des noeuds</key>
         <key alias="delete">Permettre de supprimer des noeuds</key>
-        <key alias="move">Permettre de déplacemer un noeud</key>
+        <key alias="move">Permettre de déplacer un noeud</key>
         <key alias="protect">Permettre de définir et modifier l'accès public à un noeud</key>
         <key alias="publish">Permettre de publier un noeud</key>
         <key alias="rights">Permettre de modifier les permissions pour un noeud</key>
@@ -218,7 +218,7 @@
     <key alias="routeError">Oups: ce document est publié mais son url entrerait en collision avec le contenu %0%</key>
     <key alias="publish">Publier</key>
     <key alias="published">Publié</key>
-    <key alias="publishedPendingChanges">Publié(changements en cours)</key>
+    <key alias="publishedPendingChanges">Publié (changements en cours)</key>
     <key alias="publishStatus">Statut de publication</key>
     <key alias="releaseDate">Publié le</key>
     <key alias="unpublishDate">Dépublié le</key>
@@ -265,7 +265,7 @@
 	<key alias="urls">Lien vers le média</key>
 	<key alias="orClickHereToUpload">ou cliquez ici pour choisir un fichier</key>
 	<key alias="onlyAllowedFiles">Les seuls types de fichiers autorisés sont</key>
-    <key alias="disallowedFileType">Ce fichier ne peut pas ête chargé, il n'est pas un type de fichier autorisé.</key>
+    <key alias="disallowedFileType">Ce fichier ne peut pas ête chargé, il n'est pas d'un type de fichier autorisé.</key>
 	<key alias="maxFileSize">La taille maximum de fichier est</key>
     <key alias="mediaRoot">Racine du média</key>
 </area>
@@ -276,7 +276,7 @@
   <area alias="create">
     <key alias="chooseNode">Où voulez-vous créer le nouveau %0%</key>
     <key alias="createUnder">Créer un élément sous</key>
-	<key alias="createContentBlueprint">Sélectionnez le type de document pour lequel vous voulez créer un modèle de contenu</key>
+	<key alias="createContentBlueprint">Sélectionnez le type de document pour lequel vous souhaitez créer un modèle de contenu</key>
     <key alias="updateData">Choisissez un type et un titre</key>
     <key alias="noDocumentTypes" version="7.0"><![CDATA[Il n'y a aucun type de document disponible. Vous devez d'abord les activer dans la section Paramètres, dans <strong>"Types de documents"</strong>.]]></key>
     <key alias="noMediaTypes" version="7.0"><![CDATA[Il n'y a aucun type de média disponible. Vous devez d'abord les activer dans la section Paramètres, dans <strong>"Types de médias"</strong>.]]></key>
@@ -305,7 +305,7 @@
     <key alias="discardChanges">Invalider les changements</key>
     <key alias="unsavedChanges">Vous avez des changements en cours</key>
     <key alias="unsavedChangesWarning">Etes-vous certain(e) de vouloir quitter cette page? - vous avez des changements en cours</key>
-	<key alias="confirmUnpublish">La dépublication va supprimer cette page ainsi que tous ses descendants du site.</key> 
+	<key alias="confirmUnpublish">La dépublication va supprimer du site cette page ainsi que tous ses descendants.</key> 
  </area>
   <area alias="bulk">
     <key alias="done">Terminé</key>
@@ -385,7 +385,7 @@
       en faisant référence à cet ID au sein d'un élément <code>&lt;asp:content /&gt;</code>.]]>
 	</key>
     <key alias="templateContentPlaceHolderHelp">
-		<![CDATA[<strong>Séléctionnez un placeholder id</strong> dans la liste ci-dessous. Vous pouvez seulement
+		<![CDATA[<strong>Séléctionnez un placeholder ID</strong> dans la liste ci-dessous. Vous pouvez seulement
       choisir un ID se trouvant dans le parent du modèle actuel.]]>
 	</key>
     <key alias="thumbnailimageclickfororiginal">Cliquez sur l'image pour la voir en taille réelle</key>
@@ -861,7 +861,7 @@ Vous avez installé Runway, alors pourquoi ne pas jeter un oeil au look de votre
 	</key>
     <key alias="theEndFurtherHelp">
 		<![CDATA[<h3>Aide et informations complémentaires</h3>
-Obtenez de l'aide de notre "award winning" communauté, parcourez la documentation ou regardez quelques vidéos gratuites sur la manière de construire un site simple, d'utiliser les packages ainsi qu'un guide rapide sur la terminologie Umbraco]]>
+Obtenez de l'aide de notre communauté "award winning", parcourez la documentation ou regardez quelques vidéos gratuites sur la manière de construire un site simple, d'utiliser les packages ainsi qu'un guide rapide sur la terminologie Umbraco]]>
 	</key>
     <key alias="theEndHeader">Umbraco %0% est installé et prêt à être utilisé</key>
     <key alias="theEndInstallFailed">
@@ -1077,7 +1077,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 															Salut %0%,
 														</h1>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'> 
-															Ceci est un email automatique pour vous informer que la tâche <strong>'%1%'</strong> a été executée sur la page <a style="color: #392F54; text-decoration: none; -ms-word-break: break-all; word-break: break-all;" href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> par l'utilisateur <strong>'%3%'</strong>
+															Ceci est un email automatique pour vous informer que la tâche <strong>'%1%'</strong> a été exécutée sur la page <a style="color: #392F54; text-decoration: none; -ms-word-break: break-all; word-break: break-all;" href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> par l'utilisateur <strong>'%3%'</strong>
 														</p>
 														<table border='0' cellpadding='0' cellspacing='0' class='btn btn-primary' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box;'>
 															<tbody>
@@ -1831,7 +1831,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
   </area>
   <area alias="user">
     <key alias="access">Accès</key>
-    <key alias="accessHelp">Sur base des groupes et noeuds de départ, l'utilisateur a accès aux noeuds suivants</key>
+    <key alias="accessHelp">Sur base des groupes et des noeuds de départ, l'utilisateur a accès aux noeuds suivants</key>
     <key alias="assignAccess">Donner accès</key>
     <key alias="administrators">Administrateur</key>
     <key alias="categoryField">Champ catégorie</key>
@@ -1845,7 +1845,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="changePasswordDescription">Vous pouvez changer votre mot de passe d'accès au Back Office Umbraco en remplissant le formulaire ci-dessous puis en cliquant sur le bouton "Changer le mot de passe"</key>
     <key alias="contentChannel">Canal de contenu</key>
     <key alias="createAnotherUser">Créer un autre utilisateur</key>
-    <key alias="createUserHelp">Créer de nouveaux utilisateurs pour leur donner accès à Umbraco. Lors de la création d'un nouvel utilisateur, un mot de passe est généré que vous pouvez partager avec l'utilisateur.</key>
+    <key alias="createUserHelp">Créer de nouveaux utilisateurs pour leur donner accès à Umbraco. Lors de la création d'un nouvel utilisateur, un mot de passe est généré que vous pouvez partager avec ce dernier.</key>
     <key alias="descriptionField">Champ description</key>
     <key alias="disabled">Désactiver l'utilisateur</key>
     <key alias="documentType">Type de document</key>
@@ -1889,7 +1889,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="permissionsGranularHelp">Définir les permissions sur des noeuds spécifiques</key>
     <key alias="profile">Profil</key>
     <key alias="searchAllChildren">Rechercher tous les enfants</key>
-    <key alias="sectionsHelp">Ajouter les sections auxquelles les utilisateur peuvent accéder</key>
+    <key alias="sectionsHelp">Ajouter les sections auxquelles les utilisateurs peuvent accéder</key>
     <key alias="selectUserGroups">Sélectionner les groupes d'utilisateurs</key>
     <key alias="noStartNode">Aucun noeud de départ sélectionné</key>
     <key alias="noStartNodes">Aucun noeud de départ sélectionné</key>
@@ -1917,7 +1917,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="usergroup">Groupe d'utilisateurs</key>
     <key alias="userGroups">Groupes d'utilisateurs</key>
     <key alias="userInvited">a été invité</key>
-	<key alias="userInvitedSuccessHelp">Une invitation a été envoyée au nouvel utilisateur avec les détails concernant la oonnexion à Umbraco.</key>
+	<key alias="userInvitedSuccessHelp">Une invitation a été envoyée au nouvel utilisateur avec les détails concernant la connexion à Umbraco.</key>
     <key alias="userinviteWelcomeMessage">Bien le bonjour et bienvenue dans Umbraco! Vous serez prêt.e dans moins d'1 minute, vous devez encore simplement configurer votre mot de passe et ajouter une photo pour votre avatar.</key>
     <key alias="userinviteAvatarMessage">Chargez une photo afin que les autres utilisateurs puissent vous reconnaître facilement.</key>
     <key alias="writer">Rédacteur</key>
@@ -2144,17 +2144,17 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="noSniffCheckHeaderFound"><![CDATA[L'en-tête ou le meta-tag <strong>X-Content-Type-Options</strong> utilisé pour la protection contre les vulnérabilités de MIME sniffing a été trouvé.]]></key>
     <key alias="noSniffCheckHeaderNotFound"><![CDATA[L'en-tête ou le meta-tag <strong>X-Content-Type-Options</strong> utilisé pour la protection contre les vulnérabilités de MIME sniffing n'a pas été trouvé.]]></key>
     <key alias="noSniffSetHeaderInConfigDescription">Ajoute une valeur dans la section httpProtocol/customHeaders du fichier web.config pour protéger contre les vulnérabilités de MIME sniffing.</key>
-    <key alias="noSniffSetHeaderInConfigSuccess">Une configuration a été ajoutée à votre fichier web.config pour créer un header protégeant contre les vulnérabilités de MIME sniffing.</key>
+    <key alias="noSniffSetHeaderInConfigSuccess">Une configuration a été ajoutée dans votre fichier web.config pour créer un header protégeant contre les vulnérabilités de MIME sniffing.</key>
 
     <key alias="hSTSCheckHeaderFound"><![CDATA[L'en-tête <strong>Strict-Transport-Security</strong>, aussi connu sous le nom de HSTS-header, a été trouvé.]]></key>
     <key alias="hSTSCheckHeaderNotFound"><![CDATA[L'en-tête <strong>Strict-Transport-Security</strong>, aussi connu sous le nom de HSTS-header, n'a pas été trouvé.]]></key>
     <key alias="hSTSSetHeaderInConfigDescription">Ajoute l'en-tête 'Strict-Transport-Security' avec la valeur 'max-age=10886400; preload' à la section httpProtocol/customHeaders du fichier web.config. Utilisez cette correction uniquement si vos domaines vont fonctionner en https pour les 18 prochaines semaines (minimum).</key>
-    <key alias="hSTSSetHeaderInConfigSuccess">L'en-tête HSTS a été ajouté à votre fichier web.config.</key>
+    <key alias="hSTSSetHeaderInConfigSuccess">L'en-tête HSTS a été ajouté dans votre fichier web.config.</key>
 
 	<key alias="xssProtectionCheckHeaderFound"><![CDATA[L'en-tête <strong>X-XSS-Protection</strong> a été trouvé.]]></key>
 	<key alias="xssProtectionCheckHeaderNotFound"><![CDATA[L'en-tête <strong>X-XSS-Protection</strong> n'a pas été trouvé.]]></key>
 	<key alias="xssProtectionSetHeaderInConfigDescription">Ajoute l'en-tête 'X-XSS-Protection' avec la valeur '1; mode=block' à la section httpProtocol/customHeaders du fichier web.config. </key>
-	<key alias="xssProtectionSetHeaderInConfigSuccess">L'en-tête X-XSS-Protection a été ajouté à votre fichier web.config.</key>
+	<key alias="xssProtectionSetHeaderInConfigSuccess">L'en-tête X-XSS-Protection a été ajouté dans votre fichier web.config.</key>
 
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
