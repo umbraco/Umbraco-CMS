@@ -18,7 +18,7 @@
         /// The item was already published.
         /// </summary>
         SuccessAlready = 1,
-        
+
         /// <summary>
         /// The operation failed.
         /// </summary>
@@ -58,8 +58,23 @@
         FailedContentInvalid = Failed | 6,
 
         /// <summary>
-        /// The document could not be published because it does not have published values.
+        /// Cannot republish a document that hasn't been published.
         /// </summary>
-        FailedNoPublishedValues = Failed | 7
+        FailedNoPublishedValues = Failed | 7, // in ContentService.StrategyCanPublish - fixme weird
+
+        /// <summary>
+        /// Some mandatory cultures are missing, or are not valid.
+        /// </summary>
+        FailedCannotPublish = Failed | 8, // in ContentController.PublishInternal - fixme // FailedByCulture?
+
+        /// <summary>
+        /// Publishing changes triggered an unpublishing, due to missing mandatory cultures, and unpublishing failed.
+        /// </summary>
+        FailedToUnpublish = Failed | 9, // in ContentService.SavePublishing
+
+        /// <summary>
+        /// Some mandatory cultures are missing.
+        /// </summary>
+        FailedByCulture = Failed | 10, // in ContentService.SavePublishing
     }
 }

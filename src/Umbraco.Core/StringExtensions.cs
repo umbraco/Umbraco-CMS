@@ -693,13 +693,6 @@ namespace Umbraco.Core
             return s.LastIndexOf(value, StringComparison.OrdinalIgnoreCase);
         }
 
-        [Obsolete("Use Guid.TryParse instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static bool IsGuid(this string str, bool withHyphens)
-        {
-            Guid g;
-            return Guid.TryParse(str, out g);
-        }
 
         /// <summary>
         /// Tries to parse a string into the supplied type by finding and using the Type's "Parse" method
@@ -1504,7 +1497,7 @@ namespace Umbraco.Core
         /// <summary>
         /// Turns an null-or-whitespace string into a null string.
         /// </summary>
-        public static string NullEmpty(this string text)
+        public static string NullOrWhiteSpaceAsNull(this string text)
             => string.IsNullOrWhiteSpace(text) ? null : text;
     }
 }

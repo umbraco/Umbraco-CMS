@@ -135,8 +135,8 @@ namespace Umbraco.Web.Routing
                 return null;
 
             // sanitize cultures
-            culture = culture.NullEmpty();
-            defaultCulture = defaultCulture.NullEmpty();
+            culture = culture.NullOrWhiteSpaceAsNull();
+            defaultCulture = defaultCulture.NullOrWhiteSpaceAsNull();
 
             if (uri == null)
             {

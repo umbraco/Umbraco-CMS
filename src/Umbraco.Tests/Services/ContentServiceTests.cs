@@ -210,16 +210,16 @@ namespace Umbraco.Tests.Services
         {
             var contentService = ServiceContext.ContentService;
             var root = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 1);
-            root.TryPublishValues();
+            root.PublishCulture();
             Assert.IsTrue(contentService.SaveAndPublish(root).Success);
             var content = contentService.CreateAndSave("Test", -1, "umbTextpage", 0);
-            content.TryPublishValues();
+            content.PublishCulture();
             Assert.IsTrue(contentService.SaveAndPublish(content).Success);
             var hierarchy = CreateContentHierarchy().OrderBy(x => x.Level).ToArray();
             contentService.Save(hierarchy, 0);
             foreach (var c in hierarchy)
             {
-                c.TryPublishValues();
+                c.PublishCulture();
                 Assert.IsTrue(contentService.SaveAndPublish(c).Success);
             }
 
@@ -269,7 +269,6 @@ namespace Umbraco.Tests.Services
 
 
             // Assert
-            content.TryPublishValues();
             Assert.IsTrue(contentService.SaveAndPublish(content).Success);
         }
 
@@ -284,7 +283,6 @@ namespace Umbraco.Tests.Services
             for (var i = 0; i < 20; i++)
             {
                 content.SetValue("bodyText", "hello world " + Guid.NewGuid());
-                content.TryPublishValues();
                 contentService.SaveAndPublish(content);
             }
 
@@ -423,12 +421,10 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "plus" });
-            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content2.TryPublishValues();
             contentService.SaveAndPublish(content2);
 
             // verify
@@ -464,7 +460,7 @@ namespace Umbraco.Tests.Services
             allTags = tagService.GetAllContentTags();
             Assert.AreEqual(4, allTags.Count());
 
-            content1.TryPublishValues();
+            content1.PublishCulture();
             contentService.SaveAndPublish(content1);
 
             Assert.IsTrue(content1.Published);
@@ -494,12 +490,10 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "bam" });
-            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content2.TryPublishValues();
             contentService.SaveAndPublish(content2);
 
             // verify
@@ -535,9 +529,9 @@ namespace Umbraco.Tests.Services
             allTags = tagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
-            content1.TryPublishValues();
+            content1.PublishCulture();
             contentService.SaveAndPublish(content1);
-            content2.TryPublishValues();
+            content2.PublishCulture();
             contentService.SaveAndPublish(content2);
 
             // tags are back
@@ -566,12 +560,12 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "plus" });
-            content1.TryPublishValues();
+            content1.PublishCulture();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", content1.Id);
             content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content2.TryPublishValues();
+            content2.PublishCulture();
             contentService.SaveAndPublish(content2);
 
             // verify
@@ -606,7 +600,7 @@ namespace Umbraco.Tests.Services
             allTags = tagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
-            content1.TryPublishValues();
+            content1.PublishCulture();
             contentService.SaveAndPublish(content1);
 
             Assert.IsTrue(content1.Published);
@@ -644,12 +638,10 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "bam" });
-            content1.TryPublishValues();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", -1);
             content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content2.TryPublishValues();
             contentService.SaveAndPublish(content2);
 
             contentService.Unpublish(content1);
@@ -665,7 +657,7 @@ namespace Umbraco.Tests.Services
             var allTags = tagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
-            content2.TryPublishValues();
+            content2.PublishCulture();
             contentService.SaveAndPublish(content2);
 
             tags = tagService.GetTagsForEntity(content2.Id);
@@ -691,12 +683,12 @@ namespace Umbraco.Tests.Services
 
             var content1 = MockedContent.CreateSimpleContent(contentType, "Tagged content 1", -1);
             content1.AssignTags("tags", new[] { "hello", "world", "some", "tags", "bam" });
-            content1.TryPublishValues();
+            content1.PublishCulture();
             contentService.SaveAndPublish(content1);
 
             var content2 = MockedContent.CreateSimpleContent(contentType, "Tagged content 2", content1);
             content2.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content2.TryPublishValues();
+            content2.PublishCulture();
             contentService.SaveAndPublish(content2);
 
             contentService.Unpublish(content1);
@@ -712,7 +704,7 @@ namespace Umbraco.Tests.Services
             var allTags = tagService.GetAllContentTags();
             Assert.AreEqual(0, allTags.Count());
 
-            content1.TryPublishValues();
+            content1.PublishCulture();
             contentService.SaveAndPublish(content1);
 
             tags = tagService.GetTagsForEntity(content2.Id);
@@ -796,7 +788,6 @@ namespace Umbraco.Tests.Services
             // create a content with tags and publish
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
             content.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // edit tags and save
@@ -836,7 +827,6 @@ namespace Umbraco.Tests.Services
 
             // Act
             content.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // Assert
@@ -867,12 +857,10 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
             content.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // Act
             content.AssignTags("tags", new[] { "another", "world" }, merge: true);
-            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // Assert
@@ -903,12 +891,10 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
             content.AssignTags("tags", new[] { "hello", "world", "some", "tags" });
-            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // Act
             content.RemoveTags("tags", new[] { "some", "world" });
-            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // Assert
@@ -1091,7 +1077,6 @@ namespace Umbraco.Tests.Services
 
             var parent = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 2);
             Assert.IsFalse(parent.Published);
-            parent.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(parent); // publishing parent, so Text Page 2 can be updated.
 
             var content = contentService.GetById(NodeDto.NodeIdSeed + 4);
@@ -1104,7 +1089,6 @@ namespace Umbraco.Tests.Services
 
             content.Name = "Text Page 2 Updated";
             content.SetValue("author", "Jane Doe");
-            content.TryPublishValues();
             contentService.SaveAndPublish(content); // publishes the current version, creates a version
 
             var version2 = content.VersionId;
@@ -1112,7 +1096,6 @@ namespace Umbraco.Tests.Services
 
             content.Name = "Text Page 2 ReUpdated";
             content.SetValue("author", "Bob Hope");
-            content.TryPublishValues();
             contentService.SaveAndPublish(content); // publishes again, creates a version
 
             var version3 = content.VersionId;
@@ -1179,11 +1162,9 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentService = ServiceContext.ContentService;
             var root = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            root.TryPublishValues();
             contentService.SaveAndPublish(root);
             var content = contentService.GetById(NodeDto.NodeIdSeed + 4);
             content.ExpireDate = DateTime.Now.AddSeconds(1);
-            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // Act
@@ -1233,8 +1214,7 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentService = ServiceContext.ContentService;
             var content = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            content.TryPublishValues();
-            var published = contentService.SaveAndPublish(content, 0);
+            var published = contentService.SaveAndPublish(content, userId: 0);
 
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -1256,15 +1236,30 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Can_Publish_Content()
+        public void Can_Publish_Content_1()
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
             var content = contentService.GetById(NodeDto.NodeIdSeed + 2);
 
             // Act
-            content.TryPublishValues();
-            var published = contentService.SaveAndPublish(content, 0);
+            content.PublishCulture();
+            var published = contentService.SavePublishing(content, 0);
+
+            // Assert
+            Assert.That(published.Success, Is.True);
+            Assert.That(content.Published, Is.True);
+        }
+
+        [Test]
+        public void Can_Publish_Content_2()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.GetById(NodeDto.NodeIdSeed + 2);
+
+            // Act
+            var published = contentService.SaveAndPublish(content, userId: 0);
 
             // Assert
             Assert.That(published.Success, Is.True);
@@ -1277,7 +1272,7 @@ namespace Umbraco.Tests.Services
             // Arrange
             var contentService = ServiceContext.ContentService;
             var parent = contentService.Create("parent", -1, "umbTextpage");
-            parent.TryPublishValues();
+
             contentService.SaveAndPublish(parent);
             var content = contentService.Create("child", parent, "umbTextpage");
             contentService.Save(content);
@@ -1303,8 +1298,8 @@ namespace Umbraco.Tests.Services
                 Assert.AreEqual("Home", content.Name);
 
                 content.Name = "foo";
-                content.TryPublishValues();
-                var published = contentService.SaveAndPublish(content, 0);
+                content.PublishCulture();
+                var published = contentService.SavePublishing(content, 0);
 
                 Assert.That(published.Success, Is.True);
                 Assert.That(content.Published, Is.True);
@@ -1344,17 +1339,14 @@ namespace Umbraco.Tests.Services
 
             var parent = contentService.GetById(parentId);
 
-            var parentCanPublishValues = parent.TryPublishValues();
             var parentPublished = contentService.SaveAndPublish(parent);
 
             // parent can publish values
             // and therefore can be published
-            Assert.IsTrue(parentCanPublishValues);
             Assert.IsTrue(parentPublished.Success);
             Assert.IsTrue(parent.Published);
 
-            var contentCanPublishValues = content.TryPublishValues();
-            var contentPublished = contentService.SaveAndPublish(content);
+            var contentCanPublishValues = content.PublishCulture();
 
             // content cannot publish values because they are invalid
             Assert.IsFalse(contentCanPublishValues);
@@ -1362,8 +1354,9 @@ namespace Umbraco.Tests.Services
 
             // and therefore cannot be published,
             // because it did not have a published version at all
+            var contentPublished = contentService.SaveAndPublish(content);
             Assert.IsFalse(contentPublished.Success);
-            Assert.AreEqual(PublishResultType.FailedNoPublishedValues, contentPublished.Result);
+            Assert.AreEqual(PublishResultType.FailedContentInvalid, contentPublished.Result);
             Assert.IsFalse(content.Published);
         }
 
@@ -1429,12 +1422,12 @@ namespace Umbraco.Tests.Services
             contentService.Save(content);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            parent.TryPublishValues();
-            var parentPublished = contentService.SaveAndPublish(parent, 0);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
+            parent.PublishCulture();
+            var parentPublished = contentService.SavePublishing(parent, 0);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
 
             // Act
-            content.TryPublishValues();
-            var published = contentService.SaveAndPublish(content, 0);
+            content.PublishCulture();
+            var published = contentService.SavePublishing(content, 0);
 
             // Assert
             Assert.That(parentPublished.Success, Is.True);
@@ -1452,12 +1445,12 @@ namespace Umbraco.Tests.Services
             contentService.Save(content, 0);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            parent.TryPublishValues();
-            var parentPublished = contentService.SaveAndPublish(parent, 0);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
+            parent.PublishCulture();
+            var parentPublished = contentService.SavePublishing(parent, 0);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
 
             // Act
-            content.TryPublishValues();
-            var published = contentService.SaveAndPublish(content, 0);
+            content.PublishCulture();
+            var published = contentService.SavePublishing(content, 0);
 
             // Assert
             Assert.That(parentPublished.Success, Is.True);
@@ -1489,8 +1482,8 @@ namespace Umbraco.Tests.Services
             var content = contentService.GetById(NodeDto.NodeIdSeed + 5);
 
             // Act
-            content.TryPublishValues();
-            var published = contentService.SaveAndPublish(content, 0);
+            content.PublishCulture();
+            var published = contentService.SavePublishing(content, 0);
 
             // Assert
             Assert.That(published.Success, Is.False);
@@ -1507,8 +1500,8 @@ namespace Umbraco.Tests.Services
             content.SetValue("author", "Barack Obama");
 
             // Act
-            content.TryPublishValues();
-            var published = contentService.SaveAndPublish(content, 0);
+            content.PublishCulture();
+            var published = contentService.SavePublishing(content, 0);
 
             // Assert
             Assert.That(content.HasIdentity, Is.True);
@@ -1532,15 +1525,15 @@ namespace Umbraco.Tests.Services
             content.SetValue("author", "Barack Obama");
 
             // Act
-            content.TryPublishValues();
-            var published = contentService.SaveAndPublish(content, 0);
+            content.PublishCulture();
+            var published = contentService.SavePublishing(content, 0);
             var childContent = contentService.Create("Child", content.Id, "umbTextpage", 0);
             // Reset all identity properties
             childContent.Id = 0;
             childContent.Path = null;
             ((Content)childContent).ResetIdentity();
-            childContent.TryPublishValues();
-            var childPublished = contentService.SaveAndPublish(childContent, 0);
+            childContent.PublishCulture();
+            var childPublished = contentService.SavePublishing(childContent, 0);
 
             // Assert
             Assert.That(content.HasIdentity, Is.True);
@@ -1558,12 +1551,10 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
 
             var root = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            root.TryPublishValues();
             var rootPublished = contentService.SaveAndPublish(root);
 
             var content = contentService.GetById(NodeDto.NodeIdSeed + 4);
             content.Properties["title"].SetValue(content.Properties["title"].GetValue() + " Published");
-            content.TryPublishValues();
             var contentPublished = contentService.SaveAndPublish(content);
             var publishedVersion = content.VersionId;
 
@@ -1863,14 +1854,14 @@ namespace Umbraco.Tests.Services
             content1.PropertyValues(obj);
             content1.ResetDirtyProperties(false);
             ServiceContext.ContentService.Save(content1, 0);
-            content1.TryPublishValues();
-            Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content1, 0).Success);
+            content1.PublishCulture();
+            Assert.IsTrue(ServiceContext.ContentService.SavePublishing(content1, 0).Success);
             var content2 = MockedContent.CreateBasicContent(contentType);
             content2.PropertyValues(obj);
             content2.ResetDirtyProperties(false);
             ServiceContext.ContentService.Save(content2, 0);
-            content2.TryPublishValues();
-            Assert.IsTrue(ServiceContext.ContentService.SaveAndPublish(content2, 0).Success);
+            content2.PublishCulture();
+            Assert.IsTrue(ServiceContext.ContentService.SavePublishing(content2, 0).Success);
 
             var editorGroup = ServiceContext.UserService.GetUserGroupByAlias("editor");
             editorGroup.StartContentId = content1.Id;
@@ -2027,7 +2018,6 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(0, contentTags.Length);
 
             // publish
-            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // now tags have been set (published)
@@ -2044,7 +2034,6 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(0, copiedTags.Length);
 
             // publish
-            copy.TryPublishValues();
             contentService.SaveAndPublish(copy);
 
             // now tags have been set (published)
@@ -2063,7 +2052,6 @@ namespace Umbraco.Tests.Services
 
             var parent = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 2);
             Assert.IsFalse(parent.Published);
-            parent.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(parent); // publishing parent, so Text Page 2 can be updated.
 
             var content = contentService.GetById(NodeDto.NodeIdSeed + 4);
@@ -2080,7 +2068,6 @@ namespace Umbraco.Tests.Services
             // non published = edited
             Assert.IsTrue(content.Edited);
 
-            content.TryPublishValues();
             contentService.SaveAndPublish(content); // new version
             var version2 = content.VersionId;
             Assert.AreNotEqual(version1, version2);
@@ -2105,7 +2092,6 @@ namespace Umbraco.Tests.Services
 
             content.Name = "Text Page 2 ReReUpdated";
 
-            content.TryPublishValues();
             contentService.SaveAndPublish(content); // new version
             var version3 = content.VersionId;
             Assert.AreNotEqual(version2, version3);
@@ -2125,7 +2111,7 @@ namespace Umbraco.Tests.Services
             // rollback all values to version1
             var rollback = contentService.GetById(NodeDto.NodeIdSeed + 4);
             var rollto = contentService.GetVersion(version1);
-            rollback.CopyValues(rollto);
+            rollback.CopyFrom(rollto);
             rollback.Name = rollto.Name; // must do it explicitely
             contentService.Save(rollback);
 
@@ -2147,7 +2133,7 @@ namespace Umbraco.Tests.Services
             // special because... current has edits... this really is equivalent to rolling back to version2
             var rollback2 = contentService.GetById(NodeDto.NodeIdSeed + 4);
             var rollto2 = contentService.GetVersion(version3);
-            rollback2.CopyValues(rollto2);
+            rollback2.CopyFrom(rollto2);
             rollback2.Name = rollto2.PublishName; // must do it explicitely AND must pick the publish one!
             contentService.Save(rollback2);
 
@@ -2161,7 +2147,6 @@ namespace Umbraco.Tests.Services
             content = contentService.GetById(content.Id);
             Assert.AreEqual("Text Page 2 ReReUpdated", content.Name);
             Assert.AreEqual("Jane Doe", content.GetValue<string>("author"));
-            content.TryPublishValues();
             contentService.SaveAndPublish(content);
             Assert.IsFalse(content.Edited);
             content.Name = "Xxx";
@@ -2169,7 +2154,7 @@ namespace Umbraco.Tests.Services
             contentService.Save(content);
             Assert.IsTrue(content.Edited);
             rollto = contentService.GetVersion(content.VersionId);
-            content.CopyValues(rollto);
+            content.CopyFrom(rollto);
             content.Name = rollto.PublishName; // must do it explicitely AND must pick the publish one!
             contentService.Save(content);
             Assert.IsFalse(content.Edited);
@@ -2279,7 +2264,6 @@ namespace Umbraco.Tests.Services
                 Assert.IsFalse(scope.Database.Exists<ContentXmlDto>(content.Id));
             }
 
-            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             using (var scope = ScopeProvider.CreateScope())
@@ -2421,7 +2405,6 @@ namespace Umbraco.Tests.Services
             // becomes Published, !Edited
             // creates a new version
             // can get published property values
-            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             Assert.IsTrue(content.Published);
@@ -2508,7 +2491,7 @@ namespace Umbraco.Tests.Services
             var languageService = ServiceContext.LocalizationService;
 
             var langUk = new Language("en-UK") { IsDefaultVariantLanguage = true };
-            var langFr = new Language("fr-FR");            
+            var langFr = new Language("fr-FR");
 
             languageService.Save(langFr);
             languageService.Save(langUk);
@@ -2516,15 +2499,15 @@ namespace Umbraco.Tests.Services
             var contentTypeService = ServiceContext.ContentTypeService;
 
             var contentType = contentTypeService.Get("umbTextpage");
-            contentType.Variations = ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral;
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.CultureNeutral });
+            contentType.Variations = ContentVariation.Culture;
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.Culture });
             contentTypeService.Save(contentType);
 
             var contentService = ServiceContext.ContentService;
             var content = new Content(null, -1, contentType);
 
-            content.SetName("name-us", langUk.IsoCode);
-            content.SetName("name-fr", langFr.IsoCode);
+            content.SetCultureName("name-us", langUk.IsoCode);
+            content.SetCultureName("name-fr", langFr.IsoCode);
             contentService.Save(content);
 
             //the name will be set to the default culture variant name
@@ -2551,26 +2534,26 @@ namespace Umbraco.Tests.Services
             var contentTypeService = ServiceContext.ContentTypeService;
 
             var contentType = contentTypeService.Get("umbTextpage");
-            contentType.Variations = ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral;
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.CultureNeutral });
+            contentType.Variations = ContentVariation.Culture;
             contentTypeService.Save(contentType);
 
             var contentService = ServiceContext.ContentService;
 
             var content = new Content(null, -1, contentType);
-            content.SetName("root", langUk.IsoCode);
+            content.SetCultureName("root", langUk.IsoCode);
             contentService.Save(content);
 
             for (var i = 0; i < 5; i++)
             {
                 var child = new Content(null, content, contentType);
-                child.SetName("child", langUk.IsoCode);
+                child.SetCultureName("child", langUk.IsoCode);
                 contentService.Save(child);
-                Assert.AreEqual("child" + (i == 0 ? "" : " (" + (i).ToString() + ")"), child.GetName(langUk.IsoCode));
+
+                Assert.AreEqual("child" + (i == 0 ? "" : " (" + i + ")"), child.GetCultureName(langUk.IsoCode));
 
                 //Save it again to ensure that the unique check is not performed again against it's own name
                 contentService.Save(child);
-                Assert.AreEqual("child" + (i == 0 ? "" : " (" + (i).ToString() + ")"), child.GetName(langUk.IsoCode));
+                Assert.AreEqual("child" + (i == 0 ? "" : " (" + i + ")"), child.GetCultureName(langUk.IsoCode));
             }
         }
 
@@ -2579,6 +2562,8 @@ namespace Umbraco.Tests.Services
         {
             var languageService = ServiceContext.LocalizationService;
 
+            //var langFr = new Language("fr-FR") { IsDefaultVariantLanguage = true };
+            var langXx = new Language("pt-PT") { IsDefaultVariantLanguage = true };
             var langFr = new Language("fr-FR");
             var langUk = new Language("en-UK");
             var langDe = new Language("de-DE");
@@ -2589,31 +2574,29 @@ namespace Umbraco.Tests.Services
 
             var contentTypeService = ServiceContext.ContentTypeService;
 
-            // fixme
-            // contentType.Variations is InvariantNeutral | CultureNeutral
-            // propertyType.Variations can only be a subset of contentType.Variations - ie cannot *add* anything
-            //  (at least, we should validate this)
-            // but then,
-            // if the contentType supports InvariantNeutral | CultureNeutral,
-            //    the propertyType should support InvariantNeutral, or both, but not solely CultureNeutral?
-            //  but does this mean that CultureNeutral implies InvariantNeutral?
-            //  can a contentType *not* support InvariantNeutral?
-
             var contentType = contentTypeService.Get("umbTextpage");
-            contentType.Variations = ContentVariation.InvariantNeutral | ContentVariation.CultureNeutral;
-            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.CultureNeutral });
+            contentType.Variations = ContentVariation.Culture;
+            contentType.AddPropertyType(new PropertyType(Constants.PropertyEditors.Aliases.TextBox, ValueStorageType.Nvarchar, "prop") { Variations = ContentVariation.Culture });
+            // fixme add test w/ an invariant prop
             contentTypeService.Save(contentType);
 
             var contentService = ServiceContext.ContentService;
-            var content = contentService.Create("Home US", - 1, "umbTextpage");
+            var content = contentService.Create("Home US", -1, "umbTextpage");
+
+            // creating content with a name but no culture - will set the invariant name
+            // but, because that content is variant, as soon as we save, we'll need to
+            // replace the invariant name with whatever we have in cultures - always
+            //
+            // in fact, that would throw, because there is no name
+            //contentService.Save(content);
 
             // act
 
             content.SetValue("author", "Barack Obama");
             content.SetValue("prop", "value-fr1", langFr.IsoCode);
             content.SetValue("prop", "value-uk1", langUk.IsoCode);
-            content.SetName("name-fr", langFr.IsoCode);
-            content.SetName("name-uk", langUk.IsoCode);
+            content.SetCultureName("name-fr", langFr.IsoCode); // and then we can save
+            content.SetCultureName("name-uk", langUk.IsoCode);
             contentService.Save(content);
 
             // content has been saved,
@@ -2621,9 +2604,9 @@ namespace Umbraco.Tests.Services
 
             var content2 = contentService.GetById(content.Id);
 
-            Assert.AreEqual("Home US", content2.Name);
-            Assert.AreEqual("name-fr", content2.GetName(langFr.IsoCode));
-            Assert.AreEqual("name-uk", content2.GetName(langUk.IsoCode));
+            Assert.AreEqual("name-fr", content2.Name); // got the default culture name when saved
+            Assert.AreEqual("name-fr", content2.GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("name-uk", content2.GetCultureName(langUk.IsoCode));
 
             Assert.AreEqual("value-fr1", content2.GetValue("prop", langFr.IsoCode));
             Assert.AreEqual("value-uk1", content2.GetValue("prop", langUk.IsoCode));
@@ -2648,9 +2631,9 @@ namespace Umbraco.Tests.Services
 
             // act
 
-            content.TryPublishValues(langFr.IsoCode);
-            content.TryPublishValues(langUk.IsoCode);
-            contentService.SaveAndPublish(content);
+            content.PublishCulture(langFr.IsoCode);
+            content.PublishCulture(langUk.IsoCode);
+            contentService.SavePublishing(content);
 
             // both FR and UK have been published,
             // and content has been published,
@@ -2658,9 +2641,9 @@ namespace Umbraco.Tests.Services
 
             content2 = contentService.GetById(content.Id);
 
-            Assert.AreEqual("Home US", content2.Name);
-            Assert.AreEqual("name-fr", content2.GetName(langFr.IsoCode));
-            Assert.AreEqual("name-uk", content2.GetName(langUk.IsoCode));
+            Assert.AreEqual("name-fr", content2.Name); // got the default culture name when saved
+            Assert.AreEqual("name-fr", content2.GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("name-uk", content2.GetCultureName(langUk.IsoCode));
 
             // we haven't published InvariantNeutral, but a document cannot be published without an invariant name,
             // so when we tried and published for the first time above the french culture, the french name was used
@@ -2687,29 +2670,28 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, false), (langUk, false), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, false), (langUk, false), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
+            AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
 
             // note that content and content2 culture published dates might be slightly different due to roundtrip to database
 
 
             // act
 
-            content.TryPublishValues();
             contentService.SaveAndPublish(content);
 
             // now it has publish name for invariant neutral
 
             content2 = contentService.GetById(content.Id);
 
-            Assert.AreEqual("Home US", content2.PublishName);
+            Assert.AreEqual("name-fr", content2.PublishName);
 
 
             // act
 
-            content.SetName("Home US2", null);
-            content.SetName("name-fr2", langFr.IsoCode);
-            content.SetName("name-uk2", langUk.IsoCode);
+            content.SetCultureName("Home US2", null);
+            content.SetCultureName("name-fr2", langFr.IsoCode);
+            content.SetCultureName("name-uk2", langUk.IsoCode);
             content.SetValue("author", "Barack Obama2");
             content.SetValue("prop", "value-fr2", langFr.IsoCode);
             content.SetValue("prop", "value-uk2", langUk.IsoCode);
@@ -2720,11 +2702,11 @@ namespace Umbraco.Tests.Services
 
             content2 = contentService.GetById(content.Id);
 
-            Assert.AreEqual("Home US2", content2.Name);
-            Assert.AreEqual("name-fr2", content2.GetName(langFr.IsoCode));
-            Assert.AreEqual("name-uk2", content2.GetName(langUk.IsoCode));
+            Assert.AreEqual("name-fr2", content2.Name); // got the default culture name when saved
+            Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("name-uk2", content2.GetCultureName(langUk.IsoCode));
 
-            Assert.AreEqual("Home US", content2.PublishName);
+            Assert.AreEqual("name-fr", content2.PublishName);
             Assert.AreEqual("name-fr", content2.GetPublishName(langFr.IsoCode));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
 
@@ -2748,26 +2730,27 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
+            AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langFr, false), (langUk, false)); // DE would throw
 
 
             // act
             // cannot just 'save' since we are changing what's published!
 
-            content.ClearPublishedValues(langFr.IsoCode);
-            contentService.SaveAndPublish(content);
+            content.UnpublishCulture(langFr.IsoCode);
+            contentService.SavePublishing(content);
 
             // content has been published,
             // the french culture is gone
+            // (only if french is not mandatory, else everything would be gone!)
 
             content2 = contentService.GetById(content.Id);
 
-            Assert.AreEqual("Home US2", content2.Name);
-            Assert.AreEqual("name-fr2", content2.GetName(langFr.IsoCode));
-            Assert.AreEqual("name-uk2", content2.GetName(langUk.IsoCode));
+            Assert.AreEqual("name-fr2", content2.Name); // got the default culture name when saved
+            Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("name-uk2", content2.GetCultureName(langUk.IsoCode));
 
-            Assert.AreEqual("Home US", content2.PublishName);
+            Assert.AreEqual("name-fr2", content2.PublishName);
             Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
 
@@ -2791,8 +2774,8 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
 
 
             // act
@@ -2813,11 +2796,11 @@ namespace Umbraco.Tests.Services
 
             Assert.IsFalse(content2.Published);
 
-            Assert.AreEqual("Home US2", content2.Name);
-            Assert.AreEqual("name-fr2", content2.GetName(langFr.IsoCode));
-            Assert.AreEqual("name-uk2", content2.GetName(langUk.IsoCode));
+            Assert.AreEqual("name-fr2", content2.Name); // got the default culture name when saved
+            Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("name-uk2", content2.GetCultureName(langUk.IsoCode));
 
-            Assert.AreEqual("Home US", content2.PublishName); // not null, see note above
+            Assert.AreEqual("name-fr2", content2.PublishName); // not null, see note above
             Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode)); // not null, see note above
 
@@ -2838,13 +2821,15 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
 
 
             // act
 
-            contentService.SaveAndPublish(content);
+            // that HAS to be SavePublishing, because SaveAndPublish would just republish everything!
+
+            contentService.SavePublishing(content);
 
             // content has been re-published,
             // everything is back to what it was before being unpublished
@@ -2853,11 +2838,11 @@ namespace Umbraco.Tests.Services
 
             Assert.IsTrue(content2.Published);
 
-            Assert.AreEqual("Home US2", content2.Name);
-            Assert.AreEqual("name-fr2", content2.GetName(langFr.IsoCode));
-            Assert.AreEqual("name-uk2", content2.GetName(langUk.IsoCode));
+            Assert.AreEqual("name-fr2", content2.Name); // got the default culture name when saved
+            Assert.AreEqual("name-fr2", content2.GetCultureName(langFr.IsoCode));
+            Assert.AreEqual("name-uk2", content2.GetCultureName(langUk.IsoCode));
 
-            Assert.AreEqual("Home US", content2.PublishName);
+            Assert.AreEqual("name-fr2", content2.PublishName);
             Assert.IsNull(content2.GetPublishName(langFr.IsoCode));
             Assert.AreEqual("name-uk", content2.GetPublishName(langUk.IsoCode));
 
@@ -2878,14 +2863,14 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, true), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
 
 
             // act
 
-            content.TryPublishValues(langUk.IsoCode);
-            contentService.SaveAndPublish(content);
+            content.PublishCulture(langUk.IsoCode);
+            contentService.SavePublishing(content);
 
             content2 = contentService.GetById(content.Id);
 
@@ -2901,18 +2886,22 @@ namespace Umbraco.Tests.Services
             AssertPerCulture(content, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, false), (langDe, true));
             AssertPerCulture(content2, (x, c) => x.IsCultureEdited(c), (langFr, true), (langUk, false), (langDe, true));
 
-            AssertPerCulture(content, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
-            AssertPerCulture(content2, (x, c) => x.GetCulturePublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
+            AssertPerCulture(content2, (x, c) => x.GetPublishDate(c) == DateTime.MinValue, (langUk, false)); // FR, DE would throw
 
 
             // act
 
-            content.SetName("name-uk3", langUk.IsoCode);
+            content.SetCultureName("name-uk3", langUk.IsoCode);
             contentService.Save(content);
 
             content2 = contentService.GetById(content.Id);
 
+            // note that the 'edited' flags only change once saved - not immediately
+            // but they change, on what's being saved, and when getting it back
+
             // changing the name = edited!
+
             Assert.IsTrue(content.IsCultureEdited(langUk.IsoCode));
             Assert.IsTrue(content2.IsCultureEdited(langUk.IsoCode));
         }

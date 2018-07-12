@@ -330,11 +330,11 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         public AutoPublishedContentType(int id, string alias, IEnumerable<PublishedPropertyType> propertyTypes)
-            : base(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, ContentVariation.InvariantNeutral)
+            : base(id, alias, PublishedItemType.Content, Enumerable.Empty<string>(), propertyTypes, ContentVariation.Nothing)
         { }
 
         public AutoPublishedContentType(int id, string alias, IEnumerable<string> compositionAliases, IEnumerable<PublishedPropertyType> propertyTypes)
-            : base(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, ContentVariation.InvariantNeutral)
+            : base(id, alias, PublishedItemType.Content, compositionAliases, propertyTypes, ContentVariation.Nothing)
         { }
 
         public override PublishedPropertyType GetPropertyType(string alias)

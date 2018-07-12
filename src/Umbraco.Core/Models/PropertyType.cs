@@ -47,7 +47,7 @@ namespace Umbraco.Core.Models
 
             _propertyEditorAlias = dataType.EditorAlias;
             _valueStorageType = dataType.DatabaseType;
-            _variations = ContentVariation.InvariantNeutral;
+            _variations = ContentVariation.Nothing;
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Umbraco.Core.Models
             _valueStorageType = valueStorageType;
             _forceValueStorageType = forceValueStorageType;
             _alias = propertyTypeAlias == null ? null : SanitizeAlias(propertyTypeAlias);
-            _variations = ContentVariation.InvariantNeutral;
+            _variations = ContentVariation.Nothing;
         }
 
         private static PropertySelectors Selectors => _selectors ?? (_selectors = new PropertySelectors());
@@ -224,32 +224,17 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Validates that a variation is valid for the property type.
+        /// Determines whether the property type supports a combination of culture and segment.
         /// </summary>
-        public bool ValidateVariation(string culture, string segment, bool throwIfInvalid)
+        /// <param name="culture">The culture.</param>
+        /// <param name="segment">The segment.</param>
+        /// <param name="wildcards">A value indicating whether wildcards are valid.</param>
+        public bool SupportsVariation(string culture, string segment, bool wildcards = false)
         {
-            ContentVariation variation;
-            if (culture != null)
-            {
-                variation = segment != null
-                    ? ContentVariation.CultureSegment
-                    : ContentVariation.CultureNeutral;
-            }
-            else if (segment != null)
-            {
-                variation = ContentVariation.InvariantSegment;
-            }
-            else
-            {
-                variation = ContentVariation.InvariantNeutral;
-            }
-            if (!Variations.Has(variation))
-            {
-                if (throwIfInvalid)
-                    throw new NotSupportedException($"Variation {variation} is invalid for property type \"{Alias}\".");
-                return false;
-            }
-            return true;
+            // exact validation: cannot accept a 'null' culture if the property type varies
+            //  by culture, and likewise for segment
+            // wildcard validation: can accept a '*' culture or segment
+            return Variations.ValidateVariation(culture, segment, true, wildcards, false);
         }
 
         /// <summary>

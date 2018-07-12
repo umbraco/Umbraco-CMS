@@ -188,6 +188,14 @@ h5.-black {
   margin-left: 0;
 }
 
+label[for=""] {
+  cursor: default;
+}
+
+label:not([for]) {
+  cursor: default;
+}
+
 /* CONTROL VALIDATION */
 .umb-control-required {
     color: @controlRequiredColor;

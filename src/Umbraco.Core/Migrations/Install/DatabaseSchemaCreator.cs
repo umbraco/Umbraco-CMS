@@ -357,6 +357,10 @@ namespace Umbraco.Core.Migrations.Install
             return SqlSyntax.DoesTableExist(_database, tableName);
         }
 
+        public bool TableExists<T>()        {
+            var table = DefinitionFactory.GetTableDefinition(typeof(T), SqlSyntax);
+            return table != null && TableExists(table.Name);        }
+
         // this is used in tests
         internal void CreateTable<T>(bool overwrite = false)
             where T : new()

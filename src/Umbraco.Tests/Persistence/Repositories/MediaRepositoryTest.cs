@@ -15,6 +15,7 @@ using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.Testing;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {

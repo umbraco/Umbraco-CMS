@@ -170,7 +170,10 @@
 
                     resetLastListPageNumber($scope.content);
 
+                    eventsService.emit("content.loaded", { content: $scope.content });
+
                     return $q.resolve($scope.content);
+
 
                 });
 
@@ -239,6 +242,8 @@
 
             $scope.page.buttonGroupState = "busy";
 
+            eventsService.emit("content.saving", { content: $scope.content, action: args.action });
+
             return contentEditingHelper.contentEditorPerformSave({
                 saveMethod: args.saveMethod,
                 scope: $scope,
@@ -253,6 +258,9 @@
                 }
 
                 $scope.page.buttonGroupState = "success";
+
+                eventsService.emit("content.saved", { content: $scope.content, action: args.action });
+
                 return $q.when(data);
             },
                 function (err) {
@@ -289,6 +297,8 @@
 
                     resetLastListPageNumber($scope.content);
 
+                    eventsService.emit("content.newReady", { content: $scope.content });
+
                     $scope.page.loading = false;
 
                 });
@@ -324,8 +334,10 @@
             }
 
             if (formHelper.submitForm({ scope: $scope, skipValidation: true })) {
-
+				
                 $scope.page.buttonGroupState = "busy";
+
+                eventsService.emit("content.unpublishing", { content: $scope.content });
 
                 contentResource.unPublish($scope.content.id, culture)
                     .then(function (data) {
@@ -345,6 +357,8 @@
                         }
 
                         $scope.page.buttonGroupState = "success";
+
+                        eventsService.emit("content.unpublished", { content: $scope.content });
 
                     }, function (err) {
                         $scope.page.buttonGroupState = 'error';

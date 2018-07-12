@@ -216,6 +216,14 @@ namespace Umbraco.Tests.PublishedContent
             {}
         }
 
+        [PublishedModel("anything")]
+        internal class Anything : PublishedContentModel
+        {
+            public Anything(IPublishedContent content)
+                : base(content)
+            { }
+        }
+
         [Test]
         [Ignore("Fails as long as PublishedContentModel is internal.")] // fixme
         public void Is_Last_From_Where_Filter2()
@@ -432,6 +440,23 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNull(doc.FirstChild());
             Assert.IsNull(doc.FirstChild(x => true));
             Assert.IsNull(doc.FirstChild<IPublishedContent>());
+        }
+
+        [Test]
+        public void FirstChildAsT()
+        {
+            var doc = GetNode(1046); // has child nodes
+           
+            var model = doc.FirstChild<Anything>(x => true); // predicate
+
+            Assert.IsNotNull(model);
+            Assert.IsTrue(model.Id == 1173);
+            Assert.IsInstanceOf<Anything>(model);
+            Assert.IsInstanceOf<IPublishedContent>(model);
+
+            doc = GetNode(1175); // does not have child nodes
+            Assert.IsNull(doc.FirstChild<Anything>());
+            Assert.IsNull(doc.FirstChild<Anything>(x => true));
         }
 
         [Test]

@@ -68,11 +68,11 @@ namespace Umbraco.Web.Models.Mapping
             var culture = context.GetCulture();
 
             //a culture needs to be in the context for a property type that can vary
-            if (culture == null && property.PropertyType.Variations.Has(ContentVariation.CultureNeutral))
+            if (culture == null && property.PropertyType.VariesByCulture())
                 throw new InvalidOperationException($"No languageId found in mapping operation when one is required for the culture neutral property type {property.PropertyType.Alias}");
 
             //set the culture to null if it's an invariant property type
-            culture = !property.PropertyType.Variations.Has(ContentVariation.CultureNeutral) ? null : culture;
+            culture = !property.PropertyType.VariesByCulture() ? null : culture;
 
             // if no 'IncludeProperties' were specified or this property is set to be included - we will map the value and return.
             result.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, culture);

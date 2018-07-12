@@ -172,6 +172,13 @@
     <key alias="target" version="7.0">Doel</key>
 	<key alias="scheduledPublishServerTime">Dit betekend de volgende tijd op de server:</key>
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Wat houd dit in?</a>]]></key>
+    <key alias="nestedContentDeleteItem">Ben je er zeker van dat je dit item wilt verwijderen?</key>
+    <key alias="nestedContentEditorNotSupported">Eigenschap %0% gebruikt editor %1% welke niet wordt ondersteund door Nested Content.</key>
+    <key alias="addTextBox">Voeg nog een tekstvak toe</key>
+    <key alias="removeTextBox">Verwijder dit tekstvak</key>
+    <key alias="contentRoot">Content root</key>
+    <key alias="isSensitiveValue">Deze waarde is verborgen. Indien u toegang nodig heeft om deze waarde te bekijken, contacteer dan uw website administrator.</key>
+    <key alias="isSensitiveValue_short">Deze waarde is verborgen</key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Klik om te uploaden</key>
@@ -214,6 +221,7 @@
     <key alias="discardChanges">Negeer wijzigingen</key>
     <key alias="unsavedChanges">Wijzigingen niet opgeslagen</key>
     <key alias="unsavedChangesWarning">Weet je zeker dat deze pagina wilt verlaten? - er zijn onopgeslagen wijzigingen</key>
+    <key alias="confirmUnpublish">Depubliceren zal deze pagina en alle onderliggend paginas verwijderen van de site.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
@@ -1137,7 +1145,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="thisEditorUpdateSettings">die gebruik maken van deze editor zullen geupdate worden met deze nieuwe instellingen</key>
 
     <key alias="memberCanEdit">Lid kan bewerken</key>
+    <key alias="memberCanEditDescription">Toestaan dat deze eigenschap kan worden gewijzigd door het lid op zijn profiel pagina.</key>
+    <key alias="isSensitiveData">Omvat gevoelige gegevens</key>
+    <key alias="isSensitiveDataDescription">Verberg deze eigenschap voor de content editor die geen toegang heeft tot het bekijken van gevoelige informatie.</key>
     <key alias="showOnMemberProfile">Toon in het profiel van leden</key>
+    <key alias="showOnMemberProfileDescription">Toelaten dat deze eigenschap wordt getoond op de profiel pagina van het lid.</key>
+    
     <key alias="tabHasNoSortOrder">tab heeft geen sorteervolgorde</key>
   </area>
 

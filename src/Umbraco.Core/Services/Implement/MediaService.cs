@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services.Implement
     /// <summary>
     /// Represents the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
     /// </summary>
-    public class MediaService : ScopeRepositoryService, IMediaService, IMediaServiceOperations
+    public class MediaService : ScopeRepositoryService, IMediaService
     {
         private readonly IMediaRepository _mediaRepository;
         private readonly IMediaTypeRepository _mediaTypeRepository;
@@ -749,18 +749,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="media">The <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        public void Save(IMedia media, int userId = 0, bool raiseEvents = true)
-        {
-            ((IMediaServiceOperations) this).Save(media, userId, raiseEvents);
-        }
-
-        /// <summary>
-        /// Saves a single <see cref="IMedia"/> object
-        /// </summary>
-        /// <param name="media">The <see cref="IMedia"/> to save</param>
-        /// <param name="userId">Id of the User saving the Media</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        Attempt<OperationResult> IMediaServiceOperations.Save(IMedia media, int userId, bool raiseEvents)
+        public Attempt<OperationResult> Save(IMedia media, int userId = 0, bool raiseEvents = true)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -779,8 +768,6 @@ namespace Umbraco.Core.Services.Implement
                 if (string.IsNullOrWhiteSpace(media.Name))
                     throw new ArgumentException("Media has no name.", nameof(media));
 
-                var isNew = media.IsNewEntity();
-
                 scope.WriteLock(Constants.Locks.MediaTree);
                 if (media.HasIdentity == false)
                     media.CreatorId = userId;
@@ -791,7 +778,7 @@ namespace Umbraco.Core.Services.Implement
                     saveEventArgs.CanCancel = false;
                     scope.Events.Dispatch(Saved, this, saveEventArgs);
                 }
-                var changeType = isNew ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode;
+                var changeType = TreeChangeTypes.RefreshNode;
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>(media, changeType).ToEventArgs());
 
                 Audit(AuditType.Save, "Save Media performed by user", userId, media.Id);
@@ -807,18 +794,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        public void Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true)
-        {
-            ((IMediaServiceOperations) this).Save(medias, userId, raiseEvents);
-        }
-
-        /// <summary>
-        /// Saves a collection of <see cref="IMedia"/> objects
-        /// </summary>
-        /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
-        /// <param name="userId">Id of the User saving the Media</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        Attempt<OperationResult> IMediaServiceOperations.Save(IEnumerable<IMedia> medias, int userId, bool raiseEvents)
+        public Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var mediasA = medias.ToArray();
@@ -832,7 +808,7 @@ namespace Umbraco.Core.Services.Implement
                     return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
-                var treeChanges = mediasA.Select(x => new TreeChange<IMedia>(x, x.IsNewEntity() ? TreeChangeTypes.RefreshBranch : TreeChangeTypes.RefreshNode));
+                var treeChanges = mediasA.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.RefreshNode));
 
                 scope.WriteLock(Constants.Locks.MediaTree);
                 foreach (var media in mediasA)
@@ -859,27 +835,13 @@ namespace Umbraco.Core.Services.Implement
         #endregion
 
         #region Delete
-
-        /// <summary>
-        /// Permanently deletes an <see cref="IMedia"/> object as well as all of its Children.
-        /// </summary>
-        /// <remarks>
-        /// Please note that this method will completely remove the Media from the database,
-        /// as well as associated media files from the file system.
-        /// </remarks>
-        /// <param name="media">The <see cref="IMedia"/> to delete</param>
-        /// <param name="userId">Id of the User deleting the Media</param>
-        public void Delete(IMedia media, int userId = 0)
-        {
-            ((IMediaServiceOperations) this).Delete(media, userId);
-        }
-
+        
         /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        Attempt<OperationResult> IMediaServiceOperations.Delete(IMedia media, int userId)
+        public Attempt<OperationResult> Delete(IMedia media, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -1034,17 +996,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        public void MoveToRecycleBin(IMedia media, int userId = 0)
-        {
-            ((IMediaServiceOperations) this).MoveToRecycleBin(media, userId);
-        }
-
-        /// <summary>
-        /// Deletes an <see cref="IMedia"/> object by moving it to the Recycle Bin
-        /// </summary>
-        /// <param name="media">The <see cref="IMedia"/> to delete</param>
-        /// <param name="userId">Id of the User deleting the Media</param>
-        Attempt<OperationResult> IMediaServiceOperations.MoveToRecycleBin(IMedia media, int userId)
+        public Attempt<OperationResult> MoveToRecycleBin(IMedia media, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var moves = new List<Tuple<IMedia, string>>();

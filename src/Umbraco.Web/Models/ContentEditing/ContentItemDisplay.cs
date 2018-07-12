@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -41,7 +42,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public ContentTypeBasic DocumentType { get; set; }
 
         [DataMember(Name = "urls")]
-        public string[] Urls { get; set; }
+        public UrlInfo[] Urls { get; set; }
 
         /// <summary>
         /// Determines whether previewing is allowed for this node

@@ -543,9 +543,13 @@
             var availableMasterTemplates = [];
 
             // filter out the current template and the selected master template
-            angular.forEach(vm.templates, function(template){
-                if(template.alias !== vm.template.alias && template.alias !== vm.template.masterTemplateAlias) {
-                    availableMasterTemplates.push(template);
+            angular.forEach(vm.templates, function (template) {
+                if (template.alias !== vm.template.alias && template.alias !== vm.template.masterTemplateAlias) {
+                    var templatePathArray = template.path.split(',');
+                    // filter descendant templates of current template
+                    if (templatePathArray.indexOf(String(vm.template.id)) === -1) {
+                        availableMasterTemplates.push(template);
+                    }
                 }
             });
 

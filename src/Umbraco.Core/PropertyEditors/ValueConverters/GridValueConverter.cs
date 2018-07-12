@@ -53,7 +53,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                         Current.ApplicationCache.RuntimeCache,
                         new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins)),
                         new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Config)),
-                        HttpContext.Current.IsDebuggingEnabled);
+                        Current.RuntimeState.Debug);
 
                     var sections = GetArray(obj, "sections");
                     foreach (var section in sections.Cast<JObject>())

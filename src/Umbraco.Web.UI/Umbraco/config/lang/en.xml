@@ -34,7 +34,7 @@
         <key alias="restore" version="7.3.0">Restore</key>
         <key alias="SetPermissionsForThePage">Set permissions for the page %0%</key>
         <key alias="chooseWhereToMove">Choose where to move</key>
-    <key alias="toInTheTreeStructureBelow">to in the tree structure below</key>
+        <key alias="toInTheTreeStructureBelow">In the tree structure below</key>
         <key alias="rights">Permissions</key>
         <key alias="rollback">Rollback</key>
         <key alias="sendtopublish">Send To Publish</key>
@@ -46,7 +46,34 @@
         <key alias="update">Update</key>
         <key alias="setPermissions">Set permissions</key>
         <key alias="unlock">Unlock</key>
-    <key alias="defaultValue">Default value</key>
+        <key alias="createblueprint">Create Content Template</key>
+        <key alias="resendInvite">Resend Invitation</key>
+    </area>
+    <area alias="actionCategories">
+        <key alias="content">Content</key>
+        <key alias="administration">Administration</key>
+        <key alias="structure">Structure</key>
+        <key alias="other">Other</key>
+    </area>
+    <area alias="actionDescriptions">
+        <key alias="assignDomain">Allow access to assign culture and hostnames</key>
+        <key alias="auditTrail">Allow access to view a node's history log</key>
+        <key alias="browse">Allow access to view a node</key>
+        <key alias="changeDocType">Allow access to change document type for a node</key>
+        <key alias="copy">Allow access to copy a node</key>
+        <key alias="create">Allow access to create nodes</key>
+        <key alias="delete">Allow access to delete nodes</key>
+        <key alias="move">Allow access to move a node</key>
+        <key alias="protect">Allow access to set and change public access for a node</key>
+        <key alias="publish">Allow access to publish a node</key>
+        <key alias="rights">Allow access to change permissions for a node</key>
+        <key alias="rollback">Allow access to roll back a node to a previous state</key>
+        <key alias="sendtopublish">Allow access to send a node for approval before publishing</key>
+        <key alias="sendToTranslate">Allow access to send a node for translation</key>
+        <key alias="sort">Allow access to change the sort order for nodes</key>
+        <key alias="translate">Allow access to translate a node</key>
+        <key alias="update">Allow access to save a node</key>
+        <key alias="createblueprint">Allow access to create a Content Template</key>
     </area>
     <area alias="assignDomain">
         <key alias="permissionDenied">Permission denied.</key>
@@ -62,17 +89,18 @@
         <key alias="domainExists">Domain '%0%' has already been assigned</key>
         <key alias="domainUpdated">Domain '%0%' has been updated</key>
         <key alias="orEdit">Edit Current Domains</key>
-    <key alias="domainHelp"><![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080" or
+        <key alias="domainHelp">
+            <![CDATA[Valid domain names are: "example.com", "www.example.com", "example.com:8080" or
         "https://www.example.com/". One-level paths in domains are supported, eg. "example.com/en". However, they
-        should be avoided. Better use the culture setting above.]]></key>
+        should be avoided. Better use the culture setting above.]]>
+        </key>
         <key alias="inherit">Inherit</key>
         <key alias="setLanguage">Culture</key>
-    <key alias="setLanguageHelp"><![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
-      to the current node, unless a domain below applies too.]]></key>
+        <key alias="setLanguageHelp">
+            <![CDATA[Set the culture for nodes below the current node,<br /> or inherit culture from parent nodes. Will also apply<br />
+      to the current node, unless a domain below applies too.]]>
+        </key>
         <key alias="setDomains">Domains</key>
-    </area>
-    <area alias="auditTrails">
-        <key alias="atViewingFor">Viewing for</key>
     </area>
     <area alias="buttons">
         <key alias="clearSelection">Clear selection</key>
@@ -98,7 +126,7 @@
         <key alias="relations">Edit relations</key>
         <key alias="returnToList">Return to list</key>
         <key alias="save">Save</key>
-        <key alias="saveAndPublish">Publish</key>
+        <key alias="saveAndPublish">Save and publish</key>
         <key alias="saveAndSchedule">Save and schedule</key>
         <key alias="saveToPublish">Save and send for approval</key>
         <key alias="saveListView">Save list view</key>
@@ -109,6 +137,29 @@
         <key alias="tableInsert">Insert table</key>
         <key alias="generateModels">Generate models</key>
         <key alias="saveAndGenerateModels">Save and generate models</key>
+        <key alias="undo">Undo</key>
+        <key alias="redo">Redo</key>
+    </area>
+    <area alias="auditTrails">
+        <key alias="atViewingFor">Viewing for</key>
+        <key alias="delete">Delete Content performed by user</key>
+        <key alias="unpublish">UnPublish performed by user</key>
+        <key alias="publish">Save and Publish performed by user</key>
+        <key alias="save">Save Content performed by user</key>
+        <key alias="move">Move Content performed by user</key>
+        <key alias="copy">Copy Content performed by user</key>
+        <key alias="rollback">Content rollback performed by user</key>
+        <key alias="sendtopublish">Content Send To Publish performed by user</key>
+        <key alias="sendtotranslate">Content Send To Translation performed by user</key>
+        <key alias="smallCopy">Copy</key>
+        <key alias="smallPublish">Publish</key>
+        <key alias="smallMove">Move</key>
+        <key alias="smallSave">Save</key>
+        <key alias="smallDelete">Delete</key>
+        <key alias="smallUnPublish">Unpublish</key>
+        <key alias="smallRollBack">Rollback</key>
+        <key alias="smallSendToPublish">Send To Publish</key>
+        <key alias="smallSendToTranslate">Send To Translation</key>
     </area>
     <area alias="changeDocType">
         <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
@@ -147,6 +198,8 @@
         <key alias="expireDate">Remove at</key>
         <key alias="itemChanged">This item has been changed after publication</key>
         <key alias="itemNotPublished">This item is not published</key>
+        <key alias="itemCultureNotPublished">Culture '%0%' for this item is not published</key>
+        <key alias="itemCultureNotAvailable">Culture '%0%' for this item is not available</key>
         <key alias="lastPublished">Last published</key>
         <key alias="noItemsToShow">There are no items to show</key>
         <key alias="listViewNoItems" version="7.1.5">There are no items to show in the list.</key>
@@ -163,9 +216,11 @@
         <key alias="noMediaLink">This media item has no link</key>
         <key alias="otherElements">Properties</key>
         <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
+        <key alias="parentCultureNotPublished">This culture is published but is not visible because it is unpublished on parent '%0%'</key>
         <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
         <key alias="getUrlException">Could not get the url</key>
         <key alias="routeError">This document is published but its url would collide with content %0%</key>
+        <key alias="routeErrorCannotRoute">This document is published but its url cannot be routed</key>
         <key alias="publish">Publish</key>
         <key alias="published">Published</key>
         <key alias="publishedPendingChanges">Published (pending changes)</key>
@@ -192,8 +247,22 @@
         <key alias="target" version="7.0">Target</key>
         <key alias="scheduledPublishServerTime">This translates to the following time on the server:</key>
         <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key>
+        <key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key>
+        <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
+        <key alias="addTextBox">Add another text box</key>
+        <key alias="removeTextBox">Remove this text box</key>
+        <key alias="contentRoot">Content root</key>
         <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
         <key alias="isSensitiveValue_short">This value is hidden.</key>
+    </area>
+    <area alias="blueprints">
+        <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
+        <key alias="blankBlueprint">Blank</key>
+        <key alias="selectBlueprint">Select a Content Template</key>
+        <key alias="createdBlueprintHeading">Content Template created</key>
+        <key alias="createdBlueprintMessage">A Content Template was created from '%0%'</key>
+        <key alias="duplicateBlueprintMessage">Another Content Template with the same name already exists</key>
+        <key alias="blueprintDescription">A Content Template is pre-defined content that an editor can select to use as the basis for creating new content</key>
     </area>
     <area alias="media">
         <key alias="clickToUpload">Click to upload</key>
@@ -203,6 +272,7 @@
         <key alias="onlyAllowedFiles">Only allowed file types are</key>
         <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
         <key alias="maxFileSize">Max file size is</key>
+        <key alias="mediaRoot">Media root</key>
     </area>
     <area alias="member">
         <key alias="createNewMember">Create a new member</key>
@@ -219,6 +289,13 @@
         <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
         <key alias="newFolder">New folder</key>
         <key alias="newDataType">New data type</key>
+        <key alias="newJavascriptFile">New javascript file</key>
+        <key alias="newEmptyPartialView">New empty partial view</key>
+        <key alias="newPartialViewMacro">New partial view macro</key>
+        <key alias="newPartialViewFromSnippet">New partial view from snippet</key>
+        <key alias="newEmptyPartialViewMacro">New empty partial view macro</key>
+        <key alias="newPartialViewMacroFromSnippet">New partial view macro from snippet</key>
+        <key alias="newPartialViewMacroNoMacro">New partial view macro (without macro)</key>
     </area>
     <area alias="dashboard">
         <key alias="browser">Browse your website</key>
@@ -234,6 +311,7 @@
         <key alias="discardChanges">Discard changes</key>
         <key alias="unsavedChanges">You have unsaved changes</key>
         <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+        <key alias="confirmUnpublish">Unpublishing will remove this page and all its descendants from the site.</key>
     </area>
     <area alias="bulk">
         <key alias="done">Done</key>
@@ -308,10 +386,14 @@
         <key alias="siterepublishHelp">The website cache will be refreshed. All published content will be updated, while unpublished content will stay unpublished.</key>
         <key alias="tableColumns">Number of columns</key>
         <key alias="tableRows">Number of rows</key>
-    <key alias="templateContentAreaHelp"><![CDATA[<strong>Set a placeholder id</strong> by setting an ID on your placeholder you can inject content into this template from child templates,
-      by referring this ID using a <code>&lt;asp:content /&gt;</code> element.]]></key>
-    <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Select a placeholder id</strong> from the list below. You can only
-      choose Id's from the current template's master.]]></key>
+        <key alias="templateContentAreaHelp">
+            <![CDATA[<strong>Set a placeholder id</strong> by setting an ID on your placeholder you can inject content into this template from child templates,
+      by referring this ID using a <code>&lt;asp:content /&gt;</code> element.]]>
+        </key>
+        <key alias="templateContentPlaceHolderHelp">
+            <![CDATA[<strong>Select a placeholder id</strong> from the list below. You can only
+      choose Id's from the current template's master.]]>
+        </key>
         <key alias="thumbnailimageclickfororiginal">Click on the image to see full size</key>
         <key alias="treepicker">Pick item</key>
         <key alias="viewCacheItem">View Cache Item</key>
@@ -322,6 +404,7 @@
         <key alias="linkToPage">Link to page</key>
         <key alias="openInNewWindow">Opens the linked document in a new window or tab</key>
         <key alias="linkToMedia">Link to media</key>
+        <key alias="linkToFile">Link to file</key>
         <key alias="selectContentStartNode">Select content start node</key>
         <key alias="selectMedia">Select media</key>
         <key alias="selectIcon">Select icon</key>
@@ -337,6 +420,7 @@
         <key alias="selectUsers">Select users</key>
         <key alias="noIconsFound">No icons were found</key>
         <key alias="noMacroParams">There are no parameters for this macro</key>
+        <key alias="noMacros">There are no macros available to insert</key>
         <key alias="externalLoginProviders">External login providers</key>
         <key alias="exceptionDetail">Exception Details</key>
         <key alias="stacktrace">Stacktrace</key>
@@ -345,11 +429,14 @@
         <key alias="unLinkYour">Un-link your</key>
         <key alias="account">account</key>
         <key alias="selectEditor">Select editor</key>
+        <key alias="selectSnippet">Select snippet</key>
     </area>
     <area alias="dictionaryItem">
-    <key alias="description"><![CDATA[
+        <key alias="description">
+            <![CDATA[
       Edit the different language versions for the dictionary item '<em>%0%</em>' below<br/>You can add additional languages under the 'languages' in the menu on the left
-   ]]></key>
+   ]]>
+        </key>
         <key alias="displayName">Culture Name</key>
         <key alias="changeKey">Edit the key of the dictionary item.</key>
         <key alias="changeKeyError">
@@ -357,6 +444,7 @@
       The key '%0%' already exists.
    ]]>
         </key>
+        <key alias="overviewTitle">Dictionary overview</key>
     </area>
     <area alias="placeholders">
         <key alias="username">Enter your username</key>
@@ -371,7 +459,7 @@
         <key alias="search">Type to search...</key>
         <key alias="filter">Type to filter...</key>
         <key alias="enterTags">Type to add tags (press enter after each tag)...</key>
-    <key alias="email">Enter your email</key>
+        <key alias="email">Enter your email...</key>
         <key alias="enterMessage">Enter a message...</key>
         <key alias="usernameHint">Your username is usually your email</key>
     </area>
@@ -410,6 +498,13 @@
         <key alias="rteRelatedStylesheets">Related stylesheets</key>
         <key alias="rteShowLabel">Show label</key>
         <key alias="rteWidthAndHeight">Width and height</key>
+        <key alias="allPropTypes">All property types &amp; property data</key>
+        <key alias="willBeDeleted">using this data type will be deleted permanently, please confirm you want to delete these as well</key>
+        <key alias="yesDelete">Yes, delete</key>
+        <key alias="andAllRelated">and all property types &amp; property data using this data type</key>
+        <key alias="selectFolder">Select the folder to move</key>
+        <key alias="inTheTree">to in the tree structure below</key>
+        <key alias="wasMoved">was moved underneath</key>
     </area>
     <area alias="errorHandling">
         <key alias="errorButDataWasSaved">Your data has been saved, but before you can publish this page there are some errors you need to fix first:</key>
@@ -465,6 +560,7 @@
         <key alias="closewindow">Close Window</key>
         <key alias="comment">Comment</key>
         <key alias="confirm">Confirm</key>
+        <key alias="constrain">Constrain</key>
         <key alias="constrainProportions">Constrain proportions</key>
         <key alias="continue">Continue</key>
         <key alias="copy">Copy</key>
@@ -476,6 +572,7 @@
         <key alias="deleted">Deleted</key>
         <key alias="deleting">Deleting...</key>
         <key alias="design">Design</key>
+        <key alias="dictionary">Dictionary</key>
         <key alias="dimensions">Dimensions</key>
         <key alias="down">Down</key>
         <key alias="download">Download</key>
@@ -485,6 +582,7 @@
         <key alias="email">Email</key>
         <key alias="error">Error</key>
         <key alias="findDocument">Find</key>
+        <key alias="first">First</key>
         <key alias="general">General</key>
         <key alias="groups">Groups</key>
         <key alias="height">Height</key>
@@ -501,6 +599,7 @@
         <key alias="justify">Justify</key>
         <key alias="label">Label</key>
         <key alias="language">Language</key>
+        <key alias="last">Last</key>
         <key alias="layout">Layout</key>
         <key alias="links">Links</key>
         <key alias="loading">Loading</key>
@@ -534,13 +633,17 @@
         <key alias="recycleBin">Recycle Bin</key>
         <key alias="recycleBinEmpty">Your recycle bin is empty</key>
         <key alias="remaining">Remaining</key>
+        <key alias="remove">Remove</key>
         <key alias="rename">Rename</key>
         <key alias="renew">Renew</key>
         <key alias="required" version="7.0">Required</key>
+        <key alias="retrieve">Retrieve</key>
         <key alias="retry">Retry</key>
         <key alias="rights">Permissions</key>
         <key alias="scheduledPublishing">Scheduled Publishing</key>
         <key alias="search">Search</key>
+        <key alias="searchNoResult">Sorry, we can not find what you are looking for</key>
+        <key alias="noItemsInList">No items have been added</key>
         <key alias="server">Server</key>
         <key alias="settings">Settings</key>
         <key alias="show">Show</key>
@@ -618,6 +721,15 @@
         <key alias="toggleListView">Toggle list view</key>
         <key alias="toggleAllowAsRoot">Toggle allow as root</key>
 
+        <key alias="commentLine">Comment/Uncomment lines</key>
+        <key alias="removeLine">Remove line</key>
+        <key alias="copyLineUp">Copy Lines Up</key>
+        <key alias="copyLineDown">Copy Lines Down</key>
+        <key alias="moveLineUp">Move Lines Up</key>
+        <key alias="moveLineDown">Move Lines Down</key>
+
+        <key alias="generalHeader">General</key>
+        <key alias="editorHeader">Editor</key>
     </area>
     <area alias="graphicheadline">
         <key alias="backgroundcolor">Background colour</key>
@@ -634,28 +746,37 @@
         <key alias="databaseErrorWebConfig">Could not save the web.config file. Please modify the connection string manually.</key>
         <key alias="databaseFound">Your database has been found and is identified as</key>
         <key alias="databaseHeader">Database configuration</key>
-    <key alias="databaseInstall"><![CDATA[
+        <key alias="databaseInstall">
+            <![CDATA[
       Press the <strong>install</strong> button to install the Umbraco %0% database
-    ]]></key>
+    ]]>
+        </key>
         <key alias="databaseInstallDone"><![CDATA[Umbraco %0% has now been copied to your database. Press <strong>Next</strong> to proceed.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p>
+        <key alias="databaseNotFound">
+            <![CDATA[<p>Database not found! Please check that the information in the "connection string" of the "web.config" file is correct.</p>
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
               <p>
               Click the <strong>retry</strong> button when
               done.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
-			              More information on editing web.config here.</a></p>]]></key>
-    <key alias="databaseText"><![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
+			              More information on editing web.config here.</a></p>]]>
+        </key>
+        <key alias="databaseText">
+            <![CDATA[To complete this step, you must know some information regarding your database server ("connection string").<br />
         Please contact your ISP if necessary.
-        If you're installing on a local machine or server you might need information from your system administrator.]]></key>
-    <key alias="databaseUpgrade"><![CDATA[
+        If you're installing on a local machine or server you might need information from your system administrator.]]>
+        </key>
+        <key alias="databaseUpgrade">
+            <![CDATA[
       <p>
       Press the <strong>upgrade</strong> button to upgrade your database to Umbraco %0%</p>
       <p>
       Don't worry - no content will be deleted and everything will continue working afterwards!
       </p>
+      ]]>
         </key>
         <key alias="databaseUpgradeDone">
-            <![CDATA[Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to proceed. ]]>
+            <![CDATA[Your database has been upgraded to the final version %0%.<br />Press <strong>Next</strong> to
+      proceed. ]]>
         </key>
         <key alias="databaseUpToDate"><![CDATA[Your current database is up-to-date!. Click <strong>next</strong> to continue the configuration wizard]]></key>
         <key alias="defaultUserChangePass"><![CDATA[<strong>The Default users' password needs to be changed!</strong>]]></key>
@@ -668,41 +789,56 @@
         <key alias="permissionsAffectedFolders">Affected files and folders</key>
         <key alias="permissionsAffectedFoldersMoreInfo">More information on setting up permissions for Umbraco here</key>
         <key alias="permissionsAffectedFoldersText">You need to grant ASP.NET modify permissions to the following files/folders</key>
-    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Your permission settings are almost perfect!</strong><br /><br />
-        You can run Umbraco without problems, but you will not be able to install packages which are recommended to take full advantage of Umbraco.]]></key>
+        <key alias="permissionsAlmostPerfect">
+            <![CDATA[<strong>Your permission settings are almost perfect!</strong><br /><br />
+        You can run Umbraco without problems, but you will not be able to install packages which are recommended to take full advantage of Umbraco.]]>
+        </key>
         <key alias="permissionsHowtoResolve">How to Resolve</key>
         <key alias="permissionsHowtoResolveLink">Click here to read the text version</key>
         <key alias="permissionsHowtoResolveText"><![CDATA[Watch our <strong>video tutorial</strong> on setting up folder permissions for Umbraco or read the text version.]]></key>
-    <key alias="permissionsMaybeAnIssue"><![CDATA[<strong>Your permission settings might be an issue!</strong>
+        <key alias="permissionsMaybeAnIssue">
+            <![CDATA[<strong>Your permission settings might be an issue!</strong>
       <br/><br />
-      You can run Umbraco without problems, but you will not be able to create folders or install packages which are recommended to take full advantage of Umbraco.]]></key>
-    <key alias="permissionsNotReady"><![CDATA[<strong>Your permission settings are not ready for Umbraco!</strong>
+      You can run Umbraco without problems, but you will not be able to create folders or install packages which are recommended to take full advantage of Umbraco.]]>
+        </key>
+        <key alias="permissionsNotReady">
+            <![CDATA[<strong>Your permission settings are not ready for Umbraco!</strong>
           <br /><br />
-          In order to run Umbraco, you'll need to update your permission settings.]]></key>
-    <key alias="permissionsPerfect"><![CDATA[<strong>Your permission settings are perfect!</strong><br /><br />
-              You are ready to run Umbraco and install packages!]]></key>
+          In order to run Umbraco, you'll need to update your permission settings.]]>
+        </key>
+        <key alias="permissionsPerfect">
+            <![CDATA[<strong>Your permission settings are perfect!</strong><br /><br />
+              You are ready to run Umbraco and install packages!]]>
+        </key>
         <key alias="permissionsResolveFolderIssues">Resolving folder issue</key>
         <key alias="permissionsResolveFolderIssuesLink">Follow this link for more information on problems with ASP.NET and creating folders</key>
         <key alias="permissionsSettingUpPermissions">Setting up folder permissions</key>
-    <key alias="permissionsText"><![CDATA[
+        <key alias="permissionsText">
+            <![CDATA[
       Umbraco needs write/modify access to certain directories in order to store files like pictures and PDF's.
       It also stores temporary data (aka: cache) for enhancing the performance of your website.
-    ]]></key>
+    ]]>
+        </key>
         <key alias="runwayFromScratch">I want to start from scratch</key>
-    <key alias="runwayFromScratchText"><![CDATA[
+        <key alias="runwayFromScratchText">
+            <![CDATA[
         Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own document types and templates.
         (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
-      ]]></key>
+      ]]>
+        </key>
         <key alias="runwayHeader">You've just set up a clean Umbraco platform. What do you want to do next?</key>
         <key alias="runwayInstalled">Runway is installed</key>
-    <key alias="runwayInstalledText"><![CDATA[
+        <key alias="runwayInstalledText">
+            <![CDATA[
       You have the foundation in place. Select what modules you wish to install on top of it.<br />
       This is our list of recommended modules, check off the ones you would like to install, or view the <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">full list of modules</a>
-      ]]></key>
+      ]]>
+        </key>
         <key alias="runwayOnlyProUsers">Only recommended for experienced users</key>
         <key alias="runwaySimpleSite">I want to start with a simple website</key>
-    <key alias="runwaySimpleSiteText"><![CDATA[
+        <key alias="runwaySimpleSiteText">
+            <![CDATA[
       <p>
       "Runway" is a simple website providing some basic document types and templates. The installer can set up Runway for you automatically,
         but you can easily edit, extend or remove it. It's not necessary and you can perfectly use Umbraco without it. However,
@@ -713,7 +849,8 @@
         <em>Included with Runway:</em> Home page, Getting Started page, Installing Modules page.<br />
         <em>Optional Modules:</em> Top Navigation, Sitemap, Contact, Gallery.
         </small>
-      ]]></key>
+      ]]>
+        </key>
         <key alias="runwayWhatIsRunway">What is Runway</key>
         <key alias="step1">Step 1/5 Accept license</key>
         <key alias="step2">Step 2/5: Database configuration</key>
@@ -721,24 +858,36 @@
         <key alias="step4">Step 4/5: Check Umbraco security</key>
         <key alias="step5">Step 5/5: Umbraco is ready to get you started</key>
         <key alias="thankYou">Thank you for choosing Umbraco</key>
-    <key alias="theEndBrowseSite"><![CDATA[<h3>Browse your new site</h3>
-You installed Runway, so why not see how your new website looks.]]></key>
-    <key alias="theEndFurtherHelp"><![CDATA[<h3>Further help and information</h3>
-Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the Umbraco terminology]]></key>
+        <key alias="theEndBrowseSite">
+            <![CDATA[<h3>Browse your new site</h3>
+You installed Runway, so why not see how your new website looks.]]>
+        </key>
+        <key alias="theEndFurtherHelp">
+            <![CDATA[<h3>Further help and information</h3>
+Get help from our award winning community, browse the documentation or watch some free videos on how to build a simple site, how to use packages and a quick guide to the Umbraco terminology]]>
+        </key>
         <key alias="theEndHeader">Umbraco %0% is installed and ready for use</key>
-    <key alias="theEndInstallFailed"><![CDATA[To finish the installation, you'll need to
-        manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>UmbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]></key>
-    <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>,
-you can find plenty of resources on our getting started pages.]]></key>
-    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>
-To manage your website, simply open the Umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]></key>
+        <key alias="theEndInstallFailed">
+            <![CDATA[To finish the installation, you'll need to
+        manually edit the <strong>/web.config file</strong> and update the AppSetting key <strong>UmbracoConfigurationStatus</strong> in the bottom to the value of <strong>'%0%'</strong>.]]>
+        </key>
+        <key alias="theEndInstallSuccess">
+            <![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>,
+you can find plenty of resources on our getting started pages.]]>
+        </key>
+        <key alias="theEndOpenUmbraco">
+            <![CDATA[<h3>Launch Umbraco</h3>
+To manage your website, simply open the Umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]>
+        </key>
         <key alias="Unavailable">Connection to database failed.</key>
         <key alias="Version3">Umbraco Version 3</key>
         <key alias="Version4">Umbraco Version 4</key>
         <key alias="watch">Watch</key>
-    <key alias="welcomeIntro"><![CDATA[This wizard will guide you through the process of configuring <strong>Umbraco %0%</strong> for a fresh install or upgrading from version 3.0.
+        <key alias="welcomeIntro">
+            <![CDATA[This wizard will guide you through the process of configuring <strong>Umbraco %0%</strong> for a fresh install or upgrading from version 3.0.
                                 <br /><br />
-                                Press <strong>"next"</strong> to start the wizard.]]></key>
+                                Press <strong>"next"</strong> to start the wizard.]]>
+        </key>
     </area>
     <area alias="language">
         <key alias="cultureCode">Culture Code</key>
@@ -763,6 +912,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="forgottenPassword">Forgotten password?</key>
         <key alias="forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</key>
         <key alias="requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</key>
+        <key alias="showPassword">Show password</key>
+        <key alias="hidePassword">Hide password</key>
         <key alias="returnToLogin">Return to login form</key>
         <key alias="setPasswordInstruction">Please provide a new password</key>
         <key alias="setPasswordConfirmation">Your Password has been updated</key>
@@ -873,7 +1024,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     </area>
     <area alias="notifications">
         <key alias="editNotifications">Edit your notification for %0%</key>
-    <key alias="mailBody"><![CDATA[
+        <key alias="mailBody">
+            <![CDATA[
       Hi %0%
 
       This is an automated mail to inform you that the task '%1%'
@@ -1288,6 +1440,9 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="unlockUserError">An error occurred while unlocking the user</key>
         <key alias="memberExportedSuccess">Member was exported to file</key>
         <key alias="memberExportedError">An error occurred while exporting the member</key>
+        <key alias="deleteUserSuccess">User %0% was deleted</key>
+        <key alias="resendInviteHeader">Invite user</key>
+        <key alias="resendInviteSuccess">Invitation has been re-sent to %0%</key>
     </area>
     <area alias="stylesheet">
         <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>
@@ -1519,7 +1674,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="isSensitiveDataDescription">Hide this property value from content editors that don't have access to view sensitive information</key>
         <key alias="showOnMemberProfile">Show on member profile</key>
         <key alias="showOnMemberProfileDescription">Allow this property value to be displayed on the member profile page</key>
-        
+
         <key alias="tabHasNoSortOrder">tab has no sort order</key>
         
 		<key alias="compositionUsageHeading">Where is this composition used?</key>
@@ -1867,6 +2022,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     </html>]]>
         </key>
         <key alias="invite">Invite</key>
+        <key alias="defaultInvitationMessage">Resending invitation...</key>
+        <key alias="deleteUser">Delete User</key>
+        <key alias="deleteUserConfirmation">Are you sure you wish to delete this user account?</key>
     </area>
 
     <area alias="validation">
@@ -1926,6 +2084,10 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="xmlDataIntegrityCheckMembers">Members - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
         <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
         <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid: %2%</key>
+
+        <key alias="databaseSchemaValidationCheckDatabaseOk">Database - The database schema is correct for this version of Umbraco</key>
+        <key alias="databaseSchemaValidationCheckDatabaseErrors">%0% problems were detected with your database schema (Check the log for details)</key>
+        <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Some errors were detected while validating the database schema against the current version of Umbraco.</key>
 
         <key alias="httpsCheckValidCertificate">Your website's certificate is valid.</key>
         <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>

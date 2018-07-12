@@ -11,51 +11,6 @@ using Umbraco.Core.Persistence.Querying;
 namespace Umbraco.Core.Services
 {
     /// <summary>
-    /// A temporary interface until we are in v8, this is used to return a different result for the same method and this interface gets implemented
-    /// explicitly. These methods will replace the normal ones in IContentService in v8 and this will be removed.
-    /// </summary>
-    public interface IMediaServiceOperations
-    {
-        //TODO: Remove this class in v8
-
-        //TODO: There's probably more that needs to be added like the EmptyRecycleBin, etc...
-
-        /// <summary>
-        /// Deletes an <see cref="IMedia"/> object by moving it to the Recycle Bin
-        /// </summary>
-        /// <param name="media">The <see cref="IMedia"/> to delete</param>
-        /// <param name="userId">Id of the User deleting the Media</param>
-        Attempt<OperationResult> MoveToRecycleBin(IMedia media, int userId = 0);
-
-        /// <summary>
-        /// Permanently deletes an <see cref="IMedia"/> object
-        /// </summary>
-        /// <remarks>
-        /// Please note that this method will completely remove the Media from the database,
-        /// but current not from the file system.
-        /// </remarks>
-        /// <param name="media">The <see cref="IMedia"/> to delete</param>
-        /// <param name="userId">Id of the User deleting the Media</param>
-        Attempt<OperationResult> Delete(IMedia media, int userId = 0);
-
-        /// <summary>
-        /// Saves a single <see cref="IMedia"/> object
-        /// </summary>
-        /// <param name="media">The <see cref="IMedia"/> to save</param>
-        /// <param name="userId">Id of the User saving the Media</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        Attempt<OperationResult> Save(IMedia media, int userId = 0, bool raiseEvents = true);
-
-        /// <summary>
-        /// Saves a collection of <see cref="IMedia"/> objects
-        /// </summary>
-        /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
-        /// <param name="userId">Id of the User saving the Media</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true);
-    }
-
-    /// <summary>
     /// Defines the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
     /// </summary>
     public interface IMediaService : IContentServiceBase
@@ -237,13 +192,13 @@ namespace Umbraco.Core.Services
         /// <param name="parentId">Id of the Media's new Parent</param>
         /// <param name="userId">Id of the User moving the Media</param>
         void Move(IMedia media, int parentId, int userId = 0);
-
+        
         /// <summary>
         /// Deletes an <see cref="IMedia"/> object by moving it to the Recycle Bin
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        void MoveToRecycleBin(IMedia media, int userId = 0);
+        Attempt<OperationResult> MoveToRecycleBin(IMedia media, int userId = 0);
 
         /// <summary>
         /// Empties the Recycle Bin by deleting all <see cref="IMedia"/> that resides in the bin
@@ -265,7 +220,7 @@ namespace Umbraco.Core.Services
         /// <param name="mediaTypeIds">Ids of the <see cref="IMediaType"/>s</param>
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
         void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = 0);
-
+        
         /// <summary>
         /// Permanently deletes an <see cref="IMedia"/> object
         /// </summary>
@@ -275,7 +230,7 @@ namespace Umbraco.Core.Services
         /// </remarks>
         /// <param name="media">The <see cref="IMedia"/> to delete</param>
         /// <param name="userId">Id of the User deleting the Media</param>
-        void Delete(IMedia media, int userId = 0);
+        Attempt<OperationResult> Delete(IMedia media, int userId = 0);
 
         /// <summary>
         /// Saves a single <see cref="IMedia"/> object
@@ -283,7 +238,7 @@ namespace Umbraco.Core.Services
         /// <param name="media">The <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        void Save(IMedia media, int userId = 0, bool raiseEvents = true);
+        Attempt<OperationResult> Save(IMedia media, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Saves a collection of <see cref="IMedia"/> objects
@@ -291,7 +246,7 @@ namespace Umbraco.Core.Services
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        void Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true);
+        Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Gets an <see cref="IMedia"/> object by its 'UniqueId'

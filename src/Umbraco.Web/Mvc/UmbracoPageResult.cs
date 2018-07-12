@@ -22,13 +22,6 @@ namespace Umbraco.Web.Mvc
             _profilingLogger = profilingLogger;
         }
 
-        [Obsolete("Use the ctor specifying all depenendencies instead")]
-        public UmbracoPageResult()
-            : this(new ProfilingLogger(Current.Logger, Current.Profiler))
-        {
-
-        }
-
         public override void ExecuteResult(ControllerContext context)
         {
             ResetRouteData(context.RouteData);

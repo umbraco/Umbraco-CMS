@@ -41,7 +41,7 @@ namespace Umbraco.Core.Models.PublishedContent
         public RawValueProperty(PublishedPropertyType propertyType, IPublishedElement content, object sourceValue, bool isPreviewing = false)
             : base(propertyType, PropertyCacheLevel.Unknown) // cache level is ignored
         {
-            if (propertyType.Variations != ContentVariation.InvariantNeutral)
+            if (propertyType.Variations != ContentVariation.Nothing)
                 throw new ArgumentException("Property types with variations are not supported here.", nameof(propertyType));
 
             _sourceValue = sourceValue;

@@ -46,6 +46,7 @@
         <key alias="setPermissions">Set permissions</key>
         <key alias="unlock">Unlock</key>
         <key alias="createblueprint">Create Content Template</key>
+        <key alias="resendInvite">Resend Invitation</key>
     </area>
     <area alias="actionCategories">
         <key alias="content">Content</key>
@@ -100,9 +101,6 @@
         </key>
         <key alias="setDomains">Domains</key>
     </area>
-    <area alias="auditTrails">
-        <key alias="atViewingFor">Viewing for</key>
-    </area>
     <area alias="buttons">
         <key alias="clearSelection">Clear selection</key>
         <key alias="select">Select</key>
@@ -128,8 +126,9 @@
         <key alias="relations">Edit relations</key>
         <key alias="returnToList">Return to list</key>
         <key alias="save">Save</key>
+        
         <key alias="saveAndClose">Save and close</key>
-        <key alias="saveAndPublish">Publish</key>
+        <key alias="saveAndPublish">Save and publish</key>
         <key alias="saveAndPublishMany">Publish…</key>
         <key alias="saveAndSchedule">Save and schedule</key>
         <key alias="saveToPublish">Save and send for approval</key>
@@ -145,6 +144,28 @@
         <key alias="undo">Undo</key>
         <key alias="redo">Redo</key>
     </area>
+    <area alias="auditTrails">
+        <key alias="atViewingFor">Viewing for</key>
+        <key alias="delete">Delete Content performed by user</key>
+        <key alias="unpublish">UnPublish performed by user</key>
+        <key alias="publish">Save and Publish performed by user</key>
+        <key alias="save">Save Content performed by user</key>
+        <key alias="move">Move Content performed by user</key>
+        <key alias="copy">Copy Content performed by user</key>
+        <key alias="rollback">Content rollback performed by user</key>
+        <key alias="sendtopublish">Content Send To Publish performed by user</key>
+        <key alias="sendtotranslate">Content Send To Translation performed by user</key>
+        <key alias="smallCopy">Copy</key>
+        <key alias="smallPublish">Publish</key>
+        <key alias="smallMove">Move</key>
+        <key alias="smallSave">Save</key>
+        <key alias="smallDelete">Delete</key>
+        <key alias="smallUnPublish">Unpublish</key>
+        <key alias="smallRollBack">Rollback</key>
+        <key alias="smallSendToPublish">Send To Publish</key>
+        <key alias="smallSendToTranslate">Send To Translation</key>
+    </area>
+
     <area alias="changeDocType">
         <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
         <key alias="changeDocTypeInstruction2">Then confirm and/or amend the mapping of properties from the current type to the new, and click Save.</key>
@@ -182,6 +203,8 @@
         <key alias="expireDate">Remove at</key>
         <key alias="itemChanged">This item has been changed after publication</key>
         <key alias="itemNotPublished">This item is not published</key>
+        <key alias="itemCultureNotPublished">Culture '%0%' for this item is not published</key>
+        <key alias="itemCultureNotAvailable">Culture '%0%' for this item is not available</key>
         <key alias="lastPublished">Last published</key>
         <key alias="noItemsToShow">There are no items to show</key>
         <key alias="listViewNoItems" version="7.1.5">There are no items to show in the list.</key>
@@ -198,9 +221,11 @@
         <key alias="noMediaLink">This media item has no link</key>
         <key alias="otherElements">Properties</key>
         <key alias="parentNotPublished">This document is published but is not visible because the parent '%0%' is unpublished</key>
+        <key alias="parentCultureNotPublished">This culture is published but is not visible because it is unpublished on parent '%0%'</key>
         <key alias="parentNotPublishedAnomaly">This document is published but is not in the cache</key>
         <key alias="getUrlException">Could not get the url</key>
         <key alias="routeError">This document is published but its url would collide with content %0%</key>
+        <key alias="routeErrorCannotRoute">This document is published but its url cannot be routed</key>
         <key alias="publish">Publish</key>
         <key alias="published">Published</key>
         <key alias="publishedPendingChanges">Published (pending changes)</key>
@@ -294,6 +319,7 @@
         <key alias="discardChanges">Discard changes</key>
         <key alias="unsavedChanges">You have unsaved changes</key>
         <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
+        <key alias="confirmUnpublish">Unpublishing will remove this page and all its descendants from the site.</key>
     </area>
     <area alias="bulk">
         <key alias="done">Done</key>
@@ -426,6 +452,7 @@
       The key '%0%' already exists.
    ]]>
         </key>
+        <key alias="overviewTitle">Dictionary overview</key>
     </area>
     <area alias="placeholders">
         <key alias="username">Enter your username</key>
@@ -891,6 +918,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="forgottenPassword">Forgotten password?</key>
         <key alias="forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</key>
         <key alias="requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</key>
+        <key alias="showPassword">Show password</key>
+        <key alias="hidePassword">Hide password</key>
         <key alias="returnToLogin">Return to login form</key>
         <key alias="setPasswordInstruction">Please provide a new password</key>
         <key alias="setPasswordConfirmation">Your Password has been updated</key>
@@ -1418,6 +1447,9 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="unlockUserError">An error occurred while unlocking the user</key>
         <key alias="memberExportedSuccess">Member was exported to file</key>
         <key alias="memberExportedError">An error occurred while exporting the member</key>
+        <key alias="deleteUserSuccess">User %0% was deleted</key>
+        <key alias="resendInviteHeader">Invite user</key>
+        <key alias="resendInviteSuccess">Invitation has been re-sent to %0%</key>
         <key alias="contentReqCulturePublishError">Cannot publish the document since the required '%0%' is not published</key>
         <key alias="contentCultureValidationError">Validation failed for language '%0%'</key>
         <key alias="contentCultureUnexpectedValidationError">Unexpected validation failed for language '%0%'</key>
@@ -1647,7 +1679,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="isSensitiveDataDescription">Hide this property value from content editors that don't have access to view sensitive information</key>
         <key alias="showOnMemberProfile">Show on member profile</key>
         <key alias="showOnMemberProfileDescription">Allow this property value to be displayed on the member profile page</key>
-        
+
         <key alias="tabHasNoSortOrder">tab has no sort order</key>
         
 		<key alias="compositionUsageHeading">Where is this composition used?</key>
@@ -2004,6 +2036,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     </html>]]>
         </key>
         <key alias="invite">Invite</key>
+        <key alias="defaultInvitationMessage">Resending invitation...</key>
+        <key alias="deleteUser">Delete User</key>
+        <key alias="deleteUserConfirmation">Are you sure you wish to delete this user account?</key>
     </area>
     <area alias="validation">
         <key alias="validation">Validation</key>
@@ -2062,6 +2097,10 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="xmlDataIntegrityCheckMembers">Members - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
         <key alias="xmlDataIntegrityCheckMedia">Media - Total XML: %0%, Total: %1%, Total invalid: %2%</key>
         <key alias="xmlDataIntegrityCheckContent">Content - Total XML: %0%, Total published: %1%, Total invalid: %2%</key>
+
+        <key alias="databaseSchemaValidationCheckDatabaseOk">Database - The database schema is correct for this version of Umbraco</key>
+        <key alias="databaseSchemaValidationCheckDatabaseErrors">%0% problems were detected with your database schema (Check the log for details)</key>
+        <key alias="databaseSchemaValidationCheckDatabaseLogMessage">Some errors were detected while validating the database schema against the current version of Umbraco.</key>
 
         <key alias="httpsCheckValidCertificate">Your website's certificate is valid.</key>
         <key alias="httpsCheckInvalidCertificate">Certificate validation error: '%0%'</key>

@@ -48,19 +48,21 @@ namespace Umbraco.Web.Trees
         protected override TreeNode GetSingleTreeNode(IEntitySlim entity, string parentId, FormDataCollection queryStrings)
         {
             var langId = queryStrings?["culture"];
-            
+
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(entity);
             if (CanUserAccessNode(entity, allowedUserOptions, langId))
             {
                 //Special check to see if it ia a container, if so then we'll hide children.
                 var isContainer = entity.IsContainer;   // && (queryStrings.Get("isDialog") != "true");
 
+                var hasChildren = ShouldRenderChildrenOfContainer(entity);
+                
                 var node = CreateTreeNode(
                     entity,
                     Constants.ObjectTypes.Document,
                     parentId,
                     queryStrings,
-                    entity.HasChildren && !isContainer);
+                    hasChildren);
 
                 // entity is either a container, or a document
                 if (isContainer)
@@ -126,7 +128,8 @@ namespace Umbraco.Web.Trees
                 }
 
                 // add default actions for *all* users
-                menu.Items.Add<ActionRePublish>(Services.TextService.Localize("actions", ActionRePublish.Instance.Alias)).ConvertLegacyMenuItem(null, "content", "content");
+                // fixme - temp disable RePublish as the page itself (republish.aspx) has been temp disabled
+                //menu.Items.Add<ActionRePublish>(Services.TextService.Localize("actions", ActionRePublish.Instance.Alias)).ConvertLegacyMenuItem(null, "content", "content");
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
 
                 return menu;
@@ -155,16 +158,13 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
 
-            var nodeMenu = GetAllNodeMenuItems(item);
-            var allowedMenuItems = GetAllowedUserMenuItemsForNode(item);
-
-            FilterUserAllowedMenuItems(nodeMenu, allowedMenuItems);
-
-            //if the media item is in the recycle bin, don't have a default menu, just show the regular menu
+            var nodeMenu = GetAllNodeMenuItems(item);            
+            
+            //if the content node is in the recycle bin, don't have a default menu, just show the regular menu
             if (item.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
                 nodeMenu.DefaultMenuAlias = null;
-                nodeMenu.Items.Insert(2, new MenuItem(ActionRestore.Instance, Services.TextService.Localize("actions", ActionRestore.Instance.Alias)));
+                nodeMenu = GetNodeMenuItemsForDeletedContent(item);
             }
             else
             {
@@ -172,6 +172,8 @@ namespace Umbraco.Web.Trees
                 nodeMenu.DefaultMenuAlias = ActionNew.Instance.Alias;
             }
 
+            var allowedMenuItems = GetAllowedUserMenuItemsForNode(item);
+            FilterUserAllowedMenuItems(nodeMenu, allowedMenuItems);
 
             return nodeMenu;
         }
@@ -205,7 +207,7 @@ namespace Umbraco.Web.Trees
             foreach (var entity in result)
                 EnsureName(entity, cultureVal);
 
-            return result; 
+            return result;
         }
 
         /// <summary>
@@ -244,6 +246,23 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
+        /// Returns a collection of all menu items that can be on a deleted (in recycle bin) content node
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        protected MenuItemCollection GetNodeMenuItemsForDeletedContent(IUmbracoEntity item)
+        {
+            var menu = new MenuItemCollection();
+            menu.Items.Add<ActionRestore>(Services.TextService.Localize("actions", ActionRestore.Instance.Alias));
+            menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
+
+            menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
+
+            return menu;
+        }
+
+        
+        /// <summary>
         /// set name according to variations
         /// </summary>
         /// <param name="entity"></param>
@@ -264,7 +283,7 @@ namespace Umbraco.Web.Trees
             // for those items that DO support cultures, we need to get the proper name, IF it exists
             // otherwise, invariant is fine
 
-            if (docEntity.Variations.Has(Core.Models.ContentVariation.CultureNeutral) &&
+            if (docEntity.Variations.VariesByCulture() &&
                 docEntity.CultureNames.TryGetValue(culture, out var name) &&
                 !string.IsNullOrWhiteSpace(name))
             {

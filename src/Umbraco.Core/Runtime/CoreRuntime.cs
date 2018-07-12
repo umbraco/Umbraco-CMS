@@ -258,12 +258,20 @@ namespace Umbraco.Core.Runtime
                 logger.Debug<CoreRuntime>("No local version, need to install Umbraco.");
                 _state.Level = RuntimeLevel.Install;
             }
-            else if (localVersion != codeVersion)
+            else if (localVersion < codeVersion)
             {
                 // there *is* a local version, but it does not match the code version
                 // need to upgrade
-                logger.Debug<CoreRuntime>(() => $"Local version \"{localVersion}\" != code version \"{codeVersion}\", need to upgrade Umbraco.");
+                logger.Debug<CoreRuntime>(() => $"Local version \"{localVersion}\" < code version \"{codeVersion}\", need to upgrade Umbraco.");
                 _state.Level = RuntimeLevel.Upgrade;
+            }
+            else if (localVersion > codeVersion)
+            {
+                logger.Warn<CoreRuntime>(() => $"Local version \"{localVersion}\" > code version \"{codeVersion}\", downgrading is not supported.");
+                _state.Level = RuntimeLevel.BootFailed;
+
+                // in fact, this is bad enough that we want to throw
+                throw new BootFailedException($"Local version \"{localVersion}\" > code version \"{codeVersion}\", downgrading is not supported.");
             }
             else if (databaseFactory.Configured == false)
             {

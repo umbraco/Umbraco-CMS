@@ -5,13 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Xml.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 
@@ -98,12 +95,6 @@ namespace Umbraco.Core.Models
             return mediaService.GetAncestors(media);
         }
 
-        [Obsolete("Use the overload with the service reference instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IEnumerable<IMedia> Ancestors(this IMedia media)
-        {
-            return Current.Services.MediaService.GetAncestors(media);
-        }
 
         /// <summary>
         /// Returns a list of the current medias children.
@@ -116,12 +107,6 @@ namespace Umbraco.Core.Models
             return mediaService.GetChildren(media.Id);
         }
 
-        [Obsolete("Use the overload with the service reference instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IEnumerable<IMedia> Children(this IMedia media)
-        {
-            return Current.Services.MediaService.GetChildren(media.Id);
-        }
 
         /// <summary>
         /// Returns a list of the current medias descendants, not including the media itself.
@@ -134,12 +119,6 @@ namespace Umbraco.Core.Models
             return mediaService.GetDescendants(media);
         }
 
-        [Obsolete("Use the overload with the service reference instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IEnumerable<IMedia> Descendants(this IMedia media)
-        {
-            return Current.Services.MediaService.GetDescendants(media);
-        }
 
         /// <summary>
         /// Returns the parent of the current media.
@@ -152,12 +131,6 @@ namespace Umbraco.Core.Models
             return mediaService.GetById(media.ParentId);
         }
 
-        [Obsolete("Use the overload with the service reference instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IMedia Parent(this IMedia media)
-        {
-            return Current.Services.MediaService.GetById(media.ParentId);
-        }
         #endregion
         
         /// <summary>
@@ -339,14 +312,6 @@ namespace Umbraco.Core.Models
 
         #region User/Profile methods
 
-
-        [Obsolete("Use the overload that declares the IUserService to use")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static IProfile GetCreatorProfile(this IMedia media)
-        {
-            return Current.Services.UserService.GetProfileById(media.CreatorId);
-        }
-
         /// <summary>
         /// Gets the <see cref="IProfile"/> for the Creator of this media item.
         /// </summary>
@@ -454,13 +419,6 @@ namespace Umbraco.Core.Models
             return packagingService.Export(media, true, raiseEvents: false);
         }
 
-        [Obsolete("Use the overload that declares the IPackagingService to use")]
-        public static XElement ToXml(this IContent content, bool isPreview)
-        {
-            //TODO Do a proper implementation of this
-            //If current IContent is published we should get latest unpublished version
-            return content.ToXml();
-        }
 
         /// <summary>
         /// Creates the xml representation for the <see cref="IContent"/> object
@@ -476,11 +434,6 @@ namespace Umbraco.Core.Models
             return content.ToXml(packagingService);
         }
 
-        [Obsolete("Use the overload that declares the IPackagingService to use")]
-        public static XElement ToXml(this IMember member)
-        {
-            return ((PackagingService)(Current.Services.PackagingService)).Export(member);
-        }
 
         /// <summary>
         /// Creates the xml representation for the <see cref="IMember"/> object

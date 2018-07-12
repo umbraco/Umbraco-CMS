@@ -14,6 +14,7 @@ namespace Umbraco.Web.Composing.CompositionRoots
             container.Register<ContentTypeMapperProfile>();
             container.Register<DataTypeMapperProfile>();
             container.Register<EntityMapperProfile>();
+            container.Register<DictionaryMapperProfile>();
             container.Register<MacroMapperProfile>();
             container.Register<MediaMapperProfile>();
             container.Register<MemberMapperProfile>();

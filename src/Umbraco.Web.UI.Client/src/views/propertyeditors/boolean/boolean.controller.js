@@ -16,6 +16,10 @@ function booleanEditorController($scope, $rootScope, assetsService) {
 
     setupViewModel();
 
+    if( $scope.model && !$scope.model.value ) {
+        $scope.model.value = ($scope.renderModel.value === true) ? '1' : '0';
+    }
+
     //here we declare a special method which will be called whenever the value has changed from the server
     //this is instead of doing a watch on the model.value = faster
     $scope.model.onValueChanged = function (newVal, oldVal) {
