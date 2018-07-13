@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -15,6 +14,57 @@ namespace Umbraco.Core.Persistence
     /// </summary>
     public static class PetaPocoSqlExtensions
     {
+        /// <summary>
+        /// Defines the column to select in the generated SQL query
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql">Sql object</param>
+        /// <param name="fields">Columns to select</param>
+        /// <returns></returns>
+        [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
+        public static Sql Select<T>(this Sql sql, params Expression<Func<T, object>>[] fields)
+        {
+            return sql.Select(GetColumnsList(SqlSyntaxContext.SqlSyntaxProvider, fields));
+        }
+
+        /// <summary>
+        /// Defines the column to select in the generated SQL query
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql">Sql object</param>
+        /// <param name="sqlSyntax">Sql syntax</param>
+        /// <param name="fields">Columns to select</param>
+        /// <returns></returns>
+        public static Sql Select<T>(this Sql sql, ISqlSyntaxProvider sqlSyntax, params Expression<Func<T, object>>[] fields)
+        {
+            return sql.Select(GetColumnsList(sqlSyntax, fields));
+        }
+
+        /// <summary>
+        /// Adds another set of field to select. This method must be used with "Select" when fecthing fields from different tables.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql">Sql object</param>
+        /// <param name="fields">Additional columns to select</param>
+        /// <returns></returns>
+        public static Sql AndSelect<T>(this Sql sql, params Expression<Func<T, object>>[] fields)
+        {
+            return sql.AndSelect(GetColumnsList(SqlSyntaxContext.SqlSyntaxProvider, fields));
+        }
+
+        /// <summary>
+        /// Adds another set of field to select. This method must be used with "Select" when fecthing fields from different tables.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="sql">Sql object</param>
+        /// <param name="sqlSyntax">Sql syntax</param>
+        /// <param name="fields">Additional columns to select</param>
+        /// <returns></returns>
+        public static Sql AndSelect<T>(this Sql sql, ISqlSyntaxProvider sqlSyntax, params Expression<Func<T, object>>[] fields)
+        {
+            return sql.AndSelect(GetColumnsList(sqlSyntax, fields));
+        }
+
         [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
         public static Sql From<T>(this Sql sql)
         {
@@ -238,6 +288,24 @@ namespace Umbraco.Core.Persistence
         {
             var attr = column.FirstAttribute<ColumnAttribute>();
             return attr == null || string.IsNullOrWhiteSpace(attr.Name) ? column.Name : attr.Name;
+        }
+
+        private static string[] GetColumnsList<T>(ISqlSyntaxProvider sqlSyntax, params Expression<Func<T, object>>[] fields)
+        {
+            string tableName = sqlSyntax.GetQuotedTableName(GetTableName(typeof(T)));
+
+            if (fields.Length == 0)
+            {
+                return new[] { string.Format("{0}.*", tableName) };
+            }
+
+            return fields.Select(field =>
+            {
+                var column = ExpressionHelper.FindProperty(field) as PropertyInfo;
+                var columnName = GetColumnName(column);
+
+                return string.Format("{0}.{1}", tableName, sqlSyntax.GetQuotedColumnName(columnName));
+            }).ToArray();
         }
     }
 }
