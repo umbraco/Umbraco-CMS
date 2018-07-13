@@ -291,6 +291,14 @@ namespace Umbraco.Core.Services
                 {"ContentTypeAlias", contentTypeAlias},
             };
 
+            // check that the template hasn't been created on disk before creating the content type
+            // if it exists, set the new template content to the existing file content
+            string content = GetViewContent(contentTypeAlias);
+            if (content.IsNullOrWhiteSpace() == false)
+            {
+                template.Content = content;
+            }
+
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var saveEventArgs = new SaveEventArgs<ITemplate>(template, true, evtMsgs, additionalData);
@@ -1045,6 +1053,19 @@ namespace Umbraco.Core.Services
                 : Attempt<string>.Fail();
         }
 
+        internal Attempt<string> TryGetViewPath(string fileName)
+        {
+            if (fileName.EndsWith(".cshtml") == false)
+            {
+                fileName += ".cshtml";
+            }
+
+            string viewPath = IOHelper.MapPath(SystemDirectories.MvcViews + "/" + fileName);
+            return System.IO.File.Exists(viewPath)
+                ? Attempt<string>.Succeed(viewPath)
+                : Attempt<string>.Fail();
+        }
+
         private IPartialViewRepository GetPartialViewRepository(PartialViewType partialViewType, IUnitOfWork uow)
         {
             switch (partialViewType)
@@ -1074,6 +1095,23 @@ namespace Umbraco.Core.Services
         public string GetPartialViewMacroSnippetContent(string snippetName)
         {
             return GetPartialViewMacroSnippetContent(snippetName, PartialViewType.PartialViewMacro);
+        }
+
+        public string GetViewContent(string filename)
+        {
+            if (filename.IsNullOrWhiteSpace())
+                throw new ArgumentNullException(nameof(filename));
+
+            Attempt<string> viewAttempt = TryGetViewPath(filename);
+            if (viewAttempt.Success == false)
+            {
+                return string.Empty;
+            }
+
+            using (var view = new StreamReader(System.IO.File.OpenRead(viewAttempt.Result)))
+            {
+                return view.ReadToEnd().Trim();
+            }
         }
 
         private string GetPartialViewMacroSnippetContent(string snippetName, PartialViewType partialViewType)
