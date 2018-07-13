@@ -67,10 +67,9 @@
                                 <span class="umb-variant-switcher__state" ng-if="!variant.validationError && variant.isEdited && variant.state === 'Unpublished'"><localize key="content_unpublishedPendingChanges"></localize></span>
                                 <span class="umb-variant-switcher__state" ng-if="variant.isEdited === false">{{variant.state}}</span>
                             </a>
-                            <!-- Commented out as opposed to removed until we fully support split view (U4-11290) -->
-                            <!--
+                                                        
                             <div ng-if="splitViewOpen !== true" class="umb-variant-switcher__split-view" ng-click="openInSplitView($event, variant)">Open in split view</div>
-                            -->
+                            
                         </umb-dropdown-item>
                     </umb-dropdown>
 

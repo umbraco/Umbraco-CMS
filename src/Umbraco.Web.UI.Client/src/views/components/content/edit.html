@@ -17,12 +17,12 @@
                         <umb-editor-header 
                             menu="page.menu"
                             hide-menu="page.hideActionsMenu"
-                            name="editor.content.currentVariant.name"
+                            name="editor.content.name"
                             hide-icon="true"
                             hide-description="true" 
                             hide-alias="true"
                             navigation="editor.content.apps"
-                            variants="editor.content.variants"
+                            variants="content.variants"
                             hide-change-variant="page.hideChangeVariant"
                             on-back="backToListView()"
                             show-back-button="page.listViewPath !== null"
@@ -35,7 +35,7 @@
                             <umb-editor-sub-views 
                                 ng-if="!page.loading" 
                                 sub-views="editor.content.apps" 
-                                model="editor.content">
+                                model="content">
                             </umb-editor-sub-views>    
                         </umb-editor-container>
                     </div>

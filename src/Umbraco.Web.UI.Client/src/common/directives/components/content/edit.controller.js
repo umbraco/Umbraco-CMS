@@ -21,7 +21,6 @@
         $scope.page.listViewPath = null;
         $scope.page.isNew = $scope.isNew ? true : false;
         $scope.page.buttonGroupState = "init";
-        $scope.page.culture = $scope.culture;
         $scope.page.hideActionsMenu = infiniteMode ? true : false;
         $scope.page.hideChangeVariant = infiniteMode ? true : false;
         $scope.allowOpen = true;
@@ -56,39 +55,68 @@
             bindEvents();
 
             // set first app to active
+            // TODO: We need to track active
             $scope.content.apps[0].active = true;
 
+            setActiveCulture();
+        }
+
+        /**
+         * The content item(s) are loaded into an array and this will set the active content item based on the current culture.
+         * If the content item is invariant, then only one item exists in the array.
+         */
+        function setActiveCulture() {
             // set the active variant
-            var activeCultureSet = false;
+            var activeVariant = null;
             _.each($scope.content.variants, function (v) {
-                if (!activeCultureSet) {
-                    if (v.language.culture === $scope.page.culture) {
-                        v.active = true;
-                        $scope.content.currentVariant = v;
-                        activeCultureSet = true;
-                    }
+                if (v.language.culture === $scope.culture) {
+                    v.active = true;
+                    activeVariant = v;
+                }
+                else {
+                    v.active = false;
                 }
             });
-            if (!activeCultureSet) {
+            if (!activeVariant) {
                 // set the first variant to active
                 $scope.content.variants[0].active = true;
-                $scope.content.currentVariant = $scope.content.variants[0];
-            }            
+                activeVariant = $scope.content.variants[0];
+            }
 
-            // create new editor for split view
+            //If there are no editors yet then create one with the current content.
+            //if there's already a main editor then update it with the current content.
+            //The model that is assigned to the editor contains the current content variant along
+            //with a copy of the contentApps. This is required because each editor renders it's own
+            //content apps section and the content apps contains the view for editing content itself
+            //and we need to assign a view model to the subView so that it is scoped to the current
+            //editor so that split views work. This is a bit hacky but it's required because the content
+            //app stuff isn't built to have a scoped model to an editor, it's built to have a single global
+            //model but that doesn't work for having split view.
+
+            if (!activeVariant.apps) {
+                //copy from the main model
+                activeVariant.apps = angular.copy($scope.content.apps);                
+            }
+
+            //the assign the activeVariant to a view model to the content app
+            var contentApp = _.find(activeVariant.apps, function (a) {
+                return a.alias === "content";
+            });
+            contentApp.viewModel = activeVariant;
+
             if ($scope.editors.length === 0) {
                 var editor = {
-                    content: $scope.content
+                    content: activeVariant
                 };
                 $scope.editors.push(editor);
             }
             else if ($scope.editors.length === 1) {
-                $scope.editors[0].content = $scope.content;
+                $scope.editors[0].content = activeVariant;
             }
             else {
                 //fixme - need to fix something here if we are re-loading a content item that is in a split view
             }
-        }
+        }        
 
         function bindEvents() {
             //bindEvents can be called more than once and we don't want to have multiple bound events
@@ -487,7 +515,21 @@
 
         $scope.openInSplitView = function (selectedVariant) {
 
-            console.log(selectedVariant);
+            //only the content app can be selected since no other apps are shown, and because we copy all of these apps
+            //to the "editors" we need to update this across all editors
+            for (var e = 0; e < $scope.editors.length; e++) {
+                var editor = $scope.editors[e];
+                for (var i = 0; i < editor.content.apps.length; i++) {
+                    var app = editor.content.apps[i];
+                    if (app.alias === "content") {
+                        app.active = true;
+                    }
+                    else {
+                        app.active = false;
+                    }
+                }
+            }
+            
 
             var editor = {};
             // hacking animation states - these should hopefully be easier to do when we upgrade angular
@@ -574,6 +616,12 @@
                 $scope.infiniteModel.close($scope.infiniteModel);
             }
         };
+
+        $scope.$watch('culture', function (newVal, oldVal) {
+            if (newVal !== oldVal) {
+                setActiveCulture();
+            }
+        });
 
         //ensure to unregister from all events!
         $scope.$on('$destroy', function () {

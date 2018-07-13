@@ -201,7 +201,7 @@ Use this directive to construct a header inside the main editor window.
 
 **/
 
-(function() {
+(function () {
     'use strict';
 
     function EditorHeaderDirective(iconHelper, $location, editorService) {
@@ -213,17 +213,17 @@ Use this directive to construct a header inside the main editor window.
             scope.vm.currentVariant = "";
 
             function onInit() {
-                setCurrentVariant(scope.variants);
+                setCurrentVariant();
             }
 
-            function setCurrentVariant(variants) {
-                angular.forEach(variants, function (variant) {
-                    if(variant.active) {
+            function setCurrentVariant() {
+                angular.forEach(scope.variants, function (variant) {
+                    if (variant.active) {
                         scope.vm.currentVariant = variant;
                     }
                 });
             }
-            
+
             scope.goBack = function () {
                 if (scope.onBack) {
                     scope.onBack();
@@ -235,11 +235,11 @@ Use this directive to construct a header inside the main editor window.
                 $location.search("cculture", variant.language.culture);
             };
 
-            scope.openIconPicker = function() {
+            scope.openIconPicker = function () {
                 var iconPicker = {
                     icon: scope.icon.split(' ')[0],
                     color: scope.icon.split(' ')[1],
-                    submit: function(model) {
+                    submit: function (model) {
                         if (model.icon) {
                             if (model.color) {
                                 scope.icon = model.icon + " " + model.color;
@@ -251,35 +251,44 @@ Use this directive to construct a header inside the main editor window.
                         }
                         editorService.close();
                     },
-                    close: function() {
+                    close: function () {
                         editorService.close();
                     }
                 };
                 editorService.iconPicker(iconPicker);
             };
 
-            scope.closeSplitView = function() {
-                if(scope.onCloseSplitView) {
+            scope.closeSplitView = function () {
+                if (scope.onCloseSplitView) {
                     scope.onCloseSplitView();
                 }
             };
 
-            scope.openInSplitView = function(event, variant) {
-                if(scope.onOpenInSplitView) {
+            scope.openInSplitView = function (event, variant) {
+                if (scope.onOpenInSplitView) {
                     scope.vm.dropdownOpen = false;
-                    scope.onOpenInSplitView({"variant": variant});
+                    scope.onOpenInSplitView({ "variant": variant });
                 }
             };
 
-            //TODO: Change this, we cannot watch the whole model
-            //scope.$watch('variants', function(newValue, oldValue){
-            //    if(!newValue) return;
-            //    if(newValue === oldValue) return;
-            //    setCurrentVariant(newValue);
-            //}, true);
-
             onInit();
 
+            //watch for the active culture changing, if it changes, update the current variant
+            if (scope.variants) {
+                scope.$watch(function () {
+                    for (var i = 0; i < scope.variants.length; i++) {
+                        var v = scope.variants[i];
+                        if (v.active) {
+                            return v.language.culture;
+                        }
+                    }
+                    return scope.vm.currentVariant.language.culture; //should never get here
+                }, function (newValue, oldValue) {
+                    if (newValue !== scope.vm.currentVariant.language.culture) {
+                        setCurrentVariant();
+                    }
+                });
+            }
         }
 
         var directive = {
