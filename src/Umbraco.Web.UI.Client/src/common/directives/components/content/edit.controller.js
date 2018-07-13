@@ -33,8 +33,8 @@
         };
 
         function init(content) {
-            
-            if(infiniteMode) {
+
+            if (infiniteMode) {
                 createInfiniteModeButtons(content);
             } else {
                 createButtons(content);
@@ -83,8 +83,23 @@
                 activeVariant = $scope.content.variants[0];
             }
 
+            initVariant(activeVariant);
+
             //If there are no editors yet then create one with the current content.
             //if there's already a main editor then update it with the current content.
+            if ($scope.editors.length === 0) {
+                var editor = {
+                    content: activeVariant
+                };
+                $scope.editors.push(editor);
+            }
+            else {
+                //this will mean there is only one
+                $scope.editors[0].content = activeVariant;
+            }
+        }
+
+        function initVariant(variant) {
             //The model that is assigned to the editor contains the current content variant along
             //with a copy of the contentApps. This is required because each editor renders it's own
             //content apps section and the content apps contains the view for editing content itself
@@ -93,30 +108,19 @@
             //app stuff isn't built to have a scoped model to an editor, it's built to have a single global
             //model but that doesn't work for having split view.
 
-            if (!activeVariant.apps) {
+            if (!variant.apps) {
                 //copy from the main model
-                activeVariant.apps = angular.copy($scope.content.apps);                
+                variant.apps = angular.copy($scope.content.apps);
             }
 
-            //the assign the activeVariant to a view model to the content app
-            var contentApp = _.find(activeVariant.apps, function (a) {
+            //the assign the variant to a view model to the content app
+            var contentApp = _.find(variant.apps, function (a) {
                 return a.alias === "content";
             });
-            contentApp.viewModel = activeVariant;
+            contentApp.viewModel = variant;
 
-            if ($scope.editors.length === 0) {
-                var editor = {
-                    content: activeVariant
-                };
-                $scope.editors.push(editor);
-            }
-            else if ($scope.editors.length === 1) {
-                $scope.editors[0].content = activeVariant;
-            }
-            else {
-                //fixme - need to fix something here if we are re-loading a content item that is in a split view
-            }
-        }        
+            return variant;
+        }
 
         function bindEvents() {
             //bindEvents can be called more than once and we don't want to have multiple bound events
@@ -165,7 +169,7 @@
                     // if there are any and then clear them so the collection no longer persists them.
                     serverValidationManager.executeAndClearAllSubscriptions();
 
-                    if(!infiniteMode) {
+                    if (!infiniteMode) {
                         syncTreeNode($scope.content, data.path, true);
                     }
 
@@ -205,11 +209,11 @@
             $scope.page.allowInfiniteSaveAndClose = false;
 
             // check for publish rights
-            if(_.contains(content.allowedActions, "U")) {
+            if (_.contains(content.allowedActions, "U")) {
                 $scope.page.allowInfinitePublishAndClose = true;
 
-            // check for save rights
-            } else if( _.contains(content.allowedActions, "A")) {
+                // check for save rights
+            } else if (_.contains(content.allowedActions, "A")) {
                 $scope.page.allowInfiniteSaveAndClose = true;
             }
 
@@ -254,7 +258,7 @@
                 //success            
                 init($scope.content);
 
-                if(!infiniteMode) {
+                if (!infiniteMode) {
                     syncTreeNode($scope.content, data.path);
                 }
 
@@ -328,7 +332,7 @@
             }
 
             if (formHelper.submitForm({ scope: $scope, skipValidation: true })) {
-				
+
                 $scope.page.buttonGroupState = "busy";
 
                 eventsService.emit("content.unpublishing", { content: $scope.content });
@@ -346,7 +350,7 @@
 
                         init($scope.content);
 
-                        if(!infiniteMode) {
+                        if (!infiniteMode) {
                             syncTreeNode($scope.content, data.path);
                         }
 
@@ -370,7 +374,7 @@
             // TODO: Add "..." to publish button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
             if ($scope.content.variants.length > 1) {
                 //before we launch the dialog we want to execute all client side validations first
-                if (formHelper.submitForm({ scope: $scope, action: "publish"})) {
+                if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
 
                     var dialog = {
                         view: "publish",
@@ -503,9 +507,9 @@
                 notificationsService.error(error.headline, error.content);
             });
         };
-        
+
         $scope.closeSplitView = function (index, editor) {
-            // hacky animation stuff - it will be much better when angular is upgraded
+            //TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
             editor.loading = true;
             editor.collapsed = true;
             $timeout(function () {
@@ -529,40 +533,26 @@
                     }
                 }
             }
-            
 
-            var editor = {};
-            // hacking animation states - these should hopefully be easier to do when we upgrade angular
+            var editor = {
+                content: initVariant(selectedVariant)
+            };
+            $scope.editors.push(editor);
+
+            //TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
             editor.collapsed = true;
             editor.loading = true;
-            $scope.editors.push(editor);
-            var editorIndex = $scope.editors.length - 1;
             $timeout(function () {
-                $scope.editors[editorIndex].collapsed = false;
+                editor.collapsed = false;
+                editor.loading = false;
             }, 100);
-
-            // fake loading of content
-            // TODO: Make this real, but how do we deal with saving since currently we only save one variant at a time?!
-            $timeout(function () {
-                $scope.editors[editorIndex].content = angular.copy($scope.content);
-                $scope.editors[editorIndex].content.name = "What a variant";
-                // set selected variant on split view content
-                angular.forEach($scope.editors[editorIndex].content.variants, function (variant) {
-                    if (variant.culture === selectedVariant.culture) {
-                        variant.active = true;
-                    } else {
-                        variant.active = false;
-                    }
-                });
-                $scope.editors[editorIndex].loading = false;
-            }, 500);
         };
 
         /* publish method used in infinite editing */
-        $scope.publishAndClose = function(content) {
+        $scope.publishAndClose = function (content) {
             $scope.publishAndCloseButtonState = "busy";
-            performSave({ saveMethod: contentResource.publish, action: "publish" }).then(function(){
-                if($scope.infiniteModel.submit) {
+            performSave({ saveMethod: contentResource.publish, action: "publish" }).then(function () {
+                if ($scope.infiniteModel.submit) {
                     $scope.infiniteModel.contentNode = content;
                     $scope.infiniteModel.submit($scope.infiniteModel);
                 }
@@ -571,10 +561,10 @@
         };
 
         /* save method used in infinite editing */
-        $scope.saveAndClose = function(content) {
+        $scope.saveAndClose = function (content) {
             $scope.saveAndCloseButtonState = "busy";
-            performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function(){
-                if($scope.infiniteModel.submit) {
+            performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function () {
+                if ($scope.infiniteModel.submit) {
                     $scope.infiniteModel.contentNode = content;
                     $scope.infiniteModel.submit($scope.infiniteModel);
                 }
@@ -593,7 +583,7 @@
                     }
 
                     // sync the destination node
-                    if(!infiniteMode) {
+                    if (!infiniteMode) {
                         navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false });
                     }
 
@@ -611,8 +601,8 @@
         }
 
         // methods for infinite editing
-        $scope.close = function() {
-            if($scope.infiniteModel.close) {
+        $scope.close = function () {
+            if ($scope.infiniteModel.close) {
                 $scope.infiniteModel.close($scope.infiniteModel);
             }
         };
