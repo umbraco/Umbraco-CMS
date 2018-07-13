@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence
         [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
         public static Sql Select<T>(this Sql sql, params Expression<Func<T, object>>[] fields)
         {
-            return sql.Select(GetColumnsList(SqlSyntaxContext.SqlSyntaxProvider, fields));
+            return sql.Select(GetFieldNames(SqlSyntaxContext.SqlSyntaxProvider, fields));
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Persistence
         /// <returns></returns>
         public static Sql Select<T>(this Sql sql, ISqlSyntaxProvider sqlSyntax, params Expression<Func<T, object>>[] fields)
         {
-            return sql.Select(GetColumnsList(sqlSyntax, fields));
+            return sql.Select(GetFieldNames(sqlSyntax, fields));
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Persistence
         /// <returns></returns>
         public static Sql AndSelect<T>(this Sql sql, params Expression<Func<T, object>>[] fields)
         {
-            return sql.AndSelect(GetColumnsList(SqlSyntaxContext.SqlSyntaxProvider, fields));
+            return sql.AndSelect(GetFieldNames(SqlSyntaxContext.SqlSyntaxProvider, fields));
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Persistence
         /// <returns></returns>
         public static Sql AndSelect<T>(this Sql sql, ISqlSyntaxProvider sqlSyntax, params Expression<Func<T, object>>[] fields)
         {
-            return sql.AndSelect(GetColumnsList(sqlSyntax, fields));
+            return sql.AndSelect(GetFieldNames(sqlSyntax, fields));
         }
 
         [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
@@ -103,6 +103,16 @@ namespace Umbraco.Core.Persistence
             var tableName = type.GetTableName();
 
             return sqlSyntax.GetQuotedTableName(tableName) + "." + sqlSyntax.GetQuotedColumnName(fieldName);
+        }
+
+        private static string[] GetFieldNames<T>(ISqlSyntaxProvider sqlSyntax, params Expression<Func<T, object>>[] fields)
+        {
+            if (fields.Length == 0)
+            {
+                return new[] { string.Format("{0}.*", sqlSyntax.GetQuotedTableName(typeof(T).GetTableName())) };
+            }
+
+            return fields.Select(field => GetFieldName(field, sqlSyntax)).ToArray();
         }
 
         [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
@@ -288,24 +298,6 @@ namespace Umbraco.Core.Persistence
         {
             var attr = column.FirstAttribute<ColumnAttribute>();
             return attr == null || string.IsNullOrWhiteSpace(attr.Name) ? column.Name : attr.Name;
-        }
-
-        private static string[] GetColumnsList<T>(ISqlSyntaxProvider sqlSyntax, params Expression<Func<T, object>>[] fields)
-        {
-            string tableName = sqlSyntax.GetQuotedTableName(GetTableName(typeof(T)));
-
-            if (fields.Length == 0)
-            {
-                return new[] { string.Format("{0}.*", tableName) };
-            }
-
-            return fields.Select(field =>
-            {
-                var column = ExpressionHelper.FindProperty(field) as PropertyInfo;
-                var columnName = GetColumnName(column);
-
-                return string.Format("{0}.{1}", tableName, sqlSyntax.GetQuotedColumnName(columnName));
-            }).ToArray();
         }
     }
 }
