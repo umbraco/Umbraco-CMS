@@ -138,7 +138,7 @@ namespace Umbraco.Web.Editors
                 ParentId = -1
             };
 
-            TabsAndPropertiesResolver.AddListView(display, "member", Services.DataTypeService, Services.TextService);
+            TabsAndPropertiesResolver.AddListView(display, "member", listName, Services.DataTypeService, Services.TextService);
 
             return display;
         }

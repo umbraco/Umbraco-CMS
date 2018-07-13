@@ -53,75 +53,27 @@
                 }
             }
 
-            //init can be called more than once and we don't want to have multiple bound events
-            for (var e in evts) {
-                eventsService.unsubscribe(evts[e]);
-            }
-
-            evts.push(eventsService.on("editors.content.changePublishDate", function (event, args) {
-                createButtons(args.node);
-            }));
-
-            evts.push(eventsService.on("editors.content.changeUnpublishDate", function (event, args) {
-                createButtons(args.node);
-            }));
-
-            evts.push(eventsService.on("editors.documentType.saved", function (name, args) {
-                // if this content item uses the updated doc type we need to reload the content item
-                if(args && args.documentType && args.documentType.key === content.documentType.key) {
-                    if ($scope.page.culture) {
-                        loadContent($scope.page.culture);
-                    }
-                    else {
-                        loadContent();
-                    }
-                }
-            }));
-
-            // We don't get the info tab from the server from version 7.8 so we need to manually add it
-            //contentEditingHelper.addInfoTab($scope.content.tabs);
-
-            // prototype content and info apps
-            var contentApp = {
-                "name": "Content",
-                "alias": "content",
-                "icon": "icon-document",
-                "view": "views/content/apps/content/content.html"
-            };
-
-            var infoApp = {
-                "name": "Info",
-                "alias": "info",
-                "icon": "icon-info",
-                "view": "views/content/apps/info/info.html"
-            };
-
-            var listview = {
-                "name": "Child items",
-                "alias": "childItems",
-                "icon": "icon-list",
-                "view": "views/content/apps/listview/listview.html"
-            };
-
-            $scope.content.apps = [];
-
-            if ($scope.content.isContainer) {
-                // add list view app
-                $scope.content.apps.push(listview);
-
-                // remove the list view tab
-                angular.forEach($scope.content.tabs, function (tab, index) {
-                    if (tab.alias === "umbContainerView") {
-                        tab.hide = true;
-                    }
-                });
-            }
-
-            $scope.content.apps.push(contentApp);
-            $scope.content.apps.push(infoApp);
+            bindEvents();
 
             // set first app to active
             $scope.content.apps[0].active = true;
+
+            // set the active variant
+            var activeCultureSet = false;
+            _.each($scope.content.variants, function (v) {
+                if (!activeCultureSet) {
+                    if (v.language.culture === $scope.page.culture) {
+                        v.active = true;
+                        $scope.content.currentVariant = v;
+                        activeCultureSet = true;
+                    }
+                }
+            });
+            if (!activeCultureSet) {
+                // set the first variant to active
+                $scope.content.variants[0].active = true;
+                $scope.content.currentVariant = $scope.content.variants[0];
+            }            
 
             // create new editor for split view
             if ($scope.editors.length === 0) {
@@ -138,14 +90,35 @@
             }
         }
 
+        function bindEvents() {
+            //bindEvents can be called more than once and we don't want to have multiple bound events
+            for (var e in evts) {
+                eventsService.unsubscribe(evts[e]);
+            }
+
+            evts.push(eventsService.on("editors.content.changePublishDate", function (event, args) {
+                createButtons(args.node);
+            }));
+
+            evts.push(eventsService.on("editors.content.changeUnpublishDate", function (event, args) {
+                createButtons(args.node);
+            }));
+
+            evts.push(eventsService.on("editors.documentType.saved", function (name, args) {
+                // if this content item uses the updated doc type we need to reload the content item
+                if (args && args.documentType && args.documentType.key === content.documentType.key) {
+                    loadContent();
+                }
+            }));
+        }
+
         /**
          *  This does the content loading and initializes everything, called on load and changing variants
-         * @param {any} culture
          */
-        function loadContent(culture) {
+        function loadContent() {
 
             //we are editing so get the content item from the server
-            return $scope.getMethod()($scope.contentId, culture)
+            return $scope.getMethod()($scope.contentId)
                 .then(function (data) {
 
                     $scope.content = data;
@@ -305,18 +278,11 @@
         }
         else {
 
-            //Browse content nodes based on the selected tree language variant
             $scope.page.loading = true;
-            if ($scope.page.culture) {
-                loadContent($scope.page.culture).then(function(){
-                    $scope.page.loading = false;
-                });
-            }
-            else {
-                loadContent().then(function(){
-                    $scope.page.loading = false;
-                });
-            }
+
+            loadContent().then(function () {
+                $scope.page.loading = false;
+            });
         }
 
         $scope.unPublish = function () {
@@ -326,8 +292,8 @@
             if ($scope.content.variants.length > 0) {
                 _.each($scope.content.variants,
                     function (d) {
-                        //set the culture if this is current
-                        if (d.current === true) {
+                        //set the culture if this is active
+                        if (d.active === true) {
                             culture = d.language.culture;
                         }
                     });
@@ -541,9 +507,9 @@
                 // set selected variant on split view content
                 angular.forEach($scope.editors[editorIndex].content.variants, function (variant) {
                     if (variant.culture === selectedVariant.culture) {
-                        variant.current = true;
+                        variant.active = true;
                     } else {
-                        variant.current = false;
+                        variant.active = false;
                     }
                 });
                 $scope.editors[editorIndex].loading = false;

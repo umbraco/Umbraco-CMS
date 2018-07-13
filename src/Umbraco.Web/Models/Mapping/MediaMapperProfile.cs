@@ -22,6 +22,7 @@ namespace Umbraco.Web.Models.Mapping
             var childOfListViewResolver = new MediaChildOfListViewResolver(mediaService, mediaTypeService);
             var contentTreeNodeUrlResolver = new ContentTreeNodeUrlResolver<IMedia, MediaTreeController>();
             var mediaTypeBasicResolver = new ContentTypeBasicResolver<IMedia, MediaItemDisplay>();
+            var mediaAppResolver = new MediaAppResolver();
 
             //FROM IMedia TO MediaItemDisplay
             CreateMap<IMedia, MediaItemDisplay>()
@@ -45,10 +46,11 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .ForMember(dest => dest.ContentType, opt => opt.ResolveUsing(mediaTypeBasicResolver))
                 .ForMember(dest => dest.MediaLink, opt => opt.ResolveUsing(content => string.Join(",", content.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, logger))))
+                .ForMember(dest => dest.ContentApps, opt => opt.ResolveUsing(mediaAppResolver))
                 .AfterMap((media, display) =>
                 {
-                    if (media.ContentType.IsContainer)
-                        TabsAndPropertiesResolver.AddListView(display, "media", dataTypeService, textService);
+                    //if (media.ContentType.IsContainer)
+                    //    TabsAndPropertiesResolver.AddListView(display, "media", dataTypeService, textService);
                 });
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>

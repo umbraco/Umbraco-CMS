@@ -214,38 +214,16 @@ Use this directive to construct a header inside the main editor window.
 
             function onInit() {
                 setCurrentVariant(scope.variants);
-                setVariantStatusColor(scope.variants);
             }
 
             function setCurrentVariant(variants) {
-
                 angular.forEach(variants, function (variant) {
-                    if(variant.current) {
+                    if(variant.active) {
                         scope.vm.currentVariant = variant;
                     }
                 });
             }
-
-            //TODO: This doesn't really affect any UI currently, need some feedback from mads
-            function setVariantStatusColor(variants) {
-                angular.forEach(variants, function (variant) {
-
-                    //TODO: What about variant.exists? If we are applying colors/styles, this should be one of them
-
-                    switch (variant.state) {
-                        case "Published":
-                            variant.stateColor = "success";
-                            break;
-                        case "Unpublished":
-                        //TODO: Not sure if these statuses will ever bubble up to the UI?
-                        case "Publishing":
-                        case "Unpublishing":
-                        default:
-                            variant.stateColor = "gray";
-                    }
-                });
-            }
-
+            
             scope.goBack = function () {
                 if (scope.onBack) {
                     scope.onBack();
@@ -293,12 +271,12 @@ Use this directive to construct a header inside the main editor window.
                 }
             };
 
-            scope.$watch('variants', function(newValue, oldValue){
-                if(!newValue) return;
-                if(newValue === oldValue) return;
-                setCurrentVariant(newValue);
-                setVariantStatusColor(newValue);
-            }, true);
+            //TODO: Change this, we cannot watch the whole model
+            //scope.$watch('variants', function(newValue, oldValue){
+            //    if(!newValue) return;
+            //    if(newValue === oldValue) return;
+            //    setCurrentVariant(newValue);
+            //}, true);
 
             onInit();
 

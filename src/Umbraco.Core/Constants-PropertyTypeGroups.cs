@@ -17,10 +17,10 @@
             /// </summary>
             public const string File = "50899F9C-023A-4466-B623-ABA9049885FE";
 
-            /// <summary>
-            /// Guid for a Image PropertyTypeGroup object.
-            /// </summary>
-            public const string Contents = "79995FA2-63EE-453C-A29B-2E66F324CDBE";
+            ///// <summary>
+            ///// Guid for a Image PropertyTypeGroup object.
+            ///// </summary>
+            //public const string Contents = "79995FA2-63EE-453C-A29B-2E66F324CDBE";
 
             /// <summary>
             /// Guid for a Image PropertyTypeGroup object.

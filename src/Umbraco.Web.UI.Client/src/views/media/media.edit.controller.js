@@ -116,25 +116,6 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
             "view": "views/media/apps/listview/listview.html"
         };
 
-        $scope.content.apps = [];
-
-        if($scope.content.contentTypeAlias === "Folder") {
-          // add list view app
-          $scope.content.apps.push(listview);
-            
-          // remove the list view tab
-          angular.forEach($scope.content.tabs, function(tab, index){
-            if(tab.alias === "Contents") {
-              tab.hide = true;
-            }
-          });
-
-        } else {
-            $scope.content.apps.push(contentApp);
-        }
-        
-        $scope.content.apps.push(infoApp);
-        
         // set first app to active
         $scope.content.apps[0].active = true;
 

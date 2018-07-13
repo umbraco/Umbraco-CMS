@@ -20,21 +20,24 @@ namespace Umbraco.Web.Models.Mapping
             var contentOwnerResolver = new OwnerResolver<IContent>(userService);
             var creatorResolver = new CreatorResolver(userService);
             var actionButtonsResolver = new ActionButtonsResolver(userService, contentService);
-            var tabsAndPropertiesResolver = new TabsAndPropertiesResolver<IContent, ContentItemDisplay>(textService);
+            var tabsAndPropertiesResolver = new TabsAndPropertiesResolver<IContent, ContentVariantDisplay>(textService);
             var childOfListViewResolver = new ContentChildOfListViewResolver(contentService, contentTypeService);
             var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>();
             var contentTreeNodeUrlResolver = new ContentTreeNodeUrlResolver<IContent, ContentTreeController>();
             var defaultTemplateResolver = new DefaultTemplateResolver();
             var contentUrlResolver = new ContentUrlResolver(textService, contentService, logger);
-            var variantResolver = new ContentItemDisplayVariationResolver(localizationService);
+            var variantResolver = new ContentVariantResolver(localizationService, textService);
+            var contentAppResolver = new ContentAppResolver();
 
             //FROM IContent TO ContentItemDisplay
             CreateMap<IContent, ContentItemDisplay>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(src.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, src.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Updater, opt => opt.ResolveUsing(src => creatorResolver.Resolve(src)))
-                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<ContentItemDisplayNameResolver>())
-                .ForMember(dest => dest.Variants, opt => opt.ResolveUsing(variantResolver))
+                //.ForMember(dest => dest.Name, opt => opt.ResolveUsing<ContentItemDisplayNameResolver>())
+                .ForMember(dest => dest.ContentVariants, opt => opt.ResolveUsing(variantResolver))
+                .ForMember(dest => dest.ContentApps, opt => opt.ResolveUsing(contentAppResolver))
+                //.ForMember(dest => dest.Variants, opt => opt.ResolveUsing(variantResolver))
                 .ForMember(dest => dest.Icon, opt => opt.MapFrom(src => src.ContentType.Icon))
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
                 .ForMember(dest => dest.ContentTypeName, opt => opt.MapFrom(src => src.ContentType.Name))
@@ -42,27 +45,38 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.IsBlueprint, opt => opt.MapFrom(src => src.Blueprint))
                 .ForMember(dest => dest.IsChildOfListView, opt => opt.ResolveUsing(childOfListViewResolver))
                 .ForMember(dest => dest.Trashed, opt => opt.MapFrom(src => src.Trashed))
-                .ForMember(dest => dest.PublishDate, opt => opt.MapFrom(src => src.PublishDate))
+                //TODO: The publish date needs to be per variant - in our display models 
+                //.ForMember(dest => dest.PublishDate, opt => opt.MapFrom(src => src.PublishDate))
                 .ForMember(dest => dest.TemplateAlias, opt => opt.ResolveUsing(defaultTemplateResolver))
                 .ForMember(dest => dest.Urls, opt => opt.ResolveUsing(contentUrlResolver))
-                .ForMember(dest => dest.Properties, opt => opt.Ignore())
+                //.ForMember(dest => dest.Properties, opt => opt.Ignore())
                 .ForMember(dest => dest.AllowPreview, opt => opt.Ignore())
                 .ForMember(dest => dest.TreeNodeUrl, opt => opt.ResolveUsing(contentTreeNodeUrlResolver))
                 .ForMember(dest => dest.Notifications, opt => opt.Ignore())
                 .ForMember(dest => dest.Errors, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore())
+                //.ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .ForMember(dest => dest.DocumentType, opt => opt.ResolveUsing(contentTypeBasicResolver))
                 .ForMember(dest => dest.AllowedTemplates, opt =>
                     opt.MapFrom(content => content.ContentType.AllowedTemplates
                         .Where(t => t.Alias.IsNullOrWhiteSpace() == false && t.Name.IsNullOrWhiteSpace() == false)
-                        .ToDictionary(t => t.Alias, t => t.Name)))
-                .ForMember(dest => dest.Tabs, opt => opt.ResolveUsing(tabsAndPropertiesResolver))
+                        .ToDictionary(t => t.Alias, t => t.Name)))                
+                //.ForMember(dest => dest.Tabs, opt => opt.ResolveUsing(tabsAndPropertiesResolver))
                 .ForMember(dest => dest.AllowedActions, opt => opt.ResolveUsing(src => actionButtonsResolver.Resolve(src)))
-                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
+                //.AfterMap((content, display) =>
+                //{
+                //    if (content.ContentType.IsContainer)
+                //        TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, textService);
+                //});
+
+            CreateMap<IContent, ContentVariantDisplay>()
+                .ForMember(dest => dest.PublishDate, opt => opt.MapFrom(src => src.PublishDate))
+                .ForMember(dest => dest.Properties, opt => opt.Ignore())
+                .ForMember(dest => dest.Tabs, opt => opt.ResolveUsing(tabsAndPropertiesResolver))
                 .AfterMap((content, display) =>
                 {
                     if (content.ContentType.IsContainer)
-                        TabsAndPropertiesResolver.AddListView(display, "content", dataTypeService, textService);
+                        TabsAndPropertiesResolver.AddListView(display, content.ContentType.Alias, "content", dataTypeService, textService);
                 });
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>

@@ -6,7 +6,13 @@
         var vm = this;
 
         function onInit() {
-            angular.forEach($scope.model.tabs, function(group){
+
+            //select the first one in the list
+            //TODO: We need to track the active one
+            vm.content = $scope.model.variants[0];
+            vm.content.active = true;
+
+            angular.forEach(vm.content.tabs, function(group){
                 group.open = true;
             });
         }

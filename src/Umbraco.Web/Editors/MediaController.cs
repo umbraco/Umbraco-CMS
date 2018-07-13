@@ -77,9 +77,9 @@ namespace Umbraco.Web.Editors
             var emptyContent = Services.MediaService.CreateMedia("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
             var mapped = ContextMapper.Map<IMedia, MediaItemDisplay>(emptyContent, UmbracoContext);
 
-            //remove this tab if it exists: umbContainerView
-            var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
-            mapped.Tabs = mapped.Tabs.Except(new[] { containerTab });
+            //remove the listview app if it exists
+            mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "childItems").ToList();
+
             return mapped;
         }
 
@@ -87,9 +87,9 @@ namespace Umbraco.Web.Editors
         /// Returns an item to be used to display the recycle bin for media
         /// </summary>
         /// <returns></returns>
-        public ContentItemDisplay GetRecycleBin()
+        public MediaItemDisplay GetRecycleBin()
         {
-            var display = new ContentItemDisplay
+            var display = new MediaItemDisplay
             {
                 Id = Constants.System.RecycleBinMedia,
                 Alias = "recycleBin",
@@ -101,7 +101,7 @@ namespace Umbraco.Web.Editors
                 Path = "-1," + Constants.System.RecycleBinMedia
             };
 
-            TabsAndPropertiesResolver.AddListView(display, "media", Services.DataTypeService, Services.TextService);
+            TabsAndPropertiesResolver.AddListView(display, "media", "recycleBin", Services.DataTypeService, Services.TextService);
 
             return display;
         }

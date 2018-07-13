@@ -204,8 +204,9 @@
     <Compile Include="Models\ContentEditing\AssignedUserGroupPermissions.cs" />
     <Compile Include="Models\ContentEditing\BackOfficePreview.cs" />
     <Compile Include="Models\ContentEditing\CodeFileDisplay.cs" />
+    <Compile Include="Models\ContentEditing\ContentApp.cs" />
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />
-    <Compile Include="Models\ContentEditing\ContentVariation.cs" />
+    <Compile Include="Models\ContentEditing\ContentVariationDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentVariationPublish.cs" />
     <Compile Include="Models\ContentEditing\CreatedDocumentTypeCollectionResult.cs" />
     <Compile Include="Models\ContentEditing\DictionaryDisplay.cs" />
@@ -219,6 +220,7 @@
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
+    <Compile Include="Models\ContentEditing\ITabbedContentItem.cs" />
     <Compile Include="Models\ContentEditing\Permission.cs" />
     <Compile Include="Models\ContentEditing\PostedFolder.cs" />
     <Compile Include="Models\ContentEditing\SnippetDisplay.cs" />
@@ -235,6 +237,7 @@
     <Compile Include="Models\ContentEditing\Language.cs" />
     <Compile Include="Models\Mapping\ActionButtonsResolver.cs" />
     <Compile Include="Models\Mapping\AuditMapperProfile.cs" />
+    <Compile Include="Models\Mapping\ContentAppResolver.cs" />
     <Compile Include="Models\Mapping\ContentItemDisplayNameResolver.cs" />
     <Compile Include="Models\Mapping\ContentTypeVariationsResolver.cs" />
     <Compile Include="Models\Mapping\ContextMapper.cs" />
@@ -243,6 +246,7 @@
     <Compile Include="Models\Mapping\DefaultTemplateResolver.cs" />
     <Compile Include="Models\Mapping\DictionaryModelMapper.cs" />
     <Compile Include="Models\Mapping\LanguageMapperProfile.cs" />
+    <Compile Include="Models\Mapping\MediaAppResolver.cs" />
     <Compile Include="Models\Mapping\MediaChildOfListViewResolver.cs" />
     <Compile Include="Models\Mapping\CodeFileMapperProfile.cs" />
     <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
