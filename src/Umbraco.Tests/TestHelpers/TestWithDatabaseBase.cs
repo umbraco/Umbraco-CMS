@@ -49,12 +49,8 @@ namespace Umbraco.Tests.TestHelpers
     [UmbracoTest(WithApplication = true)]
     public abstract class TestWithDatabaseBase : UmbracoTestBase
     {
-        private CacheHelper _disabledCacheHelper;
-
         private string _databasePath;
         private static byte[] _databaseBytes;
-
-        protected CacheHelper DisabledCache => _disabledCacheHelper ?? (_disabledCacheHelper = CacheHelper.CreateDisabledCacheHelper());
 
         protected PublishedContentTypeCache ContentTypesCache { get; private set; }
 

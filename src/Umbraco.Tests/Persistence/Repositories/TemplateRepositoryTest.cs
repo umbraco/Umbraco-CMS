@@ -6,6 +6,7 @@ using System.Text;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         private ITemplateRepository CreateRepository(IScopeProvider provider, ITemplatesSection templatesSection = null)
         {
-            return new TemplateRepository((IScopeAccessor) provider, DisabledCache, Logger,
+            return new TemplateRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger,
                 templatesSection ?? Mock.Of<ITemplatesSection>(t => t.DefaultRenderingEngine == RenderingEngine.Mvc),
                 _masterPageFileSystem, _viewsFileSystem);
         }
@@ -404,10 +405,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var templateRepository = CreateRepository(provider);
 
-                var tagRepository = new TagRepository((IScopeAccessor) provider, DisabledCache, Logger);
-                var contentTypeRepository = new ContentTypeRepository((IScopeAccessor) provider, DisabledCache, Logger, templateRepository);
-                var languageRepository = new LanguageRepository((IScopeAccessor) provider, DisabledCache, Logger);
-                var contentRepo = new DocumentRepository((IScopeAccessor) provider, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+                var tagRepository = new TagRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger);
+                var contentTypeRepository = new ContentTypeRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, templateRepository);
+                var languageRepository = new LanguageRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger);
+                var contentRepo = new DocumentRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!

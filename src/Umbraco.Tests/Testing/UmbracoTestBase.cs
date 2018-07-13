@@ -196,7 +196,7 @@ namespace Umbraco.Tests.Testing
 
         protected virtual void ComposeCacheHelper()
         {
-            Container.RegisterSingleton(f => CacheHelper.CreateDisabledCacheHelper());
+            Container.RegisterSingleton(f => CacheHelper.Disabled);
             Container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
         }
 

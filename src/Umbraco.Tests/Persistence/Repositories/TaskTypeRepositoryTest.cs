@@ -2,6 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
@@ -22,8 +23,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = ScopeProvider.CreateScope())
             {
                 var taskType = new TaskType("asdfasdf");
-                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
-                var taskTypeRepo = new TaskTypeRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, Logger);
+                var taskTypeRepo = new TaskTypeRepository((IScopeAccessor) provider, Logger);
 
                 var created = DateTime.Now;
                 var task = new Task(taskType)

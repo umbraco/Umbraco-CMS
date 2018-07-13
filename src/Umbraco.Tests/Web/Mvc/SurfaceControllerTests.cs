@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Mock.Of<IUmbracoComponentRenderer>(),
                 new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), Mock.Of<CacheHelper>(), Mock.Of<ILogger>(), null),
                 new ServiceContext(),
-                CacheHelper.CreateDisabledCacheHelper());
+                CacheHelper.Disabled);
 
             var ctrl = new TestSurfaceController(umbracoContext, helper);
             var result = ctrl.GetContent(2) as PublishedContentResult;

@@ -106,7 +106,6 @@
     <Compile Include="Cache\DefaultRepositoryCachePolicy.cs" />
     <Compile Include="Cache\DictionaryCacheProvider.cs" />
     <Compile Include="Cache\DictionaryCacheProviderBase.cs" />
-    <Compile Include="Cache\DisabledCacheHelper.cs" />
     <Compile Include="Cache\FullDataSetRepositoryCachePolicy.cs" />
     <Compile Include="Cache\HttpRequestCacheProvider.cs" />
     <Compile Include="Cache\HttpRuntimeCacheProvider.cs" />

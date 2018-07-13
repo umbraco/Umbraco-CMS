@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Testing.TestingTests
             Container.Register(_ => Mock.Of<IMemberService>());
             Container.Register(_ => Mock.Of<IMemberTypeService>());
             Container.Register(_ => Mock.Of<IUserService>());
-            Container.Register(_ => CacheHelper.CreateDisabledCacheHelper());
+            Container.Register(_ => CacheHelper.Disabled);
             Container.Register<ServiceContext>();
 
             // ReSharper disable once UnusedVariable
@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Testing.TestingTests
                 Mock.Of<IUmbracoComponentRenderer>(),
                 new MembershipHelper(new TestUmbracoContextAccessor(umbracoContext), Mock.Of<MembershipProvider>(), Mock.Of<RoleProvider>(), Mock.Of<IMemberService>(), Mock.Of<IMemberTypeService>(), Mock.Of<IUserService>(), Mock.Of<IPublicAccessService>(), Mock.Of<CacheHelper>(), Mock.Of<ILogger>(), null),
                 new ServiceContext(),
-                CacheHelper.CreateDisabledCacheHelper());
+                CacheHelper.Disabled);
             Assert.Pass();
         }
 

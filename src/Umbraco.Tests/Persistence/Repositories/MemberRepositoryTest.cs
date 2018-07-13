@@ -6,6 +6,7 @@ using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -28,10 +29,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         private MemberRepository CreateRepository(IScopeProvider provider, out MemberTypeRepository memberTypeRepository, out MemberGroupRepository memberGroupRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            memberTypeRepository = new MemberTypeRepository(accessor, DisabledCache, Logger);
-            memberGroupRepository = new MemberGroupRepository(accessor, DisabledCache, Logger);
-            var tagRepo = new TagRepository(accessor, DisabledCache, Logger);
-            var repository = new MemberRepository(accessor, DisabledCache, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>());
+            memberTypeRepository = new MemberTypeRepository(accessor, CacheHelper.Disabled, Logger);
+            memberGroupRepository = new MemberGroupRepository(accessor, CacheHelper.Disabled, Logger);
+            var tagRepo = new TagRepository(accessor, CacheHelper.Disabled, Logger);
+            var repository = new MemberRepository(accessor, CacheHelper.Disabled, Logger, memberTypeRepository, memberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>());
             return repository;
         }
 

@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
 
@@ -631,7 +632,7 @@ namespace Umbraco.Tests.FrontEnd
         private void SetUpDependencyContainer()
         {
             // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
-            var container = new Mock<IServiceContainer>();
+            var container = new Mock<IContainer>();
             var globalSettings = SettingsForTests.GenerateMockGlobalSettings();
 
             container

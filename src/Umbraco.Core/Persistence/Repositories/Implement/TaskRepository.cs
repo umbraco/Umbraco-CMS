@@ -15,8 +15,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class TaskRepository : NPocoRepositoryBase<int, Task>, ITaskRepository
     {
-        public TaskRepository(IScopeAccessor scopeAccessor, DisabledCacheHelper cache, ILogger logger)
-            : base(scopeAccessor, cache, logger)
+        public TaskRepository(IScopeAccessor scopeAccessor, ILogger logger)
+            : base(scopeAccessor, CacheHelper.NoCache, logger)
         { }
 
         protected override Task PerformGet(int id)

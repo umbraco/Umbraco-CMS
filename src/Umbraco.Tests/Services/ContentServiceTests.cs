@@ -25,6 +25,7 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PropertyEditors;
 using System.Reflection;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Tests.Services
 {
@@ -2951,11 +2952,11 @@ namespace Umbraco.Tests.Services
         private DocumentRepository CreateRepository(IScopeProvider provider, out ContentTypeRepository contentTypeRepository)
         {
             var accessor = (IScopeAccessor) provider;
-            var templateRepository = new TemplateRepository(accessor, DisabledCache, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
-            var tagRepository = new TagRepository(accessor, DisabledCache, Logger);
-            contentTypeRepository = new ContentTypeRepository(accessor, DisabledCache, Logger, templateRepository);
-            var languageRepository = new LanguageRepository(accessor, DisabledCache, Logger);
-            var repository = new DocumentRepository(accessor, DisabledCache, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
+            var templateRepository = new TemplateRepository(accessor, CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
+            var tagRepository = new TagRepository(accessor, CacheHelper.Disabled, Logger);
+            contentTypeRepository = new ContentTypeRepository(accessor, CacheHelper.Disabled, Logger, templateRepository);
+            var languageRepository = new LanguageRepository(accessor, CacheHelper.Disabled, Logger);
+            var repository = new DocumentRepository(accessor, CacheHelper.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, Mock.Of<IContentSection>());
             return repository;
         }
     }

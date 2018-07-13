@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Services
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>());
+                var repository = new MacroRepository((IScopeAccessor) provider, CacheHelper.Disabled, Mock.Of<ILogger>());
 
                 repository.Save(new Macro("test1", "Test1", "~/views/macropartials/test1.cshtml", MacroTypes.PartialView));
                 repository.Save(new Macro("test2", "Test2", "~/views/macropartials/test2.cshtml", MacroTypes.PartialView));

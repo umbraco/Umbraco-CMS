@@ -19,11 +19,6 @@ namespace Umbraco.Core.Composing.CompositionRoots
 
         public void Compose(IServiceRegistry container)
         {
-            // register cache helpers
-            // the main cache helper is registered by CoreBootManager and is used by most repositories
-            // the disabled one is used by those repositories that require it
-            container.RegisterSingleton<DisabledCacheHelper>();
-
             // resolve ctor dependency from GetInstance() runtimeArguments, if possible - 'factory' is
             // the container, 'info' describes the ctor argument, and 'args' contains the args that
             // were passed to GetInstance() - use first arg if it is the right type,

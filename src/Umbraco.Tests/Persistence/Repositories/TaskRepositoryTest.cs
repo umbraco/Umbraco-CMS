@@ -2,6 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
@@ -21,7 +22,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, Logger);
 
                 var created = DateTime.Now;
                 var task = new Task(new TaskType("asdfasdf"))
@@ -49,7 +50,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, Logger);
 
                 var created = DateTime.Now;
                 repo.Save(new Task(new TaskType("asdfasdf"))
@@ -82,7 +83,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, Logger);
 
                 var task = new Task(new TaskType("asdfasdf"))
                 {
@@ -119,7 +120,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, Logger);
 
                 var task = new Task(new TaskType("asdfasdf"))
                 {
@@ -148,7 +149,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, Logger);
 
                 var found = repo.GetMany().ToArray();
                 Assert.AreEqual(20, found.Count());
@@ -164,7 +165,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, Logger);
 
                 var found = repo.GetTasks(includeClosed: true).ToArray();
                 Assert.AreEqual(15, found.Count());
@@ -180,7 +181,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, Logger);
 
                 var found = repo.GetTasks(itemId:-20).ToArray();
                 Assert.AreEqual(10, found.Count());
@@ -196,7 +197,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, Logger);
 
                 var found = repo.GetTasks(includeClosed: false);
                 Assert.AreEqual(10, found.Count());
@@ -208,7 +209,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = ScopeProvider.CreateScope())
             {
-                var repo = new TaskRepository((IScopeAccessor) provider, CacheHelper, Logger);
+                var repo = new TaskRepository((IScopeAccessor) provider, Logger);
 
                 for (int i = 0; i < count; i++)
                 {

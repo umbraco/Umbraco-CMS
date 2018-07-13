@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
@@ -22,7 +23,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var sp = TestObjects.GetScopeProvider(Logger);
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor) sp, CacheHelper, Logger);
+                var repo = new AuditRepository((IScopeAccessor) sp, Logger);
                 repo.Save(new AuditItem(-1, "This is a System audit trail", AuditType.System, 0));
 
                 var dtos = scope.Database.Fetch<LogDto>("WHERE id > -1");
@@ -38,7 +39,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var sp = TestObjects.GetScopeProvider(Logger);
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor) sp, CacheHelper, Logger);
+                var repo = new AuditRepository((IScopeAccessor) sp, Logger);
 
                 for (var i = 0; i < 100; i++)
                 {
@@ -51,7 +52,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor) sp, CacheHelper, Logger);
+                var repo = new AuditRepository((IScopeAccessor) sp, Logger);
 
                 var page = repo.GetPagedResultsByQuery(sp.SqlContext.Query<IAuditItem>(), 0, 10, out var total, Direction.Descending, null, null);
 
@@ -66,7 +67,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var sp = TestObjects.GetScopeProvider(Logger);
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor) sp, CacheHelper, Logger);
+                var repo = new AuditRepository((IScopeAccessor) sp, Logger);
 
                 for (var i = 0; i < 100; i++)
                 {
@@ -79,7 +80,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor) sp, CacheHelper, Logger);
+                var repo = new AuditRepository((IScopeAccessor) sp, Logger);
 
                 var page = repo.GetPagedResultsByQuery(sp.SqlContext.Query<IAuditItem>(), 0, 9, out var total, Direction.Descending,
                         new[] {AuditType.Publish}, null)
@@ -97,7 +98,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var sp = TestObjects.GetScopeProvider(Logger);
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor) sp, CacheHelper, Logger);
+                var repo = new AuditRepository((IScopeAccessor) sp, Logger);
 
                 for (var i = 0; i < 100; i++)
                 {
@@ -110,7 +111,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             using (var scope = sp.CreateScope())
             {
-                var repo = new AuditRepository((IScopeAccessor) sp, CacheHelper, Logger);
+                var repo = new AuditRepository((IScopeAccessor) sp, Logger);
 
                 var page = repo.GetPagedResultsByQuery(sp.SqlContext.Query<IAuditItem>(), 0, 8, out var total, Direction.Descending,
                         null, sp.SqlContext.Query<IAuditItem>().Where(item => item.Comment == "Content created"))
