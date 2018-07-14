@@ -77,7 +77,10 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     // sortable options
     $scope.sortableOptions = {
+        axis: "y",
+        containment: "parent",
         distance: 10,
+        opacity: 0.7,
         tolerance: "pointer",
         scroll: true,
         zIndex: 6000
