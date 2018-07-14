@@ -130,6 +130,10 @@ namespace Umbraco.Web.Editors
                     _logger.Warn<PasswordChanger>(string.Format("Could not change user password {0}", errors));
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, errors: " + errors, new[] { "oldPassword" }) });
                 }
+
+                savingUser.LastPasswordChangeDate = DateTime.Now;
+                _userService.Save(savingUser);
+
                 return Attempt.Succeed(new PasswordChangedModel());                
             }
 
