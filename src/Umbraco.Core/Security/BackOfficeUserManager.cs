@@ -484,6 +484,7 @@ namespace Umbraco.Core.Security
         /// </remarks>
         protected override async Task<IdentityResult> UpdatePassword(IUserPasswordStore<T, int> passwordStore, T user, string newPassword)
         {
+            user.LastPasswordChangeDateUtc = DateTime.UtcNow;
             var userAwarePasswordHasher = PasswordHasher as IUserAwarePasswordHasher<BackOfficeIdentityUser, int>;
             if (userAwarePasswordHasher == null)
                 return await base.UpdatePassword(passwordStore, user, newPassword);
