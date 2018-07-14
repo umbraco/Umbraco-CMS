@@ -19,19 +19,6 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="sql">Sql object</param>
-        /// <param name="fields">Columns to select</param>
-        /// <returns></returns>
-        [Obsolete("Use the overload specifying ISqlSyntaxProvider instead")]
-        public static Sql Select<T>(this Sql sql, params Expression<Func<T, object>>[] fields)
-        {
-            return sql.Select(GetFieldNames(SqlSyntaxContext.SqlSyntaxProvider, fields));
-        }
-
-        /// <summary>
-        /// Defines the column to select in the generated SQL query
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="sql">Sql object</param>
         /// <param name="sqlSyntax">Sql syntax</param>
         /// <param name="fields">Columns to select</param>
         /// <returns></returns>
@@ -39,19 +26,7 @@ namespace Umbraco.Core.Persistence
         {
             return sql.Select(GetFieldNames(sqlSyntax, fields));
         }
-
-        /// <summary>
-        /// Adds another set of field to select. This method must be used with "Select" when fecthing fields from different tables.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="sql">Sql object</param>
-        /// <param name="fields">Additional columns to select</param>
-        /// <returns></returns>
-        public static Sql AndSelect<T>(this Sql sql, params Expression<Func<T, object>>[] fields)
-        {
-            return sql.AndSelect(GetFieldNames(SqlSyntaxContext.SqlSyntaxProvider, fields));
-        }
-
+        
         /// <summary>
         /// Adds another set of field to select. This method must be used with "Select" when fecthing fields from different tables.
         /// </summary>
