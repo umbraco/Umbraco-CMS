@@ -94,7 +94,9 @@ namespace Umbraco.Tests.PublishedContent
 				<testRecursive><![CDATA[]]></testRecursive>
 			</Home>
 			<CustomDocument id=""1177"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub 1"" urlName=""custom-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1177"" isDoc="""" />
-			<CustomDocument id=""1178"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 2"" urlName=""custom-sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178"" isDoc="""" />
+			<CustomDocument id=""1178"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""3"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-16T14:23:35"" nodeName=""custom sub 2"" urlName=""custom-sub-2"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178"" isDoc="""">
+                <CustomDocument id=""1179"" parentID=""1178"" level=""4"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""1"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""custom sub sub 1"" urlName=""custom-sub-sub-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1178,1179"" isDoc="""" />
+            </CustomDocument>
             <Home id=""1176"" parentID=""1173"" level=""3"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""4"" createDate=""2012-07-20T18:08:08"" updateDate=""2012-07-20T19:10:52"" nodeName=""Sub 3"" urlName=""sub-3"" writerName=""admin"" creatorName=""admin"" path=""-1,1046,1173,1176"" isDoc="""" key=""CDB83BBC-A83B-4BA6-93B8-AADEF67D3C09"">
 				<content><![CDATA[]]></content>
                 <umbracoNaviHide>1</umbracoNaviHide>
@@ -591,6 +593,77 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
+        public void IsAncestor()
+        {
+            // Structure:
+            // - Root : 1046 (no parent)
+            // -- Home: 1173 (parent 1046)
+            // -- Custom Doc: 1178 (parent 1173)
+            // --- Custom Doc2: 1179 (parent: 1178)
+
+            var home = GetNode(1173);
+            var root = GetNode(1046);
+            var customDoc = GetNode(1178);
+            var customDoc2 = GetNode(1179);
+
+            Assert.IsTrue(root.IsAncestor(customDoc2));
+            Assert.IsTrue(root.IsAncestor(customDoc));
+            Assert.IsTrue(root.IsAncestor(home));
+            Assert.IsFalse(root.IsAncestor(root));
+
+            Assert.IsTrue(home.IsAncestor(customDoc2));
+            Assert.IsTrue(home.IsAncestor(customDoc));
+            Assert.IsFalse(home.IsAncestor(home));
+            Assert.IsFalse(home.IsAncestor(root));
+
+            Assert.IsTrue(customDoc.IsAncestor(customDoc2));
+            Assert.IsFalse(customDoc.IsAncestor(customDoc));
+            Assert.IsFalse(customDoc.IsAncestor(home));
+            Assert.IsFalse(customDoc.IsAncestor(root));
+
+            Assert.IsFalse(customDoc2.IsAncestor(customDoc2));
+            Assert.IsFalse(customDoc2.IsAncestor(customDoc));
+            Assert.IsFalse(customDoc2.IsAncestor(home));
+            Assert.IsFalse(customDoc2.IsAncestor(root));
+        }
+
+        [Test]
+        public void IsAncestorOrSelf()
+        {
+            // Structure:
+            // - Root : 1046 (no parent)
+            // -- Home: 1173 (parent 1046)
+            // -- Custom Doc: 1178 (parent 1173)
+            // --- Custom Doc2: 1179 (parent: 1178)
+
+            var home = GetNode(1173);
+            var root = GetNode(1046);
+            var customDoc = GetNode(1178);
+            var customDoc2 = GetNode(1179);
+
+            Assert.IsTrue(root.IsAncestorOrSelf(customDoc2));
+            Assert.IsTrue(root.IsAncestorOrSelf(customDoc));
+            Assert.IsTrue(root.IsAncestorOrSelf(home));
+            Assert.IsTrue(root.IsAncestorOrSelf(root));
+
+            Assert.IsTrue(home.IsAncestorOrSelf(customDoc2));
+            Assert.IsTrue(home.IsAncestorOrSelf(customDoc));
+            Assert.IsTrue(home.IsAncestorOrSelf(home));
+            Assert.IsFalse(home.IsAncestorOrSelf(root));
+
+            Assert.IsTrue(customDoc.IsAncestorOrSelf(customDoc2));
+            Assert.IsTrue(customDoc.IsAncestorOrSelf(customDoc));
+            Assert.IsFalse(customDoc.IsAncestorOrSelf(home));
+            Assert.IsFalse(customDoc.IsAncestorOrSelf(root));
+
+            Assert.IsTrue(customDoc2.IsAncestorOrSelf(customDoc2));
+            Assert.IsFalse(customDoc2.IsAncestorOrSelf(customDoc));
+            Assert.IsFalse(customDoc2.IsAncestorOrSelf(home));
+            Assert.IsFalse(customDoc2.IsAncestorOrSelf(root));
+        }
+
+
+        [Test]
         public void Descendants_Or_Self()
         {
             var doc = GetNode(1046);
@@ -614,6 +687,76 @@ namespace Umbraco.Tests.PublishedContent
 
             Assert.AreEqual(7, result.Count());
             Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175, 4444 }));
+        }
+
+        [Test]
+        public void IsDescendant()
+        {
+            // Structure:
+            // - Root : 1046 (no parent)
+            // -- Home: 1173 (parent 1046)
+            // -- Custom Doc: 1178 (parent 1173)
+            // --- Custom Doc2: 1179 (parent: 1178)
+            
+            var home = GetNode(1173);
+            var root = GetNode(1046);
+            var customDoc = GetNode(1178);
+            var customDoc2 = GetNode(1179);
+
+            Assert.IsFalse(root.IsDescendant(root));
+            Assert.IsFalse(root.IsDescendant(home));
+            Assert.IsFalse(root.IsDescendant(customDoc));
+            Assert.IsFalse(root.IsDescendant(customDoc2));
+
+            Assert.IsTrue(home.IsDescendant(root));
+            Assert.IsFalse(home.IsDescendant(home));
+            Assert.IsFalse(home.IsDescendant(customDoc));
+            Assert.IsFalse(home.IsDescendant(customDoc2));
+
+            Assert.IsTrue(customDoc.IsDescendant(root));
+            Assert.IsTrue(customDoc.IsDescendant(home));
+            Assert.IsFalse(customDoc.IsDescendant(customDoc));
+            Assert.IsFalse(customDoc.IsDescendant(customDoc2));
+
+            Assert.IsTrue(customDoc2.IsDescendant(root));
+            Assert.IsTrue(customDoc2.IsDescendant(home));
+            Assert.IsTrue(customDoc2.IsDescendant(customDoc));
+            Assert.IsFalse(customDoc2.IsDescendant(customDoc2));
+        }
+
+        [Test]
+        public void IsDescendantOrSelf()
+        {
+            // Structure:
+            // - Root : 1046 (no parent)
+            // -- Home: 1173 (parent 1046)
+            // -- Custom Doc: 1178 (parent 1173)
+            // --- Custom Doc2: 1179 (parent: 1178)
+            
+            var home = GetNode(1173);
+            var root = GetNode(1046);
+            var customDoc = GetNode(1178);
+            var customDoc2 = GetNode(1179);
+
+            Assert.IsTrue(root.IsDescendantOrSelf(root));
+            Assert.IsFalse(root.IsDescendantOrSelf(home));
+            Assert.IsFalse(root.IsDescendantOrSelf(customDoc));
+            Assert.IsFalse(root.IsDescendantOrSelf(customDoc2));
+
+            Assert.IsTrue(home.IsDescendantOrSelf(root));
+            Assert.IsTrue(home.IsDescendantOrSelf(home));
+            Assert.IsFalse(home.IsDescendantOrSelf(customDoc));
+            Assert.IsFalse(home.IsDescendantOrSelf(customDoc2));
+
+            Assert.IsTrue(customDoc.IsDescendantOrSelf(root));
+            Assert.IsTrue(customDoc.IsDescendantOrSelf(home));
+            Assert.IsTrue(customDoc.IsDescendantOrSelf(customDoc));
+            Assert.IsFalse(customDoc.IsDescendantOrSelf(customDoc2));
+
+            Assert.IsTrue(customDoc2.IsDescendantOrSelf(root));
+            Assert.IsTrue(customDoc2.IsDescendantOrSelf(home));
+            Assert.IsTrue(customDoc2.IsDescendantOrSelf(customDoc));
+            Assert.IsTrue(customDoc2.IsDescendantOrSelf(customDoc2));
         }
 
         [Test]
