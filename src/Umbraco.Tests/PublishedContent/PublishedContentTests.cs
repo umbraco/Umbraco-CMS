@@ -315,7 +315,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var doc = GetNode(1046);
 
-            var expected = new[] { 1046, 1173, 1174, 1177, 1178, 1176, 1175, 4444, 1172 };
+            var expected = new[] { 1046, 1173, 1174, 1177, 1178, 1179, 1176, 1175, 4444, 1172 };
             var exindex = 0;
 
             // must respect the XPath descendants-or-self axis!
@@ -688,7 +688,7 @@ namespace Umbraco.Tests.PublishedContent
 
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(8, result.Count());
+            Assert.AreEqual(9, result.Count());
             Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1046, 1173, 1174, 1176, 1175 }));
         }
 
@@ -701,7 +701,7 @@ namespace Umbraco.Tests.PublishedContent
 
             Assert.IsNotNull(result);
 
-            Assert.AreEqual(7, result.Count());
+            Assert.AreEqual(8, result.Count());
             Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175, 4444 }));
         }
 
