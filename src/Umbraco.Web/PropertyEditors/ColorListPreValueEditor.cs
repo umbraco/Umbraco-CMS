@@ -41,6 +41,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             var dictionary = persistedPreVals.FormatAsDictionary();
             var items = dictionary
+                .OrderBy(x => x.Value.SortOrder)
                 .Where(x => x.Key != "useLabel")
                 .ToDictionary(x => x.Value.Id, x => x.Value.Value);
 
@@ -102,9 +103,13 @@ namespace Umbraco.Web.PropertyEditors
                         if (string.IsNullOrWhiteSpace(color)) return null;
 
                         var label = x["label"].ToString();
-                        return new PreValue(id, useLabel
-                            ? JsonConvert.SerializeObject(new { value = color, label = label })
-                            : color);
+
+                        int.TryParse(x["sortOrder"].ToString(), out var sortOrder);
+
+                        var value = useLabel
+                            ? JsonConvert.SerializeObject(new { value = color, label = label, sortOrder = sortOrder.ToString() })
+                            : color;
+                        return new PreValue(id, value, sortOrder);
                     })
                     .WhereNotNull())
                 {
@@ -135,7 +140,7 @@ namespace Umbraco.Web.PropertyEditors
                     if (jItem == null || jItem["value"] == null) continue;
 
                     //NOTE: we will be removing empty values when persisting so no need to validate
-                    var asString = jItem["value"].ToString();
+                    var asString = jItem["value"].Value<string>();
                     if (asString.IsNullOrWhiteSpace()) continue;
 
                     if (Regex.IsMatch(asString, "^([0-9a-f]{3}|[0-9a-f]{6})$", RegexOptions.IgnoreCase) == false)

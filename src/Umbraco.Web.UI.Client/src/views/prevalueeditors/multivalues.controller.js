@@ -40,7 +40,10 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiValuesControl
             
             
             if ($scope.newItem) {
-                if (!_.contains($scope.model.value, $scope.newItem)) {                
+                var exists = _.find($scope.model.value, function (item) {
+                    return item.value.toUpperCase() == $scope.newItem.toUpperCase();
+                });
+                if (!exists) {
                     $scope.model.value.push({ value: $scope.newItem });
                     $scope.newItem = "";
                     $scope.hasError = false;

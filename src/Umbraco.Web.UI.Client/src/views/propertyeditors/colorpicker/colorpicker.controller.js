@@ -1,9 +1,45 @@
 function ColorPickerController($scope) {
 
+    //setup the default config
+    var config = {
+        items: [],
+        multiple: false
+    };
+    
+    //map the user config
+    angular.extend(config, $scope.model.config);
+
+    //map back to the model
+    $scope.model.config = config;
+    
+    function convertArrayToDictionaryArray(model) {
+        //now we need to format the items in the dictionary because we always want to have an array
+        var newItems = [];
+        for (var i = 0; i < model.length; i++) {
+            newItems.push({ id: model[i], sortOrder: 0, value: model[i] });
+        }
+
+        return newItems;
+    }
+
+
+    function convertObjectToDictionaryArray(model) {
+        //now we need to format the items in the dictionary because we always want to have an array
+        var newItems = [];
+        var vals = _.values($scope.model.config.items);
+        var keys = _.keys($scope.model.config.items);
+
+        for (var i = 0; i < vals.length; i++) {
+            var label = vals[i].value ? vals[i].value : vals[i];
+            newItems.push({ id: keys[i], sortOrder: vals[i].sortOrder, value: label });
+        }
+
+        return newItems;
+    }
+    
     $scope.isConfigured = $scope.model.config && $scope.model.config.items && _.keys($scope.model.config.items).length > 0;
 
     if ($scope.isConfigured) {
-
         for (var key in $scope.model.config.items) {
             if (!$scope.model.config.items[key].hasOwnProperty("value"))
                 $scope.model.config.items[key] = { value: $scope.model.config.items[key], label: $scope.model.config.items[key] };
@@ -13,7 +49,10 @@ function ColorPickerController($scope) {
         initActiveColor();
     }
 
-    $scope.toggleItem = function (color) {
+    //sort the values
+    $scope.model.config.items.sort(function (a, b) { return (a.sortOrder > b.sortOrder) ? 1 : ((b.sortOrder > a.sortOrder) ? -1 : 0); });
+
+    $scope.toggleItem = function (item) {
 
         var currentColor = ($scope.model.value && $scope.model.value.hasOwnProperty("value"))
             ? $scope.model.value.value

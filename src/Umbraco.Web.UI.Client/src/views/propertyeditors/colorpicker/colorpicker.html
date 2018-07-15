@@ -5,6 +5,13 @@
 	</div>
 
     <ul class="thumbnails color-picker">
+		<!--
+		<li ng-repeat="item in model.config.items" ng-class="{active: model.value === item.value}">
+            <a ng-click="toggleItem(item)" class="thumbnail" hex-bg-color="{{item.value}}">
+
+            </a>
+        </li>
+		-->
         <li ng-repeat="(key, val) in model.config.items" ng-class="{active: isActiveColor(val)}">
             <a ng-click="toggleItem(val)" class="thumbnail" hex-bg-color="{{val.value}}">
             </a>
