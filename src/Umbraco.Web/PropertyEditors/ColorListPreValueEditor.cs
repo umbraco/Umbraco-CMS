@@ -40,9 +40,9 @@ namespace Umbraco.Web.PropertyEditors
         public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
         {
             var dictionary = persistedPreVals.FormatAsDictionary();
-            var items = dictionary
-                .Where(x => x.Key != "useLabel")
-                .ToDictionary(x => x.Value.Id, x => x.Value.Value);
+            var items = dictionary.Where(x => x.Key != "useLabel")
+                                  .OrderBy(x => x.Value.SortOrder)
+                                  .ToDictionary(x => x.Value.Id, x => x.Value.Value);
 
             var items2 = new Dictionary<int, object>();
             foreach (var item in items)
