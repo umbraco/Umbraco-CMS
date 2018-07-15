@@ -95,16 +95,20 @@ namespace Umbraco.Web.PropertyEditors
                     .Select(x =>
                     {
                         var idString = x["id"] == null ? "0" : x["id"].ToString();
-                        int id;
-                        if (int.TryParse(idString, out id) == false) id = 0;
+                        int id = int.TryParse(idString, out id) ? id : 0;
 
                         var color = x["value"].ToString();
                         if (string.IsNullOrWhiteSpace(color)) return null;
 
                         var label = x["label"].ToString();
-                        return new PreValue(id, useLabel
-                            ? JsonConvert.SerializeObject(new { value = color, label = label })
-                            : color);
+
+                        int.TryParse(x["sortOrder"]?.ToString(), out var sortOrder);
+
+                        var value = useLabel
+                                  ? JsonConvert.SerializeObject(new { value = color, label = label, sortOrder = sortOrder })
+                                  : color;
+
+                        return new PreValue(id, value, sortOrder);
                     })
                     .WhereNotNull())
                 {
