@@ -135,7 +135,7 @@ namespace Umbraco.Web.PropertyEditors
                     if (jItem == null || jItem["value"] == null) continue;
 
                     //NOTE: we will be removing empty values when persisting so no need to validate
-                    var asString = jItem["value"].ToString();
+                    var asString = jItem["value"].Value<string>();
                     if (asString.IsNullOrWhiteSpace()) continue;
 
                     if (Regex.IsMatch(asString, "^([0-9a-f]{3}|[0-9a-f]{6})$", RegexOptions.IgnoreCase) == false)
