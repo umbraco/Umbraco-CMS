@@ -1,5 +1,5 @@
 ﻿angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiColorPickerController",
-    function ($scope, $timeout, assetsService, angularHelper, $element) {
+    function ($scope, $timeout, assetsService, angularHelper, $element, localizationService) {
         //NOTE: We need to make each color an object, not just a string because you cannot 2-way bind to a primitive.
         var defaultColor = "000000";
         var defaultLabel = null;
@@ -7,6 +7,18 @@
         $scope.newColor = defaultColor;
         $scope.newLavel = defaultLabel;
         $scope.hasError = false;
+
+        $scope.labels = {};
+
+        var labelKeys = [
+            "general_cancel",
+            "general_choose"
+        ];
+
+        localizationService.localizeMany(labelKeys).then(function (values) {
+            $scope.labels.cancel = values[0];
+            $scope.labels.choose = values[1];
+        });
 
         assetsService.load([
             //"lib/spectrum/tinycolor.js",
@@ -16,8 +28,8 @@
             elem.spectrum({
                 color: null,
                 showInitial: false,
-                chooseText: "choose", // TODO: These can be localised
-                cancelText: "cancel", // TODO: These can be localised
+                chooseText: $scope.labels.choose,
+                cancelText: $scope.labels.cancel,
                 preferredFormat: "hex",
                 showInput: true,
                 clickoutFiresChange: true,
