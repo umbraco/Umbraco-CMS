@@ -1,0 +1,102 @@
+// Tree context menu
+// -------------------------
+.umb-actions {
+    margin: 0;
+    padding: 0px;
+    list-style: none;
+    user-select: none;
+
+    li.sep {
+        display: block;
+        border-top: 1px solid @gray-9;
+
+        &:first-child {
+            border-top: none;
+        }
+    }
+
+    a {
+        white-space: nowrap;
+        font-size: 15px;
+        color: @black;
+        padding: 9px 25px 9px 20px;
+        text-decoration: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+
+        body.touch & {
+            padding: 7px 25px 7px 20px;
+            font-size: 110%;
+        }
+    }
+
+    a:hover,
+    a:focus,
+    li.selected {
+        color: @black !important;
+        background: @gray-10 !important;
+    }
+
+    .menu-label {
+        display: inline-block;
+        vertical-align: middle;
+        padding-left: 15px;
+    }
+
+    i {
+        font-size: 18px;
+        vertical-align: middle;
+        color: @gray-3;
+    }
+}
+
+.umb-actions-child {
+
+    li {
+        display: block;
+
+        &.add {
+            margin-top: 20px;
+            border-top: 1px solid @gray-8;
+            padding-top: 20px;
+
+            i {
+                opacity: 0.4;
+            }
+        }
+
+        .menu-label {
+            font-size: 14px;
+            color: @black;
+            margin-left: 10px;
+
+            small {
+                font-size: 12px;
+                display: block;
+                clear: right;
+                line-height: 14px;
+                color: @gray-6;
+                white-space: normal;
+                margin-top: 2px;
+            }
+        }
+    }
+
+    a {
+        clear: both;
+        padding-left: 10px;
+
+        &:hover .menuLabel small {
+            text-decoration: none !important
+        }
+    }
+
+    i {
+        font-size: 30px;
+        min-width: 30px;
+        text-align: center;
+        line-height: 24px;
+        /* set line-height to ensure all icons use same line-height */
+    }
+}
