@@ -19,6 +19,12 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "view")]
         public string View { get; set; }
+
+        /// <summary>
+        /// The view model specific to this app
+        /// </summary>
+        [DataMember(Name = "viewModel")]
+        public object ViewModel { get; set; }
     }
 }
 

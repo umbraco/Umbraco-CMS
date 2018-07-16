@@ -27,14 +27,7 @@ namespace Umbraco.Web.Models.Mapping
             IgnoreProperties = ignoreProperties ?? throw new ArgumentNullException(nameof(ignoreProperties));
         }
 
-        /// <summary>
-        /// Adds the container (listview) tab to the document
-        /// </summary>
-        /// <typeparam name="TPersisted"></typeparam>
-        /// <param name="display"></param>
-        /// <param name="entityType">This must be either 'content' or 'media'</param>
-        /// <param name="dataTypeService"></param>
-        /// <param name="localizedTextService"></param>
+        //TODO: Get rid of this it should not be needed anymore since list views are dynamically added to "content apps"
         internal static void AddListView(
             ITabbedContent<ContentPropertyDisplay> display,
             string contentTypeAlias, string entityType,
@@ -46,7 +39,6 @@ namespace Umbraco.Web.Models.Mapping
             {
                 case "content":
                     dtdId = Constants.DataTypes.DefaultContentListView;
-
                     break;
                 case "media":
                     dtdId = Constants.DataTypes.DefaultMediaListView;
@@ -125,37 +117,6 @@ namespace Umbraco.Web.Models.Mapping
             }
             return -1;
         }
-
-        //private static void SetChildItemsTabPosition(ITabbedContentItem<ContentPropertyDisplay> display,
-        //        IDictionary<string, object> listViewConfig,
-        //        Tab<ContentPropertyDisplay> listViewTab)
-        //{
-        //    // Find position of tab from config
-        //    var tabIndexForChildItems = GetTabNumberFromConfig(listViewConfig);
-        //    if (tabIndexForChildItems != -1)
-        //    {
-        //        // Tab position is recorded 1-based but we insert into collection 0-based
-        //        tabIndexForChildItems--;
-
-        //        // Ensure within bounds
-        //        if (tabIndexForChildItems < 0)
-        //        {
-        //            tabIndexForChildItems = 0;
-        //        }
-
-        //        if (tabIndexForChildItems > display.Tabs.Count())
-        //        {
-        //            tabIndexForChildItems = display.Tabs.Count();
-        //        }
-        //    }
-        //    else tabIndexForChildItems = 0;
-
-        //    // Recreate tab list with child items tab at configured position
-        //    var tabs = new List<Tab<ContentPropertyDisplay>>();
-        //    tabs.AddRange(display.Tabs);
-        //    tabs.Insert(tabIndexForChildItems, listViewTab);
-        //    display.Tabs = tabs;
-        //}
 
         /// <summary>
         /// Returns a collection of custom generic properties that exist on the generic properties tab

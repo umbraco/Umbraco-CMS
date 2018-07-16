@@ -138,6 +138,7 @@ namespace Umbraco.Web.Editors
                 ParentId = -1
             };
 
+            //TODO: Change this over to use "Content Apps"
             TabsAndPropertiesResolver.AddListView(display, "member", listName, Services.DataTypeService, Services.TextService);
 
             return display;

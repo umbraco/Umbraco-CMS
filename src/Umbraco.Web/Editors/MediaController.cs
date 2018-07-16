@@ -101,6 +101,7 @@ namespace Umbraco.Web.Editors
                 Path = "-1," + Constants.System.RecycleBinMedia
             };
 
+            //TODO: Change this over to use "Content Apps"
             TabsAndPropertiesResolver.AddListView(display, "media", "recycleBin", Services.DataTypeService, Services.TextService);
 
             return display;
@@ -182,7 +183,7 @@ namespace Umbraco.Web.Editors
         /// <param name="pageNumber"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildFolders(int id, int pageNumber, int pageSize)
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildFolders(int id, int pageNumber = 1, int pageSize = 1000)
         {
             //Suggested convention for folder mediatypes - we can make this more or less complicated as long as we document it...
             //if you create a media type, which has an alias that ends with ...Folder then its a folder: ex: "secureFolder", "bannerFolder", "Folder"

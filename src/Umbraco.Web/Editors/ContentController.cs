@@ -235,6 +235,7 @@ namespace Umbraco.Web.Editors
                 }
             };
 
+            //TODO: Change this over to use "Content Apps"
             TabsAndPropertiesResolver.AddListView(display.ContentVariants.First(), "content", "recycleBin", Services.DataTypeService, Services.TextService);
 
             return display;

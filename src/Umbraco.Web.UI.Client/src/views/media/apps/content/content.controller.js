@@ -6,7 +6,7 @@
         var vm = this;
 
         function onInit() {
-            angular.forEach($scope.model.tabs, function(group){
+            angular.forEach($scope.content.tabs, function(group){
                 group.open = true;
             });
         }

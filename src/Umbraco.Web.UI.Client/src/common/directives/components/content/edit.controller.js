@@ -104,9 +104,7 @@
             //with a copy of the contentApps. This is required because each editor renders it's own
             //header and content apps section and the content apps contains the view for editing content itself
             //and we need to assign a view model to the subView so that it is scoped to the current
-            //editor so that split views work. This is a bit hacky but it's required because the content
-            //app stuff isn't built to have a scoped model to an editor, it's built to have a single global
-            //model but that doesn't work for having split view.
+            //editor so that split views work. 
 
             //copy the apps from the main model if not assigned yet to the variant
             if (!variant.apps) {
@@ -132,7 +130,7 @@
                 }
             }
             
-            //the assign the variant to a view model to the content app
+            //then assign the variant to a view model to the content app
             var contentApp = _.find(variant.apps, function (a) {
                 return a.alias === "content";
             });

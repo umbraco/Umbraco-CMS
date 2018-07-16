@@ -1,6 +1,6 @@
-<div ng-controller="Umbraco.Editors.Content.Apps.ListViewController as vm">
+<div>
 
-    <umb-property ng-repeat="property in vm.listViewGroup.properties" property="property">
+    <umb-property ng-repeat="property in model.viewModel track by property.alias" property="property">
         <umb-property-editor model="property"></umb-property-editor>
     </umb-property>
 

@@ -3,6 +3,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
@@ -14,7 +15,14 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class MediaMapperProfile : Profile
     {
-        public MediaMapperProfile(IUserService userService, ILocalizedTextService textService, IDataTypeService dataTypeService, IMediaService mediaService, IMediaTypeService mediaTypeService, ILogger logger)
+        public MediaMapperProfile(
+            IUserService userService,
+            ILocalizedTextService textService,
+            IDataTypeService dataTypeService,
+            IMediaService mediaService,
+            IMediaTypeService mediaTypeService,
+            PropertyEditorCollection propertyEditors,
+            ILogger logger)
         {
             // create, capture, cache
             var mediaOwnerResolver = new OwnerResolver<IMedia>(userService);
@@ -22,7 +30,7 @@ namespace Umbraco.Web.Models.Mapping
             var childOfListViewResolver = new MediaChildOfListViewResolver(mediaService, mediaTypeService);
             var contentTreeNodeUrlResolver = new ContentTreeNodeUrlResolver<IMedia, MediaTreeController>();
             var mediaTypeBasicResolver = new ContentTypeBasicResolver<IMedia, MediaItemDisplay>();
-            var mediaAppResolver = new MediaAppResolver();
+            var mediaAppResolver = new MediaAppResolver(dataTypeService, propertyEditors);
 
             //FROM IMedia TO MediaItemDisplay
             CreateMap<IMedia, MediaItemDisplay>()

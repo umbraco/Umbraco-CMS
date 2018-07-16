@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AutoMapper;
 using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -23,13 +26,14 @@ namespace Umbraco.Web.Models.Mapping
             View = "views/media/apps/info/info.html"
         };
 
-        private static readonly ContentApp _listViewApp = new ContentApp
+        private readonly IDataTypeService _dataTypeService;
+        private readonly PropertyEditorCollection _propertyEditorCollection;
+
+        public MediaAppResolver(IDataTypeService dataTypeService, PropertyEditorCollection propertyEditorCollection)
         {
-            Alias = "childItems",
-            Name = "Child items",
-            Icon = "icon-list",
-            View = "views/media/apps/listview/listview.html"
-        };
+            _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
+            _propertyEditorCollection = propertyEditorCollection ?? throw new ArgumentNullException(nameof(propertyEditorCollection));
+        }
 
         public IEnumerable<ContentApp> Resolve(IMedia source, MediaItemDisplay destination, IEnumerable<ContentApp> destMember, ResolutionContext context)
         {
@@ -37,7 +41,7 @@ namespace Umbraco.Web.Models.Mapping
 
             if (source.ContentType.IsContainer || source.ContentType.Alias == Umbraco.Core.Constants.Conventions.MediaTypes.Folder)
             {
-                apps.Add(_listViewApp);
+                apps.Add(this.CreateListViewApp(_dataTypeService, _propertyEditorCollection, source.ContentType.Alias, "media"));
             }
             else
             {

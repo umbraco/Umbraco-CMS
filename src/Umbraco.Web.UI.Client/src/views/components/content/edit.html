@@ -33,11 +33,11 @@
                         </umb-editor-header>
 
                         <umb-editor-container>
-                            <umb-editor-sub-views 
-                                ng-if="!page.loading" 
-                                sub-views="editor.content.apps" 
-                                model="content">
-                            </umb-editor-sub-views>    
+                            <div class="umb-editor-sub-views">
+                                <div id="sub-view-{{$index}}" ng-repeat="app in editor.content.apps track by app.alias">
+                                    <umb-editor-sub-view model="app" content="content" />
+                                </div>
+                            </div>
                         </umb-editor-container>
                     </div>
 
