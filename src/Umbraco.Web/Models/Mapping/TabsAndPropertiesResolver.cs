@@ -36,7 +36,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="dataTypeService"></param>
         /// <param name="localizedTextService"></param>
         internal static void AddListView(
-            ITabbedContentItem<ContentPropertyDisplay> display,
+            ITabbedContent<ContentPropertyDisplay> display,
             string contentTypeAlias, string entityType,
             IDataTypeService dataTypeService, ILocalizedTextService localizedTextService)
         {

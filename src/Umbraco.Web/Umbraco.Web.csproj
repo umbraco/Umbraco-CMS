@@ -221,7 +221,8 @@
     <Compile Include="Editors\IEditorValidator.cs" />
     <Compile Include="Editors\EditorModelEventManager.cs" />
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
-    <Compile Include="Models\ContentEditing\ITabbedContentItem.cs" />
+    <Compile Include="Models\ContentEditing\IContentProperties.cs" />
+    <Compile Include="Models\ContentEditing\ITabbedContent.cs" />
     <Compile Include="Models\ContentEditing\Permission.cs" />
     <Compile Include="Models\ContentEditing\PostedFolder.cs" />
     <Compile Include="Models\ContentEditing\SnippetDisplay.cs" />

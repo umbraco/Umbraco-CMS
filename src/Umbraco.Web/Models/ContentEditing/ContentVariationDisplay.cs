@@ -12,7 +12,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// Represents the variant info for a content item
     /// </summary>
     [DataContract(Name = "contentVariant", Namespace = "")]
-    public class ContentVariantDisplay : ITabbedContentItem<ContentPropertyDisplay>
+    public class ContentVariantDisplay : ITabbedContent<ContentPropertyDisplay>
     {
         public ContentVariantDisplay()
         {
