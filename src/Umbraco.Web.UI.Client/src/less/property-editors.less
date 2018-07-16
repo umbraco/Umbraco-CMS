@@ -149,52 +149,45 @@ ul.color-picker li a  {
 }
 
 .control-group.color-picker-preval .thumbnail {
-  width:30px;
-  border:none;
+    width: 30px;
+    border: none;
+    cursor: move;
 }
 
 /* pre-value editor */
-/*.control-group.color-picker-preval:before {
-    content: "";
+.control-group.color-picker-preval .handle {
+    float: left;
     display: inline-block;
-    vertical-align: middle;
-    height: 100%;
-}*/
-
-/*.control-group.color-picker-preval div.thumbnail {
-    display: inline-block;
-    vertical-align: middle;
-}*/
+    margin: 5px 3px 5px 0;
+}
 .control-group.color-picker-preval div.color-picker-prediv {
     display: inline-block;
-    width: 60%;
+    width: 50%;
 }
 
 .control-group.color-picker-preval pre {
     display: inline;
-    margin-right: 20px;
+    font-family: monospace;
+    margin-right: 10px;
     margin-left: 10px;
     width: 50%;
     white-space: nowrap;
     overflow: hidden;
     margin-bottom: 0;
     vertical-align: middle;
-}
-
-.control-group.color-picker-preval btn {
-    //vertical-align: middle;
+    padding-top: 7px;
+    padding-bottom: 7px;
 }
 
 .control-group.color-picker-preval input[type="text"] {
     min-width: 40%;
     width: 40%;
     display: inline-block;
-    margin-right: 20px;
     margin-top: 1px;
 }
 
 .control-group.color-picker-preval label {
-    border: solid @white 1px;
+    border: 1px solid @white;
     padding: 6px;
 }
 
