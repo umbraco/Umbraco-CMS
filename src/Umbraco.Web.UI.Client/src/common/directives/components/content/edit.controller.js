@@ -69,7 +69,7 @@
             // set the active variant
             var activeVariant = null;
             _.each($scope.content.variants, function (v) {
-                if (v.language.culture === $scope.culture) {
+                if (v.language && v.language.culture === $scope.culture) {
                     v.active = true;
                     activeVariant = v;
                 }
@@ -102,17 +102,36 @@
         function initVariant(variant) {
             //The model that is assigned to the editor contains the current content variant along
             //with a copy of the contentApps. This is required because each editor renders it's own
-            //content apps section and the content apps contains the view for editing content itself
+            //header and content apps section and the content apps contains the view for editing content itself
             //and we need to assign a view model to the subView so that it is scoped to the current
             //editor so that split views work. This is a bit hacky but it's required because the content
             //app stuff isn't built to have a scoped model to an editor, it's built to have a single global
             //model but that doesn't work for having split view.
 
+            //copy the apps from the main model if not assigned yet to the variant
             if (!variant.apps) {
-                //copy from the main model
                 variant.apps = angular.copy($scope.content.apps);
             }
 
+            //if this is a variant has a culture/language than we need to assign the language drop down info 
+            if (variant.language) {
+                //if the variant list that defines the header drop down isn't assigned to the variant then assign it now
+                if (!variant.variants) {
+                    variant.variants = _.map($scope.content.variants, function (v) {
+                        return _.pick(v, "active", "language", "validationError", "isEdited", "state");
+                    });
+                }
+                //ensure the current culture is set as the active one
+                for (var i = 0; i < variant.variants.length; i++) {
+                    if (variant.variants[i].language.culture === variant.language.culture) {
+                        variant.variants[i].active = true;
+                    }
+                    else {
+                        variant.variants[i].active = false;
+                    }
+                }
+            }
+            
             //the assign the variant to a view model to the content app
             var contentApp = _.find(variant.apps, function (a) {
                 return a.alias === "content";
@@ -508,6 +527,30 @@
             });
         };
 
+        $scope.selectVariant = function (editorIndex, variantDropDownItem) {
+
+            //if the editor index is zero, then update the query string to track the lang selection, otherwise if it's part
+            //of a 2nd split view editor then update the model directly.
+            if (editorIndex === 0) {
+                //if we've made it this far, then update the query string
+                $location.search("cculture", variantDropDownItem.language.culture);
+            }
+            else {
+                //set all variant drop down items as inactive for this editor and then set the selected on as active
+                var editor = $scope.editors[editorIndex];
+                for (var i = 0; i < editor.content.variants.length; i++) {
+                    editor.content.variants[i].active = false;
+                }
+                variantDropDownItem.active = true;
+
+                //get the variant content model and initialize the editor with that
+                var variant = _.find($scope.content.variants, function (v) {
+                    return v.language.culture === variantDropDownItem.language.culture;
+                });
+                editor.content = initVariant(variant);
+            }
+        };
+
         $scope.closeSplitView = function (index, editor) {
             //TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
             editor.loading = true;
@@ -518,6 +561,8 @@
         };
 
         $scope.openInSplitView = function (selectedVariant) {
+
+            var selectedCulture = selectedVariant.language.culture;
 
             //only the content app can be selected since no other apps are shown, and because we copy all of these apps
             //to the "editors" we need to update this across all editors
@@ -534,8 +579,13 @@
                 }
             }
 
+            //Find the whole variant model based on the culture that was chosen
+            var variant = _.find($scope.content.variants, function (v) {
+                return v.language.culture === selectedCulture;
+            });
+
             var editor = {
-                content: initVariant(selectedVariant)
+                content: initVariant(variant)
             };
             $scope.editors.push(editor);
 

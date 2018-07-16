@@ -22,13 +22,14 @@
                             hide-description="true" 
                             hide-alias="true"
                             navigation="editor.content.apps"
-                            variants="content.variants"
+                            variants="editor.content.variants"
                             hide-change-variant="page.hideChangeVariant"
                             on-back="backToListView()"
                             show-back-button="page.listViewPath !== null"
                             split-view-open="editors.length > 1"
                             on-open-in-split-view="openInSplitView(variant)"
-                            on-close-split-view="closeSplitView($index, editor)">
+                            on-close-split-view="closeSplitView($index, editor)"
+                            on-select-variant="selectVariant($index, variant)">
                         </umb-editor-header>
 
                         <umb-editor-container>

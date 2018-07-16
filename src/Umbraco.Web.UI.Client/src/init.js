@@ -43,10 +43,7 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
         }
 
         var currentRouteParams = null;
-
-        //A list of query strings defined that when changed will not cause a reload of the route
-        var nonRoutingQueryStrings = ["mculture", "cculture"];
-
+        
         /** execute code on each successful route */
         $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
 
@@ -128,30 +125,7 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
                 //check if the location being changed is only the mculture query string, if so, cancel the routing since this is just
                 //used as a global persistent query string that does not change routes.
 
-                var currUrlParts = currentRouteParams;
-                var nextUrlParts = next.params;
-
-                var allowRoute = true;
-
-                //The only time that we want to cancel is if only any of the nonRoutingQueryStrings have changed/added.
-                //If any of the other parts have changed we do not cancel
-                var currRoutingKeys = _.difference(_.keys(currUrlParts), nonRoutingQueryStrings);
-                var nextRoutingKeys = _.difference(_.keys(nextUrlParts), nonRoutingQueryStrings);
-                var diff = _.difference(currRoutingKeys, nextRoutingKeys);
-                //if the routing parameter keys are the same, we'll compare their values to see if any have changed and if so then the routing will be allowed.
-                if (diff.length == 0) {
-                    var partsChanged = 0;
-                    _.each(currRoutingKeys, function (k) {
-                        if (currUrlParts[k] != nextUrlParts[k]) {
-                            partsChanged++;
-                        }
-                    });
-                    if (partsChanged === 0) {
-                        allowRoute = false; //nothing except our query strings chagned, so don't continue routing
-                    }
-                }
-
-                if (allowRoute) {
+                if (navigationService.isRouteChangingNavigation(currentRouteParams, next.params)) {
                     //continue the route
                     $route.reload();
                 }

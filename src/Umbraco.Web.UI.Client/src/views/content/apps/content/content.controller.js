@@ -27,18 +27,22 @@
 
         onInit();
 
-        $scope.$watch(function () {
-            return $scope.subView.viewModel.language.culture;
-        }, function (newVal, oldVal) {
-            if (newVal !== oldVal) {
-                vm.loading = true;
+        //if this variant has a culture/language assigned, then we need to watch it since it will change
+        //if the language drop down changes and we need to re-init
+        if ($scope.subView.viewModel.language) {
+            $scope.$watch(function () {
+                return $scope.subView.viewModel.language.culture;
+            }, function (newVal, oldVal) {
+                if (newVal !== oldVal) {
+                    vm.loading = true;
 
-                //TODO: Can we minimize the flicker?
-                $timeout(function () {
-                    onInit();
-                }, 100);
-            }
-        });
+                    //TODO: Can we minimize the flicker?
+                    $timeout(function () {
+                        onInit();
+                    }, 100);
+                }
+            });
+        }
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.Content.Apps.ContentController", ContentAppContentController);

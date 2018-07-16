@@ -12,7 +12,7 @@
 * Another thing this directive does is to ensure that any .control-group that contains form elements that are invalid will
 * be marked with the 'error' css class. This ensures that labels included in that control group are styled correctly.
 **/
-function valFormManager(serverValidationManager, $rootScope, $log, $timeout, notificationsService, eventsService, $routeParams) {
+function valFormManager(serverValidationManager, $rootScope, $log, $timeout, notificationsService, eventsService, $routeParams, navigationService) {
 
     var SHOW_VALIDATION_CLASS_NAME = "show-validation";
     var SAVING_EVENT_NAME = "formSubmitting";
@@ -111,22 +111,30 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
                     return;
                 }
 
-                var path = nextLocation.split("#")[1];
-                if (path) {
-                    if (path.indexOf("%253") || path.indexOf("%252")) {
-                        path = decodeURIComponent(path);
+                var nextPath = nextLocation.split("#")[1];
+
+                //TODO: We need to check for the query strings that cause the route, if they are just the
+                //nonRoutingQueryStrings when we shouldn't show the confirm route change
+
+                if (nextPath) {
+
+                    if (navigationService.isRouteChangingNavigation(currentLocation, nextLocation)) {
+                        if (!notificationsService.hasView()) {
+
+                            if (nextPath.indexOf("%253") || nextPath.indexOf("%252")) {
+                                nextPath = decodeURIComponent(nextPath);
+                            }
+
+                            var msg = { view: "confirmroutechange", args: { path: nextPath, listener: locationEvent } };
+                            notificationsService.add(msg);
+                        }
+
+                        //prevent the route!
+                        event.preventDefault();
+
+                        //raise an event
+                        eventsService.emit("valFormManager.pendingChanges", true);
                     }
-
-                    if (!notificationsService.hasView()) {
-                        var msg = { view: "confirmroutechange", args: { path: path, listener: locationEvent } };
-                        notificationsService.add(msg);
-                    }
-
-                    //prevent the route!
-                    event.preventDefault();
-
-                    //raise an event
-                    eventsService.emit("valFormManager.pendingChanges", true);
                 }
 
             });
