@@ -194,6 +194,8 @@
                     </select>
                 </umb-control-group>
 
+                <a href="" ng-click="openTemplate()" ng-if="node.template !== null">Open</a>
+
                 <umb-control-group data-element="node-info-id" label="Id">
                     <div>{{ node.id }}</div>
                     <small>{{ node.key }}</small>
