@@ -77,7 +77,7 @@ namespace Umbraco.Core.Models.PublishedContent
 
         /// <summary>
         /// Gets the published content type containing the property type.
-        /// </summary>        
+        /// </summary>
         public PublishedContentType ContentType { get; internal set; } // internally set by PublishedContentType constructor
 
         /// <summary>
@@ -191,6 +191,20 @@ namespace Umbraco.Core.Models.PublishedContent
 
             _cacheLevel = _converter?.GetPropertyCacheLevel(this) ?? PropertyCacheLevel.Snapshot;
             _modelClrType = _converter == null ? typeof (object) : _converter.GetPropertyValueType(this);
+        }
+
+        /// <summary>
+        /// Determines whether a source value is an actual value, or not a value.
+        /// </summary>
+        /// <remarks>Used by property.HasValue and, for instance, in fallback scenarios.</remarks>
+        public bool IsValue(object value)
+        {
+            // if we have a converter, use the converter,
+            // otherwise use the old magic null & string comparisons
+
+            return _converter == null
+                ? value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false)
+                : _converter.IsValue(value);
         }
 
         /// <summary>
