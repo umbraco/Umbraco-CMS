@@ -635,6 +635,9 @@ namespace Umbraco.Web.Routing
             set { _headers = value; }
         }
 
-
+        /// <summary>
+        /// Gets of sets a value indicating whether the Umbraco Backoffice should ignore a collision for this request.
+        /// </summary>
+        public bool IgnorePublishedContentCollisions { get; set; }
     }
 }
