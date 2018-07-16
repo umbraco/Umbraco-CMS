@@ -18,11 +18,10 @@ namespace Umbraco.Web.Mvc
     public abstract class UmbracoAuthorizedController : UmbracoController
     {
         protected UmbracoAuthorizedController()
-        {
-        }
+        { }
 
-        protected UmbracoAuthorizedController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger) : base(globalSettings, umbracoContext, databaseFactory, services, applicationCache, logger, profilingLogger)
-        {
-        }
+        protected UmbracoAuthorizedController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger)
+            : base(globalSettings, umbracoContext, services, applicationCache, logger, profilingLogger)
+        { }
     }
 }

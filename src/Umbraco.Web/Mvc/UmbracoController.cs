@@ -28,6 +28,7 @@ namespace Umbraco.Web.Mvc
         // don't need to implement complex constructors + need to refactor them each time we change ours.
         // this means that these properties have a setter.
         // what can go wrong?
+        // fixme clear this comment
 
         /// <summary>
         /// Gets or sets the Umbraco context.
@@ -38,11 +39,6 @@ namespace Umbraco.Web.Mvc
         /// Gets or sets the Umbraco context.
         /// </summary>
         public virtual UmbracoContext UmbracoContext { get; set; }
-
-        /// <summary>
-        /// Gets or sets the database context.
-        /// </summary>
-        public IUmbracoDatabaseFactory DatabaseFactory { get; set; }
 
         /// <summary>
         /// Gets or sets the services context.
@@ -86,7 +82,6 @@ namespace Umbraco.Web.Mvc
             : this(
                   Current.Container.GetInstance<IGlobalSettings>(),
                   Current.Container.GetInstance<UmbracoContext>(),
-                  Current.Container.GetInstance<IUmbracoDatabaseFactory>(),
                   Current.Container.GetInstance<ServiceContext>(),
                   Current.Container.GetInstance<CacheHelper>(),
                   Current.Container.GetInstance<ILogger>(),
@@ -95,11 +90,10 @@ namespace Umbraco.Web.Mvc
         {
         }
 
-        protected UmbracoController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger)
+        protected UmbracoController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger)
         {
             GlobalSettings = globalSettings;
             UmbracoContext = umbracoContext;
-            DatabaseFactory = databaseFactory;
             Services = services;
             ApplicationCache = applicationCache;
             Logger = logger;

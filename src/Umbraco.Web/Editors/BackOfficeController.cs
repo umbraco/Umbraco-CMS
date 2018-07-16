@@ -62,7 +62,8 @@ namespace Umbraco.Web.Editors
         //    _features = features;
         //}
 
-        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, UmbracoContext umbracoContext, IUmbracoDatabaseFactory databaseFactory, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger) : base(globalSettings, umbracoContext, databaseFactory, services, applicationCache, logger, profilingLogger)
+        public BackOfficeController(ManifestParser manifestParser, UmbracoFeatures features, IGlobalSettings globalSettings, UmbracoContext umbracoContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger)
+            : base(globalSettings, umbracoContext, services, applicationCache, logger, profilingLogger)
         {
             _manifestParser = manifestParser;
             _features = features;
