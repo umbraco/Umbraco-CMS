@@ -49,8 +49,35 @@ function ColorPickerController($scope) {
         initActiveColor();
     }
 
-    //sort the values
-    $scope.model.config.items.sort(function (a, b) { return (a.sortOrder > b.sortOrder) ? 1 : ((b.sortOrder > a.sortOrder) ? -1 : 0); });
+    if (!angular.isArray($scope.model.config.items)) {
+        //make an array from the dictionary
+        var items = [];
+        for (var i in $scope.model.config.items) {
+            var oldValue = $scope.model.config.items[i];
+            if (oldValue.hasOwnProperty("value")) {
+                items.push({
+                    value: oldValue.value,
+                    label: oldValue.label,
+                    sortOrder: oldValue.sortOrder,
+                    id: i
+                });
+            } else {
+                items.push({
+                    value: oldValue,
+                    label: oldValue,
+                    sortOrder: sortOrder,
+                    id: i
+                });
+            }
+        }
+
+        //ensure the items are sorted by the provided sort order
+        items.sort(function (a, b) { return (a.sortOrder > b.sortOrder) ? 1 : ((b.sortOrder > a.sortOrder) ? -1 : 0); });
+
+        //now make the editor model the array
+        $scope.model.config.items = items;
+    }
+
     $scope.toggleItem = function (color) {
 
         var currentColor = ($scope.model.value && $scope.model.value.hasOwnProperty("value"))

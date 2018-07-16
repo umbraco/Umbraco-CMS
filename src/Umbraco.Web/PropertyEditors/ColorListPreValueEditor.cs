@@ -41,27 +41,43 @@ namespace Umbraco.Web.PropertyEditors
         {
             var dictionary = persistedPreVals.FormatAsDictionary();
             var items = dictionary.Where(x => x.Key != "useLabel")
-                                  .OrderBy(x => x.Value.SortOrder)
-                                  .ToDictionary(x => x.Value.Id, x => x.Value.Value);
+                                  .OrderBy(x => x.Value.SortOrder);
 
             var items2 = new Dictionary<int, object>();
             foreach (var item in items)
             {
-                if (item.Value.DetectIsJson() == false)
+                var valueItem = new ColorPickerColor
                 {
-                    items2[item.Key] = item.Value;
-                    continue;
+                    Color = item.Value.Value,
+                    Label = item.Value.Value,
+                    SortOrder = item.Value.SortOrder
+                };
+
+                if (item.Value.Value.DetectIsJson())
+                {
+                    try
+                    {
+                        var valueObject = JsonConvert.DeserializeObject<ColorPickerColor>(item.Value.Value);
+                        valueItem = new ColorPickerColor
+                        {
+                            Color = valueObject.Color,
+                            Label = valueObject.Label,
+                            SortOrder = valueObject.SortOrder
+                        };
+                    }
+                    catch
+                    {
+                        // let's say parsing Json failed, we'll not do anything,
+                        // we'll just use the valueItem we built in the  first place
+                    }
                 }
 
-                try
+                items2[item.Value.Id] = new JObject
                 {
-                    items2[item.Key] = JsonConvert.DeserializeObject(item.Value);
-                }
-                catch
-                {
-                    // let's say parsing Json failed, so what we have is the string - build json
-                    items2[item.Key] = new JObject { { "color", item.Value }, { "label", item.Value } };
-                }
+                    { "value", valueItem.Color },
+                    { "label", valueItem.Label },
+                    { "sortOrder", valueItem.SortOrder }
+                };
             }
 
             var result = new Dictionary<string, object> { { "items", items2 } };
@@ -83,13 +99,13 @@ namespace Umbraco.Web.PropertyEditors
                 var useLabel = false;
                 if (editorValue.TryGetValue("useLabel", out var useLabelObj))
                 {
-                    useLabel = useLabelObj is string && (string)useLabelObj == "1";
+                    useLabel = useLabelObj is string && (string) useLabelObj == "1";
                     result["useLabel"] = new PreValue(useLabel ? "1" : "0");
                 }
 
                 // get all non-empty values
                 var index = 0;
-                // we don't get the actual sortOrder but items get submitted in the sorted order, so let's just count them up
+                // items get submitted in the sorted order, so just count them up
                 var sortOrder = -1;
                 foreach (var preValue in val.OfType<JObject>()
                     .Where(x => x["value"] != null)
@@ -105,8 +121,8 @@ namespace Umbraco.Web.PropertyEditors
 
                         sortOrder++;
                         var value = useLabel
-                                  ? JsonConvert.SerializeObject(new { value = color, label = label, sortOrder = sortOrder })
-                                  : color;
+                            ? JsonConvert.SerializeObject(new { value = color, label = label, sortOrder = sortOrder })
+                            : color;
 
                         return new PreValue(id, value, sortOrder);
                     })
@@ -153,5 +169,15 @@ namespace Umbraco.Web.PropertyEditors
                 }
             }
         }
+    }
+
+    internal class ColorPickerColor
+    {
+        [JsonProperty("value")]
+        public string Color { get; set; }
+        [JsonProperty("label")]
+        public string Label { get; set; }
+        [JsonProperty("sortOrder")]
+        public int SortOrder { get; set; }
     }
 }

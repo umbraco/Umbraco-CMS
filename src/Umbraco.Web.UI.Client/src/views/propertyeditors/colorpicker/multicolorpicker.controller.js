@@ -58,12 +58,14 @@
                     items.push({
                         value: oldValue.value,
                         label: oldValue.label,
+                        sortOrder: oldValue.sortOrder,
                         id: i
                     });
                 } else {
                     items.push({
                         value: oldValue,
                         label: oldValue,
+                        sortOrder: sortOrder,
                         id: i
                     });
                 }
