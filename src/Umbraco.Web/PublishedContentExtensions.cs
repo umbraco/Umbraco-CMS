@@ -860,7 +860,7 @@ namespace Umbraco.Web
 
         public static bool IsDescendant(this IPublishedContent content, IPublishedContent other)
         {
-            return content.Level < other.Level && content.Path.InvariantStartsWith(other.Path);
+            return other.Level < content.Level && content.Path.InvariantStartsWith(other.Path);
         }
 
         public static HtmlString IsDescendant(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -891,7 +891,7 @@ namespace Umbraco.Web
         public static bool IsAncestor(this IPublishedContent content, IPublishedContent other)
         {
             // avoid using Descendants(), or Ancestors(), they're expensive
-            return other.Level < content.Level && other.Path.InvariantStartsWith(content.Path);
+            return content.Level < other.Level && other.Path.InvariantStartsWith(content.Path);
         }
 
         public static HtmlString IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
