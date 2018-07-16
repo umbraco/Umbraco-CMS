@@ -146,7 +146,7 @@ app.config(function ($routeProvider) {
             //This controller will execute for this route, then we replace the template dynamnically based on the current tree.
             controller: function ($scope, $route, $routeParams, treeService) {
 
-                if (!$routeParams.tree || !$routeParams.method) {
+                if (!$routeParams.method) {
                     $scope.templateUrl = "views/common/dashboard.html";
                 }
 
