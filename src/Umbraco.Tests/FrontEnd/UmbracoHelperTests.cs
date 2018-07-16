@@ -9,7 +9,6 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.FrontEnd
@@ -19,6 +18,12 @@ namespace Umbraco.Tests.FrontEnd
     {
         private const string SampleWithAnchorElement = "Hello world, this is some text <a href='blah'>with a link</a>";
         private const string SampleWithBoldAndAnchorElements = "Hello world, <b>this</b> is some text <a href='blah'>with a link</a>";
+
+        [TearDown]
+        public void TearDown()
+        {
+            Current.Reset();
+        }
 
         [Test]
         public static void Truncate_Simple()
@@ -340,9 +345,10 @@ namespace Umbraco.Tests.FrontEnd
         /// running.
         /// </remarks>
         [Test]
-        public static void Converting_string_udi_to_a_udi_returns_original_udi_value()
+        public void Converting_string_udi_to_a_udi_returns_original_udi_value()
         {
             // Arrange
+            SetUpDependencyContainer();
             Udi.ResetUdiTypes();
             Udi sample = new GuidUdi(Constants.UdiEntityType.AnyGuid, Guid.NewGuid());
 
@@ -362,9 +368,10 @@ namespace Umbraco.Tests.FrontEnd
         /// running.
         /// </remarks>
         [Test]
-        public static void Converting_hello_to_a_udi_returns_false()
+        public void Converting_hello_to_a_udi_returns_false()
         {
             // Arrange
+            SetUpDependencyContainer();
             Udi.ResetUdiTypes();
             const string sample = "Hello";
 
@@ -557,8 +564,6 @@ namespace Umbraco.Tests.FrontEnd
                 );
 
             // Assert
-            ResetDependencyContainer();
-
             Assert.IsTrue(success);
             Assert.That(result, Is.EqualTo(sample));
         }
@@ -579,8 +584,6 @@ namespace Umbraco.Tests.FrontEnd
                 );
 
             // Assert
-            ResetDependencyContainer();
-
             Assert.IsTrue(success);
             Assert.That(result, Is.EqualTo(sample));
         }
@@ -601,8 +604,6 @@ namespace Umbraco.Tests.FrontEnd
                 );
 
             // Assert
-            ResetDependencyContainer();
-
             Assert.IsFalse(success);
             Assert.That(result, Is.Null);
         }
@@ -623,8 +624,6 @@ namespace Umbraco.Tests.FrontEnd
                 );
 
             // Assert
-            ResetDependencyContainer();
-
             Assert.IsFalse(success);
             Assert.That(result, Is.Null);
         }
@@ -646,7 +645,5 @@ namespace Umbraco.Tests.FrontEnd
 
             Current.Container = container.Object;
         }
-
-        private void ResetDependencyContainer() => Current.Reset();
     }
 }

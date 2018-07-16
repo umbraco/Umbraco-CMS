@@ -131,6 +131,7 @@
     <Compile Include="Editors\PreviewController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\TourController.cs" />
+    <Compile Include="HealthCheck\Checks\DataIntegrity\DatabaseSchemaValidationHealthCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
@@ -244,7 +245,7 @@
     <Compile Include="Models\Mapping\ContentChildOfListViewResolver.cs" />
     <Compile Include="Models\Mapping\ContentUrlResolver.cs" />
     <Compile Include="Models\Mapping\DefaultTemplateResolver.cs" />
-    <Compile Include="Models\Mapping\DictionaryModelMapper.cs" />
+    <Compile Include="Models\Mapping\DictionaryMapperProfile.cs" />
     <Compile Include="Models\Mapping\LanguageMapperProfile.cs" />
     <Compile Include="Models\Mapping\MediaAppResolver.cs" />
     <Compile Include="Models\Mapping\MediaChildOfListViewResolver.cs" />
