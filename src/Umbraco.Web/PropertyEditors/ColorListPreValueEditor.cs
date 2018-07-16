@@ -80,30 +80,30 @@ namespace Umbraco.Web.PropertyEditors
 
             try
             {
-                object useLabelObj;
                 var useLabel = false;
-                if (editorValue.TryGetValue("useLabel", out useLabelObj))
+                if (editorValue.TryGetValue("useLabel", out var useLabelObj))
                 {
-                    useLabel = useLabelObj is string && (string) useLabelObj == "1";
+                    useLabel = useLabelObj is string && (string)useLabelObj == "1";
                     result["useLabel"] = new PreValue(useLabel ? "1" : "0");
                 }
 
                 // get all non-empty values
                 var index = 0;
+                // we don't get the actual sortOrder but items get submitted in the sorted order, so let's just count them up
+                var sortOrder = -1;
                 foreach (var preValue in val.OfType<JObject>()
                     .Where(x => x["value"] != null)
                     .Select(x =>
                     {
                         var idString = x["id"] == null ? "0" : x["id"].ToString();
-                        int id = int.TryParse(idString, out id) ? id : 0;
+                        int.TryParse(idString, out var id);
 
                         var color = x["value"].ToString();
                         if (string.IsNullOrWhiteSpace(color)) return null;
 
                         var label = x["label"].ToString();
 
-                        int.TryParse(x["sortOrder"]?.ToString(), out var sortOrder);
-
+                        sortOrder++;
                         var value = useLabel
                                   ? JsonConvert.SerializeObject(new { value = color, label = label, sortOrder = sortOrder })
                                   : color;
