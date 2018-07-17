@@ -55,8 +55,8 @@ namespace Umbraco.Tests.Web.Controllers
 
                 var userServiceMock = Mock.Get(Current.Services.UserService);
 
-                userServiceMock.Setup(service => service.Save(It.IsAny<IUser>(), It.IsAny<bool>()))
-                    .Callback((IUser u, bool raiseEvents) =>
+                userServiceMock.Setup(service => service.Save(It.IsAny<IUser>()))
+                    .Callback((IUser u) =>
                     {
                         u.Id = 1234;
                     });

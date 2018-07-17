@@ -808,13 +808,19 @@ namespace Umbraco.Core.Services.Implement
 
         #region Save
 
-        /// <summary>
-        /// Saves an <see cref="IMember"/>
-        /// </summary>
-        /// <param name="member"><see cref="IMember"/> to Save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IMember member, bool raiseEvents = true)
+        /// <inheritdoc />
+        public void Save(IMember member)
+        {
+            Save(member, true);
+        }
+
+        /// <inheritdoc />
+        public void SaveWithoutEvents(IMember member)
+        {
+            Save(member, false);
+        }
+
+        private void Save(IMember member, bool withEvents)
         {
             //trimming username and email to make sure we have no trailing space
             member.Username = member.Username.Trim();
@@ -823,7 +829,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IMember>(member);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                if (withEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     scope.Complete();
                     return;
@@ -838,11 +844,12 @@ namespace Umbraco.Core.Services.Implement
 
                 _memberRepository.Save(member);
 
-                if (raiseEvents)
+                if (withEvents)
                 {
                     saveEventArgs.CanCancel = false;
                     scope.Events.Dispatch(Saved, this, saveEventArgs);
                 }
+
                 Audit(AuditType.Save, "Save Member performed by user", 0, member.Id);
 
                 scope.Complete();
@@ -853,16 +860,14 @@ namespace Umbraco.Core.Services.Implement
         /// Saves a list of <see cref="IMember"/> objects
         /// </summary>
         /// <param name="members"><see cref="IEnumerable{IMember}"/> to save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IEnumerable<IMember> members, bool raiseEvents = true)
+        public void Save(IEnumerable<IMember> members)
         {
             var membersA = members.ToArray();
 
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IMember>(membersA);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     scope.Complete();
                     return;
@@ -879,11 +884,9 @@ namespace Umbraco.Core.Services.Implement
                     _memberRepository.Save(member);
                 }
 
-                if (raiseEvents)
-                {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs);
-                }
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Saved, this, saveEventArgs);
+
                 Audit(AuditType.Save, "Save Member items performed by user", 0, -1);
 
                 scope.Complete();
@@ -1255,7 +1258,7 @@ namespace Umbraco.Core.Services.Implement
         /// Exports a member.
         /// </summary>
         /// <remarks>
-        /// This is internal for now and is used to export a member in the member editor, 
+        /// This is internal for now and is used to export a member in the member editor,
         /// it will raise an event so that auditing logs can be created.
         /// </remarks>
         internal MemberExportModel ExportMember(Guid key)
