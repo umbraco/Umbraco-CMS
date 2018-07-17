@@ -1,6 +1,12 @@
 .umb-language-picker {
     position: relative;
-    z-index: @zindexDropdown;
+    z-index: @zindexDropdown;    
+    
+    // align bottom of tree root with bottom of first tab header in the editor
+    // means that there's a hierarchy in the element heights in the left panel, based on their height
+    ~ #tree .umb-tree-root {
+        height:60px;
+    }
 }
 
 .umb-language-picker__toggle {
@@ -10,7 +16,7 @@
     padding: 0 20px;
     cursor: pointer;
     border-bottom: 1px solid @gray-9;
-    height: 50px;
+    height: @editorHeaderHeight; // match height to editor header
     box-sizing: border-box;
 }
 
