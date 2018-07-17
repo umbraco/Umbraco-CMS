@@ -66,12 +66,9 @@ namespace Umbraco.Web.WebApi.Binders
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
-            var root = IOHelper.MapPath("~/App_Data/TEMP/FileUploads");
-            //ensure it exists
-            Directory.CreateDirectory(root);
-            var provider = new MultipartFormDataStreamProvider(root);
+            var result = GetMultiPartResult(actionContext);
 
-            var model = GetModel(actionContext, bindingContext, provider);
+            var model = GetModel(actionContext, bindingContext, result);
             //now that everything is binded, validate the properties
             var contentItemValidator = GetValidationHelper();
             contentItemValidator.ValidateItem(actionContext, model);
@@ -85,6 +82,41 @@ namespace Umbraco.Web.WebApi.Binders
             return new ContentItemValidationHelper<TPersisted, TModelSave>(Logger, UmbracoContextAccessor);
         }
 
+        private MultipartFormDataStreamProvider GetMultiPartResult(HttpActionContext actionContext)
+        {
+            var root = IOHelper.MapPath("~/App_Data/TEMP/FileUploads");
+            //ensure it exists
+            Directory.CreateDirectory(root);
+            var provider = new MultipartFormDataStreamProvider(root);
+
+            var request = actionContext.Request;
+            var content = request.Content;
+
+            //NOTE: Yes this is super strange, ugly and weird. One would think that you could 'just'
+            // use a .Return on the ReadAsMultipartAsync but that absolutely doesn't work, it immediately deadlocks.
+            // We've tried all things like .Result, ConfigureAwait(false), GetAwaiter().GetResult(), a combination of
+            // everything and they all immediately deadlock.
+            // This issue has been documented in various .NET releases but there's really no info about the best way
+            // to do this. Ideally we'd use true async/await but in .NET Framework, model binders don't support async :(
+            // For some reason wrapping the operation in our own task works without deadlocking.
+            MultipartFormDataStreamProvider result = null;
+            var task = Task.Run(() => content.ReadAsMultipartAsync(provider))
+                           .ContinueWith(x =>
+                           {
+                               if (x.IsFaulted && x.Exception != null)
+                               {
+                                   throw x.Exception;
+                               }
+                               result = x.ConfigureAwait(false).GetAwaiter().GetResult();
+                           });
+            task.Wait();
+
+            if (result == null)
+                throw new InvalidOperationException("Could not read multi-part message");
+
+            return result;
+        }
+
         /// <summary>
         /// Builds the model from the request contents
         /// </summary>
@@ -92,13 +124,11 @@ namespace Umbraco.Web.WebApi.Binders
         /// <param name="bindingContext"></param>
         /// <param name="provider"></param>
         /// <returns></returns>
-        private TModelSave GetModel(HttpActionContext actionContext, ModelBindingContext bindingContext, MultipartFormDataStreamProvider provider)
+        private TModelSave GetModel(HttpActionContext actionContext, ModelBindingContext bindingContext, MultipartFormDataStreamProvider result)
         {
-            var request = actionContext.Request;
-
-            var content = request.Content;
-
-            var result = content.ReadAsMultipartAsync(provider).Result;
+            //var request = actionContext.Request;
+            //var content = request.Content;
+            //var result = content.ReadAsMultipartAsync(provider).ConfigureAwait(false).GetAwaiter().GetResult();
 
             if (result.FormData["contentItem"] == null)
             {

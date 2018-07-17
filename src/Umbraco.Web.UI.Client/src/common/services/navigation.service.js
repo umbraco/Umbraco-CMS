@@ -153,9 +153,11 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
             //If any of the other parts have changed we do not cancel
             var currRoutingKeys = _.difference(_.keys(currUrlParams), nonRoutingQueryStrings);
             var nextRoutingKeys = _.difference(_.keys(nextUrlParams), nonRoutingQueryStrings);
-            var diff = _.difference(currRoutingKeys, nextRoutingKeys);
+            var diff1 = _.difference(currRoutingKeys, nextRoutingKeys);
+            var diff2 = _.difference(nextRoutingKeys, currRoutingKeys);
+            
             //if the routing parameter keys are the same, we'll compare their values to see if any have changed and if so then the routing will be allowed.
-            if (diff.length == 0) {
+            if (diff1.length === 0 && diff2.length === 0) {
                 var partsChanged = 0;
                 _.each(currRoutingKeys, function (k) {
                     if (currUrlParams[k] != nextUrlParams[k]) {
