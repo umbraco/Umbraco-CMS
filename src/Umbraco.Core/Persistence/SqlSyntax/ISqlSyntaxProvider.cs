@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -18,17 +19,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string GetStringColumnEqualComparison(string column, int paramIndex, TextColumnType columnType);
         string GetStringColumnWildcardComparison(string column, int paramIndex, TextColumnType columnType);
         string GetConcat(params string[] args);
-
-        [Obsolete("Use the overload with the parameter index instead")]
-        string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType);
-        [Obsolete("Use the overload with the parameter index instead")]
-        string GetStringColumnStartsWithComparison(string column, string value, TextColumnType columnType);
-        [Obsolete("Use the overload with the parameter index instead")]
-        string GetStringColumnEndsWithComparison(string column, string value, TextColumnType columnType);
-        [Obsolete("Use the overload with the parameter index instead")]
-        string GetStringColumnContainsComparison(string column, string value, TextColumnType columnType);
-        [Obsolete("Use the overload with the parameter index instead")]
-        string GetStringColumnWildcardComparison(string column, string value, TextColumnType columnType);
 
         string GetQuotedTableName(string tableName);
         string GetQuotedColumnName(string columnName);
@@ -69,6 +59,14 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string Format(ForeignKeyDefinition foreignKey);
         string FormatColumnRename(string tableName, string oldName, string newName);
         string FormatTableRename(string oldName, string newName);
+
+        /// <summary>
+        /// Gets a regex matching aliased fields.
+        /// </summary>
+        /// <remarks>
+        /// <para>Matches "(table.column) AS (alias)" where table, column and alias are properly escaped.</para>
+        /// </remarks>
+        Regex AliasRegex { get; }
 
         Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top);
 

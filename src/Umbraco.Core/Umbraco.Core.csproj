@@ -1206,7 +1206,6 @@
     <Compile Include="Persistence\Repositories\Implement\UserGroupRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\UserRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\ContentRepositoryBase.cs" />
-    <Compile Include="Persistence\Repositories\Implement\VersionableRepositoryBaseAliasRegex.cs" />
     <Compile Include="Persistence\SqlContext.cs" />
     <Compile Include="Persistence\SqlSyntax\ColumnInfo.cs" />
     <Compile Include="Persistence\SqlSyntax\DbTypes.cs" />
