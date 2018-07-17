@@ -92,13 +92,20 @@ namespace Umbraco.Web.WebApi.Binders
             var request = actionContext.Request;
             var content = request.Content;
 
-            //NOTE: Yes this is super strange, ugly and weird. One would think that you could 'just'
-            // use a .Return on the ReadAsMultipartAsync but that absolutely doesn't work, it immediately deadlocks.
-            // We've tried all things like .Result, ConfigureAwait(false), GetAwaiter().GetResult(), a combination of
-            // everything and they all immediately deadlock.
-            // This issue has been documented in various .NET releases but there's really no info about the best way
-            // to do this. Ideally we'd use true async/await but in .NET Framework, model binders don't support async :(
-            // For some reason wrapping the operation in our own task works without deadlocking.
+            // Note: YES this is super strange, ugly, and weird.
+            // One would think that you could just do:
+            //
+            //var result = content.ReadAsMultipartAsync(provider).Result;
+            //
+            // But it deadlocks. See https://stackoverflow.com/questions/15201255 for details, which
+            // points to https://msdn.microsoft.com/en-us/magazine/jj991977.aspx which contains more
+            // details under "Async All the Way" - see also https://olitee.com/2015/01/c-async-await-common-deadlock-scenario/
+            // which contains a simplified explaination: ReadAsMultipartAsync is meant to be awaited,
+            // not used in the non-async .Result way, and there is nothing we can do about it.
+            //
+            // Alas, model binders cannot be async "all the way", so we have to wrap in a task, to
+            // force proper threading, and then it works.
+
             MultipartFormDataStreamProvider result = null;
             var task = Task.Run(() => content.ReadAsMultipartAsync(provider))
                            .ContinueWith(x =>
