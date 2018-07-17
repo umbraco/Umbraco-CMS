@@ -25,6 +25,12 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "viewModel")]
         public object ViewModel { get; set; }
+
+        /// <summary>
+        /// Normally reserved for Angular to deal with but in some cases this can be set on the server side
+        /// </summary>
+        [DataMember(Name = "active")]
+        public bool Active { get; set; }
     }
 }
 

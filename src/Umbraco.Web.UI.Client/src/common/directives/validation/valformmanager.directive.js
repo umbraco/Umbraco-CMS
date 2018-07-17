@@ -113,9 +113,6 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
 
                 var nextPath = nextLocation.split("#")[1];
 
-                //TODO: We need to check for the query strings that cause the route, if they are just the
-                //nonRoutingQueryStrings when we shouldn't show the confirm route change
-
                 if (nextPath) {
 
                     if (navigationService.isRouteChangingNavigation(currentLocation, nextLocation)) {

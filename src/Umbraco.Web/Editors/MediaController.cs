@@ -34,6 +34,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Validation;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Editors
 {
@@ -46,6 +47,11 @@ namespace Umbraco.Web.Editors
     [MediaControllerControllerConfiguration]
     public class MediaController : ContentControllerBase
     {
+        public MediaController(PropertyEditorCollection propertyEditors)
+        {
+            _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
+        }
+
         /// <summary>
         /// Configures this controller with a custom action selector
         /// </summary>
@@ -89,6 +95,9 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public MediaItemDisplay GetRecycleBin()
         {
+            var apps = new List<ContentApp>();
+            apps.AppendListViewApp(Services.DataTypeService, _propertyEditors, "recycleBin", "media");
+            apps[0].Active = true;
             var display = new MediaItemDisplay
             {
                 Id = Constants.System.RecycleBinMedia,
@@ -98,11 +107,9 @@ namespace Umbraco.Web.Editors
                 ContentTypeAlias = "recycleBin",
                 CreateDate = DateTime.Now,
                 IsContainer = true,
-                Path = "-1," + Constants.System.RecycleBinMedia
+                Path = "-1," + Constants.System.RecycleBinMedia,
+                ContentApps = apps
             };
-
-            //TODO: Change this over to use "Content Apps"
-            TabsAndPropertiesResolver.AddListView(display, "media", "recycleBin", Services.DataTypeService, Services.TextService);
 
             return display;
         }
@@ -222,6 +229,8 @@ namespace Umbraco.Web.Editors
         #region GetChildren
 
         private int[] _userStartNodes;
+        private readonly PropertyEditorCollection _propertyEditors;
+
         protected int[] UserStartNodes
         {
             get { return _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService)); }

@@ -30,6 +30,7 @@ using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 using ContentVariation = Umbraco.Core.Models.ContentVariation;
 using Language = Umbraco.Web.Models.ContentEditing.Language;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Editors
 {
@@ -46,11 +47,13 @@ namespace Umbraco.Web.Editors
     public class ContentController : ContentControllerBase
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
+        private readonly PropertyEditorCollection _propertyEditors;
 
-        public ContentController(IPublishedSnapshotService publishedSnapshotService)
+        public ContentController(IPublishedSnapshotService publishedSnapshotService, PropertyEditorCollection propertyEditors)
         {
             if (publishedSnapshotService == null) throw new ArgumentNullException(nameof(publishedSnapshotService));
             _publishedSnapshotService = publishedSnapshotService;
+            _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
         }
 
         /// <summary>
@@ -215,14 +218,14 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public ContentItemDisplay GetRecycleBin()
         {
+            var apps = new List<ContentApp>();
+            apps.AppendListViewApp(Services.DataTypeService, _propertyEditors, "recycleBin", "content");
+            apps[0].Active = true;
             var display = new ContentItemDisplay
             {
                 Id = Constants.System.RecycleBinContent,
-                //Alias = "recycleBin",
                 ParentId = -1,
-                //Name = Services.TextService.Localize("general/recycleBin"),
                 ContentTypeAlias = "recycleBin",
-                //CreateDate = DateTime.Now,
                 IsContainer = true,
                 Path = "-1," + Constants.System.RecycleBinContent,
                 ContentVariants = new List<ContentVariantDisplay>
@@ -232,11 +235,9 @@ namespace Umbraco.Web.Editors
                         CreateDate = DateTime.Now,
                         Name = Services.TextService.Localize("general/recycleBin")
                     }
-                }
+                },
+                ContentApps = apps
             };
-
-            //TODO: Change this over to use "Content Apps"
-            TabsAndPropertiesResolver.AddListView(display.ContentVariants.First(), "content", "recycleBin", Services.DataTypeService, Services.TextService);
 
             return display;
         }

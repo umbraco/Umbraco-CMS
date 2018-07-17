@@ -43,7 +43,20 @@ namespace Umbraco.Web.WebApi.Binders
         where TPersisted : class, IContentBase
         where TModelSave : ContentBaseItemSave<TPersisted>
     {
-        protected ServiceContext Services => Current.Services; // fixme - inject
+        protected Core.Logging.ILogger Logger { get; }
+        protected ServiceContext Services { get; }
+        protected IUmbracoContextAccessor UmbracoContextAccessor { get; }
+
+        public ContentItemBaseBinder() : this(Current.Logger, Current.Services, Current.UmbracoContextAccessor)
+        {
+        }
+
+        public ContentItemBaseBinder(Core.Logging.ILogger logger, ServiceContext services, IUmbracoContextAccessor umbracoContextAccessor)
+        {
+            Logger = logger;
+            Services = services;
+            UmbracoContextAccessor = umbracoContextAccessor;
+        }
 
         public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
         {
@@ -58,29 +71,18 @@ namespace Umbraco.Web.WebApi.Binders
             Directory.CreateDirectory(root);
             var provider = new MultipartFormDataStreamProvider(root);
 
-            var task = Task.Run(() => GetModelAsync(actionContext, bindingContext, provider))
-                           .ContinueWith(x =>
-                               {
-                                   if (x.IsFaulted && x.Exception != null)
-                                   {
-                                       throw x.Exception;
-                                   }
-
-                                   //now that everything is binded, validate the properties
-                                   var contentItemValidator = GetValidationHelper();
-                                   contentItemValidator.ValidateItem(actionContext, x.Result);
-
-                                   bindingContext.Model = x.Result;
-                               });
-
-            task.Wait();
+            var model = GetModel(actionContext, bindingContext, provider);
+            //now that everything is binded, validate the properties
+            var contentItemValidator = GetValidationHelper();
+            contentItemValidator.ValidateItem(actionContext, model);
+            bindingContext.Model = model;
 
             return bindingContext.Model != null;
         }
 
         protected virtual ContentItemValidationHelper<TPersisted, TModelSave> GetValidationHelper()
         {
-            return new ContentItemValidationHelper<TPersisted, TModelSave>();
+            return new ContentItemValidationHelper<TPersisted, TModelSave>(Logger, UmbracoContextAccessor);
         }
 
         /// <summary>
@@ -90,29 +92,13 @@ namespace Umbraco.Web.WebApi.Binders
         /// <param name="bindingContext"></param>
         /// <param name="provider"></param>
         /// <returns></returns>
-        private async Task<TModelSave> GetModelAsync(HttpActionContext actionContext, ModelBindingContext bindingContext, MultipartFormDataStreamProvider provider)
+        private TModelSave GetModel(HttpActionContext actionContext, ModelBindingContext bindingContext, MultipartFormDataStreamProvider provider)
         {
-            // note
-            //
-            // for some reason, due to the way we do async, HttpContext.Current is null
-            // which means that the 'current' UmbracoContext is null too since we are using HttpContextUmbracoContextAccessor
-            // trying to 'EnsureContext' fails because that accessor cannot access the HttpContext either to register the current UmbracoContext
-            //
-            // so either we go with an HybridUmbracoContextAccessor that relies on a ThreadStatic variable when HttpContext.Current is null
-            // and I don't like it
-            // or
-            // we try to force-set the current http context, because, hey... it's there.
-            // and then there is no need to event 'Ensure' anything
-            // read http://stackoverflow.com/questions/1992141/how-do-i-get-an-httpcontext-object-from-httpcontextbase-in-asp-net-mvc-1
-
-            // what's below works but I cannot say I am proud of it
             var request = actionContext.Request;
-            var httpContext = (HttpContextBase) request.Properties["MS_HttpContext"];
-            HttpContext.Current = httpContext.ApplicationInstance.Context;
 
             var content = request.Content;
 
-            var result = await content.ReadAsMultipartAsync(provider);
+            var result = content.ReadAsMultipartAsync(provider).Result;
 
             if (result.FormData["contentItem"] == null)
             {

@@ -26,6 +26,14 @@ namespace Umbraco.Web.WebApi.Filters
         where TPersisted : class, IContentBase
         where TModelSave : ContentBaseItemSave<TPersisted>
     {
+        protected IUmbracoContextAccessor UmbracoContextAccessor { get; }
+        protected ILogger Logger { get; }
+
+        public ContentItemValidationHelper(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor)
+        {
+            Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            UmbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+        }
 
         /// <summary>
         /// Validates the content item and updates the Response and ModelState accordingly
@@ -94,7 +102,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// <param name="persistedProperties"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        protected bool ValidateProperties(List<ContentPropertyBasic> postedProperties , List<Property> persistedProperties, HttpActionContext actionContext)
+        protected bool ValidateProperties(List<ContentPropertyBasic> postedProperties, List<Property> persistedProperties, HttpActionContext actionContext)
         {
             foreach (var p in postedProperties)
             {
@@ -131,7 +139,8 @@ namespace Umbraco.Web.WebApi.Filters
                 if (editor == null)
                 {
                     var message = $"Could not find property editor \"{p.DataType.EditorAlias}\" for property with id {p.Id}.";
-                    Current.Logger.Warn<ContentItemValidationHelper<TPersisted, TModelSave>>(message);
+
+                    Logger.Warn<ContentItemValidationHelper<TPersisted, TModelSave>>(message);
                     continue;
                 }
 

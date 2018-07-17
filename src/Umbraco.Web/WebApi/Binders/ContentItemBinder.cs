@@ -5,7 +5,10 @@ using System.Net.Http;
 using System.Web.Http.Controllers;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.WebApi.Filters;
@@ -14,9 +17,18 @@ namespace Umbraco.Web.WebApi.Binders
 {
     internal class ContentItemBinder : ContentItemBaseBinder<IContent, ContentItemSave>
     {
+        public ContentItemBinder() : this(Current.Logger, Current.Services, Current.UmbracoContextAccessor)
+        {
+        }
+
+        public ContentItemBinder(Core.Logging.ILogger logger, ServiceContext services, IUmbracoContextAccessor umbracoContextAccessor)
+            : base(logger, services, umbracoContextAccessor)
+        {
+        }
+
         protected override ContentItemValidationHelper<IContent, ContentItemSave> GetValidationHelper()
         {
-            return new ContentValidationHelper();
+            return new ContentValidationHelper(Logger, UmbracoContextAccessor);
         }
 
         protected override IContent GetExisting(ContentItemSave model)
@@ -49,6 +61,10 @@ namespace Umbraco.Web.WebApi.Binders
 
         internal class ContentValidationHelper : ContentItemValidationHelper<IContent, ContentItemSave>
         {
+            public ContentValidationHelper(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor) : base(logger, umbracoContextAccessor)
+            {
+            }
+
             /// <summary>
             /// Validates that the correct information is in the request for saving a culture variant
             /// </summary>

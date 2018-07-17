@@ -39,9 +39,9 @@ namespace Umbraco.Web.Models.Mapping
         {
             var apps = new List<ContentApp>();
 
-            if (source.ContentType.IsContainer || source.ContentType.Alias == Umbraco.Core.Constants.Conventions.MediaTypes.Folder)
+            if (source.ContentType.IsContainer || source.ContentType.Alias == Core.Constants.Conventions.MediaTypes.Folder)
             {
-                apps.Add(this.CreateListViewApp(_dataTypeService, _propertyEditorCollection, source.ContentType.Alias, "media"));
+                apps.AppendListViewApp(_dataTypeService, _propertyEditorCollection, source.ContentType.Alias, "media");
             }
             else
             {

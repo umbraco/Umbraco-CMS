@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -9,5 +10,7 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "content", Namespace = "")]
     public class MemberListDisplay : ContentItemDisplayBase<ContentPropertyDisplay, IMember>
     {
+        [DataMember(Name = "apps")]
+        public IEnumerable<ContentApp> ContentApps { get; set; }
     }
 }

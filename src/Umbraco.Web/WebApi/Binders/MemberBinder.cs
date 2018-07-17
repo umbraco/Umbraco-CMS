@@ -19,14 +19,25 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.WebApi.Binders
 {
     internal class MemberBinder : ContentItemBaseBinder<IMember, MemberSave>
     {
+
+        public MemberBinder() : this(Current.Logger, Current.Services, Current.UmbracoContextAccessor)
+        {
+        }
+
+        public MemberBinder(ILogger logger, ServiceContext services, IUmbracoContextAccessor umbracoContextAccessor)
+            : base(logger, services, umbracoContextAccessor)
+        {
+        }
+
         protected override ContentItemValidationHelper<IMember, MemberSave> GetValidationHelper()
         {
-            return new MemberValidationHelper();
+            return new MemberValidationHelper(Logger, UmbracoContextAccessor);
         }
 
         /// <summary>
@@ -179,6 +190,10 @@ namespace Umbraco.Web.WebApi.Binders
         /// </summary>
         internal class MemberValidationHelper : ContentItemValidationHelper<IMember, MemberSave>
         {
+            public MemberValidationHelper(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor) : base(logger, umbracoContextAccessor)
+            {
+            }
+
             /// <summary>
             /// We need to manually validate a few things here like email and login to make sure they are valid and aren't duplicates
             /// </summary>
@@ -244,12 +259,9 @@ namespace Umbraco.Web.WebApi.Binders
                     propertiesToValidate.RemoveAll(property => property.Alias == remove);
                 }
 
-
-                var umbCtx = Current.UmbracoContext; // fixme inject?
-
                 //if the user doesn't have access to sensitive values, then we need to validate the incoming properties to check
                 //if a sensitive value is being submitted.
-                if (umbCtx.Security.CurrentUser.HasAccessToSensitiveData() == false)
+                if (UmbracoContextAccessor.UmbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
                 {
                     var sensitiveProperties = postedItem.PersistedContent.ContentType
                         .PropertyTypes.Where(x => postedItem.PersistedContent.ContentType.IsSensitiveProperty(x.Alias))

@@ -47,7 +47,7 @@ namespace Umbraco.Web.Models.Mapping
             if (source.ContentType.IsContainer)
             {
                 //If it's a container then add the list view app and view model
-                apps.Add(this.CreateListViewApp(_dataTypeService, _propertyEditorCollection, source.ContentType.Alias, "content"));
+                apps.AppendListViewApp(_dataTypeService, _propertyEditorCollection, source.ContentType.Alias, "content");
             }
 
             return apps;

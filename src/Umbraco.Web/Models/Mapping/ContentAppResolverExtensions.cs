@@ -11,17 +11,13 @@ namespace Umbraco.Web.Models.Mapping
     internal static class ContentAppResolverExtensions
     {
         /// <summary>
-        /// Extension method to create a list view app for the content app collection
+        /// Helper method to append a list view app to the content app collection
         /// </summary>
-        /// <typeparam name="TContent"></typeparam>
-        /// <typeparam name="TDisplay"></typeparam>
         /// <param name="resolver"></param>
-        public static ContentApp CreateListViewApp<TContent, TDisplay>(
-            this IValueResolver<TContent, TDisplay, IEnumerable<ContentApp>> resolver,
+        public static void AppendListViewApp(
+            this ICollection<ContentApp> list,
             IDataTypeService dataTypeService, PropertyEditorCollection propertyEditors,
-            string contentTypeAlias,
-            string entityType)
-            where TContent: IContentBase
+            string contentTypeAlias, string entityType)
         {
             var listViewApp = new ContentApp
             {
@@ -74,7 +70,7 @@ namespace Umbraco.Web.Models.Mapping
                     }
                 };
 
-            return listViewApp;
+            list.Add(listViewApp);
         }
     }
     

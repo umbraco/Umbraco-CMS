@@ -26,6 +26,8 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
+using System.Collections.Generic;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Editors
 {
@@ -38,7 +40,13 @@ namespace Umbraco.Web.Editors
     [OutgoingNoHyphenGuidFormat]
     public class MemberController : ContentControllerBase
     {
+        public MemberController(PropertyEditorCollection propertyEditors)
+        {
+            _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
+        }
+
         private readonly MembershipProvider _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+        private readonly PropertyEditorCollection _propertyEditors;
 
         /// <summary>
         /// Returns the currently configured membership scenario for members in umbraco
@@ -127,6 +135,10 @@ namespace Umbraco.Web.Editors
             var foundType = Services.MemberTypeService.Get(listName);
             var name = foundType != null ? foundType.Name : listName;
 
+            var apps = new List<ContentApp>();
+            apps.AppendListViewApp(Services.DataTypeService, _propertyEditors, listName, "member");
+            apps[0].Active = true;
+
             var display = new MemberListDisplay
             {
                 ContentTypeAlias = listName,
@@ -135,11 +147,9 @@ namespace Umbraco.Web.Editors
                 IsContainer = true,
                 Name = listName == Constants.Conventions.MemberTypes.AllMembersListId ? "All Members" : name,
                 Path = "-1," + listName,
-                ParentId = -1
+                ParentId = -1,
+                ContentApps = apps
             };
-
-            //TODO: Change this over to use "Content Apps"
-            TabsAndPropertiesResolver.AddListView(display, "member", listName, Services.DataTypeService, Services.TextService);
 
             return display;
         }

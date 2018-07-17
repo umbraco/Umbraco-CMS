@@ -54,12 +54,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .ForMember(dest => dest.ContentType, opt => opt.ResolveUsing(mediaTypeBasicResolver))
                 .ForMember(dest => dest.MediaLink, opt => opt.ResolveUsing(content => string.Join(",", content.GetUrls(UmbracoConfig.For.UmbracoSettings().Content, logger))))
-                .ForMember(dest => dest.ContentApps, opt => opt.ResolveUsing(mediaAppResolver))
-                .AfterMap((media, display) =>
-                {
-                    //if (media.ContentType.IsContainer)
-                    //    TabsAndPropertiesResolver.AddListView(display, "media", dataTypeService, textService);
-                });
+                .ForMember(dest => dest.ContentApps, opt => opt.ResolveUsing(mediaAppResolver));
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
             CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>()
