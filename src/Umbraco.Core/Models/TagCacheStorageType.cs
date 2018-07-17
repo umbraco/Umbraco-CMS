@@ -2,7 +2,7 @@
 {
     public enum TagCacheStorageType
     {
-        Json,
-        Csv
+        Csv,
+        Json
     }
 }
