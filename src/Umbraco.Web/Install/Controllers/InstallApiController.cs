@@ -1,18 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Install.Models;
@@ -91,8 +87,13 @@ namespace Umbraco.Web.Install.Controllers
             var starterKits = installHelper.GetStarterKits();
             return starterKits;
         }
-        
-        public async Task<InstallProgressResultModel> FreshInstall(FreshInstallModel installModel)
+
+        /// <summary>
+        /// Start the automated install
+        /// </summary>
+        /// <param name="installModel">Installation data</param>
+        /// <returns></returns>
+        public async Task<InstallProgressResultModel> Install(FreshInstallModel installModel)
         {
             var setup = GetSetup();
 
@@ -111,7 +112,29 @@ namespace Umbraco.Web.Install.Controllers
 
             return await handler.Execute();
         }
-        
+
+        /// <summary>
+        /// Start an automated upgrade
+        /// </summary>
+        /// <param name="credentialModel">Credential to use to perform the upgrade</param>
+        /// <returns></returns>
+        public async Task<InstallProgressResultModel> Upgrade(CredentialModel credentialModel)
+        {
+            var setup = GetSetup();
+
+            var instructions = new InstallInstructions
+            {
+                InstallId = setup.InstallId,
+                Instructions = new Dictionary<string, JToken>()
+            };
+            
+            instructions.Instructions.Add("Upgrade", JToken.FromObject(new InstallSteps.UpgradeStep(ApplicationContext).ViewModel));
+
+            var handler = new AutomaticInstallClientHandler(instructions);
+
+            return await handler.Execute(credentialModel ?? new CredentialModel { });
+        }
+
         /// <summary>
         /// Does the install
         /// </summary>

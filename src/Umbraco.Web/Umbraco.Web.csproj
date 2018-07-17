@@ -343,6 +343,7 @@
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
     <Compile Include="Install\AutomaticInstallClientHandler.cs" />
     <Compile Include="Install\Models\FreshInstallModel.cs" />
+    <Compile Include="Install\Models\CredentialModel.cs" />
     <Compile Include="Models\BackOfficeTourFilter.cs" />
     <Compile Include="Models\ContentEditing\BackOfficePreview.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeCollectionDisplay.cs" />
