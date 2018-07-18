@@ -1322,7 +1322,7 @@ namespace Umbraco.Web.Editors
                 culture = Services.LocalizationService.GetDefaultLanguageIsoCode();
             }
 
-            var display = ContextMapper.Map<IContent, ContentItemDisplay>(content, UmbracoContext,
+            var display = ContextMapper.Map<IContent, ContentItemDisplay>(content, 
                 new Dictionary<string, object> { { ContextMapper.CultureKey, culture } });
 
             return display;

@@ -355,6 +355,7 @@
     <Compile Include="Models\IAuditEntry.cs" />
     <Compile Include="Models\IAuditItem.cs" />
     <Compile Include="Models\IConsent.cs" />
+    <Compile Include="Models\Identity\IdentityMapperProfile.cs" />
     <Compile Include="Models\Membership\MemberExportModel.cs" />
     <Compile Include="Models\Membership\MemberExportProperty.cs" />
     <Compile Include="Models\PathValidationExtensions.cs" />
@@ -663,7 +664,6 @@
     <Compile Include="Models\IDataType.cs" />
     <Compile Include="Models\IDeepCloneable.cs" />
     <Compile Include="Models\Identity\BackOfficeIdentityUser.cs" />
-    <Compile Include="Models\Identity\IdentityProfile.cs" />
     <Compile Include="Models\Identity\IdentityUser.cs" />
     <Compile Include="Models\Identity\IdentityUserClaim.cs" />
     <Compile Include="Models\Identity\IdentityUserLogin.cs" />

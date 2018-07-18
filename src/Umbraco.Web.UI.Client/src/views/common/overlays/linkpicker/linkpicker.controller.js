@@ -1,170 +1,170 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
-	function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, userService, localizationService, tinyMceService) {
-		var dialogOptions = $scope.model;
+    function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, userService, localizationService, tinyMceService) {
+        var dialogOptions = $scope.model;
 
-		var anchorPattern = /<a id=\\"(.*?)\\">/gi;
+        var anchorPattern = /<a id=\\"(.*?)\\">/gi;
 
-		var searchText = "Search...";
-		localizationService.localize("general_search").then(function (value) {
-			searchText = value + "...";
-		});
+        var searchText = "Search...";
+        localizationService.localize("general_search").then(function (value) {
+            searchText = value + "...";
+        });
 
-		if (!$scope.model.title) {
-			$scope.model.title = localizationService.localize("defaultdialogs_selectLink");
-		}
+        if (!$scope.model.title) {
+            $scope.model.title = localizationService.localize("defaultdialogs_selectLink");
+        }
 
-	    	$scope.dialogTreeApi = {};
-		$scope.model.target = {};
-		$scope.searchInfo = {
-			searchFromId: null,
-			searchFromName: null,
-			showSearch: false,
-			results: [],
-			selectedSearchResults: []
-		};
+        $scope.dialogTreeApi = {};
+        $scope.model.target = {};
+        $scope.searchInfo = {
+            searchFromId: null,
+            searchFromName: null,
+            showSearch: false,
+            results: [],
+            selectedSearchResults: []
+        };
 
-		$scope.showTarget = $scope.model.hideTarget !== true;
+        $scope.showTarget = $scope.model.hideTarget !== true;
 
-		if (dialogOptions.currentTarget) {
-			$scope.model.target = dialogOptions.currentTarget;
-			//if we have a node ID, we fetch the current node to build the form data
-			if ($scope.model.target.id || $scope.model.target.udi) {
+        if (dialogOptions.currentTarget) {
+            $scope.model.target = dialogOptions.currentTarget;
+            //if we have a node ID, we fetch the current node to build the form data
+            if ($scope.model.target.id || $scope.model.target.udi) {
 
-				//will be either a udi or an int
-				var id = $scope.model.target.udi ? $scope.model.target.udi : $scope.model.target.id;
+                //will be either a udi or an int
+                var id = $scope.model.target.udi ? $scope.model.target.udi : $scope.model.target.id;
 
-				if (!$scope.model.target.path) {
+                if (!$scope.model.target.path) {
 
-					entityResource.getPath(id, "Document").then(function (path) {
-						$scope.model.target.path = path;
-						//now sync the tree to this path
-	                    			$scope.dialogTreeApi.syncTree({ path: $scope.model.target.path, tree: "content" });
-							path: $scope.model.target.path,
-							tree: "content"
-						});
-					});
-				}
+                    entityResource.getPath(id, "Document").then(function (path) {
+                        $scope.model.target.path = path;
+                        //now sync the tree to this path
+                        $scope.dialogTreeApi.syncTree({
+                            path: $scope.model.target.path,
+                            tree: "content"
+                        });
+                    });
+                }
 
-				// if a link exists, get the properties to build the anchor name list
-				contentResource.getById(id).then(function (resp) {
-					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-					$scope.model.target.url = resp.urls[0];
-				});
-			} else if ($scope.model.target.url.length) {
-				// a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
-				$scope.model.target.url = $scope.model.target.url.substring(0, $scope.model.target.url.search(/(#|\?)/));				
-			}
-		} else if (dialogOptions.anchors) {
-			$scope.anchorValues = dialogOptions.anchors;
-		}
+                // if a link exists, get the properties to build the anchor name list
+                contentResource.getById(id).then(function (resp) {
+                    $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
+                    $scope.model.target.url = resp.urls[0];
+                });
+            } else if ($scope.model.target.url.length) {
+                // a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
+                $scope.model.target.url = $scope.model.target.url.substring(0, $scope.model.target.url.search(/(#|\?)/));
+            }
+        } else if (dialogOptions.anchors) {
+            $scope.anchorValues = dialogOptions.anchors;
+        }
 
-	    	function nodeSelectHandler(args) {
-			if (args && args.event) {
-				args.event.preventDefault();
-				args.event.stopPropagation();
-			}
+        function nodeSelectHandler(args) {
+            if (args && args.event) {
+                args.event.preventDefault();
+                args.event.stopPropagation();
+            }
 
-			eventsService.emit("dialogs.linkPicker.select", args);
+            eventsService.emit("dialogs.linkPicker.select", args);
 
-			if ($scope.currentNode) {
-				//un-select if there's a current one selected
-				$scope.currentNode.selected = false;
-			}
+            if ($scope.currentNode) {
+                //un-select if there's a current one selected
+                $scope.currentNode.selected = false;
+            }
 
-			$scope.currentNode = args.node;
-			$scope.currentNode.selected = true;
-			$scope.model.target.id = args.node.id;
-			$scope.model.target.udi = args.node.udi;
-			$scope.model.target.name = args.node.name;
+            $scope.currentNode = args.node;
+            $scope.currentNode.selected = true;
+            $scope.model.target.id = args.node.id;
+            $scope.model.target.udi = args.node.udi;
+            $scope.model.target.name = args.node.name;
 
-			if (args.node.id < 0) {
-				$scope.model.target.url = "/";
-			} else {
-				contentResource.getById(args.node.id).then(function (resp) {
-					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-					$scope.model.target.url = resp.urls[0];
-				});
-			}
+            if (args.node.id < 0) {
+                $scope.model.target.url = "/";
+            } else {
+                contentResource.getById(args.node.id).then(function (resp) {
+                    $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
+                    $scope.model.target.url = resp.urls[0];
+                });
+            }
 
-			if (!angular.isUndefined($scope.model.target.isMedia)) {
-				delete $scope.model.target.isMedia;
-			}
-		}
+            if (!angular.isUndefined($scope.model.target.isMedia)) {
+                delete $scope.model.target.isMedia;
+            }
+        }
 
-	    	function nodeExpandedHandler(args) {
-			// open mini list view for list views
-			if (args.node.metaData.isContainer) {
-				openMiniListView(args.node);
-			}
-		}
+        function nodeExpandedHandler(args) {
+            // open mini list view for list views
+            if (args.node.metaData.isContainer) {
+                openMiniListView(args.node);
+            }
+        }
 
-		$scope.switchToMediaPicker = function () {
-			userService.getCurrentUser().then(function (userData) {
-				$scope.mediaPickerOverlay = {
-					view: "mediapicker",
-					startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
-					startNodeIsVirtual: userData.startMediaIds.length !== 1,
-					show: true,
-					submit: function (model) {
-						var media = model.selectedImages[0];
+        $scope.switchToMediaPicker = function () {
+            userService.getCurrentUser().then(function (userData) {
+                $scope.mediaPickerOverlay = {
+                    view: "mediapicker",
+                    startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
+                    startNodeIsVirtual: userData.startMediaIds.length !== 1,
+                    show: true,
+                    submit: function (model) {
+                        var media = model.selectedImages[0];
 
-						$scope.model.target.id = media.id;
-						$scope.model.target.udi = media.udi;
-						$scope.model.target.isMedia = true;
-						$scope.model.target.name = media.name;
-						$scope.model.target.url = mediaHelper.resolveFile(media);
-						
-						debugger;
+                        $scope.model.target.id = media.id;
+                        $scope.model.target.udi = media.udi;
+                        $scope.model.target.isMedia = true;
+                        $scope.model.target.name = media.name;
+                        $scope.model.target.url = mediaHelper.resolveFile(media);
 
-						$scope.mediaPickerOverlay.show = false;
-						$scope.mediaPickerOverlay = null;
-					}
-				};
-			});
-		};
+                        debugger;
 
-		$scope.hideSearch = function () {
-			$scope.searchInfo.showSearch = false;
-			$scope.searchInfo.searchFromId = null;
-			$scope.searchInfo.searchFromName = null;
-			$scope.searchInfo.results = [];
-		}
+                        $scope.mediaPickerOverlay.show = false;
+                        $scope.mediaPickerOverlay = null;
+                    }
+                };
+            });
+        };
 
-		// method to select a search result
-		$scope.selectResult = function (evt, result) {
-			result.selected = result.selected === true ? false : true;
-			nodeSelectHandler(evt, {
-				event: evt,
-				node: result
-			});
-		};
+        $scope.hideSearch = function () {
+            $scope.searchInfo.showSearch = false;
+            $scope.searchInfo.searchFromId = null;
+            $scope.searchInfo.searchFromName = null;
+            $scope.searchInfo.results = [];
+        }
 
-		//callback when there are search results
-		$scope.onSearchResults = function (results) {
-			$scope.searchInfo.results = results;
-			$scope.searchInfo.showSearch = true;
-		};
+        // method to select a search result
+        $scope.selectResult = function (evt, result) {
+            result.selected = result.selected === true ? false : true;
+            nodeSelectHandler(evt, {
+                event: evt,
+                node: result
+            });
+        };
 
-        	$scope.onTreeInit = function () {
-            		$scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
-            		$scope.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
-       	 	}
-        
-		// Mini list view
-		$scope.selectListViewNode = function (node) {
-			node.selected = node.selected === true ? false : true;
-			nodeSelectHandler({}, {
-				node: node
-			});
-		};
+        //callback when there are search results
+        $scope.onSearchResults = function (results) {
+            $scope.searchInfo.results = results;
+            $scope.searchInfo.showSearch = true;
+        };
 
-		$scope.closeMiniListView = function () {
-			$scope.miniListView = undefined;
-		};
+        $scope.onTreeInit = function () {
+            $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
+            $scope.dialogTreeApi.callbacks.treeNodeExpanded(nodeExpandedHandler);
+        }
 
-		function openMiniListView(node) {
-			$scope.miniListView = node;
-		}
+        // Mini list view
+        $scope.selectListViewNode = function (node) {
+            node.selected = node.selected === true ? false : true;
+            nodeSelectHandler({}, {
+                node: node
+            });
+        };
 
-	});
+        $scope.closeMiniListView = function () {
+            $scope.miniListView = undefined;
+        };
+
+        function openMiniListView(node) {
+            $scope.miniListView = node;
+        }
+
+    });

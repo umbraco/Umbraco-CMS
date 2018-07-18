@@ -250,17 +250,25 @@ namespace Umbraco.Web.Models.Mapping
     internal class TabsAndPropertiesResolver<TSource, TDestination> : TabsAndPropertiesResolver, IValueResolver<TSource, TDestination, IEnumerable<Tab<ContentPropertyDisplay>>>
         where TSource : IContentBase
     {
-        public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService)
-            : base(localizedTextService)
-        { }
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
-        public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
+        public TabsAndPropertiesResolver(IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService)
+            : base(localizedTextService)
+        {
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+        }
+
+        public TabsAndPropertiesResolver(IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
             : base(localizedTextService, ignoreProperties)
-        { }
+        {
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+        }
 
         public virtual IEnumerable<Tab<ContentPropertyDisplay>> Resolve(TSource source, TDestination destination, IEnumerable<Tab<ContentPropertyDisplay>> destMember, ResolutionContext context)
         {
-            var umbracoContext = context.GetUmbracoContext(throwIfMissing: false); // fixme
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
+            if (umbracoContext == null) throw new InvalidOperationException("Cannot resolve value without an UmbracoContext available");
+
             var tabs = new List<Tab<ContentPropertyDisplay>>();
 
             // add the tabs, for properties that belong to a tab

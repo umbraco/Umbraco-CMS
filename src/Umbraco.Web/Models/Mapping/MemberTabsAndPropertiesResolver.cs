@@ -22,24 +22,27 @@ namespace Umbraco.Web.Models.Mapping
     /// </remarks>
     internal class MemberTabsAndPropertiesResolver : TabsAndPropertiesResolver<IMember, MemberDisplay>
     {
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IMemberService _memberService;
         private readonly IUserService _userService;
 
-        public MemberTabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IMemberService memberService, IUserService userService)
-            : base(localizedTextService)
+        public MemberTabsAndPropertiesResolver(IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberService memberService, IUserService userService)
+            : base(umbracoContextAccessor, localizedTextService)
         {
-            _localizedTextService = localizedTextService;
-            _memberService = memberService;
-            _userService = userService;
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
+            _localizedTextService = localizedTextService ?? throw new System.ArgumentNullException(nameof(localizedTextService));
+            _memberService = memberService ?? throw new System.ArgumentNullException(nameof(memberService));
+            _userService = userService ?? throw new System.ArgumentNullException(nameof(userService));
         }
 
-        public MemberTabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties, IMemberService memberService, IUserService userService)
-            : base(localizedTextService, ignoreProperties)
+        public MemberTabsAndPropertiesResolver(IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties, IMemberService memberService, IUserService userService)
+            : base(umbracoContextAccessor, localizedTextService, ignoreProperties)
         {
-            _localizedTextService = localizedTextService;
-            _memberService = memberService;
-            _userService = userService;
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
+            _localizedTextService = localizedTextService ?? throw new System.ArgumentNullException(nameof(localizedTextService));
+            _memberService = memberService ?? throw new System.ArgumentNullException(nameof(memberService));
+            _userService = userService ?? throw new System.ArgumentNullException(nameof(userService));
         }
 
         /// <inheritdoc />
@@ -80,7 +83,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
             }
 
-            var umbracoContext = context.GetUmbracoContext();
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
             if (umbracoContext != null
                 && umbracoContext.Security.CurrentUser != null
                 && umbracoContext.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))

@@ -7,7 +7,7 @@ namespace Umbraco.Core.Composing.CompositionRoots
     {
         public void Compose(IServiceRegistry container)
         {
-            container.Register<IdentityProfile>();
+            container.Register<IdentityMapperProfile>();
         }
     }
 }
