@@ -24,7 +24,6 @@ namespace Umbraco.Tests.FrontEnd
         {
             Current.Reset();
         }
-
         [Test]
         public static void Truncate_Simple()
         {
@@ -164,7 +163,7 @@ namespace Umbraco.Tests.FrontEnd
 
             var result = helper.StripHtml(SampleWithBoldAndAnchorElements, tags).ToString();
 
-            Assert.AreEqual("Hello world, this is some text <a href='blah'>with a link</a>", result);
+            Assert.AreEqual(SampleWithAnchorElement, result);
         }
 
         [Test]
@@ -181,7 +180,7 @@ namespace Umbraco.Tests.FrontEnd
 
         // ------- Int32 conversion tests
         [Test]
-        public static void Converting_boxed_34_to_an_int_returns_34()
+        public static void Converting_Boxed_34_To_An_Int_Returns_34()
         {
             // Arrange
             const int sample = 34;
@@ -198,7 +197,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public static void Converting_string_54_to_an_int_returns_54()
+        public static void Converting_String_54_To_An_Int_Returns_54()
         {
             // Arrange
             const string sample = "54";
@@ -215,7 +214,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public static void Converting_hello_to_an_int_returns_false()
+        public static void Converting_Hello_To_An_Int_Returns_False()
         {
             // Arrange
             const string sample = "Hello";
@@ -232,7 +231,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public static void Converting_unsupported_object_to_an_int_returns_false()
+        public static void Converting_Unsupported_Object_To_An_Int_Returns_False()
         {
             // Arrange
             var clearlyWillNotConvertToInt = new StringBuilder(0);
@@ -250,7 +249,7 @@ namespace Umbraco.Tests.FrontEnd
 
         // ------- GUID conversion tests
         [Test]
-        public static void Converting_boxed_guid_to_a_guid_returns_original_guid_value()
+        public static void Converting_Boxed_Guid_To_A_Guid_Returns_Original_Guid_Value()
         {
             // Arrange
             Guid sample = Guid.NewGuid();
@@ -267,7 +266,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public static void Converting_string_guid_to_a_guid_returns_original_guid_value()
+        public static void Converting_String_Guid_To_A_Guid_Returns_Original_Guid_Value()
         {
             // Arrange
             Guid sample = Guid.NewGuid();
@@ -284,7 +283,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public static void Converting_hello_to_a_guid_returns_false()
+        public static void Converting_Hello_To_A_Guid_Returns_False()
         {
             // Arrange
             const string sample = "Hello";
@@ -301,7 +300,7 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         [Test]
-        public static void Converting_unsupported_object_to_a_guid_returns_false()
+        public static void Converting_Unsupported_Object_To_A_Guid_Returns_False()
         {
             // Arrange
             var clearlyWillNotConvertToGuid = new StringBuilder(0);
@@ -319,11 +318,10 @@ namespace Umbraco.Tests.FrontEnd
 
         // ------- UDI Conversion Tests
         /// <remarks>
-        /// This requires PluginManager.Current to be initialised before
-        /// running.
+        /// This requires PluginManager.Current to be initialised before running.
         /// </remarks>
         [Test]
-        public static void Converting_boxed_udi_to_a_udi_returns_original_udi_value()
+        public static void Converting_Boxed_Udi_To_A_Udi_Returns_Original_Udi_Value()
         {
             // Arrange
             Udi.ResetUdiTypes();
@@ -341,11 +339,10 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         /// <remarks>
-        /// This requires PluginManager.Current to be initialised before
-        /// running.
+        /// This requires PluginManager.Current to be initialised before running.
         /// </remarks>
         [Test]
-        public void Converting_string_udi_to_a_udi_returns_original_udi_value()
+        public void Converting_String_Udi_To_A_Udi_Returns_Original_Udi_Value()
         {
             // Arrange
             SetUpDependencyContainer();
@@ -364,11 +361,10 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         /// <remarks>
-        /// This requires PluginManager.Current to be initialised before
-        /// running.
+        /// This requires PluginManager.Current to be initialised before running.
         /// </remarks>
         [Test]
-        public void Converting_hello_to_a_udi_returns_false()
+        public void Converting_Hello_To_A_Udi_Returns_False()
         {
             // Arrange
             SetUpDependencyContainer();
@@ -387,11 +383,10 @@ namespace Umbraco.Tests.FrontEnd
         }
 
         /// <remarks>
-        /// This requires PluginManager.Current to be initialised before
-        /// running.
+        /// This requires PluginManager.Current to be initialised before running.
         /// </remarks>
         [Test]
-        public static void Converting_unsupported_object_to_a_udi_returns_false()
+        public static void Converting_Unsupported_Object_To_A_Udi_Returns_False()
         {
             // Arrange
             Udi.ResetUdiTypes();

@@ -20,9 +20,10 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 	    }
 	    $scope.treeModel = {
 	        hideHeader: false
-	    }
+        }
+        $scope.toggle = toggleHandler;
 	    userService.getCurrentUser().then(function (userData) {
-            $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;	     
+            $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;
 	    });
 
 	    var node = dialogOptions.currentNode;
@@ -57,7 +58,27 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
           	if (args.node.metaData.isContainer) {
 				openMiniListView(args.node);
 			}
-	    }
+        }
+
+        function toggleHandler(type){
+            // If the relateToOriginal toggle is clicked
+            if(type === "relate"){
+                if($scope.relateToOriginal){
+                    $scope.relateToOriginal = false;
+                    return;
+                }
+                $scope.relateToOriginal = true;
+            }
+
+            // If the recurvise toggle is clicked
+            if(type === "recursive"){
+                if($scope.recursive){
+                    $scope.recursive = false;
+                    return;
+                }
+                $scope.recursive = true;
+            }
+        }
 
 	    $scope.hideSearch = function () {
 	        $scope.searchInfo.showSearch = false;
