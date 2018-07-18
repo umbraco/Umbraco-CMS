@@ -285,7 +285,7 @@ AnotherContentFinder
         public void Resolves_Attributed_Trees()
         {
             var trees = _manager.ResolveAttributedTrees();
-            Assert.AreEqual(5, trees.Count());
+            Assert.AreEqual(4, trees.Count());
         }
 
         [Test]
