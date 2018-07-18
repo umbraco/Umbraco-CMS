@@ -1066,19 +1066,6 @@ namespace Umbraco.Core.Services
                 : Attempt<string>.Fail();
         }
 
-        internal Attempt<string> TryGetViewPath(string fileName)
-        {
-            if (fileName.EndsWith(".cshtml") == false)
-            {
-                fileName += ".cshtml";
-            }
-
-            string viewPath = IOHelper.MapPath(SystemDirectories.MvcViews + "/" + fileName);
-            return System.IO.File.Exists(viewPath)
-                ? Attempt<string>.Succeed(viewPath)
-                : Attempt<string>.Fail();
-        }
-
         private IPartialViewRepository GetPartialViewRepository(PartialViewType partialViewType, IUnitOfWork uow)
         {
             switch (partialViewType)
@@ -1115,16 +1102,20 @@ namespace Umbraco.Core.Services
             if (filename.IsNullOrWhiteSpace())
                 throw new ArgumentNullException(nameof(filename));
 
-            Attempt<string> viewAttempt = TryGetViewPath(filename);
-            if (viewAttempt.Success == false)
+            if (filename.EndsWith(".cshtml") == false)
             {
-                return null;
+                filename = $"{filename}.cshtml";
             }
 
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repository = RepositoryFactory.CreateTemplateRepository(uow);
-                var stream = repository.GetFileContentStream(viewAttempt.Result);
+                var stream = repository.GetFileContentStream(filename);
+
+                if (stream == null)
+                {
+                    return null;
+                }
 
                 using (var reader = new StreamReader(stream, Encoding.UTF8, true))
                 {
