@@ -61,8 +61,28 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                var groups = ContentTypeComposition.SelectMany(x => x.CompositionPropertyGroups).Union(PropertyGroups);
-                return groups;
+                // we need to "acquire" composition groups and properties here, ie get our own clones,
+                // so that we can change their variation according to this content type variations.
+                //
+                // it would be nice to cache the resulting enumerable, but alas we cannot, otherwise
+                // any change to compositions are ignored and that breaks many things - and tracking
+                // changes to refresh the cache would be expensive.
+
+                void AcquireProperty(PropertyType propertyType)
+                {
+                    propertyType.Variations = propertyType.Variations & Variations;
+                    propertyType.ResetDirtyProperties(false);
+                }
+
+                return ContentTypeComposition.SelectMany(x => x.CompositionPropertyGroups)
+                    .Select(group =>
+                    {
+                        group = (PropertyGroup) group.DeepClone();
+                        foreach (var property in group.PropertyTypes)
+                            AcquireProperty(property);
+                        return group;
+                    })
+                    .Union(PropertyGroups);
             }
         }
 
@@ -74,8 +94,23 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                var propertyTypes = ContentTypeComposition.SelectMany(x => x.CompositionPropertyTypes).Union(PropertyTypes);
-                return propertyTypes;
+                // we need to "acquire" composition properties here, ie get our own clones,
+                // so that we can change their variation according to this content type variations.
+                //
+                // see note in CompositionPropertyGroups for comments on caching the resulting enumerable
+
+                PropertyType AcquireProperty(PropertyType propertyType)
+                {
+                    propertyType = (PropertyType) propertyType.DeepClone();
+                    propertyType.Variations = propertyType.Variations & Variations;
+                    propertyType.ResetDirtyProperties(false);
+                    return propertyType;
+                }
+
+                return ContentTypeComposition
+                    .SelectMany(x => x.CompositionPropertyTypes)
+                    .Select(AcquireProperty)
+                    .Union(PropertyTypes);
             }
         }
 
