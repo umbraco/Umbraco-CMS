@@ -181,6 +181,8 @@ namespace Umbraco.Tests.Testing
             // imported from TestWithSettingsBase
             // which was inherited by TestWithApplicationBase so pretty much used everywhere
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+
+            // web
             Container.Register(_ => Umbraco.Web.Composing.Current.UmbracoContextAccessor);
             Container.RegisterSingleton<PublishedRouter>();
             Container.RegisterCollectionBuilder<ContentFinderCollectionBuilder>();
@@ -189,8 +191,7 @@ namespace Umbraco.Tests.Testing
         }
 
         protected virtual void ComposeWtf()
-        {   
-
+        {
             // what else?
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(RuntimeLevel.Run);
@@ -336,8 +337,6 @@ namespace Umbraco.Tests.Testing
             Container.RegisterCollectionBuilder<DataEditorCollectionBuilder>();
             Container.RegisterSingleton<PropertyEditorCollection>();
             Container.RegisterSingleton<ParameterEditorCollection>();
-
-
         }
 
         #endregion

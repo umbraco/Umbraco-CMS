@@ -18,10 +18,8 @@ namespace Umbraco.Core.Models.Identity
         where TRole : IdentityUserRole<string>
         where TClaim : IdentityUserClaim<TKey>
     {
-
         /// <summary>
-        /// Constructor
-        ///
+        /// Initializes a new instance of the <see cref="IdentityUser{TKey, TLogin, TRole, TClaim}"/> class.
         /// </summary>
         public IdentityUser()
         {
@@ -77,7 +75,6 @@ namespace Umbraco.Core.Models.Identity
 
         /// <summary>
         /// DateTime in UTC when the password was last changed.
-        /// 
         /// </summary>
         public virtual DateTime? LastPasswordChangeDateUtc { get; set; }
 

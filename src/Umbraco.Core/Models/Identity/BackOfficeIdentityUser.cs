@@ -35,7 +35,6 @@ namespace Umbraco.Core.Models.Identity
         private int[] _startContentIds;
         private DateTime? _lastPasswordChangeDateUtc;
 
-
         /// <summary>
         ///  Used to construct a new instance without an identity
         /// </summary>

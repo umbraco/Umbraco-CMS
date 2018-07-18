@@ -358,6 +358,5 @@ namespace Umbraco.Core.Services
         /// <param name="snippetName">The name of the snippet</param>
         /// <returns>The content of the partial view.</returns>
         string GetPartialViewSnippetContent(string snippetName);
-        
     }
 }
