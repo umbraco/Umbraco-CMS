@@ -263,6 +263,7 @@
     <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
     <Compile Include="Models\Mapping\ContentItemDisplayVariationResolver.cs" />
     <Compile Include="Models\PublishedContent\HttpContextVariationContextAccessor.cs" />
+    <Compile Include="Models\PublishedContent\PublishedValueLanguageFallback.cs" />
     <Compile Include="Models\PublishedContent\PublishedValueFallback.cs" />
     <Compile Include="Models\RelatedLink.cs" />
     <Compile Include="Models\RelatedLinkBase.cs" />

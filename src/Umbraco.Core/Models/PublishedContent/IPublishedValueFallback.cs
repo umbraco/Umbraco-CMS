@@ -2,6 +2,12 @@
 
 namespace Umbraco.Core.Models.PublishedContent
 {
+    public enum PublishedValueFallbackPriority
+    {
+        RecursiveTree,
+        FallbackLanguage
+    }
+
     /// <summary>
     /// Provides a fallback strategy for getting <see cref="IPublishedElement"/> values.
     /// </summary>
@@ -30,8 +36,8 @@ namespace Umbraco.Core.Models.PublishedContent
 
         T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue);
 
-        object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, bool recurse);
+        object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority);
 
-        T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, bool recurse);
+        T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority);
     }
 }

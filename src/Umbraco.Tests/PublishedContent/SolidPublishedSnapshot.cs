@@ -257,10 +257,72 @@ namespace Umbraco.Tests.PublishedContent
         public bool SolidHasValue { get; set; }
         public object SolidXPathValue { get; set; }
 
-        public object GetSourceValue(string culture = null, string segment = null) => SolidSourceValue;
-        public object GetValue(string culture = null, string segment = null) => SolidValue;
-        public object GetXPathValue(string culture = null, string segment = null) => SolidXPathValue;
-        public bool HasValue(string culture = null, string segment = null) => SolidHasValue;
+        public virtual object GetSourceValue(string culture = null, string segment = null) => SolidSourceValue;
+        public virtual object GetValue(string culture = null, string segment = null) => SolidValue;
+        public virtual object GetXPathValue(string culture = null, string segment = null) => SolidXPathValue;
+        public virtual bool HasValue(string culture = null, string segment = null) => SolidHasValue;
+    }
+
+    internal class SolidPublishedPropertyWithLanguageVariants : SolidPublishedProperty
+    {
+        private readonly IDictionary<string, object> _solidSourceValues = new Dictionary<string, object>();
+        private readonly IDictionary<string, object> _solidValues = new Dictionary<string, object>();
+        private readonly IDictionary<string, object> _solidXPathValues = new Dictionary<string, object>();
+
+        public override object GetSourceValue(string culture = null, string segment = null)
+        {
+            if (string.IsNullOrEmpty(culture))
+            {
+                return base.GetSourceValue(culture, segment);
+            }
+
+            return _solidSourceValues.ContainsKey(culture) ? _solidSourceValues[culture] : null;
+        }
+
+        public override object GetValue(string culture = null, string segment = null)
+        {
+            if (string.IsNullOrEmpty(culture))
+            {
+                return base.GetValue(culture, segment);
+            }
+
+            return _solidValues.ContainsKey(culture) ? _solidValues[culture] : null;
+        }
+
+        public override object GetXPathValue(string culture = null, string segment = null)
+        {
+            if (string.IsNullOrEmpty(culture))
+            {
+                return base.GetXPathValue(culture, segment);
+            }
+
+            return _solidXPathValues.ContainsKey(culture) ? _solidXPathValues[culture] : null;
+        }
+
+        public override bool HasValue(string culture = null, string segment = null)
+        {
+            if (string.IsNullOrEmpty(culture))
+            {
+                return base.HasValue(culture, segment);
+            }
+
+            return _solidSourceValues.ContainsKey(culture);
+        }
+
+        public void SetSourceValue(string culture, object value)
+        {
+            _solidSourceValues.Add(culture, value);
+        }
+
+        public void SetValue(string culture, object value)
+        {
+            _solidValues.Add(culture, value);
+        }
+
+        public void SetXPathValue(string culture, object value)
+        {
+            _solidXPathValues.Add(culture, value);
+        }
     }
 
     [PublishedModel("ContentType2")]

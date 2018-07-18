@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
@@ -8,8 +7,6 @@ using System.Web.Http;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -69,12 +66,11 @@ namespace Umbraco.Web.Editors
                 }   
                 else if (allLangs.All(x => !x.IsDefaultVariantLanguage))
                 {
-                    //if no language has the default flag, then the defaul language is the one with the lowest id
+                    //if no language has the default flag, then the default language is the one with the lowest id
                     model.IsDefaultVariantLanguage = allLangs[0].Id == lang.Id;
                     model.Mandatory = allLangs[0].Id == lang.Id;
                 }
             }
-            
 
             return model;
         }
@@ -88,13 +84,23 @@ namespace Umbraco.Web.Editors
         public IHttpActionResult DeleteLanguage(int id)
         {
             var language = Services.LocalizationService.GetLanguageById(id);
-            if (language == null) return NotFound();
+            if (language == null)
+            {
+                return NotFound();
+            }
 
-            var totalLangs = Services.LocalizationService.GetAllLanguages().Count();
+            var langs = Services.LocalizationService.GetAllLanguages().ToArray();
+            var totalLangs = langs.Length;
 
             if (language.IsDefaultVariantLanguage || totalLangs == 1)
             {
-                var message = $"Language '{language.IsoCode}' is currently set to 'default' or it is the only installed language and can not be deleted.";
+                var message = $"Language '{language.CultureName}' is currently set to 'default' or it is the only installed language and cannot be deleted.";
+                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(message));
+            }
+
+            if (langs.Any(x => x.FallbackLanguageId.HasValue && x.FallbackLanguageId.Value == language.Id))
+            {
+                var message = $"Language '{language.CultureName}' is defined as a fall-back language for one or more other languages, and so cannot be deleted.";
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(message));
             }
 
@@ -136,21 +142,62 @@ namespace Umbraco.Web.Editors
                 }
 
                 //create it
-                var newLang = new Umbraco.Core.Models.Language(culture.Name)
+                var newLang = new Core.Models.Language(culture.Name)
                 {
                     CultureName = culture.DisplayName,
                     IsDefaultVariantLanguage = language.IsDefaultVariantLanguage,
-                    Mandatory = language.Mandatory
+                    Mandatory = language.Mandatory,
+                    FallbackLanguageId = language.FallbackLanguageId
                 };
+
                 Services.LocalizationService.Save(newLang);
                 return Mapper.Map<Language>(newLang);
             }
 
             found.Mandatory = language.Mandatory;
             found.IsDefaultVariantLanguage = language.IsDefaultVariantLanguage;
+            found.FallbackLanguageId = language.FallbackLanguageId;
+
+            string selectedFallbackLanguageCultureName;
+            if (DoesUpdatedFallbackLanguageCreateACircularPath(found, out selectedFallbackLanguageCultureName))
+            {
+                ModelState.AddModelError("FallbackLanguage", "The selected fall back language '" + selectedFallbackLanguageCultureName + "' would create a circular path.");
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+            }
+
             Services.LocalizationService.Save(found);
             return Mapper.Map<Language>(found);
         }
-        
+
+        private bool DoesUpdatedFallbackLanguageCreateACircularPath(ILanguage language, out string selectedFallbackLanguageCultureName)
+        {
+            if (language.FallbackLanguageId.HasValue == false)
+            {
+                selectedFallbackLanguageCultureName = string.Empty;
+                return false;
+            }
+
+            var languages = Services.LocalizationService.GetAllLanguages().ToArray();
+            var fallbackLanguageId = language.FallbackLanguageId;
+            while (fallbackLanguageId.HasValue)
+            {
+                if (fallbackLanguageId.Value == language.Id)
+                {
+                    // We've found the current language in the path of fall back languages, so we have a circular path.
+                    selectedFallbackLanguageCultureName = GetLanguageFromCollectionById(languages, fallbackLanguageId.Value).CultureName;
+                    return true;
+                }
+
+                fallbackLanguageId = GetLanguageFromCollectionById(languages, fallbackLanguageId.Value).FallbackLanguageId;
+            }
+
+            selectedFallbackLanguageCultureName = string.Empty;
+            return false;
+        }
+
+        private static ILanguage GetLanguageFromCollectionById(IEnumerable<ILanguage> languages, int id)
+        {
+            return languages.Single(x => x.Id == id);
+        }
     }
 }

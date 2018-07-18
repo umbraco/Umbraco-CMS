@@ -38,5 +38,14 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("mandatory")]
         [Constraint(Default = "0")]
         public bool Mandatory { get; set; }
+
+        /// <summary>
+        /// Defines the fallback language that can be used in multi-lingual scenarios to provide
+        /// content if the requested language does not have it published.
+        /// </summary>
+        [Column("fallbackLanguageId")]
+        [ForeignKey(typeof(LanguageDto), Column = "id")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public int? FallbackLanguageId { get; set; }
     }
 }

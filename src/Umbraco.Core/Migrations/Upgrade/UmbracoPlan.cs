@@ -113,6 +113,7 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             Chain<ContentVariationMigration>("{1350617A-4930-4D61-852F-E3AA9E692173}");
             Chain<UpdateUmbracoConsent>("{39E5B1F7-A50B-437E-B768-1723AEC45B65}"); // from 7.12.0
+            Chain<FallbackLanguage>("{CF51B39B-9B9A-4740-BB7C-EAF606A7BFBF}");
             //FINAL
 
 

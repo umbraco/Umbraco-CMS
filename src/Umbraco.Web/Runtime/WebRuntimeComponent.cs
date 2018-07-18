@@ -199,7 +199,7 @@ namespace Umbraco.Web.Runtime
             composition.Container.Register(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>(), new PerContainerLifetime());
 
             // register properties fallback
-            composition.Container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
+            composition.Container.RegisterSingleton<IPublishedValueFallback, PublishedValueLanguageFallback>();
         }
 
         internal void Initialize(

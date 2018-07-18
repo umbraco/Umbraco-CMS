@@ -34,11 +34,11 @@ namespace Umbraco.Tests.PublishedContent
 
             Container.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
             Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
-            Container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
+            Container.RegisterSingleton<IPublishedValueFallback, PublishedValueLanguageFallback>();
 
             var logger = Mock.Of<ILogger>();
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(logger)) { Id = 1},
+                new DataType(new VoidEditor(logger)) { Id = 1 },
                 new DataType(new TrueFalsePropertyEditor(logger)) { Id = 1001 },
                 new DataType(new RichTextPropertyEditor(logger)) { Id = 1002 },
                 new DataType(new IntegerPropertyEditor(logger)) { Id = 1003 },
@@ -333,7 +333,7 @@ namespace Umbraco.Tests.PublishedContent
         }
 
         [Test]
-        public void GetPropertyValueRecursiveTest()
+        public void Get_Property_Value_Recursive()
         {
             var doc = GetNode(1174);
             var rVal = doc.Value("testRecursive", recurse: true);

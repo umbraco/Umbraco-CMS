@@ -11,45 +11,45 @@ namespace Umbraco.Web.Models.PublishedContent
         // kinda reproducing what was available in v7
 
         /// <inheritdoc />
-        public object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue)
+        public virtual object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue)
         {
             // no fallback here
             return defaultValue;
         }
 
         /// <inheritdoc />
-        public T GetValue<T>(IPublishedProperty property, string culture, string segment, T defaultValue)
+        public virtual T GetValue<T>(IPublishedProperty property, string culture, string segment, T defaultValue)
         {
             // no fallback here
             return defaultValue;
         }
 
         /// <inheritdoc />
-        public object GetValue(IPublishedElement content, string alias, string culture, string segment, object defaultValue)
+        public virtual object GetValue(IPublishedElement content, string alias, string culture, string segment, object defaultValue)
         {
             // no fallback here
             return defaultValue;
         }
 
         /// <inheritdoc />
-        public T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue)
+        public virtual T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue)
         {
             // no fallback here
             return defaultValue;
         }
 
         /// <inheritdoc />
-        public object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, bool recurse)
+        public virtual object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority)
         {
             // no fallback here
             if (!recurse) return defaultValue;
 
             // is that ok?
-            return GetValue<object>(content, alias, culture, segment, defaultValue, recurse);
+            return GetValue<object>(content, alias, culture, segment, defaultValue, true, fallbackPriority);
         }
 
         /// <inheritdoc />
-        public T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, bool recurse)
+        public virtual T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority)
         {
             // no fallback here
             if (!recurse) return defaultValue;

@@ -52,7 +52,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             sql.OrderBy<LanguageDto>(dto => dto.Id);
 
             // get languages
-            var languages = Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto).OrderBy(x => x.Id).ToList();
+            var dtos = Database.Fetch<LanguageDto>(sql);
+            var languages = dtos.Select(ConvertFromDto).ToList();
 
             // fix inconsistencies: there has to be a default language, and it has to be mandatory
             var defaultLanguage = languages.FirstOrDefault(x => x.IsDefaultVariantLanguage) ?? languages.First();
@@ -79,7 +80,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<ILanguage>(sqlClause, query);
             var sql = translator.Translate();
-            return Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto);
+            var dtos = Database.Fetch<LanguageDto>(sql);
+            return dtos.Select(ConvertFromDto).ToList();
         }
 
         #endregion
@@ -144,14 +146,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 IsolatedCache.ClearAllCache();
             }
 
-;
             var dto = LanguageFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
 
             entity.ResetDirtyProperties();
-
         }
 
         protected override void PersistUpdatedItem(ILanguage entity)
@@ -204,7 +204,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var entity = LanguageFactory.BuildEntity(dto);
             return entity;
         }
-        
+
         public ILanguage GetByIsoCode(string isoCode)
         {
             TypedCachePolicy.GetAllCached(PerformGetAll); // ensure cache is populated, in a non-expensive way

@@ -21,9 +21,9 @@
         public T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue) => defaultValue;
 
         /// <inheritdoc />
-        public object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, bool recurse) => defaultValue;
+        public object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority) => defaultValue;
 
         /// <inheritdoc />
-        public T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, bool recurse) => defaultValue;
+        public T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority) => defaultValue;
     }
 }
