@@ -295,7 +295,7 @@ namespace Umbraco.Core.Services
             // check that the template hasn't been created on disk before creating the content type
             // if it exists, set the new template content to the existing file content
             string content = GetViewContent(contentTypeAlias);
-            if (content.IsNullOrWhiteSpace() == false)
+            if (content != null)
             {
                 template.Content = content;
             }
@@ -321,17 +321,29 @@ namespace Umbraco.Core.Services
             return Attempt.Succeed(new OperationStatus<ITemplate, OperationStatusType>(template, OperationStatusType.Success, evtMsgs));
         }
 
+        /// <summary>
+        /// Create a new template, setting the content if a view exists in the filesystem
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="content"></param>
+        /// <param name="masterTemplate"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0)
         {
+            // file might already be on disk, if so grab the content to avoid overwriting
             var template = new Template(name, name)
             {
-                Content = content
+                Content = GetViewContent(name) ?? content
             };
+
             if (masterTemplate != null)
             {
                 template.SetMasterTemplate(masterTemplate);
             }
+
             SaveTemplate(template, userId);
+
             return template;
         }
 
@@ -1098,7 +1110,7 @@ namespace Umbraco.Core.Services
             return GetPartialViewMacroSnippetContent(snippetName, PartialViewType.PartialViewMacro);
         }
 
-        public string GetViewContent(string filename)
+        private string GetViewContent(string filename)
         {
             if (filename.IsNullOrWhiteSpace())
                 throw new ArgumentNullException(nameof(filename));
@@ -1106,7 +1118,7 @@ namespace Umbraco.Core.Services
             Attempt<string> viewAttempt = TryGetViewPath(filename);
             if (viewAttempt.Success == false)
             {
-                return string.Empty;
+                return null;
             }
 
             using (var uow = UowProvider.GetUnitOfWork())
