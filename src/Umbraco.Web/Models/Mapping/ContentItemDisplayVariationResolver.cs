@@ -35,7 +35,7 @@ namespace Umbraco.Web.Models.Mapping
             var variants = langs.Select(x => new ContentVariation
             {
                 Language = x,
-                Mandatory = x.Mandatory,
+                Mandatory = x.IsMandatory,
                 Name = source.GetCultureName(x.IsoCode),
                 Exists = source.IsCultureAvailable(x.IsoCode), // segments ??
                 PublishedState = (source.PublishedState == PublishedState.Unpublished //if the entire document is unpublished, then flag every variant as unpublished
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
             }
             if (!foundCurrent)
-                variants.First(x => x.Language.IsDefaultVariantLanguage).IsCurrent = true;
+                variants.First(x => x.Language.IsDefault).IsCurrent = true;
 
             return variants;
         }

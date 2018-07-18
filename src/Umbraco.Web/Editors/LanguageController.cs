@@ -57,18 +57,18 @@ namespace Umbraco.Web.Editors
 
             //if there's only one language, by default it is the default
             var allLangs = Services.LocalizationService.GetAllLanguages().OrderBy(x => x.Id).ToList();
-            if (!lang.IsDefaultVariantLanguage)
+            if (!lang.IsDefault)
             {
                 if (allLangs.Count == 1)
                 {
-                    model.IsDefaultVariantLanguage = true;
-                    model.Mandatory = true;
+                    model.IsDefault = true;
+                    model.IsMandatory = true;
                 }   
-                else if (allLangs.All(x => !x.IsDefaultVariantLanguage))
+                else if (allLangs.All(x => !x.IsDefault))
                 {
                     //if no language has the default flag, then the default language is the one with the lowest id
-                    model.IsDefaultVariantLanguage = allLangs[0].Id == lang.Id;
-                    model.Mandatory = allLangs[0].Id == lang.Id;
+                    model.IsDefault = allLangs[0].Id == lang.Id;
+                    model.IsMandatory = allLangs[0].Id == lang.Id;
                 }
             }
 
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Editors
             var langs = Services.LocalizationService.GetAllLanguages().ToArray();
             var totalLangs = langs.Length;
 
-            if (language.IsDefaultVariantLanguage || totalLangs == 1)
+            if (language.IsDefault || totalLangs == 1)
             {
                 var message = $"Language '{language.CultureName}' is currently set to 'default' or it is the only installed language and cannot be deleted.";
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(message));
@@ -145,8 +145,8 @@ namespace Umbraco.Web.Editors
                 var newLang = new Core.Models.Language(culture.Name)
                 {
                     CultureName = culture.DisplayName,
-                    IsDefaultVariantLanguage = language.IsDefaultVariantLanguage,
-                    Mandatory = language.Mandatory,
+                    IsDefault = language.IsDefault,
+                    IsMandatory = language.IsMandatory,
                     FallbackLanguageId = language.FallbackLanguageId
                 };
 
@@ -154,8 +154,8 @@ namespace Umbraco.Web.Editors
                 return Mapper.Map<Language>(newLang);
             }
 
-            found.Mandatory = language.Mandatory;
-            found.IsDefaultVariantLanguage = language.IsDefaultVariantLanguage;
+            found.IsMandatory = language.IsMandatory;
+            found.IsDefault = language.IsDefault;
             found.FallbackLanguageId = language.FallbackLanguageId;
 
             string selectedFallbackLanguageCultureName;

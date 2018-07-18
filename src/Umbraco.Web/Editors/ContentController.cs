@@ -766,7 +766,7 @@ namespace Umbraco.Web.Editors
                 var mandatoryLangs = Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLangs.Values)
                     .Where(x => otherVariantsToValidate.All(v => !v.Culture.InvariantEquals(x.IsoCode))) //don't include variants above
                     .Where(x => !x.IsoCode.InvariantEquals(contentItem.Culture)) //don't include the current variant
-                    .Where(x => x.Mandatory);
+                    .Where(x => x.IsMandatory);
                 foreach (var lang in mandatoryLangs)
                 {
                     //cannot continue publishing since a required language that is not currently being published isn't published

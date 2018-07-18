@@ -14,7 +14,7 @@ namespace Umbraco.Tests.PublishedContent
 {
     [TestFixture]
     [UmbracoTest(PluginManager = UmbracoTestOptions.PluginManager.PerFixture)]
-    public class PublishedContentLanuageVariantTests : PublishedContentSnapshotTestBase
+    public class PublishedContentLanguageVariantTests : PublishedContentSnapshotTestBase
     {
         protected override void Compose()
         {
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.PublishedContent
             // French has no fall back.
             var languages = new List<Language>
                 {
-                    new Language("en-US") { Id = 1, CultureName = "English", IsDefaultVariantLanguage = true },
+                    new Language("en-US") { Id = 1, CultureName = "English", IsDefault = true },
                     new Language("fr") { Id = 2, CultureName = "French" },
                     new Language("es") { Id = 3, CultureName = "Spanish", FallbackLanguageId = 1 },
                     new Language("it") { Id = 4, CultureName = "Italian", FallbackLanguageId = 3 },

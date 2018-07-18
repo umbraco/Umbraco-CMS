@@ -53,12 +53,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // get languages
             var dtos = Database.Fetch<LanguageDto>(sql);
-            var languages = dtos.Select(ConvertFromDto).ToList();
+            var languages = dtos.Select(ConvertFromDto).ToList(); // fixme - .OrderBy(x => x.Id) is gone?
 
             // fix inconsistencies: there has to be a default language, and it has to be mandatory
-            var defaultLanguage = languages.FirstOrDefault(x => x.IsDefaultVariantLanguage) ?? languages.First();
-            defaultLanguage.IsDefaultVariantLanguage = true;
-            defaultLanguage.Mandatory = true;
+            var defaultLanguage = languages.FirstOrDefault(x => x.IsDefault) ?? languages.First();
+            defaultLanguage.IsDefault = true;
+            defaultLanguage.IsMandatory = true;
 
             // initialize the code-id map
             lock (_codeIdMap)
@@ -122,10 +122,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return list;
         }
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
-        }
+        protected override Guid NodeObjectTypeId => throw new NotImplementedException();
 
         #endregion
 
@@ -138,7 +135,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             ((EntityBase)entity).AddingEntity();
 
-            if (entity.IsDefaultVariantLanguage)
+            if (entity.IsDefault)
             {
                 //if this entity is flagged as the default, we need to set all others to false
                 Database.Execute(Sql().Update<LanguageDto>(u => u.Set(x => x.IsDefaultVariantLanguage, false)));
@@ -161,14 +158,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             ((EntityBase)entity).UpdatingEntity();
 
-            if (entity.IsDefaultVariantLanguage)
+            if (entity.IsDefault)
             {
                 //if this entity is flagged as the default, we need to set all others to false
                 Database.Execute(Sql().Update<LanguageDto>(u => u.Set(x => x.IsDefaultVariantLanguage, false)));
                 //We need to clear the whole cache since all languages will be updated
                 IsolatedCache.ClearAllCache();
             }
-            
+
             var dto = LanguageFactory.BuildDto(entity);
 
             Database.Update(dto);
@@ -183,7 +180,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected override void PersistDeletedItem(ILanguage entity)
         {
             //we need to validate that we can delete this language
-            if (entity.IsDefaultVariantLanguage)
+            if (entity.IsDefault)
                 throw new InvalidOperationException($"Cannot delete the default language ({entity.IsoCode})");
 
             var count = Database.ExecuteScalar<int>(Sql().SelectCount().From<LanguageDto>());
@@ -268,7 +265,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             foreach (var language in all)
             {
                 // if one language is default, return
-                if (language.IsDefaultVariantLanguage)
+                if (language.IsDefault)
                     return language;
                 // keep track of language with lowest id
                 if (first == null || language.Id < first.Id)

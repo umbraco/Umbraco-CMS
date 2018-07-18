@@ -191,8 +191,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(languageBR.HasIdentity, Is.True);
                 Assert.That(languageBR.Id, Is.EqualTo(6)); //With 5 existing entries the Id should be 6
-                Assert.IsFalse(languageBR.IsDefaultVariantLanguage);
-                Assert.IsFalse(languageBR.Mandatory);
+                Assert.IsFalse(languageBR.IsDefault);
+                Assert.IsFalse(languageBR.IsMandatory);
                 Assert.IsNull(languageBR.FallbackLanguageId);
             }
         }
@@ -207,14 +207,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(provider);
 
                 // Act
-                var languageBR = new Language("pt-BR") { CultureName = "pt-BR", IsDefaultVariantLanguage = true, Mandatory = true };
+                var languageBR = new Language("pt-BR") { CultureName = "pt-BR", IsDefault = true, IsMandatory = true };
                 repository.Save(languageBR);
 
                 // Assert
                 Assert.That(languageBR.HasIdentity, Is.True);
                 Assert.That(languageBR.Id, Is.EqualTo(6)); //With 5 existing entries the Id should be 6
-                Assert.IsTrue(languageBR.IsDefaultVariantLanguage);
-                Assert.IsTrue(languageBR.Mandatory);
+                Assert.IsTrue(languageBR.IsDefault);
+                Assert.IsTrue(languageBR.IsMandatory);
                 Assert.IsNull(languageBR.FallbackLanguageId);
             }
         }
@@ -252,22 +252,22 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
                                 
-                var languageBR = (ILanguage)new Language("pt-BR") { CultureName = "pt-BR", IsDefaultVariantLanguage = true, Mandatory = true };
+                var languageBR = (ILanguage)new Language("pt-BR") { CultureName = "pt-BR", IsDefault = true, IsMandatory = true };
                 repository.Save(languageBR);
                 var languageEN = new Language("en-AU") { CultureName = "en-AU" };
                 repository.Save(languageEN);
 
-                Assert.IsTrue(languageBR.IsDefaultVariantLanguage);
-                Assert.IsTrue(languageBR.Mandatory);
+                Assert.IsTrue(languageBR.IsDefault);
+                Assert.IsTrue(languageBR.IsMandatory);
 
                 // Act
-                var languageNZ = new Language("en-NZ") { CultureName = "en-NZ", IsDefaultVariantLanguage = true, Mandatory = true };
+                var languageNZ = new Language("en-NZ") { CultureName = "en-NZ", IsDefault = true, IsMandatory = true };
                 repository.Save(languageNZ);
                 languageBR = repository.Get(languageBR.Id);
 
                 // Assert
-                Assert.IsFalse(languageBR.IsDefaultVariantLanguage);
-                Assert.IsTrue(languageNZ.IsDefaultVariantLanguage);
+                Assert.IsFalse(languageBR.IsDefault);
+                Assert.IsTrue(languageNZ.IsDefault);
             }
         }
 
