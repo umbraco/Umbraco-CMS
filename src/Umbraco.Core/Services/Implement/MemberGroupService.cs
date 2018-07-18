@@ -76,12 +76,12 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public void Save(IMemberGroup memberGroup, bool raiseEvents = true)
+        public void Save(IMemberGroup memberGroup)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IMemberGroup>(memberGroup);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     scope.Complete();
                     return;
@@ -90,11 +90,8 @@ namespace Umbraco.Core.Services.Implement
                 _memberGroupRepository.Save(memberGroup);
                 scope.Complete();
 
-                if (raiseEvents)
-                {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs);
-                }
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Saved, this, saveEventArgs);
             }
         }
 

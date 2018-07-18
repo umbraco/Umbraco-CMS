@@ -254,9 +254,8 @@ namespace Umbraco.Core.Services
         /// If null than no changes are made to the users who are assigned to this group, however if a value is passed in
         /// than all users will be removed from this group and only these users will be added
         /// </param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        void Save(IUserGroup userGroup, int[] userIds = null, bool raiseEvents = true);
+        void Save(IUserGroup userGroup, int[] userIds = null);
 
         /// <summary>
         /// Deletes a UserGroup

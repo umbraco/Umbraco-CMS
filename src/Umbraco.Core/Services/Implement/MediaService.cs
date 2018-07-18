@@ -748,15 +748,14 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="media">The <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        public Attempt<OperationResult> Save(IMedia media, int userId = 0, bool raiseEvents = true)
+        public Attempt<OperationResult> Save(IMedia media, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IMedia>(media, evtMsgs);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
@@ -773,11 +772,10 @@ namespace Umbraco.Core.Services.Implement
                     media.CreatorId = userId;
 
                 _mediaRepository.Save(media);
-                if (raiseEvents)
-                {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs);
-                }
+
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Saved, this, saveEventArgs);
+
                 var changeType = TreeChangeTypes.RefreshNode;
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>(media, changeType).ToEventArgs());
 
@@ -793,8 +791,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="medias">Collection of <see cref="IMedia"/> to save</param>
         /// <param name="userId">Id of the User saving the Media</param>
-        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        public Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = 0, bool raiseEvents = true)
+        public Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var mediasA = medias.ToArray();
@@ -802,7 +799,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IMedia>(mediasA, evtMsgs);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMedia>(mediasA, evtMsgs)))
+                if (scope.Events.DispatchCancelable(Saving, this, new SaveEventArgs<IMedia>(mediasA, evtMsgs)))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
@@ -818,11 +815,9 @@ namespace Umbraco.Core.Services.Implement
                     _mediaRepository.Save(media);
                 }
 
-                if (raiseEvents)
-                {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs);
-                }
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Saved, this, saveEventArgs);
+
                 scope.Events.Dispatch(TreeChanged, this, treeChanges.ToEventArgs());
                 Audit(AuditType.Save, "Bulk Save media performed by user", userId == -1 ? 0 : userId, Constants.System.Root);
 
@@ -1193,9 +1188,8 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="items"></param>
         /// <param name="userId"></param>
-        /// <param name="raiseEvents"></param>
         /// <returns>True if sorting succeeded, otherwise False</returns>
-        public bool Sort(IEnumerable<IMedia> items, int userId = 0, bool raiseEvents = true)
+        public bool Sort(IEnumerable<IMedia> items, int userId = 0)
         {
             var itemsA = items.ToArray();
             if (itemsA.Length == 0) return true;
@@ -1203,7 +1197,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 var args = new SaveEventArgs<IMedia>(itemsA);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, args))
+                if (scope.Events.DispatchCancelable(Saving, this, args))
                 {
                     scope.Complete();
                     return false;
@@ -1235,11 +1229,9 @@ namespace Umbraco.Core.Services.Implement
                     _mediaRepository.Save(media);
                 }
 
-                if (raiseEvents)
-                {
-                    args.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, args);
-                }
+                args.CanCancel = false;
+                scope.Events.Dispatch(Saved, this, args);
+
                 scope.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
                 Audit(AuditType.Sort, "Sorting Media performed by user", userId, 0);
 

@@ -273,11 +273,6 @@ namespace Umbraco.Tests.TestHelpers
                 throw new NotImplementedException();
             }
 
-            public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId, bool raiseEvents)
-            {
-                throw new NotImplementedException();
-            }
-
             public void Delete(IDataType dataType, int userId = -1)
             {
                 throw new NotImplementedException();

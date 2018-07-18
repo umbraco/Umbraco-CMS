@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Services
                 Username = "testUser",
                 Email = "testuser@test.com",
             };
-            ServiceContext.UserService.Save(user, false);
+            ServiceContext.UserService.Save(user);
 
             var userGroupA = new UserGroup
             {
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Services
             userGroupA.AddAllowedSection("media");
             userGroupA.AddAllowedSection("settings");
             //TODO: This is failing the test
-            ServiceContext.UserService.Save(userGroupA, new[] { user.Id }, false);
+            ServiceContext.UserService.Save(userGroupA, new[] { user.Id });
 
             var userGroupB = new UserGroup
             {
@@ -64,7 +64,7 @@ namespace Umbraco.Tests.Services
             };
             userGroupB.AddAllowedSection("settings");
             userGroupB.AddAllowedSection("developer");
-            ServiceContext.UserService.Save(userGroupB, new[] { user.Id }, false);
+            ServiceContext.UserService.Save(userGroupB, new[] { user.Id });
 
             return ServiceContext.UserService.GetUserById(user.Id);
         }

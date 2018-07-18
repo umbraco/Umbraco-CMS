@@ -856,10 +856,8 @@ namespace Umbraco.Core.Services.Implement
 
         #region Save, Publish, Unpublish
 
-        // fixme - kill all those raiseEvents
-
         /// <inheritdoc />
-        public OperationResult Save(IContent content, int userId = 0, bool raiseEvents = true)
+        public OperationResult Save(IContent content, int userId = 0)
         {
             var publishedState = content.PublishedState;
             if (publishedState != PublishedState.Published && publishedState != PublishedState.Unpublished)
@@ -870,7 +868,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
+                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 {
                     scope.Complete();
                     return OperationResult.Cancel(evtMsgs);
@@ -884,11 +882,9 @@ namespace Umbraco.Core.Services.Implement
 
                 _documentRepository.Save(content);
 
-                if (raiseEvents)
-                {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
-                }
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+
                 var changeType = TreeChangeTypes.RefreshNode;
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
                 Audit(AuditType.Save, "Saved by user", userId, content.Id);
@@ -899,7 +895,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public OperationResult Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true)
+        public OperationResult Save(IEnumerable<IContent> contents, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
             var contentsA = contents.ToArray();
@@ -907,7 +903,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IContent>(contentsA, evtMsgs);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
+                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 {
                     scope.Complete();
                     return OperationResult.Cancel(evtMsgs);
@@ -925,11 +921,9 @@ namespace Umbraco.Core.Services.Implement
                     _documentRepository.Save(content);
                 }
 
-                if (raiseEvents)
-                {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
-                }
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
+
                 scope.Events.Dispatch(TreeChanged, this, treeChanges.ToEventArgs());
                 Audit(AuditType.Save, "Bulk-saved by user", userId == -1 ? 0 : userId, Constants.System.Root);
 
@@ -940,7 +934,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = 0, bool raiseEvents = true)
+        public PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -980,7 +974,7 @@ namespace Umbraco.Core.Services.Implement
 
             // finally, "save publishing"
             // what happens next depends on whether the content can be published or not
-            return SavePublishing(content, userId, raiseEvents);
+            return SavePublishing(content, userId);
         }
 
         /// <inheritdoc />
@@ -1059,7 +1053,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public PublishResult SavePublishing(IContent content, int userId = 0, bool raiseEvents = true)
+        public PublishResult SavePublishing(IContent content, int userId = 0)
         {
             var evtMsgs = EventMessagesFactory.Get();
             PublishResult publishResult = null;
@@ -1104,7 +1098,7 @@ namespace Umbraco.Core.Services.Implement
 
                 // always save
                 var saveEventArgs = new SaveEventArgs<IContent>(content, evtMsgs);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
+                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 {
                     scope.Complete();
                     return new PublishResult(PublishResultType.FailedCancelledByEvent, evtMsgs, content);
@@ -1157,11 +1151,8 @@ namespace Umbraco.Core.Services.Implement
                 _documentRepository.Save(content);
 
                 // raise the Saved event, always
-                if (raiseEvents)
-                {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
-                }
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
 
                 if (unpublishing) // we have tried to unpublish
                 {
@@ -1888,9 +1879,8 @@ namespace Umbraco.Core.Services.Implement
         /// </remarks>
         /// <param name="items"></param>
         /// <param name="userId"></param>
-        /// <param name="raiseEvents"></param>
         /// <returns>True if sorting succeeded, otherwise False</returns>
-        public bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true)
+        public bool Sort(IEnumerable<IContent> items, int userId = 0)
         {
             var itemsA = items.ToArray();
             if (itemsA.Length == 0) return true;
@@ -1899,7 +1889,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.ContentTree);
 
-                var ret = Sort(scope, itemsA, userId, raiseEvents);
+                var ret = Sort(scope, itemsA, userId);
                 scope.Complete();
                 return ret;
             }
@@ -1915,9 +1905,8 @@ namespace Umbraco.Core.Services.Implement
         /// </remarks>
         /// <param name="ids"></param>
         /// <param name="userId"></param>
-        /// <param name="raiseEvents"></param>
         /// <returns>True if sorting succeeded, otherwise False</returns>
-        public bool Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true)
+        public bool Sort(IEnumerable<int> ids, int userId = 0)
         {
             var idsA = ids.ToArray();
             if (idsA.Length == 0) return true;
@@ -1927,16 +1916,16 @@ namespace Umbraco.Core.Services.Implement
                 scope.WriteLock(Constants.Locks.ContentTree);
                 var itemsA = GetByIds(idsA).ToArray();
 
-                var ret = Sort(scope, itemsA, userId, raiseEvents);
+                var ret = Sort(scope, itemsA, userId);
                 scope.Complete();
                 return ret;
             }
         }
 
-        private bool Sort(IScope scope, IContent[] itemsA, int userId, bool raiseEvents)
+        private bool Sort(IScope scope, IContent[] itemsA, int userId)
         {
             var saveEventArgs = new SaveEventArgs<IContent>(itemsA);
-            if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
+            if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, "Saving"))
                 return false;
 
             var published = new List<IContent>();
@@ -1967,15 +1956,12 @@ namespace Umbraco.Core.Services.Implement
                 _documentRepository.Save(content);
             }
 
-            if (raiseEvents)
-            {
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
-            }
+            saveEventArgs.CanCancel = false;
+            scope.Events.Dispatch(Saved, this, saveEventArgs, "Saved");
 
             scope.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
 
-            if (raiseEvents && published.Any())
+            if (published.Any())
                 scope.Events.Dispatch(Published, this, new PublishEventArgs<IContent>(published, false, false), "Published");
 
             Audit(AuditType.Sort, "Sorting content performed by user", userId, 0);

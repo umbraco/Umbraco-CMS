@@ -251,13 +251,13 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves a document.
         /// </summary>
-        OperationResult Save(IContent content, int userId = 0, bool raiseEvents = true);
+        OperationResult Save(IContent content, int userId = 0);
 
         /// <summary>
         /// Saves documents.
         /// </summary>
         // fixme why only 1 result not 1 per content?!
-        OperationResult Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
+        OperationResult Save(IEnumerable<IContent> contents, int userId = 0);
 
         /// <summary>
         /// Deletes a document.
@@ -334,12 +334,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true);
+        bool Sort(IEnumerable<IContent> items, int userId = 0);
 
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        bool Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true);
+        bool Sort(IEnumerable<int> ids, int userId = 0);
 
         #endregion
 
@@ -356,7 +356,7 @@ namespace Umbraco.Core.Services
         /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
         /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
         /// </remarks>
-        PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = 0, bool raiseEvents = true);
+        PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = 0);
 
         /// <summary>
         /// Saves and publishes a publishing document.
@@ -367,7 +367,7 @@ namespace Umbraco.Core.Services
         /// <see cref="IContent.UnpublishCulture"/>.</para>
         /// <para>The document is *always* saved, even when publishing fails.</para>
         /// </remarks>
-        PublishResult SavePublishing(IContent content, int userId = 0, bool raiseEvents = true);
+        PublishResult SavePublishing(IContent content, int userId = 0);
 
         /// <summary>
         /// Saves and publishes a document branch.

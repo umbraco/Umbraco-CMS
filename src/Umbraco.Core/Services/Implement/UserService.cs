@@ -282,18 +282,24 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Saves an <see cref="IUser"/>
-        /// </summary>
-        /// <param name="entity"><see cref="IUser"/> to Save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IUser entity, bool raiseEvents = true)
+        /// <inheritdoc />
+        public void Save(IUser entity)
+        {
+            Save(entity, true);
+        }
+
+        /// <inheritdoc />
+        public void SaveWithoutEvents(IUser entity)
+        {
+            Save(entity, false);
+        }
+
+        private void Save(IUser entity, bool withEvents)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IUser>(entity);
-                if (raiseEvents && scope.Events.DispatchCancelable(SavingUser, this, saveEventArgs))
+                if (withEvents && scope.Events.DispatchCancelable(SavingUser, this, saveEventArgs))
                 {
                     scope.Complete();
                     return;
@@ -320,7 +326,8 @@ namespace Umbraco.Core.Services.Implement
                 try
                 {
                     _userRepository.Save(entity);
-                    if (raiseEvents)
+
+                    if (withEvents)
                     {
                         saveEventArgs.CanCancel = false;
                         scope.Events.Dispatch(SavedUser, this, saveEventArgs);
@@ -345,16 +352,15 @@ namespace Umbraco.Core.Services.Implement
         /// Saves a list of <see cref="IUser"/> objects
         /// </summary>
         /// <param name="entities"><see cref="IEnumerable{IUser}"/> to save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IEnumerable<IUser> entities, bool raiseEvents = true)
+        public void Save(IEnumerable<IUser> entities)
         {
             var entitiesA = entities.ToArray();
 
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IUser>(entitiesA);
-                if (raiseEvents && scope.Events.DispatchCancelable(SavingUser, this, saveEventArgs))
+                if (scope.Events.DispatchCancelable(SavingUser, this, saveEventArgs))
                 {
                     scope.Complete();
                     return;
@@ -382,11 +388,8 @@ namespace Umbraco.Core.Services.Implement
                     }
                 }
 
-                if (raiseEvents)
-                {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(SavedUser, this, saveEventArgs);
-                }
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(SavedUser, this, saveEventArgs);
 
                 //commit the whole lot in one go
                 //commit the whole lot in one go
@@ -862,9 +865,8 @@ namespace Umbraco.Core.Services.Implement
         /// If null than no changes are made to the users who are assigned to this group, however if a value is passed in
         /// than all users will be removed from this group and only these users will be added
         /// </param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        public void Save(IUserGroup userGroup, int[] userIds = null, bool raiseEvents = true)
+        public void Save(IUserGroup userGroup, int[] userIds = null)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -885,7 +887,7 @@ namespace Umbraco.Core.Services.Implement
 
                 var saveEventArgs = new SaveEventArgs<UserGroupWithUsers>(new UserGroupWithUsers(userGroup, addedUsers, removedUsers));
 
-                if (raiseEvents && scope.Events.DispatchCancelable(SavingUserGroup, this, saveEventArgs))
+                if (scope.Events.DispatchCancelable(SavingUserGroup, this, saveEventArgs))
                 {
                     scope.Complete();
                     return;
@@ -893,11 +895,8 @@ namespace Umbraco.Core.Services.Implement
 
                 _userGroupRepository.AddOrUpdateGroupWithUsers(userGroup, userIds);
 
-                if (raiseEvents)
-                {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(SavedUserGroup, this, saveEventArgs);
-                }
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(SavedUserGroup, this, saveEventArgs);
 
                 scope.Complete();
             }

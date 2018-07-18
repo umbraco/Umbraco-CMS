@@ -350,13 +350,10 @@ namespace Umbraco.Web.Security.Providers
             {
                 member.LastLoginDate = DateTime.Now;
                 member.UpdateDate = DateTime.Now;
-                //don't raise events for this! It just sets the member dates, if we do raise events this will
-                // cause all distributed cache to execute - which will clear out some caches we don't want.
-                // http://issues.umbraco.org/issue/U4-3451
 
-                // when upgrating from 7.2 to 7.3 trying to save will throw
-                if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
-                    MemberService.Save(member, false);
+                // don't raise events for this! It just sets the member dates, if we do raise events this will
+                // cause all distributed cache to execute - which will clear out some caches we don't want.
+                MemberService.SaveWithoutEvents(member);
             }
 
             return ConvertToMembershipUser(member);
@@ -382,10 +379,10 @@ namespace Umbraco.Web.Security.Providers
             {
                 member.LastLoginDate = DateTime.Now;
                 member.UpdateDate = DateTime.Now;
-                //don't raise events for this! It just sets the member dates, if we do raise events this will
+
+                // don't raise events for this! It just sets the member dates, if we do raise events this will
                 // cause all distributed cache to execute - which will clear out some caches we don't want.
-                // http://issues.umbraco.org/issue/U4-3451
-                MemberService.Save(member, false);
+                MemberService.SaveWithoutEvents(member);
             }
 
             return ConvertToMembershipUser(member);
@@ -524,7 +521,7 @@ namespace Umbraco.Web.Security.Providers
 
             if (member == null)
             {
-                Current.Logger.Info<UmbracoMembershipProviderBase>(() => 
+                Current.Logger.Info<UmbracoMembershipProviderBase>(() =>
                         $"Login attempt failed for username {username} from IP address {GetCurrentRequestIpAddress()}, the user does not exist" );
 
                 return new ValidateUserResult
@@ -535,7 +532,7 @@ namespace Umbraco.Web.Security.Providers
 
             if (member.IsApproved == false)
             {
-                Current.Logger.Info<UmbracoMembershipProviderBase>(() => 
+                Current.Logger.Info<UmbracoMembershipProviderBase>(() =>
                         $"Login attempt failed for username {username} from IP address {GetCurrentRequestIpAddress()}, the user is not approved");
 
                 return new ValidateUserResult
@@ -546,7 +543,7 @@ namespace Umbraco.Web.Security.Providers
             }
             if (member.IsLockedOut)
             {
-                Current.Logger.Info<UmbracoMembershipProviderBase>(() => 
+                Current.Logger.Info<UmbracoMembershipProviderBase>(() =>
                         $"Login attempt failed for username {username} from IP address {GetCurrentRequestIpAddress()}, the user is locked");
 
                 return new ValidateUserResult
@@ -571,12 +568,12 @@ namespace Umbraco.Web.Security.Providers
                     member.IsLockedOut = true;
                     member.LastLockoutDate = DateTime.Now;
 
-                    Current.Logger.Info<UmbracoMembershipProviderBase>(() => 
+                    Current.Logger.Info<UmbracoMembershipProviderBase>(() =>
                             $"Login attempt failed for username {username} from IP address {GetCurrentRequestIpAddress()}, the user is now locked out, max invalid password attempts exceeded");
                 }
                 else
                 {
-                    Current.Logger.Info<UmbracoMembershipProviderBase>(() => 
+                    Current.Logger.Info<UmbracoMembershipProviderBase>(() =>
                             $"Login attempt failed for username {username} from IP address {GetCurrentRequestIpAddress()}");
                 }
             }
@@ -590,19 +587,13 @@ namespace Umbraco.Web.Security.Providers
 
                 member.LastLoginDate = DateTime.Now;
 
-                Current.Logger.Info<UmbracoMembershipProviderBase>(() => 
+                Current.Logger.Info<UmbracoMembershipProviderBase>(() =>
                             $"Login attempt succeeded for username {username} from IP address {GetCurrentRequestIpAddress()}");
             }
 
-            //don't raise events for this! It just sets the member dates, if we do raise events this will
+            // don't raise events for this! It just sets the member dates, if we do raise events this will
             // cause all distributed cache to execute - which will clear out some caches we don't want.
-            // http://issues.umbraco.org/issue/U4-3451
-            //TODO: In v8 we aren't going to have an overload to disable events, so we'll need to make a different method
-            // for this type of thing (i.e. UpdateLastLogin or similar).
-
-            // when upgrating from 7.2 to 7.3 trying to save will throw
-            if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
-                MemberService.Save(member, false);
+            MemberService.SaveWithoutEvents(member);
 
             return new ValidateUserResult
             {

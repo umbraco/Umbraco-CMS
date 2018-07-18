@@ -8,7 +8,7 @@ namespace Umbraco.Core.Services
         IEnumerable<IMemberGroup> GetAll();
         IMemberGroup GetById(int id);
         IMemberGroup GetByName(string name);
-        void Save(IMemberGroup memberGroup, bool raiseEvents = true);
+        void Save(IMemberGroup memberGroup);
         void Delete(IMemberGroup memberGroup);
     }
 }

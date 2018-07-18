@@ -112,18 +112,20 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="entity"><see cref="IMember"/> or <see cref="IUser"/> to Save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        void Save(T entity, bool raiseEvents = true);
+        void Save(T entity);
+
+        /// <summary>
+        /// Saves but does not trigger events.
+        /// </summary>
+        /// <remarks>Used when updating some status and dates that should not trigger cache refreshes nor any events.</remarks>
+        void SaveWithoutEvents(T entity);
 
         /// <summary>
         /// Saves a list of <see cref="IMembershipUser"/> objects
         /// </summary>
         /// <remarks>An <see cref="IMembershipUser"/> can be of type <see cref="IMember"/> or <see cref="IUser"/></remarks>
         /// <param name="entities"><see cref="IEnumerable{T}"/> to save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
-        void Save(IEnumerable<T> entities, bool raiseEvents = true);
+        void Save(IEnumerable<T> entities);
 
         /// <summary>
         /// Gets the default MemberType alias

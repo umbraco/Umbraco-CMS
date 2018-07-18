@@ -918,7 +918,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (dataTypes.Count > 0)
             {
-                _dataTypeService.Save(dataTypes, userId, true);
+                _dataTypeService.Save(dataTypes, userId);
             }
 
             if (raiseEvents)

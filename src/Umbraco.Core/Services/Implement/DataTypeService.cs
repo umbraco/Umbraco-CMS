@@ -363,25 +363,14 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issueing the save</param>
-        public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = 0)
-        {
-            Save(dataTypeDefinitions, userId, true);
-        }
-
-        /// <summary>
-        /// Saves a collection of <see cref="IDataType"/>
-        /// </summary>
-        /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
-        /// <param name="userId">Id of the user issueing the save</param>
-        /// <param name="raiseEvents">Boolean indicating whether or not to raise events</param>
-        public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId, bool raiseEvents)
+        public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId)
         {
             var dataTypeDefinitionsA = dataTypeDefinitions.ToArray();
             var saveEventArgs = new SaveEventArgs<IDataType>(dataTypeDefinitionsA);
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
                 {
                     scope.Complete();
                     return;
@@ -393,11 +382,9 @@ namespace Umbraco.Core.Services.Implement
                     _dataTypeRepository.Save(dataTypeDefinition);
                 }
 
-                if (raiseEvents)
-                {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs);
-                }
+                saveEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Saved, this, saveEventArgs);
+
                 Audit(AuditType.Save, "Save DataTypeDefinition performed by user", userId, -1);
 
                 scope.Complete();
