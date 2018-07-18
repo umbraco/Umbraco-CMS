@@ -176,14 +176,6 @@ namespace Umbraco.Web.Editors
             else
             {
                 //create
-
-                // file might already be on disk, if so grab the content to avoid overwriting
-                string content = Services.FileService.GetViewContent(display.Alias);
-                if (string.IsNullOrEmpty(content) == false)
-                {
-                    display.Content = content;
-                }
-
                 ITemplate master = null;
                 if (string.IsNullOrEmpty(display.MasterTemplateAlias) == false)
                 {

@@ -144,7 +144,7 @@ namespace Umbraco.Core.Models.Identity
         public override DateTime? LastPasswordChangeDateUtc
         {
             get { return _lastPasswordChangeDateUtc; }
-            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangeDateUtc, Ps.Value.LastPasswordChangeDateUtcSelector); }
+            set { _beingDirty.SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangeDateUtc, Ps.Value.LastPasswordChangeDateUtcSelector); }
         }
 
         /// <summary>

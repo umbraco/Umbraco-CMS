@@ -281,6 +281,11 @@ namespace Umbraco.Web.Editors
             {
                 HandleContentNotFound(id);
                 return null;//irrelevant since the above throws
+            }
+            var content = MapToDisplay(foundContent, culture);
+            return content;
+        }
+
         /// <summary>
         /// Gets the content json for the content id
         /// </summary>
@@ -288,15 +293,16 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [EnsureUserPermissionForContent("id")]
-        public ContentItemDisplay GetById(Guid id)
+        public ContentItemDisplay GetById(Guid id, string culture = null)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
             if (foundContent == null)
             {
                 HandleContentNotFound(id);
+                return null;//irrelevant since the above throws
             }
 
-            var content = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
+            var content = MapToDisplay(foundContent, culture);
             return content;
         }
 
@@ -307,22 +313,16 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [EnsureUserPermissionForContent("id")]
-        public ContentItemDisplay GetById(Udi id)
+        public ContentItemDisplay GetById(Udi id, string culture = null)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi != null)
             {
-                return GetById(guidUdi.Guid);
+                return GetById(guidUdi.Guid, culture);
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
-        }
-
-            }
-
-            var content = MapToDisplay(foundContent, culture);
-            return content;
-        }
+        }   
 
         /// <summary>
         /// Gets an empty content item for the

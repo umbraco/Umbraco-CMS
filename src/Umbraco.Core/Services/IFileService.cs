@@ -359,12 +359,5 @@ namespace Umbraco.Core.Services
         /// <returns>The content of the partial view.</returns>
         string GetPartialViewSnippetContent(string snippetName);
         
-        /// <summary>
-        /// Gets the content of a view.
-        /// </summary>
-        /// <param name="filename">The name of the view.</param>
-        /// <returns></returns>
-        string GetViewContent(string filename);
-
     }
 }
