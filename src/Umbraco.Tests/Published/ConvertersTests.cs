@@ -47,6 +47,9 @@ namespace Umbraco.Tests.Published
 
         private class SimpleConverter1 : IPropertyValueConverter
         {
+            public bool IsValue(object value)
+                => value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
+
             public bool IsConverter(PublishedPropertyType propertyType)
                 => propertyType.EditorAlias.InvariantEquals("Umbraco.Void");
 
@@ -116,6 +119,9 @@ namespace Umbraco.Tests.Published
                 _publishedSnapshotAccessor = publishedSnapshotAccessor;
                 _cacheLevel = cacheLevel;
             }
+
+            public bool IsValue(object value)
+                => value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
 
             public bool IsConverter(PublishedPropertyType propertyType)
                 => propertyType.EditorAlias.InvariantEquals("Umbraco.Void");
