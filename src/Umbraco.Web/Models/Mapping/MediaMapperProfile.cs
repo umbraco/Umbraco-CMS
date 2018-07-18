@@ -14,13 +14,19 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class MediaMapperProfile : Profile
     {
-        public MediaMapperProfile(IUserService userService, ILocalizedTextService textService, IDataTypeService dataTypeService, IMediaService mediaService, IMediaTypeService mediaTypeService, ILogger logger)
+        public MediaMapperProfile(
+            TabsAndPropertiesResolver<IMedia, MediaItemDisplay> tabsAndPropertiesResolver,
+            ContentTreeNodeUrlResolver<IMedia, MediaTreeController> contentTreeNodeUrlResolver,
+            IUserService userService,
+            ILocalizedTextService textService,
+            IDataTypeService dataTypeService,
+            IMediaService mediaService,
+            IMediaTypeService mediaTypeService,
+            ILogger logger)
         {
             // create, capture, cache
             var mediaOwnerResolver = new OwnerResolver<IMedia>(userService);
-            var tabsAndPropertiesResolver = new TabsAndPropertiesResolver<IMedia, MediaItemDisplay>(textService);
             var childOfListViewResolver = new MediaChildOfListViewResolver(mediaService, mediaTypeService);
-            var contentTreeNodeUrlResolver = new ContentTreeNodeUrlResolver<IMedia, MediaTreeController>();
             var mediaTypeBasicResolver = new ContentTypeBasicResolver<IMedia, MediaItemDisplay>();
 
             //FROM IMedia TO MediaItemDisplay

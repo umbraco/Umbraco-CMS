@@ -332,16 +332,23 @@ namespace Umbraco.Core.Services.Implement
 
             var evtMsgs = EventMessagesFactory.Get();
 
-            //NOTE: This isn't pretty but we need to maintain backwards compatibility so we cannot change
+            //fixme: This isn't pretty because we we're required to maintain backwards compatibility so we could not change
             // the event args here. The other option is to create a different event with different event
-            // args specifically for this method... which also isn't pretty. So for now, we'll use this
-            // dictionary approach to store 'additional data' in.
+            // args specifically for this method... which also isn't pretty. So fix this in v8!
             var additionalData = new Dictionary<string, object>
             {
                 { "CreateTemplateForContentType", true },
                 { "ContentTypeAlias", contentTypeAlias },
             };
 
+            // check that the template hasn't been created on disk before creating the content type
+            // if it exists, set the new template content to the existing file content
+            string content = GetViewContent(contentTypeAlias);
+            if (content.IsNullOrWhiteSpace() == false)
+            {
+                template.Content = content;
+            }
+            
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<ITemplate>(template, true, evtMsgs, additionalData);
@@ -368,6 +375,15 @@ namespace Umbraco.Core.Services.Implement
             {
                 Content = content
             };
+
+            // check that the template hasn't been created on disk before creating the content type
+            // if it exists, set the new template content to the existing file content
+            string existingContent = GetViewContent(template.Alias);
+            if (existingContent.IsNullOrWhiteSpace() == false)
+            {
+                template.Content = content;
+            }
+
             if (masterTemplate != null)
             {
                 template.SetMasterTemplate(masterTemplate);
@@ -659,10 +675,26 @@ namespace Umbraco.Core.Services.Implement
                 return _templateRepository.GetFileSize(filepath);
             }
         }
+        
+        private string GetViewContent(string fileName)
+        {
+            if (fileName.IsNullOrWhiteSpace())
+                throw new ArgumentNullException(nameof(fileName));
 
-        #endregion
+            if (!fileName.EndsWith(".cshtml")) 
+                fileName = string.Concat(fileName, ".cshtml");
 
-        #region Partial Views
+            var fs = _templateRepository.GetFileContentStream(fileName);
+            if (fs == null) return string.Empty;
+            using (var view = new StreamReader(fs))
+            {
+                return view.ReadToEnd().Trim();
+            }
+        }
+
+#endregion
+
+#region Partial Views
 
         public IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames)
         {

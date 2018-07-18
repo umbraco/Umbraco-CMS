@@ -61,7 +61,9 @@ namespace Umbraco.Web.Editors
             public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetNiceUrl", "id", typeof(int), typeof(Guid), typeof(Udi))));
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetNiceUrl", "id", typeof(int), typeof(Guid), typeof(Udi)),
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))    
+                ));
             }
         }
 
@@ -280,10 +282,47 @@ namespace Umbraco.Web.Editors
                 HandleContentNotFound(id);
                 return null;//irrelevant since the above throws
             }
+            var content = MapToDisplay(foundContent, culture);
+            return content;
+        }
+
+        /// <summary>
+        /// Gets the content json for the content id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [OutgoingEditorModelEvent]
+        [EnsureUserPermissionForContent("id")]
+        public ContentItemDisplay GetById(Guid id, string culture = null)
+        {
+            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
+            if (foundContent == null)
+            {
+                HandleContentNotFound(id);
+                return null;//irrelevant since the above throws
+            }
 
             var content = MapToDisplay(foundContent, culture);
             return content;
         }
+
+        /// <summary>
+        /// Gets the content json for the content id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [OutgoingEditorModelEvent]
+        [EnsureUserPermissionForContent("id")]
+        public ContentItemDisplay GetById(Udi id, string culture = null)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi != null)
+            {
+                return GetById(guidUdi.Guid, culture);
+            }
+
+            throw new HttpResponseException(HttpStatusCode.NotFound);
+        }   
 
         /// <summary>
         /// Gets an empty content item for the
@@ -1283,7 +1322,7 @@ namespace Umbraco.Web.Editors
                 culture = Services.LocalizationService.GetDefaultLanguageIsoCode();
             }
 
-            var display = ContextMapper.Map<IContent, ContentItemDisplay>(content, UmbracoContext,
+            var display = ContextMapper.Map<IContent, ContentItemDisplay>(content, 
                 new Dictionary<string, object> { { ContextMapper.CultureKey, culture } });
 
             return display;

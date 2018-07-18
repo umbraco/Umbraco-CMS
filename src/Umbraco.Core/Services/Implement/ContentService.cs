@@ -1841,7 +1841,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(copy, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 foreach (var x in copies)
                     scope.Events.Dispatch(Copied, this, new CopyEventArgs<IContent>(x.Item1, x.Item2, false, x.Item2.ParentId, relateToOriginal));
-                Audit(AuditType.Copy, "Copy Content performed by user", content.WriterId, content.Id);
+                Audit(AuditType.Copy, "Copy Content performed by user", userId, content.Id);
 
                 scope.Complete();
             }

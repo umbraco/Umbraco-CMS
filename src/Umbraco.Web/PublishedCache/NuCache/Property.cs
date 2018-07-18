@@ -90,11 +90,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override bool HasValue(string culture = null, string segment = null)
         {
             ContextualizeVariation(ref culture, ref segment);
-
-            var sourceValue = GetSourceValue(culture, segment);
-
-            return sourceValue != null &&
-                   (!(sourceValue is string) || string.IsNullOrWhiteSpace((string) sourceValue) == false);
+            return PropertyType.IsValue(GetSourceValue(culture, segment));
         }
 
         // used to cache the CacheValues of this property

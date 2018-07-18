@@ -1732,6 +1732,39 @@ namespace Umbraco.Tests.Services
             Assert.IsNull(mediaType2.Description);
         }
 
+        [Test]
+        public void Variations_In_Compositions()
+        {
+            var service = ServiceContext.ContentTypeService;
+            var typeA = MockedContentTypes.CreateSimpleContentType("a", "A");
+            typeA.Variations = ContentVariation.Culture; // make it variant
+            typeA.PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations = ContentVariation.Culture; // with a variant property
+            service.Save(typeA);
+
+            var typeB = MockedContentTypes.CreateSimpleContentType("b", "B", typeA, true);
+            typeB.Variations = ContentVariation.Nothing; // make it invariant
+            service.Save(typeB);
+
+            var typeC = MockedContentTypes.CreateSimpleContentType("c", "C", typeA, true);
+            typeC.Variations = ContentVariation.Culture; // make it variant
+            service.Save(typeC);
+
+            // property is variant on A
+            var test = service.Get(typeA.Id);
+            Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
+            Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyGroups.First().PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
+
+            // but not on B
+            test = service.Get(typeB.Id);
+            Assert.AreEqual(ContentVariation.Nothing, test.CompositionPropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
+            Assert.AreEqual(ContentVariation.Nothing, test.CompositionPropertyGroups.First().PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
+
+            // but on C
+            test = service.Get(typeC.Id);
+            Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
+            Assert.AreEqual(ContentVariation.Culture, test.CompositionPropertyGroups.First().PropertyTypes.First(x => x.Alias.InvariantEquals("title")).Variations);
+        }
+
         private ContentType CreateComponent()
         {
             var component = new ContentType(-1)

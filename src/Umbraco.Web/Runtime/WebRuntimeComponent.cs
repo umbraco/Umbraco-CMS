@@ -194,7 +194,7 @@ namespace Umbraco.Web.Runtime
             composition.Container.RegisterAuto(typeof(UmbracoViewPage<>));
 
             // register published router
-            composition.Container.Register<PublishedRouter>();
+            composition.Container.RegisterSingleton<PublishedRouter>();
             composition.Container.Register(_ => UmbracoConfig.For.UmbracoSettings().WebRouting);
 
             // register preview SignalR hub

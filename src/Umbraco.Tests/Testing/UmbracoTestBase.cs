@@ -39,6 +39,7 @@ using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Composing.CompositionRoots;
 using Umbraco.Web._Legacy.Actions;
 using Current = Umbraco.Core.Composing.Current;
+using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Testing
 {
@@ -137,6 +138,7 @@ namespace Umbraco.Tests.Testing
             ComposeApplication(Options.WithApplication);
 
             // etc
+            ComposeWeb();
             ComposeWtf();
 
             // not sure really
@@ -173,12 +175,24 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton(f => new ProfilingLogger(f.GetInstance<ILogger>(), f.GetInstance<IProfiler>()));
         }
 
-        protected virtual void ComposeWtf()
+        protected virtual void ComposeWeb()
         {
+            //TODO: Should we 'just' register the WebRuntimeComponent?
+
             // imported from TestWithSettingsBase
             // which was inherited by TestWithApplicationBase so pretty much used everywhere
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
 
+            // web
+            Container.Register(_ => Umbraco.Web.Composing.Current.UmbracoContextAccessor);
+            Container.RegisterSingleton<PublishedRouter>();
+            Container.RegisterCollectionBuilder<ContentFinderCollectionBuilder>();
+            Container.Register<IContentLastChanceFinder, TestLastChanceFinder>();
+            Container.Register<IVariationContextAccessor, TestVariationContextAccessor>();
+        }
+
+        protected virtual void ComposeWtf()
+        {
             // what else?
             var runtimeStateMock = new Mock<IRuntimeState>();
             runtimeStateMock.Setup(x => x.Level).Returns(RuntimeLevel.Run);
@@ -271,7 +285,8 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton(factory => globalSettings);
             Container.RegisterSingleton(factory => umbracoSettings.Content);
             Container.RegisterSingleton(factory => umbracoSettings.Templates);
-
+            Container.RegisterSingleton(factory => umbracoSettings.WebRouting);
+            
             // fixme - The whole MediaFileSystem coupling thing seems broken. 
             Container.Register<IFileSystem, MediaFileSystem>((factory, fileSystem) => new MediaFileSystem(fileSystem, factory.GetInstance<IContentSection>(), factory.GetInstance<IMediaPathScheme>(),  factory.GetInstance<ILogger>()));
             Container.RegisterConstructorDependency((factory, parameterInfo) => factory.GetInstance<FileSystems>().MediaFileSystem);

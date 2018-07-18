@@ -18,6 +18,11 @@ namespace Umbraco.Core.PropertyEditors
         bool IsConverter(PublishedPropertyType propertyType);
 
         /// <summary>
+        /// Determines whether a source value is an actual value, or not a value.
+        /// </summary>
+        bool IsValue(object value);
+
+        /// <summary>
         /// Gets the type of values returned by the converter.
         /// </summary>
         /// <param name="propertyType">The property type.</param>

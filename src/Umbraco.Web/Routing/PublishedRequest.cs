@@ -78,6 +78,11 @@ namespace Umbraco.Web.Routing
             _publishedRouter.PrepareRequest(this);
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the Umbraco Backoffice should ignore a collision for this request.
+        /// </summary>
+        public bool IgnorePublishedContentCollisions { get; set; }
+
         #region Events
 
         /// <summary>
