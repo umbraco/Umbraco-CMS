@@ -24,7 +24,6 @@ namespace Umbraco.Core.CodeAnnotations
         /// intended.</param>
         public UmbracoExperimentalFeatureAttribute(string description)
         {
-            /* empty */
         }
 
         /// <summary>
@@ -37,7 +36,6 @@ namespace Umbraco.Core.CodeAnnotations
         /// details, discussion, and planning.</param>
         public UmbracoExperimentalFeatureAttribute(string description, string trackerUrl)
         {
-            /* empty */
         }
     }
 }

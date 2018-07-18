@@ -25,7 +25,6 @@ namespace Umbraco.Core.CodeAnnotations
         /// intended.</param>
         public UmbracoProposedPublicAttribute(string description)
         {
-            /* empty */
         }
 
         /// <summary>
@@ -38,7 +37,6 @@ namespace Umbraco.Core.CodeAnnotations
         /// details, discussion, and planning.</param>
         public UmbracoProposedPublicAttribute(string description, string trackerUrl)
         {
-            /* empty */
         }
     }
 }

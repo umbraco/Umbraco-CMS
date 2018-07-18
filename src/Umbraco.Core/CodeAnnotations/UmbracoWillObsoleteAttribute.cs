@@ -21,7 +21,6 @@ namespace Umbraco.Core.CodeAnnotations
         /// intended.</param>
         public UmbracoWillObsoleteAttribute(string description)
         {
-            /* empty */
         }
 
         /// <summary>
@@ -34,7 +33,6 @@ namespace Umbraco.Core.CodeAnnotations
         /// details, discussion, and planning.</param>
         public UmbracoWillObsoleteAttribute(string description, string trackerUrl)
         {
-            /* empty */
         }
     }
 }
