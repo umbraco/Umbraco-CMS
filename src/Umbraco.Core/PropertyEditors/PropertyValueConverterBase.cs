@@ -9,33 +9,24 @@ namespace Umbraco.Core.PropertyEditors
     public abstract class PropertyValueConverterBase : IPropertyValueConverter
     {
         public virtual bool IsConverter(PublishedPropertyType propertyType)
-        {
-            return false;
-        }
+            => false;
+
+        public bool IsValue(object value)
+            => value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
 
         public virtual Type GetPropertyValueType(PublishedPropertyType propertyType)
-        {
-            return typeof (object);
-        }
+            => typeof (object);
 
         public virtual PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType)
-        {
-            return PropertyCacheLevel.Snapshot;
-        }
+            => PropertyCacheLevel.Snapshot;
 
         public virtual object ConvertSourceToIntermediate(IPublishedElement owner, PublishedPropertyType propertyType, object source, bool preview)
-        {
-            return source;
-        }
+            => source;
 
         public virtual object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
-        {
-            return inter;
-        }
+            => inter;
 
         public virtual object ConvertIntermediateToXPath(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
-        {
-            return inter?.ToString() ?? string.Empty;
-        }
+            => inter?.ToString() ?? string.Empty;
     }
 }
