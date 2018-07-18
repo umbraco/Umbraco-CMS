@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
@@ -1108,9 +1109,15 @@ namespace Umbraco.Core.Services
                 return string.Empty;
             }
 
-            using (var view = new StreamReader(System.IO.File.OpenRead(viewAttempt.Result)))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
-                return view.ReadToEnd().Trim();
+                var repository = RepositoryFactory.CreateTemplateRepository(uow);
+                var stream = repository.GetFileContentStream(viewAttempt.Result);
+
+                using (var reader = new StreamReader(stream, Encoding.UTF8, true))
+                {
+                    return reader.ReadToEnd().Trim();
+                }
             }
         }
 
