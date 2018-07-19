@@ -13,7 +13,7 @@ angular.module("umbraco.directives")
                 onMacroPickerClick: "=",
                 onLinkPickerClick: "="
             },
-            template: "<textarea ng-model=\"value\" rows=\"10\" class=\"mceNoEditor\" style=\"overflow:hidden\" id=\"{{uniqueId}}\"></textarea>",
+            template: "<div class=\"mceNoEditor\" style=\"overflow:hidden\" id=\"{{uniqueId}}\"></textarea>",
             replace: true,
             link: function (scope, element, attrs) {
 
@@ -40,7 +40,6 @@ angular.module("umbraco.directives")
                         plugins.push("autoresize");
 
                         //config value on the data type
-                        var toolbar = ["code", "styleselect", "bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "link", "umbmediapicker", "umbembeddialog"].join(" | ");
                         var stylesheets = [];
 
                         var styleFormats = [];
@@ -48,14 +47,22 @@ angular.module("umbraco.directives")
 
                         //queue file loading
                         if (typeof (tinymce) === "undefined") {
-                                await.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", scope));
+                            await.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", scope));
                         }
 
-
-                        if(scope.configuration && scope.configuration.toolbar){
-                            toolbar = scope.configuration.toolbar.join(' | ');
+                        var toolbar = ["code", "styleselect", "bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "link", "umbmediapicker", "umbembeddialog"];
+                        if(scope.configuration && scope.configuration.toolbar) {
+                            toolbar = scope.configuration.toolbar;
                         }
-
+                        //TODO: get this from the config
+                        var allowedSelectionToolbar = ["bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "outdent", "indent", "link"];
+                        var allowedInsertToolbar = ["link", "image", "umbmediapicker", "umbembeddialog", "umbmacro", "bullist", "numlist"];
+                        var insertToolbar = _.filter(toolbar, function (t) {
+                            return allowedInsertToolbar.indexOf(t) !== -1;
+                        }).join(" | ");
+                        var selectionToolbar = _.filter(toolbar, function (t) {
+                            return allowedSelectionToolbar.indexOf(t) !== -1;
+                        }).join(" | ");
 
                         if(scope.configuration && scope.configuration.stylesheets){
                             angular.forEach(scope.configuration.stylesheets, function(stylesheet, key){
@@ -103,8 +110,8 @@ angular.module("umbraco.directives")
 
                             //create a baseline Config to exten upon
                             var baseLineConfigObj = {
-                                mode: "exact",
-                                skin: "umbraco",
+                                theme: "inlite",
+                                inline: true,
                                 plugins: plugins,
                                 valid_elements: validElements,
                                 invalid_elements: invalidElements,
@@ -112,7 +119,8 @@ angular.module("umbraco.directives")
                                 menubar: false,
                                 statusbar: false,
                                 relative_urls: false,
-                                toolbar: toolbar,
+                                insert_toolbar: insertToolbar,
+                                selection_toolbar: selectionToolbar,
                                 content_css: stylesheets,
                                 style_formats: styleFormats,
                                 autoresize_bottom_margin: 0,
@@ -157,7 +165,8 @@ angular.module("umbraco.directives")
                             }
 
                             //set all the things that user configs should not be able to override
-                            baseLineConfigObj.elements = uniqueId;
+                            //baseLineConfigObj.elements = uniqueId;
+                            baseLineConfigObj.selector = "#" + scope.uniqueId;
                             baseLineConfigObj.setup = function (editor) {
 
                                 //set the reference
@@ -166,6 +175,11 @@ angular.module("umbraco.directives")
 
                                 //enable browser based spell checking
                                 editor.on('init', function (e) {
+
+                                    if (!scope.value) {
+                                        scope.value = "";
+                                    }
+                                    editor.setContent(scope.value);
 
                                     editor.getBody().setAttribute('spellcheck', true);
 
@@ -180,58 +194,57 @@ angular.module("umbraco.directives")
 
                                 });
 
-                                // pin toolbar to top of screen if we have focus and it scrolls off the screen
-                                var pinToolbar = function () {
+                                //// pin toolbar to top of screen if we have focus and it scrolls off the screen
+                                //var pinToolbar = function () {
 
-                                    var _toolbar = $(editor.editorContainer).find(".mce-toolbar");
-                                    var toolbarHeight = _toolbar.height();
+                                //    var _toolbar = $(editor.editorContainer).find(".mce-toolbar");
+                                //    var toolbarHeight = _toolbar.height();
 
-                                    var _tinyMce = $(editor.editorContainer);
-                                    var tinyMceRect = _tinyMce[0].getBoundingClientRect();
-                                    var tinyMceTop = tinyMceRect.top;
-                                    var tinyMceBottom = tinyMceRect.bottom;
-                                    var tinyMceWidth = tinyMceRect.width;
+                                //    var _tinyMce = $(editor.editorContainer);
+                                //    var tinyMceRect = _tinyMce[0].getBoundingClientRect();
+                                //    var tinyMceTop = tinyMceRect.top;
+                                //    var tinyMceBottom = tinyMceRect.bottom;
+                                //    var tinyMceWidth = tinyMceRect.width;
 
-                                    var _tinyMceEditArea = _tinyMce.find(".mce-edit-area");
+                                //    var _tinyMceEditArea = _tinyMce.find(".mce-edit-area");
 
-                                    // set padding in top of mce so the content does not "jump" up
-                                    _tinyMceEditArea.css("padding-top", toolbarHeight);
+                                //    // set padding in top of mce so the content does not "jump" up
+                                //    _tinyMceEditArea.css("padding-top", toolbarHeight);
 
-                                    if (tinyMceTop < 160 && ((160 + toolbarHeight) < tinyMceBottom)) {
-                                        _toolbar
-                                            .css("visibility", "visible")
-                                            .css("position", "fixed")
-                                            .css("top", "160px")
-                                            .css("margin-top", "0")
-                                            .css("width", tinyMceWidth);
-                                    } else {
-                                        _toolbar
-                                            .css("visibility", "visible")
-                                            .css("position", "absolute")
-                                            .css("top", "auto")
-                                            .css("margin-top", "0")
-                                            .css("width", tinyMceWidth);
-                                    }
+                                //    if (tinyMceTop < 160 && ((160 + toolbarHeight) < tinyMceBottom)) {
+                                //        _toolbar
+                                //            .css("visibility", "visible")
+                                //            .css("position", "fixed")
+                                //            .css("top", "160px")
+                                //            .css("margin-top", "0")
+                                //            .css("width", tinyMceWidth);
+                                //    } else {
+                                //        _toolbar
+                                //            .css("visibility", "visible")
+                                //            .css("position", "absolute")
+                                //            .css("top", "auto")
+                                //            .css("margin-top", "0")
+                                //            .css("width", tinyMceWidth);
+                                //    }
                                     
-                                };
+                                //};
 
-                                // unpin toolbar to top of screen
-                                var unpinToolbar = function() {
+                                //// unpin toolbar to top of screen
+                                //var unpinToolbar = function() {
 
-                                    var _toolbar = $(editor.editorContainer).find(".mce-toolbar");
-                                    var _tinyMce = $(editor.editorContainer);
-                                    var _tinyMceEditArea = _tinyMce.find(".mce-edit-area");
+                                //    var _toolbar = $(editor.editorContainer).find(".mce-toolbar");
+                                //    var _tinyMce = $(editor.editorContainer);
+                                //    var _tinyMceEditArea = _tinyMce.find(".mce-edit-area");
 
-                                    // reset padding in top of mce so the content does not "jump" up
-                                    _tinyMceEditArea.css("padding-top", "0");
+                                //    // reset padding in top of mce so the content does not "jump" up
+                                //    _tinyMceEditArea.css("padding-top", "0");
                                         
-                                    _toolbar.css("position", "static");
+                                //    _toolbar.css("position", "static");
 
-                                };
+                                //};
 
                                 //when we leave the editor (maybe)
-                                editor.on('blur', function (e) {
-                                    editor.save();
+                                editor.on('blur', function (e) {                                    
                                     angularHelper.safeApply(scope, function () {
                                         scope.value = editor.getContent();
 
@@ -242,8 +255,8 @@ angular.module("umbraco.directives")
                                             scope.onBlur();
                                         }
 
-                                        unpinToolbar();
-                                        $('.umb-panel-body').off('scroll', pinToolbar);
+                                        //unpinToolbar();
+                                        //$('.umb-panel-body').off('scroll', pinToolbar);
 
                                     });
                                 });
@@ -256,8 +269,8 @@ angular.module("umbraco.directives")
                                             scope.onFocus();
                                         }
 
-                                        pinToolbar();
-                                        $('.umb-panel-body').on('scroll', pinToolbar);
+                                        //pinToolbar();
+                                        //$('.umb-panel-body').on('scroll', pinToolbar);
 
                                     });
                                 });
@@ -270,36 +283,17 @@ angular.module("umbraco.directives")
                                             scope.onClick();
                                         }
 
-                                        pinToolbar();
-                                        $('.umb-panel-body').on('scroll', pinToolbar);
+                                        //pinToolbar();
+                                        //$('.umb-panel-body').on('scroll', pinToolbar);
 
-                                    });
-                                });
-
-                                //when buttons modify content
-                                editor.on('ExecCommand', function (e) {
-                                    editor.save();
-                                    angularHelper.safeApply(scope, function () {
-                                        scope.value = editor.getContent();
-                                    });
-                                });
-
-                                // Update model on keypress
-                                editor.on('KeyUp', function (e) {
-                                    editor.save();
-                                    angularHelper.safeApply(scope, function () {
-                                        scope.value = editor.getContent();
                                     });
                                 });
 
                                 // Update model on change, i.e. copy/pasted text, plugins altering content
-                                editor.on('SetContent', function (e) {
-                                    if (!e.initial) {
-                                        editor.save();
-                                        angularHelper.safeApply(scope, function () {
-                                            scope.value = editor.getContent();
-                                        });
-                                    }
+                                editor.on('Change', function (e) {
+                                    angularHelper.safeApply(scope, function () {
+                                        scope.value = editor.getContent();
+                                    });
                                 });
 
                                 editor.on('ObjectResized', function (e) {

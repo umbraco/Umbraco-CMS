@@ -10,8 +10,7 @@ angular.module("umbraco")
         var d = new Date();
         var n = d.getTime();
         $scope.textAreaHtmlId = $scope.model.alias + "_" + n + "_rte";
-
-        var alreadyDirty = false;
+        
         function syncContent(editor){
             angularHelper.safeApply($scope, function () {
                 $scope.model.value = editor.getContent();
@@ -39,6 +38,8 @@ angular.module("umbraco")
             }
 
             //config value on the data type
+            var toolbar = editorConfig.toolbar;
+            //TODO: get this from the config
             var allowedSelectionToolbar = ["bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "outdent", "indent", "link"];
             var allowedInsertToolbar = ["link", "image", "umbmediapicker", "umbembeddialog", "umbmacro", "bullist", "numlist"];
             var insertToolbar = _.filter(editorConfig.toolbar, function (t) {
@@ -47,6 +48,7 @@ angular.module("umbraco")
             var selectionToolbar = _.filter(editorConfig.toolbar, function(t) {
                 return allowedSelectionToolbar.indexOf(t) !== -1;
             }).join(" | ");
+
             var stylesheets = [];
             var styleFormats = [];
             var await = [];
@@ -139,7 +141,6 @@ angular.module("umbraco")
                 
                 //create a baseline Config to exten upon
                 var baseLineConfigObj = {
-                    //skin: "umbraco",
                     theme: "inlite",
                     inline: true,
                     plugins: plugins,
@@ -152,7 +153,6 @@ angular.module("umbraco")
                     height: editorConfig.dimensions.height,
                     width: editorConfig.dimensions.width,
                     maxImageSize: editorConfig.maxImageSize,
-                    //toolbar: toolbar,
                     insert_toolbar: insertToolbar,
                     selection_toolbar: selectionToolbar,
                     content_css: stylesheets,
@@ -212,14 +212,10 @@ angular.module("umbraco")
                     });
                     
                     editor.on('Dirty', function (e) {
-                        console.log("DIRTY...");
-                        if (!alreadyDirty) {
-                            //make the form dirty manually so that the track changes works, setting our model doesn't trigger
-                            // the angular bits because tinymce replaces the textarea.
-                            var currForm = angularHelper.getCurrentForm($scope);
-                            currForm.$setDirty();
-                            alreadyDirty = true;
-                        }
+                        //make the form dirty manually so that the track changes works, setting our model doesn't trigger
+                        // the angular bits because tinymce replaces the textarea.
+                        var currForm = angularHelper.getCurrentForm($scope);
+                        currForm.$setDirty();
                     });
 
                     editor.on('Change', function (e) {
@@ -227,14 +223,16 @@ angular.module("umbraco")
                         syncContent(editor);
                     });
 
-                    //editor.on('ObjectResized', function (e) {
-                    //    var qs = "?width=" + e.width + "&height=" + e.height + "&mode=max";
-                    //    var srcAttr = $(e.target).attr("src");
-                    //    var path = srcAttr.split("?")[0];
-                    //    $(e.target).attr("data-mce-src", path + qs);
+                    editor.on('ObjectResized', function (e) {
+                        console.log("ObjectResized...");
 
-                    //    syncContent(editor);
-                    //});
+                        var qs = "?width=" + e.width + "&height=" + e.height + "&mode=max";
+                        var srcAttr = $(e.target).attr("src");
+                        var path = srcAttr.split("?")[0];
+                        $(e.target).attr("data-mce-src", path + qs);
+
+                        syncContent(editor);
+                    });
 					
                     tinyMceService.createLinkPicker(editor, $scope, function(currentTarget, anchorElement) {
                         $scope.linkPickerOverlay = {
