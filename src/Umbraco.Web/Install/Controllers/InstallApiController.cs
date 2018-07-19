@@ -54,8 +54,8 @@ namespace Umbraco.Web.Install.Controllers
         public bool PostValidateDatabaseConnection(DatabaseModel model)
         {
             var dbHelper = new DatabaseHelper();
-            var canConnect = dbHelper.CheckConnection(model, ApplicationContext);
-            return canConnect;
+
+            return dbHelper.CheckConnection(model, ApplicationContext);
         }
 
         /// <summary>
@@ -84,8 +84,8 @@ namespace Umbraco.Web.Install.Controllers
         public IEnumerable<Package> GetPackages()
         {
             var installHelper = new InstallHelper(UmbracoContext);
-            var starterKits = installHelper.GetStarterKits();
-            return starterKits;
+
+            return installHelper.GetStarterKits();
         }
 
         /// <summary>
