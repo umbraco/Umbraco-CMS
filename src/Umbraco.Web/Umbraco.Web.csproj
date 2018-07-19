@@ -115,6 +115,8 @@
     <Compile Include="Editors\BackOfficeAssetsController.cs" />
     <Compile Include="Editors\BackOfficeModel.cs" />
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
+    <Compile Include="Models\ContentEditing\IContentSave.cs" />
+    <Compile Include="WebApi\TrimModelBinder.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\DashboardHelper.cs" />
     <Compile Include="Editors\DictionaryController.cs" />
@@ -122,11 +124,12 @@
     <Compile Include="Editors\EditorValidatorCollection.cs" />
     <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />
     <Compile Include="Editors\EditorValidatorOfT.cs" />
+    <Compile Include="Editors\Filters\MemberValidationHelper.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
     <Compile Include="Editors\HelpController.cs" />
-    <Compile Include="Editors\IsCurrentUserModelFilterAttribute.cs" />
+    <Compile Include="Editors\Filters\IsCurrentUserModelFilterAttribute.cs" />
     <Compile Include="Editors\LanguageController.cs" />
-    <Compile Include="Editors\ParameterSwapControllerActionSelector.cs" />
+    <Compile Include="WebApi\ParameterSwapControllerActionSelector.cs" />
     <Compile Include="Editors\PasswordChanger.cs" />
     <Compile Include="Editors\PreviewController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
@@ -135,10 +138,10 @@
     <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
-    <Compile Include="Editors\UserGroupAuthorizationAttribute.cs" />
-    <Compile Include="Editors\UserGroupEditorAuthorizationHelper.cs" />
+    <Compile Include="Editors\Filters\UserGroupAuthorizationAttribute.cs" />
+    <Compile Include="Editors\Filters\UserGroupEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\UserGroupsController.cs" />
-    <Compile Include="Editors\UserGroupValidateAttribute.cs" />
+    <Compile Include="Editors\Filters\UserGroupValidateAttribute.cs" />
     <Compile Include="Editors\UsersController.cs" />
     <Compile Include="ExamineStartup.cs" />
     <Compile Include="Features\DisabledFeatures.cs" />
@@ -207,8 +210,8 @@
     <Compile Include="Models\ContentEditing\CodeFileDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentApp.cs" />
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />
+    <Compile Include="Models\ContentEditing\ContentVariantSave.cs" />
     <Compile Include="Models\ContentEditing\ContentVariationDisplay.cs" />
-    <Compile Include="Models\ContentEditing\ContentVariationPublish.cs" />
     <Compile Include="Models\ContentEditing\CreatedDocumentTypeCollectionResult.cs" />
     <Compile Include="Models\ContentEditing\DictionaryDisplay.cs" />
     <Compile Include="Models\ContentEditing\DictionaryOverviewDisplay.cs" />
@@ -455,6 +458,8 @@
     <Compile Include="WebApi\Filters\AppendUserModifiedHeaderAttribute.cs" />
     <Compile Include="WebApi\Filters\CheckIfUserTicketDataIsStaleAttribute.cs" />
     <Compile Include="WebApi\Filters\FeatureAuthorizeAttribute.cs" />
+    <Compile Include="Editors\Filters\MediaItemSaveValidationAttribute.cs" />
+    <Compile Include="Editors\Filters\MemberSaveValidationAttribute.cs" />
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollection.cs" />
     <Compile Include="WebApi\UnhandedExceptionLoggerConfigurationAttribute.cs" />
@@ -608,13 +613,12 @@
     <Compile Include="Controllers\UmbProfileController.cs" />
     <Compile Include="Editors\ContentController.cs" />
     <Compile Include="Controllers\UmbLoginStatusController.cs" />
-    <Compile Include="Editors\ContentPostValidateAttribute.cs" />
+    <Compile Include="Editors\Filters\ContentPostValidateAttribute.cs" />
     <Compile Include="Editors\ContentTypeControllerBase.cs" />
     <Compile Include="Editors\DashboardController.cs" />
     <Compile Include="Editors\DashboardSecurity.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
-    <Compile Include="Editors\EntityControllerConfigurationAttribute.cs" />
     <Compile Include="Editors\ImagesController.cs" />
     <Compile Include="Editors\PackageInstallController.cs" />
     <Compile Include="Editors\RelationController.cs" />
@@ -634,7 +638,7 @@
     <Compile Include="Models\TemplateQuery\QueryModel.cs" />
     <Compile Include="Models\TemplateQuery\QueryResultModel.cs" />
     <Compile Include="Editors\TemplateQueryController.cs" />
-    <Compile Include="Models\ContentEditing\ContentBaseItemSave.cs" />
+    <Compile Include="Models\ContentEditing\ContentBaseSave.cs" />
     <Compile Include="Models\ContentEditing\MediaItemSave.cs" />
     <Compile Include="Models\ImageCropAnchor.cs" />
     <Compile Include="Models\ImageCropMode.cs" />
@@ -733,7 +737,6 @@
     <Compile Include="PropertyEditors\PropertyEditorAssetAttribute.cs" />
     <Compile Include="PropertyEditors\RteEmbedController.cs" />
     <Compile Include="Editors\EntityController.cs" />
-    <Compile Include="Editors\MediaPostValidateAttribute.cs" />
     <Compile Include="Editors\MemberController.cs" />
     <Compile Include="Editors\CurrentUserController.cs" />
     <Compile Include="Models\ContentEditing\DashboardControl.cs" />
@@ -815,7 +818,7 @@
     </Compile>
     <Compile Include="WebApi\AngularJsonMediaTypeFormatter.cs" />
     <Compile Include="WebApi\AngularJsonOnlyConfigurationAttribute.cs" />
-    <Compile Include="WebApi\Binders\MemberBinder.cs" />
+    <Compile Include="Editors\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
     <Compile Include="WebApi\Filters\AppendCurrentEventMessagesAttribute.cs" />
     <Compile Include="WebApi\Filters\ClearAngularAntiForgeryTokenAttribute.cs" />
@@ -997,12 +1000,12 @@
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="UrlHelperRenderExtensions.cs" />
-    <Compile Include="WebApi\Binders\ContentItemBaseBinder.cs" />
+    <Compile Include="Editors\Binders\ContentItemBaseBinder.cs" />
     <Compile Include="WebApi\IsBackOfficeAttribute.cs" />
-    <Compile Include="WebApi\Binders\ContentItemBinder.cs" />
-    <Compile Include="WebApi\Binders\MediaItemBinder.cs" />
+    <Compile Include="Editors\Binders\ContentItemBinder.cs" />
+    <Compile Include="Editors\Binders\MediaItemBinder.cs" />
     <Compile Include="WebApi\Filters\EnsureUserPermissionForContentAttribute.cs" />
-    <Compile Include="WebApi\Filters\ContentItemValidationHelper.cs" />
+    <Compile Include="Editors\Filters\ContentItemValidationHelper.cs" />
     <Compile Include="WebApi\Filters\EnsureUserPermissionForMediaAttribute.cs" />
     <Compile Include="WebApi\Filters\FileUploadCleanupFilterAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterAllowedOutgoingContentAttribute.cs" />

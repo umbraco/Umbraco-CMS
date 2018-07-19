@@ -31,6 +31,7 @@ using Constants = Umbraco.Core.Constants;
 using ContentVariation = Umbraco.Core.Models.ContentVariation;
 using Language = Umbraco.Web.Models.ContentEditing.Language;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Editors.Filters;
 
 namespace Umbraco.Web.Editors
 {
@@ -230,7 +231,7 @@ namespace Umbraco.Web.Editors
                 ContentTypeAlias = "recycleBin",
                 IsContainer = true,
                 Path = "-1," + Constants.System.RecycleBinContent,
-                ContentVariants = new List<ContentVariantDisplay>
+                Variants = new List<ContentVariantDisplay>
                 {
                     new ContentVariantDisplay
                     {
@@ -293,7 +294,7 @@ namespace Umbraco.Web.Editors
                 HandleContentNotFound(id);
                 return null;//irrelevant since the above throws
             }
-            var content = MapToDisplay(foundContent, culture);
+            var content = MapToDisplay(foundContent);
             return content;
         }
 
@@ -304,7 +305,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [EnsureUserPermissionForContent("id")]
-        public ContentItemDisplay GetById(Guid id, string culture = null)
+        public ContentItemDisplay GetById(Guid id)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
             if (foundContent == null)
@@ -324,12 +325,12 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [EnsureUserPermissionForContent("id")]
-        public ContentItemDisplay GetById(Udi id, string culture = null)
+        public ContentItemDisplay GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi != null)
             {
-                return GetById(guidUdi.Guid, culture);
+                return GetById(guidUdi.Guid);
             }
 
             throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -631,119 +632,117 @@ namespace Umbraco.Web.Editors
 
         private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod)
         {
-            throw new NotImplementedException("Implement this!");
+            //If we've reached here it means:
+            // * Our model has been bound
+            // * and validated
+            // * any file attachments have been saved to their temporary location for us to use
+            // * we have a reference to the DTO object and the persisted object
+            // * Permissions are valid
+            MapPropertyValues(contentItem);
 
-            ////If we've reached here it means:
-            //// * Our model has been bound
-            //// * and validated
-            //// * any file attachments have been saved to their temporary location for us to use
-            //// * we have a reference to the DTO object and the persisted object
-            //// * Permissions are valid
-            //MapPropertyValues(contentItem);
+            //We need to manually check the validation results here because:
+            // * We still need to save the entity even if there are validation value errors
+            // * Depending on if the entity is new, and if there are non property validation errors (i.e. the name is null)
+            //      then we cannot continue saving, we can only display errors
+            // * If there are validation errors and they were attempting to publish, we can only save, NOT publish and display
+            //      a message indicating this
+            if (ModelState.IsValid == false)
+            {
+                if (!RequiredForPersistenceAttribute.HasRequiredValuesForPersistence(contentItem) && IsCreatingAction(contentItem.Action))
+                {
+                    //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
+                    // add the modelstate to the outgoing object and throw a validation message
+                    var forDisplay = MapToDisplay(contentItem.PersistedContent, contentItem.Culture);
+                    forDisplay.Errors = ModelState.ToErrorDictionary();
+                    throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
 
-            ////We need to manually check the validation results here because:
-            //// * We still need to save the entity even if there are validation value errors
-            //// * Depending on if the entity is new, and if there are non property validation errors (i.e. the name is null)
-            ////      then we cannot continue saving, we can only display errors
-            //// * If there are validation errors and they were attempting to publish, we can only save, NOT publish and display
-            ////      a message indicating this
-            //if (ModelState.IsValid == false)
-            //{
-            //    if (!RequiredForPersistenceAttribute.HasRequiredValuesForPersistence(contentItem) && IsCreatingAction(contentItem.Action))
-            //    {
-            //        //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
-            //        // add the modelstate to the outgoing object and throw a validation message
-            //        var forDisplay = MapToDisplay(contentItem.PersistedContent, contentItem.Culture);
-            //        forDisplay.Errors = ModelState.ToErrorDictionary();
-            //        throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
+                }
 
-            //    }
+                //if the model state is not valid we cannot publish so change it to save
+                switch (contentItem.Action)
+                {
+                    case ContentSaveAction.Publish:
+                        contentItem.Action = ContentSaveAction.Save;
+                        break;
+                    case ContentSaveAction.PublishNew:
+                        contentItem.Action = ContentSaveAction.SaveNew;
+                        break;
+                }
+            }
 
-            //    //if the model state is not valid we cannot publish so change it to save
-            //    switch (contentItem.Action)
-            //    {
-            //        case ContentSaveAction.Publish:
-            //            contentItem.Action = ContentSaveAction.Save;
-            //            break;
-            //        case ContentSaveAction.PublishNew:
-            //            contentItem.Action = ContentSaveAction.SaveNew;
-            //            break;
-            //    }
-            //}
+            //initialize this to successful
+            var publishStatus = new PublishResult(null, contentItem.PersistedContent);
+            var wasCancelled = false;
 
-            ////initialize this to successful
-            //var publishStatus = new PublishResult(null, contentItem.PersistedContent);
-            //var wasCancelled = false;
+            if (contentItem.Action == ContentSaveAction.Save || contentItem.Action == ContentSaveAction.SaveNew)
+            {
+                //save the item
+                var saveResult = saveMethod(contentItem.PersistedContent);
 
-            //if (contentItem.Action == ContentSaveAction.Save || contentItem.Action == ContentSaveAction.SaveNew)
-            //{
-            //    //save the item
-            //    var saveResult = saveMethod(contentItem.PersistedContent);
+                wasCancelled = saveResult.Success == false && saveResult.Result == OperationResultType.FailedCancelledByEvent;
+            }
+            else if (contentItem.Action == ContentSaveAction.SendPublish || contentItem.Action == ContentSaveAction.SendPublishNew)
+            {
+                var sendResult = Services.ContentService.SendToPublication(contentItem.PersistedContent, Security.CurrentUser.Id);
+                wasCancelled = sendResult == false;
+            }
+            else
+            {
+                PublishInternal(contentItem, ref publishStatus, ref wasCancelled);
+            }
 
-            //    wasCancelled = saveResult.Success == false && saveResult.Result == OperationResultType.FailedCancelledByEvent;
-            //}
-            //else if (contentItem.Action == ContentSaveAction.SendPublish || contentItem.Action == ContentSaveAction.SendPublishNew)
-            //{
-            //    var sendResult = Services.ContentService.SendToPublication(contentItem.PersistedContent, Security.CurrentUser.Id);
-            //    wasCancelled = sendResult == false;
-            //}
-            //else
-            //{
-            //    PublishInternal(contentItem, ref publishStatus, ref wasCancelled);
-            //}
+            //get the updated model
+            var display = MapToDisplay(contentItem.PersistedContent, contentItem.Culture);
 
-            ////get the updated model
-            //var display = MapToDisplay(contentItem.PersistedContent, contentItem.Culture);
+            //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
+            HandleInvalidModelState(display);
 
-            ////lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
-            //HandleInvalidModelState(display);
+            //put the correct msgs in
+            switch (contentItem.Action)
+            {
+                case ContentSaveAction.Save:
+                case ContentSaveAction.SaveNew:
+                    if (wasCancelled == false)
+                    {
+                        display.AddSuccessNotification(
+                            Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
+                            Services.TextService.Localize("speechBubbles/editContentSavedText"));
+                    }
+                    else
+                    {
+                        AddCancelMessage(display);
+                    }
+                    break;
+                case ContentSaveAction.SendPublish:
+                case ContentSaveAction.SendPublishNew:
+                    if (wasCancelled == false)
+                    {
+                        display.AddSuccessNotification(
+                            Services.TextService.Localize("speechBubbles/editContentSendToPublish"),
+                            Services.TextService.Localize("speechBubbles/editContentSendToPublishText"));
+                    }
+                    else
+                    {
+                        AddCancelMessage(display);
+                    }
+                    break;
+                case ContentSaveAction.Publish:
+                case ContentSaveAction.PublishNew:
+                    ShowMessageForPublishStatus(publishStatus, display);
+                    break;
+            }
 
-            ////put the correct msgs in
-            //switch (contentItem.Action)
-            //{
-            //    case ContentSaveAction.Save:
-            //    case ContentSaveAction.SaveNew:
-            //        if (wasCancelled == false)
-            //        {
-            //            display.AddSuccessNotification(
-            //                Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
-            //                Services.TextService.Localize("speechBubbles/editContentSavedText"));
-            //        }
-            //        else
-            //        {
-            //            AddCancelMessage(display);
-            //        }
-            //        break;
-            //    case ContentSaveAction.SendPublish:
-            //    case ContentSaveAction.SendPublishNew:
-            //        if (wasCancelled == false)
-            //        {
-            //            display.AddSuccessNotification(
-            //                Services.TextService.Localize("speechBubbles/editContentSendToPublish"),
-            //                Services.TextService.Localize("speechBubbles/editContentSendToPublishText"));
-            //        }
-            //        else
-            //        {
-            //            AddCancelMessage(display);
-            //        }
-            //        break;
-            //    case ContentSaveAction.Publish:
-            //    case ContentSaveAction.PublishNew:
-            //        ShowMessageForPublishStatus(publishStatus, display);
-            //        break;
-            //}
+            //If the item is new and the operation was cancelled, we need to return a different
+            // status code so the UI can handle it since it won't be able to redirect since there
+            // is no Id to redirect to!
+            if (wasCancelled && IsCreatingAction(contentItem.Action))
+            {
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
+            }
 
-            ////If the item is new and the operation was cancelled, we need to return a different
-            //// status code so the UI can handle it since it won't be able to redirect since there
-            //// is no Id to redirect to!
-            //if (wasCancelled && IsCreatingAction(contentItem.Action))
-            //{
-            //    throw new HttpResponseException(Request.CreateValidationErrorResponse(display));
-            //}
+            display.PersistedContent = contentItem.PersistedContent;
 
-            //display.PersistedContent = contentItem.PersistedContent;
-
-            //return display;
+            return display;
         }
 
         /// <summary>
@@ -1078,51 +1077,56 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Maps the dto property values to the persisted model
         /// </summary>
-        /// <param name="contentItem"></param>
-        private void MapPropertyValues(ContentItemSave contentItem)
+        /// <param name="contentSave"></param>
+        private void MapPropertyValues(ContentItemSave contentSave)
         {
-            //Don't update the name if it is empty
-            if (!contentItem.Name.IsNullOrWhiteSpace())
+            //set the names for the variants
+            foreach(var variant in contentSave.Variants)
             {
-                if (contentItem.PersistedContent.ContentType.VariesByCulture())
+                //Don't update the name if it is empty
+                if (!variant.Name.IsNullOrWhiteSpace())
                 {
-                    if (contentItem.Culture.IsNullOrWhiteSpace())
-                        throw new InvalidOperationException($"Cannot set culture name without a culture.");
-                    contentItem.PersistedContent.SetCultureName(contentItem.Name, contentItem.Culture);
-                }
-                else
-                {
-                    contentItem.PersistedContent.Name = contentItem.Name;
+                    if (contentSave.PersistedContent.ContentType.VariesByCulture())
+                    {
+                        if (variant.Culture.IsNullOrWhiteSpace())
+                            throw new InvalidOperationException($"Cannot set culture name without a culture.");
+                        contentSave.PersistedContent.SetCultureName(variant.Name, variant.Culture);
+                    }
+                    else
+                    {
+                        contentSave.PersistedContent.Name = variant.Name;
+                    }
                 }
             }
 
             //TODO: We need to support 'send to publish'
 
-            contentItem.PersistedContent.ExpireDate = contentItem.ExpireDate;
-            contentItem.PersistedContent.ReleaseDate = contentItem.ReleaseDate;
+            contentSave.PersistedContent.ExpireDate = contentSave.ExpireDate;
+            contentSave.PersistedContent.ReleaseDate = contentSave.ReleaseDate;
+
             //only set the template if it didn't change
-            var templateChanged = (contentItem.PersistedContent.Template == null && contentItem.TemplateAlias.IsNullOrWhiteSpace() == false)
-                                                        || (contentItem.PersistedContent.Template != null && contentItem.PersistedContent.Template.Alias != contentItem.TemplateAlias)
-                                                        || (contentItem.PersistedContent.Template != null && contentItem.TemplateAlias.IsNullOrWhiteSpace());
+            var templateChanged = (contentSave.PersistedContent.Template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
+                                                        || (contentSave.PersistedContent.Template != null && contentSave.PersistedContent.Template.Alias != contentSave.TemplateAlias)
+                                                        || (contentSave.PersistedContent.Template != null && contentSave.TemplateAlias.IsNullOrWhiteSpace());
             if (templateChanged)
             {
-                var template = Services.FileService.GetTemplate(contentItem.TemplateAlias);
-                if (template == null && contentItem.TemplateAlias.IsNullOrWhiteSpace() == false)
+                var template = Services.FileService.GetTemplate(contentSave.TemplateAlias);
+                if (template == null && contentSave.TemplateAlias.IsNullOrWhiteSpace() == false)
                 {
                     //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
-                    Logger.Warn<ContentController>("No template exists with the specified alias: " + contentItem.TemplateAlias);
+                    Logger.Warn<ContentController>("No template exists with the specified alias: " + contentSave.TemplateAlias);
                 }
                 else
                 {
                     //NOTE: this could be null if there was a template and the posted template is null, this should remove the assigned template
-                    contentItem.PersistedContent.Template = template;
+                    contentSave.PersistedContent.Template = template;
                 }
             }
 
             bool Varies(Property property) => property.PropertyType.VariesByCulture();
 
             MapPropertyValues<IContent, ContentItemSave>(
-                contentItem,
+                contentSave,
                 (save, property) => Varies(property) ? property.GetValue(save.Culture) : property.GetValue(),         //get prop val
                 (save, property, v) => { if (Varies(property)) property.SetValue(v, save.Culture); else property.SetValue(v); });  //set prop val
         }
@@ -1323,19 +1327,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private ContentItemDisplay MapToDisplay(IContent content)
         {
-            ////A culture must exist in the mapping context if this content type is CultureNeutral since for a culture variant to be edited,
-            //// the Cuture property of ContentItemDisplay must exist (at least currently).
-            //if (culture == null && content.ContentType.VariesByCulture())
-            //{
-            //    //If a culture is not explicitly sent up, then it means that the user is editing the default variant language.
-            //    culture = Services.LocalizationService.GetDefaultLanguageIsoCode();
-            //}
-
-            //var display = ContextMapper.Map<IContent, ContentItemDisplay>(content, UmbracoContext,
-            //    new Dictionary<string, object> { { ContextMapper.CultureKey, culture } });
-
-            var display = ContextMapper.Map<IContent, ContentItemDisplay>(content, UmbracoContext);
-
+            var display = Mapper.Map<ContentItemDisplay>(content);
             return display;
         }
     }

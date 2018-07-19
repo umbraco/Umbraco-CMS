@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
@@ -13,7 +11,7 @@ using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web._Legacy.Actions;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.Editors.Filters
 {
     /// <summary>
     /// Checks if the user has access to post a content item based on whether it's being created or saved.

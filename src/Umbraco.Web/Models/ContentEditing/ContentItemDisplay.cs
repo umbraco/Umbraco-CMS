@@ -22,7 +22,7 @@ namespace Umbraco.Web.Models.ContentEditing
             AllowPreview = true;
             Notifications = new List<Notification>();
             Errors = new Dictionary<string, object>();
-            ContentVariants = new List<ContentVariantDisplay>();
+            Variants = new List<ContentVariantDisplay>();
             ContentApps = new List<ContentApp>();
         }
 
@@ -65,7 +65,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// If a content item is invariant, this collection will only contain one item, else it will contain all culture variants
         /// </remarks>
         [DataMember(Name = "variants")]
-        public IEnumerable<ContentVariantDisplay> ContentVariants { get; set; }
+        public IEnumerable<ContentVariantDisplay> Variants { get; set; }
 
         [DataMember(Name = "owner")]
         public UserProfile Owner { get; set; }

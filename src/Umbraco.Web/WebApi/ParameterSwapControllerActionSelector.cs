@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Formatting;
 using System.Web;
-using System.Web.Http;
 using System.Web.Http.Controllers;
-using System.Web.Http.Validation;
-using System.Web.Http.ValueProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.WebApi
 {
     /// <summary>
     /// This is used to auto-select specific actions on controllers that would otherwise be ambiguous based on a single parameter type

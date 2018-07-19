@@ -13,6 +13,7 @@ using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding.Binders;
 using System.Web.Http.Validation;
 using System.Web.ModelBinding;
+using System.Web.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Umbraco.Core;
@@ -34,33 +35,33 @@ using ModelMetadataProvider = System.Web.Http.Metadata.ModelMetadataProvider;
 using MutableObjectModelBinder = System.Web.Http.ModelBinding.Binders.MutableObjectModelBinder;
 using Task = System.Threading.Tasks.Task;
 
-namespace Umbraco.Web.WebApi.Binders
+namespace Umbraco.Web.Editors.Binders
 {
+    /// <inheritdoc />
     /// <summary>
     /// Binds the content model to the controller action for the posted multi-part Post
     /// </summary>
     internal abstract class ContentItemBaseBinder<TPersisted, TModelSave> : IModelBinder
-        where TPersisted : class, IContentBase
-        where TModelSave : ContentBaseItemSave<TPersisted>
+    where TPersisted : class, IContentBase
+        //where TModelSave : ContentBaseItemSave<TPersisted>
     {
         protected Core.Logging.ILogger Logger { get; }
         protected ServiceContext Services { get; }
         protected IUmbracoContextAccessor UmbracoContextAccessor { get; }
 
-        public ContentItemBaseBinder() : this(Current.Logger, Current.Services, Current.UmbracoContextAccessor)
+        protected ContentItemBaseBinder() : this(Current.Logger, Current.Services, Current.UmbracoContextAccessor)
         {
         }
 
-        public ContentItemBaseBinder(Core.Logging.ILogger logger, ServiceContext services, IUmbracoContextAccessor umbracoContextAccessor)
+        protected ContentItemBaseBinder(Core.Logging.ILogger logger, ServiceContext services, IUmbracoContextAccessor umbracoContextAccessor)
         {
             Logger = logger;
             Services = services;
             UmbracoContextAccessor = umbracoContextAccessor;
         }
 
-        public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
+        public virtual bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
         {
-            //NOTE: Validation is done in the filter
             if (actionContext.Request.Content.IsMimeMultipartContent() == false)
             {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
@@ -69,17 +70,9 @@ namespace Umbraco.Web.WebApi.Binders
             var result = GetMultiPartResult(actionContext);
 
             var model = GetModel(actionContext, bindingContext, result);
-            //now that everything is binded, validate the properties
-            var contentItemValidator = GetValidationHelper();
-            contentItemValidator.ValidateItem(actionContext, model);
             bindingContext.Model = model;
 
             return bindingContext.Model != null;
-        }
-
-        protected virtual ContentItemValidationHelper<TPersisted, TModelSave> GetValidationHelper()
-        {
-            return new ContentItemValidationHelper<TPersisted, TModelSave>(Logger, UmbracoContextAccessor);
         }
 
         private MultipartFormDataStreamProvider GetMultiPartResult(HttpActionContext actionContext)
@@ -129,14 +122,10 @@ namespace Umbraco.Web.WebApi.Binders
         /// </summary>
         /// <param name="actionContext"></param>
         /// <param name="bindingContext"></param>
-        /// <param name="provider"></param>
+        /// <param name="result"></param>
         /// <returns></returns>
         private TModelSave GetModel(HttpActionContext actionContext, ModelBindingContext bindingContext, MultipartFormDataStreamProvider result)
         {
-            //var request = actionContext.Request;
-            //var content = request.Content;
-            //var result = content.ReadAsMultipartAsync(provider).ConfigureAwait(false).GetAwaiter().GetResult();
-
             if (result.FormData["contentItem"] == null)
             {
                 var response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest);
@@ -170,14 +159,14 @@ namespace Umbraco.Web.WebApi.Binders
                 }
                 var propAlias = parts[1];
 
-                var fileName = file.Headers.ContentDisposition.FileName.Trim(new char[] {'\"'});
+                var fileName = file.Headers.ContentDisposition.FileName.Trim(new char[] { '\"' });
 
                 model.UploadedFiles.Add(new ContentPropertyFile
-                    {
-                        TempFilePath = file.LocalFileName,
-                        PropertyAlias = propAlias,
-                        FileName = fileName
-                    });
+                {
+                    TempFilePath = file.LocalFileName,
+                    PropertyAlias = propAlias,
+                    FileName = fileName
+                });
             }
 
             if (ContentControllerBase.IsCreatingAction(model.Action))
@@ -202,8 +191,6 @@ namespace Umbraco.Web.WebApi.Binders
                 MapPropertyValuesFromSaved(model, model.ContentDto);
             }
 
-            model.Name = model.Name.Trim();
-
             return model;
         }
 
@@ -212,7 +199,7 @@ namespace Umbraco.Web.WebApi.Binders
         /// </summary>
         /// <param name="saveModel"></param>
         /// <param name="dto"></param>
-        private static void MapPropertyValuesFromSaved(TModelSave saveModel, ContentItemDto<TPersisted> dto)
+        private static void MapPropertyValuesFromSaved(IContentProperties<ContentPropertyBasic> saveModel, ContentItemDto<TPersisted> dto)
         {
             //NOTE: Don't convert this to linq, this is much quicker
             foreach (var p in saveModel.Properties)

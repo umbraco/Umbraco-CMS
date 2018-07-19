@@ -5,6 +5,8 @@
     /// </summary>
     public class ContentPropertyFile
     {
+        //TODO: This needs to be overhauled to support variants and things like NC
+
         /// <summary>
         /// Gets or sets the property alias.
         /// </summary>

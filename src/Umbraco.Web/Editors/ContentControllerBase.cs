@@ -49,7 +49,7 @@ namespace Umbraco.Web.Editors
             Func<TSaved, Property, object> getPropertyValue,
             Action<TSaved, Property, object> savePropertyValue)
             where TPersisted : IContentBase
-            where TSaved : ContentBaseItemSave<TPersisted>
+            where TSaved : ContentBaseSave<TPersisted>
         {
             // map the property values
             foreach (var propertyDto in contentItem.ContentDto.Properties)

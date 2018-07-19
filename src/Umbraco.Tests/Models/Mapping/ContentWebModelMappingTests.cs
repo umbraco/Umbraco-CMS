@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             AssertBasics(result, content);
 
-            var invariantContent = result.ContentVariants.First();
+            var invariantContent = result.Variants.First();
             foreach (var p in content.Properties)
             {
                 AssertBasicProperty(invariantContent, p);
@@ -146,7 +146,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             AssertBasics(result, content);
 
-            var invariantContent = result.ContentVariants.First();
+            var invariantContent = result.Variants.First();
             foreach (var p in content.Properties)
             {
                 AssertBasicProperty(invariantContent, p);
@@ -195,7 +195,7 @@ namespace Umbraco.Tests.Models.Mapping
 
             AssertBasics(result, content);
 
-            var invariantContent = result.ContentVariants.First();
+            var invariantContent = result.Variants.First();
             foreach (var p in content.Properties)
             {
                 AssertBasicProperty(invariantContent, p);
@@ -238,7 +238,7 @@ namespace Umbraco.Tests.Models.Mapping
                 Assert.IsNull(result.Owner); // because, 0 is no user
             }
 
-            var invariantContent = result.ContentVariants.First();
+            var invariantContent = result.Variants.First();
 
             Assert.AreEqual(content.ParentId, result.ParentId);
             Assert.AreEqual(content.UpdateDate, invariantContent.UpdateDate);

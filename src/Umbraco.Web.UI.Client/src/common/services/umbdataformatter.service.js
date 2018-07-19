@@ -343,6 +343,7 @@
             /** formats the display model used to display the content to the model used to save the content  */
             formatContentPostData: function (displayModel, action) {
 
+                //TODO: We need to change this since it's no longer relevant with variants
                 //this is basically the same as for media but we need to explicitly add some extra properties
                 var saveModel = this.formatMediaPostData(displayModel, action);
 

@@ -18,6 +18,7 @@ namespace Umbraco.Web.Models.Mapping
         public MediaMapperProfile(
             TabsAndPropertiesResolver<IMedia, MediaItemDisplay> tabsAndPropertiesResolver,
             ContentTreeNodeUrlResolver<IMedia, MediaTreeController> contentTreeNodeUrlResolver,
+            MediaAppResolver mediaAppResolver,
             IUserService userService,
             ILocalizedTextService textService,
             IDataTypeService dataTypeService,
@@ -29,7 +30,6 @@ namespace Umbraco.Web.Models.Mapping
             var mediaOwnerResolver = new OwnerResolver<IMedia>(userService);
             var childOfListViewResolver = new MediaChildOfListViewResolver(mediaService, mediaTypeService);
             var mediaTypeBasicResolver = new ContentTypeBasicResolver<IMedia, MediaItemDisplay>();
-            var mediaAppResolver = new MediaAppResolver(dataTypeService, propertyEditors);
 
             //FROM IMedia TO MediaItemDisplay
             CreateMap<IMedia, MediaItemDisplay>()

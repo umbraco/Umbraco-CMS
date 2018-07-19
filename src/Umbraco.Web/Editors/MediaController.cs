@@ -23,7 +23,6 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using System.Linq;
 using System.Web.Http.Controllers;
-using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 using Umbraco.Core.Configuration;
@@ -35,6 +34,8 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Editors.Binders;
+using Umbraco.Web.Editors.Filters;
 
 namespace Umbraco.Web.Editors
 {
@@ -81,7 +82,7 @@ namespace Umbraco.Web.Editors
             }
 
             var emptyContent = Services.MediaService.CreateMedia("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
-            var mapped = ContextMapper.Map<IMedia, MediaItemDisplay>(emptyContent, UmbracoContext);
+            var mapped = Mapper.Map<MediaItemDisplay>(emptyContent);
 
             //remove the listview app if it exists
             mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "childItems").ToList();
@@ -131,7 +132,7 @@ namespace Umbraco.Web.Editors
                 //HandleContentNotFound will throw an exception
                 return null;
             }
-            return ContextMapper.Map<IMedia, MediaItemDisplay>(foundContent, UmbracoContext);
+            return Mapper.Map<MediaItemDisplay>(foundContent);
         }
 
         /// <summary>
@@ -151,7 +152,7 @@ namespace Umbraco.Web.Editors
                 //HandleContentNotFound will throw an exception
                 return null;
             }
-            return ContextMapper.Map<IMedia, MediaItemDisplay>(foundContent, UmbracoContext);
+            return Mapper.Map<MediaItemDisplay>(foundContent);
         }
 
         /// <summary>
@@ -180,7 +181,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<MediaItemDisplay> GetByIds([FromUri]int[] ids)
         {
             var foundMedia = Services.MediaService.GetByIds(ids);
-            return foundMedia.Select(media => ContextMapper.Map<IMedia, MediaItemDisplay>(media, UmbracoContext));
+            return foundMedia.Select(media => Mapper.Map<MediaItemDisplay>(media));
         }
 
         /// <summary>
@@ -430,7 +431,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [FileUploadCleanupFilter]
-        [MediaPostValidate]
+        [MediaItemSaveValidation]
         [OutgoingEditorModelEvent]
         public MediaItemDisplay PostSave(
             [ModelBinder(typeof(MediaItemBinder))]
@@ -467,7 +468,7 @@ namespace Umbraco.Web.Editors
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the modelstate to the outgoing object and throw validation response
-                    var forDisplay = ContextMapper.Map<IMedia, MediaItemDisplay>(contentItem.PersistedContent, UmbracoContext);
+                    var forDisplay = Mapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
                 }
@@ -477,7 +478,7 @@ namespace Umbraco.Web.Editors
             var saveStatus = Services.MediaService.Save(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
 
             //return the updated model
-            var display = ContextMapper.Map<IMedia, MediaItemDisplay>(contentItem.PersistedContent, UmbracoContext);
+            var display = Mapper.Map<MediaItemDisplay>(contentItem.PersistedContent);
 
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
@@ -574,7 +575,7 @@ namespace Umbraco.Web.Editors
             var f = mediaService.CreateMedia(folder.Name, intParentId, Constants.Conventions.MediaTypes.Folder);
             mediaService.Save(f, Security.CurrentUser.Id);
 
-            return ContextMapper.Map<IMedia, MediaItemDisplay>(f, UmbracoContext);
+            return Mapper.Map<MediaItemDisplay>(f);
         }
 
         /// <summary>

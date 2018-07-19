@@ -5,7 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.Editors.Filters
 {
     internal class UserGroupEditorAuthorizationHelper
     {

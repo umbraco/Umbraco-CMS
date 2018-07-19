@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Web.Http.Controllers;
+using System.Web.Http.ModelBinding;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -7,8 +9,12 @@ using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 
-namespace Umbraco.Web.WebApi.Binders
+namespace Umbraco.Web.Editors.Binders
 {
+    /// <inheritdoc />
+    /// <summary>
+    /// The model binder for <see cref="T:Umbraco.Web.Models.ContentEditing.MediaItemSave" />
+    /// </summary>
     internal class MediaItemBinder : ContentItemBaseBinder<IMedia, MediaItemSave>
     {
         public MediaItemBinder() : this(Current.Logger, Current.Services, Current.UmbracoContextAccessor)
@@ -18,6 +24,23 @@ namespace Umbraco.Web.WebApi.Binders
         public MediaItemBinder(Core.Logging.ILogger logger, ServiceContext services, IUmbracoContextAccessor umbracoContextAccessor)
             : base(logger, services, umbracoContextAccessor)
         {
+        }
+
+        /// <summary>
+        /// Overridden to trim the name
+        /// </summary>
+        /// <param name="actionContext"></param>
+        /// <param name="bindingContext"></param>
+        /// <returns></returns>
+        public override bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
+        {
+            var result = base.BindModel(actionContext, bindingContext);
+            if (result)
+            {
+                var model = (MediaItemSave) bindingContext.Model;
+                model.Name = model.Name.Trim();
+            }
+            return result;
         }
 
         protected override IMedia GetExisting(MediaItemSave model)

@@ -44,7 +44,7 @@ namespace Umbraco.Tests.Web.AngularIntegration
             var displayModel = new ContentItemDisplay
             {
                 Id = 1234,
-                ContentVariants = new List<ContentVariantDisplay>
+                Variants = new List<ContentVariantDisplay>
                 {
                     new ContentVariantDisplay
                     {
