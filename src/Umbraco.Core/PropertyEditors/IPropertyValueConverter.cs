@@ -18,9 +18,16 @@ namespace Umbraco.Core.PropertyEditors
         bool IsConverter(PublishedPropertyType propertyType);
 
         /// <summary>
-        /// Determines whether a source value is an actual value, or not a value.
+        /// Determines whether a value is an actual value, or not a value.
         /// </summary>
-        bool IsValue(object value);
+        /// <remarks>
+        /// <para>Called for Source, Inter and Object levels, until one does not return null.</para>
+        /// <para>Can return true (is a value), false (is not a value), or null to indicate that it
+        /// cannot be determined at the specified level. For instance, if source is a string that
+        /// could contain JSON, the decision could be made on the intermediate value. Or, if it is
+        /// a picker, it could be made on the object value (the actual picked object).</para>
+        /// </remarks>
+        bool? IsValue(object value, PropertyValueLevel level);
 
         /// <summary>
         /// Gets the type of values returned by the converter.

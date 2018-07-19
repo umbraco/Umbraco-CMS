@@ -87,10 +87,34 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _variations = origin._variations;
         }
 
+        // determines whether a property has value
         public override bool HasValue(string culture = null, string segment = null)
         {
             ContextualizeVariation(ref culture, ref segment);
-            return PropertyType.IsValue(GetSourceValue(culture, segment));
+
+            var value = GetSourceValue(culture, segment);
+            var hasValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
+            if (hasValue.HasValue) return hasValue.Value;
+
+            lock (_locko)
+            {
+                value = GetInterValue(culture, segment);
+                hasValue = PropertyType.IsValue(value, PropertyValueLevel.Inter);
+                if (hasValue.HasValue) return hasValue.Value;
+
+                var cacheValues = GetCacheValues(PropertyType.CacheLevel).For(culture, segment);
+
+                // initial reference cache level always is .Content
+                const PropertyCacheLevel initialCacheLevel = PropertyCacheLevel.Element;
+
+                if (!cacheValues.ObjectInitialized)
+                {
+                    cacheValues.ObjectValue = PropertyType.ConvertInterToObject(_content, initialCacheLevel, value, _isPreviewing);
+                    cacheValues.ObjectInitialized = true;
+                }
+                value = cacheValues.ObjectValue;
+                return PropertyType.IsValue(value, PropertyValueLevel.Object) ?? false;
+            }
         }
 
         // used to cache the CacheValues of this property
