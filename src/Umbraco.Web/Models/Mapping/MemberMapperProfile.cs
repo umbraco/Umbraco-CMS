@@ -14,16 +14,19 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class MemberMapperProfile : Profile
     {
-        public MemberMapperProfile(IUserService userService, ILocalizedTextService textService, IMemberTypeService memberTypeService, IMemberService memberService)
+        public MemberMapperProfile(
+            MemberTabsAndPropertiesResolver tabsAndPropertiesResolver,
+            MemberTreeNodeUrlResolver memberTreeNodeUrlResolver,
+            MemberBasicPropertiesResolver memberBasicPropertiesResolver,
+            IUserService userService,
+            IMemberTypeService memberTypeService,
+            IMemberService memberService)
         {
             // create, capture, cache
             var memberOwnerResolver = new OwnerResolver<IMember>(userService);
-            var tabsAndPropertiesResolver = new MemberTabsAndPropertiesResolver(textService, memberService, userService);
             var memberProfiderFieldMappingResolver = new MemberProviderFieldResolver();
             var membershipScenarioMappingResolver = new MembershipScenarioResolver(memberTypeService);
             var memberDtoPropertiesResolver = new MemberDtoPropertiesResolver();
-            var memberTreeNodeUrlResolver = new MemberTreeNodeUrlResolver();
-            var memberBasicPropertiesResolver = new MemberBasicPropertiesResolver();
 
             //FROM MembershipUser TO MediaItemDisplay - used when using a non-umbraco membership provider
             CreateMap<MembershipUser, MemberDisplay>().ConvertUsing<MembershipUserTypeConverter>();

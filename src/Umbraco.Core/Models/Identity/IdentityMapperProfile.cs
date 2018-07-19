@@ -8,9 +8,9 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models.Identity
 {
-    public class IdentityProfile : Profile
+    public class IdentityMapperProfile : Profile
     {
-        public IdentityProfile(ILocalizedTextService textService, IEntityService entityService, IGlobalSettings globalSettings)
+        public IdentityMapperProfile(ILocalizedTextService textService, IEntityService entityService, IGlobalSettings globalSettings)
         {
             CreateMap<IUser, BackOfficeIdentityUser>()
                 .BeforeMap((src, dest) =>
@@ -19,6 +19,7 @@ namespace Umbraco.Core.Models.Identity
                 })
                 .ConstructUsing(src => new BackOfficeIdentityUser(src.Id, src.Groups))
                 .ForMember(dest => dest.LastLoginDateUtc, opt => opt.MapFrom(src => src.LastLoginDate.ToUniversalTime()))
+                .ForMember(user => user.LastPasswordChangeDateUtc, expression => expression.MapFrom(user => user.LastPasswordChangeDate.ToUniversalTime()))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.EmailConfirmed, opt => opt.MapFrom(src => src.EmailConfirmedDate.HasValue))
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))

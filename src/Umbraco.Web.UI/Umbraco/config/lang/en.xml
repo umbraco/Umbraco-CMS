@@ -344,6 +344,7 @@
     <area alias="defaultdialogs">
         <key alias="nodeNameLinkPicker">Link title</key>
         <key alias="urlLinkPicker">Link</key>
+        <key alias="anchorLinkPicker">Anchor / querystring</key>
         <key alias="anchorInsert">Name</key>
         <key alias="assignDomain">Manage hostnames</key>
         <key alias="closeThisWindow">Close this window</key>
@@ -462,6 +463,7 @@
         <key alias="email">Enter your email...</key>
         <key alias="enterMessage">Enter a message...</key>
         <key alias="usernameHint">Your username is usually your email</key>
+        <key alias="anchor">#value or ?key=value</key>
     </area>
     <area alias="editcontenttype">
         <key alias="allowAtRoot" version="7.2">Allow at root</key>

@@ -16,25 +16,24 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentMapperProfile : Profile
     {
         public ContentMapperProfile(
+            ContentUrlResolver contentUrlResolver,
+            ContentTreeNodeUrlResolver<IContent, ContentTreeController> contentTreeNodeUrlResolver,
+            TabsAndPropertiesResolver<IContent, ContentVariantDisplay> tabsAndPropertiesResolver,
             IUserService userService,
             ILocalizedTextService textService,
             IContentService contentService,
             IContentTypeService contentTypeService,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
-            PropertyEditorCollection propertyEditors,
             ILogger logger)
         {
             // create, capture, cache
             var contentOwnerResolver = new OwnerResolver<IContent>(userService);
             var creatorResolver = new CreatorResolver(userService);
             var actionButtonsResolver = new ActionButtonsResolver(userService, contentService);
-            var tabsAndPropertiesResolver = new TabsAndPropertiesResolver<IContent, ContentVariantDisplay>(textService);
             var childOfListViewResolver = new ContentChildOfListViewResolver(contentService, contentTypeService);
             var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>();
-            var contentTreeNodeUrlResolver = new ContentTreeNodeUrlResolver<IContent, ContentTreeController>();
             var defaultTemplateResolver = new DefaultTemplateResolver();
-            var contentUrlResolver = new ContentUrlResolver(textService, contentService, logger);
             var variantResolver = new ContentVariantResolver(localizationService, textService);
             var contentAppResolver = new ContentAppResolver(dataTypeService, propertyEditors);
 
