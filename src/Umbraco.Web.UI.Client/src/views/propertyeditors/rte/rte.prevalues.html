@@ -4,7 +4,7 @@
 		<div ng-repeat="cmd in tinyMceConfig.commands">
             <label>
 			    <input type="checkbox" 
-				       ng-checked="selected(cmd, cmd.frontEndCommand, model.value.toolbar)" 
+				       ng-checked="selected(cmd, cmd.alias, model.value.toolbar)" 
 				       ng-model="cmd.selected" 
 				       ng-change="selectCommand(cmd)" /> 
 

@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Newtonsoft.Json.Linq;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -8,7 +9,7 @@ namespace Umbraco.Web.PropertyEditors
     public class RichTextConfiguration
     {
         [ConfigurationField("editor", "Editor", "views/propertyeditors/rte/rte.prevalues.html", HideLabel = true)]
-        public string Editor { get; set; }
+        public JObject Editor { get; set; }
 
         [ConfigurationField("hideLabel", "Hide Label", "boolean")]
         public bool HideLabel { get; set; }

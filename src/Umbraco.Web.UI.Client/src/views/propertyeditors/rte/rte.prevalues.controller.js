@@ -25,7 +25,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
 
             // extend commands with properties for font-icon and if it is a custom command
             $scope.tinyMceConfig.commands = _.map($scope.tinyMceConfig.commands, function (obj) {
-                var icon = getFontIcon(obj.frontEndCommand);
+                var icon = getFontIcon(obj.alias);
                 return angular.extend(obj, {
                     fontIcon: icon.name,
                     isCustom: icon.isCustom
@@ -46,10 +46,10 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
         };
 
         $scope.selectCommand = function(command){
-            var index = $scope.model.value.toolbar.indexOf(command.frontEndCommand);
+            var index = $scope.model.value.toolbar.indexOf(command.alias);
 
             if(command.selected && index === -1){
-                $scope.model.value.toolbar.push(command.frontEndCommand);
+                $scope.model.value.toolbar.push(command.alias);
             }else if(index >= 0){
                 $scope.model.value.toolbar.splice(index, 1);
             }
@@ -107,7 +107,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
         var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
 
             var commands = _.where($scope.tinyMceConfig.commands, {selected: true});
-            $scope.model.value.toolbar = _.pluck(commands, "frontEndCommand");
+            $scope.model.value.toolbar = _.pluck(commands, "alias");
             
         });
 

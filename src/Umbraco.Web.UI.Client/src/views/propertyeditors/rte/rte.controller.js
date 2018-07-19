@@ -13,18 +13,9 @@ angular.module("umbraco")
 
         var alreadyDirty = false;
         function syncContent(editor){
-            editor.save();
             angularHelper.safeApply($scope, function () {
                 $scope.model.value = editor.getContent();
             });
-
-            if (!alreadyDirty) {
-                //make the form dirty manually so that the track changes works, setting our model doesn't trigger
-                // the angular bits because tinymce replaces the textarea.
-                var currForm = angularHelper.getCurrentForm($scope);
-                currForm.$setDirty();
-                alreadyDirty = true;
-            }
         }
 
         tinyMceService.configuration().then(function (tinyMceConfig) {
@@ -37,11 +28,10 @@ angular.module("umbraco")
             var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],span[id|class|style]";
 
             var invalidElements = tinyMceConfig.inValidElements;
-            var plugins = _.map(tinyMceConfig.plugins, function (plugin) {
-                if (plugin.useOnFrontend) {
+            var plugins = _.map(tinyMceConfig.plugins,
+                function(plugin) {
                     return plugin.name;
-                }
-            }).join(" ");
+                });
 
             var editorConfig = $scope.model.config.editor;
             if (!editorConfig || angular.isString(editorConfig)) {
@@ -49,7 +39,14 @@ angular.module("umbraco")
             }
 
             //config value on the data type
-            var toolbar = editorConfig.toolbar.join(" | ");
+            var allowedSelectionToolbar = ["bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "outdent", "indent", "link"];
+            var allowedInsertToolbar = ["link", "image", "umbmediapicker", "umbembeddialog", "umbmacro", "bullist", "numlist"];
+            var insertToolbar = _.filter(editorConfig.toolbar, function (t) {
+                return allowedInsertToolbar.indexOf(t) !== -1;
+            }).join(" | ");
+            var selectionToolbar = _.filter(editorConfig.toolbar, function(t) {
+                return allowedSelectionToolbar.indexOf(t) !== -1;
+            }).join(" | ");
             var stylesheets = [];
             var styleFormats = [];
             var await = [];
@@ -142,8 +139,9 @@ angular.module("umbraco")
                 
                 //create a baseline Config to exten upon
                 var baseLineConfigObj = {
-                    mode: "exact",
-                    skin: "umbraco",
+                    //skin: "umbraco",
+                    theme: "inlite",
+                    inline: true,
                     plugins: plugins,
                     valid_elements: validElements,
                     invalid_elements: invalidElements,
@@ -154,7 +152,9 @@ angular.module("umbraco")
                     height: editorConfig.dimensions.height,
                     width: editorConfig.dimensions.width,
                     maxImageSize: editorConfig.maxImageSize,
-                    toolbar: toolbar,
+                    //toolbar: toolbar,
+                    insert_toolbar: insertToolbar,
+                    selection_toolbar: selectionToolbar,
                     content_css: stylesheets,
                     style_formats: styleFormats,
                     language: language,
@@ -198,81 +198,43 @@ angular.module("umbraco")
                 }
 
                 //set all the things that user configs should not be able to override
-                baseLineConfigObj.elements = $scope.textAreaHtmlId; //this is the exact textarea id to replace!
+                //baseLineConfigObj.elements = $scope.textAreaHtmlId; //this is the exact textarea id to replace!
+                baseLineConfigObj.selector = "#" + $scope.textAreaHtmlId;
                 baseLineConfigObj.setup = function (editor) {
 
                     //set the reference
                     tinyMceEditor = editor;
 
-                    //enable browser based spell checking
+                    //set the value and enable browser based spell checking
                     editor.on('init', function (e) {
+                        editor.setContent($scope.model.value);
                         editor.getBody().setAttribute('spellcheck', true);
                     });
-
-                    //We need to listen on multiple things here because of the nature of tinymce, it doesn't
-                    //fire events when you think!
-                    //The change event doesn't fire when content changes, only when cursor points are changed and undo points
-                    //are created. the blur event doesn't fire if you insert content into the editor with a button and then
-                    //press save.
-                    //We have a couple of options, one is to do a set timeout and check for isDirty on the editor, or we can
-                    //listen to both change and blur and also on our own 'saving' event. I think this will be best because a
-                    //timer might end up using unwanted cpu and we'd still have to listen to our saving event in case they clicked
-                    //save before the timeout elapsed.
-
-                    //TODO: We need to re-enable something like this to ensure the track changes is working with tinymce
-                    // so we can detect if the form is dirty or not, Per has some better events to use as this one triggers
-                    // even if you just enter/exit with mouse cursuor which doesn't really mean it's changed.
-                    // see: http://issues.umbraco.org/issue/U4-4485
-                    //var alreadyDirty = false;
-                    //editor.on('change', function (e) {
-                    //    angularHelper.safeApply($scope, function () {
-                    //        $scope.model.value = editor.getContent();
-
-                    //        if (!alreadyDirty) {
-                    //            //make the form dirty manually so that the track changes works, setting our model doesn't trigger
-                    //            // the angular bits because tinymce replaces the textarea.
-                    //            var currForm = angularHelper.getCurrentForm($scope);
-                    //            currForm.$setDirty();
-                    //            alreadyDirty = true;
-                    //        }
-
-                    //    });
-                    //});
-
-                    //when we leave the editor (maybe)
-                    editor.on('blur', function (e) {
-                        editor.save();
-                        angularHelper.safeApply($scope, function () {
-                            $scope.model.value = editor.getContent();
-                        });
-                    });
-
-                    //when buttons modify content
-                    editor.on('ExecCommand', function (e) {
-                        syncContent(editor);
-                    });
-
-                    // Update model on keypress
-                    editor.on('KeyUp', function (e) {
-                        syncContent(editor);
-                    });
-
-                    // Update model on change, i.e. copy/pasted text, plugins altering content
-                    editor.on('SetContent', function (e) {
-                        if (!e.initial) {
-                            syncContent(editor);
+                    
+                    editor.on('Dirty', function (e) {
+                        console.log("DIRTY...");
+                        if (!alreadyDirty) {
+                            //make the form dirty manually so that the track changes works, setting our model doesn't trigger
+                            // the angular bits because tinymce replaces the textarea.
+                            var currForm = angularHelper.getCurrentForm($scope);
+                            currForm.$setDirty();
+                            alreadyDirty = true;
                         }
                     });
 
-
-                    editor.on('ObjectResized', function (e) {
-                        var qs = "?width=" + e.width + "&height=" + e.height + "&mode=max";
-                        var srcAttr = $(e.target).attr("src");
-                        var path = srcAttr.split("?")[0];
-                        $(e.target).attr("data-mce-src", path + qs);
-
+                    editor.on('Change', function (e) {
+                        console.log("Change...");
                         syncContent(editor);
                     });
+
+                    //editor.on('ObjectResized', function (e) {
+                    //    var qs = "?width=" + e.width + "&height=" + e.height + "&mode=max";
+                    //    var srcAttr = $(e.target).attr("src");
+                    //    var path = srcAttr.split("?")[0];
+                    //    $(e.target).attr("data-mce-src", path + qs);
+
+                    //    syncContent(editor);
+                    //});
 					
                     tinyMceService.createLinkPicker(editor, $scope, function(currentTarget, anchorElement) {
                         $scope.linkPickerOverlay = {
@@ -354,7 +316,7 @@ angular.module("umbraco")
 
                         $scope.isLoading = false;
 
-                    }, 200, false);
+                    }, 200);
                 }
 
 

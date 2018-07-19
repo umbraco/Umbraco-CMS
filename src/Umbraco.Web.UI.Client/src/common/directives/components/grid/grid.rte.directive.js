@@ -34,10 +34,10 @@ angular.module("umbraco.directives")
 
                         var invalidElements = tinyMceConfig.inValidElements;
                         var plugins = _.map(tinyMceConfig.plugins, function (plugin) {
-                            if (plugin.useOnFrontend) {
-                                return plugin.name;
-                            }
-                        }).join(" ") + " autoresize";
+                            return plugin.name;
+                        });
+
+                        plugins.push("autoresize");
 
                         //config value on the data type
                         var toolbar = ["code", "styleselect", "bold", "italic", "alignleft", "aligncenter", "alignright", "bullist", "numlist", "link", "umbmediapicker", "umbembeddialog"].join(" | ");
