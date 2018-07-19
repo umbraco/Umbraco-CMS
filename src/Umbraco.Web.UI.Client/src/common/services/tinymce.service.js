@@ -761,9 +761,14 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 		 * @param {string} input the string to parse      
 		 */
 		getAnchorNames: function (input) {
-			var anchorPattern = /<a id=\\"(.*?)\\">/gi;
+            var anchors = [];
+            if (!input) {
+                return anchors;
+            }
+                
+		    var anchorPattern = /<a id=\\"(.*?)\\">/gi;
 			var matches = input.match(anchorPattern);
-			var anchors = [];
+			
 
 			if (matches) {
 				anchors = matches.map(function (v) {
