@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 
@@ -18,14 +17,14 @@ namespace Umbraco.Web.Tour
         /// <summary>
         /// Initializes a new instance of the <see cref="TourFilterCollectionBuilder"/> class.
         /// </summary>
-        public TourFilterCollectionBuilder(IServiceContainer container)
+        public TourFilterCollectionBuilder(IContainer container)
             : base(container)
         { }
 
         /// <inheritdoc />
-        protected override IEnumerable<BackOfficeTourFilter> CreateItems(params object[] args)
+        protected override IEnumerable<BackOfficeTourFilter> CreateItems(/*params object[] args*/)
         {
-            return base.CreateItems(args).Concat(_instances);
+            return base.CreateItems(/*args*/).Concat(_instances);
         }
 
         /// <summary>

@@ -1,16 +1,15 @@
-﻿using LightInject;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Migrations
 {
     public class PostMigrationCollectionBuilder : LazyCollectionBuilderBase<PostMigrationCollectionBuilder, PostMigrationCollection, IPostMigration>
     {
-        public PostMigrationCollectionBuilder(IServiceContainer container)
+        public PostMigrationCollectionBuilder(IContainer container)
             : base(container)
         { }
 
         protected override PostMigrationCollectionBuilder This => this;
 
-        protected override ILifetime CollectionLifetime => null; // transient
+        protected override Lifetime CollectionLifetime => Lifetime.Transient;
     }
 }

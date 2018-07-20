@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 
 namespace Umbraco.Core.Composing
 {
@@ -16,13 +15,13 @@ namespace Umbraco.Core.Composing
         where TCollection : IBuilderCollection<TItem>
     {
         private readonly List<Func<IEnumerable<Type>>> _producers1 = new List<Func<IEnumerable<Type>>>();
-        private readonly List<Func<IServiceFactory, IEnumerable<Type>>> _producers2 = new List<Func<IServiceFactory, IEnumerable<Type>>>();
+        private readonly List<Func<IContainer, IEnumerable<Type>>> _producers2 = new List<Func<IContainer, IEnumerable<Type>>>();
         private readonly List<Type> _excluded = new List<Type>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LazyCollectionBuilderBase{TBuilder,TCollection,TItem}"/> class.
         /// </summary>
-        protected LazyCollectionBuilderBase(IServiceContainer container)
+        protected LazyCollectionBuilderBase(IContainer container)
             : base(container)
         { }
 
@@ -125,7 +124,7 @@ namespace Umbraco.Core.Composing
         /// </summary>
         /// <param name="producer">The types producer.</param>
         /// <returns>The builder.</returns>
-        public TBuilder Add(Func<IServiceFactory, IEnumerable<Type>> producer)
+        public TBuilder Add(Func<IContainer, IEnumerable<Type>> producer)
         {
             Configure(types =>
             {

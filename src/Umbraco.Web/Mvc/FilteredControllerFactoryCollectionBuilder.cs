@@ -1,11 +1,10 @@
-﻿using LightInject;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Mvc
 {
     public class FilteredControllerFactoryCollectionBuilder : OrderedCollectionBuilderBase<FilteredControllerFactoryCollectionBuilder, FilteredControllerFactoryCollection, IFilteredControllerFactory>
     {
-        public FilteredControllerFactoryCollectionBuilder(IServiceContainer container)
+        public FilteredControllerFactoryCollectionBuilder(IContainer container)
             : base(container)
         { }
 

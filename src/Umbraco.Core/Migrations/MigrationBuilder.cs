@@ -1,5 +1,4 @@
 ﻿using System;
-using LightInject;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Migrations

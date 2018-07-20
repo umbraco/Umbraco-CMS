@@ -1,13 +1,11 @@
 ﻿using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 

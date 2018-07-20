@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 using LightInject;
 
 namespace Umbraco.Core.Composing.LightInject
@@ -55,6 +56,10 @@ namespace Umbraco.Core.Composing.LightInject
         /// <inheritdoc />
         public IEnumerable<object> GetAllInstances(Type type)
             => Container.GetAllInstances(type);
+
+        /// <inheritdoc />
+        public IEnumerable<Registration> GetRegistered(Type type)
+            => Container.GetAvailableServices(type).Select(x => new Registration(x.ServiceType, x.ServiceName));
 
         #endregion
 
@@ -174,6 +179,14 @@ namespace Umbraco.Core.Composing.LightInject
             => Container.RegisterOrdered(serviceType, implementingTypes, _ => GetLifetime(lifetime));
 
         /// <inheritdoc />
+        public void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, TDependency> factory)
+            => Container.RegisterConstructorDependency((f, x) => factory(this, x));
+
+        /// <inheritdoc />
+        public void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, object[], TDependency> factory)
+            => Container.RegisterConstructorDependency((f, x, a) => factory(this, x, a));
+
+        /// <inheritdoc />
         public T RegisterCollectionBuilder<T>()
             => Container.RegisterCollectionBuilder<T>();
 
@@ -186,7 +199,7 @@ namespace Umbraco.Core.Composing.LightInject
             => Container.BeginScope();
 
         /// <inheritdoc />
-        public void ConfigureForUmbraco()
+        public IContainer ConfigureForUmbraco()
         {
             // supports annotated constructor injections
             // eg to specify the service name on some services
@@ -211,6 +224,8 @@ namespace Umbraco.Core.Composing.LightInject
 
             // see notes in MixedLightInjectScopeManagerProvider
             Container.ScopeManagerProvider = new MixedLightInjectScopeManagerProvider();
+
+            return this;
         }
 
         private class AssemblyScanner : IAssemblyScanner
@@ -234,15 +249,18 @@ namespace Umbraco.Core.Composing.LightInject
         }
 
         /// <inheritdoc />
-        public virtual void ConfigureForWeb()
-        { }
+        public virtual IContainer ConfigureForWeb()
+        {
+            return this;
+        }
 
         /// <inheritdoc />
-        public void EnablePerWebRequestScope()
+        public IContainer EnablePerWebRequestScope()
         {
             if (!(Container.ScopeManagerProvider is MixedLightInjectScopeManagerProvider smp))
                 throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
             smp.EnablePerWebRequestScope();
+            return this;
         }
 
         #endregion

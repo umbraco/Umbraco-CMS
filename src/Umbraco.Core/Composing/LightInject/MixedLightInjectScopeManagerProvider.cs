@@ -1,7 +1,7 @@
 ﻿using LightInject;
 using LightInject.Web;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Core.Composing.LightInject
 {
     // by default, the container's scope manager provider is PerThreadScopeManagerProvider,
     // and then container.EnablePerWebRequestScope() replaces it with PerWebRequestScopeManagerProvider,

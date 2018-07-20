@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Umbraco.Core.Composing
 {
@@ -66,6 +67,9 @@ namespace Umbraco.Core.Composing
         /// <typeparam name="TService">The type of the service.</typeparam>
         IEnumerable<TService> GetAllInstances<TService>();
 
+        // fixme
+        IEnumerable<Registration> GetRegistered(Type serviceType);
+
         #endregion
 
         #region Registry
@@ -117,6 +121,10 @@ namespace Umbraco.Core.Composing
         /// <returns>A collection builder of the specified type.</returns>
         T RegisterCollectionBuilder<T>();
 
+        // fixme - very LightInject specific? or?
+        void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, TDependency> factory);
+        void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, object[], TDependency> factory);
+
         #endregion
 
         #region Control
@@ -132,11 +140,11 @@ namespace Umbraco.Core.Composing
 
         // fixme - document all these
 
-        void ConfigureForUmbraco();
+        IContainer ConfigureForUmbraco();
 
-        void ConfigureForWeb();
+        IContainer ConfigureForWeb();
 
-        void EnablePerWebRequestScope();
+        IContainer EnablePerWebRequestScope();
 
         #endregion
     }

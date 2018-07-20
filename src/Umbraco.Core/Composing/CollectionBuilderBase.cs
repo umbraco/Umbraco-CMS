@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using LightInject;
 
 namespace Umbraco.Core.Composing
 {
@@ -19,14 +18,14 @@ namespace Umbraco.Core.Composing
         private readonly List<Type> _types = new List<Type>();
         private readonly object _locker = new object();
         private Func<IEnumerable<TItem>, TCollection> _collectionCtor;
-        private ServiceRegistration[] _registrations;
+        private Registration[] _registrations;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CollectionBuilderBase{TBuilder, TCollection,TItem}"/>
         /// class with a service container.
         /// </summary>
-        /// <param name="container">A service container.</param>
-        protected CollectionBuilderBase(IServiceContainer container)
+        /// <param name="container">A container.</param>
+        protected CollectionBuilderBase(IContainer container)
         {
             Container = container;
             // ReSharper disable once DoNotCallOverridableMethodsInConstructor
@@ -34,9 +33,9 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
-        /// Gets the service container.
+        /// Gets the container.
         /// </summary>
-        protected IServiceContainer Container { get; }
+        protected IContainer Container { get; }
 
         /// <summary>
         /// Gets the internal list of types as an IEnumerable (immutable).
@@ -64,7 +63,7 @@ namespace Umbraco.Core.Composing
             // else _collectionCtor remains null, assuming CreateCollection has been overriden
 
             // we just don't want to support re-registering collections here
-            var registration = Container.GetAvailableService<TCollection>();
+            var registration = Container.GetRegistered<TCollection>().FirstOrDefault();
             if (registration != null)
                 throw new InvalidOperationException("Collection builders cannot be registered once the collection itself has been registered.");
 
@@ -75,8 +74,7 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Gets the collection lifetime.
         /// </summary>
-        /// <remarks>Return null for transient collections.</remarks>
-        protected virtual ILifetime CollectionLifetime => new PerContainerLifetime();
+        protected virtual Lifetime CollectionLifetime => Lifetime.Singleton;
 
         /// <summary>
         /// Configures the internal list of types.
@@ -122,7 +120,11 @@ namespace Umbraco.Core.Composing
                     Container.Register(typeof(TItem), type, name);
                 }
 
-                _registrations = Container.AvailableServices
+                // note: we do this, because we don't want to get "all",
+                // because other types implementing TItem may be registered,
+                // and we only want those for *this* builder
+
+                _registrations = Container.GetRegistered(typeof(TItem))
                     .Where(x => x.ServiceName.StartsWith(prefix))
                     .OrderBy(x => x.ServiceName)
                     .ToArray();
@@ -134,13 +136,13 @@ namespace Umbraco.Core.Composing
         /// </summary>
         /// <param name="args">The arguments.</param>
         /// <returns>The collection items.</returns>
-        protected virtual IEnumerable<TItem> CreateItems(params object[] args)
+        protected virtual IEnumerable<TItem> CreateItems(/*params object[] args*/)
         {
             RegisterTypes(); // will do it only once
 
             var type = typeof (TItem);
             return _registrations
-                .Select(x => (TItem) Container.GetInstance(type, x.ServiceName, args))
+                .Select(x => (TItem) Container.GetInstance(type, x.ServiceName/*, args*/))
                 .ToArray(); // safe
         }
 

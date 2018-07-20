@@ -1,11 +1,10 @@
-﻿using LightInject;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.PropertyEditors
 {
     public class PropertyValueConverterCollectionBuilder : OrderedCollectionBuilderBase<PropertyValueConverterCollectionBuilder, PropertyValueConverterCollection, IPropertyValueConverter>
     {
-        public PropertyValueConverterCollectionBuilder(IServiceContainer container)
+        public PropertyValueConverterCollectionBuilder(IContainer container)
             : base(container)
         { }
 

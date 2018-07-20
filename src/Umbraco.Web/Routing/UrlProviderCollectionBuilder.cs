@@ -1,11 +1,10 @@
-﻿using LightInject;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Routing
 {
     public class UrlProviderCollectionBuilder : OrderedCollectionBuilderBase<UrlProviderCollectionBuilder, UrlProviderCollection, IUrlProvider>
     {
-        public UrlProviderCollectionBuilder(IServiceContainer container)
+        public UrlProviderCollectionBuilder(IContainer container)
             : base(container)
         { }
 

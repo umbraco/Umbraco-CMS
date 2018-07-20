@@ -6,6 +6,7 @@ using System.Web.Http;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -41,7 +42,7 @@ namespace Umbraco.Tests.Web.Controllers
 
             // kill the true IEntityService too
             Container.RegisterSingleton(f => Mock.Of<IEntityService>());
-            
+
             Container.RegisterSingleton<UmbracoFeatures>();
         }
 
@@ -68,7 +69,6 @@ namespace Umbraco.Tests.Web.Controllers
                     .Returns((int id) => id == 1234 ? new User(1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]) : null);
 
                 var usersController = new UsersController();
-                Container.InjectProperties(usersController);
                 return usersController;
             }
 
@@ -125,7 +125,6 @@ namespace Umbraco.Tests.Web.Controllers
             ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
             {
                 var usersController = new UsersController();
-                Container.InjectProperties(usersController);
                 return usersController;
             }
 
@@ -153,7 +152,6 @@ namespace Umbraco.Tests.Web.Controllers
                     .Returns(() => users);
 
                 var usersController = new UsersController();
-                Container.InjectProperties(usersController);
                 return usersController;
             }
 

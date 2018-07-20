@@ -1,5 +1,4 @@
-﻿using LightInject;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 using Umbraco.Web.Trees;
 
@@ -9,7 +8,7 @@ namespace Umbraco.Web.Search
     {
         private readonly IApplicationTreeService _treeService;
 
-        public SearchableTreeCollectionBuilder(IServiceContainer container, IApplicationTreeService treeService)
+        public SearchableTreeCollectionBuilder(IContainer container, IApplicationTreeService treeService)
             : base(container)
         {
             _treeService = treeService;

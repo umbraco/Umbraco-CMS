@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 
 namespace Umbraco.Core.Composing
 {
@@ -19,7 +18,7 @@ namespace Umbraco.Core.Composing
         /// Initializes a new instance of the <see cref="WeightedCollectionBuilderBase{TBuilder,TCollection,TItem}"/> class.
         /// </summary>
         /// <param name="container"></param>
-        protected WeightedCollectionBuilderBase(IServiceContainer container)
+        protected WeightedCollectionBuilderBase(IContainer container)
             : base(container)
         { }
 

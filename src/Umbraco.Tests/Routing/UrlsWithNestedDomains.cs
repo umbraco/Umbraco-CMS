@@ -1,12 +1,12 @@
 ﻿using System;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Services;
-using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.Routing
 {

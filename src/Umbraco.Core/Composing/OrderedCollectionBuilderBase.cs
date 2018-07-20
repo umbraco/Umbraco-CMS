@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using LightInject;
 
 namespace Umbraco.Core.Composing
 {
@@ -18,7 +17,7 @@ namespace Umbraco.Core.Composing
         /// Initializes a new instance of the <see cref="OrderedCollectionBuilderBase{TBuilder,TCollection,TItem}"/> class.
         /// </summary>
         /// <param name="container"></param>
-        protected OrderedCollectionBuilderBase(IServiceContainer container)
+        protected OrderedCollectionBuilderBase(IContainer container)
             : base (container)
         { }
 
@@ -92,7 +91,7 @@ namespace Umbraco.Core.Composing
         /// </summary>
         /// <param name="types">The types to append.</param>
         /// <returns>The builder.</returns>
-        public TBuilder Append(Func<IServiceFactory, IEnumerable<Type>> types)
+        public TBuilder Append(Func<IContainer, IEnumerable<Type>> types)
         {
             Configure(list =>
             {

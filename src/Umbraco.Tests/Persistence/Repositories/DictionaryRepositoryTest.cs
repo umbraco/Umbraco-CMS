@@ -6,8 +6,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using LightInject;
-using Umbraco.Core.Scoping;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {

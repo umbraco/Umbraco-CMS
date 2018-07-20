@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Composing;
 
 namespace Umbraco.Core
@@ -44,6 +45,9 @@ namespace Umbraco.Core
             => (T) container.TryGetInstance(typeof(T));
 
         // fixme - document all these
+
+        public static IEnumerable<Registration> GetRegistered<TService>(this IContainer container)
+            => container.GetRegistered(typeof(TService));
 
         public static void Register<TService, TImplementing>(this IContainer container, Lifetime lifetime = Lifetime.Transient)
             => container.Register(typeof(TService), typeof(TImplementing), lifetime);

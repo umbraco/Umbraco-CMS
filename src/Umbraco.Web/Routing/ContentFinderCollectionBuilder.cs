@@ -1,11 +1,10 @@
-﻿using LightInject;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Routing
 {
     public class ContentFinderCollectionBuilder : OrderedCollectionBuilderBase<ContentFinderCollectionBuilder, ContentFinderCollection, IContentFinder>
     {
-        public ContentFinderCollectionBuilder(IServiceContainer container)
+        public ContentFinderCollectionBuilder(IContainer container)
             : base(container)
         { }
 

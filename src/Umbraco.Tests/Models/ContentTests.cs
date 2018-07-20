@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using Moq;
-using LightInject;
+using Umbraco.Core;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration.UmbracoSettings;

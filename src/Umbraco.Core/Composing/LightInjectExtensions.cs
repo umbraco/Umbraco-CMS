@@ -134,7 +134,7 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Updates a registration.
         /// </summary>
-        private static void UpdateRegistration(Registration registration, Type implementingType, Delegate factoryExpression)
+        private static void UpdateRegistration(ServiceRegistration registration, Type implementingType, Delegate factoryExpression)
         {
             // if the container has compiled already then the registrations have been captured,
             // and re-registering - although updating available services - does not modify the

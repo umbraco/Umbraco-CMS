@@ -95,7 +95,6 @@ namespace Umbraco.Tests.Web.Mvc
 
             var controller = new TestSurfaceController(umbracoContext);
             Container.Register(_ => umbracoContext);
-            Container.InjectProperties(controller);
 
             Assert.IsNotNull(controller.Umbraco);
         }
@@ -187,7 +186,7 @@ namespace Umbraco.Tests.Web.Mvc
                 : base(ctx, null, new ServiceContext(), Mock.Of<CacheHelper>(), null, null)
             {
                 if (helper != null)
-                { 
+                {
                    Umbraco = helper;
                 }
             }

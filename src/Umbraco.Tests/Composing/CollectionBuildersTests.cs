@@ -435,7 +435,7 @@ namespace Umbraco.Tests.Composing
         // ReSharper disable once ClassNeverInstantiated.Local
         private class TestCollectionBuilder : OrderedCollectionBuilderBase<TestCollectionBuilder, TestCollection, Resolved>
         {
-            public TestCollectionBuilder(IServiceContainer container)
+            public TestCollectionBuilder(IContainer container)
                 : base(container)
             { }
 
@@ -445,31 +445,31 @@ namespace Umbraco.Tests.Composing
         // ReSharper disable once ClassNeverInstantiated.Local
         private class TestCollectionBuilderTransient : OrderedCollectionBuilderBase<TestCollectionBuilderTransient, TestCollection, Resolved>
         {
-            public TestCollectionBuilderTransient(IServiceContainer container)
+            public TestCollectionBuilderTransient(IContainer container)
                 : base(container)
             { }
 
             protected override TestCollectionBuilderTransient This => this;
 
-            protected override ILifetime CollectionLifetime => null; // transient
+            protected override Lifetime CollectionLifetime => Lifetime.Transient; // transient
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
         private class TestCollectionBuilderScope : OrderedCollectionBuilderBase<TestCollectionBuilderScope, TestCollection, Resolved>
         {
-            public TestCollectionBuilderScope(IServiceContainer container)
+            public TestCollectionBuilderScope(IContainer container)
                 : base(container)
             { }
 
             protected override TestCollectionBuilderScope This => this;
 
-            protected override ILifetime CollectionLifetime => new PerScopeLifetime();
+            protected override Lifetime CollectionLifetime => Lifetime.Scope;
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local
         private class TestCollectionBuilderWeighted : WeightedCollectionBuilderBase<TestCollectionBuilderWeighted, TestCollection, Resolved>
         {
-            public TestCollectionBuilderWeighted(IServiceContainer container)
+            public TestCollectionBuilderWeighted(IContainer container)
                 : base(container)
             { }
 

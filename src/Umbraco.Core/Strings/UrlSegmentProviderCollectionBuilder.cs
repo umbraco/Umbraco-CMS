@@ -1,11 +1,10 @@
-﻿using LightInject;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Strings
 {
     public class UrlSegmentProviderCollectionBuilder : OrderedCollectionBuilderBase<UrlSegmentProviderCollectionBuilder, UrlSegmentProviderCollection, IUrlSegmentProvider>
     {
-        public UrlSegmentProviderCollectionBuilder(IServiceContainer container)
+        public UrlSegmentProviderCollectionBuilder(IContainer container)
             : base(container)
         { }
 

@@ -1,11 +1,10 @@
-﻿using LightInject;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.PropertyEditors
 {
     public class DataEditorCollectionBuilder : LazyCollectionBuilderBase<DataEditorCollectionBuilder, DataEditorCollection, IDataEditor>
     {
-        public DataEditorCollectionBuilder(IServiceContainer container)
+        public DataEditorCollectionBuilder(IContainer container)
             : base(container)
         { }
 
