@@ -1,5 +1,6 @@
 ﻿using Umbraco.Core.Components;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Web.PublishedCache.NuCache

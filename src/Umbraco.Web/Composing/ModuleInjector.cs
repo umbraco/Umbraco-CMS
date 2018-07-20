@@ -1,5 +1,6 @@
 ﻿using System.Web;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Web.Composing
 {

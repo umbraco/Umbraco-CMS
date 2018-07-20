@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Composing;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Provides extension methods to the <see cref="IContainer"/> class.

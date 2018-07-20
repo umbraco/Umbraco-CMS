@@ -2,6 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
+using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
 
 namespace Umbraco.Web.Models
 {
@@ -23,7 +24,7 @@ namespace Umbraco.Web.Models
         {
             if (doLookup && Current.UmbracoContext != null)
             {
-                var helper = Current.Container.GetInstance<MembershipHelper>();
+                var helper = ContainerExtensions.GetInstance<MembershipHelper>(Current.Container);
                 var model = helper.GetCurrentLoginStatus();
                 if (model != null)
                 {

@@ -14,6 +14,7 @@ using Umbraco.Web.Composing;
 using Umbraco.Core.Cache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
 
 namespace Umbraco.Web
 {
@@ -155,7 +156,7 @@ namespace Umbraco.Web
         /// Gets the membership helper.
         /// </summary>
         public MembershipHelper MembershipHelper => _membershipHelper
-            ?? (_membershipHelper = Current.Container.GetInstance<MembershipHelper>());
+            ?? (_membershipHelper = ContainerExtensions.GetInstance<MembershipHelper>(Current.Container));
 
         /// <summary>
         /// Gets the url provider.

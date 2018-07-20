@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;

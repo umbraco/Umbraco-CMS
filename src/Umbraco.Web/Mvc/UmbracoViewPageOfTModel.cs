@@ -13,6 +13,7 @@ using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
 
 namespace Umbraco.Web.Mvc
 {
@@ -108,8 +109,8 @@ namespace Umbraco.Web.Mvc
 
         protected UmbracoViewPage()
             : this(
-                Current.Container.GetInstance<ServiceContext>(),
-                Current.Container.GetInstance<CacheHelper>()
+                ContainerExtensions.GetInstance<ServiceContext>(Current.Container),
+                ContainerExtensions.GetInstance<CacheHelper>(Current.Container)
             )
         {
         }

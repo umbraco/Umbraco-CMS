@@ -4,6 +4,7 @@ using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Core.IO;

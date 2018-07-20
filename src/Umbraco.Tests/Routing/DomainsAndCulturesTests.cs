@@ -4,6 +4,7 @@ using Umbraco.Core.Models;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.Routing
 {

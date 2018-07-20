@@ -15,6 +15,7 @@ using Umbraco.Web.Composing;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Scheduling;
 using Umbraco.Web.Search;
+using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
 
 namespace Umbraco.Web.Components
 {
@@ -53,12 +54,12 @@ namespace Umbraco.Web.Components
         {
             composition.SetServerMessenger(factory =>
             {
-                var runtime = factory.GetInstance<IRuntimeState>();
-                var databaseFactory = factory.GetInstance<IUmbracoDatabaseFactory>();
-                var globalSettings = factory.GetInstance<IGlobalSettings>();
-                var proflog = factory.GetInstance<ProfilingLogger>();
-                var scopeProvider = factory.GetInstance<IScopeProvider>();
-                var sqlContext = factory.GetInstance<ISqlContext>();
+                var runtime = ContainerExtensions.GetInstance<IRuntimeState>(factory);
+                var databaseFactory = ContainerExtensions.GetInstance<IUmbracoDatabaseFactory>(factory);
+                var globalSettings = ContainerExtensions.GetInstance<IGlobalSettings>(factory);
+                var proflog = ContainerExtensions.GetInstance<ProfilingLogger>(factory);
+                var scopeProvider = ContainerExtensions.GetInstance<IScopeProvider>(factory);
+                var sqlContext = ContainerExtensions.GetInstance<ISqlContext>(factory);
 
                 return new BatchedDatabaseServerMessenger(
                     runtime, databaseFactory, scopeProvider, sqlContext, proflog, globalSettings,

@@ -21,6 +21,7 @@ using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 using Umbraco.Web.Services;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
+using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
 
 namespace Umbraco.Web.Cache
 {
@@ -236,7 +237,7 @@ namespace Umbraco.Web.Cache
                     UmbracoConfig.For.UmbracoSettings(),
                     Current.UrlProviders,
                     UmbracoConfig.For.GlobalSettings(),
-                    Current.Container.GetInstance<IVariationContextAccessor>(),
+                    ContainerExtensions.GetInstance<IVariationContextAccessor>(Current.Container),
                     true);
             }
 

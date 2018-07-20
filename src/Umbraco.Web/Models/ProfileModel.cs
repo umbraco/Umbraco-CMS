@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 using Umbraco.Core;
+using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
 
 namespace Umbraco.Web.Models
 {
@@ -27,7 +28,7 @@ namespace Umbraco.Web.Models
             MemberProperties = new List<UmbracoProperty>();
             if (doLookup && Current.UmbracoContext != null)
             {
-                var helper = Current.Container.GetInstance<MembershipHelper>();
+                var helper = ContainerExtensions.GetInstance<MembershipHelper>(Current.Container);
                 var model = helper.GetCurrentMemberProfileModel();
                 MemberProperties = model.MemberProperties;
             }

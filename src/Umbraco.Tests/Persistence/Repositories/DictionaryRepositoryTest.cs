@@ -7,6 +7,7 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {

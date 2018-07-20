@@ -13,6 +13,7 @@ using umbraco;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
+using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
 
 namespace Umbraco.Web.Templates
 {
@@ -40,7 +41,7 @@ namespace Umbraco.Web.Templates
         }
 
         // todo - inject!
-        private PublishedRouter PublishedRouter => Core.Composing.Current.Container.GetInstance<PublishedRouter>();
+        private PublishedRouter PublishedRouter => ContainerExtensions.GetInstance<PublishedRouter>(Core.Composing.Current.Container);
 
 
         /// <summary>

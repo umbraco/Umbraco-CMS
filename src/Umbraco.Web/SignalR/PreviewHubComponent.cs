@@ -2,6 +2,7 @@
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Components;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 

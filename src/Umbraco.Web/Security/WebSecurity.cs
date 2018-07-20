@@ -18,6 +18,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Web.Composing;
+using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 
 namespace Umbraco.Web.Security
@@ -57,7 +58,7 @@ namespace Umbraco.Web.Security
             {
                 return false;
             }
-            var helper = Current.Container.GetInstance<MembershipHelper>();
+            var helper = ContainerExtensions.GetInstance<MembershipHelper>(Current.Container);
             return helper.IsMemberAuthorized(allowAll, allowTypes, allowGroups, allowMembers);
         }
 

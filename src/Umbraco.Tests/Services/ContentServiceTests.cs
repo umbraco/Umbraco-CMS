@@ -20,6 +20,7 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.Testing;
 using System.Reflection;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Tests.Services
 {

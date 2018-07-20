@@ -5,6 +5,7 @@ using Umbraco.Tests.TestHelpers;
 using System;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Services;
 
