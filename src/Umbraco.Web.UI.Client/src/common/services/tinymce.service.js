@@ -6,8 +6,248 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper, userService) {
+function tinyMceService($log, $q, imageHelper, $locale, $http, $timeout, stylesheetResource, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper, userService) {
+
+    //These are absolutely required in order for the macros to render inline
+    //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
+    var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style],-h1[id|dir|class|align|style],-h2[id|dir|class|align|style],-h3[id|dir|class|align|style],-h4[id|dir|class|align|style],-h5[id|dir|class|align|style],-h6[id|style|dir|class|align],span[id|class|style]";
+    var fallbackStyles = [{ title: "Page header", block: "h2" }, { title: "Section header", block: "h3" }, { title: "Paragraph header", block: "h4" }, { title: "Normal", block: "p" }, { title: "Quote", block: "blockquote" }, { title: "Code", block: "code" }];
+    // these languages are available for localization
+    var availableLanguages = [
+        'da',
+        'de',
+        'en',
+        'en_us',
+        'fi',
+        'fr',
+        'he',
+        'it',
+        'ja',
+        'nl',
+        'no',
+        'pl',
+        'pt',
+        'ru',
+        'sv',
+        'zh'
+    ];
+    //define fallback language
+    var defaultLanguage = 'en_us';
+
+    /**
+     * Returns a promise of an object containing the stylesheets and styleFormats collections
+     * @param {any} configuredStylesheets
+     */
+    function getStyles(configuredStylesheets) {
+
+        var stylesheets = [];
+        var styleFormats = [];
+        var promises = [$q.when(true)]; //a collection of promises, the first one is an empty promise
+
+        //get the umbraco stylesheet loaded and use that href to inject into tinymce.
+        //strip off the query string since tiny will append our cache buster itself.
+        stylesheets.push(_.find(document.styleSheets, function (s) {
+            return s.href && s.href.indexOf("assets/css/umbraco.css") !== -1
+        }).href.split("?")[0]);
+
+        //queue rules loading
+        if (configuredStylesheets) {
+            angular.forEach(configuredStylesheets, function (val, key) {
+
+                stylesheets.push(Umbraco.Sys.ServerVariables.umbracoSettings.cssPath + "/" + val + ".css");
+
+                promises.push(stylesheetResource.getRulesByName(val).then(function (rules) {
+                    angular.forEach(rules, function (rule) {
+                        var r = {};
+                        r.title = rule.name;
+                        if (rule.selector[0] == ".") {
+                            r.inline = "span";
+                            r.classes = rule.selector.substring(1);
+                        }
+                        else if (rule.selector[0] === "#") {
+                            r.inline = "span";
+                            r.attributes = { id: rule.selector.substring(1) };
+                        }
+                        else if (rule.selector[0] !== "." && rule.selector.indexOf(".") > -1) {
+                            var split = rule.selector.split(".");
+                            r.block = split[0];
+                            r.classes = rule.selector.substring(rule.selector.indexOf(".") + 1).replace(".", " ");
+                        }
+                        else if (rule.selector[0] != "#" && rule.selector.indexOf("#") > -1) {
+                            var split = rule.selector.split("#");
+                            r.block = split[0];
+                            r.classes = rule.selector.substring(rule.selector.indexOf("#") + 1);
+                        }
+                        else {
+                            r.block = rule.selector;
+                        }
+
+                        styleFormats.push(r);
+                    });
+                }));
+            });
+        }
+        else {
+            styleFormats = fallbackStyles;
+        }
+
+        return $q.all(promises).then(function() {
+            return $q.when({ stylesheets: stylesheets, styleFormats: styleFormats});
+        });
+    }
+
+    /** Returns the language to use for TinyMCE */
+    function getLanguage() {
+        var language = defaultLanguage;
+        //get locale from angular and match tinymce format. Angular localization is always in the format of ru-ru, de-de, en-gb, etc.
+        //wheras tinymce is in the format of ru, de, en, en_us, etc.
+        var localeId = $locale.id.replace('-', '_');
+        //try matching the language using full locale format
+        var languageMatch = _.find(availableLanguages, function (o) { return o === localeId; });
+        //if no matches, try matching using only the language
+        if (languageMatch === undefined) {
+            var localeParts = localeId.split('_');
+            languageMatch = _.find(availableLanguages, function (o) { return o === localeParts[0]; });
+        }
+        //if a match was found - set the language
+        if (languageMatch !== undefined) {
+            language = languageMatch;
+        }
+        return language;
+    }
+
+    function getToolbars(configuredToolbar, tinyMceConfig) {
+
+        //the commands for selection/all
+        var allowedSelectionToolbar = _.map(_.filter(tinyMceConfig.commands,
+                function(f) {
+                    return f.mode === "Selection" || f.mode === "All";
+                }),
+            function(f) {
+                return f.alias;
+            });
+
+        //the commands for insert/all
+        var allowedInsertToolbar = _.map(_.filter(tinyMceConfig.commands,
+                function(f) {
+                    return f.mode === "Insert" || f.mode === "All";
+                }),
+            function(f) {
+                return f.alias;
+            });
+
+        var insertToolbar = _.filter(configuredToolbar, function (t) {
+            return allowedInsertToolbar.indexOf(t) !== -1;
+        }).join(" | ");
+
+        var selectionToolbar = _.filter(configuredToolbar, function (t) {
+            return allowedSelectionToolbar.indexOf(t) !== -1;
+        }).join(" | ");
+
+        return {
+            insertToolbar: insertToolbar,
+            selectionToolbar: selectionToolbar
+        }
+    }
+
     return {
+
+        /**
+         * Returns a promise of the configuration object to initialize the TinyMCE editor
+         * @param {} args
+         * @returns {} 
+         */
+        getTinyMceEditorConfig: function (args) {
+
+            var promises = [
+                this.configuration(),
+                getStyles(args.stylesheets)
+            ];
+
+            return $q.all(promises).then(function(result) {
+
+                var tinyMceConfig = result[0];
+                var styles = result[1];
+
+                var toolbars = getToolbars(args.toolbar, tinyMceConfig);
+
+                var plugins = _.map(tinyMceConfig.plugins, function (plugin) {
+                    return plugin.name;
+                });
+
+                //plugins that must always be active
+                plugins.push("autoresize");
+                plugins.push("noneditable");
+
+                //create a baseline Config to exten upon
+                var config = {
+                    selector: "#" + args.htmlId,
+                    theme: "inlite",
+                    inline: true,
+                    plugins: plugins,
+                    valid_elements: tinyMceConfig.validElements,
+                    invalid_elements: tinyMceConfig.inValidElements,
+                    extended_valid_elements: extendedValidElements,
+                    menubar: false,
+                    statusbar: false,
+                    relative_urls: false,
+                    autoresize_bottom_margin: 0,
+                    content_css: styles.stylesheets,
+                    style_formats: styles.styleFormats,
+                    language: getLanguage(),
+
+                    //this would be for a theme other than inlite
+                    toolbar: args.toolbar,
+                    //these are for the inlite theme to work
+                    insert_toolbar: toolbars.insertToolbar,
+                    selection_toolbar: toolbars.selectionToolbar,
+
+                    body_class: 'umb-rte',
+                    //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
+                    cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster
+                };
+
+                if (tinyMceConfig.customConfig) {
+
+                    //if there is some custom config, we need to see if the string value of each item might actually be json and if so, we need to
+                    // convert it to json instead of having it as a string since this is what tinymce requires
+                    for (var i in tinyMceConfig.customConfig) {
+                        var val = tinyMceConfig.customConfig[i];
+                        if (val) {
+                            val = val.toString().trim();
+                            if (val.detectIsJson()) {
+                                try {
+                                    tinyMceConfig.customConfig[i] = JSON.parse(val);
+                                    //now we need to check if this custom config key is defined in our baseline, if it is we don't want to
+                                    //overwrite the baseline config item if it is an array, we want to concat the items in the array, otherwise
+                                    //if it's an object it will overwrite the baseline
+                                    if (angular.isArray(config[i]) && angular.isArray(tinyMceConfig.customConfig[i])) {
+                                        //concat it and below this concat'd array will overwrite the baseline in angular.extend
+                                        tinyMceConfig.customConfig[i] = config[i].concat(tinyMceConfig.customConfig[i]);
+                                    }
+                                }
+                                catch (e) {
+                                    //cannot parse, we'll just leave it
+                                }
+                            }
+                            if (val === "true") {
+                                tinyMceConfig.customConfig[i] = true;
+                            }
+                            if (val === "false") {
+                                tinyMceConfig.customConfig[i] = false;
+                            }
+                        }
+                    }
+
+                    angular.extend(config, tinyMceConfig.customConfig);
+                }
+
+
+                return $q.when(config);
+
+            });
+            
+        },
 
 		/**
 		 * @ngdoc method
@@ -285,6 +525,8 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					 * If we change the selection inside this method, then we end up in an infinite loop, so we have to remove ourselves
 					 * from the event listener before changing selection, however, it seems that putting a break point in this method
 					 * will always cause an 'infinite' loop as the caret keeps changing.
+					 *
+					 * TODO: I don't think we need this anymore with recent tinymce fixes: https://www.tiny.cloud/docs/plugins/noneditable/
 					 */
                     function onNodeChanged(evt) {
 
@@ -325,7 +567,11 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 
                     });
 
-                    /** This prevents any other commands from executing when the current element is the macro so the content cannot be edited */
+                    /**
+                     * This prevents any other commands from executing when the current element is the macro so the content cannot be edited
+                     *
+                     * TODO: I don't think we need this anymore with recent tinymce fixes: https://www.tiny.cloud/docs/plugins/noneditable/
+                     */
                     editor.on('BeforeExecCommand', function (o) {
                         if (isOnMacroElement) {
                             if (o.preventDefault) {
@@ -338,7 +584,11 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
                         }
                     });
 
-                    /** This double checks and ensures you can't paste content into the rendered macro */
+                    /**
+                     * This double checks and ensures you can't paste content into the rendered macro
+                     *
+                     * TODO: I don't think we need this anymore with recent tinymce fixes: https://www.tiny.cloud/docs/plugins/noneditable/
+                     */
                     editor.on("Paste", function (o) {
                         if (isOnMacroElement) {
                             if (o.preventDefault) {
@@ -358,6 +608,8 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					 * Listen for the keydown in the editor, we'll check if we are currently on a macro element, if so
 					 * we'll check if the key down is a supported key which requires an action, otherwise we ignore the request
 					 * so the macro cannot be edited.
+					 *
+					 * TODO: I don't think we need this anymore with recent tinymce fixes: https://www.tiny.cloud/docs/plugins/noneditable/
 					 */
                     editor.on('KeyDown', function (e) {
                         if (isOnMacroElement) {
@@ -457,9 +709,10 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
             var macroSyntaxComment = "<!-- " + macroObject.syntax + " -->";
             //create an id class for this element so we can re-select it after inserting
             var uniqueId = "umb-macro-" + editor.dom.uniqueId();
-            var macroDiv = editor.dom.create('div', {
-                'class': 'umb-macro-holder ' + macroObject.macroAlias + ' mceNonEditable ' + uniqueId
-            },
+            var macroDiv = editor.dom.create('div',
+                {
+                    'class': 'umb-macro-holder ' + macroObject.macroAlias + ' mceNonEditable ' + uniqueId
+                },
                 macroSyntaxComment + '<ins>Macro alias: <strong>' + macroObject.macroAlias + '</strong></ins>');
 
             editor.selection.setNode(macroDiv);

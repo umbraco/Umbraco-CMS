@@ -63,6 +63,7 @@ namespace Umbraco.Web.PropertyEditors
                                     {
                                         Name = n.AttributeValue<string>("name") ?? alias,
                                         Alias = alias,
+                                        Mode = Enum<RichTextEditorCommandMode>.Parse(n.AttributeValue<string>("mode"), true)
                                     }
                                 );
                         }
