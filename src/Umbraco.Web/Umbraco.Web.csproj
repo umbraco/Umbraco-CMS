@@ -110,6 +110,7 @@
     <Compile Include="Cache\UserGroupCacheRefresher.cs" />
     <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
     <Compile Include="Composing\Composers\InstallerComposer.cs" />
+    <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="CompositionExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Editors\BackOfficeAssetsController.cs" />
@@ -165,7 +166,7 @@
     <Compile Include="Install\InstallSteps\ConfigureMachineKey.cs" />
     <Compile Include="IPublishedContentQuery.cs" />
     <Compile Include="Editors\MemberGroupController.cs" />
-    <Compile Include="LightInjectExtensions.cs" />
+    <Compile Include="Composing\Composers\ControllersComposer.cs" />
     <Compile Include="Editors\EditorValidator.cs" />
     <Compile Include="Macros\MacroContent.cs" />
     <Compile Include="HealthCheck\Checks\Config\AbstractConfigCheck.cs" />

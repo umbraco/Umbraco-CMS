@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using LightInject;
 using Umbraco.Core.Collections;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Scoping;
@@ -15,7 +15,7 @@ namespace Umbraco.Core.Components
 
     internal class BootLoader
     {
-        private readonly IServiceContainer _container;
+        private readonly IContainer _container;
         private readonly ProfilingLogger _proflog;
         private readonly ILogger _logger;
         private IUmbracoComponent[] _components;
@@ -27,7 +27,7 @@ namespace Umbraco.Core.Components
         /// Initializes a new instance of the <see cref="BootLoader"/> class.
         /// </summary>
         /// <param name="container">The application container.</param>
-        public BootLoader(IServiceContainer container)
+        public BootLoader(IContainer container)
         {
             _container = container ?? throw new ArgumentNullException(nameof(container));
             _proflog = container.GetInstance<ProfilingLogger>();
@@ -247,15 +247,16 @@ namespace Umbraco.Core.Components
         private static void GatherRequirementsFromRequiredAttribute(Type type, ICollection<Type> types, IDictionary<Type, List<Type>> requirements)
         {
             // get 'required' attributes
-            // fixme explain
+            // these attributes are *not* inherited because we want to "custom-inherit" for interfaces only
             var requiredAttributes = type
-                .GetInterfaces().SelectMany(x => x.GetCustomAttributes<RequiredComponentAttribute>())
-                .Concat(type.GetCustomAttributes<RequiredComponentAttribute>());
+                .GetInterfaces().SelectMany(x => x.GetCustomAttributes<RequiredComponentAttribute>()) // those marking interfaces
+                .Concat(type.GetCustomAttributes<RequiredComponentAttribute>()); // those marking the component
 
             foreach (var attr in requiredAttributes)
             {
                 if (attr.RequiringType == type) continue; // ignore self-requirements (+ exclude in implems, below)
 
+                // required by an interface = by any enabled component implementing this that interface
                 if (attr.RequiringType.IsInterface)
                 {
                     var implems = types.Where(x => x != type && attr.RequiringType.IsAssignableFrom(x)).ToList();
@@ -265,6 +266,7 @@ namespace Umbraco.Core.Components
                         requirements[implem].Add(type);
                     }
                 }
+                // required by a class
                 else
                 {
                     if (types.Contains(attr.RequiringType))

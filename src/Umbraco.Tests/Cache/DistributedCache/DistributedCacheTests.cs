@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Sync;
@@ -20,11 +20,11 @@ namespace Umbraco.Tests.Cache.DistributedCache
         [SetUp]
         public void Setup()
         {
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
+            var container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            container.ConfigureForUmbraco();
 
             container.Register<IServerRegistrar>(_ => new TestServerRegistrar());
-            container.Register<IServerMessenger>(_ => new TestServerMessenger(), new PerContainerLifetime());
+            container.RegisterSingleton<IServerMessenger>(_ => new TestServerMessenger());
 
             container.RegisterCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add<TestCacheRefresher>();

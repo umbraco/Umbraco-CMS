@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -14,13 +13,11 @@ using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.Testing;
@@ -51,7 +48,7 @@ namespace Umbraco.Tests.Routing
                 : base(umbracoApplication)
             { }
 
-            public override void Boot(ServiceContainer container)
+            public override void Boot(IContainer container)
             {
                 // do it before anything else - this is the only place where it's possible
                 var logger = Mock.Of<ILogger>();

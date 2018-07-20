@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading;
 using Examine;
-using LightInject;
 using Umbraco.Core;
 using Umbraco.Core.Components;
 using Umbraco.Core.Configuration;

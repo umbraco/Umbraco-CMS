@@ -1,6 +1,4 @@
-﻿using System;
-using System.Web;
-using LightInject;
+﻿using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -27,7 +25,7 @@ namespace Umbraco.Web.Runtime
         { }
 
         /// <inheritdoc/>
-        public override void Boot(ServiceContainer container)
+        public override void Boot(IContainer container)
         {
             // create and start asap to profile boot
             var debug = GlobalSettings.DebugMode;
@@ -46,13 +44,11 @@ namespace Umbraco.Web.Runtime
             base.Boot(container);
 
             // now (and only now) is the time to switch over to perWebRequest scopes
-            if (!(container.ScopeManagerProvider is MixedLightInjectScopeManagerProvider smp))
-                throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
-            smp.EnablePerWebRequestScope();
+            container.EnablePerWebRequestScope();
         }
 
         /// <inheritdoc/>
-        public override void Compose(ServiceContainer container)
+        public override void Compose(IContainer container)
         {
             base.Compose(container);
 

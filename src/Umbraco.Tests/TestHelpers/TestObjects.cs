@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using LightInject;
 using Moq;
 using NPoco;
 using Umbraco.Core;
@@ -32,9 +30,9 @@ namespace Umbraco.Tests.TestHelpers
     /// </summary>
     internal partial class TestObjects
     {
-        private readonly IServiceContainer _container;
+        private readonly IContainer _container;
 
-        public TestObjects(IServiceContainer container)
+        public TestObjects(IContainer container)
         {
             _container = container;
         }
@@ -85,7 +83,7 @@ namespace Umbraco.Tests.TestHelpers
             return new UmbracoDatabase(connection, sqlContext, logger);
         }
 
-        public void RegisterServices(IServiceContainer container)
+        public void RegisterServices(IContainer container)
         { }
 
         /// <summary>
@@ -109,7 +107,7 @@ namespace Umbraco.Tests.TestHelpers
             IGlobalSettings globalSettings,
             IEventMessagesFactory eventMessagesFactory,
             IEnumerable<IUrlSegmentProvider> urlSegmentProviders,
-            IServiceFactory container = null)
+            IContainer container = null)
         {
             if (scopeProvider == null) throw new ArgumentNullException(nameof(scopeProvider));
             if (scopeAccessor == null) throw new ArgumentNullException(nameof(scopeAccessor));
@@ -220,13 +218,13 @@ namespace Umbraco.Tests.TestHelpers
                 consentService);
         }
 
-        private Lazy<T> GetLazyService<T>(IServiceFactory container, Func<IServiceFactory, T> ctor)
+        private Lazy<T> GetLazyService<T>(IContainer container, Func<IContainer, T> ctor)
             where T : class
         {
             return new Lazy<T>(() => container?.TryGetInstance<T>() ?? ctor(container));
         }
 
-        private T GetRepo<T>(IServiceFactory container)
+        private T GetRepo<T>(IContainer container)
             where T : class, IRepository
         {
             return container?.TryGetInstance<T>() ?? Mock.Of<T>();

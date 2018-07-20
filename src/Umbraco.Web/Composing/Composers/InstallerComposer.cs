@@ -1,4 +1,5 @@
-﻿using LightInject;
+﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Install;
 using Umbraco.Web.Install.InstallSteps;
 using Umbraco.Web.Install.Models;
@@ -7,10 +8,10 @@ namespace Umbraco.Web.Composing.Composers
 {
     public static class InstallerComposer
     {
-        public static IServiceRegistry ComposeInstaller(this IServiceRegistry registry)
+        public static IContainer ComposeInstaller(this IContainer container)
         {
             //register the installer steps in order
-            registry.RegisterOrdered(typeof(InstallSetupStep),
+            container.RegisterOrdered(typeof(InstallSetupStep),
                 new[]
                 {
                     typeof(NewInstallStep),
@@ -27,12 +28,12 @@ namespace Umbraco.Web.Composing.Composers
                     //typeof(StarterKitCleanupStep),
 
                     typeof(SetUmbracoVersionStep)
-                }, type => new PerScopeLifetime());
+                }, Lifetime.Scope);
 
-            registry.Register<InstallStepCollection>();
-            registry.Register<InstallHelper>();
+            container.Register<InstallStepCollection>();
+            container.Register<InstallHelper>();
 
-            return registry;
+            return container;
         }
     }
 }

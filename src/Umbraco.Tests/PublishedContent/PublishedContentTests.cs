@@ -9,7 +9,6 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Composing;
-using LightInject;
 using Moq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -72,7 +71,7 @@ namespace Umbraco.Tests.PublishedContent
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
         }
 
-        protected override TypeLoader CreatePluginManager(IServiceFactory f)
+        protected override TypeLoader CreatePluginManager(IContainer f)
         {
             var pluginManager = base.CreatePluginManager(f);
 
@@ -448,7 +447,7 @@ namespace Umbraco.Tests.PublishedContent
         public void FirstChildAsT()
         {
             var doc = GetNode(1046); // has child nodes
-           
+
             var model = doc.FirstChild<Anything>(x => true); // predicate
 
             Assert.IsNotNull(model);

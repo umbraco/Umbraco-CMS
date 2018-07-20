@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.Composing
 {
     [TestFixture]
     public class CollectionBuildersTests
     {
-        private ServiceContainer _container;
+        private IContainer _container;
 
         [SetUp]
         public void Setup()
         {
             Current.Reset();
 
-            _container = new ServiceContainer();
-            _container.ConfigureUmbracoCore();
+            _container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            _container.ConfigureForUmbraco();
         }
 
         [TearDown]
@@ -344,24 +344,27 @@ namespace Umbraco.Tests.Composing
             // but the container manages the scope, so to test the scope
             // the collection must come from the container
 
-            var scope1 = _container.BeginScope();
+            TestCollection col1A, col1B;
 
-            var col1A = _container.GetInstance<TestCollection>();
+            using (_container.BeginScope())
+            {
+                col1A = _container.GetInstance<TestCollection>();
+                col1B = _container.GetInstance<TestCollection>();
+            }
+
             AssertCollection(col1A, typeof(Resolved1), typeof(Resolved2));
-            var col1B = _container.GetInstance<TestCollection>();
             AssertCollection(col1B, typeof(Resolved1), typeof(Resolved2));
-
             AssertSameCollection(col1A, col1B);
 
-            _container.ScopeManagerProvider.GetScopeManager(_container).CurrentScope.Dispose();
-            var scope2 = _container.BeginScope();
+            TestCollection col2;
 
-            var col2 = _container.GetInstance<TestCollection>();
+            using (_container.BeginScope())
+            {
+                col2 = _container.GetInstance<TestCollection>();
+            }
+
             AssertCollection(col2, typeof(Resolved1), typeof(Resolved2));
-
             AssertNotSameCollection(col1A, col2);
-
-            _container.ScopeManagerProvider.GetScopeManager(_container).CurrentScope.Dispose();
         }
 
         [Test]

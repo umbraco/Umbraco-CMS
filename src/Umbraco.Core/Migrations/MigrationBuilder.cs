@@ -1,13 +1,14 @@
 ﻿using System;
 using LightInject;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.Migrations
 {
     public class MigrationBuilder : IMigrationBuilder
     {
-        private readonly IServiceContainer _container;
+        private readonly IContainer _container;
 
-        public MigrationBuilder(IServiceContainer container)
+        public MigrationBuilder(IContainer container)
         {
             _container = container;
 

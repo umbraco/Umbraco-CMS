@@ -1,12 +1,10 @@
 ﻿using Moq;
 using NUnit.Framework;
-using LightInject;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Testing;
 using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Tests.Routing
 {

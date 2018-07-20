@@ -5,6 +5,7 @@ using LightInject;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Composing.LightInject;
 
 namespace Umbraco.Tests.Composing
 {
@@ -32,6 +33,7 @@ namespace Umbraco.Tests.Composing
         {
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
+            Current.Container = new LightInjectContainer(container);
 
             container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
@@ -56,6 +58,7 @@ namespace Umbraco.Tests.Composing
         {
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
+            Current.Container = new LightInjectContainer(container);
 
             container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Add(() => new[] { typeof(TransientObject3), typeof(TransientObject2) })
@@ -79,6 +82,7 @@ namespace Umbraco.Tests.Composing
         {
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
+            Current.Container = new LightInjectContainer(container);
 
             container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
@@ -103,6 +107,7 @@ namespace Umbraco.Tests.Composing
         {
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
+            Current.Container = new LightInjectContainer(container);
 
             container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()
@@ -125,6 +130,7 @@ namespace Umbraco.Tests.Composing
         {
             var container = new ServiceContainer();
             container.ConfigureUmbracoCore();
+            Current.Container = new LightInjectContainer(container);
 
             container.RegisterCollectionBuilder<TestCollectionBuilder>()
                 .Add<TransientObject3>()

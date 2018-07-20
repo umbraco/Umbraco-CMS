@@ -14,7 +14,6 @@ using System.Web.Security;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Examine;
-using LightInject;
 using Microsoft.AspNet.SignalR;
 using Umbraco.Core;
 using Umbraco.Core.Components;
@@ -93,17 +92,17 @@ namespace Umbraco.Web.Runtime
 
             // register a per-request HttpContextBase object
             // is per-request so only one wrapper is created per request
-            composition.Container.Register<HttpContextBase>(factory => new HttpContextWrapper(factory.GetInstance<IHttpContextAccessor>().HttpContext), new PerRequestLifeTime());
+            composition.Container.RegisterSingleton<HttpContextBase>(factory => new HttpContextWrapper(factory.GetInstance<IHttpContextAccessor>().HttpContext));
 
             // register the published snapshot accessor - the "current" published snapshot is in the umbraco context
             composition.Container.RegisterSingleton<IPublishedSnapshotAccessor, UmbracoContextPublishedSnapshotAccessor>();
 
             // register a per-request UmbracoContext object
             // no real need to be per request but assuming it is faster
-            composition.Container.Register(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext, new PerRequestLifeTime());
+            composition.Container.RegisterSingleton(factory => factory.GetInstance<IUmbracoContextAccessor>().UmbracoContext);
 
             // register the umbraco helper
-            composition.Container.Register<UmbracoHelper>(new PerRequestLifeTime());
+            composition.Container.RegisterSingleton<UmbracoHelper>();
 
             // register distributed cache
             composition.Container.RegisterSingleton(f => new DistributedCache());
@@ -116,16 +115,10 @@ namespace Umbraco.Web.Runtime
 
             composition.Container.RegisterSingleton<IExamineManager>(factory => ExamineManager.Instance);
 
-            // IoC setup for LightInject for MVC/WebApi
-            // see comments on MixedLightInjectScopeManagerProvider for explainations of what we are doing here
-            if (!(composition.Container.ScopeManagerProvider is MixedLightInjectScopeManagerProvider smp))
-                throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
-            composition.Container.EnableMvc(); // does container.EnablePerWebRequestScope()
-            composition.Container.ScopeManagerProvider = smp; // reverts - we will do it last (in WebRuntime)
-
-            composition.Container.RegisterMvcControllers(typeLoader, GetType().Assembly);
-            composition.Container.EnableWebApi(GlobalConfiguration.Configuration);
-            composition.Container.RegisterApiControllers(typeLoader, GetType().Assembly);
+            // configure the container for web
+            composition.Container.ConfigureForWeb();
+            composition.Container.ComposeMvcControllers(typeLoader, GetType().Assembly);
+            composition.Container.ComposeApiControllers(typeLoader, GetType().Assembly);
 
             composition.Container.RegisterCollectionBuilder<SearchableTreeCollectionBuilder>()
                 .Add(() => typeLoader.GetTypes<ISearchableTree>()); // fixme which searchable trees?!
@@ -200,7 +193,7 @@ namespace Umbraco.Web.Runtime
             composition.Container.Register(_ => UmbracoConfig.For.UmbracoSettings().WebRouting);
 
             // register preview SignalR hub
-            composition.Container.Register(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>(), new PerContainerLifetime());
+            composition.Container.RegisterSingleton(_ => GlobalHost.ConnectionManager.GetHubContext<PreviewHub>());
 
             // register properties fallback
             composition.Container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();

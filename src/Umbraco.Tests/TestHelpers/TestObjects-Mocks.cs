@@ -5,18 +5,16 @@ using System.Data.Common;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Web;
-using LightInject;
 using Moq;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
@@ -55,7 +53,7 @@ namespace Umbraco.Tests.TestHelpers
         /// Gets a mocked service context built with mocked services.
         /// </summary>
         /// <returns>A ServiceContext.</returns>
-        public ServiceContext GetServiceContextMock(IServiceFactory container = null)
+        public ServiceContext GetServiceContextMock(IContainer container = null)
         {
             return new ServiceContext(
                 MockService<IContentService>(),
@@ -83,7 +81,7 @@ namespace Umbraco.Tests.TestHelpers
                 MockService<IMacroService>());
         }
 
-        private T MockService<T>(IServiceFactory container = null)
+        private T MockService<T>(IContainer container = null)
             where T : class
         {
             return container?.TryGetInstance<T>() ?? new Mock<T>().Object;

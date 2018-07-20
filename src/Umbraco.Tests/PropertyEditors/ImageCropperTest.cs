@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using LightInject;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
@@ -9,7 +8,6 @@ using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
-using Umbraco.Core.IO.MediaPathSchemes;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -67,12 +65,13 @@ namespace Umbraco.Tests.PropertyEditors
         {
             try
             {
-                var container = new ServiceContainer();
-                container.ConfigureUmbracoCore();
+                var container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+                container.ConfigureForUmbraco();
+
                 container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
-                container.Register<ILogger, PerContainerLifetime>(f => Mock.Of<ILogger>());
-                container.Register<IContentSection, PerContainerLifetime>(f => Mock.Of<IContentSection>());
+                Current.Container.RegisterSingleton<ILogger>(f => Mock.Of<ILogger>());
+                Current.Container.RegisterSingleton<IContentSection>(f => Mock.Of<IContentSection>());
                 var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), Mock.Of<IContentSection>(), Mock.Of<IMediaPathScheme>(), Mock.Of<ILogger>());
 
                 var dataTypeService = new TestObjects.TestDataTypeService(

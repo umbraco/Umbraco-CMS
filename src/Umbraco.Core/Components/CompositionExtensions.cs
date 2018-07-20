@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
-using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Composing;
@@ -97,7 +95,7 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a culture dictionary factory.</param>
-        public static void SetCultureDictionaryFactory(this Composition composition, Func<IServiceFactory, ICultureDictionaryFactory> factory)
+        public static void SetCultureDictionaryFactory(this Composition composition, Func<IContainer, ICultureDictionaryFactory> factory)
         {
             composition.Container.RegisterSingleton(factory);
         }
@@ -128,7 +126,7 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a published content model factory.</param>
-        public static void SetPublishedContentModelFactory(this Composition composition, Func<IServiceFactory, IPublishedModelFactory> factory)
+        public static void SetPublishedContentModelFactory(this Composition composition, Func<IContainer, IPublishedModelFactory> factory)
         {
             composition.Container.RegisterSingleton(factory);
         }
@@ -159,7 +157,7 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a server registar.</param>
-        public static void SetServerRegistrar(this Composition composition, Func<IServiceFactory, IServerRegistrar> factory)
+        public static void SetServerRegistrar(this Composition composition, Func<IContainer, IServerRegistrar> factory)
         {
             composition.Container.RegisterSingleton(factory);
         }
@@ -182,7 +180,7 @@ namespace Umbraco.Core.Components
         public static void SetServerMessenger<T>(this Composition composition)
             where T : IServerMessenger
         {
-            composition.Container.RegisterSingleton<IServerMessenger, T>();
+            composition.Container.Register<IServerMessenger, T>(Lifetime.Singleton);
         }
 
         /// <summary>
@@ -190,7 +188,7 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a server messenger.</param>
-        public static void SetServerMessenger(this Composition composition, Func<IServiceFactory, IServerMessenger> factory)
+        public static void SetServerMessenger(this Composition composition, Func<IContainer, IServerMessenger> factory)
         {
             composition.Container.RegisterSingleton(factory);
         }
@@ -221,7 +219,7 @@ namespace Umbraco.Core.Components
         /// </summary>
         /// <param name="composition">The composition.</param>
         /// <param name="factory">A function creating a short string helper.</param>
-        public static void SetShortStringHelper(this Composition composition, Func<IServiceFactory, IShortStringHelper> factory)
+        public static void SetShortStringHelper(this Composition composition, Func<IContainer, IShortStringHelper> factory)
         {
             composition.Container.RegisterSingleton(factory);
         }

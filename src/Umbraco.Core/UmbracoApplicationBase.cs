@@ -4,7 +4,6 @@ using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using log4net;
-using LightInject;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 
@@ -28,6 +27,16 @@ namespace Umbraco.Core
         protected virtual ILogger GetLogger()
         {
             return Logger.CreateWithDefaultLog4NetConfiguration();
+        }
+
+        /// <summary>
+        /// Gets the application container.
+        /// </summary>
+        protected virtual IContainer GetContainer()
+        {
+            // note: the actual, web UmbracoApplication is overriding this
+            // with a web-supporting container
+            return new Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
         }
 
         // events - in the order they trigger
@@ -60,8 +69,9 @@ namespace Umbraco.Core
 
             // create the container for the application, and configure.
             // the boot manager is responsible for registrations
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore(); // also sets Current.Container
+            var container = GetContainer();
+            container.ConfigureForUmbraco();
+            Current.Container = container;
 
             // register the essential stuff,
             // ie the global application logger
@@ -163,7 +173,7 @@ namespace Umbraco.Core
             // dispose the container and everything
             // but first, capture the looger!
             var logger = Current.Logger;
-            Current.Reset(); 
+            Current.Reset();
 
             if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted) return;
 

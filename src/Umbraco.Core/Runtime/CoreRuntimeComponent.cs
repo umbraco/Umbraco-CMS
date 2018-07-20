@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
 using AutoMapper;
 using LightInject;
 using Umbraco.Core.Cache;
@@ -94,7 +93,7 @@ namespace Umbraco.Core.Runtime
             composition.Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append(factory => factory.GetInstance<TypeLoader>().GetTypes<IPropertyValueConverter>());
 
-            composition.Container.Register<IPublishedContentTypeFactory, PublishedContentTypeFactory>(new PerContainerLifetime());
+            composition.Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
 
             composition.Container.RegisterSingleton<IShortStringHelper>(factory
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetInstance<IUmbracoSettingsSection>())));

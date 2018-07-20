@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -18,7 +17,7 @@ namespace Umbraco.Tests.IO
     [TestFixture]
     public class FileSystemsTests
     {
-        private ServiceContainer _container;
+        private IContainer _container;
 
         [SetUp]
         public void Setup()
@@ -27,8 +26,9 @@ namespace Umbraco.Tests.IO
             var config = SettingsForTests.GetDefaultUmbracoSettings();
             SettingsForTests.ConfigureSettings(config);
 
-            _container = new ServiceContainer();
-            _container.ConfigureUmbracoCore();
+            _container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            _container.ConfigureForUmbraco();
+
             _container.Register(_ => Mock.Of<ILogger>());
             _container.Register<FileSystems>();
             _container.Register(_ => Mock.Of<IDataTypeService>());
@@ -37,7 +37,7 @@ namespace Umbraco.Tests.IO
 
             _container.Register<IFileSystem, MediaFileSystem>((f, x) => new MediaFileSystem(x, f.GetInstance<IContentSection>(), f.GetInstance<IMediaPathScheme>(), f.GetInstance<ILogger>()));
             _container.Register<IFileSystem, NonConfiguredTypeFileSystem>((f, x) => new NonConfiguredTypeFileSystem(x));
-        
+
             // make sure we start clean
             // because some tests will create corrupt or weird filesystems
             FileSystems.Reset();

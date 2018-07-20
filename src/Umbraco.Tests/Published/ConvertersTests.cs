@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -172,8 +171,9 @@ namespace Umbraco.Tests.Published
         public void SimpleConverter3Test()
         {
             Current.Reset();
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
+            var container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            container.ConfigureForUmbraco();
+
 
             Current.Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>()
                 .Append<SimpleConverter3A>()

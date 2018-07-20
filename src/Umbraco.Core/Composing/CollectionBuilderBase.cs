@@ -140,7 +140,7 @@ namespace Umbraco.Core.Composing
 
             var type = typeof (TItem);
             return _registrations
-                .Select(x => (TItem) Container.GetInstanceOrThrow(type, x.ServiceName, x.ImplementingType, args))
+                .Select(x => (TItem) Container.GetInstance(type, x.ServiceName, args))
                 .ToArray(); // safe
         }
 

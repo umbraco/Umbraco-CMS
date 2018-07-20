@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -22,8 +21,9 @@ namespace Umbraco.Tests.PropertyEditors
             //normalize culture
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
 
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
+            var container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            container.ConfigureForUmbraco();
+
             container.Register<IShortStringHelper>(_
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())));
         }

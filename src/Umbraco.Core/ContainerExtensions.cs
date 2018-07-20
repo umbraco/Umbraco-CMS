@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Composing;
+﻿using System;
+using Umbraco.Core.Composing;
 
 namespace Umbraco.Core
 {
@@ -41,5 +42,31 @@ namespace Umbraco.Core
         /// to get an instance of the specified type, but failed to do so.</remarks>
         public static T TryGetInstance<T>(this IContainer container)
             => (T) container.TryGetInstance(typeof(T));
+
+        // fixme - document all these
+
+        public static void Register<TService, TImplementing>(this IContainer container, Lifetime lifetime = Lifetime.Transient)
+            => container.Register(typeof(TService), typeof(TImplementing), lifetime);
+
+        public static void Register<TService, TImplementing>(this IContainer container, string name, Lifetime lifetime = Lifetime.Transient)
+            => container.Register(typeof(TService), typeof(TImplementing), name, lifetime);
+
+        public static void Register<TService>(this IContainer container, Lifetime lifetime = Lifetime.Transient)
+            => container.Register(typeof(TService), lifetime);
+
+        public static void RegisterSingleton<TService>(this IContainer container)
+            => container.Register(typeof(TService), Lifetime.Singleton);
+
+        public static void RegisterSingleton<TService, TImplementing>(this IContainer container)
+            => container.Register(typeof(TService), typeof(TImplementing), Lifetime.Singleton);
+
+        public static void RegisterSingleton<TService>(this IContainer container, Func<IContainer, TService> factory)
+            => container.Register(factory, Lifetime.Singleton);
+
+        public static void RegisterInstance<TService>(this IContainer container, TService instance)
+            => container.RegisterInstance(typeof(TService), instance);
+
+        public static void RegisterAuto<TServiceBase>(this IContainer container)
+            => container.RegisterAuto(typeof(TServiceBase));
     }
 }

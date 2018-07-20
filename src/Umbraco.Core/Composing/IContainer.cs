@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Umbraco.Core.Composing
 {
     /// <summary>
     /// Defines a container for Umbraco.
     /// </summary>
-    public interface IContainer
+    public interface IContainer : IDisposable
     {
         /// <summary>
         /// Gets the concrete container.
@@ -21,6 +22,15 @@ namespace Umbraco.Core.Composing
         /// <returns>An instance of the specified type.</returns>
         /// <remarks>Throws an exception if the container failed to get an instance of the specified type.</remarks>
         object GetInstance(Type type);
+
+        /// <summary>
+        /// Gets a named instance.
+        /// </summary>
+        /// <param name="type">The type of the instance.</param>
+        /// <param name="name">The name of the instance.</param>
+        /// <returns>An instance of the specified type.</returns>
+        /// <remarks>Throws an exception if the container failed to get an instance of the specified type.</remarks>
+        object GetInstance(Type type, string name);
 
         /// <summary>
         /// Gets an instance with arguments.
@@ -44,15 +54,61 @@ namespace Umbraco.Core.Composing
         /// to get an instance of the specified type, but failed to do so.</remarks>
         object TryGetInstance(Type type);
 
+        /// <summary>
+        /// Gets all instances of a service.
+        /// </summary>
+        /// <param name="serviceType">The type of the service.</param>
+        IEnumerable<object> GetAllInstances(Type serviceType);
+
+        /// <summary>
+        /// Gets all instances of a service.
+        /// </summary>
+        /// <typeparam name="TService">The type of the service.</typeparam>
+        IEnumerable<TService> GetAllInstances<TService>();
+
         #endregion
 
         #region Registry
 
-        // fixme register direct type?
-        // fixme register an instance?
-        void RegisterSingleton<T>(Func<IContainer, T> factory);
-        void Register<T>(Func<IContainer, T> factory);
+        /// <summary>
+        /// Registers a service as its own implementation.
+        /// </summary>
+        void Register(Type serviceType, Lifetime lifetime = Lifetime.Transient);
+
+        /// <summary>
+        /// Registers a service with an implementation type.
+        /// </summary>
+        void Register(Type serviceType, Type implementingType, Lifetime lifetime = Lifetime.Transient);
+
+        /// <summary>
+        /// Registers a service with a named implementation type.
+        /// </summary>
+        void Register(Type serviceType, Type implementingType, string name, Lifetime lifetime = Lifetime.Transient);
+
+        /// <summary>
+        /// Registers a service with an implementation factory.
+        /// </summary>
+        void Register<TService>(Func<IContainer, TService> factory, Lifetime lifetime = Lifetime.Transient);
+
+        /// <summary>
+        /// Registers a service with an implementation factory accepting an argument.
+        /// </summary>
         void Register<T, TService>(Func<IContainer, T, TService> factory);
+
+        /// <summary>
+        /// Registers a service with an implementing instance.
+        /// </summary>
+        void RegisterInstance(Type serviceType, object instance);
+
+        /// <summary>
+        /// Registers a base type for auto-registration.
+        /// </summary>
+        void RegisterAuto(Type serviceBaseType);
+
+        /// <summary>
+        /// Registers a service with an ordered set of implementation types.
+        /// </summary>
+        void RegisterOrdered(Type serviceType, Type[] implementingTypes, Lifetime lifetime = Lifetime.Transient);
 
         /// <summary>
         /// Registers and instanciates a collection builder.
@@ -60,6 +116,27 @@ namespace Umbraco.Core.Composing
         /// <typeparam name="T">The type of the collection builder.</typeparam>
         /// <returns>A collection builder of the specified type.</returns>
         T RegisterCollectionBuilder<T>();
+
+        #endregion
+
+        #region Control
+
+        /// <summary>
+        /// Begins a scope.
+        /// </summary>
+        /// <remarks>
+        /// <para>When the scope is disposed, scoped instances that have been created during the scope are disposed.</para>
+        /// <para>Scopes can be nested. Each instance is disposed individually.</para>
+        /// </remarks>
+        IDisposable BeginScope();
+
+        // fixme - document all these
+
+        void ConfigureForUmbraco();
+
+        void ConfigureForWeb();
+
+        void EnablePerWebRequestScope();
 
         #endregion
     }

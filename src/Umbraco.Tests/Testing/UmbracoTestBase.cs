@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using AutoMapper;
 using Examine;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -75,7 +74,7 @@ namespace Umbraco.Tests.Testing
         // test feature, and no test "base" class should be. only actual test feature classes
         // should be marked with that attribute.
 
-        protected ServiceContainer Container { get; private set; }
+        protected IContainer Container { get; private set; }
 
         protected UmbracoTestAttribute Options { get; private set; }
 
@@ -114,8 +113,8 @@ namespace Umbraco.Tests.Testing
             // but hey, never know, better avoid garbage-in
             Reset();
 
-            Container = new ServiceContainer();
-            Container.ConfigureUmbracoCore();
+            Container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            Container.ConfigureForUmbraco();
 
             TestObjects = new TestObjects(Container);
 
@@ -238,12 +237,12 @@ namespace Umbraco.Tests.Testing
             });
         }
 
-        protected virtual TypeLoader CreatePluginManager(IServiceFactory f)
+        protected virtual TypeLoader CreatePluginManager(IContainer f)
         {
             return CreateCommonPluginManager(f);
         }
 
-        private static TypeLoader CreateCommonPluginManager(IServiceFactory f)
+        private static TypeLoader CreateCommonPluginManager(IContainer f)
         {
             return new TypeLoader(f.GetInstance<CacheHelper>().RuntimeCache, f.GetInstance<IGlobalSettings>(), f.GetInstance<ProfilingLogger>(), false)
             {
@@ -284,25 +283,8 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton(factory => umbracoSettings.Content);
             Container.RegisterSingleton(factory => umbracoSettings.Templates);
             Container.RegisterSingleton(factory => umbracoSettings.WebRouting);
-            
-            // fixme - The whole MediaFileSystem coupling thing seems broken. 
-            Container.Register<IFileSystem, MediaFileSystem>((factory, fileSystem) => new MediaFileSystem(fileSystem, factory.GetInstance<IContentSection>(), factory.GetInstance<IMediaPathScheme>(),  factory.GetInstance<ILogger>()));
-            Container.RegisterConstructorDependency((factory, parameterInfo) => factory.GetInstance<FileSystems>().MediaFileSystem);
 
             Container.RegisterSingleton<IExamineManager>(factory => ExamineManager.Instance);
-
-            // replace some stuff
-            Container.RegisterSingleton(factory => Mock.Of<IFileSystem>(), "ScriptFileSystem");
-            Container.RegisterSingleton(factory => Mock.Of<IFileSystem>(), "PartialViewFileSystem");
-            Container.RegisterSingleton(factory => Mock.Of<IFileSystem>(), "PartialViewMacroFileSystem");
-            Container.RegisterSingleton(factory => Mock.Of<IFileSystem>(), "StylesheetFileSystem");
-
-            // need real file systems here as templates content is on-disk only
-            //Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "MasterpageFileSystem");
-            //Container.RegisterSingleton<IFileSystem>(factory => Mock.Of<IFileSystem>(), "ViewFileSystem");
-            Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("Views", "/views"), "ViewFileSystem");
-            Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("MasterPages", "/masterpages"), "MasterpageFileSystem");
-            Container.RegisterSingleton<IFileSystem>(factory => new PhysicalFileSystem("Xslt", "/xslt"), "XsltFileSystem");
 
             // no factory (noop)
             Container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();

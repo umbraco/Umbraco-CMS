@@ -1,10 +1,8 @@
 ﻿using System;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -28,8 +26,8 @@ namespace Umbraco.Tests.Models
             // need to be able to retrieve them all...
 
             Current.Reset();
-            var container = Mock.Of<IServiceContainer>();
-            Current.Container = new LightInjectContainer(container);
+            var container = Mock.Of<IContainer>();
+            Current.Container = container;
 
             var dataEditors = new DataEditorCollection(new IDataEditor[]
             {

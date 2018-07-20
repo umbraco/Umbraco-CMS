@@ -1,21 +1,17 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Web;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.LightInject;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
@@ -40,11 +36,11 @@ namespace Umbraco.Tests.Web
             var serviceContext = new ServiceContext(entityService: entityService.Object);
 
             // fixme - bad in a unit test - but Udi has a static ctor that wants it?!
-            var container = new Mock<IServiceContainer>();
+            var container = new Mock<IContainer>();
             container.Setup(x => x.GetInstance(typeof(TypeLoader))).Returns(
                 new TypeLoader(NullCacheProvider.Instance, SettingsForTests.GenerateMockGlobalSettings(), new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>())));
             container.Setup(x => x.GetInstance(typeof (ServiceContext))).Returns(serviceContext);
-            Current.Container = new LightInjectContainer(container.Object);
+            Current.Container = container.Object;
 
             Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
 

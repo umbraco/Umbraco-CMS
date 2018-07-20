@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Threading;
 using System.Web;
-using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
@@ -42,7 +40,7 @@ namespace Umbraco.Core.Runtime
         }
 
         /// <inheritdoc/>
-        public virtual void Boot(ServiceContainer container)
+        public virtual void Boot(IContainer container)
         {
             // some components may want to initialize with the UmbracoApplicationBase
             // well, they should not - we should not do this
@@ -114,7 +112,7 @@ namespace Umbraco.Core.Runtime
             //sa.Scope?.Dispose();
         }
 
-        private void AquireMainDom(IServiceFactory container)
+        private void AquireMainDom(IContainer container)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Acquiring MainDom.", "Aquired."))
             {
@@ -132,7 +130,7 @@ namespace Umbraco.Core.Runtime
         }
 
         // internal for tests
-        internal void DetermineRuntimeLevel(IServiceFactory container)
+        internal void DetermineRuntimeLevel(IContainer container)
         {
             using (var timer = ProfilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined."))
             {
@@ -185,7 +183,7 @@ namespace Umbraco.Core.Runtime
         /// <summary>
         /// Composes the runtime.
         /// </summary>
-        public virtual void Compose(ServiceContainer container)
+        public virtual void Compose(IContainer container)
         {
             // compose the very essential things that are needed to bootstrap, before anything else,
             // and only these things - the rest should be composed in runtime components

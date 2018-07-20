@@ -1,5 +1,4 @@
 ﻿using System;
-using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
@@ -20,7 +19,7 @@ namespace Umbraco.Core.Composing
     /// Provides a static service locator for most singletons.
     /// </summary>
     /// <remarks>
-    /// <para>This class is initialized with the container via LightInjectExtensions.ConfigureUmbracoCore,
+    /// <para>This class is initialized with the container in UmbracoApplicationBase,
     /// right after the container is created in UmbracoApplicationBase.HandleApplicationStart.</para>
     /// <para>Obviously, this is a service locator, which some may consider an anti-pattern. And yet,
     /// practically, it works.</para>

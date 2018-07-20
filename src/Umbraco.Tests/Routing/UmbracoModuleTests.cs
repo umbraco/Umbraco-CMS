@@ -4,7 +4,6 @@ using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Core.IO;
@@ -12,13 +11,9 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-
-// fixme - abstract container
-using LightInject;
 
 namespace Umbraco.Tests.Routing
 {
@@ -52,7 +47,7 @@ namespace Umbraco.Tests.Routing
             );
 
             runtime.Level = RuntimeLevel.Run;
-            
+
 
             //SettingsForTests.ReservedPaths = "~/umbraco,~/install/";
             //SettingsForTests.ReservedUrls = "~/config/splashes/booting.aspx,~/install/default.aspx,~/config/splashes/noNodes.aspx,~/VSEnterpriseHelper.axd";

@@ -1,14 +1,11 @@
 ﻿using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Tests.TestHelpers;
-using LightInject;
 using Moq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Tests.PublishedContent

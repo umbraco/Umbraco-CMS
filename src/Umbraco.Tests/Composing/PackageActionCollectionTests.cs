@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Xml;
-using LightInject;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core._Legacy.PackageActions;
@@ -14,8 +13,8 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void PackageActionCollectionBuilderWorks()
         {
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
+            var container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            container.ConfigureForUmbraco();
 
             container.RegisterCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(() => TypeLoader.GetPackageActions());

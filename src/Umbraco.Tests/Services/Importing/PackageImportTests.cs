@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
@@ -11,7 +10,6 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.Testing;
-using LightInject;
 
 namespace Umbraco.Tests.Services.Importing
 {

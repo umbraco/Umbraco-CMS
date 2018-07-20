@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using AutoMapper;
 using NUnit.Framework;
@@ -9,7 +8,6 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
-using LightInject;
 
 namespace Umbraco.Tests.Models.Mapping
 {

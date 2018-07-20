@@ -1,4 +1,5 @@
-﻿using LightInject;
+﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
@@ -8,39 +9,39 @@ namespace Umbraco.Web.Composing.Composers
 {
     public static class WebMappingProfilesComposer
     {
-        public static IServiceRegistry ComposeWebMappingProfiles(this IServiceRegistry registry)
+        public static IContainer ComposeWebMappingProfiles(this IContainer container)
         {
             //register the profiles
-            registry.Register<AuditMapperProfile>();
-            registry.Register<CodeFileMapperProfile>();
-            registry.Register<ContentMapperProfile>();
-            registry.Register<ContentPropertyMapperProfile>();
-            registry.Register<ContentTypeMapperProfile>();
-            registry.Register<DataTypeMapperProfile>();
-            registry.Register<EntityMapperProfile>();
-            registry.Register<DictionaryMapperProfile>();
-            registry.Register<MacroMapperProfile>();
-            registry.Register<MediaMapperProfile>();
-            registry.Register<MemberMapperProfile>();
-            registry.Register<RedirectUrlMapperProfile>();
-            registry.Register<RelationMapperProfile>();
-            registry.Register<SectionMapperProfile>();
-            registry.Register<TagMapperProfile>();
-            registry.Register<TemplateMapperProfile>();
-            registry.Register<UserMapperProfile>();
-            registry.Register<LanguageMapperProfile>();
+            container.Register<AuditMapperProfile>();
+            container.Register<CodeFileMapperProfile>();
+            container.Register<ContentMapperProfile>();
+            container.Register<ContentPropertyMapperProfile>();
+            container.Register<ContentTypeMapperProfile>();
+            container.Register<DataTypeMapperProfile>();
+            container.Register<EntityMapperProfile>();
+            container.Register<DictionaryMapperProfile>();
+            container.Register<MacroMapperProfile>();
+            container.Register<MediaMapperProfile>();
+            container.Register<MemberMapperProfile>();
+            container.Register<RedirectUrlMapperProfile>();
+            container.Register<RelationMapperProfile>();
+            container.Register<SectionMapperProfile>();
+            container.Register<TagMapperProfile>();
+            container.Register<TemplateMapperProfile>();
+            container.Register<UserMapperProfile>();
+            container.Register<LanguageMapperProfile>();
 
             //register any resolvers, etc.. that the profiles use
-            registry.Register<ContentUrlResolver>();
-            registry.Register<ContentTreeNodeUrlResolver<IContent, ContentTreeController>>();
-            registry.Register<TabsAndPropertiesResolver<IContent, ContentItemDisplay>>();
-            registry.Register<TabsAndPropertiesResolver<IMedia, MediaItemDisplay>>();
-            registry.Register<ContentTreeNodeUrlResolver<IMedia, MediaTreeController>>();
-            registry.Register<MemberTabsAndPropertiesResolver>();
-            registry.Register<MemberTreeNodeUrlResolver>();
-            registry.Register<MemberBasicPropertiesResolver>();
+            container.Register<ContentUrlResolver>();
+            container.Register<ContentTreeNodeUrlResolver<IContent, ContentTreeController>>();
+            container.Register<TabsAndPropertiesResolver<IContent, ContentItemDisplay>>();
+            container.Register<TabsAndPropertiesResolver<IMedia, MediaItemDisplay>>();
+            container.Register<ContentTreeNodeUrlResolver<IMedia, MediaTreeController>>();
+            container.Register<MemberTabsAndPropertiesResolver>();
+            container.Register<MemberTreeNodeUrlResolver>();
+            container.Register<MemberBasicPropertiesResolver>();
 
-            return registry;
+            return container;
         }
     }
 }

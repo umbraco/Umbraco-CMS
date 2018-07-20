@@ -167,6 +167,7 @@
     <Compile Include="Composing\IContainer.cs" />
     <Compile Include="Composing\IDiscoverable.cs" />
     <Compile Include="Composing\LazyCollectionBuilderBase.cs" />
+    <Compile Include="Composing\Lifetime.cs" />
     <Compile Include="Composing\LightInjectExtensions.cs" />
     <Compile Include="Composing\LightInject\LightInjectContainer.cs" />
     <Compile Include="Composing\MixedLightInjectScopeManagerProvider.cs" />

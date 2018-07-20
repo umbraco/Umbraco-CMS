@@ -1,15 +1,9 @@
-﻿using Moq;
-using System.IO;
-using LightInject;
+﻿using System.IO;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Profiling;
 using Umbraco.Core.Strings;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Examine;
 
 namespace Umbraco.Tests.UmbracoExamine
 {

@@ -12,107 +12,10 @@ namespace Umbraco.Core.Composing
     /// </summary>
     public static class LightInjectExtensions
     {
-        /// <summary>
-        /// Configure the container for Umbraco Core usage and assign to Current.
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <remarks>The container is now the unique application container and is now accessible via Current.Container.</remarks>
-        internal static void ConfigureUmbracoCore(this ServiceContainer container)
+        // fixme temp
+        internal static ServiceContainer AsLightInject(this IContainer container)
         {
-            // supports annotated constructor injections
-            // eg to specify the service name on some services
-            container.EnableAnnotatedConstructorInjection();
-
-            // from the docs: "LightInject considers all read/write properties a dependency, but implements
-            // a loose strategy around property dependencies, meaning that it will NOT throw an exception
-            // in the case of an unresolved property dependency."
-            //
-            // in Umbraco we do NOT want to do property injection by default, so we have to disable it.
-            // from the docs, the following line will cause the container to "now only try to inject
-            // dependencies for properties that is annotated with the InjectAttribute."
-            //
-            // could not find it documented, but tests & code review shows that LightInject considers a
-            // property to be "injectable" when its setter exists and is not static, nor private, nor
-            // it is an index property. which means that eg protected or internal setters are OK.
-            container.EnableAnnotatedPropertyInjection();
-
-            // ensure that we do *not* scan assemblies
-            // we explicitely RegisterFrom our own composition roots and don't want them scanned
-            container.AssemblyScanner = new AssemblyScanner(/*container.AssemblyScanner*/);
-
-            // see notes in MixedLightInjectScopeManagerProvider
-            container.ScopeManagerProvider = new MixedLightInjectScopeManagerProvider();
-
-            // self-register
-            // fixme - WHERE is this used, and should it be a generic container, not LightInject's?
-            container.Register<IServiceContainer>(_ => container);
-
-            // configure the current container
-            Current.Container = new LightInject.LightInjectContainer(container);
-        }
-
-        private class AssemblyScanner : IAssemblyScanner
-        {
-            //private readonly IAssemblyScanner _scanner;
-
-            //public AssemblyScanner(IAssemblyScanner scanner)
-            //{
-            //    _scanner = scanner;
-            //}
-
-            public void Scan(Assembly assembly, IServiceRegistry serviceRegistry, Func<ILifetime> lifetime, Func<Type, Type, bool> shouldRegister, Func<Type, Type, string> serviceNameProvider)
-            {
-                // nothing - we *could* scan non-Umbraco assemblies, though
-            }
-
-            public void Scan(Assembly assembly, IServiceRegistry serviceRegistry)
-            {
-                // nothing - we *could* scan non-Umbraco assemblies, though
-            }
-        }
-
-        /// <summary>
-        /// Registers a service implementation with a specified lifetime.
-        /// </summary>
-        /// <typeparam name="TService">The type of the service.</typeparam>
-        /// <typeparam name="TImplementation">The type of the implementation.</typeparam>
-        /// <typeparam name="TLifetime">The type of the lifetime.</typeparam>
-        /// <param name="container">The container.</param>
-        public static void Register<TService, TImplementation, TLifetime>(this IServiceContainer container)
-            where TImplementation : TService
-            where TLifetime : ILifetime, new()
-        {
-            container.Register<TService, TImplementation>(new TLifetime());
-        }
-
-        /// <summary>
-        /// Registers a service implementation with a specified lifetime.
-        /// </summary>
-        /// <typeparam name="TService">The type of the service.</typeparam>
-        /// <typeparam name="TLifetime">The type of the lifetime.</typeparam>
-        /// <param name="container">The container.</param>
-        /// <param name="factory">A factory.</param>
-        public static void Register<TService, TLifetime>(this IServiceContainer container, Func<IServiceFactory, TService> factory)
-            where TLifetime : ILifetime, new()
-        {
-            container.Register(factory, new TLifetime());
-        }
-
-        /// <summary>
-        /// Registers several service implementations with a specified lifetime.
-        /// </summary>
-        /// <typeparam name="TService">The type of the service.</typeparam>
-        /// <typeparam name="TLifeTime">The type of the lifetime.</typeparam>
-        /// <param name="container">The container.</param>
-        /// <param name="implementations">The types of the implementations.</param>
-        public static void RegisterMany<TService, TLifeTime>(this IServiceContainer container, IEnumerable<Type> implementations)
-            where TLifeTime : ILifetime, new()
-        {
-            foreach (var implementation in implementations)
-            {
-                // if "typeof (TService)" is there then "implementation.FullName" MUST be there too
-                container.Register(typeof(TService), implementation, implementation.FullName, new TLifeTime());
-            }
+            return (ServiceContainer) container.ConcreteContainer;
         }
 
         /// <summary>
@@ -139,17 +42,39 @@ namespace Umbraco.Core.Composing
         public static void RegisterSingleton<TService, TImplementation>(this IServiceRegistry container)
             where TImplementation : TService
         {
-            var registration = container.GetAvailableService<TService>();
+            container.RegisterSingleton(typeof(TService), typeof(TImplementation));
+        }
+
+        // fixme
+        public static void RegisterSingleton(this IServiceRegistry container, Type serviceType, Type implementingType)
+        {
+            var registration = container.GetAvailableService(serviceType);
 
             if (registration == null)
             {
-                container.Register<TService, TImplementation>(new PerContainerLifetime());
+                container.Register(serviceType, implementingType, new PerContainerLifetime());
             }
             else
             {
                 if (registration.Lifetime is PerContainerLifetime == false)
                     throw new InvalidOperationException("Existing registration lifetime is not PerContainer.");
-                UpdateRegistration(registration, typeof(TImplementation), null);
+                UpdateRegistration(registration, implementingType, null);
+            }
+        }
+
+        public static void RegisterSingleton(this IServiceRegistry container, Type serviceType, Type implementingType, string name)
+        {
+            var registration = container.GetAvailableServices(serviceType).FirstOrDefault(x => x.ServiceName == name);
+
+            if (registration == null)
+            {
+                container.Register(serviceType, implementingType, name, new PerContainerLifetime());
+            }
+            else
+            {
+                if (registration.Lifetime is PerContainerLifetime == false)
+                    throw new InvalidOperationException("Existing registration lifetime is not PerContainer.");
+                UpdateRegistration(registration, implementingType, null);
             }
         }
 
@@ -158,18 +83,22 @@ namespace Umbraco.Core.Composing
         /// </summary>
         public static void RegisterSingleton<TImplementation>(this IServiceRegistry container)
         {
-            var registration = container.GetAvailableService<TImplementation>();
+            container.RegisterSingleton(typeof(TImplementation));
+        }
+
+        public static void RegisterSingleton(this IServiceRegistry container, Type serviceType)
+        {
+            var registration = container.GetAvailableService(serviceType);
             if (registration == null)
             {
-                container.Register<TImplementation>(new PerContainerLifetime());
+                container.Register(serviceType, new PerContainerLifetime());
             }
             else
             {
                 if (registration.Lifetime is PerContainerLifetime == false)
                     throw new InvalidOperationException("Existing registration lifetime is not PerContainer.");
-                UpdateRegistration(registration, typeof(TImplementation), null);
+                UpdateRegistration(registration, serviceType, null);
             }
-
         }
 
         /// <summary>
@@ -240,10 +169,10 @@ namespace Umbraco.Core.Composing
         /// <param name="container">The container.</param>
         /// <returns>The service registrations for the service type.</returns>
         public static IEnumerable<ServiceRegistration> GetAvailableServices<TService>(this IServiceRegistry container)
-        {
-            var typeofTService = typeof(TService);
-            return container.AvailableServices.Where(x => x.ServiceType == typeofTService);
-        }
+            => container.GetAvailableServices(typeof(TService));
+
+        public static IEnumerable<ServiceRegistration> GetAvailableServices(this IServiceRegistry container, Type serviceType)
+            => container.AvailableServices.Where(x => x.ServiceType == serviceType);
 
         /// <summary>
         /// Gets the unique available service registration for a service type.
@@ -258,6 +187,12 @@ namespace Umbraco.Core.Composing
             return container.AvailableServices.SingleOrDefault(x => x.ServiceType == typeofTService);
         }
 
+        // fixme
+        public static ServiceRegistration GetAvailableService(this IServiceRegistry container, Type serviceType)
+        {
+            return container.AvailableServices.SingleOrDefault(x => x.ServiceType == serviceType);
+        }
+
         /// <summary>
         /// Gets the unique available service registration for a service type and a name.
         /// </summary>
@@ -270,101 +205,6 @@ namespace Umbraco.Core.Composing
         {
             var typeofTService = typeof(TService);
             return container.AvailableServices.SingleOrDefault(x => x.ServiceType == typeofTService && x.ServiceName == name);
-        }
-
-        /// <summary>
-        /// Gets an instance of a TService or throws a meaningful exception.
-        /// </summary>
-        /// <typeparam name="TService">The service type.</typeparam>
-        /// <param name="factory">The container.</param>
-        /// <returns>The instance.</returns>
-        public static TService GetInstanceOrThrow<TService>(this IServiceFactory factory)
-        {
-            if (factory == null)
-                throw new ArgumentNullException(nameof(factory));
-
-            try
-            {
-                return factory.GetInstance<TService>();
-            }
-            catch (Exception e)
-            {
-                LightInjectException.TryThrow(e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Gets an instance of a TService or throws a meaningful exception.
-        /// </summary>
-        /// <param name="factory">The container.</param>
-        /// <param name="tService">The type of the service.</param>
-        /// <param name="serviceName">The name of the service.</param>
-        /// <param name="implementingType">The implementing type.</param>
-        /// <param name="args">Arguments.</param>
-        /// <returns>The instance.</returns>
-        internal static object GetInstanceOrThrow(this IServiceFactory factory, Type tService, string serviceName, Type implementingType, object[] args)
-        {
-            if (factory == null)
-                throw new ArgumentNullException(nameof(factory));
-
-            // fixme temp - STOP doing this, it confuses LightInject and then we get ugly exception traces
-            // we HAVE to let LightInject throw - and catch at THE OUTERMOST if InvalidOperationException in LightInject.Anything!
-
-            return factory.GetInstance(tService, serviceName, args);
-            //try
-            //{
-            //    return factory.GetInstance(tService, serviceName, args);
-            //}
-            //catch (Exception e)
-            //{
-            //    LightInjectException.TryThrow(e, implementingType);
-            //    throw;
-            //}
-        }
-
-        /// <summary>
-        /// Registers a base type for auto-registration.
-        /// </summary>
-        /// <typeparam name="T">The base type.</typeparam>
-        /// <param name="container">The container.</param>
-        /// <remarks>
-        /// <para>Any type that inherits/implements the base type will be auto-registered on-demand.</para>
-        /// <para>This methods works with actual types. Use the other overload for eg generic definitions.</para>
-        /// </remarks>
-        public static void RegisterAuto<T>(this IServiceContainer container)
-        {
-            container.RegisterFallback((serviceType, serviceName) =>
-            {
-                //Current.Logger.Debug(typeof(LightInjectExtensions), $"Fallback for type {serviceType.FullName}.");
-                // https://github.com/seesharper/LightInject/issues/173
-
-                if (typeof(T).IsAssignableFrom(serviceType))
-                    container.Register(serviceType);
-                return false;
-            }, null);
-        }
-
-        /// <summary>
-        /// Registers a base type for auto-registration.
-        /// </summary>
-        /// <param name="container">The container.</param>
-        /// <param name="type">The base type.</param>
-        /// <remarks>
-        /// <para>Any type that inherits/implements the base type will be auto-registered on-demand.</para>
-        /// <para>This methods works with actual types, as well as generic definitions eg <c>typeof(MyBase{})</c>.</para>
-        /// </remarks>
-        public static void RegisterAuto(this IServiceContainer container, Type type)
-        {
-            container.RegisterFallback((serviceType, serviceName) =>
-            {
-                //Current.Logger.Debug(typeof(LightInjectExtensions), $"Fallback for type {serviceType.FullName}.");
-                // https://github.com/seesharper/LightInject/issues/173
-
-                if (type.IsAssignableFromGtd(serviceType))
-                    container.Register(serviceType);
-                return false;
-            }, null);
         }
 
         /// <summary>

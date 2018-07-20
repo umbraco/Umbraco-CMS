@@ -1,5 +1,4 @@
-﻿using LightInject;
-using Moq;
+﻿using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -7,7 +6,6 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Profiling;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence;
 
@@ -34,8 +32,8 @@ namespace Umbraco.Tests.TestHelpers
 
             var sqlSyntax = new SqlCeSyntaxProvider();
 
-            var container = new ServiceContainer();
-            container.ConfigureUmbracoCore();
+            var container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            container.ConfigureForUmbraco();
 
             container.RegisterSingleton<ILogger>(factory => Mock.Of<ILogger>());
             container.RegisterSingleton<IProfiler>(factory => Mock.Of<IProfiler>());

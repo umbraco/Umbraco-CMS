@@ -1,5 +1,4 @@
-﻿using LightInject;
-using Umbraco.Core.Configuration.UmbracoSettings;
+﻿using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -7,22 +6,22 @@ namespace Umbraco.Core.Composing.Composers
 {
     public static class FileSystemsComposer
     {
-        public static IServiceRegistry ComposeFileSystems(this IServiceRegistry registry)
+        public static IContainer ComposeFileSystems(this IContainer container)
         {
             // register FileSystems, which manages all filesystems
-            registry.RegisterSingleton<FileSystems>();
+            container.RegisterSingleton<FileSystems>();
 
             // register IFileSystems, which gives access too all filesystems
-            registry.RegisterSingleton<IFileSystems>(factory => factory.GetInstance<FileSystems>());
+            container.RegisterSingleton<IFileSystems>(factory => factory.GetInstance<FileSystems>());
 
             // register MediaFileSystem, which can be injected directly
-            registry.RegisterSingleton(factory => factory.GetInstance<IFileSystems>().MediaFileSystem);
+            container.RegisterSingleton(factory => factory.GetInstance<IFileSystems>().MediaFileSystem);
 
             // register MediaFileSystem, so that FileSystems can create it
-            registry.Register<IFileSystem, MediaFileSystem>((f, wrappedFileSystem)
+            container.Register<IFileSystem, MediaFileSystem>((f, wrappedFileSystem)
                 => new MediaFileSystem(wrappedFileSystem, f.GetInstance<IContentSection>(), f.GetInstance<IMediaPathScheme>(), f.GetInstance<ILogger>()));
 
-            return registry;
+            return container;
         }
     }
 }

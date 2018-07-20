@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Web.Hosting;
 using Examine;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -13,7 +12,6 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Runtime;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
-using Umbraco.Examine;
 
 namespace Umbraco.Tests.Runtimes
 {
@@ -83,7 +81,7 @@ namespace Umbraco.Tests.Runtimes
                 : base(umbracoApplication)
             { }
 
-            public override void Compose(ServiceContainer container)
+            public override void Compose(IContainer container)
             {
                 base.Compose(container);
 
@@ -116,7 +114,7 @@ namespace Umbraco.Tests.Runtimes
 
             private MainDom _mainDom;
 
-            public override void Boot(ServiceContainer container)
+            public override void Boot(IContainer container)
             {
                 base.Boot(container);
                 _mainDom = container.GetInstance<MainDom>();

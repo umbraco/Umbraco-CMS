@@ -1,4 +1,5 @@
 ﻿using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Web.Runtime;
 
 namespace Umbraco.Web
@@ -11,6 +12,11 @@ namespace Umbraco.Web
         protected override IRuntime GetRuntime()
         {
             return new WebRuntime(this);
+        }
+
+        protected override IContainer GetContainer()
+        {
+            return new Web.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
         }
     }
 }

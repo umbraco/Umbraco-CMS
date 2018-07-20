@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Components;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Components
         private static readonly List<Type> Composed = new List<Type>();
         private static readonly List<string> Initialized = new List<string>();
 
-        private static IServiceContainer MockContainer(Action<Mock<IServiceContainer>> setup = null)
+        private static IContainer MockContainer(Action<Mock<IContainer>> setup = null)
         {
             // fixme use IUmbracoDatabaseFactory vs UmbracoDatabaseFactory, clean it all up!
 
@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Components
             var fs = new FileSystems(logger);
             var p = new ScopeProvider(f, fs, logger);
 
-            var mock = new Mock<IServiceContainer>();
+            var mock = new Mock<IContainer>();
             mock.Setup(x => x.GetInstance(typeof (ILogger))).Returns(logger);
             mock.Setup(x => x.GetInstance(typeof (ProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             mock.Setup(x => x.GetInstance(typeof (IUmbracoDatabaseFactory))).Returns(f);
