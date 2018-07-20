@@ -158,10 +158,11 @@
     <Compile Include="Components\UmbracoCoreComponent.cs" />
     <Compile Include="Composing\BuilderCollectionBase.cs" />
     <Compile Include="Composing\CollectionBuilderBase.cs" />
-    <Compile Include="Composing\CompositionRoots\ConfigurationCompositionRoot.cs" />
-    <Compile Include="Composing\CompositionRoots\CoreMappingProfilesCompositionRoot.cs" />
-    <Compile Include="Composing\CompositionRoots\RepositoryCompositionRoot.cs" />
-    <Compile Include="Composing\CompositionRoots\ServicesCompositionRoot.cs" />
+    <Compile Include="Composing\Composers\ConfigurationComposer.cs" />
+    <Compile Include="Composing\Composers\CoreMappingProfilesComposer.cs" />
+    <Compile Include="Composing\Composers\FileSystemsComposer.cs" />
+    <Compile Include="Composing\Composers\RepositoriesComposer.cs" />
+    <Compile Include="Composing\Composers\ServicesComposer.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="Composing\HideFromTypeFinderAttribute.cs" />
     <Compile Include="Composing\IBuilderCollection.cs" />
@@ -305,6 +306,7 @@
     <Compile Include="Constants-System.cs" />
     <Compile Include="Constants-Web.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="ContainerExtensions.cs" />
     <Compile Include="ContentVariationExtensions.cs" />
     <Compile Include="DisposableObjectSlim.cs" />
     <Compile Include="Events\ExportedMemberEventArgs.cs" />

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Web;
 using LightInject;
 using Moq;
@@ -10,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
@@ -138,6 +140,24 @@ namespace Umbraco.Tests.TestHelpers
         public IGlobalSettings GetGlobalSettings()
         {
             return SettingsForTests.GetDefaultGlobalSettings();
+        }
+
+        public IFileSystems GetFileSystemsMock()
+        {
+            var fileSystems = Mock.Of<IFileSystems>();
+            MockFs(fileSystems, x => x.MasterPagesFileSystem);
+            MockFs(fileSystems, x => x.MacroPartialsFileSystem);
+            MockFs(fileSystems, x => x.MvcViewsFileSystem);
+            MockFs(fileSystems, x => x.PartialViewsFileSystem);
+            MockFs(fileSystems, x => x.ScriptsFileSystem);
+            MockFs(fileSystems, x => x.StylesheetsFileSystem);
+            return fileSystems;
+        }
+
+        private void MockFs(IFileSystems fileSystems, Expression<Func<IFileSystems, IFileSystem>> fileSystem)
+        {
+            var fs = Mock.Of<IFileSystem>();
+            Mock.Get(fileSystems).Setup(fileSystem).Returns(fs);
         }
 
         #region Inner classes

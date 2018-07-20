@@ -11,7 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.CompositionRoots;
+using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Events;
@@ -22,7 +22,6 @@ using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
@@ -34,9 +33,8 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Services;
-using Umbraco.Examine;
 using Umbraco.Tests.Testing.Objects.Accessors;
-using Umbraco.Web.Composing.CompositionRoots;
+using Umbraco.Web.Composing.Composers;
 using Umbraco.Web._Legacy.Actions;
 using Current = Umbraco.Core.Composing.Current;
 using Umbraco.Web.Routing;
@@ -218,8 +216,8 @@ namespace Umbraco.Tests.Testing
         {
             if (configure == false) return;
 
-            Container.RegisterFrom<CoreMappingProfilesCompositionRoot>();
-            Container.RegisterFrom<WebMappingProfilesCompositionRoot>();
+            Container.ComposeCoreMappingProfiles();
+            Container.ComposeWebMappingProfiles();
         }
 
         protected virtual void ComposePluginManager(UmbracoTestOptions.PluginManager pluginManager)
@@ -278,7 +276,7 @@ namespace Umbraco.Tests.Testing
             SettingsForTests.ConfigureSettings(globalSettings);
 
             // default Datalayer/Repositories/SQL/Database/etc...
-            Container.RegisterFrom<RepositoryCompositionRoot>();
+            Container.ComposeRepositories();
 
             // register basic stuff that might need to be there for some container resolvers to work
             Container.RegisterSingleton(factory => umbracoSettings);
@@ -325,11 +323,13 @@ namespace Umbraco.Tests.Testing
 
             Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
             Container.RegisterSingleton(factory => new FileSystems(factory.TryGetInstance<ILogger>()));
+            Container.RegisterSingleton<IFileSystems>(factory => factory.GetInstance<FileSystems>());
             Container.RegisterSingleton(factory
                 => TestObjects.GetScopeProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
             Container.RegisterSingleton(factory => (IScopeAccessor) factory.GetInstance<IScopeProvider>());
 
-            Container.RegisterFrom<ServicesCompositionRoot>();
+            Container.ComposeServices();
+
             // composition root is doing weird things, fix
             Container.RegisterSingleton<IApplicationTreeService, ApplicationTreeService>();
             Container.RegisterSingleton<ISectionService, SectionService>();

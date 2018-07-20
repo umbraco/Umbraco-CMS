@@ -4,6 +4,7 @@ using System.Xml;
 using Moq;
 using NUnit.Framework;
 using LightInject;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;

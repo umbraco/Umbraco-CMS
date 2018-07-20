@@ -11,8 +11,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class StylesheetRepository : FileRepository<string, Stylesheet>, IStylesheetRepository
     {
-        public StylesheetRepository(IFileSystem fileSystem)
-            : base(fileSystem)
+        public StylesheetRepository(IFileSystems fileSystems)
+            : base(fileSystems.StylesheetsFileSystem)
         { }
 
         #region Overrides of FileRepository<string,Stylesheet>

@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Web;
+﻿using System.ComponentModel.DataAnnotations;
 using Umbraco.Core;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;

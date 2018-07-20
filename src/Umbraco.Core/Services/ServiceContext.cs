@@ -134,7 +134,7 @@ namespace Umbraco.Core.Services
             if (redirectUrlService != null) _redirectUrlService = new Lazy<IRedirectUrlService>(() => redirectUrlService);
             if (consentService != null) _consentService = new Lazy<IConsentService>(() => consentService);
         }
-        
+
         /// <summary>
         /// Gets the <see cref="IPublicAccessService"/>
         /// </summary>

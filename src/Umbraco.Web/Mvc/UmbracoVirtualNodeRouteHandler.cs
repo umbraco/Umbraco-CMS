@@ -4,7 +4,7 @@ using System.Web.Routing;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
-using LightInject;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Mvc
 {

@@ -162,7 +162,7 @@ namespace Umbraco.Tests.Services
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var tRepository = new TemplateRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
+                var tRepository = new TemplateRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
                 var tagRepo = new TagRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger);
                 var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, tRepository);
                 var languageRepository = new LanguageRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger);
@@ -195,7 +195,7 @@ namespace Umbraco.Tests.Services
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var tRepository = new TemplateRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
+                var tRepository = new TemplateRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
                 var tagRepo = new TagRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger);
                 var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, tRepository);
                 var languageRepository = new LanguageRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger);
@@ -226,7 +226,7 @@ namespace Umbraco.Tests.Services
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var tRepository = new TemplateRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
+                var tRepository = new TemplateRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
                 var tagRepo = new TagRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger);
                 var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, tRepository);
                 var languageRepository = new LanguageRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger);
@@ -260,7 +260,7 @@ namespace Umbraco.Tests.Services
             var provider = TestObjects.GetScopeProvider(Logger);
             using (var scope = provider.CreateScope())
             {
-                var tRepository = new TemplateRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>());
+                var tRepository = new TemplateRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, Mock.Of<ITemplatesSection>(), TestObjects.GetFileSystemsMock());
                 var tagRepo = new TagRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger);
                 var ctRepository = new ContentTypeRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger, tRepository);
                 var languageRepository = new LanguageRepository((IScopeAccessor) provider, CacheHelper.Disabled, Logger);

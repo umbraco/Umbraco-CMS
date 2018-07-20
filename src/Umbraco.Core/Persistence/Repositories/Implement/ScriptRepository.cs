@@ -15,8 +15,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly IContentSection _contentConfig;
 
-        public ScriptRepository(IFileSystem fileSystem, IContentSection contentConfig)
-            : base(fileSystem)
+        public ScriptRepository(IFileSystems fileSystems, IContentSection contentConfig)
+            : base(fileSystems.ScriptsFileSystem)
         {
             _contentConfig = contentConfig ?? throw new ArgumentNullException(nameof(contentConfig));
         }

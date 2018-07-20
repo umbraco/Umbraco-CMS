@@ -41,6 +41,7 @@ namespace Umbraco.Tests.Models
             Container.Register(_ => Mock.Of<ILogger>());
             Container.Register<IFileSystem, MediaFileSystem>((factory, fileSystem) => new MediaFileSystem(fileSystem, factory.GetInstance<IContentSection>(), factory.GetInstance<IMediaPathScheme>(), factory.GetInstance<ILogger>()));
             Container.Register<FileSystems>();
+            Container.Register<IFileSystems>(factory => factory.GetInstance<FileSystems>());
             Container.Register(_ => Mock.Of<IDataTypeService>());
             Container.Register(_ => Mock.Of<IContentSection>());
         }

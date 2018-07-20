@@ -241,7 +241,7 @@ namespace Umbraco.Web.Composing
 
         public static IScopeProvider ScopeProvider => CoreCurrent.ScopeProvider;
 
-        public static FileSystems FileSystems => CoreCurrent.FileSystems;
+        public static IFileSystems FileSystems => CoreCurrent.FileSystems;
 
         public static ISqlContext SqlContext=> CoreCurrent.SqlContext;
 

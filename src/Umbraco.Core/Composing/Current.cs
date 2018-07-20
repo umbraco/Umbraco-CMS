@@ -101,8 +101,8 @@ namespace Umbraco.Core.Composing
         public static TypeLoader TypeLoader
             => Container.GetInstance<TypeLoader>();
 
-        public static FileSystems FileSystems
-            => Container.GetInstance<FileSystems>();
+        public static IFileSystems FileSystems
+            => Container.GetInstance<IFileSystems>();
 
         public static UrlSegmentProviderCollection UrlSegmentProviders
             => Container.GetInstance<UrlSegmentProviderCollection>();

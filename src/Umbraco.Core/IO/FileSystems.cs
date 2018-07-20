@@ -12,7 +12,18 @@ using Umbraco.Core.Composing;
 
 namespace Umbraco.Core.IO
 {
-    public class FileSystems
+    public interface IFileSystems // fixme move!
+    {
+        IFileSystem MacroPartialsFileSystem { get; }
+        IFileSystem PartialViewsFileSystem { get; }
+        IFileSystem StylesheetsFileSystem { get; }
+        IFileSystem ScriptsFileSystem { get; }
+        IFileSystem MasterPagesFileSystem { get; }
+        IFileSystem MvcViewsFileSystem { get; }
+        MediaFileSystem MediaFileSystem { get; }
+    }
+
+    public class FileSystems : IFileSystems
     {
         private readonly IFileSystemProvidersSection _config;
         private readonly ConcurrentSet<ShadowWrapper> _wrappers = new ConcurrentSet<ShadowWrapper>();
@@ -35,10 +46,6 @@ namespace Umbraco.Core.IO
         private object _wkfsObject;
 
         private MediaFileSystem _mediaFileSystem;
-
-        
-        //fixme - is this needed to be a managed file system? seems irrelevant since it won't ever be moved and is only used in one place in code
-        private IFileSystem _javascriptLibraryFileSystem;
 
         #region Constructor
 
@@ -129,16 +136,6 @@ namespace Umbraco.Core.IO
             }
         }
 
-        //fixme - is this needed to be a managed file system? seems irrelevant since it won't ever be moved and is only used in one place in code
-        internal IFileSystem JavaScriptLibraryFileSystem
-        {
-            get
-            {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-                return _javascriptLibraryFileSystem;
-            }
-        }
-
         private void EnsureWellKnownFileSystems()
         {
             LazyInitializer.EnsureInitialized(ref _wkfsObject, ref _wkfsInitialized, ref _wkfsLock, CreateWellKnownFileSystems);
@@ -154,7 +151,6 @@ namespace Umbraco.Core.IO
             var scriptsFileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
             var masterPagesFileSystem = new PhysicalFileSystem(SystemDirectories.Masterpages);
             var mvcViewsFileSystem = new PhysicalFileSystem(SystemDirectories.MvcViews);
-            var javaScriptLibraryFileSystem = new PhysicalFileSystem(SystemDirectories.JavaScriptLibrary);
 
             _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, "Views/MacroPartials", () => IsScoped());
             _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, "Views/Partials", () => IsScoped());
@@ -162,7 +158,6 @@ namespace Umbraco.Core.IO
             _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, "scripts", () => IsScoped());
             _masterPagesFileSystem = new ShadowWrapper(masterPagesFileSystem, "masterpages", () => IsScoped());
             _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, "Views", () => IsScoped());
-            _javascriptLibraryFileSystem = new ShadowWrapper(javaScriptLibraryFileSystem, "Lib", () => IsScoped());
 
             // filesystems obtained from GetFileSystemProvider are already wrapped and do not need to be wrapped again
             _mediaFileSystem = GetFileSystemProvider<MediaFileSystem>();
@@ -190,7 +185,7 @@ namespace Umbraco.Core.IO
         /// <param name="alias">The alias of the strongly-typed filesystem.</param>
         /// <returns>The non-typed filesystem supporting the strongly-typed filesystem with the specified alias.</returns>
         /// <remarks>This method should not be used directly, used <see cref="GetFileSystemProvider{TFileSystem}()"/> instead.</remarks>
-        public IFileSystem GetUnderlyingFileSystemProvider(string alias)
+        internal IFileSystem GetUnderlyingFileSystemProvider(string alias)
         {
             return GetUnderlyingFileSystemProvider(alias, null);
         }
@@ -303,10 +298,8 @@ namespace Umbraco.Core.IO
                 var innerFs = GetUnderlyingFileSystemNoCache(alias, fallback);
                 var shadowWrapper = new ShadowWrapper(innerFs, "typed/" + alias, () => IsScoped());
 
-                // fixme - switch to using container. where are these registered?
-
-                //var fs = (IFileSystem) Activator.CreateInstance(typeof(TFileSystem), shadowWrapper);
-                var fs = Current.Container.GetInstance<TFileSystem>(new object[] { (IFileSystem)shadowWrapper });
+                // getting the fs from the container - see FileSystemsComposer
+                var fs = Current.Container.GetInstance<TFileSystem>(new object[] { (IFileSystem) shadowWrapper });
                 _wrappers.Add(shadowWrapper); // keeping a reference to the wrapper
                 return fs;
             });

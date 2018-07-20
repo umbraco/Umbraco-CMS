@@ -7,7 +7,7 @@ using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.CompositionRoots;
+using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Runtime
             container.RegisterSingleton<ProfilingLogger>();
             container.RegisterSingleton<IRuntimeState, RuntimeState>();
 
-            container.RegisterFrom<ConfigurationCompositionRoot>();
+            container.ComposeConfiguration();
 
             // register caches
             // need the deep clone runtime cache profiver to ensure entities are cached properly, ie

@@ -50,7 +50,7 @@ namespace Umbraco.Core.Persistence
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
-        /// <remarks>Used by LightInject.</remarks>
+        /// <remarks>Used by injection.</remarks>
         public UmbracoDatabaseFactory(IEnumerable<ISqlSyntaxProvider> sqlSyntaxProviders, ILogger logger, IMapperCollection mappers)
             : this(Constants.System.UmbracoConnectionName, sqlSyntaxProviders, logger, mappers)
         {

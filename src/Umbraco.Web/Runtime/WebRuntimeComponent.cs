@@ -10,6 +10,7 @@ using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.Security;
 using ClientDependency.Core.CompositeFiles.Providers;
 using ClientDependency.Core.Config;
 using Examine;
@@ -23,28 +24,26 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Macros;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Services;
-using Umbraco.Examine;
 using Umbraco.Web.Cache;
-using Umbraco.Web.Composing.CompositionRoots;
+using Umbraco.Web.Composing.Composers;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Install;
-using Umbraco.Web.Media;
 using Umbraco.Web.Models.PublishedContent;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Search;
 using Umbraco.Web.Security;
+using Umbraco.Web.Security.Providers;
 using Umbraco.Web.Services;
 using Umbraco.Web.SignalR;
 using Umbraco.Web.Tour;
@@ -63,14 +62,17 @@ namespace Umbraco.Web.Runtime
         {
             base.Compose(composition);
 
-            composition.Container.RegisterFrom<WebMappingProfilesCompositionRoot>();
+            composition.Container.ComposeWebMappingProfiles();
 
             //register the install components
             //NOTE: i tried to not have these registered if we weren't installing or upgrading but post install when the site restarts
             //it still needs to use the install controller so we can't do that
-            composition.Container.RegisterFrom<InstallerCompositionRoot>();
+            composition.Container.ComposeInstaller();
 
-            composition.Container.RegisterFrom<HelperCompositionRoot>();
+            // register membership stuff
+            composition.Container.Register(factory => Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider());
+            composition.Container.Register(factory => Roles.Enabled ? Roles.Provider : new MembersRoleProvider(factory.GetInstance<IMemberService>()));
+            composition.Container.Register<MembershipHelper>();
 
             // register accessors for cultures
             composition.Container.RegisterSingleton<IDefaultCultureAccessor, DefaultCultureAccessor>();
@@ -180,7 +182,7 @@ namespace Umbraco.Web.Runtime
                 .Append<ContentFinderByRedirectUrl>();
 
             composition.Container.RegisterSingleton<ISiteDomainHelper, SiteDomainHelper>();
-            
+
             composition.Container.RegisterSingleton<ICultureDictionaryFactory, DefaultCultureDictionaryFactory>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course

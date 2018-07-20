@@ -22,6 +22,18 @@ namespace Umbraco.Core.Composing.LightInject
         public object ConcreteContainer => _container;
 
         /// <inheritdoc />
+        public object GetInstance(Type type)
+            => _container.GetInstance(type);
+
+        /// <inheritdoc />
+        public object GetInstance(Type type, object[] args)
+            => _container.GetInstance(type, args);
+
+        /// <inheritdoc />
+        public object TryGetInstance(Type type)
+            => _container.TryGetInstance(type);
+
+        /// <inheritdoc />
         public void RegisterSingleton<T>(Func<IContainer, T> factory)
             => _container.RegisterSingleton(f => factory(this));
 
@@ -36,21 +48,5 @@ namespace Umbraco.Core.Composing.LightInject
         /// <inheritdoc />
         public T RegisterCollectionBuilder<T>()
             => _container.RegisterCollectionBuilder<T>();
-
-        /// <inheritdoc />
-        public T TryGetInstance<T>()
-            => _container.TryGetInstance<T>();
-
-        /// <inheritdoc />
-        public T GetInstance<T>()
-            => _container.GetInstance<T>();
-
-        /// <inheritdoc />
-        public T GetInstance<T>(object[] args)
-            => (T) _container.GetInstance(typeof(T), args);
-
-        /// <inheritdoc />
-        public object GetInstance(Type type)
-            => _container.GetInstance(type);
     }
 }

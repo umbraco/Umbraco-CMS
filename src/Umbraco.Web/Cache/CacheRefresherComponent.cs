@@ -20,7 +20,6 @@ using Umbraco.Core.Services.Implement;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 using Umbraco.Web.Services;
-using LightInject;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
 
 namespace Umbraco.Web.Cache

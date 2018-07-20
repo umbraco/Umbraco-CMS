@@ -1,17 +1,12 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -21,13 +16,16 @@ namespace Umbraco.Tests.Persistence.Repositories
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
     public class StylesheetRepositoryTest : TestWithDatabaseBase
     {
+        private IFileSystems _fileSystems;
         private IFileSystem _fileSystem;
 
         public override void SetUp()
         {
             base.SetUp();
 
+            _fileSystems = Mock.Of<IFileSystems>();
             _fileSystem = new PhysicalFileSystem(SystemDirectories.Css);
+            Mock.Get(_fileSystems).Setup(x => x.StylesheetsFileSystem).Returns(_fileSystem);
             var stream = CreateStream("body {background:#EE7600; color:#FFF;}");
             _fileSystem.AddFile("styles.css", stream);
         }
@@ -36,11 +34,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
                 // Act
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
 
                 // Assert
@@ -52,10 +49,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 // Act
                 var stylesheet = new Stylesheet("test-add.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -71,10 +67,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 // Act
                 var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -99,10 +94,9 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_With_Property()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 // Act
                 var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -130,10 +124,9 @@ p{font-size:2em;}"));
         public void Throws_When_Adding_Duplicate_Properties()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 // Act
                 var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -150,10 +143,9 @@ p{font-size:2em;}"));
         public void Can_Perform_Delete()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 // Act
                 var stylesheet = new Stylesheet("test-delete.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -172,10 +164,9 @@ p{font-size:2em;}"));
         public void Can_Perform_Get()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 // Act
                 var stylesheet = repository.Get("styles.css");
@@ -192,10 +183,9 @@ p{font-size:2em;}"));
         public void Can_Perform_GetAll()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
@@ -216,10 +206,9 @@ p{font-size:2em;}"));
         public void Can_Perform_GetAll_With_Params()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
@@ -240,10 +229,9 @@ p{font-size:2em;}"));
         public void Can_Perform_Exists()
         {
             // Arrange
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 // Act
                 var exists = repository.Exists("styles.css");
@@ -258,10 +246,9 @@ p{font-size:2em;}"));
         {
             // unless noted otherwise, no changes / 7.2.8
 
-            var provider = TestObjects.GetScopeProvider(Logger);
-            using (var scope = ScopeProvider.CreateScope())
+            using (ScopeProvider.CreateScope())
             {
-                var repository = new StylesheetRepository(_fileSystem);
+                var repository = new StylesheetRepository(_fileSystems);
 
                 var stylesheet = new Stylesheet("test-path-1.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
                 repository.Save(stylesheet);
