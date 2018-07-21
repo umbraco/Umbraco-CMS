@@ -23,9 +23,9 @@ namespace Umbraco.Core.Models.PublishedContent
         public T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue, ICollection<int> visitedLanguages) => defaultValue;
 
         /// <inheritdoc />
-        public object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority, ICollection<int> visitedLanguages) => defaultValue;
+        public object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, IEnumerable<int> fallbackMethods, ICollection<int> visitedLanguages) => defaultValue;
 
         /// <inheritdoc />
-        public T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority, ICollection<int> visitedLanguages) => defaultValue;
+        public T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, IEnumerable<int> fallbackMethods, ICollection<int> visitedLanguages) => defaultValue;
     }
 }

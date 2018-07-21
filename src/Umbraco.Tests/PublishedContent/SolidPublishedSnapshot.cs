@@ -248,7 +248,7 @@ namespace Umbraco.Tests.PublishedContent
         #endregion
     }
 
-    class SolidPublishedProperty : IPublishedProperty
+    internal class SolidPublishedProperty : IPublishedProperty
     {
         public PublishedPropertyType PropertyType { get; set; }
         public string Alias { get; set; }
@@ -309,19 +309,33 @@ namespace Umbraco.Tests.PublishedContent
             return _solidSourceValues.ContainsKey(culture);
         }
 
-        public void SetSourceValue(string culture, object value)
+        public void SetSourceValue(string culture, object value, bool defaultValue = false)
         {
             _solidSourceValues.Add(culture, value);
+            if (defaultValue)
+            {
+                SolidSourceValue = value;
+                SolidHasValue = true;
+            }
         }
 
-        public void SetValue(string culture, object value)
+        public void SetValue(string culture, object value, bool defaultValue = false)
         {
             _solidValues.Add(culture, value);
+            if (defaultValue)
+            {
+                SolidValue = value;
+                SolidHasValue = true;
+            }
         }
 
-        public void SetXPathValue(string culture, object value)
+        public void SetXPathValue(string culture, object value, bool defaultValue = false)
         {
             _solidXPathValues.Add(culture, value);
+            if (defaultValue)
+            {
+                SolidXPathValue = value;
+            }
         }
     }
 
