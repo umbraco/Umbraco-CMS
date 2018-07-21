@@ -23,7 +23,7 @@ namespace Umbraco.Tests.Composing
         }
 
         private IContainer CreateContainer()
-            => Current.Container = (new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer())).ConfigureForUmbraco();
+            => Current.Container = Core.Composing.LightInject.LightInjectContainer.Create().ConfigureForUmbraco();
 
         // note
         // lazy collection builder does not throw on duplicate, just uses distinct types

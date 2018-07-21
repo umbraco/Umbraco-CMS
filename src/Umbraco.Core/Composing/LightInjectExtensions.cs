@@ -206,28 +206,5 @@ namespace Umbraco.Core.Composing
             var typeofTService = typeof(TService);
             return container.AvailableServices.SingleOrDefault(x => x.ServiceType == typeofTService && x.ServiceName == name);
         }
-
-        /// <summary>
-        /// Registers and instanciates a collection builder.
-        /// </summary>
-        /// <typeparam name="TBuilder">The type of the collection builder.</typeparam>
-        /// <param name="container">The container.</param>
-        /// <returns>The collection builder.</returns>
-        public static TBuilder RegisterCollectionBuilder<TBuilder>(this IServiceContainer container)
-        {
-            // make sure it's not already registered
-            // we just don't want to support re-registering collection builders
-            var registration = container.GetAvailableService<TBuilder>();
-            if (registration != null)
-                throw new InvalidOperationException("Collection builders should be registered only once.");
-
-            // register the builder - per container
-            var builderLifetime = new PerContainerLifetime();
-            container.Register<TBuilder>(builderLifetime);
-
-            // return the builder
-            // (also initializes the builder)
-            return container.GetInstance<TBuilder>();
-        }
     }
 }

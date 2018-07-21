@@ -21,7 +21,7 @@ namespace Umbraco.Tests.PropertyEditors
             //normalize culture
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
 
-            var container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            var container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
             container.ConfigureForUmbraco();
 
             container.Register<IShortStringHelper>(_

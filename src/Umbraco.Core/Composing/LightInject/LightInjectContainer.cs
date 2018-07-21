@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
+using System.Threading;
 using LightInject;
 
 namespace Umbraco.Core.Composing.LightInject
@@ -11,13 +12,27 @@ namespace Umbraco.Core.Composing.LightInject
     /// </summary>
     public class LightInjectContainer : IContainer
     {
+        private int _disposed;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="LightInjectContainer"/> with a LightInject container.
         /// </summary>
-        public LightInjectContainer(ServiceContainer container)
+        protected LightInjectContainer(ServiceContainer container)
         {
             Container = container;
         }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="LightInjectContainer"/> class.
+        /// </summary>
+        public static LightInjectContainer Create()
+            => new LightInjectContainer(CreateServiceContainer());
+
+        /// <summary>
+        /// Creates a new instance of the LightInject service container.
+        /// </summary>
+        protected static ServiceContainer CreateServiceContainer()
+            => new ServiceContainer(new ContainerOptions { EnablePropertyInjection = false });
 
         /// <summary>
         /// Gets the LightInject container.
@@ -29,7 +44,12 @@ namespace Umbraco.Core.Composing.LightInject
 
         /// <inheritdoc />
         public void Dispose()
-            => Container.Dispose();
+        {
+            if (Interlocked.Exchange(ref _disposed, 1) == 1)
+                return;
+
+            Container.Dispose();
+        }
 
         #region Factory
 
@@ -186,10 +206,6 @@ namespace Umbraco.Core.Composing.LightInject
         public void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, object[], TDependency> factory)
             => Container.RegisterConstructorDependency((f, x, a) => factory(this, x, a));
 
-        /// <inheritdoc />
-        public T RegisterCollectionBuilder<T>()
-            => Container.RegisterCollectionBuilder<T>();
-
         #endregion
 
         #region Control
@@ -205,6 +221,9 @@ namespace Umbraco.Core.Composing.LightInject
             // eg to specify the service name on some services
             Container.EnableAnnotatedConstructorInjection();
 
+            // note: the block below is disabled, we do not allow property injection at all anymore
+            //       (see options in CreateServiceContainer)
+            //
             // from the docs: "LightInject considers all read/write properties a dependency, but implements
             // a loose strategy around property dependencies, meaning that it will NOT throw an exception
             // in the case of an unresolved property dependency."
@@ -216,7 +235,7 @@ namespace Umbraco.Core.Composing.LightInject
             // could not find it documented, but tests & code review shows that LightInject considers a
             // property to be "injectable" when its setter exists and is not static, nor private, nor
             // it is an index property. which means that eg protected or internal setters are OK.
-            Container.EnableAnnotatedPropertyInjection();
+            //Container.EnableAnnotatedPropertyInjection();
 
             // ensure that we do *not* scan assemblies
             // we explicitely RegisterFrom our own composition roots and don't want them scanned
@@ -224,6 +243,17 @@ namespace Umbraco.Core.Composing.LightInject
 
             // see notes in MixedLightInjectScopeManagerProvider
             Container.ScopeManagerProvider = new MixedLightInjectScopeManagerProvider();
+
+            // note: the block below is disabled, because it does not work, because collection builders
+            //       are singletons, and constructor dependencies don't work on singletons, see
+            //       https://github.com/seesharper/LightInject/issues/294
+            //
+            // if looking for a IContainer, and one was passed in args, use it
+            // this is for collection builders which require the IContainer
+            //Container.RegisterConstructorDependency((c, i, a) => a.OfType<IContainer>().FirstOrDefault());
+
+            // which means that the only way to inject the container into builders is to register it
+            Container.RegisterInstance<IContainer>(this);
 
             return this;
         }

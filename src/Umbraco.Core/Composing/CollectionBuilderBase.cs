@@ -63,8 +63,7 @@ namespace Umbraco.Core.Composing
             // else _collectionCtor remains null, assuming CreateCollection has been overriden
 
             // we just don't want to support re-registering collections here
-            var registration = Container.GetRegistered<TCollection>().FirstOrDefault();
-            if (registration != null)
+            if (Container.GetRegistered<TCollection>().Any())
                 throw new InvalidOperationException("Collection builders cannot be registered once the collection itself has been registered.");
 
             // register the collection

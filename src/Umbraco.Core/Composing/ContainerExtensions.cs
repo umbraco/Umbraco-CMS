@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Umbraco.Core.Composing
 {
@@ -71,5 +72,26 @@ namespace Umbraco.Core.Composing
 
         public static void RegisterAuto<TServiceBase>(this IContainer container)
             => container.RegisterAuto(typeof(TServiceBase));
+
+        /// <summary>
+        /// Registers and instanciates a collection builder.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of the collection builder.</typeparam>
+        /// <returns>A collection builder of the specified type.</returns>
+        public static TBuilder RegisterCollectionBuilder<TBuilder>(this IContainer container)
+        {
+            // make sure it's not already registered
+            // we just don't want to support re-registering collection builders
+            if (container.GetRegistered<TBuilder>().Any())
+                throw new InvalidOperationException("Collection builders should be registered only once.");
+
+            // register the builder - per container
+            container.RegisterSingleton<TBuilder>();
+
+            // initialize and return the builder 
+            // note: see notes in IContainer - cannot pass the container as a parameter to a singleton
+            //       and so, for now, the container is registered into itself
+            return container.GetInstance<TBuilder>(/*new object[] { container }*/);
+        }
     }
 }

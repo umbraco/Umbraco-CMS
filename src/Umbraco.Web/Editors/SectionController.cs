@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using System.Linq;
-using LightInject;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Web.Trees;
 using Section = Umbraco.Web.Models.ContentEditing.Section;
@@ -19,7 +16,6 @@ namespace Umbraco.Web.Editors
     {
         public IEnumerable<Section> GetSections()
         {
-
             var sections =  Services.SectionService.GetAllowedSections(Security.GetUserId().ResultOr(0));
 
             var sectionModels = sections.Select(Mapper.Map<Core.Models.Section, Section>).ToArray();
@@ -29,11 +25,8 @@ namespace Umbraco.Web.Editors
             var dashboardHelper = new DashboardHelper(Services.SectionService);
 
             // this is a bit nasty since we'll be proxying via the app tree controller but we sort of have to do that
-            // since tree's by nature are controllers and require request contextual data - and then we have to
-            // remember to inject properties - nasty indeed
-            var appTreeController = new ApplicationTreeController();
-            ((IServiceContainer)Current.Container.ConcreteContainer).InjectProperties(appTreeController);
-            appTreeController.ControllerContext = ControllerContext;
+            // since tree's by nature are controllers and require request contextual data
+            var appTreeController = new ApplicationTreeController { ControllerContext = ControllerContext };
 
             var dashboards = dashboardHelper.GetDashboards(Security.CurrentUser);
             //now we can add metadata for each section so that the UI knows if there's actually anything at all to render for

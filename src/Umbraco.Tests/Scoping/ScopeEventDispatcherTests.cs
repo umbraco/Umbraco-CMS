@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Scoping
             DoThing2 = null;
             DoThing3 = null;
 
-            var container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            var container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
 
             _testObjects = new TestObjects(container);
 

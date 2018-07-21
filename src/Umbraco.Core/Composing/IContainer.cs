@@ -114,14 +114,8 @@ namespace Umbraco.Core.Composing
         /// </summary>
         void RegisterOrdered(Type serviceType, Type[] implementingTypes, Lifetime lifetime = Lifetime.Transient);
 
-        /// <summary>
-        /// Registers and instanciates a collection builder.
-        /// </summary>
-        /// <typeparam name="T">The type of the collection builder.</typeparam>
-        /// <returns>A collection builder of the specified type.</returns>
-        T RegisterCollectionBuilder<T>();
-
         // fixme - very LightInject specific? or?
+        // beware! does NOT work on singletons, see https://github.com/seesharper/LightInject/issues/294
         void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, TDependency> factory);
         void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, object[], TDependency> factory);
 

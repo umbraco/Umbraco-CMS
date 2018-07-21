@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Configuration;
 using AutoMapper;
-using LightInject;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Components;
 using Umbraco.Core.Composing;

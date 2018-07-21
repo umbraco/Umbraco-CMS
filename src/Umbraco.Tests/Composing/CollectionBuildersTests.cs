@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Composing
         {
             Current.Reset();
 
-            _container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            _container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
             _container.ConfigureForUmbraco();
         }
 

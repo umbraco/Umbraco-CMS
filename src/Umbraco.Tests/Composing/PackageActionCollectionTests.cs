@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Composing
         [Test]
         public void PackageActionCollectionBuilderWorks()
         {
-            var container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            var container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
             container.ConfigureForUmbraco();
 
             container.RegisterCollectionBuilder<PackageActionCollectionBuilder>()

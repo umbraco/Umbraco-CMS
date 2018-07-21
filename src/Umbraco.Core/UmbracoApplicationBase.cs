@@ -36,7 +36,7 @@ namespace Umbraco.Core
         {
             // note: the actual, web UmbracoApplication is overriding this
             // with a web-supporting container
-            return new Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            return Composing.LightInject.LightInjectContainer.Create();
         }
 
         // events - in the order they trigger

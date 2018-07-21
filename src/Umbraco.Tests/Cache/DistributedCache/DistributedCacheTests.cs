@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Cache.DistributedCache
         [SetUp]
         public void Setup()
         {
-            var container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            var container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
             container.ConfigureForUmbraco();
 
             container.Register<IServerRegistrar>(_ => new TestServerRegistrar());

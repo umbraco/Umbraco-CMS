@@ -113,7 +113,7 @@ namespace Umbraco.Tests.Testing
             // but hey, never know, better avoid garbage-in
             Reset();
 
-            Container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            Container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
             Container.ConfigureForUmbraco();
 
             TestObjects = new TestObjects(Container);
@@ -286,6 +286,10 @@ namespace Umbraco.Tests.Testing
 
             Container.RegisterSingleton<IExamineManager>(factory => ExamineManager.Instance);
 
+            // register filesystems
+            Container.RegisterSingleton(factory => TestObjects.GetFileSystemsMock());
+            Container.RegisterSingleton(factory => factory.GetInstance<IFileSystems>().MediaFileSystem);
+
             // no factory (noop)
             Container.RegisterSingleton<IPublishedModelFactory, NoopPublishedModelFactory>();
 
@@ -304,8 +308,7 @@ namespace Umbraco.Tests.Testing
             Container.RegisterSingleton(f => f.TryGetInstance<IUmbracoDatabaseFactory>().SqlContext);
 
             Container.RegisterCollectionBuilder<UrlSegmentProviderCollectionBuilder>(); // empty
-            Container.RegisterSingleton(factory => new FileSystems(factory.TryGetInstance<ILogger>()));
-            Container.RegisterSingleton<IFileSystems>(factory => factory.GetInstance<FileSystems>());
+
             Container.RegisterSingleton(factory
                 => TestObjects.GetScopeProvider(factory.TryGetInstance<ILogger>(), factory.TryGetInstance<FileSystems>(), factory.TryGetInstance<IUmbracoDatabaseFactory>()));
             Container.RegisterSingleton(factory => (IScopeAccessor) factory.GetInstance<IScopeProvider>());

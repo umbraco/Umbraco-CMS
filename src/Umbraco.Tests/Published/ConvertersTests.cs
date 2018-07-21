@@ -171,7 +171,7 @@ namespace Umbraco.Tests.Published
         public void SimpleConverter3Test()
         {
             Current.Reset();
-            var container = Current.Container = new Core.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            var container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
             container.ConfigureForUmbraco();
 
 

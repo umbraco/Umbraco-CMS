@@ -16,7 +16,7 @@ namespace Umbraco.Web
 
         protected override IContainer GetContainer()
         {
-            return new Web.Composing.LightInject.LightInjectContainer(new LightInject.ServiceContainer());
+            return Composing.LightInject.LightInjectContainer.Create();
         }
     }
 }

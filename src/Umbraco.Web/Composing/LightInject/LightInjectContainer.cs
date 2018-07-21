@@ -14,9 +14,15 @@ namespace Umbraco.Web.Composing.LightInject
         /// <summary>
         /// Initializes a new instance of the <see cref="LightInjectContainer"/> with a LightInject container.
         /// </summary>
-        public LightInjectContainer(ServiceContainer container)
+        protected LightInjectContainer(ServiceContainer container)
             : base(container)
         { }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="LightInjectContainer"/> class.
+        /// </summary>
+        public new static LightInjectContainer Create()
+            => new LightInjectContainer(CreateServiceContainer());
 
         /// <inheritdoc />
         public override IContainer ConfigureForWeb()
