@@ -35,13 +35,17 @@ namespace Umbraco.Tests.PublishedContent
             // Set up languages.
             // Spanish falls back to English and Italian to Spanish (and then to English).
             // French has no fall back.
+            // Danish, Swedish and Norweigan create an invalid loop.
             var languages = new List<Language>
                 {
                     new Language("en-US") { Id = 1, CultureName = "English", IsDefaultVariantLanguage = true },
                     new Language("fr") { Id = 2, CultureName = "French" },
                     new Language("es") { Id = 3, CultureName = "Spanish", FallbackLanguageId = 1 },
                     new Language("it") { Id = 4, CultureName = "Italian", FallbackLanguageId = 3 },
-                    new Language("de") { Id = 5, CultureName = "German" }
+                    new Language("de") { Id = 5, CultureName = "German" },
+                    new Language("da") { Id = 6, CultureName = "Danish", FallbackLanguageId = 8 },
+                    new Language("sv") { Id = 7, CultureName = "Swedish", FallbackLanguageId = 6 },
+                    new Language("no") { Id = 8, CultureName = "Norweigan", FallbackLanguageId = 7 }
                 };
 
             var localizationService = Mock.Get(serviceContext.LocalizationService);
@@ -125,6 +129,14 @@ namespace Umbraco.Tests.PublishedContent
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First();
             var value = content.Value("welcomeText", "it");
             Assert.AreEqual("Welcome", value);
+        }
+
+        [Test]
+        public void Do_Not_GetContent_For_Unpopulated_Requested_Language_With_Fallback_Over_That_Loops()
+        {
+            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First();
+            var value = content.Value("welcomeText", "no");
+            Assert.IsNull(value);
         }
     }
 }

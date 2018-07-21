@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.PublishedContent;
+﻿using System.Collections.Generic;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Models.PublishedContent
 {
@@ -11,45 +12,45 @@ namespace Umbraco.Web.Models.PublishedContent
         // kinda reproducing what was available in v7
 
         /// <inheritdoc />
-        public virtual object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue)
+        public virtual object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue, ICollection<int> visitedLanguages)
         {
             // no fallback here
             return defaultValue;
         }
 
         /// <inheritdoc />
-        public virtual T GetValue<T>(IPublishedProperty property, string culture, string segment, T defaultValue)
+        public virtual T GetValue<T>(IPublishedProperty property, string culture, string segment, T defaultValue, ICollection<int> visitedLanguages)
         {
             // no fallback here
             return defaultValue;
         }
 
         /// <inheritdoc />
-        public virtual object GetValue(IPublishedElement content, string alias, string culture, string segment, object defaultValue)
+        public virtual object GetValue(IPublishedElement content, string alias, string culture, string segment, object defaultValue, ICollection<int> visitedLanguages)
         {
             // no fallback here
             return defaultValue;
         }
 
         /// <inheritdoc />
-        public virtual T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue)
+        public virtual T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue, ICollection<int> visitedLanguages)
         {
             // no fallback here
             return defaultValue;
         }
 
         /// <inheritdoc />
-        public virtual object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority)
+        public virtual object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority, ICollection<int> visitedLanguages)
         {
             // no fallback here
             if (!recurse) return defaultValue;
 
             // is that ok?
-            return GetValue<object>(content, alias, culture, segment, defaultValue, true, fallbackPriority);
+            return GetValue<object>(content, alias, culture, segment, defaultValue, true, fallbackPriority, visitedLanguages);
         }
 
         /// <inheritdoc />
-        public virtual T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority)
+        public virtual T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority, ICollection<int> visitedLanguages)
         {
             // no fallback here
             if (!recurse) return defaultValue;

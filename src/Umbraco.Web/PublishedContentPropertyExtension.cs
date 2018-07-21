@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+﻿using System.Collections.Generic;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
 
@@ -15,19 +16,19 @@ namespace Umbraco.Web
 
         #region Value
 
-        public static object Value(this IPublishedProperty property, string culture = null, string segment = null, object defaultValue = default)
+        public static object Value(this IPublishedProperty property, string culture = null, string segment = null, object defaultValue = default, ICollection<int> visitedLanguages = null)
         {
             if (property.HasValue(culture, segment))
                 return property.GetValue(culture, segment);
 
-            return PublishedValueFallback.GetValue(property, culture, segment, defaultValue);
+            return PublishedValueFallback.GetValue(property, culture, segment, defaultValue, visitedLanguages ?? new List<int>());
         }
 
         #endregion
 
         #region Value<T>
 
-        public static T Value<T>(this IPublishedProperty property, string culture = null, string segment = null, T defaultValue = default)
+        public static T Value<T>(this IPublishedProperty property, string culture = null, string segment = null, T defaultValue = default, ICollection<int> visitedLanguages = null)
         {
             // for Value<T> when defaultValue is not specified, and HasValue() is false, we still want to convert the result (see below)
             // but we have no way to tell whether default value is specified or not - we could do it with overloads, but then defaultValue

@@ -1,4 +1,4 @@
-﻿using Umbraco.Core.Composing;
+﻿using System.Collections.Generic;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
@@ -22,22 +22,22 @@ namespace Umbraco.Core.Models.PublishedContent
         // this method is called whenever property.Value(culture, segment, defaultValue) is called, and
         // property.HasValue(culture, segment) is false. it can only fallback at property level (no recurse).
 
-        object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue);
+        object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue, ICollection<int> visitedLanguages);
 
         // this method is called whenever property.Value<T>(culture, segment, defaultValue) is called, and
         // property.HasValue(culture, segment) is false. it can only fallback at property level (no recurse).
 
-        T GetValue<T>(IPublishedProperty property, string culture, string segment, T defaultValue);
+        T GetValue<T>(IPublishedProperty property, string culture, string segment, T defaultValue, ICollection<int> visitedLanguages);
 
         // these methods to be called whenever getting the property value for the specified alias, culture and segment,
         // either returned no property at all, or a property that does not HasValue for the specified culture and segment.
 
-        object GetValue(IPublishedElement content, string alias, string culture, string segment, object defaultValue);
+        object GetValue(IPublishedElement content, string alias, string culture, string segment, object defaultValue, ICollection<int> visitedLanguages);
 
-        T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue);
+        T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue, ICollection<int> visitedLanguages);
 
-        object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority);
+        object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority, ICollection<int> visitedLanguages);
 
-        T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority);
+        T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority, ICollection<int> visitedLanguages);
     }
 }
