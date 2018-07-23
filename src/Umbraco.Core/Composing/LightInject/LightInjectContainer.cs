@@ -150,6 +150,12 @@ namespace Umbraco.Core.Composing.LightInject
             return ctor.Invoke(ctorArgs);
         }
 
+        // notes:
+        // we may want to look into MS code, eg:
+        // TypeActivatorCache in MVC at https://github.com/aspnet/Mvc/blob/dev/src/Microsoft.AspNetCore.Mvc.Core/Internal/TypeActivatorCache.cs
+        // which relies onto
+        // ActivatorUtilities at https://github.com/aspnet/DependencyInjection/blob/master/shared/Microsoft.Extensions.ActivatorUtilities.Sources/ActivatorUtilities.cs
+
         #endregion
 
         #region Registry
