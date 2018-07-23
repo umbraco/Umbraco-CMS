@@ -172,7 +172,6 @@ namespace Umbraco.Tests.Published
         {
             Current.Reset();
             var container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
-            container.ConfigureForUmbraco();
 
 
             Current.Container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>()

@@ -22,7 +22,6 @@ namespace Umbraco.Tests.PropertyEditors
             Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture;
 
             var container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
-            container.ConfigureForUmbraco();
 
             container.Register<IShortStringHelper>(_
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(SettingsForTests.GetDefaultUmbracoSettings())));

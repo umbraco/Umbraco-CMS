@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using LightInject;
-using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.Composing
 {
@@ -12,12 +9,6 @@ namespace Umbraco.Core.Composing
     /// </summary>
     public static class LightInjectExtensions
     {
-        // fixme temp
-        internal static ServiceContainer AsLightInject(this IContainer container)
-        {
-            return (ServiceContainer) container.ConcreteContainer;
-        }
-
         /// <summary>
         /// Registers the TService with the factory that describes the dependencies of the service, as a singleton.
         /// </summary>
@@ -37,7 +28,7 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
-        /// Registers the TService with the TImplementation as a singleton.
+        /// Registers a servuice with an implementation as a singleton.
         /// </summary>
         public static void RegisterSingleton<TService, TImplementation>(this IServiceRegistry container)
             where TImplementation : TService
@@ -45,7 +36,9 @@ namespace Umbraco.Core.Composing
             container.RegisterSingleton(typeof(TService), typeof(TImplementation));
         }
 
-        // fixme
+        /// <summary>
+        /// Registers a servuice with an implementation as a singleton.
+        /// </summary>
         public static void RegisterSingleton(this IServiceRegistry container, Type serviceType, Type implementingType)
         {
             var registration = container.GetAvailableService(serviceType);
@@ -62,9 +55,12 @@ namespace Umbraco.Core.Composing
             }
         }
 
+        /// <summary>
+        /// Registers a servuice with a named implementation as a singleton.
+        /// </summary>
         public static void RegisterSingleton(this IServiceRegistry container, Type serviceType, Type implementingType, string name)
         {
-            var registration = container.GetAvailableServices(serviceType).FirstOrDefault(x => x.ServiceName == name);
+            var registration = container.AvailableServices.FirstOrDefault(x => x.ServiceType == serviceType && x.ServiceName == name);
 
             if (registration == null)
             {
@@ -86,6 +82,9 @@ namespace Umbraco.Core.Composing
             container.RegisterSingleton(typeof(TImplementation));
         }
 
+        /// <summary>
+        /// Registers a concrete type as a singleton service.
+        /// </summary>
         public static void RegisterSingleton(this IServiceRegistry container, Type serviceType)
         {
             var registration = container.GetAvailableService(serviceType);
@@ -163,32 +162,22 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
-        /// Gets the available service registrations for a service type.
-        /// </summary>
-        /// <typeparam name="TService">The service type.</typeparam>
-        /// <param name="container">The container.</param>
-        /// <returns>The service registrations for the service type.</returns>
-        public static IEnumerable<ServiceRegistration> GetAvailableServices<TService>(this IServiceRegistry container)
-            => container.GetAvailableServices(typeof(TService));
-
-        public static IEnumerable<ServiceRegistration> GetAvailableServices(this IServiceRegistry container, Type serviceType)
-            => container.AvailableServices.Where(x => x.ServiceType == serviceType);
-
-        /// <summary>
         /// Gets the unique available service registration for a service type.
         /// </summary>
         /// <typeparam name="TService">The service type.</typeparam>
         /// <param name="container">The container.</param>
         /// <returns>The unique service registration for the service type.</returns>
         /// <remarks>Can return <c>null</c>, but throws if more than one registration exist for the service type.</remarks>
-        public static ServiceRegistration GetAvailableService<TService>(this IServiceRegistry container)
+        private static ServiceRegistration GetAvailableService<TService>(this IServiceRegistry container)
         {
             var typeofTService = typeof(TService);
             return container.AvailableServices.SingleOrDefault(x => x.ServiceType == typeofTService);
         }
 
-        // fixme
-        public static ServiceRegistration GetAvailableService(this IServiceRegistry container, Type serviceType)
+        /// <summary>
+        /// Gets the unique available service registration for a service type.
+        /// </summary>
+        private static ServiceRegistration GetAvailableService(this IServiceRegistry container, Type serviceType)
         {
             return container.AvailableServices.SingleOrDefault(x => x.ServiceType == serviceType);
         }
@@ -201,7 +190,7 @@ namespace Umbraco.Core.Composing
         /// <param name="name">The name.</param>
         /// <returns>The unique service registration for the service type and the name.</returns>
         /// <remarks>Can return <c>null</c>, but throws if more than one registration exist for the service type and the name.</remarks>
-        public static ServiceRegistration GetAvailableService<TService>(this IServiceRegistry container, string name)
+        private static ServiceRegistration GetAvailableService<TService>(this IServiceRegistry container, string name)
         {
             var typeofTService = typeof(TService);
             return container.AvailableServices.SingleOrDefault(x => x.ServiceType == typeofTService && x.ServiceName == name);

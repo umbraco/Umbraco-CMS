@@ -15,6 +15,11 @@ namespace Umbraco.Core.Composing
 
         #region Factory
 
+        // notes
+        // when implementing IContainer, the following rules apply
+        // - always pick the constructor with the most parameters
+        // - always prefer Lazy parameters over non-Lazy in constructors
+
         /// <summary>
         /// Gets an instance.
         /// </summary>
@@ -31,21 +36,6 @@ namespace Umbraco.Core.Composing
         /// <returns>An instance of the specified type.</returns>
         /// <remarks>Throws an exception if the container failed to get an instance of the specified type.</remarks>
         object GetInstance(Type type, string name);
-
-        /// <summary>
-        /// Gets an instance with arguments.
-        /// </summary>
-        /// <param name="type">The type of the instance.</param>
-        /// <param name="args">Arguments.</param>
-        /// <returns>An instance of the specified type.</returns>
-        /// <remarks>
-        /// <para>Throws an exception if the container failed to get an instance of the specified type.</para>
-        /// <para>The arguments are used as dependencies by the container.</para>
-        /// </remarks>
-        // fixme - some restrictions:
-        //  method is not optimized, .Invoke-ing the ctor, no compiled dynamic method
-        //  uses the ctor with most args, always, not trying to figure out which one to use
-        object GetInstance(Type type, params object[] args);
 
         /// <summary>
         /// Tries to get an instance.
@@ -76,6 +66,19 @@ namespace Umbraco.Core.Composing
         /// <returns>The registrations for the service.</returns>
         IEnumerable<Registration> GetRegistered(Type serviceType);
 
+        /// <summary>
+        /// Creates an instance with arguments.
+        /// </summary>
+        /// <param name="type">The type of the instance.</param>
+        /// <param name="args">Arguments.</param>
+        /// <returns>An instance of the specified type.</returns>
+        /// <remarks>
+        /// <para>The instance type does not need to be registered into the container.</para>
+        /// <para>The arguments are used as dependencies by the container. Other dependencies
+        /// are retrieved from the container.</para>
+        /// </remarks>
+        object CreateInstance(Type type, params object[] args);
+
         #endregion
 
         #region Registry
@@ -105,11 +108,6 @@ namespace Umbraco.Core.Composing
         /// Registers a service with an implementation factory.
         /// </summary>
         void Register<TService>(Func<IContainer, TService> factory, Lifetime lifetime = Lifetime.Transient);
-
-        /// <summary>
-        /// Registers a service with an implementation factory accepting an argument.
-        /// </summary>
-        void Register<T, TService>(Func<IContainer, T, TService> factory);
 
         /// <summary>
         /// Registers a service with an implementing instance.
@@ -146,18 +144,23 @@ namespace Umbraco.Core.Composing
         /// </remarks>
         IDisposable BeginScope();
 
-        // fixme - document all these
-
         /// <summary>
-        /// Configures the container for Umbraco.
+        /// Configures the container for web support.
         /// </summary>
+        /// <returns>The container.</returns>
         /// <remarks>
-        /// <para></para>
+        /// <para>Enables support for MVC, WebAPI, but *not* per-request scope. This is used early in the boot
+        /// process, where anything "scoped" should not be linked to a web request.</para>
         /// </remarks>
-        IContainer ConfigureForUmbraco();
-
         IContainer ConfigureForWeb();
 
+        /// <summary>
+        /// Enables per-request scope.
+        /// </summary>
+        /// <returns>The container.</returns>
+        /// <remarks>
+        /// <para>Ties scopes to web requests.</para>
+        /// </remarks>
         IContainer EnablePerWebRequestScope();
 
         #endregion

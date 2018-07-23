@@ -1,7 +1,4 @@
-﻿using System.Linq;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
+﻿using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Composing.Composers
 {
@@ -16,7 +13,9 @@ namespace Umbraco.Core.Composing.Composers
             container.RegisterSingleton<IFileSystems>(factory => factory.GetInstance<FileSystems>());
 
             // register MediaFileSystem, which can be injected directly
-            container.Register/*Singleton*/(factory => factory.GetInstance<IFileSystems>().MediaFileSystem);
+            // note: the actual MediaFileSystem implementation is created by FileSystems directly,
+            //       without being registered in the container - this just gives access to it
+            container.Register(factory => factory.GetInstance<IFileSystems>().MediaFileSystem);
 
             return container;
         }

@@ -14,7 +14,6 @@ namespace Umbraco.Tests.Composing
         public void PackageActionCollectionBuilderWorks()
         {
             var container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
-            container.ConfigureForUmbraco();
 
             container.RegisterCollectionBuilder<PackageActionCollectionBuilder>()
                 .Add(() => TypeLoader.GetPackageActions());

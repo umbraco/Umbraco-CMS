@@ -32,7 +32,53 @@ namespace Umbraco.Core.Composing.LightInject
         /// Creates a new instance of the LightInject service container.
         /// </summary>
         protected static ServiceContainer CreateServiceContainer()
-            => new ServiceContainer(new ContainerOptions { EnablePropertyInjection = false });
+        {
+            var container = new ServiceContainer(new ContainerOptions { EnablePropertyInjection = false });
+
+                        // supports annotated constructor injections
+            // eg to specify the service name on some services
+            container.EnableAnnotatedConstructorInjection();
+
+            // note: the block below is disabled, we do not allow property injection at all anymore
+            //       (see options in CreateServiceContainer)
+            //
+            // from the docs: "LightInject considers all read/write properties a dependency, but implements
+            // a loose strategy around property dependencies, meaning that it will NOT throw an exception
+            // in the case of an unresolved property dependency."
+            //
+            // in Umbraco we do NOT want to do property injection by default, so we have to disable it.
+            // from the docs, the following line will cause the container to "now only try to inject
+            // dependencies for properties that is annotated with the InjectAttribute."
+            //
+            // could not find it documented, but tests & code review shows that LightInject considers a
+            // property to be "injectable" when its setter exists and is not static, nor private, nor
+            // it is an index property. which means that eg protected or internal setters are OK.
+            //Container.EnableAnnotatedPropertyInjection();
+
+            // ensure that we do *not* scan assemblies
+            // we explicitely RegisterFrom our own composition roots and don't want them scanned
+            container.AssemblyScanner = new AssemblyScanner(/*container.AssemblyScanner*/);
+
+            // see notes in MixedLightInjectScopeManagerProvider
+            container.ScopeManagerProvider = new MixedLightInjectScopeManagerProvider();
+
+            // note: the block below is disabled, because it does not work, because collection builders
+            //       are singletons, and constructor dependencies don't work on singletons, see
+            //       https://github.com/seesharper/LightInject/issues/294
+            //
+            // if looking for a IContainer, and one was passed in args, use it
+            // this is for collection builders which require the IContainer
+            //container.RegisterConstructorDependency((c, i, a) => a.OfType<IContainer>().FirstOrDefault());
+            //
+            // and, the block below is also disabled, because it is ugly
+            //
+            //// which means that the only way to inject the container into builders is to register it
+            //container.RegisterInstance<IContainer>(this);
+            //
+            // instead, we use an explicit GetInstance with arguments implementation
+
+            return container;
+        }
 
         /// <summary>
         /// Gets the LightInject container.
@@ -62,10 +108,31 @@ namespace Umbraco.Core.Composing.LightInject
             => Container.GetInstance(type, name);
 
         /// <inheritdoc />
-        public object GetInstance(Type type, params object[] args)
+        public object TryGetInstance(Type type)
+            => Container.TryGetInstance(type);
+
+        /// <inheritdoc />
+        public IEnumerable<T> GetAllInstances<T>()
+            => Container.GetAllInstances<T>();
+
+        /// <inheritdoc />
+        public IEnumerable<object> GetAllInstances(Type type)
+            => Container.GetAllInstances(type);
+
+        /// <inheritdoc />
+        public IEnumerable<Registration> GetRegistered(Type type)
+            => Container.AvailableServices.Where(x => x.ServiceType == type).Select(x => new Registration(x.ServiceType, x.ServiceName));
+
+        /// <inheritdoc />
+        public object CreateInstance(Type type, params object[] args)
         {
             // LightInject has this, but then it requires RegisterConstructorDependency etc and has various oddities
+            // including the most annoying one, which is that it does not work on singletons (hard to fix)
             //return Container.GetInstance(type, args);
+
+            // this method is essentially used to build singleton instances, so it is assumed that it would be
+            // more expensive to build and cache a dynamic method ctor than to simply invoke the ctor, as we do
+            // here - this can be discussed
 
             var ctor = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public).OrderByDescending(x => x.GetParameters().Length).FirstOrDefault();
             if (ctor == null) throw new InvalidOperationException($"Could not find a public constructor for type {type.FullName}.");
@@ -82,22 +149,6 @@ namespace Umbraco.Core.Composing.LightInject
             }
             return ctor.Invoke(ctorArgs);
         }
-
-        /// <inheritdoc />
-        public object TryGetInstance(Type type)
-            => Container.TryGetInstance(type);
-
-        /// <inheritdoc />
-        public IEnumerable<T> GetAllInstances<T>()
-            => Container.GetAllInstances<T>();
-
-        /// <inheritdoc />
-        public IEnumerable<object> GetAllInstances(Type type)
-            => Container.GetAllInstances(type);
-
-        /// <inheritdoc />
-        public IEnumerable<Registration> GetRegistered(Type type)
-            => Container.GetAvailableServices(type).Select(x => new Registration(x.ServiceType, x.ServiceName));
 
         #endregion
 
@@ -175,10 +226,6 @@ namespace Umbraco.Core.Composing.LightInject
             }
         }
 
-        /// <inheritdoc />
-        public void Register<T, TService>(Func<IContainer, T, TService> factory)
-            => Container.Register<T, TService>((f, x) => factory(this, x));
-
         private ILifetime GetLifetime(Lifetime lifetime)
         {
             switch (lifetime)
@@ -236,50 +283,17 @@ namespace Umbraco.Core.Composing.LightInject
             => Container.BeginScope();
 
         /// <inheritdoc />
-        public IContainer ConfigureForUmbraco()
+        public virtual IContainer ConfigureForWeb()
         {
-            // supports annotated constructor injections
-            // eg to specify the service name on some services
-            Container.EnableAnnotatedConstructorInjection();
+            return this;
+        }
 
-            // note: the block below is disabled, we do not allow property injection at all anymore
-            //       (see options in CreateServiceContainer)
-            //
-            // from the docs: "LightInject considers all read/write properties a dependency, but implements
-            // a loose strategy around property dependencies, meaning that it will NOT throw an exception
-            // in the case of an unresolved property dependency."
-            //
-            // in Umbraco we do NOT want to do property injection by default, so we have to disable it.
-            // from the docs, the following line will cause the container to "now only try to inject
-            // dependencies for properties that is annotated with the InjectAttribute."
-            //
-            // could not find it documented, but tests & code review shows that LightInject considers a
-            // property to be "injectable" when its setter exists and is not static, nor private, nor
-            // it is an index property. which means that eg protected or internal setters are OK.
-            //Container.EnableAnnotatedPropertyInjection();
-
-            // ensure that we do *not* scan assemblies
-            // we explicitely RegisterFrom our own composition roots and don't want them scanned
-            Container.AssemblyScanner = new AssemblyScanner(/*container.AssemblyScanner*/);
-
-            // see notes in MixedLightInjectScopeManagerProvider
-            Container.ScopeManagerProvider = new MixedLightInjectScopeManagerProvider();
-
-            // note: the block below is disabled, because it does not work, because collection builders
-            //       are singletons, and constructor dependencies don't work on singletons, see
-            //       https://github.com/seesharper/LightInject/issues/294
-            //
-            // if looking for a IContainer, and one was passed in args, use it
-            // this is for collection builders which require the IContainer
-            //Container.RegisterConstructorDependency((c, i, a) => a.OfType<IContainer>().FirstOrDefault());
-            //
-            // and, the block below is also disabled, because it is ugly
-            //
-            //// which means that the only way to inject the container into builders is to register it
-            //Container.RegisterInstance<IContainer>(this);
-            //
-            // instead, we use an explicit GetInstance with arguments implementation
-
+        /// <inheritdoc />
+        public IContainer EnablePerWebRequestScope()
+        {
+            if (!(Container.ScopeManagerProvider is MixedLightInjectScopeManagerProvider smp))
+                throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
+            smp.EnablePerWebRequestScope();
             return this;
         }
 
@@ -301,21 +315,6 @@ namespace Umbraco.Core.Composing.LightInject
             {
                 // nothing - we *could* scan non-Umbraco assemblies, though
             }
-        }
-
-        /// <inheritdoc />
-        public virtual IContainer ConfigureForWeb()
-        {
-            return this;
-        }
-
-        /// <inheritdoc />
-        public IContainer EnablePerWebRequestScope()
-        {
-            if (!(Container.ScopeManagerProvider is MixedLightInjectScopeManagerProvider smp))
-                throw new Exception("Container.ScopeManagerProvider is not MixedLightInjectScopeManagerProvider.");
-            smp.EnablePerWebRequestScope();
-            return this;
         }
 
         #endregion

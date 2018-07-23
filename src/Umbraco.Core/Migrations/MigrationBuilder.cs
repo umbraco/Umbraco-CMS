@@ -14,8 +14,7 @@ namespace Umbraco.Core.Migrations
 
         public IMigration Build(Type migrationType, IMigrationContext context)
         {
-            _container.Register(migrationType);
-            return (IMigration) _container.GetInstance(migrationType, context);
+            return (IMigration) _container.CreateInstance(migrationType, context);
         }
     }
 }

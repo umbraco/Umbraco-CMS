@@ -27,16 +27,12 @@ namespace Umbraco.Tests.IO
             SettingsForTests.ConfigureSettings(config);
 
             _container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
-            _container.ConfigureForUmbraco();
 
             _container.Register(_ => Mock.Of<ILogger>());
             _container.Register<FileSystems>();
             _container.Register(_ => Mock.Of<IDataTypeService>());
             _container.Register(_ => Mock.Of<IContentSection>());
             _container.RegisterSingleton<IMediaPathScheme, OriginalMediaPathScheme>();
-
-            _container.Register<IFileSystem, MediaFileSystem>((f, x) => new MediaFileSystem(x, f.GetInstance<IContentSection>(), f.GetInstance<IMediaPathScheme>(), f.GetInstance<ILogger>()));
-            _container.Register<IFileSystem, NonConfiguredTypeFileSystem>((f, x) => new NonConfiguredTypeFileSystem(x));
 
             // make sure we start clean
             // because some tests will create corrupt or weird filesystems

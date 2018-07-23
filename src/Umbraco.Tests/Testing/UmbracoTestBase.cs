@@ -114,7 +114,6 @@ namespace Umbraco.Tests.Testing
             Reset();
 
             Container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
-            Container.ConfigureForUmbraco();
 
             TestObjects = new TestObjects(Container);
 
@@ -325,6 +324,7 @@ namespace Umbraco.Tests.Testing
 
             // note - don't register collections, use builders
             Container.RegisterCollectionBuilder<DataEditorCollectionBuilder>();
+            var temp = Container.GetInstance<DataEditorCollectionBuilder>();
             Container.RegisterSingleton<PropertyEditorCollection>();
             Container.RegisterSingleton<ParameterEditorCollection>();
         }
