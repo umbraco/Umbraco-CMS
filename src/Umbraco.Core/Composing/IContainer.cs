@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace Umbraco.Core.Composing
 {
@@ -43,7 +42,10 @@ namespace Umbraco.Core.Composing
         /// <para>Throws an exception if the container failed to get an instance of the specified type.</para>
         /// <para>The arguments are used as dependencies by the container.</para>
         /// </remarks>
-        object GetInstance(Type type, object[] args);
+        // fixme - some restrictions:
+        //  method is not optimized, .Invoke-ing the ctor, no compiled dynamic method
+        //  uses the ctor with most args, always, not trying to figure out which one to use
+        object GetInstance(Type type, params object[] args);
 
         /// <summary>
         /// Tries to get an instance.
@@ -67,12 +69,22 @@ namespace Umbraco.Core.Composing
         /// <typeparam name="TService">The type of the service.</typeparam>
         IEnumerable<TService> GetAllInstances<TService>();
 
-        // fixme
+        /// <summary>
+        /// Gets registration for a service.
+        /// </summary>
+        /// <param name="serviceType">The type of the service.</param>
+        /// <returns>The registrations for the service.</returns>
         IEnumerable<Registration> GetRegistered(Type serviceType);
 
         #endregion
 
         #region Registry
+
+        // notes
+        // when implementing IContainer, the following rules apply
+        // - it is possible to register a service, even after some instances of other services have been created
+        // - it is possible to re-register a service, as long as an instance of that service has not been created
+        // - once an instance of a service has been created, it is not possible to change its registration
 
         /// <summary>
         /// Registers a service as its own implementation.
@@ -107,17 +119,19 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Registers a base type for auto-registration.
         /// </summary>
+        /// <remarks>
+        /// <para>Auto-registration means that anytime the container is asked to create an instance
+        /// of a type deriving from <paramref name="serviceBaseType"/>, it will first register that
+        /// type automatically.</para>
+        /// <para>This can be used for instance for views or controllers. Then, one just needs to
+        /// register a common base class or interface, and the container knows how to create instances.</para>
+        /// </remarks>
         void RegisterAuto(Type serviceBaseType);
 
         /// <summary>
         /// Registers a service with an ordered set of implementation types.
         /// </summary>
         void RegisterOrdered(Type serviceType, Type[] implementingTypes, Lifetime lifetime = Lifetime.Transient);
-
-        // fixme - very LightInject specific? or?
-        // beware! does NOT work on singletons, see https://github.com/seesharper/LightInject/issues/294
-        void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, TDependency> factory);
-        void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, object[], TDependency> factory);
 
         #endregion
 
@@ -134,6 +148,12 @@ namespace Umbraco.Core.Composing
 
         // fixme - document all these
 
+        /// <summary>
+        /// Configures the container for Umbraco.
+        /// </summary>
+        /// <remarks>
+        /// <para></para>
+        /// </remarks>
         IContainer ConfigureForUmbraco();
 
         IContainer ConfigureForWeb();

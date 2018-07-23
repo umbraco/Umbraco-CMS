@@ -4,8 +4,8 @@ using System.Text;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.IO;
-using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -21,6 +21,16 @@ namespace Umbraco.Tests.Scoping
 
             SafeCallContext.Clear();
             ClearFiles();
+        }
+
+        protected override void ComposeApplication(bool withApplication)
+        {
+            base.ComposeApplication(withApplication);
+
+            if (!withApplication) return;
+
+            // re-register with actual media fs
+            Container.ComposeFileSystems();
         }
 
         public override void TearDown()

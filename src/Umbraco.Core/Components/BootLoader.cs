@@ -313,7 +313,7 @@ namespace Umbraco.Core.Components
                 {
                     var componentType = component.GetType();
                     var initializers = componentType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                        .Where(x => x.Name == "Initialize" && x.IsGenericMethod == false);
+                        .Where(x => x.Name == "Initialize" && x.IsGenericMethod == false && x.IsStatic == false);
                     using (_proflog.DebugDuration<BootLoader>($"Initializing {componentType.FullName}.", $"Initialised {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {
                         foreach (var initializer in initializers)

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Configuration;
-using System.Linq;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -11,8 +8,6 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Cache.DistributedCache;
-using Umbraco.Tests.TestHelpers.Stubs;
 
 
 namespace Umbraco.Tests.Misc
@@ -75,7 +70,7 @@ namespace Umbraco.Tests.Misc
 
             ApplicationUrlHelper.ApplicationUrlProvider = request => "http://server1.com/umbraco";
 
-            
+
 
             var state = new RuntimeState(Mock.Of<ILogger>(), new Lazy<IServerRegistrar>(Mock.Of<IServerRegistrar>), new Lazy<MainDom>(Mock.Of<MainDom>), settings, globalConfig.Object);
 
@@ -101,7 +96,7 @@ namespace Umbraco.Tests.Misc
             // still NOT set
             Assert.IsNull(url);
         }
-        
+
         [Test]
         public void SetApplicationUrlFromStSettingsNoSsl()
         {
@@ -112,8 +107,8 @@ namespace Umbraco.Tests.Misc
             var globalConfig = Mock.Get(SettingsForTests.GenerateMockGlobalSettings());
             globalConfig.Setup(x => x.UseHttps).Returns(false);
 
-            
-            
+
+
             var url = ApplicationUrlHelper.TryGetApplicationUrl(settings, Mock.Of<ILogger>(), globalConfig.Object, Mock.Of<IServerRegistrar>());
 
             Assert.AreEqual("http://mycoolhost.com/umbraco", url);
@@ -129,8 +124,8 @@ namespace Umbraco.Tests.Misc
             var globalConfig = Mock.Get(SettingsForTests.GenerateMockGlobalSettings());
             globalConfig.Setup(x => x.UseHttps).Returns(true);
 
-            
-            
+
+
             var url = ApplicationUrlHelper.TryGetApplicationUrl(settings, Mock.Of<ILogger>(), globalConfig.Object, Mock.Of<IServerRegistrar>());
 
             Assert.AreEqual("https://mycoolhost.com/umbraco", url);
@@ -146,13 +141,13 @@ namespace Umbraco.Tests.Misc
             var globalConfig = Mock.Get(SettingsForTests.GenerateMockGlobalSettings());
             globalConfig.Setup(x => x.UseHttps).Returns(true);
 
-            
+
 
             var url = ApplicationUrlHelper.TryGetApplicationUrl(settings, Mock.Of<ILogger>(), globalConfig.Object, Mock.Of<IServerRegistrar>());
 
             Assert.AreEqual("httpx://whatever.com/umbraco", url);
         }
 
-        
+
     }
 }

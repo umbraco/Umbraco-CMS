@@ -299,7 +299,7 @@ namespace Umbraco.Core.IO
                 var shadowWrapper = new ShadowWrapper(innerFs, "typed/" + alias, () => IsScoped());
 
                 // getting the fs from the container - see FileSystemsComposer
-                var fs = Current.Container.GetInstance<TFileSystem>(new object[] { (IFileSystem) shadowWrapper });
+                var fs = Current.Container.GetInstance<TFileSystem>((IFileSystem) shadowWrapper);
                 _wrappers.Add(shadowWrapper); // keeping a reference to the wrapper
                 return fs;
             });

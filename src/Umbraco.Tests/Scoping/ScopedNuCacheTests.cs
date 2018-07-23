@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Routing;
-using LightInject;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -14,7 +13,6 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;

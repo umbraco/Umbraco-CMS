@@ -62,8 +62,26 @@ namespace Umbraco.Core.Composing.LightInject
             => Container.GetInstance(type, name);
 
         /// <inheritdoc />
-        public object GetInstance(Type type, object[] args)
-            => Container.GetInstance(type, args);
+        public object GetInstance(Type type, params object[] args)
+        {
+            // LightInject has this, but then it requires RegisterConstructorDependency etc and has various oddities
+            //return Container.GetInstance(type, args);
+
+            var ctor = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public).OrderByDescending(x => x.GetParameters().Length).FirstOrDefault();
+            if (ctor == null) throw new InvalidOperationException($"Could not find a public constructor for type {type.FullName}.");
+
+            var ctorParameters = ctor.GetParameters();
+            var ctorArgs = new object[ctorParameters.Length];
+            var i = 0;
+            foreach (var parameter in ctorParameters)
+            {
+                // no! IsInstanceOfType is not ok here
+                // ReSharper disable once UseMethodIsInstanceOfType
+                var arg = args?.FirstOrDefault(a => parameter.ParameterType.IsAssignableFrom(a.GetType()));
+                ctorArgs[i++] = arg ?? GetInstance(parameter.ParameterType);
+            }
+            return ctor.Invoke(ctorArgs);
+        }
 
         /// <inheritdoc />
         public object TryGetInstance(Type type)
@@ -198,13 +216,16 @@ namespace Umbraco.Core.Composing.LightInject
         public void RegisterOrdered(Type serviceType, Type[] implementingTypes, Lifetime lifetime = Lifetime.Transient)
             => Container.RegisterOrdered(serviceType, implementingTypes, _ => GetLifetime(lifetime));
 
-        /// <inheritdoc />
-        public void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, TDependency> factory)
-            => Container.RegisterConstructorDependency((f, x) => factory(this, x));
-
-        /// <inheritdoc />
-        public void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, object[], TDependency> factory)
-            => Container.RegisterConstructorDependency((f, x, a) => factory(this, x, a));
+        // was the Light-Inject specific way of dealing with args, but we've replaced it with our own
+        // beware! does NOT work on singletons, see https://github.com/seesharper/LightInject/issues/294
+        //
+        ///// <inheritdoc />
+        //public void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, TDependency> factory)
+        //    => Container.RegisterConstructorDependency((f, x) => factory(this, x));
+        //
+        ///// <inheritdoc />
+        //public void RegisterConstructorDependency<TDependency>(Func<IContainer, ParameterInfo, object[], TDependency> factory)
+        //    => Container.RegisterConstructorDependency((f, x, a) => factory(this, x, a));
 
         #endregion
 
@@ -251,9 +272,13 @@ namespace Umbraco.Core.Composing.LightInject
             // if looking for a IContainer, and one was passed in args, use it
             // this is for collection builders which require the IContainer
             //Container.RegisterConstructorDependency((c, i, a) => a.OfType<IContainer>().FirstOrDefault());
-
-            // which means that the only way to inject the container into builders is to register it
-            Container.RegisterInstance<IContainer>(this);
+            //
+            // and, the block below is also disabled, because it is ugly
+            //
+            //// which means that the only way to inject the container into builders is to register it
+            //Container.RegisterInstance<IContainer>(this);
+            //
+            // instead, we use an explicit GetInstance with arguments implementation
 
             return this;
         }

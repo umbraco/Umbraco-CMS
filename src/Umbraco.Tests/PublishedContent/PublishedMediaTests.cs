@@ -1,7 +1,6 @@
 ﻿using System.Web;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Lucene.Net.Store;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -20,10 +19,8 @@ using Umbraco.Core.Strings;
 using Umbraco.Examine;
 using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Tests.Testing;
-using LightInject;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.PublishedContent
 {

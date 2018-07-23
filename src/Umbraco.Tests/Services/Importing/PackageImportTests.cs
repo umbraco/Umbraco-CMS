@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Composing.Composers;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.PropertyEditors;
@@ -51,6 +52,16 @@ namespace Umbraco.Tests.Services.Importing
             Container.GetInstance<DataEditorCollectionBuilder>()
                 .Add<Editor1>()
                 .Add<Editor2>();
+        }
+
+        protected override void ComposeApplication(bool withApplication)
+        {
+            base.ComposeApplication(withApplication);
+
+            if (!withApplication) return;
+
+            // re-register with actual media fs
+            Container.ComposeFileSystems();
         }
 
         [Test]

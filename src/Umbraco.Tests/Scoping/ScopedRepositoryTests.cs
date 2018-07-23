@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
@@ -11,7 +10,6 @@ using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.Cache;
-using LightInject;
 using Moq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Sync;

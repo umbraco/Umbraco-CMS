@@ -30,7 +30,7 @@ namespace Umbraco.Core.Composing
         /// <para>Throws an exception if the container failed to get an instance of the specified type.</para>
         /// <para>The arguments are used as dependencies by the container.</para>
         /// </remarks>
-        public static T GetInstance<T>(this IContainer container, object[] args)
+        public static T GetInstance<T>(this IContainer container, params object[] args)
             => (T) container.GetInstance(typeof(T), args);
 
         /// <summary>
