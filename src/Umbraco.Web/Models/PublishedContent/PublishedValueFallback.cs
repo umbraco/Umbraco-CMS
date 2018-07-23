@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Models.PublishedContent;
+﻿using System;
+using System.Collections.Generic;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Models.PublishedContent
 {
@@ -7,54 +9,79 @@ namespace Umbraco.Web.Models.PublishedContent
     /// </summary>
     public class PublishedValueFallback : IPublishedValueFallback
     {
-        // this is our default implementation
         // kinda reproducing what was available in v7
 
         /// <inheritdoc />
-        public virtual object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue)
+        public object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue, ICollection<int> visitedLanguages)
         {
             // no fallback here
             return defaultValue;
         }
 
         /// <inheritdoc />
-        public virtual T GetValue<T>(IPublishedProperty property, string culture, string segment, T defaultValue)
+        public T GetValue<T>(IPublishedProperty property, string culture, string segment, T defaultValue, ICollection<int> visitedLanguages)
         {
             // no fallback here
             return defaultValue;
         }
 
         /// <inheritdoc />
-        public virtual object GetValue(IPublishedElement content, string alias, string culture, string segment, object defaultValue)
+        public object GetValue(IPublishedElement content, string alias, string culture, string segment, object defaultValue, ICollection<int> visitedLanguages)
         {
             // no fallback here
             return defaultValue;
         }
 
         /// <inheritdoc />
-        public virtual T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue)
+        public T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue, ICollection<int> visitedLanguages)
         {
             // no fallback here
             return defaultValue;
         }
 
         /// <inheritdoc />
-        public virtual object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority)
+        public object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, IEnumerable<int> fallbackMethods, ICollection<int> visitedLanguages)
         {
-            // no fallback here
-            if (!recurse) return defaultValue;
-
             // is that ok?
-            return GetValue<object>(content, alias, culture, segment, defaultValue, true, fallbackPriority);
+            return GetValue<object>(content, alias, culture, segment, defaultValue, fallbackMethods, visitedLanguages);
         }
 
         /// <inheritdoc />
-        public virtual T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority)
+        public T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, IEnumerable<int> fallbackMethods, ICollection<int> visitedLanguages)
         {
-            // no fallback here
-            if (!recurse) return defaultValue;
+            if (fallbackMethods == null)
+            {
+                return defaultValue;
+            }
 
-            // otherwise, implement recursion as it was implemented in PublishedContentBase
+            foreach (var fallbackMethod in fallbackMethods)
+            {
+                if (TryGetValueWithFallbackMethod(content, alias, culture, segment, defaultValue, fallbackMethods, visitedLanguages, fallbackMethod, out T value))
+                {
+                    return value;
+                }
+            }
+
+            return defaultValue;
+        }
+
+        protected virtual bool TryGetValueWithFallbackMethod<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, IEnumerable<int> fallbackMethods, ICollection<int> visitedLanguages, int fallbackMethod, out T value)
+        {
+            value = defaultValue;
+            switch (fallbackMethod)
+            {
+                case Core.Constants.Content.FallbackMethods.None:
+                    return false;
+                case Core.Constants.Content.FallbackMethods.RecursiveTree:
+                    return TryGetValueWithRecursiveTree(content, alias, culture, segment, defaultValue, out value);
+                default:
+                    throw new NotSupportedException($"Fallback method with indentifying number {fallbackMethod} is not supported within {GetType().Name}.");
+            }
+        }
+
+        protected static bool TryGetValueWithRecursiveTree<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, out T value)
+        {
+            // Implement recursion as it was implemented in PublishedContentBase
 
             // fixme caching?
             //
@@ -72,21 +99,31 @@ namespace Umbraco.Web.Models.PublishedContent
             {
                 content = content.Parent;
                 property = content?.GetProperty(alias);
-                if (property != null) noValueProperty = property;
-            } while (content != null && (property == null || property.HasValue(culture, segment) == false));
+                if (property != null)
+                {
+                    noValueProperty = property;
+                }
+            }
+            while (content != null && (property == null || property.HasValue(culture, segment) == false));
 
             // if we found a content with the property having a value, return that property value
             if (property != null && property.HasValue(culture, segment))
-                return property.Value<T>(culture, segment);
+            {
+                value = property.Value<T>(culture, segment);
+                return true;
+            }
 
             // if we found a property, even though with no value, return that property value
             // because the converter may want to handle the missing value. ie if defaultValue is default,
             // either specified or by default, the converter may want to substitute something else.
             if (noValueProperty != null)
-                return noValueProperty.Value<T>(culture, segment, defaultValue: defaultValue);
+            {
+                value = noValueProperty.Value<T>(culture, segment, defaultValue: defaultValue);
+                return true;
+            }
 
-            // else return default
-            return defaultValue;
+            value = defaultValue;
+            return false;
         }
     }
 }

@@ -179,7 +179,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistDeletedItem(ILanguage entity)
         {
-            //we need to validate that we can delete this language
+            // We need to validate that we can delete this language
             if (entity.IsDefault)
                 throw new InvalidOperationException($"Cannot delete the default language ({entity.IsoCode})");
 
@@ -187,9 +187,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (count == 1)
                 throw new InvalidOperationException($"Cannot delete the default language ({entity.IsoCode})");
 
+            // We need to remove any references to the language if it's being used as a fall-back from other ones
+            Database.Execute(Sql().Update<LanguageDto>(u => u.Set(x => x.FallbackLanguageId, null)).Where<LanguageDto>(x => x.FallbackLanguageId == entity.Id));
+
             base.PersistDeletedItem(entity);
 
-            //Clear the cache entries that exist by key/iso
+            // Clear the cache entries that exist by key/iso
             IsolatedCache.ClearCacheItem(RepositoryCacheKeys.GetKey<ILanguage>(entity.IsoCode));
             IsolatedCache.ClearCacheItem(RepositoryCacheKeys.GetKey<ILanguage>(entity.CultureName));
         }

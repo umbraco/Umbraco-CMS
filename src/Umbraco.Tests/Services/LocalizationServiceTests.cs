@@ -193,6 +193,20 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Delete_Language_Used_As_Fallback()
+        {
+            var danish = ServiceContext.LocalizationService.GetLanguageByIsoCode("da-DK");
+            var norwegian = new Language("nb-NO") { CultureName = "Norwegian", FallbackLanguageId = danish.Id };
+            ServiceContext.LocalizationService.Save(norwegian, 0);
+            var languageId = danish.Id;
+
+            ServiceContext.LocalizationService.Delete(danish);
+
+            var language = ServiceContext.LocalizationService.GetLanguageById(languageId);
+            Assert.Null(language);
+        }
+
+        [Test]
         public void Can_Create_DictionaryItem_At_Root()
         {
             var english = ServiceContext.LocalizationService.GetLanguageByIsoCode("en-US");

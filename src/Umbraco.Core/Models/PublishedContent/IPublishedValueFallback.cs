@@ -1,15 +1,7 @@
-﻿using Umbraco.Core.Composing;
+﻿using System.Collections.Generic;
 
 namespace Umbraco.Core.Models.PublishedContent
 {
-    // fixme document
-    // fixme add values?
-    public enum PublishedValueFallbackPriority
-    {
-        RecursiveTree,
-        FallbackLanguage
-    }
-
     /// <summary>
     /// Provides a fallback strategy for getting <see cref="IPublishedElement"/> values.
     /// </summary>
@@ -33,7 +25,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>At property level, property.GetValue() does *not* implement fallback, and one has to
         /// get property.Value() or property.Value{T}() to trigger fallback.</para>
         /// </remarks>
-        object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue);
+        object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue, ICollection<int> visitedLanguages);
 
         /// <summary>
         /// Gets a fallback value for a property.
@@ -51,7 +43,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// <para>At property level, property.GetValue() does *not* implement fallback, and one has to
         /// get property.Value() or property.Value{T}() to trigger fallback.</para>
         /// </remarks>
-        T GetValue<T>(IPublishedProperty property, string culture, string segment, T defaultValue);
+        T GetValue<T>(IPublishedProperty property, string culture, string segment, T defaultValue, ICollection<int> visitedLanguages);
 
         /// <summary>
         /// Gets a fallback value for a published element property.
@@ -67,7 +59,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// segment, either returned no property at all, or a property with HasValue(culture, segment) being false.</para>
         /// <para>It can only fallback at element level (no recurse).</para>
         /// </remarks>
-        object GetValue(IPublishedElement content, string alias, string culture, string segment, object defaultValue);
+        object GetValue(IPublishedElement content, string alias, string culture, string segment, object defaultValue, ICollection<int> visitedLanguages);
 
         /// <summary>
         /// Gets a fallback value for a published element property.
@@ -84,7 +76,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// segment, either returned no property at all, or a property with HasValue(culture, segment) being false.</para>
         /// <para>It can only fallback at element level (no recurse).</para>
         /// </remarks>
-        T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue);
+        T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue, ICollection<int> visitedLanguages);
 
         /// <summary>
         /// Gets a fallback value for a published content property.
@@ -100,7 +92,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// segment, either returned no property at all, or a property with HasValue(culture, segment) being false.</para>
         /// fixme explain & document priority + merge w/recurse?
         /// </remarks>
-        object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority);
+        object GetValue(IPublishedContent content, string alias, string culture, string segment, object defaultValue, IEnumerable<int> fallbackMethods, ICollection<int> visitedLanguages);
 
         /// <summary>
         /// Gets a fallback value for a published content property.
@@ -117,6 +109,6 @@ namespace Umbraco.Core.Models.PublishedContent
         /// segment, either returned no property at all, or a property with HasValue(culture, segment) being false.</para>
         /// fixme explain & document priority + merge w/recurse?
         /// </remarks>
-        T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, bool recurse, PublishedValueFallbackPriority fallbackPriority);
+        T GetValue<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, IEnumerable<int> fallbackMethods, ICollection<int> visitedLanguages);
     }
 }

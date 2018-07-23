@@ -319,6 +319,30 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_Delete_On_LanguageRepository_With_Language_Used_As_Fallback()
+        {
+            // Arrange
+            var provider = TestObjects.GetScopeProvider(Logger);
+            using (var scope = provider.CreateScope())
+            {
+                // Add language to delete as a fall-back language to another one
+                var repository = CreateRepository(provider);
+                var languageToFallbackFrom = repository.Get(5);
+                languageToFallbackFrom.FallbackLanguageId = 1;
+                repository.Save(languageToFallbackFrom);
+
+                // Act
+                var languageToDelete = repository.Get(1);
+                repository.Delete(languageToDelete);
+
+                var exists = repository.Exists(1);
+
+                // Assert
+                Assert.That(exists, Is.False);
+            }
+        }
+
+        [Test]
         public void Can_Perform_Exists_On_LanguageRepository()
         {
             // Arrange

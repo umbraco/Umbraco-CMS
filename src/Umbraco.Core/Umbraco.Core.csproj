@@ -286,6 +286,7 @@
     <Compile Include="Configuration\UmbracoSettings\UserProviderElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\WebRoutingElement.cs" />
     <Compile Include="Configuration\UmbracoVersion.cs" />
+    <Compile Include="Constants-Content.cs" />
     <Compile Include="Constants-Applications.cs" />
     <Compile Include="Constants-Conventions.cs" />
     <Compile Include="Constants-DatabaseProviders.cs" />

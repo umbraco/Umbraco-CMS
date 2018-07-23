@@ -393,8 +393,7 @@ namespace Umbraco.Core.Services.Implement
                     return;
                 }
 
-                //NOTE: There isn't any constraints in the db, so possible references aren't deleted
-
+                // NOTE: Other than the fall-back language, there aren't any other constraints in the db, so possible references aren't deleted
                 _languageRepository.Delete(language);
                 deleteEventArgs.CanCancel = false;
 
