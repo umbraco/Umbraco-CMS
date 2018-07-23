@@ -2,7 +2,7 @@
     <div class="control-group color-picker-preval">
         <input name="newColor" type="hidden" />
         <label for="newColor" val-highlight="{{hasError}}">#{{newColor}}</label>
-        <input name="newLabel" type="text" ng-model="newLabel" class="umb-editor color-label" placeholder="Label" />
+        <input name="newLabel" type="text" ng-model="newLabel" class="umb-editor color-label" placeholder="Label" ng-show="labelEnabled" />
         <button class="btn add" ng-click="add($event)"><localize key="general_add">Add</localize></button>
     </div>
     <div ui-sortable="sortableOptions" ng-model="model.value">

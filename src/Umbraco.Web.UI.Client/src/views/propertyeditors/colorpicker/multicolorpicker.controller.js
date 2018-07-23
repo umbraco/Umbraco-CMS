@@ -1,5 +1,5 @@
 ﻿angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiColorPickerController",
-    function ($scope, $timeout, assetsService, angularHelper, $element, localizationService) {
+    function ($scope, $timeout, assetsService, angularHelper, $element, localizationService, eventsService) {
         //NOTE: We need to make each color an object, not just a string because you cannot 2-way bind to a primitive.
         var defaultColor = "000000";
         var defaultLabel = null;
@@ -15,6 +15,11 @@
             "general_choose"
         ];
 
+        $scope.labelEnabled = false;
+        eventsService.on("toggleValue", function (e, args) {
+            $scope.labelEnabled = args.value;
+        });
+        
         localizationService.localizeMany(labelKeys).then(function (values) {
             $scope.labels.cancel = values[0];
             $scope.labels.choose = values[1];
