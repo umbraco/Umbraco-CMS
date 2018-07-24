@@ -167,7 +167,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Can_Get_Content_For_Unpopulated_Requested_Language_With_Fallback()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First();
-            var value = content.Value("welcomeText", "es", fallbackMethods: new[] { Core.Constants.Content.FallbackMethods.FallbackLanguage });
+            var value = content.Value("welcomeText", "es", fallback: Core.Constants.Content.ValueFallback.Language);
             Assert.AreEqual("Welcome", value);
         }
 
@@ -175,7 +175,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Can_Get_Content_For_Unpopulated_Requested_Language_With_Fallback_Over_Two_Levels()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First();
-            var value = content.Value("welcomeText", "it", fallbackMethods: new[] { Core.Constants.Content.FallbackMethods.FallbackLanguage });
+            var value = content.Value("welcomeText", "it", fallback: Core.Constants.Content.ValueFallback.Language);
             Assert.AreEqual("Welcome", value);
         }
 
@@ -183,7 +183,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Do_Not_GetContent_For_Unpopulated_Requested_Language_With_Fallback_Over_That_Loops()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First();
-            var value = content.Value("welcomeText", "no", fallbackMethods: new[] { Core.Constants.Content.FallbackMethods.FallbackLanguage });
+            var value = content.Value("welcomeText", "no", fallback: Core.Constants.Content.ValueFallback.Language);
             Assert.IsNull(value);
         }
 
@@ -199,27 +199,7 @@ namespace Umbraco.Tests.PublishedContent
         public void Can_Get_Content_Recursively()
         {
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
-            var value = content.Value("welcomeText2", fallbackMethods: new[] { Core.Constants.Content.FallbackMethods.RecursiveTree });
-            Assert.AreEqual("Welcome", value);
-        }
-
-        [Test]
-        public void Can_Get_Content_With_Recursive_Priority()
-        {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
-            var value = content.Value("welcomeText", "nl", fallbackMethods: new[] { Core.Constants.Content.FallbackMethods.RecursiveTree, Core.Constants.Content.FallbackMethods.FallbackLanguage });
-
-            // No Dutch value is directly assigned.  Check has fallen back to Dutch value from parent.
-            Assert.AreEqual("Welkom", value);
-        }
-
-        [Test]
-        public void Can_Get_Content_With_Fallback_Language_Priority()
-        {
-            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
-            var value = content.Value("welcomeText", "nl", fallbackMethods: new[] { Core.Constants.Content.FallbackMethods.FallbackLanguage, Core.Constants.Content.FallbackMethods.RecursiveTree });
-
-            // No Dutch value is directly assigned.  Check has fallen back to English value from language variant.
+            var value = content.Value("welcomeText2", fallback: Core.Constants.Content.ValueFallback.Recurse);
             Assert.AreEqual("Welcome", value);
         }
     }

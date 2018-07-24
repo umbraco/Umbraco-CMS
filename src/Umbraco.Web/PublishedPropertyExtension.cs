@@ -16,12 +16,12 @@ namespace Umbraco.Web
 
         #region Value
 
-        public static object Value(this IPublishedProperty property, string culture = null, string segment = null, object defaultValue = default, ICollection<int> visitedLanguages = null)
+        public static object Value(this IPublishedProperty property, string culture = null, string segment = null, object defaultValue = default)
         {
             if (property.HasValue(culture, segment))
                 return property.GetValue(culture, segment);
 
-            return PublishedValueFallback.GetValue(property, culture, segment, defaultValue, visitedLanguages ?? new List<int>());
+            return PublishedValueFallback.GetValue(property, culture, segment, defaultValue);
         }
 
         #endregion

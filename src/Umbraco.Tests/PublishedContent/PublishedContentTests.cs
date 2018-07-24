@@ -34,7 +34,7 @@ namespace Umbraco.Tests.PublishedContent
 
             Container.RegisterSingleton<IPublishedModelFactory>(f => new PublishedModelFactory(f.GetInstance<TypeLoader>().GetTypes<PublishedContentModel>()));
             Container.RegisterSingleton<IPublishedContentTypeFactory, PublishedContentTypeFactory>();
-            Container.RegisterSingleton<IPublishedValueFallback, PublishedValueLanguageFallback>();
+            Container.RegisterSingleton<IPublishedValueFallback, PublishedValueFallback>();
 
             var logger = Mock.Of<ILogger>();
             var dataTypeService = new TestObjects.TestDataTypeService(
@@ -336,8 +336,8 @@ namespace Umbraco.Tests.PublishedContent
         public void Get_Property_Value_Recursive()
         {
             var doc = GetNode(1174);
-            var rVal = doc.Value("testRecursive", fallbackMethods: new[] { Constants.Content.FallbackMethods.RecursiveTree } );
-            var nullVal = doc.Value("DoNotFindThis", fallbackMethods: new[] { Constants.Content.FallbackMethods.RecursiveTree });
+            var rVal = doc.Value("testRecursive", fallback: Constants.Content.ValueFallback.Recurse);
+            var nullVal = doc.Value("DoNotFindThis", fallback: Constants.Content.ValueFallback.Recurse);
             Assert.AreEqual("This is the recursive val", rVal);
             Assert.AreEqual(null, nullVal);
         }

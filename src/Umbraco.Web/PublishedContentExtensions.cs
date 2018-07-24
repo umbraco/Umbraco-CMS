@@ -153,18 +153,16 @@ namespace Umbraco.Web
         /// <param name="culture">The variation language.</param>
         /// <param name="segment">The variation segment.</param>
         /// <param name="defaultValue">The default value.</param>
-        /// <param name="fallbackMethods">Options for fall-back if content not found.</param>
-        /// <param name="visitedLanguages">A list of cultures already visited in looking for a value via a fall-back method.</param>
+        /// <param name="fallback">Optional fallback strategy.</param>
         /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
-        public static object Value(this IPublishedContent content, string alias, string culture = null, string segment = null, object defaultValue = default,
-                                   int[] fallbackMethods = null, ICollection<int> visitedLanguages = null)
+        public static object Value(this IPublishedContent content, string alias, string culture = null, string segment = null, object defaultValue = default, int fallback = 0)
         {
             var property = content.GetProperty(alias);
 
             if (property != null && property.HasValue(culture, segment))
                 return property.GetValue(culture, segment);
 
-            return PublishedValueFallback.GetValue(content, alias, culture, segment, defaultValue, fallbackMethods, visitedLanguages ?? new List<int>());
+            return PublishedValueFallback.GetValue(content, alias, culture, segment, defaultValue, fallback);
         }
 
         #endregion
@@ -180,24 +178,20 @@ namespace Umbraco.Web
         /// <param name="culture">The variation language.</param>
         /// <param name="segment">The variation segment.</param>
         /// <param name="defaultValue">The default value.</param>
-        /// <param name="fallbackMethods">Options for fall-back if content not found.</param>
-        /// <param name="visitedLanguages">A list of cultures already visited in looking for a value via a fall-back method.</param>
+        /// <param name="fallback">Optional fallback strategy.</param>
         /// <returns>The value of the content's property identified by the alias, converted to the specified type.</returns>
-        /// <remarks>
-        public static T Value<T>(this IPublishedContent content, string alias, string culture = null, string segment = null, T defaultValue = default,
-                                 int[] fallbackMethods = null, ICollection<int> visitedLanguages = null)
+        public static T Value<T>(this IPublishedContent content, string alias, string culture = null, string segment = null, T defaultValue = default, int fallback = 0)
         {
             var property = content.GetProperty(alias);
 
             if (property != null && property.HasValue(culture, segment))
                 return property.Value<T>(culture, segment);
 
-            return PublishedValueFallback.GetValue(content, alias, culture, segment, defaultValue, fallbackMethods, visitedLanguages ?? new List<int>());
+            return PublishedValueFallback.GetValue(content, alias, culture, segment, defaultValue, fallback);
         }
 
         // fixme - .Value() refactoring - in progress
-        public static IHtmlString Value<T>(this IPublishedContent content, string aliases, Func<T, string> format, string alt = "",
-                                           int[] fallbackMethods = null, ICollection<int> visitedLanguages = null)
+        public static IHtmlString Value<T>(this IPublishedContent content, string aliases, Func<T, string> format, string alt = "", int fallback = 0)
         {
             var aliasesA = aliases.Split(',');
             if (aliasesA.Length == 0)

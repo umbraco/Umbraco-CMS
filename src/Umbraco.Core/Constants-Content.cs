@@ -11,11 +11,27 @@
             /// Defines core supported content fall-back options when retrieving content property values.
             /// Defined as constants rather than enum to allow solution or package defined fall-back methods.
             /// </summary>
-            public static class FallbackMethods
+            public static class ValueFallback
             {
-                public const int None = 0;
-                public const int RecursiveTree = 1;
-                public const int FallbackLanguage = 2;
+                /// <summary>
+                /// No fallback at all.
+                /// </summary>
+                public const int None = -1;
+
+                /// <summary>
+                /// Default fallback.
+                /// </summary>
+                public const int Default = 0;
+
+                /// <summary>
+                /// Recurse up the tree.
+                /// </summary>
+                public const int Recurse = 1;
+
+                /// <summary>
+                /// Fallback to other languages.
+                /// </summary>
+                public const int Language = 2;
             }
         }
     }
