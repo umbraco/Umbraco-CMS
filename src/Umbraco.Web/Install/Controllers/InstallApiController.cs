@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web.Http;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Install.Models;
@@ -55,8 +54,8 @@ namespace Umbraco.Web.Install.Controllers
         public bool PostValidateDatabaseConnection(DatabaseModel model)
         {
             var dbHelper = new DatabaseHelper();
-            var canConnect = dbHelper.CheckConnection(model, ApplicationContext);
-            return canConnect;
+
+            return dbHelper.CheckConnection(model, ApplicationContext);
         }
 
         /// <summary>
@@ -81,12 +80,59 @@ namespace Umbraco.Web.Install.Controllers
 
             return setup;
         }
-        
+
         public IEnumerable<Package> GetPackages()
         {
             var installHelper = new InstallHelper(UmbracoContext);
-            var starterKits = installHelper.GetStarterKits();
-            return starterKits;
+
+            return installHelper.GetStarterKits();
+        }
+
+        /// <summary>
+        /// Start the automated install
+        /// </summary>
+        /// <param name="installModel">Installation data</param>
+        /// <returns></returns>
+        public async Task<InstallProgressResultModel> Install(FreshInstallModel installModel)
+        {
+            var setup = GetSetup();
+
+            var instructions = new InstallInstructions
+            {
+                InstallId = setup.InstallId,
+                Instructions = new Dictionary<string, JToken>()
+            };
+            
+            instructions.Instructions.Add("User", JToken.FromObject(installModel.User));
+            instructions.Instructions.Add("DatabaseConfigure", JToken.FromObject(installModel.Database));
+            instructions.Instructions.Add("ConfigureMachineKey", JToken.FromObject(installModel.ConfigureMachineKey));
+            instructions.Instructions.Add("StarterKitDownload", JToken.FromObject(installModel.StarterKit));
+
+            var handler = new AutomaticInstallClientHandler(instructions);
+
+            return await handler.Execute();
+        }
+
+        /// <summary>
+        /// Start an automated upgrade
+        /// </summary>
+        /// <param name="credentialModel">Credential to use to perform the upgrade</param>
+        /// <returns></returns>
+        public async Task<InstallProgressResultModel> Upgrade(CredentialModel credentialModel)
+        {
+            var setup = GetSetup();
+
+            var instructions = new InstallInstructions
+            {
+                InstallId = setup.InstallId,
+                Instructions = new Dictionary<string, JToken>()
+            };
+            
+            instructions.Instructions.Add("Upgrade", JToken.FromObject(new InstallSteps.UpgradeStep(ApplicationContext).ViewModel));
+
+            var handler = new AutomaticInstallClientHandler(instructions);
+
+            return await handler.Execute(credentialModel ?? new CredentialModel { });
         }
 
         /// <summary>
@@ -109,7 +155,7 @@ namespace Umbraco.Web.Install.Controllers
             while (queue.Count > 0)
             {
                 var stepStatus = queue.Dequeue();
-                
+
                 var step = InstallHelper.GetAllSteps().Single(x => x.Name == stepStatus.Name);
 
                 JToken instruction = null;
@@ -118,7 +164,7 @@ namespace Umbraco.Web.Install.Controllers
                 {
                     instruction = installModel.Instructions[step.Name];
                 }
-                
+
                 //If this step doesn't require execution then continue to the next one, this is just a fail-safe check.
                 if (StepRequiresExecution(step, instruction) == false)
                 {
@@ -136,7 +182,7 @@ namespace Umbraco.Web.Install.Controllers
 
                     //Determine's the next step in the queue and dequeue's any items that don't need to execute
                     var nextStep = IterateNextRequiredStep(step, queue, installModel.InstallId, installModel);
-                    
+
                     //check if there's a custom view to return for this step
                     if (setupData != null && setupData.View.IsNullOrWhiteSpace() == false)
                     {
@@ -199,7 +245,7 @@ namespace Umbraco.Web.Install.Controllers
                 // we cannot peek ahead as the next step might rely on the app restart and therefore RequiresExecution 
                 // will rely on that too.                
                 if (current.PerformsAppRestart)
-                {                    
+                {
                     return step.Name;
                 }
 
