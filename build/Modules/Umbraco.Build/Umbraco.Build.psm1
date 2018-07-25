@@ -376,7 +376,7 @@ function Prepare-Packages
   Copy-Files "$src\Umbraco.Web.UI\umbraco\js" "*" "$tmp\WebApp\umbraco\js"
   Copy-Files "$src\Umbraco.Web.UI\umbraco\lib" "*" "$tmp\WebApp\umbraco\lib"
   Copy-Files "$src\Umbraco.Web.UI\umbraco\views" "*" "$tmp\WebApp\umbraco\views"
-  Copy-Files "$src\Umbraco.Web.UI\umbraco\preview" "*" "$tmp\WebApp\umbraco\preview"
+
 }
 
 #

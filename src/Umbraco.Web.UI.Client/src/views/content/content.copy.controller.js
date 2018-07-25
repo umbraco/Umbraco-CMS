@@ -20,12 +20,19 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 	    }
 	    $scope.treeModel = {
 	        hideHeader: false
-	    }
+        }
+        $scope.toggle = toggleHandler;
 	    userService.getCurrentUser().then(function (userData) {
-            $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;	     
+            $scope.treeModel.hideHeader = userData.startContentIds.length > 0 && userData.startContentIds.indexOf(-1) == -1;
 	    });
 
 	    var node = dialogOptions.currentNode;
+
+        function treeLoadedHandler(ev, args) {
+            if (node && node.path) {
+                $scope.dialogTreeEventHandler.syncTree({ path: node.path, activate: false });
+            }
+        }
 
 	    function nodeSelectHandler(ev, args) {
 
@@ -51,7 +58,27 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
           	if (args.node.metaData.isContainer) {
 				openMiniListView(args.node);
 			}
-	    }
+        }
+
+        function toggleHandler(type){
+            // If the relateToOriginal toggle is clicked
+            if(type === "relate"){
+                if($scope.relateToOriginal){
+                    $scope.relateToOriginal = false;
+                    return;
+                }
+                $scope.relateToOriginal = true;
+            }
+
+            // If the recurvise toggle is clicked
+            if(type === "recursive"){
+                if($scope.recursive){
+                    $scope.recursive = false;
+                    return;
+                }
+                $scope.recursive = true;
+            }
+        }
 
 	    $scope.hideSearch = function () {
 	        $scope.searchInfo.showSearch = false;
@@ -110,10 +137,12 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
                 });
 	    };
 
+	    $scope.dialogTreeEventHandler.bind("treeLoaded", treeLoadedHandler);
 	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
 	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
 
 	    $scope.$on('$destroy', function () {
+	        $scope.dialogTreeEventHandler.unbind("treeLoaded", treeLoadedHandler);
 	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
 	        $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
 	    });
@@ -131,5 +160,5 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.CopyController",
 		function openMiniListView(node) {
 			$scope.miniListView = node;
 		}
-		
+
 	});

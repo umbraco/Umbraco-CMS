@@ -1798,7 +1798,7 @@
         <key alias="httpsCheckInvalidCertificate">Error validando certificado: '%0%'</key>
         <key alias="httpsCheckExpiredCertificate">El ceriticado SSL de tu sitio ha caducado.</key>
         <key alias="httpsCheckExpiringCertificate">El ceriticado SSL de tu sitio caducará en %0% días.</key>
-        <key alias="httpsCheckInvalidUrl">Error pinging la URL %0% - '%1%'</key>
+        <key alias="healthCheckInvalidUrl">Error pinging la URL %0% - '%1%'</key>
         <key alias="httpsCheckIsCurrentSchemeHttps">Actualmente estás %0% viendo el sitio usando el esquema HTTPS.</key>
         <key alias="httpsCheckConfigurationRectifyNotPossible">El appSetting 'umbracoUseSSL' está configurado como 'false' en tu archivo web.config. Una vez que accedes al sitio usando HTTPS, debería ser configuraio como 'true'.</key>
         <key alias="httpsCheckConfigurationCheckResult">Ele appSetting 'umbracoUseSSL' está configurado como '%0%' en tu archivo your web.config, tus cookies son %1% marcadas como seguras.</key>
@@ -1838,10 +1838,10 @@
 
         <key alias="clickJackingCheckHeaderFound"><![CDATA[El header or meta-tag <strong>X-Frame-Options</strong> usado para controlar si un sitio puede ser IFRAMEd por otra fue encontrado.]]></key>
         <key alias="clickJackingCheckHeaderNotFound"><![CDATA[El header or meta-tag <strong>X-Frame-Options</strong> usado para controlar si un sitio puede ser IFRAMEd por otra no se ha encontrado.]]></key>
-        <key alias="clickJackingSetHeaderInConfig">Establecer Header en Config</key>
+        <key alias="setHeaderInConfig">Establecer Header en Config</key>
         <key alias="clickJackingSetHeaderInConfigDescription">Adds a value to the httpProtocol/customHeaders section of web.config to prevent the site being IFRAMEd by other websites.</key>
         <key alias="clickJackingSetHeaderInConfigSuccess">A setting to create a header preventing IFRAMEing of the site by other websites has been added to your web.config file.</key>
-        <key alias="clickJackingSetHeaderInConfigError">Could not update web.config file. Error: %0%</key>
+        <key alias="setHeaderInConfigError">Could not update web.config file. Error: %0%</key>
 
         <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found

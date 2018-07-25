@@ -73,7 +73,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
 
             var extension = file.file.substring(file.file.lastIndexOf(".") + 1, file.file.length);
 
-            file.thumbnail = thumbnailUrl;
+            file.thumbnail = thumbnailUrl + '&rnd=' + Math.random();
             file.extension = extension.toLowerCase();
         });
 
@@ -157,26 +157,24 @@ angular.module("umbraco")
     .controller('Umbraco.PropertyEditors.FileUploadController', fileUploadController)
     .run(function(mediaHelper, umbRequestHelper, assetsService){
         if (mediaHelper && mediaHelper.registerFileResolver) {
-            assetsService.load(["lib/moment/moment-with-locales.js"]).then(
-                function () {
-                    //NOTE: The 'entity' can be either a normal media entity or an "entity" returned from the entityResource
-                    // they contain different data structures so if we need to query against it we need to be aware of this.
-                    mediaHelper.registerFileResolver("Umbraco.UploadField", function(property, entity, thumbnail){
-                        if (thumbnail) {
-                            if (mediaHelper.detectIfImageByExtension(property.value)) {
-                                //get default big thumbnail from image processor
-                                var thumbnailUrl = property.value + "?rnd=" + moment(entity.updateDate).format("YYYYMMDDHHmmss") + "&width=500&animationprocessmode=first";
-                                return thumbnailUrl;
-                            }
-                            else {
-                                return null;
-                            }
-                        }
-                        else {
-                            return property.value;
-                        }
-                    });
+
+            //NOTE: The 'entity' can be either a normal media entity or an "entity" returned from the entityResource
+            // they contain different data structures so if we need to query against it we need to be aware of this.
+            mediaHelper.registerFileResolver("Umbraco.UploadField", function(property, entity, thumbnail){
+                if (thumbnail) {
+                    if (mediaHelper.detectIfImageByExtension(property.value)) {
+                        //get default big thumbnail from image processor
+                        var thumbnailUrl = property.value + "?rnd=" + moment(entity.updateDate).format("YYYYMMDDHHmmss") + "&width=500&animationprocessmode=first";
+                        return thumbnailUrl;
+                    }
+                    else {
+                        return null;
+                    }
                 }
-            );
+                else {
+                    return property.value;
+                }
+            });
+
         }
     });

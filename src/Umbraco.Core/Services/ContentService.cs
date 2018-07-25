@@ -1872,7 +1872,7 @@ namespace Umbraco.Core.Services
                     }
                     copyEventArgs.CanCancel = false;
                     uow.Events.Dispatch(Copied, this, copyEventArgs);
-                    Audit(uow, AuditType.Copy, "Copy Content performed by user", content.WriterId, content.Id);
+                    Audit(uow, AuditType.Copy, "Copy Content performed by user", userId, content.Id);
                     uow.Commit();
                 }
 

@@ -8,7 +8,7 @@
 
 
 
-// Sortabel
+// Sortable
 // -------------------------
 
 // sortable-helper
@@ -127,6 +127,16 @@
     position: relative;
     margin-bottom: 40px;
     padding-top: 10px;
+
+    &:hover {
+        background-color: @grayLighter;
+    }
+
+    &[ng-click],
+    &[data-ng-click],
+    &[x-ng-click] {
+        cursor: pointer;
+    }
 }
 
 .umb-grid .row-tools a {
@@ -431,7 +441,7 @@
     background-color: @gray-10;
 
     .umb-row-title-bar {
-        cursor: default;
+        cursor: inherit;
     }
 
     .umb-row-title {

@@ -29,6 +29,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                 view: preVals[i].view,
                 value: preVals[i].value,
                 config: preVals[i].config,
+                prevalues: preVals[i].prevalues
             });
         }
     }
@@ -50,8 +51,9 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
     $scope.preValues = [];
 
     if ($routeParams.create) {
-
+        
         $scope.page.loading = true;
+        $scope.showIdentifier = false;
 
         //we are creating so get an empty data type item
         dataTypeResource.getScaffold($routeParams.id)
@@ -76,6 +78,8 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
     function loadDataType() {
 
         $scope.page.loading = true;
+
+        $scope.showIdentifier = true;
 
         //we are editing so get the content item from the server
         dataTypeResource.getById($routeParams.id)

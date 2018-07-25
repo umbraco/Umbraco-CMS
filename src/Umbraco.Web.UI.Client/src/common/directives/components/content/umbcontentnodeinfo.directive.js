@@ -8,6 +8,8 @@
             var evts = [];
             var isInfoTab = false;
             scope.publishStatus = {};
+
+            scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
             
             function onInit() {
 
@@ -52,6 +54,11 @@
                 var url = "/settings/documenttypes/edit/" + documentType.id;
                 $location.url(url);
             };
+
+            scope.openTemplate = function () {
+                var url = "/settings/templates/edit/" + scope.node.templateId;
+                $location.url(url);
+            }
 
             scope.updateTemplate = function (templateAlias) {
 

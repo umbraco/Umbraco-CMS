@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 using Umbraco.Core.Manifest;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -86,5 +87,11 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>        
         [JsonProperty("config")]
         public IDictionary<string, object> Config { get; set; }
+
+        /// <summary>
+        /// This allows for inner prevalues to be defined, for views such as radiobuttonlist, that require a selection.
+        /// </summary>        
+        [JsonProperty("prevalues")]
+        public PreValueInnerListItem[] PreValues { get; set; }
     }
 }

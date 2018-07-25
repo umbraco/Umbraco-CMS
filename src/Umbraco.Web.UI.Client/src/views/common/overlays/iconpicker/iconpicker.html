@@ -15,7 +15,7 @@
     </div>
 
     <div class="umb-control-group">
-        <select ng-model="color" class="input-block-level">
+        <select ng-model="color" ng-change="changeColor(color)" class="input-block-level">
             <option value=""><localize key="colors_black">Black</localize></option>
             <option value="color-blue-grey"><localize key="colors_bluegrey">Blue Grey</localize></option>
             <option value="color-grey"><localize key="colors_grey">Grey</localize></option>
@@ -42,7 +42,7 @@
 
     <div class="umb-control-group" ng-show="!loading && filtered.length > 0 ">
         <ul class="umb-iconpicker" ng-class="color" ng-show="icons">
-            <li class="umb-iconpicker-item" ng-repeat="icon in filtered = (icons | filter: searchTerm) track by $id(icon)">
+            <li class="umb-iconpicker-item" ng-class="{'-selected': icon == model.icon}" ng-repeat="icon in filtered = (icons | filter: searchTerm) track by $id(icon)">
                 <a href="#" title="{{icon}}" ng-click="selectIcon(icon, color)" prevent-default>
                     <i class="{{icon}} large"></i>
                 </a>

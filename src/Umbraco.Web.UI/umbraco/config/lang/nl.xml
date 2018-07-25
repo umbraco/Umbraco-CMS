@@ -172,6 +172,13 @@
     <key alias="target" version="7.0">Doel</key>
 	<key alias="scheduledPublishServerTime">Dit betekend de volgende tijd op de server:</key>
     <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Wat houd dit in?</a>]]></key>
+    <key alias="nestedContentDeleteItem">Ben je er zeker van dat je dit item wilt verwijderen?</key>
+    <key alias="nestedContentEditorNotSupported">Eigenschap %0% gebruikt editor %1% welke niet wordt ondersteund door Nested Content.</key>
+    <key alias="addTextBox">Voeg nog een tekstvak toe</key>
+    <key alias="removeTextBox">Verwijder dit tekstvak</key>
+    <key alias="contentRoot">Content root</key>
+    <key alias="isSensitiveValue">Deze waarde is verborgen. Indien u toegang nodig heeft om deze waarde te bekijken, contacteer dan uw website administrator.</key>
+    <key alias="isSensitiveValue_short">Deze waarde is verborgen</key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">Klik om te uploaden</key>
@@ -214,6 +221,7 @@
     <key alias="discardChanges">Negeer wijzigingen</key>
     <key alias="unsavedChanges">Wijzigingen niet opgeslagen</key>
     <key alias="unsavedChangesWarning">Weet je zeker dat deze pagina wilt verlaten? - er zijn onopgeslagen wijzigingen</key>
+    <key alias="confirmUnpublish">Depubliceren zal deze pagina en alle onderliggend paginas verwijderen van de site.</key>
   </area>
   <area alias="bulk">
     <key alias="done">Done</key>
@@ -1146,7 +1154,12 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="thisEditorUpdateSettings">die gebruik maken van deze editor zullen geupdate worden met deze nieuwe instellingen</key>
 
     <key alias="memberCanEdit">Lid kan bewerken</key>
+    <key alias="memberCanEditDescription">Toestaan dat deze eigenschap kan worden gewijzigd door het lid op zijn profiel pagina.</key>
+    <key alias="isSensitiveData">Omvat gevoelige gegevens</key>
+    <key alias="isSensitiveDataDescription">Verberg deze eigenschap voor de content editor die geen toegang heeft tot het bekijken van gevoelige informatie.</key>
     <key alias="showOnMemberProfile">Toon in het profiel van leden</key>
+    <key alias="showOnMemberProfileDescription">Toelaten dat deze eigenschap wordt getoond op de profiel pagina van het lid.</key>
+    
     <key alias="tabHasNoSortOrder">tab heeft geen sorteervolgorde</key>
   </area>
 
@@ -1368,7 +1381,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
 
     <key alias="httpsCheckValidCertificate">Het cerficaat van de website is ongeldig.</key>
     <key alias="httpsCheckInvalidCertificate">Cerficaat validatie foutmelding: '%0%'</key>
-    <key alias="httpsCheckInvalidUrl">Fout bij pingen van URL %0% - '%1%'</key>
+    <key alias="healthCheckInvalidUrl">Fout bij pingen van URL %0% - '%1%'</key>
     <key alias="httpsCheckIsCurrentSchemeHttps">De site wordt momenteel %0% bekeken via HTTPS.</key>
     <key alias="httpsCheckConfigurationRectifyNotPossible">De appSetting 'umbracoUseSSL' in web.config staat op 'false'. Indien HTTPS gebruikt wordt moet deze op 'true' staan.</key>
     <key alias="httpsCheckConfigurationCheckResult">De appSetting 'umbracoUseSSL' in web.config is ingesteld op '%0%'. Cookies zijn %1% ingesteld als secure.</key>
@@ -1408,10 +1421,10 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
 
     <key alias="clickJackingCheckHeaderFound"><![CDATA[De <strong>X-Frame-Options</strong> header of meta-tag om IFRAMEing door andere websites te voorkomen is aanwezig!]]></key>
     <key alias="clickJackingCheckHeaderNotFound"><![CDATA[De <strong>X-Frame-Options</strong> header of meta-tag om IFRAMEing door andere websites te voorkomen is NIET aanwezig.]]></key>
-    <key alias="clickJackingSetHeaderInConfig">Voorkom IFRAMEing via web.config</key>
+    <key alias="setHeaderInConfig">Voorkom IFRAMEing via web.config</key>
     <key alias="clickJackingSetHeaderInConfigDescription">Voegt de instelling toe aan de httpProtocol/customHeaders section in web.config om IFRAMEing door andere websites te voorkomen.</key>
     <key alias="clickJackingSetHeaderInConfigSuccess">De instelling om IFRAMEing door andere websites te voorkomen is toegevoegd aan de web.config!</key>
-    <key alias="clickJackingSetHeaderInConfigError">Web.config kon niet aangepast worden door error: %0%</key>
+    <key alias="setHeaderInConfigError">Web.config kon niet aangepast worden door error: %0%</key>
 
     <!-- The following key get these tokens passed in:
 	    0: Comma delimitted list of headers found
