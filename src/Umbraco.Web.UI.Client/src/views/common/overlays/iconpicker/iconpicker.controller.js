@@ -42,7 +42,6 @@ function IconPickerOverlay($scope, iconHelper, localizationService) {
         $scope.color = $scope.colors[0].value;
     };
 
-    };
     if ($scope.model.color) {
         $scope.color = $scope.model.color;
     };
