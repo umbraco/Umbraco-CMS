@@ -1,20 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using AutoMapper;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Web.Http;
-using AutoMapper;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.Services;
-using System.Net.Http;
-using Umbraco.Core;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Core.Logging;
-using Umbraco.Web.Composing;
-using ContentVariation = Umbraco.Core.Models.ContentVariation;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
 {
@@ -405,6 +406,35 @@ namespace Umbraco.Web.Editors
                 copy,
                 getContentType: i => Services.ContentTypeService.Get(i),
                 doCopy: (type, i) => Services.ContentTypeService.Copy(type, i));
+        }
+
+        [HttpGet]
+        public HttpResponseMessage Export(int id)
+        {
+            var contentType = Services.ContentTypeService.Get(id);
+            if (contentType == null) throw new NullReferenceException("No content type found with id " + id);
+
+            var serializer = new EntityXmlSerializer();
+            var xml = serializer.Serialize(
+                Services.DataTypeService,
+                Services.ContentTypeService,
+                contentType);
+            var response = new HttpResponseMessage
+            {
+                Content = new StringContent(xml.ToDataString())
+                {
+                    Headers =
+                    {
+                        ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                        {
+                            FileName = $"{contentType.Alias}.udt"
+                        },
+                        ContentType =   new MediaTypeHeaderValue( "application/octet-stream")
+                    }
+                }
+            };
+
+            return response;
         }
     }
 }

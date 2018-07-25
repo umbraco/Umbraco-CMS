@@ -315,8 +315,21 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                 "Failed to rename the folder with id " + id
             );
 
-        }
+        },
 
+        export: function (id) {
+            if (!id) {
+                throw "id cannot be null";
+            }
+
+            return window.open(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl",
+                "Export",
+                {
+                    id: id
+                }),
+                '_blank',
+                '');
+        }
     };
 }
 angular.module('umbraco.resources').factory('contentTypeResource', contentTypeResource);
