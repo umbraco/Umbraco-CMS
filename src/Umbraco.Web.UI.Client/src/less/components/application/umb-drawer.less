@@ -55,12 +55,13 @@
 /* Our badge - should be moved */
 
 .umb-help-badge {
-    padding: 10px 20px 10px 35px;
+    padding: 10px 20px 10px 55px;
     background: @white;
     position: relative;
     overflow: hidden;
     border-radius: 3px;
     display: block;
+    margin-bottom:5px;
 }
 
 .umb-help-badge:hover,
@@ -74,10 +75,10 @@
 }
 
 .umb-help-badge__icon {
-    font-size: 40px;
+    font-size: 36px;
     transform: translate(0,-50%);
     position: absolute;
-    left: -15px;
+    left: 10px;
     top: 50%;
     color: @red-l3;
 }
@@ -128,6 +129,14 @@
     align-items: center;
 }
 
+/* the outer container for each help type - tours, video etc */
+.umb-help-section + .umb-help-section {
+    margin-top:20px;
+}
+
+.umb-help-section__title {
+    margin:0 0 10px;    
+}
 
 /* Help list */
 
@@ -135,12 +144,12 @@
     list-style: none;
     margin-left: 0;
     margin-bottom: 0;
-    background: @white;
+    background: @white; 
     border-radius: 3px;
-}
-
-.umb-help-list:last-child {
-    border-bottom: none;
+    
+    [data-element*="help-tours"] & {
+        margin-bottom:5px;
+    }
 }
 
 .umb-help-list-item {
@@ -149,20 +158,28 @@
     border-bottom: 1px solid @gray-9;
 }
 
-.umb-help-list-item > a,
+.umb-help-list-item__group-title i {
+    margin-right:2px;
+    text-decoration: none;
+}
+
 .umb-help-list-item__content {
     display: flex;
     align-items: center;
-    padding: 10px 20px;
+    padding: 10px 20px 10px 10px;
+    text-decoration: none;
 }
 
+.umb-help-list-item:hover,
+.umb-help-list-item:focus,
+.umb-help-list-item:active,
 .umb-help-list-item > a:hover, 
 .umb-help-list-item > a:focus,
 .umb-help-list-item > a:active {
     text-decoration: none;
 
     .umb-help-list-item__title {
-        text-decoration: underline !important;
+        text-decoration: underline;
     }
 }
 
@@ -191,4 +208,8 @@
 
 .umb-help-list-item:hover .umb-help-list-item__group-title {
     text-decoration: underline;
+}
+
+[data-element*="tour-"].umb-help-list-item:hover .umb-help-list-item__title {
+    text-decoration:none;
 }

@@ -16,6 +16,7 @@
     </div>
 
     <div class="umb-control-group">
+        <select ng-model="color" class="input-block-level">
         <umb-color-swatches colors="colors" selected-color="color" size="s"></umb-color-swatches>
     </div>
 
@@ -32,7 +33,7 @@
 
     <div class="umb-control-group" ng-show="!loading && filtered.length > 0 ">
         <ul class="umb-iconpicker" ng-class="color" ng-show="icons">
-            <li class="umb-iconpicker-item" ng-repeat="icon in filtered = (icons | filter: searchTerm) track by $id(icon)">
+            <li class="umb-iconpicker-item" ng-class="{'-selected': icon == model.icon}" ng-repeat="icon in filtered = (icons | filter: searchTerm) track by $id(icon)">
                 <a href="#" title="{{icon}}" ng-click="selectIcon(icon, color)" prevent-default>
                     <i class="{{icon}} large"></i>
                 </a>

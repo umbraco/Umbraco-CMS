@@ -1,4 +1,6 @@
-<label ng-controller="Umbraco.PrevalueEditors.BooleanController" for="{{htmlId}}" class="checkbox">
-    <input name="boolean" type="checkbox" ng-model="model.value" ng-true-value="1" ng-false-value="0" id="{{htmlId}}" />
-    <localize key="general_yes">Yes</localize>
-</label>
+<div ng-controller="Umbraco.PrevalueEditors.BooleanController">
+    <umb-toggle
+        checked="toggleValue"
+        on-click="toggle()">
+    </umb-toggle>
+</div>
