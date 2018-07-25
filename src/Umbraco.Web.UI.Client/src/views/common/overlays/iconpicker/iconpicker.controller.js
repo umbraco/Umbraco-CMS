@@ -20,6 +20,9 @@ function IconPickerOverlay($scope, iconHelper, localizationService) {
        { name: 'Blue Grey', value: 'color-blue-grey' },
        { name: 'Grey', value: 'color-grey' },
        { name: 'Brown', value: 'color-brown' },
+       { name: 'Purple', value: 'color-purple' },
+       { name: 'Deep Purple', value: 'color-deep-purple' },
+       { name: 'Indigo', value: 'color-indigo' },
        { name: 'Blue', value: 'color-blue' },
        { name: 'Light Blue', value: 'color-light-blue' },
        { name: 'Cyan', value: 'color-cyan' },
@@ -31,10 +34,7 @@ function IconPickerOverlay($scope, iconHelper, localizationService) {
        { name: 'Orange', value: 'color-orange' },
        { name: 'Deep Orange', value: 'color-deep-orange' },
        { name: 'Red', value: 'color-red' },
-       { name: 'Pink', value: 'color-pink' },
-       { name: 'Purple', value: 'color-purple' },
-       { name: 'Deep Purple', value: 'color-deep-purple' },
-       { name: 'Indigo', value: 'color-indigo' }
+       { name: 'Pink', value: 'color-pink' }
    ];
 
     if (!$scope.color) {
