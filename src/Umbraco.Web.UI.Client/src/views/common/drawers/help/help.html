@@ -80,7 +80,7 @@
         </div>
 
         <!--  Umbraco tv content -->
-        <div class="umb-help-section" data-element="help-videos">
+        <div class="umb-help-section" data-element="help-videos" ng-if="vm.hasAccessToSettings">
             <h5 class="umb-help-section__title" ng-if="vm.videos.length > 0">Videos</h5>
             <ul class="umb-help-list">
                 <li class="umb-help-list-item" ng-repeat="video in vm.videos track by $index">
@@ -94,7 +94,7 @@
         </div>
 
         <!--  Links -->
-        <div class="umb-help-section" data-element="help-links">
+        <div class="umb-help-section" data-element="help-links" ng-if="vm.hasAccessToSettings">
             <a data-element="help-link-umbraco-tv" class="umb-help-badge" target="_blank" href="http://umbraco.tv?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
                 <i class="umb-help-badge__icon icon-tv-old"></i>
                 <div class="umb-help-badge__title">Visit umbraco.tv</div>
