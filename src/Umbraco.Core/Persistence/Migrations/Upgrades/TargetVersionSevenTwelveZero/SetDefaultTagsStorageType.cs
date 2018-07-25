@@ -1,7 +1,10 @@
-﻿using Umbraco.Core.Logging;
+﻿using System;
+using System.Linq;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenElevenTwelve
+namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZero
 {
     /// <summary>
     /// Set the default storageType for the tags datatype to "CSV" to ensure backwards compatibilty since the default is going to be JSON in new versions
@@ -16,23 +19,26 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenElevenT
 
         public override void Up()
         {
-            if (Context == null || Context.Database == null) return;
-
-
+            if (Context?.Database == null) return;
+            
             // We need to get all datatypes with an alias of "umbraco.tags" so we can loop over them and set the missing values if needed
-            var nodeIds = Context.Database.Query<int>("SELECT NodeId FROM CmsDataType WHERE PropertyEditorAlias = {0}", Constants.PropertyEditors.TagsAlias);
+            var datatypes = Context.Database.Fetch<DataTypeDto>("SELECT * FROM cmsDataType");
+            var tagsDataTypes = datatypes.Where(x => string.Equals(x.PropertyEditorAlias, Constants.PropertyEditors.TagsAlias, StringComparison.InvariantCultureIgnoreCase));
+            var dataTypePreValues = Context.Database.Fetch<DataTypePreValueDto>("SELECT * FROM cmsDataTypePrevalues");
 
-            foreach (var nodeId in nodeIds)
+            foreach (var datatype in tagsDataTypes)
             {
                 // We need to check if the node has a "storageType" set
-                var result = Context.Database.SingleOrDefault<string>("SELECT value FROM CmsDataTypePrevalue WHERE nodeId = {0} AND alias = '{1}'", nodeId, "storageType");
+                var result = dataTypePreValues.FirstOrDefault(x =>
+                    x.DataTypeNodeId == datatype.DataTypeId
+                    && string.Equals(x.Alias, "storageType", StringComparison.InvariantCultureIgnoreCase));
 
                 // if the "storageType" has not been set we do so by adding a new row in the table for the nodid and set it
                 if (result == null)
                 {
-                    Insert.IntoTable("CmsDataTypePrevalue").Row(new
+                    Insert.IntoTable("CmsDataTypePrevalues").Row(new
                     {
-                        datatypeNodId = nodeId,
+                        datatypeNodeId = datatype.DataTypeId,
                         value = "Csv",
                         sortOrder = 2,
                         alias = "storageType"
