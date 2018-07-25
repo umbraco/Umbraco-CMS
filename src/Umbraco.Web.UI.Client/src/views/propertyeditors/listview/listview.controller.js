@@ -58,23 +58,26 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       items: []
    };
 
-   $scope.currentNodePermissions = {}
+   //when this is null, we don't check permissions
+   $scope.currentNodePermissions = null;
 
-   //Just ensure we do have an editorState
-   if (editorState.current) {
-      //Fetch current node allowed actions for the current user
-      //This is the current node & not each individual child node in the list
-      var currentUserPermissions = editorState.current.allowedActions;
+   if ($scope.entityType === "content") {
+       //Just ensure we do have an editorState
+       if (editorState.current) {
+           //Fetch current node allowed actions for the current user
+           //This is the current node & not each individual child node in the list
+           var currentUserPermissions = editorState.current.allowedActions;
 
-      //Create a nicer model rather than the funky & hard to remember permissions strings
-      $scope.currentNodePermissions = {
-         "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
-         "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
-         "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
-         "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
-         "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
-         "canUnpublish": _.contains(currentUserPermissions, 'U'), //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
-      };
+           //Create a nicer model rather than the funky & hard to remember permissions strings
+           $scope.currentNodePermissions = {
+               "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
+               "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
+               "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
+               "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
+               "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
+               "canUnpublish": _.contains(currentUserPermissions, 'U'), //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
+           };
+       }
    }
 
    //when this is null, we don't check permissions
