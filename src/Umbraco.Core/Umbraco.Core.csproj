@@ -15,6 +15,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <TargetFrameworkProfile />
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,6 +26,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -48,9 +50,6 @@
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.9.5, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.4.9.5\lib\Net45\HtmlAgilityPack.dll</HintPath>
-    </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="ImageProcessor, Version=2.5.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ImageProcessor.2.5.6\lib\net45\ImageProcessor.dll</HintPath>
@@ -108,12 +107,17 @@
     </Reference>
     <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Linq.Expressions" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Transactions" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.Web.Extensions" />
@@ -138,6 +142,7 @@
     <Compile Include="AsyncLock.cs" />
     <Compile Include="Attempt{T}.cs" />
     <Compile Include="Auditing\Audit.cs" />
+    <Compile Include="Auditing\AuditEventHandler.cs" />
     <Compile Include="Auditing\AuditTypes.cs" />
     <Compile Include="Auditing\IdentityAuditEventArgs.cs" />
     <Compile Include="BindingRedirects.cs" />
@@ -179,6 +184,7 @@
     <Compile Include="CodeAnnotations\UmbracoProposedPublicAttribute.cs" />
     <Compile Include="Collections\DeepCloneableList.cs" />
     <Compile Include="Collections\ListCloneBehavior.cs" />
+    <Compile Include="Collections\TypeList.cs" />
     <Compile Include="ConcurrentHashSet.cs" />
     <Compile Include="Configuration\BaseRest\IBaseRestSection.cs" />
     <Compile Include="Configuration\BaseRest\IExtension.cs" />
@@ -239,6 +245,7 @@
     <Compile Include="Configuration\UmbracoConfigurationSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\AppCodeFileExtensionsElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\BackOfficeElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\CharCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\CharElement.cs" />
     <Compile Include="Configuration\CommaDelimitedConfigurationElement.cs" />
@@ -247,6 +254,7 @@
     <Compile Include="Configuration\UmbracoSettings\ContentErrorPageElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentErrorsElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentSectionExtensions.cs" />
+    <Compile Include="Configuration\UmbracoSettings\IBackOfficeSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillPropertiesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillUploadFieldElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />
@@ -273,8 +281,6 @@
     <Compile Include="Configuration\UmbracoSettings\INotDynamicXmlDocument.cs" />
     <Compile Include="Configuration\UmbracoSettings\IProvidersSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IRazorStaticMapping.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IRepositoriesSection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IRepository.cs" />
     <Compile Include="Configuration\UmbracoSettings\IRequestHandlerSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IScheduledTask.cs" />
     <Compile Include="Configuration\UmbracoSettings\IScheduledTasksSection.cs" />
@@ -282,6 +288,7 @@
     <Compile Include="Configuration\UmbracoSettings\ISecuritySection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IServer.cs" />
     <Compile Include="Configuration\UmbracoSettings\ITemplatesSection.cs" />
+    <Compile Include="Configuration\UmbracoSettings\ITourSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IUmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IViewStateMoverModuleSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\IWebRoutingSection.cs" />
@@ -299,10 +306,6 @@
     <Compile Include="Configuration\UmbracoSettings\RazorElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RazorStaticMappingCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\RazorStaticMappingElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoriesCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoriesElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoryConfigExtensions.cs" />
-    <Compile Include="Configuration\UmbracoSettings\RepositoryElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\RequestHandlerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ScheduledTaskElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ScheduledTasksCollection.cs" />
@@ -312,6 +315,7 @@
     <Compile Include="Configuration\UmbracoSettings\ServerCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ServerElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\TemplatesElement.cs" />
+    <Compile Include="Configuration\UmbracoSettings\TourConfigElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\UmbracoConfigurationElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\UmbracoSettingsSection.cs" />
     <Compile Include="Configuration\UmbracoSettings\UrlReplacingElement.cs" />
@@ -345,9 +349,12 @@
     <Compile Include="Deploy\Direction.cs" />
     <Compile Include="Deploy\IFileType.cs" />
     <Compile Include="Deploy\IFileTypeCollection.cs" />
+    <Compile Include="DisposableObjectSlim.cs" />
     <Compile Include="EmailSender.cs" />
     <Compile Include="Events\EventDefinitionFilter.cs" />
+    <Compile Include="Events\ExportedMemberEventArgs.cs" />
     <Compile Include="Events\IDeletingMediaFilesEventArgs.cs" />
+    <Compile Include="Events\UserGroupWithUsers.cs" />
     <Compile Include="Events\ScopeEventDispatcherBase.cs" />
     <Compile Include="Events\ScopeLifespanMessagesFactory.cs" />
     <Compile Include="Events\SendEmailEventArgs.cs" />
@@ -358,19 +365,33 @@
     <Compile Include="IEmailSender.cs" />
     <Compile Include="IHttpContextAccessor.cs" />
     <Compile Include="Logging\RollingFileCleanupAppender.cs" />
+    <Compile Include="Models\AuditEntry.cs" />
+    <Compile Include="Models\Consent.cs" />
+    <Compile Include="Models\ConsentExtensions.cs" />
+    <Compile Include="Models\ConsentState.cs" />
     <Compile Include="Models\EntityBase\EntityPath.cs" />
     <Compile Include="Models\EntityBase\IDeletableEntity.cs" />
+    <Compile Include="Models\IAuditEntry.cs" />
+    <Compile Include="Models\IAuditItem.cs" />
+    <Compile Include="Models\IConsent.cs" />
     <Compile Include="Models\IUserControl.cs" />
     <Compile Include="Models\Membership\ContentPermissionSet.cs" />
     <Compile Include="Models\Membership\EntityPermissionCollection.cs" />
     <Compile Include="Models\Membership\IReadOnlyUserGroup.cs" />
     <Compile Include="Models\Membership\IUserType.cs" />
+    <Compile Include="Models\Membership\MemberExportModel.cs" />
+    <Compile Include="Models\Membership\MemberExportProperty.cs" />
     <Compile Include="Models\Membership\ReadOnlyUserGroup.cs" />
     <Compile Include="Models\Membership\UserGroupExtensions.cs" />
     <Compile Include="Models\Membership\UserProfile.cs" />
     <Compile Include="Models\Membership\UserState.cs" />
     <Compile Include="Models\Membership\UserType.cs" />
+    <Compile Include="Models\PreValueInnerListItem.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />
+    <Compile Include="Models\Rdbms\AuditEntryDto.cs" />
+    <Compile Include="Models\Rdbms\ConsentDto.cs" />
+    <Compile Include="Models\Rdbms\MediaDto.cs" />
+    <Compile Include="Models\Rdbms\UserLoginDto.cs" />
     <Compile Include="Models\Rdbms\UserStartNodeDto.cs" />
     <Compile Include="Models\UserControl.cs" />
     <Compile Include="OrderedHashSet.cs" />
@@ -522,6 +543,7 @@
     <Compile Include="Persistence\Constants-Locks.cs" />
     <Compile Include="Persistence\DatabaseNodeLockExtensions.cs" />
     <Compile Include="Persistence\DatabaseDebugHelper.cs" />
+    <Compile Include="Persistence\Factories\AuditEntryFactory.cs" />
     <Compile Include="Persistence\Factories\ExternalLoginFactory.cs" />
     <Compile Include="Persistence\Factories\MigrationEntryFactory.cs" />
     <Compile Include="Persistence\Factories\PublicAccessEntryFactory.cs" />
@@ -532,12 +554,25 @@
     <Compile Include="Persistence\LockedRepository.cs" />
     <Compile Include="Persistence\LockingRepository.cs" />
     <Compile Include="Persistence\Mappers\AccessMapper.cs" />
+    <Compile Include="Persistence\Mappers\AuditEntryMapper.cs" />
+    <Compile Include="Persistence\Mappers\AuditMapper.cs" />
+    <Compile Include="Persistence\Mappers\ConsentMapper.cs" />
     <Compile Include="Persistence\Mappers\DomainMapper.cs" />
     <Compile Include="Persistence\Mappers\ExternalLoginMapper.cs" />
     <Compile Include="Persistence\Mappers\MigrationEntryMapper.cs" />
     <Compile Include="Persistence\Mappers\UserGroupMapper.cs" />
     <Compile Include="Persistence\Migrations\LocalMigrationContext.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionFourOneZero\AddPreviewXmlTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddTourDataUserColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddIndexToPropertyTypeAliasColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddInstructionCountColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddCmsMediaTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenEightZero\AddUserLoginTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwelveZero\SetDefaultTagsStorageType.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenNineZero\AddUmbracoAuditTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenNineZero\AddUmbracoConsentTable.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenNineZero\AddIsSensitiveMemberTypeColumn.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenNineZero\CreateSensitiveDataUserGroup.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\AddIndexToDictionaryKeyColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\EnsureContentTemplatePermissions.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSevenZero\ReduceDictionaryKeyColumnsSize.cs" />
@@ -567,6 +602,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\NormalizeTemplateGuids.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\RemovePropertyDataIdIndex.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenSixZero\RemoveUmbracoDeployTables.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTenZero\RenamePreviewFolder.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeTwo\EnsureMigrationsTableIdentityIsCorrect.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenFourZero\EnsureContentTypeUniqueIdsAreConsistent.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\AddExternalLoginsTable.cs" />
@@ -601,6 +637,8 @@
     <Compile Include="Media\Exif\TIFFStrip.cs" />
     <Compile Include="Media\Exif\Utility.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeOne\UpdateUserLanguagesToIsoCode.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwelveZero\IncreaseLanguageIsoCodeColumnLength.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenTwelveZero\UpdateUmbracoConsent.cs" />
     <Compile Include="Persistence\PocoDataDataReader.cs" />
     <Compile Include="Persistence\Querying\CachedExpression.cs" />
     <Compile Include="Persistence\Querying\QueryExtensions.cs" />
@@ -608,12 +646,17 @@
     <Compile Include="Persistence\Relators\AccessRulesRelator.cs" />
     <Compile Include="Persistence\Relators\UserGroupRelator.cs" />
     <Compile Include="Persistence\Relators\UserGroupSectionRelator.cs" />
+    <Compile Include="Persistence\Repositories\AuditEntryRepository.cs" />
     <Compile Include="Persistence\Repositories\AuditRepository.cs" />
     <Compile Include="Persistence\Repositories\BaseQueryType.cs" />
+    <Compile Include="Persistence\Factories\ConsentFactory.cs" />
+    <Compile Include="Persistence\Repositories\ConsentRepository.cs" />
     <Compile Include="Persistence\Repositories\ContentBlueprintRepository.cs" />
     <Compile Include="Persistence\Repositories\EntityContainerRepository.cs" />
     <Compile Include="Persistence\Repositories\DomainRepository.cs" />
     <Compile Include="Persistence\Repositories\ExternalLoginRepository.cs" />
+    <Compile Include="Persistence\Repositories\IAuditEntryRepository.cs" />
+    <Compile Include="Persistence\Repositories\IConsentRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IAuditRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IContentTypeCompositionRepository.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IDomainRepository.cs" />
@@ -649,6 +692,7 @@
     <Compile Include="PropertyEditors\ValueConverters\DropdownListValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DropdownListWithKeysValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\EmailAddressValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\FlexibleDropdownPropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\GridValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\DecimalValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\LabelValueConverter.cs" />
@@ -685,11 +729,13 @@
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\IMembershipProviderPasswordHasher.cs" />
     <Compile Include="Security\IUserAwarePasswordHasher.cs" />
+    <Compile Include="Security\IUserSessionStore.cs" />
     <Compile Include="Security\MachineKeyGenerator.cs" />
     <Compile Include="Security\MembershipProviderPasswordHasher.cs" />
     <Compile Include="Security\EmailService.cs" />
     <Compile Include="Security\MembershipProviderPasswordValidator.cs" />
     <Compile Include="Security\OwinExtensions.cs" />
+    <Compile Include="Security\SessionIdValidator.cs" />
     <Compile Include="Security\UmbracoEmailMessage.cs" />
     <Compile Include="Security\UserAwareMembershipProviderPasswordHasher.cs" />
     <Compile Include="SemVersionExtensions.cs" />
@@ -708,8 +754,10 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\CreateCacheInstructionTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenThreeZero\MigrateStylesheetDataToFile.cs" />
     <Compile Include="Services\AuditService.cs" />
+    <Compile Include="Services\ConsentService.cs" />
     <Compile Include="Services\ContentTypeServiceExtensions.cs" />
     <Compile Include="Models\RedirectUrl.cs" />
+    <Compile Include="Services\IConsentService.cs" />
     <Compile Include="Services\IContentServiceBase.cs" />
     <Compile Include="Services\IdkMap.cs" />
     <Compile Include="Services\MediaServiceExtensions.cs" />
@@ -733,6 +781,7 @@
     <Compile Include="Services\RepositoryService.cs" />
     <Compile Include="Services\OperationStatus.cs" />
     <Compile Include="Services\OperationStatusType.cs" />
+    <Compile Include="Events\RolesEventArgs.cs" />
     <Compile Include="Services\ScopeRepositoryService.cs" />
     <Compile Include="Services\TaskService.cs" />
     <Compile Include="Strings\Css\StylesheetHelper.cs" />
@@ -1556,6 +1605,9 @@
     <Compile Include="Constants-Packaging.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
+    <Compile Include="Constants-PackageRepository.cs">
+      <DependentUpon>Constants.cs</DependentUpon>
+    </Compile>
     <Compile Include="Constants-ObjectTypes.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
@@ -1625,9 +1677,10 @@
       <LastGenOutput>Files.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

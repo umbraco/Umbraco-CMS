@@ -1,7 +1,9 @@
 (function () {
   'use strict';
 
-  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http) {
+  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource) {
+
+    var evts = [];
 
     //setup scope vars
     $scope.defaultButton = null;
@@ -14,22 +16,13 @@
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.listViewPath = null;
     $scope.page.isNew = $scope.isNew ? true : false;
-    $scope.page.buttonGroupState = "init";
+    $scope.page.buttonGroupState = "init";    
+    $scope.allowOpen = true;
+
 
     function init(content) {
 
-      var buttons = contentEditingHelper.configureContentEditorButtons({
-        create: $scope.page.isNew,
-        content: content,
-        methods: {
-          saveAndPublish: $scope.saveAndPublish,
-          sendToPublish: $scope.sendToPublish,
-          save: $scope.save,
-          unPublish: $scope.unPublish
-        }
-      });
-      $scope.defaultButton = buttons.defaultButton;
-      $scope.subButtons = buttons.subButtons;
+      createButtons(content);
 
       editorState.set($scope.content);
 
@@ -42,6 +35,72 @@
             });
         }
       }
+
+      evts.push(eventsService.on("editors.content.changePublishDate", function (event, args) {
+        createButtons(args.node);
+      }));
+
+      evts.push(eventsService.on("editors.content.changeUnpublishDate", function (event, args) {
+        createButtons(args.node);
+      }));
+
+      // We don't get the info tab from the server from version 7.8 so we need to manually add it
+      contentEditingHelper.addInfoTab($scope.content.tabs);
+
+    }
+
+    function getNode() {
+
+      $scope.page.loading = true;
+
+      //we are editing so get the content item from the server
+      $scope.getMethod()($scope.contentId)
+        .then(function (data) {
+
+          $scope.content = data;
+
+          if (data.isChildOfListView && data.trashed === false) {
+            $scope.page.listViewPath = ($routeParams.page) ?
+              "/content/content/edit/" + data.parentId + "?page=" + $routeParams.page :
+              "/content/content/edit/" + data.parentId;
+          }
+
+          init($scope.content);
+
+          //in one particular special case, after we've created a new item we redirect back to the edit
+          // route but there might be server validation errors in the collection which we need to display
+          // after the redirect, so we will bind all subscriptions which will show the server validation errors
+          // if there are any and then clear them so the collection no longer persists them.
+          serverValidationManager.executeAndClearAllSubscriptions();
+
+          syncTreeNode($scope.content, data.path, true);
+
+          resetLastListPageNumber($scope.content);
+
+          eventsService.emit("content.loaded", { content: $scope.content });
+
+          $scope.page.loading = false;
+
+        });
+
+    }
+
+    function createButtons(content) {
+      $scope.page.buttonGroupState = "init";
+      var buttons = contentEditingHelper.configureContentEditorButtons({
+        create: $scope.page.isNew,
+        content: content,
+        methods: {
+          saveAndPublish: $scope.saveAndPublish,
+          sendToPublish: $scope.sendToPublish,
+          save: $scope.save,
+          unPublish: $scope.unPublish
+        }
+      });
+
+      $scope.defaultButton = buttons.defaultButton;
+      $scope.subButtons = buttons.subButtons;
+
     }
 
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */
@@ -73,6 +132,8 @@
 
       $scope.page.buttonGroupState = "busy";
 
+      eventsService.emit("content.saving", { content: $scope.content, action: args.action });
+
       contentEditingHelper.contentEditorPerformSave({
         statusMessage: args.statusMessage,
         saveMethod: args.saveMethod,
@@ -87,6 +148,9 @@
         $scope.page.buttonGroupState = "success";
 
         deferred.resolve(data);
+
+        eventsService.emit("content.saved", { content: $scope.content, action: args.action });
+
       }, function (err) {
         //error
         if (err) {
@@ -126,70 +190,63 @@
 
           $scope.page.loading = false;
 
-        });
+          eventsService.emit("content.newReady", { content: $scope.content });
+
+          });
     }
     else {
 
-      $scope.page.loading = true;
+      getNode();
 
-      //we are editing so get the content item from the server
-      $scope.getMethod()($scope.contentId)
-        .then(function (data) {
-
-          $scope.content = data;
-
-          if (data.isChildOfListView && data.trashed === false) {
-            $scope.page.listViewPath = ($routeParams.page) ?
-              "/content/content/edit/" + data.parentId + "?page=" + $routeParams.page :
-              "/content/content/edit/" + data.parentId;
-          }
-
-          init($scope.content);
-
-          //in one particular special case, after we've created a new item we redirect back to the edit
-          // route but there might be server validation errors in the collection which we need to display
-          // after the redirect, so we will bind all subscriptions which will show the server validation errors
-          // if there are any and then clear them so the collection no longer persists them.
-          serverValidationManager.executeAndClearAllSubscriptions();
-
-          syncTreeNode($scope.content, data.path, true);
-
-          resetLastListPageNumber($scope.content);
-
-          $scope.page.loading = false;
-
-        });
     }
 
 
-    $scope.unPublish = function () {
+    $scope.unPublish = function () {								
+			// raising the event triggers the confirmation dialog			
+			if (!notificationsService.hasView()) {
+				notificationsService.add({ view: "confirmunpublish" });
+			}				
+				
+			$scope.page.buttonGroupState = "busy";
 
-      if (formHelper.submitForm({ scope: $scope, statusMessage: "Unpublishing...", skipValidation: true })) {
+			// actioning the dialog raises the confirmUnpublish event, act on it here
+			var actioned = $rootScope.$on("content.confirmUnpublish", function(event, confirmed) {
+				if (confirmed && formHelper.submitForm({ scope: $scope, statusMessage: "Unpublishing...", skipValidation: true })) {
+							
+					eventsService.emit("content.unpublishing", { content: $scope.content });
 
-        $scope.page.buttonGroupState = "busy";
+					contentResource.unPublish($scope.content.id)
+						.then(function (data) {
 
-        contentResource.unPublish($scope.content.id)
-          .then(function (data) {
+							formHelper.resetForm({ scope: $scope, notifications: data.notifications });
 
-            formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+							contentEditingHelper.handleSuccessfulSave({
+								scope: $scope,
+								savedContent: data,
+								rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+							});
 
-            contentEditingHelper.handleSuccessfulSave({
-              scope: $scope,
-              savedContent: data,
-              rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
-            });
+							init($scope.content);
 
-            init($scope.content);
+							syncTreeNode($scope.content, data.path);
 
-            syncTreeNode($scope.content, data.path);
+							$scope.page.buttonGroupState = "success";
+							eventsService.emit("content.unpublished", { content: $scope.content });
 
-            $scope.page.buttonGroupState = "success";
-
-          }, function(err) {
-            $scope.page.buttonGroupState = 'error';
-          });
-      }
-
+						}, function(err) {
+							formHelper.showNotifications(err.data);
+							$scope.page.buttonGroupState = 'error';
+						});	
+					
+				} else {
+					$scope.page.buttonGroupState = "init";
+				}
+				
+				// unsubscribe to avoid queueing notifications
+				// listener is re-bound when the unpublish button is clicked so it is created just-in-time				
+				actioned();
+				
+			}); 
     };
 
     $scope.sendToPublish = function () {
@@ -225,12 +282,91 @@
         else {
             $scope.save().then(function (data) {
                 previewWindow.location.href = redirect;
-            });    
+            });
+        }
+      }
+    };
+
+    $scope.restore = function (content) {
+
+      $scope.page.buttonRestore = "busy";
+
+      relationResource.getByChildId(content.id, "relateParentDocumentOnDelete").then(function (data) {
+
+        var relation = null;
+        var target = null;
+        var error = { headline: "Cannot automatically restore this item", content: "Use the Move menu item to move it manually"};
+
+        if (data.length == 0) {
+          notificationsService.error(error.headline, "There is no 'restore' relation found for this node. Use the Move menu item to move it manually.");
+          $scope.page.buttonRestore = "error";
+          return;
         }
 
-      }
+        relation = data[0];
+
+        if (relation.parentId == -1) {
+          target = { id: -1, name: "Root" };
+          moveNode(content, target);
+        } else {
+          contentResource.getById(relation.parentId).then(function (data) {
+            target = data;
+
+            // make sure the target item isn't in the recycle bin
+            if(target.path.indexOf("-20") !== -1) {
+              notificationsService.error(error.headline, "The item you want to restore it under (" + target.name + ") is in the recycle bin. Use the Move menu item to move the item manually.");
+              $scope.page.buttonRestore = "error";              
+              return;
+            }
+
+            moveNode(content, target);
+
+          }, function (err) {
+            $scope.page.buttonRestore = "error";
+            notificationsService.error(error.headline, error.content);
+          });
+        }
+
+      }, function (err) {
+        $scope.page.buttonRestore = "error";
+        notificationsService.error(error.headline, error.content);
+      });
+
 
     };
+
+    function moveNode(node, target) {
+
+      contentResource.move({ "parentId": target.id, "id": node.id })
+        .then(function (path) {
+
+          // remove the node that we're working on
+          if($scope.page.menu.currentNode) {
+            treeService.removeNode($scope.page.menu.currentNode);
+          }
+
+          // sync the destination node
+          navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false });
+
+          $scope.page.buttonRestore = "success";
+          notificationsService.success("Successfully restored " + node.name + " to " + target.name);
+
+          // reload the node
+          getNode();
+
+        }, function (err) {
+          $scope.page.buttonRestore = "error";
+          notificationsService.error("Cannot automatically restore this item", err);
+        });
+
+    }
+
+    //ensure to unregister from all events!
+    $scope.$on('$destroy', function () {
+      for (var e in evts) {
+        eventsService.unsubscribe(evts[e]);
+      }
+    });
 
   }
 

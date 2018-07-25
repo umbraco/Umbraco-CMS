@@ -1,4 +1,4 @@
-<div ng-controller="Umbraco.Editors.Scripts.EditController as vm">
+<div data-element="editor-scripts" ng-controller="Umbraco.Editors.Scripts.EditController as vm">
 
     <umb-load-indicator ng-if="vm.page.loading"></umb-load-indicator>
 
@@ -21,6 +21,7 @@
             <umb-editor-container>
 
                 <div
+                    data-element="code-editor"
                     auto-scale="85"
                     umb-ace-editor="vm.aceOption"
                     model="vm.script.content">

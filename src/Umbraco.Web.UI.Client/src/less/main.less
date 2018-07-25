@@ -131,7 +131,6 @@ h5.-black {
 /* BLOCK MODE */
 .block-form .umb-control-group {
   border-bottom: none;
-  margin-bottom: 10px !important;
   padding-bottom: 0;
 }
 
@@ -181,6 +180,14 @@ h5.-black {
 }
 .umb-nolabel .controls {
   margin-left: 0;
+}
+
+label[for=""] {
+  cursor: default;
+}
+
+label:not([for]) {
+  cursor: default;
 }
 
 /* CONTROL VALIDATION */

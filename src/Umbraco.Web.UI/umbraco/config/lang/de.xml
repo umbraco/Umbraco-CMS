@@ -83,6 +83,7 @@
     <key alias="returnToList">Zurück zur Liste</key>
     <key alias="save">Speichern</key>
     <key alias="saveAndPublish">Speichern und veröffentlichen</key>
+    <key alias="saveAndSchedule">Speichern und planen</key>
     <key alias="saveToPublish">Speichern und zur Abnahme übergeben</key>
     <key alias="showPage">Vorschau</key>
     <key alias="showPageDisabled">Die Vorschaufunktion ist deaktiviert, da keine Vorlage zugewiesen ist</key>

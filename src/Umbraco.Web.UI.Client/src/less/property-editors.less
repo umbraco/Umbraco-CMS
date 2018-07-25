@@ -3,10 +3,24 @@
 // --------------------------------------------------
 .umb-editor {
   min-width:66.6%;
+	
+	&-pull {
+		float:left;
+		width:66.6%;
+	}
+	
+	&-push {
+		float:right;
+	} 
 }
 
 .umb-editor-tiny {
   width: 60px;
+	
+	&.umb-editor-push {
+		width:30%;
+		min-width:0;
+	}
 }
 
 .umb-editor-small {
@@ -28,6 +42,27 @@
   width: 99%;
 }
 
+// displays property inline with preceeding
+.umb-property {
+	&--pull {
+		float:left;
+		width:60%;
+	}
+
+	&--push {
+		float:right;
+		width:35%;
+	}
+	
+	&--pull, &--push {
+		.umb-editor {
+			min-width:0;
+			width:100%;
+		}
+	}
+}
+
+
 //
 // Content picker
 // --------------------------------------------------
@@ -38,6 +73,16 @@
 
 .umb-contentpicker-popover .search-holder {
   padding: 10px;
+}
+
+.umb-contentpicker__min-max-help {
+    font-size: 13px;
+    margin-top: 5px;
+    color: @gray-4;
+}
+
+.show-validation .umb-contentpicker__min-max-help {
+    display: none;
 }
 
 .umb-contentpicker small {
@@ -193,16 +238,37 @@ ul.color-picker li a  {
   text-decoration: none;
 }
 
+.umb-mediapicker .label.trashed {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    color: #fff;
+    background-color: #fe6561;
+    background-image: linear-gradient(180deg,#fe6561,#fe6561);
+}
+
 .umb-mediapicker .add-link-square {
   height: 120px;
 }
 
 
 
-.umb-thumbnails{
-  position: relative;
+.umb-thumbnails {
+    position: relative;
+    display: flex;
+    -ms-flex-direction: row;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    -ms-flex-wrap: wrap;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    justify-content: flex-start;
 }
 
+.umb-thumbnails > li.icon {
+    width: 14%;
+    text-align: center;
+}
 
 .umb-thumbnails i{margin: auto;}
 .umb-thumbnails a{
@@ -239,7 +305,7 @@ ul.color-picker li a  {
 
 .umb-mediapicker .umb-sortable-thumbnails li {
     flex-direction: column;
-    margin: 0 5px 0 0;
+    margin: 0 5px 5px 0;
     padding: 5px;
 }
 
@@ -278,8 +344,8 @@ ul.color-picker li a  {
 }
 
 .umb-sortable-thumbnails .umb-sortable-thumbnails__wrapper {
-    width: 120px;
-    height: 114px;
+    width: 124px;
+    height: 124px;
     overflow: hidden;
 }
 
@@ -293,6 +359,12 @@ ul.color-picker li a  {
     opacity: 0;
     visibility: hidden;
 }
+
+.umb-sortable-thumbnails.ui-sortable:not(.ui-sortable-disabled) {
+    > li:not(.unsortable) {
+        cursor: move;
+    }
+} 
 
 .umb-sortable-thumbnails li:hover .umb-sortable-thumbnails__actions  {
     opacity: 1;
@@ -860,7 +932,21 @@ ul.color-picker li a  {
 
 //
 // Nested boolean (e.g. list view bulk action permissions)
-// ---------------------=====-----------------------------
+// -------------------------------------------------------
 .umb-nested-boolean label {margin-bottom: 8px; float: left; width: 320px;}
 .umb-nested-boolean label span {float: left; width: 80%;}
 .umb-nested-boolean label input[type='checkbox'] {margin-right: 10px; float: left;}
+
+
+//
+// Custom styles of property editors in property preview in document type editor
+// -----------------------------------------------------------------------------
+.umb-group-builder__property-preview {
+    .umb-property-editor {
+        .slider {
+            .tooltip {
+                display: none;
+            }
+        }
+    }
+}

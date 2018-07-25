@@ -255,6 +255,19 @@ namespace umbraco.BusinessLogic
             }
         }
 
+        /// <summary>
+        /// Gets the security stamp
+        /// </summary>
+        /// <value>The loginname.</value>
+        internal string SecurityStamp
+        {
+            get
+            {
+                if (_lazyId.HasValue) SetupUser(_lazyId.Value);
+                return UserEntity.SecurityStamp;
+            }            
+        }
+
         private static bool EnsureUniqueLoginName(string loginName, User currentUser)
         {
             User[] u = User.getAllByLoginName(loginName);

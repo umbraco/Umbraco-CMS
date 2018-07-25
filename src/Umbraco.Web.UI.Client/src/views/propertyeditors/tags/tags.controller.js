@@ -5,15 +5,12 @@ angular.module("umbraco")
         var $typeahead;
 
         $scope.isLoading = true;
-        $scope.tagToAdd = "";
-
-        assetsService.loadJs("lib/typeahead.js/typeahead.bundle.min.js").then(function () {
-
-            $scope.isLoading = false;
-
-            //load current value
-
-            if ($scope.model.value) {
+        $scope.tagToAdd = "";	
+		
+		function setModelValue(val) {
+			
+			$scope.model.value = val || $scope.model.value;			
+			if ($scope.model.value) {
                 if (!$scope.model.config.storageType || $scope.model.config.storageType !== "Json") {
                     //it is csv
                     if (!$scope.model.value) {
@@ -21,7 +18,14 @@ angular.module("umbraco")
                     }
                     else {
                        if($scope.model.value.length > 0) {
-                          $scope.model.value = $scope.model.value.split(",");
+						  // split the csv string, and remove any duplicate values
+						  var tempArray = $scope.model.value.split(',').map(function(v) {
+							 return v.trim(); 
+						  });
+						   
+                          $scope.model.value = tempArray.filter(function(v, i, self) {
+							  return self.indexOf(v) === i;
+						  });
                        }
                     }
                 }
@@ -29,6 +33,14 @@ angular.module("umbraco")
             else {
                 $scope.model.value = [];
             }
+		}
+
+        assetsService.loadJs("lib/typeahead.js/typeahead.bundle.min.js", $scope).then(function () {
+
+            $scope.isLoading = false;
+
+            //load current value
+			setModelValue();            
 
             // Method required by the valPropertyValidator directive (returns true if the property editor has at least one tag selected)
             $scope.validateMandatory = function () {
@@ -85,17 +97,7 @@ angular.module("umbraco")
             //vice versa
             $scope.model.onValueChanged = function (newVal, oldVal) {
                 //update the display val again if it has changed from the server
-                $scope.model.value = newVal;
-
-                if (!$scope.model.config.storageType || $scope.model.config.storageType !== "Json") {
-                    //it is csv
-                    if (!$scope.model.value) {
-                        $scope.model.value = [];
-                    }
-                    else {
-                        $scope.model.value = $scope.model.value.split(",");
-                    }
-                }
+				setModelValue(newVal);
             };
 
             //configure the tags data source
@@ -190,4 +192,4 @@ angular.module("umbraco")
         });
 
     }
-);
+);

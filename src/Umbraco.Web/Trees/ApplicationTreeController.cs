@@ -84,10 +84,19 @@ namespace Umbraco.Web.Trees
         private async Task<TreeNode> GetRootForMultipleAppTree(ApplicationTree configTree, FormDataCollection queryStrings)
         {
             if (configTree == null) throw new ArgumentNullException("configTree");
-            var byControllerAttempt = await configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext);
-            if (byControllerAttempt.Success)
+            try
             {
-                return byControllerAttempt.Result;
+                var byControllerAttempt = await configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext);
+                if (byControllerAttempt.Success)
+                {
+                    return byControllerAttempt.Result;
+                }
+            }
+            catch (HttpResponseException)
+            {
+                //if this occurs its because the user isn't authorized to view that tree, in this case since we are loading multiple trees we
+                //will just return null so that it's not added to the list.
+                return null;
             }
 
             var legacyAttempt = configTree.TryGetRootNodeFromLegacyTree(queryStrings, Url, configTree.ApplicationAlias);

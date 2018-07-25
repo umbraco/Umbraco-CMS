@@ -35,15 +35,15 @@ angular.module("umbraco.directives")
         //TODO: Remove more of the binding from this template and move the DOM manipulation to be manually done in the link function,
         // this will greatly improve performance since there's potentially a lot of nodes being rendered = a LOT of watches!
 
-        template: '<li ng-class="{\'current\': (node == currentNode), \'has-children\': node.hasChildren}" on-right-click="altSelect(node, $event)">' +
+        template: '<li data-element="tree-item-{{node.dataElement}}" ng-class="{\'current\': (node == currentNode), \'has-children\': node.hasChildren}" on-right-click="altSelect(node, $event)">' +
             '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)" >' +
             //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
             //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' + 
-            '<ins ng-class="{\'icon-navigation-right\': !node.expanded || node.metaData.isContainer, \'icon-navigation-down\': node.expanded && !node.metaData.isContainer}" ng-click="load(node)">&nbsp;</ins>' +
+            '<ins data-element="tree-item-expand" ng-class="{\'icon-navigation-right\': !node.expanded || node.metaData.isContainer, \'icon-navigation-down\': node.expanded && !node.metaData.isContainer}" ng-click="load(node)">&nbsp;</ins>' +
             '<i class="icon umb-tree-icon sprTree" ng-click="select(node, $event)"></i>' +
             '<a class="umb-tree-item__label" href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' +
             //NOTE: These are the 'option' elipses
-            '<a class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' +
+            '<a data-element="tree-item-options" class="umb-options" ng-click="options(node, $event)"><i></i><i></i><i></i></a>' +
             '<div ng-show="node.loading" class="l"><div></div></div>' +
             '</div>' +
             '</li>',
@@ -96,6 +96,14 @@ angular.module("umbraco.directives")
                 if (node.style) {
                     element.find("i:first").attr("style", node.style);
                 }
+
+                // add a unique data element to each tree item so it is easy to navigate with code
+                if(!node.metaData.treeAlias) {
+                    node.dataElement = node.name;
+                } else {
+                    node.dataElement = node.metaData.treeAlias;
+                }
+
             }
 
             //This will deleteAnimations to true after the current digest

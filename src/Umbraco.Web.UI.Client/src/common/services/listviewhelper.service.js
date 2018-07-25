@@ -270,12 +270,19 @@
             for (var i = 0; selection.length > i; i++) {
                 var selectedItem = selection[i];
                 // if item.id is 2147483647 (int.MaxValue) use item.key
-                if ((item.id !== 2147483647 && item.id === selectedItem.id) || item.key === selectedItem.key) {
+                if ((item.id !== 2147483647 && item.id === selectedItem.id) || (item.key && item.key === selectedItem.key)) {
                     isSelected = true;
                 }
             }
             if (!isSelected) {
-                selection.push({ id: item.id, key: item.key });
+                var obj = {
+                    id: item.id
+                };
+                if (item.key) {
+                    obj.key = item.key;
+                }
+
+                selection.push(obj);
                 item.selected = true;
             }
         }
@@ -296,7 +303,7 @@
             for (var i = 0; selection.length > i; i++) {
                 var selectedItem = selection[i];
                 // if item.id is 2147483647 (int.MaxValue) use item.key
-                if ((item.id !== 2147483647 && item.id === selectedItem.id) || item.key === selectedItem.key) {
+                if ((item.id !== 2147483647 && item.id === selectedItem.id) || (item.key && item.key === selectedItem.key)) {
                     selection.splice(i, 1);
                     item.selected = false;
                 }
@@ -366,9 +373,15 @@
             for (var i = 0; i < items.length; i++) {
 
                 var item = items[i];
+                var obj = {
+                    id: item.id
+                };
+                if (item.key) {
+                    obj.key = item.key
+                }
 
                 if (checkbox.checked) {
-                    selection.push({ id: item.id, key: item.key });
+                    selection.push(obj);
                 } else {
                     clearSelection = true;
                 }
@@ -408,7 +421,7 @@
                     var selectedItem = selection[selectedIndex];
 
                     // if item.id is 2147483647 (int.MaxValue) use item.key
-                    if ((item.id !== 2147483647 && item.id === selectedItem.id) || item.key === selectedItem.key) {
+                    if ((item.id !== 2147483647 && item.id === selectedItem.id) || (item.key && item.key === selectedItem.key)) {
                         numberOfSelectedItem++;
                     }
                 }

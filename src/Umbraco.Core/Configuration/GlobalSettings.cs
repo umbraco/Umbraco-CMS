@@ -35,7 +35,7 @@ namespace Umbraco.Core.Configuration
         private static Version _version;
         private static readonly object Locker = new object();
         //make this volatile so that we can ensure thread safety with a double check lock
-    	private static volatile string _reservedUrlsCache;
+        private static volatile string _reservedUrlsCache;
         private static string _reservedPathsCache;
         private static HashSet<string> _reservedList = new HashSet<string>();
         private static string _reservedPaths;
@@ -190,7 +190,7 @@ namespace Umbraco.Core.Configuration
         /// This will return the MVC area that we will route all custom routes through like surface controllers, etc...
         /// We will use the 'Path' (default ~/umbraco) to create it but since it cannot contain '/' and people may specify a path of ~/asdf/asdf/admin
         /// we will convert the '/' to '-' and use that as the path. its a bit lame but will work.
-		/// 
+        /// 
         /// We also make sure that the virtual directory (SystemDirectories.Root) is stripped off first, otherwise we'd end up with something
         /// like "MyVirtualDirectory-Umbraco" instead of just "Umbraco".
         /// </remarks>
@@ -205,7 +205,7 @@ namespace Umbraco.Core.Configuration
                 var path = Path;
                 if (path.StartsWith(SystemDirectories.Root)) // beware of TrimStart, see U4-2518
                     path = path.Substring(SystemDirectories.Root.Length);
-			    return path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
+                return path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
             }
         }
 
@@ -312,7 +312,7 @@ namespace Umbraco.Core.Configuration
                 SetMembershipProvidersLegacyEncoding(UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider, value);
             }
         }
-		
+        
         /// <summary>
         /// Saves a setting into the configuration file.
         /// </summary>
@@ -503,7 +503,7 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Returns a string value to determine if umbraco should skip version-checking.
+        /// Returns the number of days that should take place between version checks.
         /// </summary>
         /// <value>The version check period in days (0 = never).</value>
         public static int VersionCheckPeriod

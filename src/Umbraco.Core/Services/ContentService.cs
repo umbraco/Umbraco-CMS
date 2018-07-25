@@ -692,7 +692,7 @@ namespace Umbraco.Core.Services
                         totalChildren = 0;
                         return Enumerable.Empty<IContent>();
                     }
-                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", contentPath[0]), TextColumnType.NVarchar));
+                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", contentPath[0].Path), TextColumnType.NVarchar));
                 }
                     
 
@@ -737,7 +737,7 @@ namespace Umbraco.Core.Services
                         totalChildren = 0;
                         return Enumerable.Empty<IContent>();
                     }
-                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", contentPath[0]), TextColumnType.NVarchar));
+                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", contentPath[0].Path), TextColumnType.NVarchar));
                 }
 
                 return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalChildren, orderBy, orderDirection, orderBySystemField, filter);
@@ -884,8 +884,8 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateContentRepository(uow);
-                var query = Query<IContent>.Builder.Where(x => x.Published && x.ExpireDate <= DateTime.Now);
-                return repository.GetByQuery(query);
+                var query = Query<IContent>.Builder.Where(x => x.ExpireDate <= DateTime.Now);
+                return repository.GetByQuery(query).Where(x => x.HasPublishedVersion);
             }
         }
 
@@ -912,12 +912,10 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateContentRepository(uow);
-                var query = Query<IContent>.Builder.Where(x => x.Path.Contains(Constants.System.RecycleBinContent.ToInvariantString()));
+                var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith(Constants.System.RecycleBinContentPathPrefix));
                 return repository.GetByQuery(query);
             }
         }
-
-
 
         /// <summary>
         /// Checks whether an <see cref="IContent"/> item has any children
@@ -1874,7 +1872,7 @@ namespace Umbraco.Core.Services
                     }
                     copyEventArgs.CanCancel = false;
                     uow.Events.Dispatch(Copied, this, copyEventArgs);
-                    Audit(uow, AuditType.Copy, "Copy Content performed by user", content.WriterId, content.Id);
+                    Audit(uow, AuditType.Copy, "Copy Content performed by user", userId, content.Id);
                     uow.Commit();
                 }
 
@@ -2576,7 +2574,6 @@ namespace Umbraco.Core.Services
 
                     Audit(uow, AuditType.Publish, "Save and Publish performed by user", userId, content.Id);
                     uow.Commit();
-
                     return Attempt.If(publishStatus.StatusType == PublishStatusType.Success, publishStatus);
                 }
             }

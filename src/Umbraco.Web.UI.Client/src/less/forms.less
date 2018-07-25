@@ -544,6 +544,9 @@ input[type="checkbox"][readonly] {
   padding-left: 5px;
 }
 
+div.help {
+    margin-top: 5px;
+}
 
 
 // INPUT GROUPS
@@ -775,6 +778,8 @@ legend + .control-group {
       *padding-left: @horizontalComponentOffset;
     }
   }
+
+ 
   // Remove bottom margin on block level help text since that's accounted for on .control-group
   .help-block {
     margin-bottom: 0;
@@ -795,6 +800,14 @@ legend + .control-group {
     padding-left: @horizontalComponentOffset;
   }
 }
+
+// adjustments for properties tab
+.form-horizontal .block-form .control-label {
+  display: block;
+  float: none;
+  width: 100%;
+}
+
 //make sure buttons are always on top
 .umb-panel-buttons .umb-btn-toolbar .btn {
     position: relative;

@@ -81,7 +81,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Deletes a document type wth a given ID
+        /// Deletes a media type with a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -127,7 +127,22 @@ namespace Umbraco.Web.Editors
                 });
             return Request.CreateResponse(result);
         }
-
+        /// <summary>
+        /// Returns where a particular composition has been used
+        /// This has been wrapped in a dto instead of simple parameters to support having multiple parameters in post request body
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public HttpResponseMessage GetWhereCompositionIsUsedInContentTypes(GetAvailableCompositionsFilter filter)
+        {
+            var result = PerformGetWhereCompositionIsUsedInContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MediaType)
+                .Select(x => new
+                {
+                    contentType = x
+                });
+            return Request.CreateResponse(result);
+        }
         public MediaTypeDisplay GetEmpty(int parentId)
         {
             var ct = new MediaType(parentId) {Icon = "icon-picture"};
@@ -138,17 +153,16 @@ namespace Umbraco.Web.Editors
 
 
         /// <summary>
-        /// Returns all member types
+        /// Returns all media types
         /// </summary>
         public IEnumerable<ContentTypeBasic> GetAll()
         {
-
             return Services.ContentTypeService.GetAllMediaTypes()
                                .Select(Mapper.Map<IMediaType, ContentTypeBasic>);
         }
 
         /// <summary>
-        /// Deletes a document type container wth a given ID
+        /// Deletes a media type container wth a given ID
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

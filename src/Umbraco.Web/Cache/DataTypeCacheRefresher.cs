@@ -117,7 +117,6 @@ namespace Umbraco.Web.Cache
             LegacyMediaPickerPropertyConverter.ClearCaches();
             SliderValueConverter.ClearCaches();
             MediaPickerPropertyConverter.ClearCaches();
-            MultiNodeTreePickerPropertyConverter.ClearCaches();
 
 
             base.Refresh(jsonPayload);
