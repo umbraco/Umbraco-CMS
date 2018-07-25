@@ -60,10 +60,6 @@ function IconPickerOverlay($scope, iconHelper, localizationService) {
        $scope.model.color = color;
        $scope.submitForm($scope.model);
    };
-
-    $scope.changeColor = function (color) {
-        $scope.model.color = color;
-    };
 }
 
 angular.module("umbraco").controller("Umbraco.Overlays.IconPickerOverlay", IconPickerOverlay);
