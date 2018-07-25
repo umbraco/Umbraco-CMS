@@ -41,6 +41,9 @@
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
 
+                // Declare a fallback URL for the <umb-node-preview/> directive
+                scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
+
                 setNodePublishStatus(scope.node);
                 
             }
