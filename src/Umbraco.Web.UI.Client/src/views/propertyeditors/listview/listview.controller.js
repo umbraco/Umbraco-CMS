@@ -50,9 +50,10 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
    $scope.pagination = [];
    $scope.isNew = false;
+   $scope.isFirstLoad = true;
    $scope.actionInProgress = false;
    $scope.selection = [];
-   $scope.folders = [];   
+   $scope.folders = [];
    $scope.listViewResultSet = {
       totalPages: 0,
       items: []
@@ -71,7 +72,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
          "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
          "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
-         "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
+         "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M
          "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
          "canUnpublish": _.contains(currentUserPermissions, 'U'), //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
       };
@@ -81,7 +82,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    $scope.buttonPermissions = null;
 
    //When we are dealing with 'content', we need to deal with permissions on child nodes.
-   // Currently there is no real good way to 
+   // Currently there is no real good way to
    if ($scope.entityType === "content") {
 
       var idsWithPermissions = null;
@@ -253,8 +254,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
        $scope.reloadView($scope.contentId, true);
    }
 
-   $scope.reloadView = function (id, reloadFolders) {
-
+   $scope.reloadView = function (id, reloadFolders, reloadTree) {
       $scope.viewLoaded = false;
 
       listViewHelper.clearSelection($scope.listViewResultSet.items, $scope.folders, $scope.selection);
@@ -276,9 +276,17 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             mediaResource.getChildFolders($scope.contentId)
                     .then(function (folders) {
                        $scope.folders = folders;
-                       $scope.viewLoaded = true;
+                       $scope.viewLoaded  = true;
                     });
 
+            //Prevents tree reload on initial page load
+            if ($scope.isFirstLoad === false) {
+                //Reload tree
+                var mediaNode = appState.getTreeState("currentRootNode");
+                if (mediaNode) {
+                    navigationService.reloadNode(mediaNode.root);
+                }
+            }
          } else {
             $scope.viewLoaded = true;
          }
@@ -293,6 +301,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             $scope.reloadView(id);
          }
 
+         $scope.isFirstLoad = false;
       });
    };
 
@@ -458,7 +467,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
 
    function performMove(target) {
 
-       //NOTE: With the way this applySelected/serial works, I'm not sure there's a better way currently to return 
+       //NOTE: With the way this applySelected/serial works, I'm not sure there's a better way currently to return
        // a specific value from one of the methods, so we'll have to try this way. Even though the first method
        // will fire once per every node moved, the destination path will be the same and we need to use that to sync.
        var newPath = null;
