@@ -920,7 +920,9 @@ namespace Umbraco.Core.Services
                     var deletedContentTypes = new List<IContentType> { contentType };
                     deletedContentTypes.AddRange(GetDescendants(contentType));
 
-                    _contentService.DeleteContentOfTypes(deletedContentTypes.Select(x => x.Id), userId);
+                    var ids = deletedContentTypes.Select(x => x.Id).ToArray();
+                    _contentService.DeleteContentOfTypes(ids, userId);
+                    _contentService.DeleteBlueprintsOfTypes(ids);
 
                     repository.Delete(contentType);
                     deleteEventArgs.DeletedEntities = deletedContentTypes.DistinctBy(x => x.Id);

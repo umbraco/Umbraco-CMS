@@ -763,7 +763,21 @@ namespace umbraco.cms.businesslogic.packager
             if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true);
             Directory.CreateDirectory(tempDir);
 
-            ZipFile.ExtractToDirectory(zipName, tempDir);
+            //Have to open zip & get each entry & unzip to flatten
+            //Some Umbraco packages are nested in another folder, where others have all the files at the root
+            using (var archive = ZipFile.OpenRead(zipName))
+            {
+                foreach (var entry in archive.Entries)
+                {
+                    //Name will be empty if it's a folder
+                    //Otherwise its the filename - where FullName will include any nested folders too
+                    if (string.IsNullOrEmpty(entry.Name) == false)
+                    {
+                        var fullPath = Path.Combine(tempDir, entry.Name);
+                        entry.ExtractToFile(fullPath);
+                    }
+                }
+            }
 
             if (deleteFile)
             {
@@ -795,7 +809,9 @@ namespace umbraco.cms.businesslogic.packager
             var installationSummary = insPack.GetInstallationSummary(contentTypeService, dataTypeService, fileService, localizationService, macroService);
             installationSummary.PackageInstalled = true;
 
-            var args = new ImportPackageEventArgs<InstallationSummary>(installationSummary, false);
+            var metadata = insPack.GetMetaData();
+
+            var args = new ImportPackageEventArgs<InstallationSummary>(installationSummary, metadata, false);
             PackagingService.OnImportedPackage(args);
         }
     }

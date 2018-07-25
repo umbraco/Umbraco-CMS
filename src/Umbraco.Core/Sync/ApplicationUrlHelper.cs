@@ -55,7 +55,7 @@ namespace Umbraco.Core.Sync
                 if (newApplicationUrl)
                 {
                     appContext._umbracoApplicationDomains.Add(applicationUrl);
-                    LogHelper.Info(typeof(ApplicationUrlHelper), $"New ApplicationUrl detected: {applicationUrl}");
+                    LogHelper.Info(typeof(ApplicationUrlHelper), string.Format("New ApplicationUrl detected: {0}", applicationUrl));
                 }
             }
 

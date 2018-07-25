@@ -706,5 +706,6 @@ namespace Umbraco.Core.Models.Membership
                 return _user.GetHashCode();
             }
         }
+
     }
 }

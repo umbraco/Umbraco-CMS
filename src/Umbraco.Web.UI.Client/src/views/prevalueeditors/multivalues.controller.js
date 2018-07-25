@@ -5,6 +5,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiValuesControl
 
         $scope.newItem = "";
         $scope.hasError = false;
+        $scope.focusOnNew = false;
        
         if (!angular.isArray($scope.model.value)) {
 
@@ -43,6 +44,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiValuesControl
                     $scope.model.value.push({ value: $scope.newItem });
                     $scope.newItem = "";
                     $scope.hasError = false;
+                    $scope.focusOnNew = true;
                     return;
                 }
             }
@@ -72,6 +74,12 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiValuesControl
                 }
             }
         };
+
+        $scope.createNew = function (event) {
+            if (event.keyCode == 13) {
+                $scope.add(event);
+            }
+        }
 
         function getElementIndexByPrevalueText(value) {
             for (var i = 0; i < $scope.model.value.length; i++) {

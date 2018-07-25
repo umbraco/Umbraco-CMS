@@ -10,7 +10,7 @@ using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal abstract class RepositoryBase : DisposableObject
+    internal abstract class RepositoryBase : DisposableObjectSlim
     {
         private readonly IScopeUnitOfWork _work;
         private readonly CacheHelper _globalCache;
@@ -308,6 +308,9 @@ namespace Umbraco.Core.Persistence.Repositories
         public virtual void PersistNewItem(IEntity entity)
         {
             CachePolicy.Create((TEntity) entity, PersistNewItem);
+
+            //TODO: In v8 we should automatically reset dirty properties so they don't have to be manually reset in all of the implemented repositories
+            //if (entity is ICanBeDirty dirty) dirty.ResetDirtyProperties();
         }
 
         /// <summary>
@@ -317,6 +320,8 @@ namespace Umbraco.Core.Persistence.Repositories
         public virtual void PersistUpdatedItem(IEntity entity)
         {
             CachePolicy.Update((TEntity) entity, PersistUpdatedItem);
+            //TODO: In v8 we should automatically reset dirty properties so they don't have to be manually reset in all of the implemented repositories
+            //if (entity is ICanBeDirty dirty) dirty.ResetDirtyProperties();
         }
 
         /// <summary>

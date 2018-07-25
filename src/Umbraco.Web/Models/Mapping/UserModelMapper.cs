@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models.Mapping;
@@ -24,13 +25,18 @@ namespace Umbraco.Web.Models.Mapping
         {
             
             config.CreateMap<UserGroupSave, IUserGroup>()
-                .ConstructUsing((UserGroupSave save) => new UserGroup() { CreateDate = DateTime.Now })
+                .ConstructUsing((UserGroupSave save) => new UserGroup() { CreateDate = DateTime.UtcNow })
                 .IgnoreDeletableEntityCommonProperties()
                 .ForMember(dest => dest.Id, map => map.Condition(source => GetIntId(source.Id) > 0))
-                .ForMember(dest => dest.Id, map => map.MapFrom(source => GetIntId(source.Id)))                
-                .ForMember(dest => dest.Permissions, map => map.MapFrom(source => source.DefaultPermissions))
+                .ForMember(dest => dest.Id, map => map.MapFrom(source => GetIntId(source.Id)))
+                //TODO: This is insane - but with our current version of AutoMapper when mapping from an existing object to another existing object, it will map the private fields which means the public setter is not used! wtf. So zpqrtbnk will laugh and say how crappy AutoMapper is... well he'll win this battle this time, so we need to do this in AfterMap to make sure the public setter is used so the property is dirty
+                //.ForMember(dest => dest.Permissions, map => map.MapFrom(source => source.DefaultPermissions))
+                .ForMember(dest => dest.Permissions, map => map.Ignore())
                 .AfterMap((save, userGroup) =>
                 {
+                    //TODO: See above comment
+                    userGroup.Permissions = save.DefaultPermissions;
+
                     userGroup.ClearAllowedSections();
                     foreach (var section in save.Sections)
                     {
@@ -203,10 +209,24 @@ namespace Umbraco.Web.Models.Mapping
 
                     var allContentPermissions = applicationContext.Services.UserService.GetPermissions(@group, true)
                         .ToDictionary(x => x.EntityId, x => x);
-                    
-                    var contentEntities = allContentPermissions.Keys.Count == 0
-                        ? new IUmbracoEntity[0]
-                        : applicationContext.Services.EntityService.GetAll(UmbracoObjectTypes.Document, allContentPermissions.Keys.ToArray());
+
+                    IEnumerable<IUmbracoEntity> contentEntities;
+                    if (allContentPermissions.Keys.Count == 0)
+                    {
+                        contentEntities = new IUmbracoEntity[0];
+                    }
+                    else
+                    {
+                        // a group can end up with way more than 2000 assigned permissions,
+                        // so we need to break them into groups in order to avoid breaking
+                        // the entity service due to too many Sql parameters.
+
+                        var list = new List<IUmbracoEntity>();
+                        contentEntities = list;
+                        var entityService = applicationContext.Services.EntityService;
+                        foreach (var idGroup in allContentPermissions.Keys.InGroupsOf(2000))
+                            list.AddRange(entityService.GetAll(UmbracoObjectTypes.Document, idGroup.ToArray()));
+                    }
 
                     var allAssignedPermissions = new List<AssignedContentPermissions>();
                     foreach (var entity in contentEntities)
@@ -232,11 +252,13 @@ namespace Umbraco.Web.Models.Mapping
 
             //Important! Currently we are never mapping to multiple UserDisplay objects but if we start doing that
             // this will cause an N+1 and we'll need to change how this works.
+            
             config.CreateMap<IUser, UserDisplay>()
                 .ForMember(detail => detail.Avatars, opt => opt.MapFrom(user => user.GetUserAvatarUrls(applicationContext.ApplicationCache.RuntimeCache)))
                 .ForMember(detail => detail.Username, opt => opt.MapFrom(user => user.Username))
                 .ForMember(detail => detail.LastLoginDate, opt => opt.MapFrom(user => user.LastLoginDate == default(DateTime) ? null : (DateTime?) user.LastLoginDate))
                 .ForMember(detail => detail.UserGroups, opt => opt.MapFrom(user => user.Groups))
+                .ForMember(detail => detail.Navigation, opt => opt.MapFrom(user => CreateUserEditorNavigation(applicationContext.Services.TextService)))
                 .ForMember(
                     detail => detail.CalculatedStartContentIds,
                     opt => opt.MapFrom(user => GetStartNodeValues(
@@ -356,6 +378,21 @@ namespace Umbraco.Web.Models.Mapping
 
             config.CreateMap<IProfile, UserProfile>()
                   .ForMember(detail => detail.UserId, opt => opt.MapFrom(profile => GetIntId(profile.Id)));
+        }
+
+        private IEnumerable<EditorNavigation> CreateUserEditorNavigation(ILocalizedTextService textService)
+        {
+            return new[]
+            {
+                new EditorNavigation
+                {
+                    Active = true,
+                    Alias = "details",
+                    Icon = "icon-umb-users",
+                    Name = textService.Localize("general/user"),
+                    View = "views/users/views/user/details.html"
+                }
+            };
         }
 
         private IEnumerable<EntityBasic> GetStartNodeValues(int[] startNodeIds,

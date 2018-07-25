@@ -389,7 +389,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
-                var query = Query<IMedia>.Builder.Where(x => x.Level == level && x.Path.StartsWith("-21") == false);
+                var query = Query<IMedia>.Builder.Where(x => x.Level == level && x.Path.StartsWith(Constants.System.RecycleBinMediaPathPrefix) == false);
                 return repository.GetByQuery(query);
             }
         }
@@ -440,7 +440,7 @@ namespace Umbraco.Core.Services
         /// <returns>An Enumerable list of <see cref="IMedia"/> objects</returns>
         public IEnumerable<IMedia> GetAncestors(IMedia media)
         {
-            var ids = media.Path.Split(',').Where(x => x != "-1" && x != media.Id.ToString(CultureInfo.InvariantCulture)).Select(int.Parse).ToArray();
+            var ids = media.Path.Split(',').Where(x => x != Constants.System.RootString && x != media.Id.ToString(CultureInfo.InvariantCulture)).Select(int.Parse).ToArray();
             if (ids.Any() == false)
                 return new List<IMedia>();
 
@@ -609,7 +609,7 @@ namespace Umbraco.Core.Services
                         totalChildren = 0;
                         return Enumerable.Empty<IMedia>();
                     }
-                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", mediaPath[0]), TextColumnType.NVarchar));
+                    query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", mediaPath[0].Path), TextColumnType.NVarchar));
                 }
                 IQuery<IMedia> filterQuery = null;
                 if (filter.IsNullOrWhiteSpace() == false)
@@ -673,7 +673,7 @@ namespace Umbraco.Core.Services
         /// <returns>Parent <see cref="IMedia"/> object</returns>
         public IMedia GetParent(IMedia media)
         {
-            if (media.ParentId == -1 || media.ParentId == -21)
+            if (media.ParentId == Constants.System.Root || media.ParentId == Constants.System.RecycleBinMedia)
                 return null;
 
             return GetById(media.ParentId);
@@ -703,7 +703,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
-                var query = Query<IMedia>.Builder.Where(x => x.ParentId == -1);
+                var query = Query<IMedia>.Builder.Where(x => x.ParentId == Constants.System.Root);
                 return repository.GetByQuery(query);
             }
         }
@@ -717,7 +717,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateMediaRepository(uow);
-                var query = Query<IMedia>.Builder.Where(x => x.Path.Contains("-21"));
+                var query = Query<IMedia>.Builder.Where(x => x.Path.StartsWith(Constants.System.RecycleBinMediaPathPrefix));
                 return repository.GetByQuery(query);
             }
         }
@@ -767,7 +767,7 @@ namespace Umbraco.Core.Services
             using (new WriteLock(Locker))
             {
                 //This ensures that the correct method is called if this method is used to Move to recycle bin.
-                if (parentId == -21)
+                if (parentId == Constants.System.RecycleBinMedia)
                 {
                     MoveToRecycleBin(media, userId);
                     return;
@@ -868,7 +868,7 @@ namespace Umbraco.Core.Services
 
             var repository = RepositoryFactory.CreateMediaRepository(uow);
             repository.Delete(media);
-            deleteEventArgs.CanCancel = false;            
+            deleteEventArgs.CanCancel = false;
             uow.Events.Dispatch(Deleted, this, deleteEventArgs);
 
             Audit(uow, AuditType.Delete, "Delete Media performed by user", userId, media.Id);
@@ -1003,7 +1003,7 @@ namespace Umbraco.Core.Services
                     recycleBinEventArgs.RecycleBinEmptiedSuccessfully = success;
                     uow.Events.Dispatch(EmptiedRecycleBin, this, recycleBinEventArgs);
 
-                    Audit(uow, AuditType.Delete, "Empty Media Recycle Bin performed by user", 0, -21);
+                    Audit(uow, AuditType.Delete, "Empty Media Recycle Bin performed by user", 0, Constants.System.RecycleBinMedia);
                     uow.Commit();
                 }
             }

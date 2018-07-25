@@ -188,20 +188,19 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Select("un.*")
                 .From("umbracoNode AS un")
                 .InnerJoin("cmsMember2MemberGroup")
-                .On("un.id = cmsMember2MemberGroup.MemberGroup")
-                .LeftJoin("(SELECT umbracoNode.id, cmsMember.LoginName FROM umbracoNode INNER JOIN cmsMember ON umbracoNode.id = cmsMember.nodeId) AS member")
-                .On("member.id = cmsMember2MemberGroup.Member")
-                .Where("un.nodeObjectType=@objectType", new {objectType = NodeObjectTypeId })
-                .Where("member.LoginName=@loginName", new {loginName = username});
+                .On("cmsMember2MemberGroup.MemberGroup = un.id")
+                .InnerJoin("cmsMember")
+                .On("cmsMember.nodeId = cmsMember2MemberGroup.Member")
+                .Where("un.nodeObjectType=@objectType", new { objectType = NodeObjectTypeId })
+                .Where("cmsMember.LoginName=@loginName", new { loginName = username });
             
             return Database.Fetch<NodeDto>(sql)
                 .DistinctBy(dto => dto.NodeId)
                 .Select(x => _modelFactory.BuildEntity(x));
         }
 
-        public void AssignRoles(string[] usernames, string[] roleNames)
+        public int[] GetMemberIds(string[] names)
         {
-            //first get the member ids based on the usernames
             var memberSql = new Sql();
             var memberObjectType = new Guid(Constants.ObjectTypes.Member);
             memberSql.Select("umbracoNode.id")
@@ -209,25 +208,19 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<MemberDto>()
                 .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
-                .Where("cmsMember.LoginName in (@usernames)", new { usernames = usernames });
-            var memberIds = Database.Fetch<int>(memberSql).ToArray();
+                .Where("cmsMember.LoginName in (@names)", new { names });
+            return Database.Fetch<int>(memberSql).ToArray();
+        }
 
+        public void AssignRoles(string[] usernames, string[] roleNames)
+        {
+            var memberIds = GetMemberIds(usernames);
             AssignRolesInternal(memberIds, roleNames);            
         }
 
         public void DissociateRoles(string[] usernames, string[] roleNames)
         {
-            //first get the member ids based on the usernames
-            var memberSql = new Sql();
-            var memberObjectType = new Guid(Constants.ObjectTypes.Member);
-            memberSql.Select("umbracoNode.id")
-                .From<NodeDto>()
-                .InnerJoin<MemberDto>()
-                .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
-                .Where("cmsMember.LoginName in (@usernames)", new { usernames = usernames });
-            var memberIds = Database.Fetch<int>(memberSql).ToArray();
-
+            var memberIds = GetMemberIds(usernames);
             DissociateRolesInternal(memberIds, roleNames);
         }
 
@@ -249,7 +242,7 @@ namespace Umbraco.Core.Persistence.Repositories
                .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
                .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
             var existingRoles = Database.Fetch<NodeDto>(existingSql).Select(x => x.Text);
-            var missingRoles = roleNames.Except(existingRoles);
+            var missingRoles = roleNames.Except(existingRoles, StringComparer.CurrentCultureIgnoreCase);
             var missingGroups = missingRoles.Select(x => new MemberGroup {Name = x}).ToArray();
 
             if (UnitOfWork.Events.DispatchCancelable(SavingMemberGroup, this, new SaveEventArgs<IMemberGroup>(missingGroups)))
@@ -287,8 +280,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 //exist in the roleNames list, then determine which ones are not currently assigned.
                 var mId = memberId;
                 var found = currentlyAssigned.Where(x => x.MemberId == mId).ToArray();
-                var assignedRoles = found.Where(x => roleNames.Contains(x.RoleName)).Select(x => x.RoleName);
-                var nonAssignedRoles = roleNames.Except(assignedRoles);
+                var assignedRoles = found.Where(x => roleNames.Contains(x.RoleName,StringComparer.CurrentCultureIgnoreCase)).Select(x => x.RoleName);
+                var nonAssignedRoles = roleNames.Except(assignedRoles, StringComparer.CurrentCultureIgnoreCase);
                 foreach (var toAssign in nonAssignedRoles)
                 {
                     var groupId = rolesForNames.First(x => x.Text == toAssign).NodeId;

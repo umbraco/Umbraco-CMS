@@ -239,18 +239,18 @@ function Prepare-Tests
   
   # data
   Write-Host "Copy data files"
-  if( -Not (Test-Path -Path "$tmp\tests\Packaging" ) )
+  if (-Not (Test-Path -Path "$tmp\tests\Packaging" ) )
   {
     Write-Host "Create packaging directory"
-    New-Item -ItemType directory -Path "$tmp\tests\Packaging"
+    mkdir "$tmp\tests\Packaging" > $null
   }
   Copy-Files "$src\Umbraco.Tests\Packaging\Packages" "*" "$tmp\tests\Packaging\Packages"
   
   # required for package install tests  
-  if( -Not (Test-Path -Path "$tmp\tests\bin" ) )
+  if (-Not (Test-Path -Path "$tmp\tests\bin" ) )
   {
     Write-Host "Create bin directory"
-    New-Item -ItemType directory -Path "$tmp\tests\bin"
+    mkdir "$tmp\tests\bin" > $null
   }
 }
 
@@ -376,7 +376,7 @@ function Prepare-Packages
   Copy-Files "$src\Umbraco.Web.UI\umbraco\js" "*" "$tmp\WebApp\umbraco\js"
   Copy-Files "$src\Umbraco.Web.UI\umbraco\lib" "*" "$tmp\WebApp\umbraco\lib"
   Copy-Files "$src\Umbraco.Web.UI\umbraco\views" "*" "$tmp\WebApp\umbraco\views"
-  Copy-Files "$src\Umbraco.Web.UI\umbraco\preview" "*" "$tmp\WebApp\umbraco\preview"
+
 }
 
 #
@@ -445,7 +445,7 @@ function Restore-NuGet
   Write-Host ">> Restore NuGet"
   Write-Host "Logging to $tmp\nuget.restore.log" 
   
-  &$uenv.NuGet restore "$src\Umbraco.sln" > "$tmp\nuget.restore.log"
+  &$uenv.NuGet restore "$src\Umbraco.sln" -configfile "$src\NuGet.config" > "$tmp\nuget.restore.log"
 }
 
 #

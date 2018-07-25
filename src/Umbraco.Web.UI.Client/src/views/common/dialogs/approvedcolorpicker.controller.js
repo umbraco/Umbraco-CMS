@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.Dialogs.ApprovedColorPickerController", function ($scope, $http, umbPropEditorHelper, assetsService) {
-        assetsService.loadJs("lib/cssparser/cssparser.js")
+        assetsService.loadJs("lib/cssparser/cssparser.js", $scope)
 			    .then(function () {
 
 			        var cssPath = $scope.dialogData.cssPath;
@@ -19,7 +19,7 @@ angular.module("umbraco")
                             $scope.classes.splice(0, 0, "noclass");
                         })
 
-			        assetsService.loadCss("/App_Plugins/Lecoati.uSky.Grid/lib/uSky.Grid.ApprovedColorPicker.css");
-			        assetsService.loadCss(cssPath);
+                    assetsService.loadCss("/App_Plugins/Lecoati.uSky.Grid/lib/uSky.Grid.ApprovedColorPicker.css", $scope);
+                    assetsService.loadCss(cssPath, $scope);
 			    });
 });

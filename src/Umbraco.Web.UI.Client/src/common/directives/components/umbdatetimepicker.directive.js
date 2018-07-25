@@ -92,10 +92,10 @@ Use this directive to render a date time picker
                 scope.hasTranscludedContent = element.find('.js-datePicker__transcluded-content')[0].children.length > 0;
 
                 // load css file for the date picker
-                assetsService.loadCss('lib/datetimepicker/bootstrap-datetimepicker.min.css');
+                assetsService.loadCss('lib/datetimepicker/bootstrap-datetimepicker.min.css', scope);
                 
                 // load the js file for the date picker
-                assetsService.loadJs('lib/datetimepicker/bootstrap-datetimepicker.js').then(function () {
+                assetsService.loadJs('lib/datetimepicker/bootstrap-datetimepicker.js', scope).then(function () {
                     // init date picker
                     initDatePicker();
                 });

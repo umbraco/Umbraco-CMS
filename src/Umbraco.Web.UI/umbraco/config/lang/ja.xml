@@ -976,6 +976,12 @@ Runwayをインストールして作られた新しいウェブサイトがど�
   </area>
 
   <area alias="grid">
+      <key alias="rte">Rich Text Editor</key>
+    <key alias="media">Image</key>
+    <key alias="macro">Macro</key>
+    <key alias="embed">Embed</key>
+    <key alias="headline">Headline</key>
+    <key alias="quote">Quote</key>
     <key alias="insertControl">挿入するアイテムを選択する</key>
     <key alias="addLayout">レイアウトを選択</key>
     <key alias="addRows">行の追加</key>

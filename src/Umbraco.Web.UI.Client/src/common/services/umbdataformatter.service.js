@@ -56,7 +56,7 @@
                     });
 
                     var saveProperties = _.map(realProperties, function (p) {
-                        var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile');
+                        var saveProperty = _.pick(p, 'id', 'alias', 'description', 'validation', 'label', 'sortOrder', 'dataTypeId', 'groupId', 'memberCanEdit', 'showOnMemberProfile', 'isSensitiveData');
                         return saveProperty;
                     });
 
@@ -96,6 +96,28 @@
                         value: preValues[i].value
                     });
                 }
+                return saveModel;
+            },
+
+            /** formats the display model used to display the dictionary to the model used to save the dictionary */
+            formatDictionaryPostData : function(dictionary, nameIsDirty) {
+                var saveModel = {
+                    parentId: dictionary.parentId,
+                    id: dictionary.id,
+                    name: dictionary.name,
+                    nameIsDirty: nameIsDirty,
+                    translations: [],
+                    key : dictionary.key
+                };
+
+                for(var i = 0; i < dictionary.translations.length; i++) {
+                    saveModel.translations.push({
+                        isoCode: dictionary.translations[i].isoCode,
+                        languageId: dictionary.translations[i].languageId,
+                        translation: dictionary.translations[i].translation
+                    });
+                }
+
                 return saveModel;
             },
 
@@ -267,10 +289,10 @@
                             // by looking at the key
                             switch (foundAlias[0]) {
                                 case "umbracoMemberLockedOut":
-                                    saveModel.isLockedOut = prop.value.toString() === "1" ? true : false;
+                                    saveModel.isLockedOut = prop.value ? (prop.value.toString() === "1" ? true : false) : false;
                                     break;
                                 case "umbracoMemberApproved":
-                                    saveModel.isApproved = prop.value.toString() === "1" ? true : false;
+                                    saveModel.isApproved = prop.value ? (prop.value.toString() === "1" ? true : false) : true;
                                     break;
                                 case "umbracoMemberComments":
                                     saveModel.comments = prop.value;
@@ -304,14 +326,14 @@
                     _.each(tab.properties, function (prop) {
 
                         //don't include the custom generic tab properties
-                        if (!prop.alias.startsWith("_umb_")) {
+                        //don't include a property that is marked readonly
+                        if (!prop.alias.startsWith("_umb_") && !prop.readonly) {
                             saveModel.properties.push({
                                 id: prop.id,
                                 alias: prop.alias,
                                 value: prop.value
                             });
                         }
-
                     });
                 });
 

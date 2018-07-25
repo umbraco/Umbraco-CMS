@@ -43,15 +43,17 @@
             setSectionName();
 
             userService.getCurrentUser().then(function (user) {
-
+                
                 vm.userType = user.userType;
                 vm.userLang = user.locale;
+
+                vm.hasAccessToSettings = _.contains(user.allowedSections, 'settings');                
 
                 evts.push(eventsService.on("appState.treeState.changed", function (e, args) {
                     handleSectionChange();
                 }));
 
-                findHelp(vm.section, vm.tree, vm.usertype, vm.userLang);
+                findHelp(vm.section, vm.tree, vm.userType, vm.userLang);
 
             });
             
@@ -76,17 +78,20 @@
                     vm.tree = $routeParams.tree;
 
                     setSectionName();
-                    findHelp(vm.section, vm.tree, vm.usertype, vm.userLang);
+                    findHelp(vm.section, vm.tree, vm.userType, vm.userLang);
 
                 }
             });
         }
 
         function findHelp(section, tree, usertype, userLang) {
+
+            if (vm.hasAccessToSettings) {
+                helpService.getContextHelpForPage(section, tree).then(function (topics) {
+                    vm.topics = topics;
+                });
+            }
             
-            helpService.getContextHelpForPage(section, tree).then(function (topics) {
-                vm.topics = topics;
-            });
 
             var rq = {};
             rq.section = vm.section;
@@ -108,10 +113,12 @@
                 rq.path = rq.section + "/" + $routeParams.tree + "/" + $routeParams.method;
             }
 
-            helpService.findVideos(rq).then(function(videos){
-    	        vm.videos = videos;
-            });
-            
+
+            if (vm.hasAccessToSettings) {
+                helpService.findVideos(rq).then(function (videos) {
+                    vm.videos = videos;
+                });
+            }                       
         }
 
         function setSectionName() {
@@ -124,7 +131,7 @@
 
         function showTourButton(index, tourGroup) {
             if(index !== 0) {
-                var prevTour = tourGroup[index - 1];
+                var prevTour = tourGroup.tours[index - 1];
                 if(prevTour.completed) {
                     return true;
                 }
@@ -147,12 +154,12 @@
             // Finding out, how many tours are completed for the progress circle
             angular.forEach(vm.tours, function(group){
                 var completedTours = 0;
-                angular.forEach(group, function(tour){
+                angular.forEach(group.tours, function(tour){
                     if(tour.completed) {
                         completedTours++;
                     }
                 });
-                group.completedPercentage = Math.round((completedTours/group.length)*100);
+                group.completedPercentage = Math.round((completedTours/group.tours.length)*100);
             });
         }
 

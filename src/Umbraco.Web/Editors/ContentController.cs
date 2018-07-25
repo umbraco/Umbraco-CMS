@@ -67,7 +67,9 @@ namespace Umbraco.Web.Editors
             public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetNiceUrl", "id", typeof(int), typeof(Guid), typeof(Udi))));
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetNiceUrl", "id", typeof(int), typeof(Guid), typeof(Udi)),
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))    
+                ));
             }
         }
 
@@ -80,7 +82,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
         {
             var foundContent = Services.ContentService.GetByIds(ids);
-            return foundContent.Select(Mapper.Map<IContent, ContentItemDisplay>);
+            return foundContent.Select(content => AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(content, UmbracoContext));
         }
 
         /// <summary>
@@ -100,7 +102,7 @@ namespace Umbraco.Web.Editors
 
             var content = Services.ContentService.GetById(saveModel.ContentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-            
+
             //current permissions explicitly assigned to this content item
             var contentPermissions = Services.ContentService.GetPermissionsForEntity(content)
                 .ToDictionary(x => x.UserGroupId, x => x);
@@ -136,10 +138,10 @@ namespace Umbraco.Web.Editors
                     //if they are different we need to update, otherwise there's nothing to update
                     else if (contentPermissions.ContainsKey(userGroup.Id) == false || contentPermissions[userGroup.Id].AssignedPermissions.UnsortedSequenceEqual(groupPermissionCodes) == false)
                     {
-                        
+
                         Services.UserService.ReplaceUserGroupPermissions(userGroup.Id, groupPermissionCodes.Select(x => x[0]), content.Id);
-                    }                    
-                }                
+                    }
+                }
             }
 
             return GetDetailedPermissions(content, allUserGroups);
@@ -158,7 +160,7 @@ namespace Umbraco.Web.Editors
         {
             if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             var content = Services.ContentService.GetById(contentId);
-            if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));            
+            if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
             //TODO: Should non-admins be able to see detailed permissions?
 
@@ -195,9 +197,9 @@ namespace Umbraco.Web.Editors
                     permission.Checked = false;
                     permission.Checked = assignedGroupPermission.AssignedPermissions.Contains(permission.PermissionCode, StringComparer.InvariantCulture);
                 }
-                
+
             }
-            
+
             return defaultPermissionsByGroup;
         }
 
@@ -219,7 +221,7 @@ namespace Umbraco.Web.Editors
                 Path = "-1," + Constants.System.RecycleBinContent
             };
 
-            TabsAndPropertiesResolver.AddListView(display, "content", Services.DataTypeService, Services.TextService);
+            TabsAndPropertiesResolver<IContent>.AddListView(display, "content", Services.DataTypeService, Services.TextService);
 
             return display;
         }
@@ -232,7 +234,7 @@ namespace Umbraco.Web.Editors
                 HandleContentNotFound(id);
             }
 
-            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            var content = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
 
             SetupBlueprint(content, foundContent);
 
@@ -246,10 +248,10 @@ namespace Umbraco.Web.Editors
             //set a custom path since the tree that renders this has the content type id as the parent
             content.Path = string.Format("-1,{0},{1}", persistedContent.ContentTypeId, content.Id);
 
-            content.AllowedActions = new[] {"A"};
+            content.AllowedActions = new[] { "A" };
             content.IsBlueprint = true;
 
-            var excludeProps = new[] {"_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template"};
+            var excludeProps = new[] { "_umb_urls", "_umb_releasedate", "_umb_expiredate", "_umb_template" };
             var propsTab = content.Tabs.Last();
             propsTab.Properties = propsTab.Properties
                 .Where(p => excludeProps.Contains(p.Alias) == false);
@@ -270,8 +272,45 @@ namespace Umbraco.Web.Editors
                 HandleContentNotFound(id);
             }
 
-            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            var content = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
             return content;
+        }
+
+        /// <summary>
+        /// Gets the content json for the content id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [OutgoingEditorModelEvent]
+        [EnsureUserPermissionForContent("id")]
+        public ContentItemDisplay GetById(Guid id)
+        {
+            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
+            if (foundContent == null)
+            {
+                HandleContentNotFound(id);
+            }
+
+            var content = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
+            return content;
+        }
+
+        /// <summary>
+        /// Gets the content json for the content id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [OutgoingEditorModelEvent]
+        [EnsureUserPermissionForContent("id")]
+        public ContentItemDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi != null)
+            {
+                return GetById(guidUdi.Guid);
+            }
+
+            throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
         [EnsureUserPermissionForContent("id")]
@@ -283,7 +322,7 @@ namespace Umbraco.Web.Editors
                 HandleContentNotFound(id);
             }
 
-            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            var content = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
             return content;
         }
 
@@ -306,7 +345,7 @@ namespace Umbraco.Web.Editors
             }
 
             var emptyContent = Services.ContentService.CreateContent("", parentId, contentType.Alias, UmbracoUser.Id);
-            var mapped = Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
+            var mapped = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(emptyContent, UmbracoContext);
 
             //remove this tab if it exists: umbContainerView
             var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
@@ -373,13 +412,13 @@ namespace Umbraco.Web.Editors
             {
                 return GetNiceUrl(guidUdi.Guid);
             }
-            throw new HttpResponseException(HttpStatusCode.NotFound);            
+            throw new HttpResponseException(HttpStatusCode.NotFound);
         }
 
         /// <summary>
         /// Gets the children for the content id passed in
         /// </summary>
-        /// <returns></returns>        
+        /// <returns></returns>
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IContent>>), "Items")]
         public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
                 int id,
@@ -389,7 +428,25 @@ namespace Umbraco.Web.Editors
                 Direction orderDirection = Direction.Ascending,
                 bool orderBySystemField = true,
                 string filter = "")
-        {            
+        {
+            return GetChildren(id, null, pageNumber, pageSize, orderBy, orderDirection, orderBySystemField, filter);
+        }
+
+        /// <summary>
+        /// Gets the children for the content id passed in
+        /// </summary>
+        /// <returns></returns>
+        [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IContent>>), "Items")]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
+                int id,
+                string includeProperties,
+                int pageNumber = 0,  //TODO: This should be '1' as it's not the index
+                int pageSize = 0,
+                string orderBy = "SortOrder",
+                Direction orderDirection = Direction.Ascending,
+                bool orderBySystemField = true,
+                string filter = "")
+        {
             long totalChildren;
             IContent[] children;
             if (pageNumber > 0 && pageSize > 0)
@@ -410,8 +467,16 @@ namespace Umbraco.Web.Editors
             }
 
             var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(totalChildren, pageNumber, pageSize);
-            pagedResult.Items = children
-                    .Select(Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>);
+            pagedResult.Items = children.Select(content =>
+                Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>(content,
+                    opts =>
+                    {
+                        // if there's a list of property aliases to map - we will make sure to store this in the mapping context.
+                        if (String.IsNullOrWhiteSpace(includeProperties) == false)
+                        {
+                            opts.Items["IncludeProperties"] = includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries);
+                        }
+                    }));
 
             return pagedResult;
         }
@@ -433,7 +498,7 @@ namespace Umbraco.Web.Editors
         {
             var permissions = Services.UserService
                     .GetPermissions(Security.CurrentUser, nodeIds);
-            
+
             var permissionsDictionary = new Dictionary<int, string[]>();
             foreach (var nodeId in nodeIds)
             {
@@ -487,7 +552,7 @@ namespace Umbraco.Web.Editors
             var notificationModel = new SimpleNotificationModel();
             notificationModel.AddSuccessNotification(
                 Services.TextService.Localize("blueprints/createdBlueprintHeading"),
-                Services.TextService.Localize("blueprints/createdBlueprintMessage", new[]{ content.Name})
+                Services.TextService.Localize("blueprints/createdBlueprintMessage", new[] { content.Name })
             );
 
             return notificationModel;
@@ -532,11 +597,12 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [FileUploadCleanupFilter]
         [ContentPostValidate]
+        [OutgoingEditorModelEvent]
         public ContentItemDisplay PostSave(
                 [ModelBinder(typeof(ContentItemBinder))]
                                 ContentItemSave contentItem)
         {
-            return PostSaveInternal(contentItem, 
+            return PostSaveInternal(contentItem,
                 content => Services.ContentService.WithResult().Save(contentItem.PersistedContent, Security.CurrentUser.Id));
         }
 
@@ -562,7 +628,7 @@ namespace Umbraco.Web.Editors
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the modelstate to the outgoing object and throw a validation message
-                    var forDisplay = Mapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent);
+                    var forDisplay = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(contentItem.PersistedContent, UmbracoContext);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
 
@@ -604,7 +670,7 @@ namespace Umbraco.Web.Editors
             }
 
             //return the updated model
-            var display = Mapper.Map<IContent, ContentItemDisplay>(contentItem.PersistedContent);
+            var display = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(contentItem.PersistedContent, UmbracoContext);
 
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
@@ -834,7 +900,7 @@ namespace Umbraco.Web.Editors
         {
             var toCopy = ValidateMoveOrCopy(copy);
 
-            var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive);
+            var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, Security.CurrentUser.Id);
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(c.Path, Encoding.UTF8, "application/json");
@@ -847,6 +913,7 @@ namespace Umbraco.Web.Editors
         /// <param name="id"></param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("id", 'U')]
+        [OutgoingEditorModelEvent]
         public ContentItemDisplay PostUnPublish(int id)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
@@ -856,7 +923,7 @@ namespace Umbraco.Web.Editors
 
             var unpublishResult = Services.ContentService.WithResult().UnPublish(foundContent, Security.CurrentUser.Id);
 
-            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            var content = AutoMapperExtensions.MapWithUmbracoContext<IContent, ContentItemDisplay>(foundContent, UmbracoContext);
 
             if (unpublishResult == false)
             {
@@ -1055,7 +1122,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            
+
             var hasPathAccess = (nodeId == Constants.System.Root)
                 ? user.HasContentRootAccess(entityService)
                 : (nodeId == Constants.System.RecycleBinContent)
@@ -1080,7 +1147,7 @@ namespace Umbraco.Web.Editors
             var allowed = true;
             foreach (var p in permissionsToCheck)
             {
-                if (permission == null 
+                if (permission == null
                     || permission.GetAllPermissions().Contains(p.ToString(CultureInfo.InvariantCulture)) == false)
                 {
                     allowed = false;

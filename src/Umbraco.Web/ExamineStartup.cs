@@ -22,6 +22,7 @@ namespace Umbraco.Web
         private readonly List<BaseIndexProvider> _indexesToRebuild = new List<BaseIndexProvider>();
         private readonly ApplicationContext _appCtx;
         private readonly ProfilingLogger _profilingLogger;
+        private static bool _isConfigured = false;
 
         //this is used if we are not the MainDom, in which case we need to ensure that if indexes need rebuilding that this
         //doesn't occur since that should only occur when we are MainDom
@@ -89,24 +90,7 @@ namespace Umbraco.Web
         /// </summary>
         public void Complete()
         {
-            //We now need to disable waiting for indexing for Examine so that the appdomain is shutdown immediately and doesn't wait for pending
-            //indexing operations. We used to wait for indexing operations to complete but this can cause more problems than that is worth because
-            //that could end up halting shutdown for a very long time causing overlapping appdomains and many other problems.
-            foreach (var luceneIndexer in ExamineManager.Instance.IndexProviderCollection.OfType<LuceneIndexer>())
-            {
-                luceneIndexer.WaitForIndexQueueOnShutdown = false;
-
-                //we should check if the index is locked ... it shouldn't be! We are using simple fs lock now and we are also ensuring that
-                //the indexes are not operational unless MainDom is true so if _disableExamineIndexing is false then we should be in charge
-                if (_disableExamineIndexing == false)
-                {
-                    var dir = luceneIndexer.GetLuceneDirectory();
-                    if (IndexWriter.IsLocked(dir))
-                    {
-                        IndexWriter.Unlock(dir);
-                    }
-                }
-            }
+            EnsureUnlockedAndConfigured();
 
             //Ok, now that everything is complete we'll check if we've stored any references to index that need rebuilding and run them
             // (see the initialize method for notes) - we'll ensure we remove the event handler too in case examine manager doesn't actually
@@ -130,6 +114,8 @@ namespace Umbraco.Web
         {
             //don't do anything if we have disabled this
             if (_disableExamineIndexing) return;
+
+            EnsureUnlockedAndConfigured();
 
             //If the developer has explicitly opted out of rebuilding indexes on startup then we
             // should adhere to that and not do it, this means that if they are load balancing things will be
@@ -166,6 +152,40 @@ namespace Umbraco.Web
             // return
             foreach (var index in indexes)
                 yield return index;
+        }
+
+        /// <summary>
+        /// Must be called to configure each index and ensure it's unlocked before any indexing occurs
+        /// </summary>
+        /// <remarks>
+        /// Indexing rebuilding can occur on a normal boot if the indexes are empty or on a cold boot by the database server messenger. Before
+        /// either of these happens, we need to configure the indexes.
+        /// </remarks>
+        private void EnsureUnlockedAndConfigured()
+        {
+            if (_isConfigured) return;
+
+            _isConfigured = true;
+
+            foreach (var luceneIndexer in ExamineManager.Instance.IndexProviderCollection.OfType<LuceneIndexer>())
+            {
+                //We now need to disable waiting for indexing for Examine so that the appdomain is shutdown immediately and doesn't wait for pending
+                //indexing operations. We used to wait for indexing operations to complete but this can cause more problems than that is worth because
+                //that could end up halting shutdown for a very long time causing overlapping appdomains and many other problems.
+                luceneIndexer.WaitForIndexQueueOnShutdown = false;
+
+                //we should check if the index is locked ... it shouldn't be! We are using simple fs lock now and we are also ensuring that
+                //the indexes are not operational unless MainDom is true so if _disableExamineIndexing is false then we should be in charge
+                if (_disableExamineIndexing == false)
+                {
+                    var dir = luceneIndexer.GetLuceneDirectory();
+                    if (IndexWriter.IsLocked(dir))
+                    {
+                        _profilingLogger.Logger.Info<ExamineStartup>("Forcing index " + luceneIndexer.IndexSetName + " to be unlocked since it was left in a locked state");
+                        IndexWriter.Unlock(dir);
+                    }
+                }
+            }
         }
 
         private void OnInstanceOnBuildingEmptyIndexOnStartup(object sender, BuildingEmptyIndexOnStartupEventArgs args)

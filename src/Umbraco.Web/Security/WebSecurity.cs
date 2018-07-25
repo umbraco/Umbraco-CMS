@@ -23,7 +23,7 @@ namespace Umbraco.Web.Security
     /// <summary>
     /// A utility class used for dealing with USER security in Umbraco
     /// </summary>
-    public class WebSecurity : DisposableObject
+    public class WebSecurity : DisposableObjectSlim
     {
         private HttpContextBase _httpContext;
         private ApplicationContext _applicationContext;

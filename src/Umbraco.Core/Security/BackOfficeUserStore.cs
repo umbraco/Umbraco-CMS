@@ -18,7 +18,7 @@ using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Core.Security
 {
-    public class BackOfficeUserStore : DisposableObject, 
+    public class BackOfficeUserStore : DisposableObjectSlim, 
         IUserStore<BackOfficeIdentityUser, int>, 
         IUserPasswordStore<BackOfficeIdentityUser, int>, 
         IUserEmailStore<BackOfficeIdentityUser, int>, 
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObject"/> which handles common required locking logic.
+        /// Handles the disposal of resources. Derived from abstract class <see cref="DisposableObjectSlim"/> which handles common required locking logic.
         /// </summary>
         protected override void DisposeResources()
         {
@@ -622,7 +622,7 @@ namespace Umbraco.Core.Security
         private bool UpdateMemberProperties(IUser user, BackOfficeIdentityUser identityUser)
         {
             var anythingChanged = false;
-            
+
             //don't assign anything if nothing has changed as this will trigger the track changes of the model
 
             if (identityUser.IsPropertyDirty("LastLoginDateUtc")
@@ -631,6 +631,13 @@ namespace Umbraco.Core.Security
             {
                 anythingChanged = true;
                 user.LastLoginDate = identityUser.LastLoginDateUtc.Value.ToLocalTime();
+            }
+            if (identityUser.IsPropertyDirty("LastPasswordChangeDateUtc")
+                || (user.LastPasswordChangeDate != default(DateTime) && identityUser.LastPasswordChangeDateUtc.HasValue == false)
+                || identityUser.LastPasswordChangeDateUtc.HasValue && user.LastPasswordChangeDate.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value)
+            {
+                anythingChanged = true;
+                user.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc.Value.ToLocalTime();
             }
             if (identityUser.IsPropertyDirty("EmailConfirmed")
                 || (user.EmailConfirmedDate.HasValue && user.EmailConfirmedDate.Value != default(DateTime) && identityUser.EmailConfirmed == false)

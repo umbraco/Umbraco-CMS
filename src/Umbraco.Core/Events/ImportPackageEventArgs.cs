@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Umbraco.Core.Packaging.Models;
 
 namespace Umbraco.Core.Events
@@ -8,15 +9,24 @@ namespace Umbraco.Core.Events
     {
         private readonly MetaData _packageMetaData;
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the overload specifying packageMetaData instead")]
         public ImportPackageEventArgs(TEntity eventObject, bool canCancel)
             : base(new[] { eventObject }, canCancel)
         {
         }
 
-        public ImportPackageEventArgs(TEntity eventObject, MetaData packageMetaData)
-            : base(new[] { eventObject })
+        public ImportPackageEventArgs(TEntity eventObject, MetaData packageMetaData, bool canCancel)
+            : base(new[] { eventObject }, canCancel)
         {
+            if (packageMetaData == null) throw new ArgumentNullException("packageMetaData");
             _packageMetaData = packageMetaData;
+        }
+
+        public ImportPackageEventArgs(TEntity eventObject, MetaData packageMetaData)
+            : this(eventObject, packageMetaData, true)
+        {
+            
         }
 
         public MetaData PackageMetaData

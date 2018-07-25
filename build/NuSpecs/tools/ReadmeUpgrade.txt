@@ -8,7 +8,7 @@
                                                    
 ----------------------------------------------------
 
-*** IMPORTANT NOTICE FOR 7.7 UPGRADES ***
+*** IMPORTANT NOTICE FOR UPGRADES FROM VERSIONS BELOW 7.7.0 ***
 
 Be sure to read the version specific upgrade information before proceeding:
 https://our.umbraco.org/documentation/Getting-Started/Setup/Upgrading/version-specific#version-7-7-0

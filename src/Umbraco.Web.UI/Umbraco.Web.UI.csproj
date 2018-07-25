@@ -116,9 +116,8 @@
       <HintPath>..\packages\AutoMapper.3.3.1\lib\net40\AutoMapper.Net4.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ClientDependency.Core, Version=1.9.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ClientDependency.1.9.2\lib\net45\ClientDependency.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="ClientDependency.Core, Version=1.9.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ClientDependency.1.9.6\lib\net45\ClientDependency.Core.dll</HintPath>
     </Reference>
     <Reference Include="ClientDependency.Core.Mvc, Version=1.8.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ClientDependency-Mvc5.1.8.0.0\lib\net45\ClientDependency.Core.Mvc.dll</HintPath>
@@ -333,8 +332,8 @@
       <Name>umbraco.providers</Name>
     </ProjectReference>
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Umbraco.ModelsBuilder, Version=3.0.7.99, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Umbraco.ModelsBuilder.3.0.7\lib\Umbraco.ModelsBuilder.dll</HintPath>
+    <Reference Include="Umbraco.ModelsBuilder, Version=3.0.10.102, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Umbraco.ModelsBuilder.3.0.10\lib\Umbraco.ModelsBuilder.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -838,6 +837,19 @@
     <Content Include="Views\Partials\Grid\Editors\Base.cshtml" />
     <Content Include="Views\Partials\Grid\Bootstrap3-Fluid.cshtml" />
     <Content Include="Views\Partials\Grid\Bootstrap2-Fluid.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Background.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Border.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Color.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Googlefontpicker.cshtml" />
+    <Content Include="Umbraco\Views\Preview\GridRow.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Index.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Layout.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Margin.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Padding.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Radius.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Shadow.cshtml" />
+    <Content Include="Umbraco\Views\Preview\Slider.cshtml" />
+    <Content Include="Umbraco\Views\Preview\web.config" />
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
@@ -975,7 +987,6 @@
     <Content Include="Umbraco\Masterpages\default.Master" />
     <Content Include="Umbraco\Webservices\TreeDataService.ashx" />
     <Content Include="Umbraco\Webservices\TagsAutoCompleteHandler.ashx" />
-    <Content Include="Umbraco\Webservices\MediaUploader.ashx" />
     <None Include="web.Template.config">
       <SubType>Designer</SubType>
     </None>
@@ -996,7 +1007,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Umbraco\preview\" />
     <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
   <ItemGroup>
@@ -1025,9 +1035,9 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.1\x86\*.* "$(TargetDir)x86\" 
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>7800</DevelopmentServerPort>
+          <DevelopmentServerPort>7120</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:7800</IISUrl>
+          <IISUrl>http://localhost:7120</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

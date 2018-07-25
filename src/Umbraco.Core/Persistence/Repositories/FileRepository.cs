@@ -9,7 +9,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal abstract class FileRepository<TId, TEntity> : DisposableObject, IUnitOfWorkRepository, IRepository<TId, TEntity> 
+    internal abstract class FileRepository<TId, TEntity> : DisposableObjectSlim, IUnitOfWorkRepository, IRepository<TId, TEntity> 
         where TEntity : IFile
     {
         private IUnitOfWork _work;

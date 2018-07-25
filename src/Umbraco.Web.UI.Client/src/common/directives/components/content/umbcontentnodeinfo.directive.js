@@ -1,13 +1,15 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService) {
+    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper) {
 
         function link(scope, element, attrs, ctrl) {
 
             var evts = [];
             var isInfoTab = false;
             scope.publishStatus = {};
+
+            scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
             
             function onInit() {
 
@@ -53,8 +55,13 @@
 
             scope.openDocumentType = function (documentType) {               
                 var url = "/settings/documenttypes/edit/" + documentType.id;
-                $location.path(url);
+                $location.url(url);
             };
+
+            scope.openTemplate = function () {
+                var url = "/settings/templates/edit/" + scope.node.templateId;
+                $location.url(url);
+            }
 
             scope.updateTemplate = function (templateAlias) {
 
@@ -89,7 +96,7 @@
                         // get current backoffice user and format dates
                         userService.getCurrentUser().then(function (currentUser) {
                             angular.forEach(data.items, function(item) {
-                                item.timestampFormatted = getLocalDate(item.timestamp, currentUser.locale, 'LLL');
+                                item.timestampFormatted = dateHelper.getLocalDate(item.timestamp, currentUser.locale, 'LLL');
                             });
                         });
                     
@@ -152,8 +159,17 @@
 
             function setPublishDate(date) {
 
+                if (!date) {
+                    return;
+                }
+
+                //The date being passed in here is the user's local date/time that they have selected
+                //we need to convert this date back to the server date on the model.
+
+                var serverTime = dateHelper.convertToServerStringTime(moment(date), Umbraco.Sys.ServerVariables.application.serverTimeOffset);
+
                 // update publish value
-                scope.node.releaseDate = date;
+                scope.node.releaseDate = serverTime;
 
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
@@ -177,8 +193,17 @@
 
             function setUnpublishDate(date) {
 
+                if (!date) {
+                    return;
+                }
+
+                //The date being passed in here is the user's local date/time that they have selected
+                //we need to convert this date back to the server date on the model.
+
+                var serverTime = dateHelper.convertToServerStringTime(moment(date), Umbraco.Sys.ServerVariables.application.serverTimeOffset);
+
                 // update publish value
-                scope.node.removeDate = date;
+                scope.node.removeDate = serverTime;
 
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
@@ -202,31 +227,24 @@
             
             function ucfirst(string) {
                 return string.charAt(0).toUpperCase() + string.slice(1);
-            } 
-
-            function getLocalDate(date, culture, format) {
-                if (date) {
-                    var dateVal;
-                    var serverOffset = Umbraco.Sys.ServerVariables.application.serverTimeOffset;
-                    var localOffset = new Date().getTimezoneOffset();
-                    var serverTimeNeedsOffsetting = -serverOffset !== localOffset;
-                    if (serverTimeNeedsOffsetting) {
-                        dateVal = dateHelper.convertToLocalMomentTime(date, serverOffset);
-                    } else {
-                        dateVal = moment(date, 'YYYY-MM-DD HH:mm:ss');
-                    }
-                    return dateVal.locale(culture).format(format);
-                }
             }
 
             function formatDatesToLocal() {
                 // get current backoffice user and format dates
                 userService.getCurrentUser().then(function (currentUser) {
-                    scope.node.createDateFormatted = getLocalDate(scope.node.createDate, currentUser.locale, 'LLL');
-                    scope.node.releaseDateMonth = scope.node.releaseDate ? ucfirst(getLocalDate(scope.node.releaseDate, currentUser.locale, 'MMMM')) : null;
-                    scope.node.releaseDateDay = scope.node.releaseDate ? ucfirst(getLocalDate(scope.node.releaseDate, currentUser.locale, 'dddd')) : null;
-                    scope.node.removeDateMonth = scope.node.removeDate ? ucfirst(getLocalDate(scope.node.removeDate, currentUser.locale, 'MMMM')) : null;
-                    scope.node.removeDateDay = scope.node.removeDate ? ucfirst(getLocalDate(scope.node.removeDate, currentUser.locale, 'dddd')) : null;
+                    scope.node.createDateFormatted = dateHelper.getLocalDate(scope.node.createDate, currentUser.locale, 'LLL');
+                    
+                    scope.node.releaseDateYear = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'YYYY')) : null;
+                    scope.node.releaseDateMonth = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'MMMM')) : null;
+                    scope.node.releaseDateDayNumber = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'DD')) : null;
+                    scope.node.releaseDateDay = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'dddd')) : null;
+                    scope.node.releaseDateTime = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'HH:mm')) : null;
+                    
+                    scope.node.removeDateYear = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'YYYY')) : null;
+                    scope.node.removeDateMonth = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'MMMM')) : null;
+                    scope.node.removeDateDayNumber = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'DD')) : null;
+                    scope.node.removeDateDay = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'dddd')) : null;
+                    scope.node.removeDateTime = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'HH:mm')) : null;
                 });
             }
 

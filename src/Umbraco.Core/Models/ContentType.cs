@@ -95,8 +95,10 @@ namespace Umbraco.Core.Models
             get { return _allowedTemplates; }
             set
             {
-                SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, Ps.Value.AllowedTemplatesSelector,
-                   Ps.Value.TemplateComparer);
+                SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, Ps.Value.AllowedTemplatesSelector, Ps.Value.TemplateComparer);
+
+                if (_allowedTemplates.Any(x => x.Id == _defaultTemplate) == false)
+                    DefaultTemplateId = 0;
             }
         }
 

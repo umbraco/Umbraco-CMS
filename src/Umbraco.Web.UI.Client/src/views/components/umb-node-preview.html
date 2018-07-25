@@ -2,7 +2,7 @@
     <i ng-if="icon" class="umb-node-preview__icon {{ icon }}"></i>
     <div class="umb-node-preview__content">
         
-        <div class="umb-node-preview__name">{{ name }}</div>
+        <div class="umb-node-preview__name" ng-attr-title="{{alias}}">{{ name }}</div>
         <div class="umb-node-preview__description" ng-if="description">{{ description }}</div>
 
         <div class="umb-user-group-preview__permission" ng-if="permissions">
