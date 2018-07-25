@@ -55,6 +55,11 @@
                 $location.url(url);
             };
 
+            scope.openTemplate = function () {
+                var url = "/settings/templates/edit/" + scope.node.templateId;
+                $location.url(url);
+            }
+
             scope.updateTemplate = function (templateAlias) {
 
                 // update template value
