@@ -59,7 +59,18 @@ function IconPickerOverlay($scope, iconHelper, localizationService) {
        $scope.model.icon = icon;
        $scope.model.color = color;
        $scope.submitForm($scope.model);
-   };
+    };
+
+    //we always need to ensure we dont submit anything broken
+    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
+        $scope.model.icon = $scope.icon;
+        $scope.model.color = $scope.color;
+    });
+
+    //when the scope is destroyed we need to unsubscribe
+    $scope.$on('$destroy', function () {
+        unsubscribe();
+    });
 }
 
 angular.module("umbraco").controller("Umbraco.Overlays.IconPickerOverlay", IconPickerOverlay);
