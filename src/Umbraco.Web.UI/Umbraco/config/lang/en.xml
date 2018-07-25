@@ -1445,6 +1445,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="deleteUserSuccess">User %0% was deleted</key>
         <key alias="resendInviteHeader">Invite user</key>
         <key alias="resendInviteSuccess">Invitation has been re-sent to %0%</key>
+        <key alias="documentTypeExportedSuccess">Document type was exported to file</key>
+        <key alias="documentTypeExportedError">An error occurred while exporting the document type</key>			
     </area>
     <area alias="stylesheet">
         <key alias="aliasHelp">Uses CSS syntax ex: h1, .redHeader, .blueTex</key>

@@ -419,6 +419,7 @@ namespace Umbraco.Web.Editors
                 Services.DataTypeService,
                 Services.ContentTypeService,
                 contentType);
+
             var response = new HttpResponseMessage
             {
                 Content = new StringContent(xml.ToDataString())
@@ -430,9 +431,13 @@ namespace Umbraco.Web.Editors
                             FileName = $"{contentType.Alias}.udt"
                         },
                         ContentType =   new MediaTypeHeaderValue( "application/octet-stream")
+
                     }
                 }
             };
+
+            // Set custom header so umbRequestHelper.downloadFile can save the correct filename
+            response.Headers.Add("x-filename", $"{contentType.Alias}.udt");
 
             return response;
         }
