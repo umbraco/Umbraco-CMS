@@ -148,50 +148,67 @@ ul.color-picker li a  {
   cursor:pointer;
 }
 
-.control-group.color-picker-preval .thumbnail {
-  width:30px;
-  border:none;
-}
+
 
 /* pre-value editor */
-/*.control-group.color-picker-preval:before {
-    content: "";
-    display: inline-block;
-    vertical-align: middle;
-    height: 100%;
-}*/
+.control-group.color-picker-preval {
+    .thumbnail {
+        width: 36px;
+        border: none;
+        cursor: move;
+        border-radius: 3px;
+    }
 
-/*.control-group.color-picker-preval div.thumbnail {
-    display: inline-block;
-    vertical-align: middle;
-}*/
-.control-group.color-picker-preval div.color-picker-prediv {
-    display: inline-block;
-    width: 60%;
-}
+    .handle {
+        float: left;
+        display: inline-flex;
+        margin: 5px 3px 5px 0;
+    }
 
-.control-group.color-picker-preval pre {
-    display: inline;
-    margin-right: 20px;
-    margin-left: 10px;
-    width: 50%;
-    white-space: nowrap;
-    overflow: hidden;
-    margin-bottom: 0;
-    vertical-align: middle;
-}
+    div.color-picker-prediv {
+        display: inline-flex;
+        align-items: center;
 
-.control-group.color-picker-preval input[type="text"] {
-    min-width: 40%;
-    width: 40%;
-    display: inline-block;
-    margin-right: 20px;
-    margin-top: 1px;
-}
+        pre {
+            display: inline;
+            font-family: monospace;
+            margin-right: 10px;
+            margin-left: 10px;
+            width: 50%;
+            white-space: nowrap;
+            overflow: hidden;
+            margin-bottom: 0;
+            vertical-align: middle;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            background: #f7f7f7;
+        }
 
-.control-group.color-picker-preval label {
-    border: solid @white 1px;
-    padding: 6px;
+        span {
+            margin-left: 5px;
+        }
+    }
+
+    input[type="text"] {
+        min-width: 40%;
+        width: 320px;
+        display: inline-block;
+        margin-top: 1px;
+    }
+
+    .sp-replacer {
+        margin-right: 18px;
+    }
+
+    label {
+        border: 1px solid #fff;
+        padding: 7px 10px;
+        font-family: monospace;
+        border: 1px solid #dfdfe1;
+        background: #f7f7f7;
+        margin: 0 15px 0 0;
+        border-radius: 3px;
+    }
 }
 
 
@@ -236,15 +253,6 @@ ul.color-picker li a  {
   overflow: hidden;
   display: none;
   text-decoration: none;
-}
-
-.umb-mediapicker .label.trashed {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    color: #fff;
-    background-color: #fe6561;
-    background-image: linear-gradient(180deg,#fe6561,#fe6561);
 }
 
 .umb-mediapicker .add-link-square {
@@ -518,7 +526,6 @@ ul.color-picker li a  {
 
     .gravity-container .viewport {
         max-width: 600px;
-        min-width: 250px;
     }
 
     .gravity-container .viewport:hover {
@@ -810,38 +817,28 @@ ul.color-picker li a  {
   padding-top: 27px;
 }
 
-.umb-fileupload .file-icon-wrap {
+.umb-fileupload .file-icon {
   text-align: center;
   display: block;
   position: relative;
   padding: 5px 0;
 
-  /* fit text within container */
-  & + span {
-      word-wrap: break-word;
+  > .icon {
+    font-size: 70px;
+    line-height: 110%;
+    color: @gray-4;
+    text-align: center;
   }
 
-  .file-icon {
-      position: relative;
-      display: inline-block;
-
-      > .icon {
-        font-size: 70px;
-        line-height: 110%;
-    color: @gray-4;
-        text-align: center;
-      }
-
-      > span {
+  > span {
     color: @white;
     background: @gray-4;
-        padding: 1px 3px;
-        font-size: 12px;
-        line-height: 130%;
-        position: absolute;
-        top: 40px;
-        left: 35px;
-      }
+    padding: 1px 3px;
+    font-size: 12px;
+    line-height: 130%;
+    position: absolute;
+    top: 45px;
+    left: 110px;
   }
 }
 
@@ -901,19 +898,6 @@ ul.color-picker li a  {
     border-bottom: 1px solid @tableBorder;
 }
 
-.umb-multiple-textbox .textbox-wrapper { align-items: center; margin-bottom: 15px; }
-.umb-multiple-textbox .textbox-wrapper .umb-editor { margin-bottom: 0; }
-.umb-multiple-textbox .textbox-wrapper i { margin-right: 5px; }
-.umb-multiple-textbox .textbox-wrapper i.handle { margin-left: 5px; }
-.umb-multiple-textbox .textbox-wrapper a.remove { margin-left: 5px; text-decoration: none; }
-.umb-multiple-textbox .add-link {
-    &:extend(.umb-node-preview-add);
-}
-.umb-editor-wrapper .umb-multiple-textbox .add-link {
-    &:extend(.umb-editor-wrapper .umb-node-preview);
-}
-.umb-modal .umb-multiple-textbox .textbox-wrapper .umb-editor { flex: 1 1 auto; width: auto; }
-
 
 //
 // Tags
@@ -943,21 +927,7 @@ ul.color-picker li a  {
 
 //
 // Nested boolean (e.g. list view bulk action permissions)
-// -------------------------------------------------------
+// ---------------------=====-----------------------------
 .umb-nested-boolean label {margin-bottom: 8px; float: left; width: 320px;}
 .umb-nested-boolean label span {float: left; width: 80%;}
 .umb-nested-boolean label input[type='checkbox'] {margin-right: 10px; float: left;}
-
-
-//
-// Custom styles of property editors in property preview in document type editor
-// -----------------------------------------------------------------------------
-.umb-group-builder__property-preview {
-    .umb-property-editor {
-        .slider {
-            .tooltip {
-                display: none;
-            }
-        }
-    }
-}
