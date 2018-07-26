@@ -81,27 +81,7 @@ namespace Umbraco.Web.Templates
                 }
             }
 
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(text);
-
-            var textModified = false;
-            var dataUdiTags = htmlDoc.DocumentNode.SelectNodes("//a[@data-udi] | //img[@data-udi]");
-
-            if(dataUdiTags == null)
-            {
-                return text;
-            }
-
-            foreach(var tag in dataUdiTags)
-            {
-                tag.Attributes.Remove("data-udi");
-                textModified = true;
-            }
-
-            if(textModified)
-            {
-                text = htmlDoc.DocumentNode.OuterHtml;
-            }
+            text = StripUdiDataAttributes(text);
 
             return text;
         }
