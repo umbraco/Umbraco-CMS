@@ -58,7 +58,6 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="6.2.2" />
     <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="ClientDependency" Version="1.9.6" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
@@ -295,8 +294,6 @@
     <Compile Include="PropertyEditors\GridConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\ImageCropperConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\IntegerConfigurationEditor.cs" />
-    <Compile Include="PropertyEditors\LabelConfiguration.cs" />
-    <Compile Include="PropertyEditors\LabelConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\ListViewConfiguration.cs" />
     <Compile Include="PropertyEditors\ListViewConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\MacroContainerConfiguration.cs" />
@@ -462,8 +459,6 @@
     <Compile Include="Runtime\WebRuntimeComponent.cs" />
     <Compile Include="Editors\PublishedStatusController.cs" />
     <Compile Include="Editors\NuCacheStatusController.cs" />
-    <Compile Include="WebServices\PublishedStatusController.cs" />
-    <Compile Include="WebServices\NuCacheStatusController.cs" />
     <Compile Include="_Legacy\Actions\Action.cs" />
     <Compile Include="_Legacy\Actions\ActionAssignDomain.cs" />
     <Compile Include="_Legacy\Actions\ActionAudit.cs" />
@@ -508,7 +503,6 @@
     <Compile Include="Models\Trees\TreeNode.cs" />
     <Compile Include="Routing\NotFoundHandlerHelper.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeDisplay.cs" />
-    <Compile Include="Media\EmbedProviders\Flickr.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeCompositionDisplay.cs" />
     <Compile Include="Models\ContentEditing\ContentTypeSave.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeSave.cs" />
@@ -772,7 +766,6 @@
     <Compile Include="PropertyEditors\DropDownPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PublishValueValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownWithKeysPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
@@ -1068,8 +1061,6 @@
     <Compile Include="Mvc\PluginControllerMetadata.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="PropertyEditors\ValueConverters\RteMacroRenderingValueConverter.cs" />
-    <Compile Include="RenderFieldCaseType.cs" />
-    <Compile Include="RenderFieldEncodingType.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\AliasUrlProvider.cs" />
     <Compile Include="Routing\ContentFinderByLegacy404.cs" />
@@ -1214,9 +1205,6 @@
     <Compile Include="umbraco.presentation\item.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\library.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\page.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -1305,19 +1293,12 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx.designer.cs">
       <DependentUpon>SendPublish.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\dialogHandler_temp.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.cs">
       <DependentUpon>editPackage.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx.designer.cs">
       <DependentUpon>editPackage.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx.cs">
-      <DependentUpon>exportDocumenttype.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\importDocumenttype.aspx.cs">
       <DependentUpon>importDocumenttype.aspx</DependentUpon>
@@ -1446,22 +1427,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Editors\XmlDataIntegrityController.cs" />
-    <Compile Include="WebServices\BulkPublishController.cs" />
-    <Compile Include="WebServices\CoreStringsController.cs" />
-    <Compile Include="WebServices\DomainsApiController.cs" />
-    <Compile Include="WebServices\EmbedMediaService.cs" />
-    <Compile Include="WebServices\ExamineManagementApiController.cs" />
-    <Compile Include="WebServices\TagsController.cs" />
-    <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />
-    <Compile Include="WebServices\SaveFileController.cs" />
-    <Compile Include="WebServices\UmbracoAuthorizedWebService.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="WebServices\UmbracoHttpHandler.cs" />
-    <Compile Include="WebServices\UmbracoWebService.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="WebServices\XmlDataIntegrityController.cs" />
     <Compile Include="WebViewPageExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -1526,7 +1491,6 @@
     <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\importDocumenttype.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\notifications.aspx">
       <SubType>ASPXCodeBehind</SubType>
