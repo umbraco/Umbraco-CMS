@@ -1,0 +1,61 @@
+﻿.umb-color-swatches {
+
+    .umb-color-box {
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 5px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        margin: 5px;
+        border-radius: 3px;
+        width: 30px;
+        height: 30px;
+        transition: box-shadow .3s;
+
+        &:hover, &:focus {
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        }
+
+        .check_circle {
+            display: none;
+            visibility: hidden;
+            width: 20px;
+            height: 20px;
+            margin: 0 auto;
+
+            .icon {
+                font-size: 1em;
+                display: flex;
+                width: 100%;
+                height: 100%;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                background-color: rgba(0,0,0,.15);
+                float: left;
+            }
+        }
+
+        &.active {
+            .check_circle {
+                display: flex;
+                visibility: visible;
+            }
+        }
+
+        &.umb-color-box--s {
+        }
+
+        &.umb-color-box--m {
+            width: 40px;
+            height: 40px;
+
+            .check_circle {
+                width: 25px;
+                height: 25px;
+            }
+        }
+    }
+}

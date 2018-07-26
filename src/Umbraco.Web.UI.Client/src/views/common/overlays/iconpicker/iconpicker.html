@@ -17,14 +17,8 @@
     </div>
 
     <div class="umb-control-group">
-        <button ng-repeat="c in colors" class="button btn-{{c.value}}" ng-class="{active: c.value === color}" title="{{c.name}}" ng-click="setColor(c.value)">
-            <div class="check_circle" ng-class="{active:c.value === color}">
-                <i class="icon-check small" ng-class="{active:c.value === color}"></i>
-            </div>
-            
-        </button>
-    </div> 
- 
+        <umb-color-swatches colors="colors" selected-color="color" size="s"></umb-color-swatches>
+    </div>
 
     <umb-load-indicator ng-if="loading"></umb-load-indicator>
 
