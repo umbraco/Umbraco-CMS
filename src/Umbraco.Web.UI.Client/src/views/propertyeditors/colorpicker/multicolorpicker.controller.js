@@ -131,7 +131,7 @@
             axis: 'y',
             containment: 'parent',
             cursor: 'move',
-            handle: ".handle, .thumbnail",
+            //handle: ".handle, .thumbnail",
             items: '> div.control-group',
             tolerance: 'pointer',
             update: function (e, ui) {

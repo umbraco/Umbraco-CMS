@@ -148,47 +148,52 @@ ul.color-picker li a  {
   cursor:pointer;
 }
 
-.control-group.color-picker-preval .thumbnail {
-    width: 30px;
-    border: none;
-    cursor: move;
-}
+
 
 /* pre-value editor */
-.control-group.color-picker-preval .handle {
-    float: left;
-    display: inline-block;
-    margin: 5px 3px 5px 0;
-}
-.control-group.color-picker-preval div.color-picker-prediv {
-    display: inline-block;
-    width: 50%;
-}
+.control-group.color-picker-preval {
+    .thumbnail {
+        width: 30px;
+        border: none;
+        cursor: move;
+    }
 
-.control-group.color-picker-preval pre {
-    display: inline;
-    font-family: monospace;
-    margin-right: 10px;
-    margin-left: 10px;
-    width: 50%;
-    white-space: nowrap;
-    overflow: hidden;
-    margin-bottom: 0;
-    vertical-align: middle;
-    padding-top: 7px;
-    padding-bottom: 7px;
-}
+    .handle {
+        float: left;
+        display: inline-flex;
+        margin: 5px 3px 5px 0;
+    }
 
-.control-group.color-picker-preval input[type="text"] {
-    min-width: 40%;
-    width: 40%;
-    display: inline-block;
-    margin-top: 1px;
-}
+    div.color-picker-prediv {
+        display: inline-flex;
+        align-items: center;
+    }
 
-.control-group.color-picker-preval label {
-    border: 1px solid @white;
-    padding: 6px;
+    pre {
+        display: inline;
+        font-family: monospace;
+        margin-right: 10px;
+        margin-left: 10px;
+        width: 50%;
+        white-space: nowrap;
+        overflow: hidden;
+        margin-bottom: 0;
+        vertical-align: middle;
+        padding-top: 7px;
+        padding-bottom: 7px;
+    }
+
+    input[type="text"] {
+        min-width: 40%;
+        width: 40%;
+        display: inline-block;
+        margin-top: 1px;
+    }
+
+    label {
+        border: 1px solid @white;
+        padding: 6px;
+    }
 }
 
 
