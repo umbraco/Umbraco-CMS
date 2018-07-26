@@ -860,7 +860,7 @@ namespace Umbraco.Web
 
         public static bool IsDescendant(this IPublishedContent content, IPublishedContent other)
         {
-            return other.Level < content.Level && content.Path.InvariantStartsWith(other.Path);
+            return other.Level < content.Level && content.Path.InvariantStartsWith(other.Path.EnsureEndsWith(','));
         }
 
         public static HtmlString IsDescendant(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -875,7 +875,7 @@ namespace Umbraco.Web
 
         public static bool IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other)
         {
-            return content.Path.InvariantStartsWith(other.Path);
+            return content.Path.InvariantEquals(other.Path) || content.IsDescendant(other);
         }
 
         public static HtmlString IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -890,8 +890,7 @@ namespace Umbraco.Web
 
         public static bool IsAncestor(this IPublishedContent content, IPublishedContent other)
         {
-            // avoid using Descendants(), or Ancestors(), they're expensive
-            return content.Level < other.Level && other.Path.InvariantStartsWith(content.Path);
+            return content.Level < other.Level && other.Path.InvariantStartsWith(content.Path.EnsureEndsWith(','));
         }
 
         public static HtmlString IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -906,8 +905,7 @@ namespace Umbraco.Web
 
         public static bool IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other)
         {
-            // avoid using DescendantsOrSelf() or AncestorsOrSelf(), they're expensive
-            return other.Path.InvariantStartsWith(content.Path);
+            return other.Path.InvariantEquals(content.Path) || content.IsAncestor(other);
         }
 
         public static HtmlString IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
@@ -294,7 +295,7 @@ namespace Umbraco.Core.Services
             // check that the template hasn't been created on disk before creating the content type
             // if it exists, set the new template content to the existing file content
             string content = GetViewContent(contentTypeAlias);
-            if (content.IsNullOrWhiteSpace() == false)
+            if (content != null)
             {
                 template.Content = content;
             }
@@ -320,17 +321,29 @@ namespace Umbraco.Core.Services
             return Attempt.Succeed(new OperationStatus<ITemplate, OperationStatusType>(template, OperationStatusType.Success, evtMsgs));
         }
 
+        /// <summary>
+        /// Create a new template, setting the content if a view exists in the filesystem
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="content"></param>
+        /// <param name="masterTemplate"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0)
         {
+            // file might already be on disk, if so grab the content to avoid overwriting
             var template = new Template(name, name)
             {
-                Content = content
+                Content = GetViewContent(name) ?? content
             };
+
             if (masterTemplate != null)
             {
                 template.SetMasterTemplate(masterTemplate);
             }
+
             SaveTemplate(template, userId);
+
             return template;
         }
 
@@ -1053,19 +1066,6 @@ namespace Umbraco.Core.Services
                 : Attempt<string>.Fail();
         }
 
-        internal Attempt<string> TryGetViewPath(string fileName)
-        {
-            if (fileName.EndsWith(".cshtml") == false)
-            {
-                fileName += ".cshtml";
-            }
-
-            string viewPath = IOHelper.MapPath(SystemDirectories.MvcViews + "/" + fileName);
-            return System.IO.File.Exists(viewPath)
-                ? Attempt<string>.Succeed(viewPath)
-                : Attempt<string>.Fail();
-        }
-
         private IPartialViewRepository GetPartialViewRepository(PartialViewType partialViewType, IUnitOfWork uow)
         {
             switch (partialViewType)
@@ -1097,20 +1097,30 @@ namespace Umbraco.Core.Services
             return GetPartialViewMacroSnippetContent(snippetName, PartialViewType.PartialViewMacro);
         }
 
-        public string GetViewContent(string filename)
+        private string GetViewContent(string filename)
         {
             if (filename.IsNullOrWhiteSpace())
                 throw new ArgumentNullException(nameof(filename));
 
-            Attempt<string> viewAttempt = TryGetViewPath(filename);
-            if (viewAttempt.Success == false)
+            if (filename.EndsWith(".cshtml") == false)
             {
-                return string.Empty;
+                filename = $"{filename}.cshtml";
             }
 
-            using (var view = new StreamReader(System.IO.File.OpenRead(viewAttempt.Result)))
+            using (var uow = UowProvider.GetUnitOfWork())
             {
-                return view.ReadToEnd().Trim();
+                var repository = RepositoryFactory.CreateTemplateRepository(uow);
+                var stream = repository.GetFileContentStream(filename);
+
+                if (stream == null)
+                {
+                    return null;
+                }
+
+                using (var reader = new StreamReader(stream, Encoding.UTF8, true))
+                {
+                    return reader.ReadToEnd().Trim();
+                }
             }
         }
 

@@ -67,28 +67,62 @@
     -o-user-select: none;
 }
 
-.nested-content__heading
-{
-    float: left;
+.nested-content__heading {
     line-height: 20px;
-}
+    position: relative;
 
-.nested-content__heading i
-{
-    vertical-align: text-top;
-    color: #999; /* same icon color as the icons in the item type picker */
-    margin-right: 10px;
+    &.-with-icon
+    {
+        padding-left: 20px;
+    }
+
+    i
+    {
+        color: #999; /* same icon color as the icons in the item type picker */
+        position: absolute;
+        left: 0;
+    }
+
+    .nested-content__item-name
+    {
+        max-height: 20px;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+    }
 }
 
 .nested-content__icons
 {
-    margin: -6px 0;
     opacity: 0;
 
     transition: opacity .15s ease-in-out;
    -moz-transition: opacity .15s ease-in-out;
    -webkit-transition: opacity .15s ease-in-out;
+
+    position: absolute;
+    right: 0px;
+    top: 2px;
+    background-color: white;
+    padding: 5px;
+
+    &:before
+    {
+        content: ' ';
+        position: absolute;
+        display: block;
+        width: 30px;
+        left: -30px;
+        top: 0;
+        bottom: 0;
+        background: -webkit-linear-gradient(90deg, rgba(255,255,255,0), white);
+        background: -moz-linear-gradient(90deg, rgba(255,255,255,0), white);
+        background: linear-gradient(90deg, rgba(255,255,255,0), white);
+    }
 }
+
 
 .nested-content__header-bar:hover .nested-content__icons,
 .nested-content__item--active > .nested-content__header-bar .nested-content__icons

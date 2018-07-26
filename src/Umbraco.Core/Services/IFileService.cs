@@ -427,12 +427,5 @@ namespace Umbraco.Core.Services
         /// <param name="filepath">The filesystem path to the partial view.</param>
         /// <returns>The size of the partial view.</returns>
         long GetPartialViewFileSize(string filepath);
-
-        /// <summary>
-        /// Gets the content of a view.
-        /// </summary>
-        /// <param name="filename">The name of the view.</param>
-        /// <returns></returns>
-        string GetViewContent(string filename);
     }
 }
