@@ -1058,8 +1058,6 @@
     <Compile Include="Mvc\PluginControllerMetadata.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
     <Compile Include="PropertyEditors\ValueConverters\RteMacroRenderingValueConverter.cs" />
-    <Compile Include="RenderFieldCaseType.cs" />
-    <Compile Include="RenderFieldEncodingType.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
     <Compile Include="Routing\AliasUrlProvider.cs" />
     <Compile Include="Routing\ContentFinderByLegacy404.cs" />
