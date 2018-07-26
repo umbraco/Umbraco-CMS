@@ -10,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Exceptions;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Editors;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebServices;
@@ -28,7 +29,8 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static string GetExamineManagementServicePath(this UrlHelper url)
         {
-            var result = url.GetUmbracoApiService<ExamineManagementApiController>("GetIndexerDetails");
+            // TODO: Possibly remove this method, I think it's unused...
+            var result = url.GetUmbracoApiService<ExamineManagementController>("GetIndexerDetails");
             return result.TrimEnd("GetIndexerDetails").EnsureEndsWith('/');
         }
 

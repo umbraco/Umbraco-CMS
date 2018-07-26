@@ -122,6 +122,7 @@
     <Compile Include="Editors\EditorValidatorCollection.cs" />
     <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />
     <Compile Include="Editors\EditorValidatorOfT.cs" />
+    <Compile Include="Editors\ExamineManagementController.cs" />
     <Compile Include="Editors\FromJsonPathAttribute.cs" />
     <Compile Include="Editors\HelpController.cs" />
     <Compile Include="Editors\IsCurrentUserModelFilterAttribute.cs" />
@@ -208,6 +209,8 @@
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />
     <Compile Include="Models\ContentEditing\ContentVariation.cs" />
     <Compile Include="Models\ContentEditing\ContentVariationPublish.cs" />
+    <Compile Include="Models\ContentEditing\DomainDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DomainSave.cs" />
     <Compile Include="Models\ContentEditing\CreatedDocumentTypeCollectionResult.cs" />
     <Compile Include="Models\ContentEditing\DictionaryDisplay.cs" />
     <Compile Include="Models\ContentEditing\DictionaryOverviewDisplay.cs" />
@@ -454,8 +457,8 @@
     <Compile Include="WebApi\UnhandedExceptionLoggerConfigurationAttribute.cs" />
     <Compile Include="WebApi\UnhandledExceptionLogger.cs" />
     <Compile Include="Runtime\WebRuntimeComponent.cs" />
-    <Compile Include="WebServices\PublishedStatusController.cs" />
-    <Compile Include="WebServices\NuCacheStatusController.cs" />
+    <Compile Include="Editors\PublishedStatusController.cs" />
+    <Compile Include="Editors\NuCacheStatusController.cs" />
     <Compile Include="_Legacy\Actions\Action.cs" />
     <Compile Include="_Legacy\Actions\ActionAssignDomain.cs" />
     <Compile Include="_Legacy\Actions\ActionAudit.cs" />
@@ -1414,22 +1417,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
-    <Compile Include="WebServices\BulkPublishController.cs" />
-    <Compile Include="WebServices\CoreStringsController.cs" />
-    <Compile Include="WebServices\DomainsApiController.cs" />
-    <Compile Include="WebServices\EmbedMediaService.cs" />
-    <Compile Include="WebServices\ExamineManagementApiController.cs" />
-    <Compile Include="WebServices\TagsController.cs" />
-    <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />
-    <Compile Include="WebServices\SaveFileController.cs" />
-    <Compile Include="WebServices\UmbracoAuthorizedWebService.cs">
+    <Compile Include="TagsController.cs" />
+    <Compile Include="UmbracoAuthorizedHttpHandler.cs" />
+    <Compile Include="umbraco.presentation\umbraco\webservices\UmbracoAuthorizedWebService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="WebServices\UmbracoHttpHandler.cs" />
-    <Compile Include="WebServices\UmbracoWebService.cs">
+    <Compile Include="UmbracoHttpHandler.cs" />
+    <Compile Include="UmbracoWebService.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="WebServices\XmlDataIntegrityController.cs" />
+    <Compile Include="Editors\XmlDataIntegrityController.cs" />
     <Compile Include="WebViewPageExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

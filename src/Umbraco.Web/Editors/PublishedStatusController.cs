@@ -3,7 +3,7 @@ using System.Web.Http;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.WebApi;
 
-namespace Umbraco.Web.WebServices
+namespace Umbraco.Web.Editors
 {
     public class PublishedStatusController : UmbracoAuthorizedApiController
     {
