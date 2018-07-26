@@ -518,6 +518,7 @@ ul.color-picker li a  {
 
     .gravity-container .viewport {
         max-width: 600px;
+        min-width: 250px;
     }
 
     .gravity-container .viewport:hover {
@@ -809,28 +810,38 @@ ul.color-picker li a  {
   padding-top: 27px;
 }
 
-.umb-fileupload .file-icon {
+.umb-fileupload .file-icon-wrap {
   text-align: center;
   display: block;
   position: relative;
   padding: 5px 0;
 
-  > .icon {
-    font-size: 70px;
-    line-height: 110%;
-    color: @gray-4;
-    text-align: center;
+  /* fit text within container */
+  & + span {
+      word-wrap: break-word;
   }
 
-  > span {
+  .file-icon {
+      position: relative;
+      display: inline-block;
+
+      > .icon {
+        font-size: 70px;
+        line-height: 110%;
+    color: @gray-4;
+        text-align: center;
+      }
+
+      > span {
     color: @white;
     background: @gray-4;
-    padding: 1px 3px;
-    font-size: 12px;
-    line-height: 130%;
-    position: absolute;
-    top: 45px;
-    left: 110px;
+        padding: 1px 3px;
+        font-size: 12px;
+        line-height: 130%;
+        position: absolute;
+        top: 40px;
+        left: 35px;
+      }
   }
 }
 
