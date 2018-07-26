@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.Web;
+using HtmlAgilityPack;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -10,7 +10,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
@@ -71,13 +70,47 @@ namespace Umbraco.Tests.Web
                 //setup a quick mock of the WebRouting section
                 Mock.Of<IUmbracoSettingsSection>(section => section.WebRouting == Mock.Of<IWebRoutingSection>(routingSection => routingSection.UrlProviderMode == "AutoLegacy")),
                 //pass in the custom url provider
-                new[]{ testUrlProvider.Object },
+                new[] { testUrlProvider.Object },
                 true))
             {
                 var output = TemplateUtilities.ParseInternalLinks(input, umbCtx.UrlProvider);
 
                 Assert.AreEqual(result, output);
             }
+        }
+
+        [Test]
+        public void StripDataUdiAttributesHtmlNullInput()
+        {
+            Assert.Throws<ArgumentNullException>(() => TemplateUtilities.StripUdiDataAttributes(null));
+        }
+
+        [Test]
+        public void StripDataUdiAttributesUsingHmtlDocOnLinks()
+        {
+            var input = "hello <a data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"/my-test-url\"> world</a> ";
+            var expected = "hello <a href=\"/my-test-url\"> world</a> ";
+
+            var htmlDocInput = new HtmlDocument();
+            htmlDocInput.LoadHtml(input);
+
+            var htmlDocOutput = TemplateUtilities.StripUdiDataAttributes(htmlDocInput);
+
+            Assert.AreEqual(expected, htmlDocOutput.DocumentNode.OuterHtml);
+        }
+
+        [Test]
+        public void StripDataUdiAttributesUsingHmtlDocOnImages()
+        {
+            var input = "hello <img data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ";
+            var expected = "hello <img src=\"imageofcats.jpg\"> world ";
+
+            var htmlDocInput = new HtmlDocument();
+            htmlDocInput.LoadHtml(input);
+
+            var htmlDocOutput = TemplateUtilities.StripUdiDataAttributes(htmlDocInput);
+
+            Assert.AreEqual(expected, htmlDocOutput.DocumentNode.OuterHtml);
         }
     }
 }

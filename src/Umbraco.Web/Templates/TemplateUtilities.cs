@@ -173,5 +173,27 @@ namespace Umbraco.Web.Templates
         {
             return text.CleanForXss(ignoreFromClean);
         }
+
+        public static HtmlDocument StripUdiDataAttributes(HtmlDocument input)
+        {
+            if (input == null)
+            {
+                throw new ArgumentNullException(nameof(input));
+            }
+            
+            var dataUdiTags = input.DocumentNode.SelectNodes("//a[@data-udi] | //img[@data-udi]");
+
+            if (dataUdiTags == null)
+            {
+                return input;
+            }
+
+            foreach (var tag in dataUdiTags)
+            {
+                tag.Attributes.Remove("data-udi");               
+            }
+
+            return input;
+        }
     }
 }
