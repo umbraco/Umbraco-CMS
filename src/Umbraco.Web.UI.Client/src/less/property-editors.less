@@ -168,20 +168,25 @@ ul.color-picker li a  {
     div.color-picker-prediv {
         display: inline-flex;
         align-items: center;
-    }
 
-    pre {
-        display: inline;
-        font-family: monospace;
-        margin-right: 10px;
-        margin-left: 10px;
-        width: 50%;
-        white-space: nowrap;
-        overflow: hidden;
-        margin-bottom: 0;
-        vertical-align: middle;
-        padding-top: 7px;
-        padding-bottom: 7px;
+        pre {
+            display: inline;
+            font-family: monospace;
+            margin-right: 10px;
+            margin-left: 10px;
+            width: 50%;
+            white-space: nowrap;
+            overflow: hidden;
+            margin-bottom: 0;
+            vertical-align: middle;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            background: #f7f7f7;
+        }
+
+        span {
+            margin-left: 5px;
+        }
     }
 
     input[type="text"] {
@@ -191,9 +196,18 @@ ul.color-picker li a  {
         margin-top: 1px;
     }
 
+    .sp-replacer {
+        margin-right: 18px;
+    }
+
     label {
-        border: 1px solid @white;
-        padding: 6px;
+        border: 1px solid #fff;
+        padding: 7px 10px;
+        font-family: monospace;
+        border: 1px solid #dfdfe1;
+        background: #f7f7f7;
+        margin: 0 15px 0 0;
+        border-radius: 3px;
     }
 }
 
