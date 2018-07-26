@@ -56,34 +56,6 @@ namespace Umbraco.Web.Cache
                     if (payload.ChangeTypes == TreeChangeTypes.Remove)
                        _idkMap.ClearCache(payload.Id);
 
-                    // note: ClearCacheByKeySearch - does StartsWith(...)
-
-                    // legacy alert!
-                    //
-                    // library cache library.GetMedia(int mediaId, bool deep) maintains a cache
-                    // of media xml - and of *deep* media xml - using the key
-                    // MediaCacheKey + "_" + mediaId + "_" + deep
-                    //
-                    // this clears the non-deep xml for the current media
-                    //
-                    Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
-                        $"{CacheKeys.MediaCacheKey}_{payload.Id}_False");
-
-                    // and then, for the entire path, we have to clear whatever might contain the media
-                    // bearing in mind there are probably nasty race conditions here - this is all legacy
-                    var k = $"{CacheKeys.MediaCacheKey}_{payload.Id}_";
-                    var x = Current.ApplicationCache.RuntimeCache.GetCacheItem(k)
-                        as Tuple<XElement, string>;
-                    if (x == null) continue;
-                    var path = x.Item2;
-
-                    foreach (var pathId in path.Split(',').Skip(1).Select(int.Parse))
-                    {
-                        // this clears the deep xml for the medias in the path (skipping -1)
-                        Current.ApplicationCache.RuntimeCache.ClearCacheByKeySearch(
-                            $"{CacheKeys.MediaCacheKey}_{pathId}_True");
-                    }
-
                     // repository cache
                     // it *was* done for each pathId but really that does not make sense
                     // only need to do it for the current media
