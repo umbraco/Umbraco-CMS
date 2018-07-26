@@ -22,9 +22,9 @@ namespace Umbraco.Web.PropertyEditors
             //use a custom editor too
             field.View = "views/propertyeditors/colorpicker/colorpicker.prevalues.html";
             //change the description
-            field.Description = "Add and remove colors";
+            field.Description = "Add, remove or sort colors.";
             //change the label
-            field.Name = "Add color";
+            field.Name = "Colors";
             //need to have some custom validation happening here
             field.Validators.Add(new ColorListValidator());
 
