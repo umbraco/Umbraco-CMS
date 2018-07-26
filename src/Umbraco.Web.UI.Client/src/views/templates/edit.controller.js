@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function TemplatesEditController($scope, $routeParams, $timeout, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, treeService, contentEditingHelper, localizationService, angularHelper, templateHelper) {
+    function TemplatesEditController($scope, $routeParams, $timeout, templateResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, treeService, contentEditingHelper, localizationService, angularHelper, templateHelper, editorService) {
 
         var vm = this;
         var oldMasterTemplateAlias = null;
@@ -55,12 +55,19 @@
 
         //Keyboard shortcuts for help dialog
         vm.page.keyboardShortcutsOverview = [];
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getGeneralShortcuts());
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getEditorShortcuts());
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getTemplateEditorShortcuts());
+
+        templateHelper.getGeneralShortcuts().then(function(data){
+            vm.page.keyboardShortcutsOverview.push(data);
+        });
+        templateHelper.getEditorShortcuts().then(function(data){
+            vm.page.keyboardShortcutsOverview.push(data);
+        });
+        templateHelper.getTemplateEditorShortcuts().then(function(data){
+            vm.page.keyboardShortcutsOverview.push(data);
+        });
 
         
-        vm.save = function () {
+        vm.save = function (suppressNotification) {
             vm.page.saveButtonState = "busy";
 
             vm.template.content = vm.editor.getValue();
@@ -76,11 +83,13 @@
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 
+							if (!suppressNotification) {
                 localizationService.localizeMany(["speechBubbles_templateSavedHeader", "speechBubbles_templateSavedText"]).then(function(data){
                     var header = data[0];
                     var message = data[1];
                     notificationsService.success(header, message);
                 });
+							}
 
 
                 vm.page.saveButtonState = "success";
@@ -166,6 +175,21 @@
         	vm.page.loading = false;
             vm.template = template;
 
+						// if this is a new template, bind to the blur event on the name
+						if ($routeParams.create) {
+							$timeout(function() {
+								var nameField = angular.element(document.querySelector('[data-element="editor-name-field"]'));
+								if (nameField) {
+									nameField.bind('blur', function(event) {
+										if (event.target.value) {
+											vm.save(true);
+										}
+									});
+								}
+							});
+						}
+					
+					
             //sync state
             editorState.set(vm.template);
             navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {
@@ -316,58 +340,45 @@
         vm.selectMasterTemplate = selectMasterTemplate;
         vm.getMasterTemplateName = getMasterTemplateName;
         vm.removeMasterTemplate = removeMasterTemplate;
+        vm.closeShortcuts = closeShortcuts;
 
         function openInsertOverlay() {
-
-            vm.insertOverlay = {
-                view: "insert",
+            var insertOverlay = {
                 allowedTypes: {
                     macro: true,
                     dictionary: true,
                     partial: true,
                     umbracoField: true
                 },
-                hideSubmitButton: true,
-                show: true,
                 submit: function(model) {
-
                     switch(model.insert.type) {
-
                         case "macro":
                             var macroObject = macroService.collectValueData(model.insert.selectedMacro, model.insert.macroParams, "Mvc");
                             insert(macroObject.syntax);
                             break;
-
                         case "dictionary":
                         	var code = templateHelper.getInsertDictionarySnippet(model.insert.node.name);
                         	insert(code);
                             break;
-
                         case "partial":
                             var code = templateHelper.getInsertPartialSnippet(model.insert.node.parentId, model.insert.node.name);
                             insert(code);
                             break;
-                            
                         case "umbracoField":
                             insert(model.insert.umbracoField);
                             break;
                     }
-
-                    vm.insertOverlay.show = false;
-                    vm.insertOverlay = null;
-
+                    editorService.close();
                 },
                 close: function(oldModel) {
                     // close the dialog
-                    vm.insertOverlay.show = false;
-                    vm.insertOverlay = null;
+                    editorService.close();
                     // focus editor
                     vm.editor.focus();
                 }
             };
-
+            editorService.insertCodeSnippet(insertOverlay);
         }
-
 
         function openMacroOverlay() {
 
@@ -375,7 +386,6 @@
                 view: "macropicker",
                 dialogData: {},
                 show: true,
-                title: localizationService.localize("template_insertMacro"),
                 submit: function (model) {
 
                     var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, "Mvc");
@@ -402,7 +412,6 @@
                 closeButtonlabel: "Cancel",
                 view: "insertfield",
                 show: true,
-                title: localizationService.localize("template_insertPageField"),
                 submit: function (model) {
                     insert(model.umbracoField);
                     vm.pageFieldOverlay.show = false;
@@ -420,87 +429,90 @@
 
 
         function openDictionaryItemOverlay() {
-            vm.dictionaryItemOverlay = {
-                view: "treepicker",
-                section: "settings",
-                treeAlias: "dictionary",
-                entityType: "dictionary",
-                multiPicker: false,
-                show: true,
-                title: localizationService.localize("template_insertDictionaryItem"),
-                emptyStateMessage: localizationService.localize("emptyStates_emptyDictionaryTree"),
-                select: function(node){
-                    var code = templateHelper.getInsertDictionarySnippet(node.name);
-                	insert(code);
 
-                	vm.dictionaryItemOverlay.show = false;
-                    vm.dictionaryItemOverlay = null;
-                },
-                close: function (model) {
-                    // close dialog
-                    vm.dictionaryItemOverlay.show = false;
-                    vm.dictionaryItemOverlay = null;
-                    // focus editor
-                    vm.editor.focus();
-                }
-            };
+            var labelKeys = [
+                "template_insertDictionaryItem",
+                "emptyStates_emptyDictionaryTree"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(function(values){
+                var title = values[0];
+                var emptyStateMessage = values[1];
+
+                var dictionaryItem = {
+                    section: "settings",
+                    treeAlias: "dictionary",
+                    entityType: "dictionary",
+                    multiPicker: false,
+                    title: title,
+                    emptyStateMessage: emptyStateMessage,
+                    select: function(node){
+                        var code = templateHelper.getInsertDictionarySnippet(node.name);
+                        insert(code);
+                        editorService.close();
+                    },
+                    close: function (model) {
+                        // close dialog
+                        editorService.close();
+                        // focus editor
+                        vm.editor.focus();
+                    }
+                };
+
+                editorService.treePicker(dictionaryItem);
+
+            });
+
         }
 
         function openPartialOverlay() {
-            vm.partialItemOverlay = {
-                view: "treepicker",
-                section: "settings", 
-                treeAlias: "partialViews",
-                entityType: "partialView",
-                multiPicker: false,
-                show: true,
-                title: localizationService.localize("template_insertPartialView"),
-                filter: function(i) {
-                    if(i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
-                        return true;
-                    }
-                },
-                filterCssClass: "not-allowed",
-                select: function(node){
-                    
-                    var code = templateHelper.getInsertPartialSnippet(node.parentId, node.name);
-                    insert(code);
 
-                    vm.partialItemOverlay.show = false;
-                    vm.partialItemOverlay = null;
-                },
-                close: function (model) {
-                    // close dialog
-                    vm.partialItemOverlay.show = false;
-                    vm.partialItemOverlay = null;
-                    // focus editor
-                    vm.editor.focus();
-                }
-            };
+            localizationService.localize("template_insertPartialView").then(function(value){
+                var title = value;
+
+                var partialItem = {
+                    section: "settings", 
+                    treeAlias: "partialViews",
+                    entityType: "partialView",
+                    multiPicker: false,
+                    title: title,
+                    filter: function(i) {
+                        if(i.name.indexOf(".cshtml") === -1 && i.name.indexOf(".vbhtml") === -1) {
+                            return true;
+                        }
+                    },
+                    filterCssClass: "not-allowed",
+                    select: function(node){
+                        var code = templateHelper.getInsertPartialSnippet(node.parentId, node.name);
+                        insert(code);
+                        editorService.close();
+                    },
+                    close: function (model) {
+                        // close dialog
+                        editorService.close();
+                        // focus editor
+                        vm.editor.focus();
+                    }
+                };
+
+                editorService.treePicker(partialItem);
+            });
         }
 
         function openQueryBuilderOverlay() {
-            vm.queryBuilderOverlay = {
-                view: "querybuilder",
-                show: true,
-                title: localizationService.localize("template_queryBuilder"),
+            var queryBuilder = {
                 submit: function (model) {
-
                     var code = templateHelper.getQuerySnippet(model.result.queryExpression);
                     insert(code);
-                    
-                    vm.queryBuilderOverlay.show = false;
-                    vm.queryBuilderOverlay = null;
+                    editorService.close();
                 },
-
-                close: function (model) {
-                    // close dialog
-                    vm.queryBuilderOverlay.show = false;
-                    vm.queryBuilderOverlay = null;
+                close: function () {
+                    editorService.close();
                     // focus editor
                     vm.editor.focus();   
                 }
             };
+            editorService.queryBuilder(queryBuilder);
         }
 
 
@@ -548,40 +560,48 @@
             var availableMasterTemplates = [];
 
             // filter out the current template and the selected master template
-            angular.forEach(vm.templates, function(template){
-                if(template.alias !== vm.template.alias && template.alias !== vm.template.masterTemplateAlias) {
-                    availableMasterTemplates.push(template);
+            angular.forEach(vm.templates, function (template) {
+                if (template.alias !== vm.template.alias && template.alias !== vm.template.masterTemplateAlias) {
+                    var templatePathArray = template.path.split(',');
+                    // filter descendant templates of current template
+                    if (templatePathArray.indexOf(String(vm.template.id)) === -1) {
+                        availableMasterTemplates.push(template);
+                    }
                 }
             });
 
-            vm.masterTemplateOverlay = {
-                view: "itempicker",
-                title: localizationService.localize("template_mastertemplate"),
-                availableItems: availableMasterTemplates,
-                show: true,
-                submit: function(model) {
+            localizationService.localize("template_mastertemplate").then(function(value){
+                var title = value;
 
-                    var template = model.selectedItem;
-
-                    if (template && template.alias) {
-                        vm.template.masterTemplateAlias = template.alias;
-                        setLayout(template.alias + ".cshtml");
-                    } else {
-                        vm.template.masterTemplateAlias = null;
-                        setLayout(null);
+                vm.masterTemplateOverlay = {
+                    view: "itempicker",
+                    title: title,
+                    availableItems: availableMasterTemplates,
+                    show: true,
+                    submit: function(model) {
+    
+                        var template = model.selectedItem;
+    
+                        if (template && template.alias) {
+                            vm.template.masterTemplateAlias = template.alias;
+                            setLayout(template.alias + ".cshtml");
+                        } else {
+                            vm.template.masterTemplateAlias = null;
+                            setLayout(null);
+                        }
+    
+                        vm.masterTemplateOverlay.show = false;
+                        vm.masterTemplateOverlay = null;
+                    },
+                    close: function(oldModel) {
+                        // close dialog
+                        vm.masterTemplateOverlay.show = false;
+                        vm.masterTemplateOverlay = null;
+                        // focus editor
+                        vm.editor.focus();
                     }
-
-                    vm.masterTemplateOverlay.show = false;
-                    vm.masterTemplateOverlay = null;
-                },
-                close: function(oldModel) {
-                    // close dialog
-                    vm.masterTemplateOverlay.show = false;
-                    vm.masterTemplateOverlay = null;
-                    // focus editor
-                    vm.editor.focus();
-                }
-            };
+                };
+            });
 
         }
 
@@ -690,6 +710,10 @@
             } else if(state === "pristine") {
                 currentForm.$setPristine();
             }
+        }
+
+        function closeShortcuts() {
+            vm.showKeyboardShortcut = false;
         }
     
         vm.init();

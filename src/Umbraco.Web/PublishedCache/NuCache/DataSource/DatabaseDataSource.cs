@@ -141,7 +141,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 .OrderBy<NodeDto>(x => x.Level, x => x.SortOrder);
 
             var dto = scope.Database.Fetch<ContentSourceDto>(sql).FirstOrDefault();
-            return dto == null ? new ContentNodeKit() : CreateContentNodeKit(dto);
+            return dto == null ? new ContentNodeKit() : CreateMediaNodeKit(dto);
         }
 
         public IEnumerable<ContentNodeKit> GetAllMediaSources(IScope scope)
@@ -186,7 +186,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             {
                 if (Debugger.IsAttached)
                     throw new Exception("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
-                Current.Logger.Warn<DatabaseDataSource>("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
+                Current.Logger.Warn<DatabaseDataSource>(() => $"Missing cmsContentNu edited content for node {dto.Id}, consider rebuilding.");
             }
             else
             {
@@ -211,7 +211,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 {
                     if (Debugger.IsAttached)
                         throw new Exception("Missing cmsContentNu published content for node " + dto.Id + ", consider rebuilding.");
-                    Current.Logger.Warn<DatabaseDataSource>("Missing cmsContentNu published content for node " + dto.Id + ", consider rebuilding.");
+                    Current.Logger.Warn<DatabaseDataSource>(() => $"Missing cmsContentNu published content for node {dto.Id}, consider rebuilding.");
                 }
                 else
                 {

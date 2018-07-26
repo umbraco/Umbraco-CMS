@@ -83,7 +83,7 @@
     <Folder Include="Views\MacroPartials\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="6.2.2" />
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="ClientDependency" Version="1.9.6" />
     <PackageReference Include="ClientDependency-Mvc5" Version="1.8.0.0" />
@@ -108,6 +108,9 @@
     <PackageReference Include="MiniProfiler" Version="3.2.0.157" />
     <PackageReference Include="MySql.Data" Version="6.10.7" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Umbraco.ModelsBuilder.Ui">
+      <Version>8.0.0-alpha.20</Version>
+    </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
   <ItemGroup>
@@ -118,10 +121,6 @@
     <ProjectReference Include="..\Umbraco.Examine\Umbraco.Examine.csproj">
       <Name>Umbraco.Examine</Name>
       <Project>{07FBC26B-2927-4A22-8D96-D644C667FECC}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\Umbraco.ModelsBuilder\Umbraco.ModelsBuilder.csproj">
-      <Project>{7020a059-c0d1-43a0-8efd-23591a0c9af6}</Project>
-      <Name>Umbraco.ModelsBuilder</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651e1350-91b6-44b7-bd60-7207006d7003}</Project>
@@ -242,6 +241,7 @@
     <Content Include="Umbraco\Config\Lang\tr.xml" />
     <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
     <Content Include="Umbraco\create.aspx" />
+    <Content Include="Umbraco\Developer\Packages\installer.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco\umbraco.aspx" />
     <Compile Include="Umbraco\umbraco.aspx.cs">
@@ -402,7 +402,6 @@
     <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
     <Content Include="Umbraco\Dialogs\create.aspx" />
-    <Content Include="Umbraco\Dialogs\exportDocumenttype.aspx" />
     <Content Include="Umbraco\Dialogs\importDocumenttype.aspx" />
     <Content Include="Umbraco\Dialogs\notifications.aspx" />
     <Content Include="Umbraco\Dialogs\protectPage.aspx" />

@@ -16,14 +16,16 @@
                     <div class="umb-split-view__content" ng-if="!editor.loading">
                         <umb-editor-header 
                             menu="page.menu"
+                            hide-menu="page.hideActionsMenu"
                             name="editor.content.name"
                             hide-icon="true"
                             hide-description="true" 
                             hide-alias="true"
                             navigation="editor.content.apps"
                             variants="editor.content.variants"
+                            hide-change-variant="page.hideChangeVariant"
                             on-back="backToListView()"
-                            show-back-button="{{page.listViewPath}}"
+                            show-back-button="page.listViewPath !== null"
                             split-view-open="editors.length > 1"
                             on-open-in-split-view="openInSplitView(variant)"
                             on-close-split-view="closeSplitView($index, editor)">
@@ -57,16 +59,16 @@
                 <umb-editor-footer-content-right>
 
                     <umb-button
-                        ng-if="model.infiniteMode"
+                        ng-if="infiniteModel.infiniteMode"
                         action="close()"
                         button-style="link"
-                        label="Close"
+                        label-key="general_close"
                         type="button">
                     </umb-button>
 
                     <umb-button 
                         alias="preview" 
-                        ng-if="!page.isNew && content.allowPreview" 
+                        ng-if="!page.isNew && content.allowPreview"
                         type="button" 
                         button-style="info" 
                         action="preview(content)"
@@ -75,7 +77,7 @@
                     </umb-button>
 
                     <umb-button-group 
-                        ng-if="defaultButton && !content.trashed" 
+                        ng-if="defaultButton && !content.trashed && !infiniteModel.infiniteMode" 
                         button-style="success"
                         default-button="defaultButton" 
                         sub-buttons="subButtons" 
@@ -83,6 +85,24 @@
                         direction="up"
                         float="right">
                     </umb-button-group>
+
+                    <umb-button
+                        ng-if="infiniteModel.infiniteMode && page.allowInfiniteSaveAndClose"
+                        action="saveAndClose(content)"
+                        button-style="primary"
+                        state="saveAndCloseButtonState"
+                        label-key="buttons_saveAndClose"
+                        type="button">
+                    </umb-button>
+
+                    <umb-button
+                        ng-if="infiniteModel.infiniteMode && page.allowInfinitePublishAndClose"
+                        action="publishAndClose(content)"
+                        button-style="primary"
+                        state="publishAndCloseButtonState"
+                        label-key="buttons_publishAndClose"
+                        type="button">
+                    </umb-button>
 
                     <umb-button 
                         alias="restore" 

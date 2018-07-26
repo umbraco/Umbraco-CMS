@@ -176,20 +176,6 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns media items known to be of a "Folder" type
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [Obsolete("This is no longer used and shouldn't be because it performs poorly when there are a lot of media items")]
-        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>))]
-        public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildFolders(int id = -1)
-        {
-            //we are only allowing a max of 500 to be returned here, if more is required it needs to be paged
-            var result = GetChildFolders(id, 1, 500);
-            return result.Items;
-        }
-
-        /// <summary>
         /// Returns a paged result of media items known to be of a "Folder" type
         /// </summary>
         /// <param name="id"></param>
@@ -390,7 +376,7 @@ namespace Umbraco.Web.Editors
             //if the current item is in the recycle bin
             if (foundMedia.Trashed == false)
             {
-                var moveResult = Services.MediaService.WithResult().MoveToRecycleBin(foundMedia, (int)Security.CurrentUser.Id);
+                var moveResult = Services.MediaService.MoveToRecycleBin(foundMedia, (int)Security.CurrentUser.Id);
                 if (moveResult == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending
@@ -400,7 +386,7 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                var deleteResult = Services.MediaService.WithResult().Delete(foundMedia, (int)Security.CurrentUser.Id);
+                var deleteResult = Services.MediaService.Delete(foundMedia, (int)Security.CurrentUser.Id);
                 if (deleteResult == false)
                 {
                     //returning an object of INotificationModel will ensure that any pending
@@ -478,7 +464,7 @@ namespace Umbraco.Web.Editors
             }
 
             //save the item
-            var saveStatus = Services.MediaService.WithResult().Save(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
+            var saveStatus = Services.MediaService.Save(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
 
             //return the updated model
             var display = ContextMapper.Map<IMedia, MediaItemDisplay>(contentItem.PersistedContent, UmbracoContext);
@@ -708,7 +694,7 @@ namespace Umbraco.Web.Editors
                         f.SetValue(Constants.Conventions.Media.File, fileName, fs);
                     }
 
-                    var saveResult = mediaService.WithResult().Save(f, Security.CurrentUser.Id);
+                    var saveResult = mediaService.Save(f, Security.CurrentUser.Id);
                     if (saveResult == false)
                     {
                         AddCancelMessage(tempFiles,

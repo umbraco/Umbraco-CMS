@@ -72,7 +72,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             // ensure string is parsed for macros and macros are executed correctly
             sourceString = RenderMacros(sourceString, preview);
 
-            return sourceString;
+            return new HtmlString(sourceString);
         }
     }
 }

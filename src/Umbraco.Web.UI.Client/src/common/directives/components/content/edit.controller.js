@@ -7,6 +7,7 @@
         keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource, overlayService, localizationService) {
 
         var evts = [];
+        var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
 
         //setup scope vars
         $scope.defaultButton = null;
@@ -21,6 +22,8 @@
         $scope.page.isNew = $scope.isNew ? true : false;
         $scope.page.buttonGroupState = "init";
         $scope.page.culture = $scope.culture;
+        $scope.page.hideActionsMenu = infiniteMode ? true : false;
+        $scope.page.hideChangeVariant = infiniteMode ? true : false;
         $scope.allowOpen = true;
 
         // add all editors to an editors array to support split view 
@@ -31,8 +34,12 @@
         };
 
         function init(content) {
-
-            createButtons(content);
+            
+            if(infiniteMode) {
+                createInfiniteModeButtons(content);
+            } else {
+                createButtons(content);
+            }
 
             editorState.set($scope.content);
 
@@ -57,6 +64,18 @@
 
             evts.push(eventsService.on("editors.content.changeUnpublishDate", function (event, args) {
                 createButtons(args.node);
+            }));
+
+            evts.push(eventsService.on("editors.documentType.saved", function (name, args) {
+                // if this content item uses the updated doc type we need to reload the content item
+                if(args && args.documentType && args.documentType.key === content.documentType.key) {
+                    if ($scope.page.culture) {
+                        loadContent($scope.page.culture);
+                    }
+                    else {
+                        loadContent();
+                    }
+                }
             }));
 
             // We don't get the info tab from the server from version 7.8 so we need to manually add it
@@ -125,10 +144,8 @@
          */
         function loadContent(culture) {
 
-            $scope.page.loading = true;
-
             //we are editing so get the content item from the server
-            $scope.getMethod()($scope.contentId, culture)
+            return $scope.getMethod()($scope.contentId, culture)
                 .then(function (data) {
 
                     $scope.content = data;
@@ -147,11 +164,16 @@
                     // if there are any and then clear them so the collection no longer persists them.
                     serverValidationManager.executeAndClearAllSubscriptions();
 
-                    syncTreeNode($scope.content, data.path, true);
+                    if(!infiniteMode) {
+                        syncTreeNode($scope.content, data.path, true);
+                    }
 
                     resetLastListPageNumber($scope.content);
 
-                    $scope.page.loading = false;
+                    eventsService.emit("content.loaded", { content: $scope.content });
+
+                    return $q.resolve($scope.content);
+
 
                 });
 
@@ -172,6 +194,23 @@
 
             $scope.defaultButton = buttons.defaultButton;
             $scope.subButtons = buttons.subButtons;
+
+        }
+
+        // create infinite editing buttons
+        function createInfiniteModeButtons(content) {
+
+            $scope.page.allowInfinitePublishAndClose = false;
+            $scope.page.allowInfiniteSaveAndClose = false;
+
+            // check for publish rights
+            if(_.contains(content.allowedActions, "U")) {
+                $scope.page.allowInfinitePublishAndClose = true;
+
+            // check for save rights
+            } else if( _.contains(content.allowedActions, "A")) {
+                $scope.page.allowInfiniteSaveAndClose = true;
+            }
 
         }
 
@@ -203,6 +242,8 @@
 
             $scope.page.buttonGroupState = "busy";
 
+            eventsService.emit("content.saving", { content: $scope.content, action: args.action });
+
             return contentEditingHelper.contentEditorPerformSave({
                 saveMethod: args.saveMethod,
                 scope: $scope,
@@ -211,9 +252,15 @@
             }).then(function (data) {
                 //success            
                 init($scope.content);
-                syncTreeNode($scope.content, data.path);
+
+                if(!infiniteMode) {
+                    syncTreeNode($scope.content, data.path);
+                }
 
                 $scope.page.buttonGroupState = "success";
+
+                eventsService.emit("content.saved", { content: $scope.content, action: args.action });
+
                 return $q.when(data);
             },
                 function (err) {
@@ -250,6 +297,8 @@
 
                     resetLastListPageNumber($scope.content);
 
+                    eventsService.emit("content.newReady", { content: $scope.content });
+
                     $scope.page.loading = false;
 
                 });
@@ -257,11 +306,16 @@
         else {
 
             //Browse content nodes based on the selected tree language variant
+            $scope.page.loading = true;
             if ($scope.page.culture) {
-                loadContent($scope.page.culture);
+                loadContent($scope.page.culture).then(function(){
+                    $scope.page.loading = false;
+                });
             }
             else {
-                loadContent();
+                loadContent().then(function(){
+                    $scope.page.loading = false;
+                });
             }
         }
 
@@ -280,13 +334,15 @@
             }
 
             if (formHelper.submitForm({ scope: $scope, skipValidation: true })) {
-
+				
                 $scope.page.buttonGroupState = "busy";
+
+                eventsService.emit("content.unpublishing", { content: $scope.content });
 
                 contentResource.unPublish($scope.content.id, culture)
                     .then(function (data) {
 
-                        formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                        formHelper.resetForm({ scope: $scope });
 
                         contentEditingHelper.handleSuccessfulSave({
                             scope: $scope,
@@ -296,12 +352,15 @@
 
                         init($scope.content);
 
-                        syncTreeNode($scope.content, data.path);
+                        if(!infiniteMode) {
+                            syncTreeNode($scope.content, data.path);
+                        }
 
                         $scope.page.buttonGroupState = "success";
 
+                        eventsService.emit("content.unpublished", { content: $scope.content });
+
                     }, function (err) {
-            formHelper.showNotifications(err.data);
                         $scope.page.buttonGroupState = 'error';
                     });
             }
@@ -320,7 +379,6 @@
                 if (formHelper.submitForm({ scope: $scope, action: "publish"})) {
 
                     var dialog = {
-                        title: localizationService.localize("content_readyToPublish"),
                         view: "publish",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
@@ -368,12 +426,12 @@
                 }
             }
             else {
-                return performSave({ saveMethod: contentResource.publish, action: "publish" });
+                return performSave({ saveMethod: contentResource.publish, action: "publish" }).catch(angular.noop);;
             }
         };
 
         $scope.save = function () {
-            return performSave({ saveMethod: $scope.saveMethod(), action: "save" });
+            return performSave({ saveMethod: $scope.saveMethod(), action: "save" }).catch(angular.noop);
         };
 
         $scope.preview = function (content) {
@@ -397,7 +455,7 @@
                 else {
                     $scope.save().then(function (data) {
                         previewWindow.location.href = redirect;
-                    });
+                    }).catch(angular.noop);
                 }
             }
         };
@@ -492,6 +550,30 @@
             }, 500);
         };
 
+        /* publish method used in infinite editing */
+        $scope.publishAndClose = function(content) {
+            $scope.publishAndCloseButtonState = "busy";
+            performSave({ saveMethod: contentResource.publish, action: "publish" }).then(function(){
+                if($scope.infiniteModel.submit) {
+                    $scope.infiniteModel.contentNode = content;
+                    $scope.infiniteModel.submit($scope.infiniteModel);
+                }
+                $scope.publishAndCloseButtonState = "success";
+            }).catch(angular.noop);;
+        };
+
+        /* save method used in infinite editing */
+        $scope.saveAndClose = function(content) {
+            $scope.saveAndCloseButtonState = "busy";
+            performSave({ saveMethod: $scope.saveMethod(), action: "save" }).then(function(){
+                if($scope.infiniteModel.submit) {
+                    $scope.infiniteModel.contentNode = content;
+                    $scope.infiniteModel.submit($scope.infiniteModel);
+                }
+                $scope.saveAndCloseButtonState = "success";
+            }).catch(angular.noop);;
+        };
+
         function moveNode(node, target) {
 
             contentResource.move({ "parentId": target.id, "id": node.id })
@@ -503,7 +585,9 @@
                     }
 
                     // sync the destination node
-                    navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false });
+                    if(!infiniteMode) {
+                        navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false });
+                    }
 
                     $scope.page.buttonRestore = "success";
                     notificationsService.success("Successfully restored " + node.name + " to " + target.name);
@@ -520,8 +604,8 @@
 
         // methods for infinite editing
         $scope.close = function() {
-            if($scope.model.close) {
-                $scope.model.close($scope.model);
+            if($scope.infiniteModel.close) {
+                $scope.infiniteModel.close($scope.infiniteModel);
             }
         };
 
@@ -550,7 +634,7 @@
                 getMethod: "&",
                 getScaffoldMethod: "&?",
                 culture: "=?",
-                model: "=?"
+                infiniteModel: "=?"
             }
         };
 

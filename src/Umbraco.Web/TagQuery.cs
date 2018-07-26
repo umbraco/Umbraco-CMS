@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
@@ -22,20 +21,6 @@ namespace Umbraco.Web
         private readonly ITagService _tagService;
         private readonly IPublishedContentQuery _contentQuery;
 
-        [Obsolete("Use the alternate constructor specifying the contentQuery instead")]
-        public TagQuery(ITagService tagService)
-            : this(tagService, new PublishedContentQuery(UmbracoContext.Current.ContentCache, UmbracoContext.Current.MediaCache))
-        {
-        }
-
-        [Obsolete("Use the alternate constructor specifying the ITypedPublishedContentQuery instead")]
-        public TagQuery(ITagService tagService, PublishedContentQuery contentQuery)
-        {
-            if (tagService == null) throw new ArgumentNullException("tagService");
-            if (contentQuery == null) throw new ArgumentNullException("contentQuery");
-            _tagService = tagService;
-            _contentQuery = contentQuery;
-        }
 
         /// <summary>
         /// Constructor for wrapping ITagQuery, see http://issues.umbraco.org/issue/U4-6899

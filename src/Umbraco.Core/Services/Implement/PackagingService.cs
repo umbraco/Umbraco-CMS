@@ -127,7 +127,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional Id of the user performing the import</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated content</returns>
-        public IEnumerable<IContent> ImportContent(XElement element, int parentId = -1, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<IContent> ImportContent(XElement element, int parentId = -1, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -337,7 +337,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated ContentTypes</returns>
-        public IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = 0, bool raiseEvents = true)
         {
             return ImportContentTypes(element, true, userId);
         }
@@ -350,7 +350,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated ContentTypes</returns>
-        public IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -631,10 +631,7 @@ namespace Umbraco.Core.Services.Implement
                     }
                     else
                     {
-                        _logger.Warn<PackagingService>(
-                            string.Format(
-                                "Packager: Error handling allowed templates. Template with alias '{0}' could not be found.",
-                                alias));
+                        _logger.Warn<PackagingService>(() => $"Packager: Error handling allowed templates. Template with alias '{alias}' could not be found.");
                     }
                 }
 
@@ -650,10 +647,7 @@ namespace Umbraco.Core.Services.Implement
                 }
                 else
                 {
-                    _logger.Warn<PackagingService>(
-                        string.Format(
-                            "Packager: Error handling default template. Default template with alias '{0}' could not be found.",
-                            defaultTemplateElement.Value));
+                    _logger.Warn<PackagingService>(() => $"Packager: Error handling default template. Default template with alias '{defaultTemplateElement.Value}' could not be found.");
                 }
             }
         }
@@ -724,11 +718,7 @@ namespace Umbraco.Core.Services.Implement
                 // This means that the property will not be created.
                 if (dataTypeDefinition == null)
                 {
-                    _logger.Warn<PackagingService>(
-                        string.Format("Packager: Error handling creation of PropertyType '{0}'. Could not find DataTypeDefintion with unique id '{1}' nor one referencing the DataType with a property editor alias (or legacy control id) '{2}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
-                                      property.Element("Name").Value,
-                                      dataTypeDefinitionId,
-                                      property.Element("Type").Value.Trim()));
+                    _logger.Warn<PackagingService>(() => $"Packager: Error handling creation of PropertyType '{property.Element("Name").Value}'. Could not find DataTypeDefintion with unique id '{dataTypeDefinitionId}' nor one referencing the DataType with a property editor alias (or legacy control id) '{property.Element("Type").Value.Trim()}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.");
 
                     //convert to a label!
                     dataTypeDefinition = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.Aliases.NoEdit).FirstOrDefault();
@@ -772,7 +762,7 @@ namespace Umbraco.Core.Services.Implement
                 var allowedChild = _importedContentTypes.ContainsKey(alias) ? _importedContentTypes[alias] : _contentTypeService.Get(alias);
                 if (allowedChild == null)
                 {
-                    _logger.Warn<PackagingService>($"Packager: Error handling DocumentType structure. DocumentType with alias '{alias}' could not be found and was not added to the structure for '{contentType.Alias}'.");
+                    _logger.Warn<PackagingService>(() => $"Packager: Error handling DocumentType structure. DocumentType with alias '{alias}' could not be found and was not added to the structure for '{contentType.Alias}'.");
                     continue;
                 }
 
@@ -856,7 +846,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the user</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated DataTypeDefinitions</returns>
-        public IEnumerable<IDataType> ImportDataTypeDefinitions(XElement element, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<IDataType> ImportDataTypeDefinitions(XElement element, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -1190,7 +1180,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the User performing the operation</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumerable list of generated languages</returns>
-        public IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -1231,7 +1221,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional id of the User performing the operation</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns></returns>
-        public IEnumerable<IMacro> ImportMacros(XElement element, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<IMacro> ImportMacros(XElement element, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -1502,7 +1492,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userId">Optional user id</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated Templates</returns>
-        public IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -1579,7 +1569,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
 
-        public IEnumerable<IFile> ImportStylesheets(XElement element, int userId = -1, bool raiseEvents = true)
+        public IEnumerable<IFile> ImportStylesheets(XElement element, int userId = 0, bool raiseEvents = true)
         {
 
             if (raiseEvents)
@@ -1670,7 +1660,7 @@ namespace Umbraco.Core.Services.Implement
             set { _packageInstallation = value; }
         }
 
-        internal InstallationSummary InstallPackage(string packageFilePath, int userId = -1, bool raiseEvents = false)
+        internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0, bool raiseEvents = false)
         {
             var metaData = GetPackageMetaData(packageFilePath);
 

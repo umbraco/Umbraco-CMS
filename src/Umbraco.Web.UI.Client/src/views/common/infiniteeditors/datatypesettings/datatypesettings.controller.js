@@ -10,7 +10,7 @@
 (function () {
     "use strict";
 
-    function DataTypeSettingsController($scope, dataTypeResource, dataTypeHelper) {
+    function DataTypeSettingsController($scope, dataTypeResource, dataTypeHelper, localizationService) {
 
         var vm = this;
 
@@ -22,10 +22,22 @@
         vm.submit = submit;
 
         function onInit() {
+
+            setTitle();
+
             if($scope.model.create) {
                 createNewDataType();
             } else {
                 getDataType();
+            }
+        }
+
+        function setTitle() {
+            if(!$scope.model.title) {
+                localizationService.localize("contentTypeEditor_editorSettings")
+                    .then(function(data){
+                        $scope.model.title = data;
+                    });
             }
         }
 

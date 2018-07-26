@@ -49,21 +49,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return indexType;
         }
 
-        [Obsolete("Use the overload with the parameter index instead")]
-        public override string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnEqualComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for = comparison with NText columns but allows this syntax
-                    return string.Format("{0} LIKE '{1}'", column, value);
-                default:
-                    throw new ArgumentOutOfRangeException("columnType");
-            }
-        }
-
         public override string GetConcat(params string[] args)
         {
             return "(" + string.Join("+", args) + ")";

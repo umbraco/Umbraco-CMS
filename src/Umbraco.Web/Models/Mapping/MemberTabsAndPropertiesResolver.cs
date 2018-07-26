@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Security;
 using AutoMapper;
@@ -22,24 +23,27 @@ namespace Umbraco.Web.Models.Mapping
     /// </remarks>
     internal class MemberTabsAndPropertiesResolver : TabsAndPropertiesResolver<IMember, MemberDisplay>
     {
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IMemberService _memberService;
         private readonly IUserService _userService;
 
-        public MemberTabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IMemberService memberService, IUserService userService)
+        public MemberTabsAndPropertiesResolver(IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IMemberService memberService, IUserService userService)
             : base(localizedTextService)
         {
-            _localizedTextService = localizedTextService;
-            _memberService = memberService;
-            _userService = userService;
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
+            _localizedTextService = localizedTextService ?? throw new System.ArgumentNullException(nameof(localizedTextService));
+            _memberService = memberService ?? throw new System.ArgumentNullException(nameof(memberService));
+            _userService = userService ?? throw new System.ArgumentNullException(nameof(userService));
         }
 
-        public MemberTabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties, IMemberService memberService, IUserService userService)
+        public MemberTabsAndPropertiesResolver(IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties, IMemberService memberService, IUserService userService)
             : base(localizedTextService, ignoreProperties)
         {
-            _localizedTextService = localizedTextService;
-            _memberService = memberService;
-            _userService = userService;
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
+            _localizedTextService = localizedTextService ?? throw new System.ArgumentNullException(nameof(localizedTextService));
+            _memberService = memberService ?? throw new System.ArgumentNullException(nameof(memberService));
+            _userService = userService ?? throw new System.ArgumentNullException(nameof(userService));
         }
 
         /// <inheritdoc />
@@ -80,7 +84,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
             }
 
-            var umbracoContext = context.GetUmbracoContext();
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
             if (umbracoContext != null
                 && umbracoContext.Security.CurrentUser != null
                 && umbracoContext.Security.CurrentUser.AllowedSections.Any(x => x.Equals(Constants.Applications.Settings)))
@@ -166,16 +170,17 @@ namespace Umbraco.Web.Models.Mapping
         /// <summary>
         /// Overridden to assign the IsSensitive property values
         /// </summary>
-        /// <param name="umbracoContext"></param>
         /// <param name="content"></param>
         /// <param name="properties"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        protected override List<ContentPropertyDisplay> MapProperties(UmbracoContext umbracoContext, IContentBase content, List<Property> properties, ResolutionContext context)
+        protected override List<ContentPropertyDisplay> MapProperties(IContentBase content, List<Property> properties, ResolutionContext context)
         {
-            var result = base.MapProperties(umbracoContext, content, properties, context);
+            var result = base.MapProperties(content, properties, context);
             var member = (IMember)content;
             var memberType = member.ContentType;
+
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
 
             //now update the IsSensitive value
             foreach (var prop in result)
@@ -183,7 +188,7 @@ namespace Umbraco.Web.Models.Mapping
                 //check if this property is flagged as sensitive
                 var isSensitiveProperty = memberType.IsSensitiveProperty(prop.Alias);
                 //check permissions for viewing sensitive data
-                if (isSensitiveProperty && umbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false)
+                if (isSensitiveProperty && (umbracoContext == null || umbracoContext.Security.CurrentUser.HasAccessToSensitiveData() == false))
                 {
                     //mark this property as sensitive
                     prop.IsSensitive = true;

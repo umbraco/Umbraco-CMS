@@ -20,7 +20,7 @@
         the latter would pick anything below 3.0.0 and that includes prereleases such as 3.0.0-alpha, and we do
         not want this to happen as the alpha of the next major is, really, the next major already.
       -->
-      <dependency id="AutoMapper" version="[6.2.2,6.999999)" />
+      <dependency id="AutoMapper" version="[7.0.1,7.999999)" />
       <dependency id="ClientDependency" version="[1.9.6,1.999999)" />
       <dependency id="ClientDependency-Mvc5" version="[1.8.0,1.999999)" />
       <dependency id="CSharpTest.Net.Collections" version="[14.906.1403.1082,14.999999)" />
@@ -65,14 +65,12 @@
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.dll" target="lib\net472\Umbraco.Web.dll" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.dll" target="lib\net472\Umbraco.Web.UI.dll" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.dll" target="lib\net472\Umbraco.Examine.dll" />
-    <file src="$BuildTmp$\WebApp\bin\Umbraco.ModelsBuilder.dll" target="lib\net472\Umbraco.ModelsBuilder.dll" />
 
       <!-- docs -->
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Core.xml" target="lib\Umbraco.Core.xml" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.xml" target="lib\Umbraco.Web.xml" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.xml" target="lib\Umbraco.Web.UI.xml" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.xml" target="lib\Umbraco.Examine.xml" />
-    <file src="$BuildTmp$\WebApp\bin\Umbraco.ModelsBuilder.xml" target="lib\Umbraco.ModelsBuilder.xml" />
 
     <file src="tools\install.core.ps1" target="tools\install.ps1" />
 
@@ -85,7 +83,5 @@
     <file src="$BuildTmp$\..\src\Umbraco.Web.UI\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Web.UI" />
     <file src="$BuildTmp$\bin\Umbraco.Examine.pdb" target="lib" />
     <file src="$BuildTmp$\..\src\Umbraco.Examine\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Examine" />
-    <file src="$BuildTmp$\bin\Umbraco.ModelsBuilder.pdb" target="lib" />
-    <file src="$BuildTmp$\..\src\Umbraco.ModelsBuilder\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.ModelsBuilder" />
   </files>
 </package>

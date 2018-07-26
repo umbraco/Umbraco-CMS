@@ -2,20 +2,22 @@
 angular.module("umbraco").controller("Umbraco.Overlays.MemberGroupPickerController",
     function($scope, eventsService, entityResource, searchService, $log, localizationService) {
 
-        if(!$scope.model.title) {
-            $scope.model.title = localizationService.localize("defaultdialogs_selectMemberGroup");
-        }
-
         $scope.dialogTreeApi = {};
         $scope.multiPicker = $scope.model.multiPicker;
 
         function activate() {
 
-          if($scope.multiPicker) {
-             $scope.model.selectedMemberGroups = [];
-          } else {
-             $scope.model.selectedMemberGroup = "";
-          }
+            if(!$scope.model.title) {
+                localizationService.localize("defaultdialogs_selectMemberGroup").then(function(value){
+                    $scope.model.title = value;
+                });
+            }
+
+            if ($scope.multiPicker) {
+                $scope.model.selectedMemberGroups = [];
+            } else {
+                $scope.model.selectedMemberGroup = "";
+            }
 
         }
 

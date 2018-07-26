@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="6.2.2" />
+    <PackageReference Include="AutoMapper" Version="7.0.1" />
     <PackageReference Include="ClientDependency" Version="1.9.6" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="Examine" Version="1.0.0-beta025" />
@@ -117,6 +118,7 @@
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\DashboardHelper.cs" />
+    <Compile Include="Editors\DictionaryController.cs" />
     <Compile Include="Editors\EditorModelEventArgs.cs" />
     <Compile Include="Editors\EditorValidatorCollection.cs" />
     <Compile Include="Editors\EditorValidatorCollectionBuilder.cs" />
@@ -131,6 +133,7 @@
     <Compile Include="Editors\PreviewController.cs" />
     <Compile Include="Editors\TemplateController.cs" />
     <Compile Include="Editors\TourController.cs" />
+    <Compile Include="HealthCheck\Checks\DataIntegrity\DatabaseSchemaValidationHealthCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
@@ -209,6 +212,13 @@
     <Compile Include="Models\ContentEditing\ContentVariationPublish.cs" />
     <Compile Include="Models\ContentEditing\DomainDisplay.cs" />
     <Compile Include="Models\ContentEditing\DomainSave.cs" />
+    <Compile Include="Models\ContentEditing\CreatedDocumentTypeCollectionResult.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryOverviewDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryOverviewTranslationDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DictionarySave.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryTranslationDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryTranslationSave.cs" />
     <Compile Include="Models\ContentEditing\EditorNavigation.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
@@ -236,6 +246,7 @@
     <Compile Include="Models\Mapping\ContentChildOfListViewResolver.cs" />
     <Compile Include="Models\Mapping\ContentUrlResolver.cs" />
     <Compile Include="Models\Mapping\DefaultTemplateResolver.cs" />
+    <Compile Include="Models\Mapping\DictionaryMapperProfile.cs" />
     <Compile Include="Models\Mapping\LanguageMapperProfile.cs" />
     <Compile Include="Models\Mapping\MediaChildOfListViewResolver.cs" />
     <Compile Include="Models\Mapping\CodeFileMapperProfile.cs" />
@@ -255,6 +266,7 @@
     <Compile Include="Models\Mapping\TemplateMapperProfile.cs" />
     <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
     <Compile Include="Models\Mapping\ContentItemDisplayVariationResolver.cs" />
+    <Compile Include="Models\PublishedContent\HttpContextVariationContextAccessor.cs" />
     <Compile Include="Models\PublishedContent\PublishedValueFallback.cs" />
     <Compile Include="Models\RelatedLink.cs" />
     <Compile Include="Models\RelatedLinkBase.cs" />
@@ -323,6 +335,7 @@
     <Compile Include="PropertyEditors\TrueFalseConfiguration.cs" />
     <Compile Include="PropertyEditors\TrueFalseConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\UserPickerConfiguration.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\FlexibleDropdownPropertyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentManyValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentValueConverterBase.cs" />
     <Compile Include="PropertyEditors\ValueConverters\NestedContentSingleValueConverter.cs" />
@@ -399,6 +412,7 @@
     <Compile Include="Routing\ContentFinderCollectionBuilder.cs" />
     <Compile Include="Routing\Domain.cs" />
     <Compile Include="Routing\IContentLastChanceFinder.cs" />
+    <Compile Include="Routing\UrlInfo.cs" />
     <Compile Include="Routing\UrlProviderCollection.cs" />
     <Compile Include="Routing\UrlProviderCollectionBuilder.cs" />
     <Compile Include="Scheduling\HealthCheckNotifier.cs" />
@@ -430,6 +444,9 @@
     <Compile Include="Trees\UserPermissionsTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
     <Compile Include="Trees\UsersTreeController.cs" />
+    <Compile Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\endPreview.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -445,6 +462,8 @@
     <Compile Include="Runtime\WebRuntimeComponent.cs" />
     <Compile Include="Editors\PublishedStatusController.cs" />
     <Compile Include="Editors\NuCacheStatusController.cs" />
+    <Compile Include="WebServices\PublishedStatusController.cs" />
+    <Compile Include="WebServices\NuCacheStatusController.cs" />
     <Compile Include="_Legacy\Actions\Action.cs" />
     <Compile Include="_Legacy\Actions\ActionAssignDomain.cs" />
     <Compile Include="_Legacy\Actions\ActionAudit.cs" />
@@ -1427,6 +1446,22 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Editors\XmlDataIntegrityController.cs" />
+    <Compile Include="WebServices\BulkPublishController.cs" />
+    <Compile Include="WebServices\CoreStringsController.cs" />
+    <Compile Include="WebServices\DomainsApiController.cs" />
+    <Compile Include="WebServices\EmbedMediaService.cs" />
+    <Compile Include="WebServices\ExamineManagementApiController.cs" />
+    <Compile Include="WebServices\TagsController.cs" />
+    <Compile Include="WebServices\UmbracoAuthorizedHttpHandler.cs" />
+    <Compile Include="WebServices\SaveFileController.cs" />
+    <Compile Include="WebServices\UmbracoAuthorizedWebService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WebServices\UmbracoHttpHandler.cs" />
+    <Compile Include="WebServices\UmbracoWebService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="WebServices\XmlDataIntegrityController.cs" />
     <Compile Include="WebViewPageExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

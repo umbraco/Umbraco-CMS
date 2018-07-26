@@ -32,27 +32,27 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves a blueprint.
         /// </summary>
-        void SaveBlueprint(IContent content, int userId = -1);
+        void SaveBlueprint(IContent content, int userId = 0);
 
         /// <summary>
         /// Deletes a blueprint.
         /// </summary>
-        void DeleteBlueprint(IContent content, int userId = -1);
+        void DeleteBlueprint(IContent content, int userId = 0);
 
         /// <summary>
         /// Creates a new content item from a blueprint.
         /// </summary>
-        IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = -1);
+        IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = 0);
 
         /// <summary>
         /// Deletes blueprints for a content type.
         /// </summary>
-        void DeleteBlueprintsOfType(int contentTypeId, int userId = -1);
+        void DeleteBlueprintsOfType(int contentTypeId, int userId = 0);
 
         /// <summary>
         /// Deletes blueprints for content types.
         /// </summary>
-        void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = -1);
+        void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = 0);
 
         #endregion
 
@@ -251,13 +251,13 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves a document.
         /// </summary>
-        OperationResult Save(IContent content, int userId = -1, bool raiseEvents = true);
+        OperationResult Save(IContent content, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Saves documents.
         /// </summary>
         // fixme why only 1 result not 1 per content?!
-        OperationResult Save(IEnumerable<IContent> contents, int userId = -1, bool raiseEvents = true);
+        OperationResult Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Deletes a document.
@@ -266,7 +266,7 @@ namespace Umbraco.Core.Services
         /// <para>This method will also delete associated media files, child content and possibly associated domains.</para>
         /// <para>This method entirely clears the content from the database.</para>
         /// </remarks>
-        OperationResult Delete(IContent content, int userId = -1);
+        OperationResult Delete(IContent content, int userId = 0);
 
         /// <summary>
         /// Deletes all documents of a given document type.
@@ -275,7 +275,7 @@ namespace Umbraco.Core.Services
         /// <para>All non-deleted descendants of the deleted documents are moved to the recycle bin.</para>
         /// <para>This operation is potentially dangerous and expensive.</para>
         /// </remarks>
-        void DeleteOfType(int documentTypeId, int userId = -1);
+        void DeleteOfType(int documentTypeId, int userId = 0);
 
         /// <summary>
         /// Deletes all documents of given document types.
@@ -284,17 +284,17 @@ namespace Umbraco.Core.Services
         /// <para>All non-deleted descendants of the deleted documents are moved to the recycle bin.</para>
         /// <para>This operation is potentially dangerous and expensive.</para>
         /// </remarks>
-        void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = -1);
+        void DeleteOfTypes(IEnumerable<int> contentTypeIds, int userId = 0);
 
         /// <summary>
         /// Deletes versions of a document prior to a given date.
         /// </summary>
-        void DeleteVersions(int id, DateTime date, int userId = -1);
+        void DeleteVersions(int id, DateTime date, int userId = 0);
 
         /// <summary>
         /// Deletes a version of a document.
         /// </summary>
-        void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = -1);
+        void DeleteVersion(int id, int versionId, bool deletePriorVersions, int userId = 0);
 
         #endregion
 
@@ -303,7 +303,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Moves a document under a new parent.
         /// </summary>
-        void Move(IContent content, int parentId, int userId = -1);
+        void Move(IContent content, int parentId, int userId = 0);
 
         /// <summary>
         /// Copies a document.
@@ -311,7 +311,7 @@ namespace Umbraco.Core.Services
         /// <remarks>
         /// <para>Recursively copies all children.</para>
         /// </remarks>
-        IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = -1);
+        IContent Copy(IContent content, int parentId, bool relateToOriginal, int userId = 0);
 
         /// <summary>
         /// Copies a document.
@@ -319,12 +319,12 @@ namespace Umbraco.Core.Services
         /// <remarks>
         /// <para>Optionaly recursively copies all children.</para>
         /// </remarks>
-        IContent Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = -1);
+        IContent Copy(IContent content, int parentId, bool relateToOriginal, bool recursive, int userId = 0);
 
         /// <summary>
         /// Moves a document to the recycle bin.
         /// </summary>
-        OperationResult MoveToRecycleBin(IContent content, int userId = -1);
+        OperationResult MoveToRecycleBin(IContent content, int userId = 0);
 
         /// <summary>
         /// Empties the recycle bin.
@@ -334,12 +334,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        bool Sort(IEnumerable<IContent> items, int userId = -1, bool raiseEvents = true);
+        bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Sorts documents.
         /// </summary>
-        bool Sort(IEnumerable<int> ids, int userId = -1, bool raiseEvents = true);
+        bool Sort(IEnumerable<int> ids, int userId = 0, bool raiseEvents = true);
 
         #endregion
 
@@ -348,23 +348,48 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves and publishes a document.
         /// </summary>
-        /// <remarks>Property values must first be published at document level.</remarks>
-        PublishResult SaveAndPublish(IContent content, int userId = -1, bool raiseEvents = true);
+        /// <remarks>
+        /// <para>By default, publishes all variations of the document, but it is possible to specify a culture to be published.</para>
+        /// <para>When a culture is being published, it includes all varying values along with all invariant values. For
+        /// anything more complicated, see <see cref="SavePublishing"/>.</para>
+        /// <para>The document is *always* saved, even when publishing fails.</para>
+        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
+        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
+        /// </remarks>
+        PublishResult SaveAndPublish(IContent content, string culture = "*", int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Saves and publishes a publishing document.
+        /// </summary>
+        /// <remarks>
+        /// <para>A publishing document is a document with values that are being published, i.e.
+        /// that have been published or cleared via <see cref="IContent.PublishCulture"/> and
+        /// <see cref="IContent.UnpublishCulture"/>.</para>
+        /// <para>The document is *always* saved, even when publishing fails.</para>
+        /// </remarks>
+        PublishResult SavePublishing(IContent content, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Saves and publishes a document branch.
         /// </summary>
-        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = null, string segment = null, int userId = -1);
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, string culture = "*", int userId = 0);
 
         /// <summary>
         /// Saves and publishes a document branch.
         /// </summary>
-        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, Func<IContent, bool> editing, Func<IContent, bool> publishValues, int userId = -1);
+        IEnumerable<PublishResult> SaveAndPublishBranch(IContent content, bool force, Func<IContent, bool> editing, Func<IContent, bool> publishCultures, int userId = 0);
 
         /// <summary>
-        /// Unpublishes a document or optionally unpublishes a culture and/or segment for the document.
+        /// Unpublishes a document.
         /// </summary>
-        UnpublishResult Unpublish(IContent content, string culture = null, string segment = null, int userId = -1);
+        /// <remarks>
+        /// <para>By default, unpublishes the document as a whole, but it is possible to specify a culture to be
+        /// unpublished. Depending on whether that culture is mandatory, and other cultures remain published,
+        /// the document as a whole may or may not remain published.</para>
+        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither null nor
+        /// empty. If the content type is invariant, then culture can be either '*' or null or empty.</para>
+        /// </remarks>
+        UnpublishResult Unpublish(IContent content, string culture = "*", int userId = 0);
 
         /// <summary>
         /// Gets a value indicating whether a document is path-publishable.
@@ -381,7 +406,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves a document and raises the "sent to publication" events.
         /// </summary>
-        bool SendToPublication(IContent content, int userId = -1);
+        bool SendToPublication(IContent content, int userId = 0);
 
         /// <summary>
         /// Publishes and unpublishes scheduled documents.
@@ -416,27 +441,27 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Creates a document.
         /// </summary>
-        IContent Create(string name, Guid parentId, string documentTypeAlias, int userId = -1);
+        IContent Create(string name, Guid parentId, string documentTypeAlias, int userId = 0);
 
         /// <summary>
         /// Creates a document.
         /// </summary>
-        IContent Create(string name, int parentId, string documentTypeAlias, int userId = -1);
+        IContent Create(string name, int parentId, string documentTypeAlias, int userId = 0);
 
         /// <summary>
         /// Creates a document.
         /// </summary>
-        IContent Create(string name, IContent parent, string documentTypeAlias, int userId = -1);
+        IContent Create(string name, IContent parent, string documentTypeAlias, int userId = 0);
 
         /// <summary>
         /// Creates and saves a document.
         /// </summary>
-        IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = -1);
+        IContent CreateAndSave(string name, int parentId, string contentTypeAlias, int userId = 0);
 
         /// <summary>
         /// Creates and saves a document.
         /// </summary>
-        IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = -1);
+        IContent CreateAndSave(string name, IContent parent, string contentTypeAlias, int userId = 0);
 
         #endregion
     }

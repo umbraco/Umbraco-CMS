@@ -24,7 +24,7 @@ namespace Umbraco.Core.Strings
             if (content.HasProperty(Constants.Conventions.Content.UrlName))
                 source = (content.GetValue<string>(Constants.Conventions.Content.UrlName, culture) ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(source))
-                source = content.GetName(culture);
+                source = content.GetCultureName(culture);
             return source;
         }
     }

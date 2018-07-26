@@ -27,7 +27,8 @@
                 <umb-button type="button"
                             label-key="general_upload"
                             action="upload()"
-                            disabled="lockedFolder">
+                            disabled="lockedFolder"
+                            ng-if="acceptedMediatypes.length > 0">
                 </umb-button>
             </div>
 

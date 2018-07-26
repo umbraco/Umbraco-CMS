@@ -42,17 +42,6 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="content">The content.</param>
         /// <returns>The absolute url for the content.</returns>
-        //[Obsolete("UrlWithDomain() is obsolete, use the UrlAbsolute() method instead.")]
-        public static string UrlWithDomain(this IPublishedContent content)
-        {
-            return content.UrlAbsolute();
-        }
-
-        /// <summary>
-        /// Gets the absolute url for the content.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <returns>The absolute url for the content.</returns>
         public static string UrlAbsolute(this IPublishedContent content)
         {
             // adapted from PublishedContentBase.Url
@@ -82,11 +71,15 @@ namespace Umbraco.Web
         public static string GetUrlSegment(this IPublishedContent content, string culture = null)
         {
             // for invariant content, return the invariant url segment
-            if (!content.ContentType.Variations.Has(ContentVariation.CultureNeutral))
+            if (!content.ContentType.VariesByCulture())
                 return content.UrlSegment;
 
+            // content.GetCulture(culture) will use the 'current' culture (via accessor) in case 'culture'
+            // is null (meaning, 'current') - and can return 'null' if that culture is not published - and
+            // will return 'null' if the content is variant and culture is invariant
+
             // else try and get the culture info
-            // return the corresponding url segment, or null if none (ie the culture is not published)
+            // return the corresponding url segment, or null if none
             var cultureInfo = content.GetCulture(culture);
             return cultureInfo?.UrlSegment;
         }
@@ -392,7 +385,7 @@ namespace Umbraco.Web
 
         public static bool IsDescendant(this IPublishedContent content, IPublishedContent other)
         {
-            return content.Ancestors().Any(x => x.Id == other.Id);
+            return other.Level < content.Level && content.Path.InvariantStartsWith(other.Path);
         }
 
         public static HtmlString IsDescendant(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -407,7 +400,7 @@ namespace Umbraco.Web
 
         public static bool IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other)
         {
-            return content.AncestorsOrSelf().Any(x => x.Id == other.Id);
+            return content.Path.InvariantStartsWith(other.Path);
         }
 
         public static HtmlString IsDescendantOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -422,8 +415,8 @@ namespace Umbraco.Web
 
         public static bool IsAncestor(this IPublishedContent content, IPublishedContent other)
         {
-            // avoid using Descendants(), that's expensive
-            return other.Ancestors().Any(x => x.Id == content.Id);
+            // avoid using Descendants(), or Ancestors(), they're expensive
+            return content.Level < other.Level && other.Path.InvariantStartsWith(content.Path);
         }
 
         public static HtmlString IsAncestor(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -438,8 +431,8 @@ namespace Umbraco.Web
 
         public static bool IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other)
         {
-            // avoid using DescendantsOrSelf(), that's expensive
-            return other.AncestorsOrSelf().Any(x => x.Id == content.Id);
+            // avoid using DescendantsOrSelf() or AncestorsOrSelf(), they're expensive
+            return other.Path.InvariantStartsWith(content.Path);
         }
 
         public static HtmlString IsAncestorOrSelf(this IPublishedContent content, IPublishedContent other, string valueIfTrue)
@@ -731,7 +724,7 @@ namespace Umbraco.Web
             return content.AncestorsOrSelf<T>(maxLevel).FirstOrDefault();
         }
 
-        internal static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func)
+        public static IEnumerable<IPublishedContent> AncestorsOrSelf(this IPublishedContent content, bool orSelf, Func<IPublishedContent, bool> func)
         {
             var ancestorsOrSelf = content.EnumerateAncestors(orSelf);
             return func == null ? ancestorsOrSelf : ancestorsOrSelf.Where(func);
@@ -1091,13 +1084,13 @@ namespace Umbraco.Web
             return content.Children(predicate).FirstOrDefault();
         }
 
-        public static IPublishedContent FirstChild<T>(this IPublishedContent content)
+        public static T FirstChild<T>(this IPublishedContent content)
             where T : class, IPublishedContent
         {
             return content.Children<T>().FirstOrDefault();
         }
 
-        public static IPublishedContent FirstChild<T>(this IPublishedContent content, Func<IPublishedContent, bool> predicate)
+        public static T FirstChild<T>(this IPublishedContent content, Func<T, bool> predicate)
             where T : class, IPublishedContent
         {
             return content.Children<T>().FirstOrDefault(predicate);

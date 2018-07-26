@@ -26,11 +26,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var created = DateTime.Now;
                 var task = new Task(new TaskType("asdfasdf"))
                 {
-                    AssigneeUserId = Constants.Security.SuperId,
+                    AssigneeUserId = Constants.Security.SuperUserId,
                     Closed = false,
                     Comment = "hello world",
                     EntityId = -1,
-                    OwnerUserId = Constants.Security.SuperId
+                    OwnerUserId = Constants.Security.SuperUserId
                 };
                 repo.Save(task);
                 
@@ -54,23 +54,23 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var created = DateTime.Now;
                 repo.Save(new Task(new TaskType("asdfasdf"))
                 {
-                    AssigneeUserId = Constants.Security.SuperId,
+                    AssigneeUserId = Constants.Security.SuperUserId,
                     Closed = false,
                     Comment = "hello world",
                     EntityId = -1,
-                    OwnerUserId = Constants.Security.SuperId
+                    OwnerUserId = Constants.Security.SuperUserId
                 });
                 
 
                 var found = repo.GetMany().ToArray();
 
                 Assert.AreEqual(1, found.Length);
-                Assert.AreEqual(Constants.Security.SuperId, found.First().AssigneeUserId);
+                Assert.AreEqual(Constants.Security.SuperUserId, found.First().AssigneeUserId);
                 Assert.AreEqual(false, found.First().Closed);
                 Assert.AreEqual("hello world", found.First().Comment);
                 Assert.GreaterOrEqual(found.First().CreateDate.TruncateTo(DateTimeExtensions.DateTruncate.Second), created.TruncateTo(DateTimeExtensions.DateTruncate.Second));
                 Assert.AreEqual(-1, found.First().EntityId);
-                Assert.AreEqual(Constants.Security.SuperId, found.First().OwnerUserId);
+                Assert.AreEqual(Constants.Security.SuperUserId, found.First().OwnerUserId);
                 Assert.AreEqual(true, found.First().HasIdentity);
                 Assert.AreEqual(true, found.First().TaskType.HasIdentity);
             }
@@ -86,11 +86,11 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var task = new Task(new TaskType("asdfasdf"))
                 {
-                    AssigneeUserId = Constants.Security.SuperId,
+                    AssigneeUserId = Constants.Security.SuperUserId,
                     Closed = false,
                     Comment = "hello world",
                     EntityId = -1,
-                    OwnerUserId = Constants.Security.SuperId
+                    OwnerUserId = Constants.Security.SuperUserId
                 };
 
                 repo.Save(task);
@@ -123,11 +123,11 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var task = new Task(new TaskType("asdfasdf"))
                 {
-                    AssigneeUserId = Constants.Security.SuperId,
+                    AssigneeUserId = Constants.Security.SuperUserId,
                     Closed = false,
                     Comment = "hello world",
                     EntityId = -1,
-                    OwnerUserId = Constants.Security.SuperId
+                    OwnerUserId = Constants.Security.SuperUserId
                 };
 
                 repo.Save(task);
@@ -214,11 +214,11 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     repo.Save(new Task(new TaskType("asdfasdf"))
                     {
-                        AssigneeUserId = Constants.Security.SuperId,
+                        AssigneeUserId = Constants.Security.SuperUserId,
                         Closed = closed,
                         Comment = "hello world " + i,
                         EntityId = entityId,
-                        OwnerUserId = Constants.Security.SuperId
+                        OwnerUserId = Constants.Security.SuperUserId
                     });
                 }
 

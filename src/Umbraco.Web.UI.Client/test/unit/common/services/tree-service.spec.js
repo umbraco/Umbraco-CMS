@@ -39,6 +39,7 @@ describe('tree service tests', function () {
     beforeEach(module('umbraco.services'));
     beforeEach(module('umbraco.resources'));
     beforeEach(module('umbraco.mocks'));
+    beforeEach(module('ngRoute'));
 
     beforeEach(inject(function ($injector, mocksUtils) {
         

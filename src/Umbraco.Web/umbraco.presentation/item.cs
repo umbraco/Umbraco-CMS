@@ -60,7 +60,9 @@ namespace umbraco
 
             if (_fieldName.StartsWith("#"))
             {
-                _fieldContent = library.GetDictionaryItem(_fieldName.Substring(1, _fieldName.Length - 1));
+                var umbHelper = new UmbracoHelper(Current.UmbracoContext, Current.Services, Current.ApplicationCache);
+
+                _fieldContent = umbHelper.GetDictionaryValue(_fieldName.Substring(1, _fieldName.Length - 1));
             }
             else
             {

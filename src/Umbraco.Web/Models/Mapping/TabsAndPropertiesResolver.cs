@@ -164,7 +164,6 @@ namespace Umbraco.Web.Models.Mapping
         /// <summary>
         /// Maps properties on to the generic properties tab
         /// </summary>
-        /// <param name="umbracoContext"></param>
         /// <param name="content"></param>
         /// <param name="tabs"></param>
         /// <param name="context"></param>
@@ -172,14 +171,14 @@ namespace Umbraco.Web.Models.Mapping
         /// The generic properties tab is responsible for 
         /// setting up the properties such as Created date, updated date, template selected, etc...
         /// </remarks>
-        protected virtual void MapGenericProperties(UmbracoContext umbracoContext, IContentBase content, List<Tab<ContentPropertyDisplay>> tabs, ResolutionContext context)
+        protected virtual void MapGenericProperties(IContentBase content, List<Tab<ContentPropertyDisplay>> tabs, ResolutionContext context)
         {
             // add the generic properties tab, for properties that don't belong to a tab
             // get the properties, map and translate them, then add the tab
             var noGroupProperties = content.GetNonGroupedProperties()
                 .Where(x => IgnoreProperties.Contains(x.Alias) == false) // skip ignored
                 .ToList();
-            var genericproperties = MapProperties(umbracoContext, content, noGroupProperties, context);
+            var genericproperties = MapProperties(content, noGroupProperties, context);
 
             tabs.Add(new Tab<ContentPropertyDisplay>
             {
@@ -225,12 +224,11 @@ namespace Umbraco.Web.Models.Mapping
         /// <summary>
         /// Maps a list of <see cref="Property"/> to a list of <see cref="ContentPropertyDisplay"/>
         /// </summary>
-        /// <param name="umbracoContext"></param>
         /// <param name="content"></param>
         /// <param name="properties"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        protected virtual List<ContentPropertyDisplay> MapProperties(UmbracoContext umbracoContext, IContentBase content, List<Property> properties, ResolutionContext context)
+        protected virtual List<ContentPropertyDisplay> MapProperties(IContentBase content, List<Property> properties, ResolutionContext context)
         {
             //we need to map this way to pass the context through, I don't like it but we'll see what AutoMapper says: https://github.com/AutoMapper/AutoMapper/issues/2588
             var result = context.Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(
@@ -252,15 +250,16 @@ namespace Umbraco.Web.Models.Mapping
     {
         public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService)
             : base(localizedTextService)
-        { }
+        {
+        }
 
         public TabsAndPropertiesResolver(ILocalizedTextService localizedTextService, IEnumerable<string> ignoreProperties)
             : base(localizedTextService, ignoreProperties)
-        { }
+        {
+        }
 
         public virtual IEnumerable<Tab<ContentPropertyDisplay>> Resolve(TSource source, TDestination destination, IEnumerable<Tab<ContentPropertyDisplay>> destMember, ResolutionContext context)
         {
-            var umbracoContext = context.GetUmbracoContext(throwIfMissing: false); // fixme
             var tabs = new List<Tab<ContentPropertyDisplay>>();
 
             // add the tabs, for properties that belong to a tab
@@ -285,7 +284,7 @@ namespace Umbraco.Web.Models.Mapping
                     continue;
 
                 //map the properties
-                var mappedProperties = MapProperties(umbracoContext, source, properties, context);
+                var mappedProperties = MapProperties(source, properties, context);
 
                 // add the tab
                 // we need to pick an identifier... there is no "right" way...
@@ -303,7 +302,7 @@ namespace Umbraco.Web.Models.Mapping
                 });
             }
 
-            MapGenericProperties(umbracoContext, source, tabs, context);
+            MapGenericProperties(source, tabs, context);
 
             // activate the first tab, if any
             if (tabs.Count > 0)

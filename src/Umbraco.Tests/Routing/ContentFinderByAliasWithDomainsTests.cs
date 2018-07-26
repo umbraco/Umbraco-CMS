@@ -1,12 +1,39 @@
-﻿using NUnit.Framework;
+﻿using System.Linq;
+using Moq;
+using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {
-
     [TestFixture]
     public class ContentFinderByAliasWithDomainsTests : ContentFinderByAliasTests
     {
+        private PublishedContentType _publishedContentType;
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+
+            var properties = new[]
+            {
+                new PublishedPropertyType("umbracoUrlAlias", Constants.DataTypes.Textbox, false, ContentVariation.Nothing,
+                    new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()),
+                    Mock.Of<IPublishedModelFactory>(),
+                    Mock.Of<IPublishedContentTypeFactory>()), 
+            };
+            _publishedContentType = new PublishedContentType(0, "Doc", PublishedItemType.Content, Enumerable.Empty<string>(), properties, ContentVariation.Nothing);
+        }
+
+        protected override PublishedContentType GetPublishedContentTypeByAlias(string alias)
+        {
+            if (alias == "Doc") return _publishedContentType;
+            return null;
+        }
+
         [TestCase("http://domain1.com/this/is/my/alias", "de-DE", -1001)] // alias to domain's page fails - no alias on domain's home
         [TestCase("http://domain1.com/page2/alias", "de-DE", 10011)] // alias to sub-page works
         [TestCase("http://domain1.com/en/flux", "en-US", -10011)] // alias to domain's page fails - no alias on domain's home

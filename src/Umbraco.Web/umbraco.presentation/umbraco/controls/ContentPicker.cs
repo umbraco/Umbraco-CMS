@@ -17,18 +17,6 @@ namespace umbraco.controls
             TreeAlias = "content";
         }
 
-        [Obsolete("Use Value property instead, this simply wraps it.")]
-        public string Text
-        {
-            get
-            {
-                return this.Value;
-            }
-            set
-            {
-                this.Value = value;
-            }
-        }
 
         public string AppAlias { get; set; }
         public string TreeAlias { get; set; }

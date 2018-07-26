@@ -21,7 +21,8 @@ namespace Umbraco.Core.Models
         private DateTime? _releaseDate;
         private DateTime? _expireDate;
         private Dictionary<string, (string Name, DateTime Date)> _publishInfos;
-        private HashSet<string> _edited;
+        private Dictionary<string, (string Name, DateTime Date)> _publishInfosOrig;
+        private HashSet<string> _editedCultures;
 
         private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
 
@@ -188,47 +189,41 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public IContentType ContentType => _contentType;
 
+        /// <inheritdoc />
         [IgnoreDataMember]
-        public DateTime? PublishDate { get; internal set; }
+        public DateTime? PublishDate { get; internal set; } // set by persistence
 
+        /// <inheritdoc />
         [IgnoreDataMember]
-        public int? PublisherId { get; internal set; }
+        public int? PublisherId { get; internal set; } // set by persistence
 
+        /// <inheritdoc />
         [IgnoreDataMember]
-        public ITemplate PublishTemplate { get; internal set; }
+        public ITemplate PublishTemplate { get; internal set; } // set by persistence
 
+        /// <inheritdoc />
         [IgnoreDataMember]
-        public string PublishName { get; internal set; }
+        public string PublishName { get; internal set; } // set by persistence
 
-        // sets publish infos
-        // internal for repositories
-        // clear by clearing name
-        internal void SetPublishInfos(string culture, string name, DateTime date)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentNullOrEmptyException(nameof(name));
+        /// <inheritdoc />
+        [IgnoreDataMember]
+        public IEnumerable<string> EditedCultures => CultureNames.Keys.Where(IsCultureEdited);
 
-            // this is the only place where we set PublishName (apart from factories etc), and we must ensure
-            // that we do have an invariant name, as soon as we have a variant name, else we would end up not
-            // being able to publish - and not being able to change the name, as PublishName is readonly.
-            // see also: DocumentRepository.EnsureInvariantNameValues() - which deals with Name.
-            // see also: U4-11286
-            if (culture == null || string.IsNullOrEmpty(PublishName))
-            {
-                PublishName = name;
-                PublishDate = date;
-            }
+        /// <inheritdoc />
+        [IgnoreDataMember]
+        public IEnumerable<string> PublishedCultures => _publishInfos?.Keys ?? Enumerable.Empty<string>();
 
-            if (culture != null)
-            {
-                // private method, assume that culture is valid
+        /// <inheritdoc />
+        public bool IsCulturePublished(string culture)
+            => _publishInfos != null && _publishInfos.ContainsKey(culture);
 
-                if (_publishInfos == null)
-                    _publishInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
+        /// <inheritdoc />
+        public bool WasCulturePublished(string culture)
+            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture);
 
-                _publishInfos[culture] = (name, date);
-            }
-        }
+        /// <inheritdoc />
+        public bool IsCultureEdited(string culture)
+            => !IsCulturePublished(culture) || (_editedCultures != null && _editedCultures.Contains(culture));
 
         /// <inheritdoc/>
         [IgnoreDataMember]
@@ -237,73 +232,74 @@ namespace Umbraco.Core.Models
         /// <inheritdoc/>
         public string GetPublishName(string culture)
         {
-            if (culture == null) return PublishName;
+            if (culture.IsNullOrWhiteSpace()) return PublishName;
+            if (!ContentTypeBase.VariesByCulture()) return null;
             if (_publishInfos == null) return null;
             return _publishInfos.TryGetValue(culture, out var infos) ? infos.Name : null;
         }
 
-        // clears a publish name
-        private void ClearPublishName(string culture)
+        /// <inheritdoc />
+        public DateTime? GetPublishDate(string culture)
         {
-            if (culture == null)
-            {
-                PublishName = null;
-                return;
-            }
-
-            if (_publishInfos == null) return;
-            _publishInfos.Remove(culture);
-            if (_publishInfos.Count == 0)
-                _publishInfos = null;
+            if (culture.IsNullOrWhiteSpace()) return PublishDate;
+            if (!ContentTypeBase.VariesByCulture()) return null;
+            if (_publishInfos == null) return null;
+            return _publishInfos.TryGetValue(culture, out var infos) ? infos.Date : (DateTime?) null;
         }
 
-        // clears all publish names
-        private void ClearPublishNames()
+        // internal for repository
+        internal void SetPublishInfo(string culture, string name, DateTime date)
         {
-            PublishName = null;
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentNullOrEmptyException(nameof(name));
+
+            if (culture.IsNullOrWhiteSpace())
+                throw new ArgumentNullOrEmptyException(nameof(culture));
+
+            if (_publishInfos == null)
+                _publishInfos = new Dictionary<string, (string Name, DateTime Date)>(StringComparer.OrdinalIgnoreCase);
+
+            _publishInfos[culture] = (name, date);
+        }
+
+        private void ClearPublishInfos()
+        {
             _publishInfos = null;
         }
 
-        /// <inheritdoc />
-        public bool IsCulturePublished(string culture)
-            => !string.IsNullOrWhiteSpace(GetPublishName(culture));
-
-        /// <inheritdoc />
-        public DateTime GetCulturePublishDate(string culture)
+        private void ClearPublishInfo(string culture)
         {
-            if (_publishInfos != null && _publishInfos.TryGetValue(culture, out var infos))
-                return infos.Date;
-            throw new InvalidOperationException($"Culture \"{culture}\" is not published.");
-        }
+            if (culture.IsNullOrWhiteSpace())
+                throw new ArgumentNullOrEmptyException(nameof(culture));
 
-        /// <inheritdoc />
-        public IEnumerable<string> PublishedCultures => _publishInfos?.Keys ?? Enumerable.Empty<string>();
-
-        /// <inheritdoc />
-        public bool IsCultureEdited(string culture)
-        {
-            return string.IsNullOrWhiteSpace(GetPublishName(culture)) || (_edited != null && _edited.Contains(culture));
+            if (_publishInfos == null) return;
+            _publishInfos.Remove(culture);
+            if (_publishInfos.Count == 0) _publishInfos = null;
         }
 
         // sets a publish edited
         internal void SetCultureEdited(string culture)
         {
-            if (_edited == null)
-                _edited = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            _edited.Add(culture);
+            if (culture.IsNullOrWhiteSpace())
+                throw new ArgumentNullOrEmptyException(nameof(culture));
+            if (_editedCultures == null)
+                _editedCultures = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            _editedCultures.Add(culture);
         }
 
         // sets all publish edited
         internal void SetCultureEdited(IEnumerable<string> cultures)
         {
-            _edited = new HashSet<string>(cultures, StringComparer.OrdinalIgnoreCase);
+            if (cultures == null)
+            {
+                _editedCultures = null;
+            }
+            else
+            {
+                var editedCultures = new HashSet<string>(cultures.Where(x => !x.IsNullOrWhiteSpace()), StringComparer.OrdinalIgnoreCase);
+                _editedCultures = editedCultures.Count > 0 ? editedCultures : null;
+            }
         }
-
-        /// <inheritdoc />
-        public IEnumerable<string> EditedCultures => Names.Keys.Where(IsCultureEdited);
-
-        /// <inheritdoc />
-        public IEnumerable<string> AvailableCultures => Names.Keys;
 
         [IgnoreDataMember]
         public int PublishedVersionId { get; internal set; }
@@ -312,249 +308,71 @@ namespace Umbraco.Core.Models
         public bool Blueprint { get; internal set; }
 
         /// <inheritdoc />
-        internal virtual bool TryPublishAllValues()
+        public virtual bool PublishCulture(string culture = "*")
         {
-            // the values we want to publish should be valid
-            if (ValidateAllProperties().Any())
-                return false; //fixme this should return an attempt with error results
+            culture = culture.NullOrWhiteSpaceAsNull();
 
-            // Name and PublishName are managed by the repository, but Names and PublishNames
-            // must be managed here as they depend on the existing / supported variations.
-            if (string.IsNullOrWhiteSpace(Name))
-                throw new InvalidOperationException($"Cannot publish invariant culture without a name.");
-            PublishName = Name;
-            var now = DateTime.Now;
-            foreach (var (culture, name) in Names)
-            {
-                if (string.IsNullOrWhiteSpace(name))
-                    return false; //fixme this should return an attempt with error results
-
-                SetPublishInfos(culture, name, now);
-            }
-
-            // property.PublishAllValues only deals with supported variations (if any)
-            foreach (var property in Properties)
-                property.PublishAllValues();
-
-            _publishedState = PublishedState.Publishing;
-            return true;
-        }
-
-        /// <inheritdoc />
-        public virtual bool TryPublishValues(string culture = null, string segment = null)
-        {
-            // the variation should be supported by the content type
-            ContentType.ValidateVariation(culture, segment, throwIfInvalid: true);
+            // the variation should be supported by the content type properties
+            //  if the content type is invariant, only '*' and 'null' is ok
+            //  if the content type varies, everything is ok because some properties may be invariant
+            if (!ContentType.SupportsPropertyVariation(culture, "*", true))
+                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{ContentType.Alias}\" with variation \"{ContentType.Variations}\".");
 
             // the values we want to publish should be valid
-            if (ValidateProperties(culture, segment).Any())
-                return false; //fixme this should return an attempt with error results
-
-            // Name and PublishName are managed by the repository, but Names and PublishNames
-            // must be managed here as they depend on the existing / supported variations.
-            if (segment == null)
-            {
-                var name = GetName(culture);
-                if (string.IsNullOrWhiteSpace(name))
-                    return false; //fixme this should return an attempt with error results
-
-                SetPublishInfos(culture, name, DateTime.Now);
-            }
-
-            // property.PublishValue throws on invalid variation, so filter them out
-            foreach (var property in Properties.Where(x => x.PropertyType.ValidateVariation(culture, segment, throwIfInvalid: false)))
-                property.PublishValue(culture, segment);
-
-            _publishedState = PublishedState.Publishing;
-            return true;
-        }
-
-        /// <inheritdoc />
-        internal virtual bool PublishCultureValues(string culture = null)
-        {
-            //fixme - needs API review as this is not used apart from in tests
-
-            // the values we want to publish should be valid
-            if (ValidatePropertiesForCulture(culture).Any())
+            if (ValidateProperties(culture).Any())
                 return false;
 
-            // Name and PublishName are managed by the repository, but Names and PublishNames
-            // must be managed here as they depend on the existing / supported variations.
-            var name = GetName(culture);
-            if (string.IsNullOrWhiteSpace(name))
-                throw new InvalidOperationException($"Cannot publish {culture ?? "invariant"} culture without a name.");
-            SetPublishInfos(culture, name, DateTime.Now);
+            var alsoInvariant = false;
+            if (culture == "*") // all cultures
+            {
+                foreach (var c in AvailableCultures)
+                {
+                    var name = GetCultureName(c);
+                    if (string.IsNullOrWhiteSpace(name))
+                        return false;
+                    SetPublishInfo(c, name, DateTime.Now);
+                }
+            }
+            else // one single culture
+            {
+                var name = GetCultureName(culture);
+                if (string.IsNullOrWhiteSpace(name))
+                    return false;
+                SetPublishInfo(culture, name, DateTime.Now);
+                alsoInvariant = true; // we also want to publish invariant values
+            }
 
-            // property.PublishCultureValues only deals with supported variations (if any)
+            // property.PublishValues only publishes what is valid, variation-wise
             foreach (var property in Properties)
-                property.PublishCultureValues(culture);
+            {
+                property.PublishValues(culture);
+                if (alsoInvariant)
+                    property.PublishValues(null);
+            }
 
             _publishedState = PublishedState.Publishing;
             return true;
         }
 
         /// <inheritdoc />
-        public virtual void ClearAllPublishedValues()
+        public virtual void UnpublishCulture(string culture = "*")
         {
-            // property.ClearPublishedAllValues only deals with supported variations (if any)
-            foreach (var property in Properties)
-                property.ClearPublishedAllValues();
+            culture = culture.NullOrWhiteSpaceAsNull();
 
-            // Name and PublishName are managed by the repository, but Names and PublishNames
-            // must be managed here as they depend on the existing / supported variations.
-            ClearPublishNames();
+            // the variation should be supported by the content type properties
+            if (!ContentType.SupportsPropertyVariation(culture, "*", true))
+                throw new NotSupportedException($"Culture \"{culture}\" is not supported by content type \"{ContentType.Alias}\" with variation \"{ContentType.Variations}\".");
+
+            if (culture == "*") // all cultures
+                ClearPublishInfos();
+            else // one single culture
+                ClearPublishInfo(culture);
+
+            // property.PublishValues only publishes what is valid, variation-wise
+            foreach (var property in Properties)
+                property.UnpublishValues(culture);
 
             _publishedState = PublishedState.Publishing;
-        }
-
-        /// <inheritdoc />
-        public virtual void ClearPublishedValues(string culture = null, string segment = null)
-        {
-            // the variation should be supported by the content type
-            ContentType.ValidateVariation(culture, segment, throwIfInvalid: true);
-
-            // property.ClearPublishedValue throws on invalid variation, so filter them out
-            foreach (var property in Properties.Where(x => x.PropertyType.ValidateVariation(culture, segment, throwIfInvalid: false)))
-                property.ClearPublishedValue(culture, segment);
-
-            // Name and PublishName are managed by the repository, but Names and PublishNames
-            // must be managed here as they depend on the existing / supported variations.
-            ClearPublishName(culture);
-
-            _publishedState = PublishedState.Publishing;
-        }
-
-        /// <inheritdoc />
-        public virtual void ClearCulturePublishedValues(string culture = null)
-        {
-            // property.ClearPublishedCultureValues only deals with supported variations (if any)
-            foreach (var property in Properties)
-                property.ClearPublishedCultureValues(culture);
-
-            // Name and PublishName are managed by the repository, but Names and PublishNames
-            // must be managed here as they depend on the existing / supported variations.
-            ClearPublishName(culture);
-
-            _publishedState = PublishedState.Publishing;
-        }
-
-        private bool CopyingFromSelf(IContent other)
-        {
-            // copying from the same Id and VersionPk
-            return Id == other.Id && VersionId == other.VersionId;
-        }
-
-        /// <inheritdoc />
-        public virtual void CopyAllValues(IContent other)
-        {
-            if (other.ContentTypeId != ContentTypeId)
-                throw new InvalidOperationException("Cannot copy values from a different content type.");
-
-            // we could copy from another document entirely,
-            // or from another version of the same document,
-            // in which case there is a special case.
-            var published = CopyingFromSelf(other);
-
-            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
-
-            // clear all existing properties
-            foreach (var property in Properties)
-            foreach (var pvalue in property.Values)
-                if (property.PropertyType.ValidateVariation(pvalue.Culture, pvalue.Segment, false))
-                    property.SetValue(null, pvalue.Culture, pvalue.Segment);
-
-            // copy other properties
-            var otherProperties = other.Properties;
-            foreach (var otherProperty in otherProperties)
-            {
-                var alias = otherProperty.PropertyType.Alias;
-                foreach (var pvalue in otherProperty.Values)
-                {
-                    if (!otherProperty.PropertyType.ValidateVariation(pvalue.Culture, pvalue.Segment, false))
-                        continue;
-                    var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
-                    SetValue(alias, value, pvalue.Culture, pvalue.Segment);
-                }
-            }
-
-            // copy names
-            ClearNames();
-            foreach (var (culture, name) in other.Names)
-                SetName(name, culture);
-            Name = other.Name;
-        }
-
-        /// <inheritdoc />
-        public virtual void CopyValues(IContent other, string culture = null, string segment = null)
-        {
-            if (other.ContentTypeId != ContentTypeId)
-                throw new InvalidOperationException("Cannot copy values from a different content type.");
-
-            var published = CopyingFromSelf(other);
-
-            // segment is invariant in comparisons
-            segment = segment?.ToLowerInvariant();
-
-            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
-
-            // clear all existing properties
-            foreach (var property in Properties)
-            {
-                if (!property.PropertyType.ValidateVariation(culture, segment, false))
-                    continue;
-
-                foreach (var pvalue in property.Values)
-                    if (pvalue.Culture.InvariantEquals(culture) && pvalue.Segment.InvariantEquals(segment))
-                        property.SetValue(null, pvalue.Culture, pvalue.Segment);
-            }
-
-            // copy other properties
-            var otherProperties = other.Properties;
-            foreach (var otherProperty in otherProperties)
-            {
-                if (!otherProperty.PropertyType.ValidateVariation(culture, segment, false))
-                    continue;
-
-                var alias = otherProperty.PropertyType.Alias;
-                SetValue(alias, otherProperty.GetValue(culture, segment, published), culture, segment);
-            }
-
-            // copy name
-            SetName(other.GetName(culture), culture);
-        }
-
-        /// <inheritdoc />
-        public virtual void CopyCultureValues(IContent other, string culture = null)
-        {
-            if (other.ContentTypeId != ContentTypeId)
-                throw new InvalidOperationException("Cannot copy values from a different content type.");
-
-            var published = CopyingFromSelf(other);
-
-            // note: use property.SetValue(), don't assign pvalue.EditValue, else change tracking fails
-
-            // clear all existing properties
-            foreach (var property in Properties)
-            foreach (var pvalue in property.Values)
-                if (pvalue.Culture.InvariantEquals(culture) && property.PropertyType.ValidateVariation(pvalue.Culture, pvalue.Segment, false))
-                    property.SetValue(null, pvalue.Culture, pvalue.Segment);
-
-            // copy other properties
-            var otherProperties = other.Properties;
-            foreach (var otherProperty in otherProperties)
-            {
-                var alias = otherProperty.PropertyType.Alias;
-                foreach (var pvalue in otherProperty.Values)
-                {
-                    if (pvalue.Culture != culture || !otherProperty.PropertyType.ValidateVariation(pvalue.Culture, pvalue.Segment, false))
-                        continue;
-                    var value = published ? pvalue.PublishedValue : pvalue.EditedValue;
-                    SetValue(alias, value, pvalue.Culture, pvalue.Segment);
-                }
-            }
-
-            // copy name
-            SetName(other.GetName(culture), culture);
         }
 
         /// <summary>
@@ -598,6 +416,11 @@ namespace Umbraco.Core.Models
 
             // take care of the published state
             _publishedState = _published ? PublishedState.Published : PublishedState.Unpublished;
+
+            // take care of publish infos
+            _publishInfosOrig = _publishInfos == null
+                ? null
+                : new Dictionary<string, (string Name, DateTime Date)>(_publishInfos, StringComparer.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -630,7 +453,6 @@ namespace Umbraco.Core.Models
             clone.EnableChangeTracking();
 
             return clone;
-
         }
     }
 }

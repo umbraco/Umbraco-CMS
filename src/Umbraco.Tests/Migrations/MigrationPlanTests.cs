@@ -133,9 +133,9 @@ namespace Umbraco.Tests.Migrations
         public void ValidateUmbracoPlan()
         {
             var plan = new UmbracoPlan(Mock.Of<IMigrationBuilder>(), Mock.Of<ILogger>());
-            var finalState = plan.Validate();
-            Console.WriteLine(finalState);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(finalState));
+            plan.Validate();
+            Console.WriteLine(plan.FinalState);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(plan.FinalState));
         }
 
         public class DeleteRedirectUrlTable : MigrationBase

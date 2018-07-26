@@ -22,6 +22,7 @@ using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Tests.Testing;
 using LightInject;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.PublishedContent
 {

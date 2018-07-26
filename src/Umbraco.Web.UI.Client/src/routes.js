@@ -50,7 +50,7 @@ app.config(function ($routeProvider) {
                                     }
                                 }
                                 else {
-                                    return $q.reject({ path: "/" });
+                                    return $q.when(true);
                                 }
                             });
 
@@ -76,8 +76,11 @@ app.config(function ($routeProvider) {
     /** When this is used to resolve it will attempt to log the current user out */
     var doLogout = function() {
         return {
-            isLoggedOut: function ($q, userService) {
+            isLoggedOut: function ($q, $location, userService) {
                 return userService.logout().then(function () {
+                    // we have to redirect here instead of the routes redirectTo
+                    // https://github.com/angular/angular.js/commit/7f4b356c2bebb87f0c26b57a20415b004b20bcd1
+                    $location.path("/login/false");
                     //success so continue
                     return $q.when(true);
                 }, function() {
@@ -89,6 +92,9 @@ app.config(function ($routeProvider) {
     }
 
     $routeProvider
+        .when("/", {
+            redirectTo: '/content'
+        })
         .when('/login', {
             templateUrl: 'views/common/login.html',
             //ensure auth is *not* required so it will redirect to /
@@ -100,10 +106,9 @@ app.config(function ($routeProvider) {
             resolve: canRoute(false)
         })
         .when('/logout', {
-             redirectTo: '/login/false',
             resolve: doLogout()
         })
-        .when('/:section', {
+        .when('/:section?', {
             //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
             template: "<div ng-include='templateUrl'></div>",
             //This controller will execute for this route, then we can execute some code in order to set the template Url
@@ -141,19 +146,38 @@ app.config(function ($routeProvider) {
             reloadOnSearch: false,
             resolve: canRoute(true)
         })
-        .when('/:section/:tree/:method', {
-            templateUrl: function (rp) {
+        .when('/:section/:tree/:method?', {
+            //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
+            template: "<div ng-include='templateUrl'></div>",
+            //This controller will execute for this route, then we replace the template dynamnically based on the current tree.
+            controller: function ($scope, $route, $routeParams, treeService) {
 
-                //if there is no method registered for this then show the dashboard
-                if (!rp.method)
-                    return "views/common/dashboard.html";
-                
-                return ('views/' + rp.tree + '/' + rp.method + '.html');
+                if (!$routeParams.method) {
+                    $scope.templateUrl = "views/common/dashboard.html";
+                }
+
+                // Here we need to figure out if this route is for a package tree and if so then we need
+                // to change it's convention view path to:
+                // /App_Plugins/{mypackage}/backoffice/{treetype}/{method}.html
+
+                // otherwise if it is a core tree we use the core paths:
+                // views/{treetype}/{method}.html
+
+                var packageTreeFolder = treeService.getTreePackageFolder($routeParams.tree);
+
+                if (packageTreeFolder) {
+                    $scope.templateUrl = (Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
+                        "/" + packageTreeFolder +
+                        "/backoffice/" + $routeParams.tree + "/" + $routeParams.method + ".html");
+                }
+                else {
+                    $scope.templateUrl = ('views/' + $routeParams.tree + '/' + $routeParams.method + '.html');
+                }
             },
             reloadOnSearch: false,
             resolve: canRoute(true)
         })
-        .when('/:section/:tree/:method/:id', {
+        .when('/:section/:tree/:method?/:id', {
             //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
             template: "<div ng-include='templateUrl'></div>",
             //This controller will execute for this route, then we replace the template dynamnically based on the current tree.
@@ -187,9 +211,7 @@ app.config(function ($routeProvider) {
         })
         .otherwise({ redirectTo: '/login' });
     }).config(function ($locationProvider) {
-
-        //$locationProvider.html5Mode(false).hashPrefix('!'); //turn html5 mode off
-        // $locationProvider.html5Mode(true);         //turn html5 mode on
-
         
+        $locationProvider.html5Mode(false); //turn html5 mode off
+        $locationProvider.hashPrefix('');
     });

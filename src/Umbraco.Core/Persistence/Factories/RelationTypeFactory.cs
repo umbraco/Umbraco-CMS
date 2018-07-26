@@ -3,11 +3,11 @@ using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class RelationTypeFactory
+    internal static class RelationTypeFactory
     {
         #region Implementation of IEntityFactory<RelationType,RelationTypeDto>
 
-        public IRelationType BuildEntity(RelationTypeDto dto)
+        public static IRelationType BuildEntity(RelationTypeDto dto)
         {
             var entity = new RelationType(dto.ChildObjectType, dto.ParentObjectType, dto.Alias);
 
@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Factories
             }
         }
 
-        public RelationTypeDto BuildDto(IRelationType entity)
+        public static RelationTypeDto BuildDto(IRelationType entity)
         {
             var dto = new RelationTypeDto
             {

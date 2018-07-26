@@ -15,23 +15,8 @@ namespace Umbraco.Web.PropertyEditors
     {
         public TagConfigurationEditor(ManifestValueValidatorCollection validators)
         {
-            Fields.Add(new ConfigurationField(new RequiredValidator())
-            {
-                Description = "Define a tag group",
-                Key = "group",
-                Name = "Tag group",
-                PropertyName = nameof(TagConfiguration.Group),
-                View = "requiredfield"
-            });
-
-            Fields.Add(new ConfigurationField(new RequiredValidator())
-            {
-                Description = "Select whether to store the tags in cache as CSV (default) or as JSON. The only benefits of storage as JSON is that you are able to have commas in a tag value but this will require parsing the json in your views or using a property value converter",
-                Key = "storageType",
-                Name = "Storage Type",
-                PropertyName = nameof(TagConfiguration.StorageType),
-                View = "views/propertyeditors/tags/tags.prevalues.html"
-            });
+            Field(nameof(TagConfiguration.Group)).Validators.Add(new RequiredValidator());
+            Field(nameof(TagConfiguration.StorageType)).Validators.Add(new RequiredValidator());
         }
 
         public override Dictionary<string, object> ToConfigurationEditor(TagConfiguration configuration)

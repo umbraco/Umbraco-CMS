@@ -1,24 +1,19 @@
 ﻿using System;
-using System.ComponentModel;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web;
-using System.Web.Security;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Xml;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Web.Mvc;
-using Umbraco.Core.Cache;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
+using Umbraco.Core.Xml;
 using Umbraco.Web.Composing;
+using Umbraco.Core.Cache;
+using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
@@ -180,29 +175,44 @@ namespace Umbraco.Web
             ?? (_componentRenderer = new UmbracoComponentRenderer(UmbracoContext));
 
         /// <summary>
-        /// Returns the current IPublishedContent item assigned to the UmbracoHelper
+        /// Returns the current <seealso cref="IPublishedContent"/> item
+        /// assigned to the UmbracoHelper.
         /// </summary>
         /// <remarks>
-        /// Note that this is the assigned IPublishedContent item to the UmbracoHelper, this is not necessarily the Current IPublishedContent item
-        /// being rendered. This IPublishedContent object is contextual to the current UmbracoHelper instance.
-        ///
-        /// In some cases accessing this property will throw an exception if there is not IPublishedContent assigned to the Helper
-        /// this will only ever happen if the Helper is constructed with an UmbracoContext and it is not a front-end request
+        /// <para>
+        /// Note that this is the assigned IPublishedContent item to the
+        /// UmbracoHelper, this is not necessarily the Current IPublishedContent
+        /// item being rendered. This IPublishedContent object is contextual to
+        /// the current UmbracoHelper instance.
+        /// </para>
+        ///<para>
+        /// In some cases accessing this property will throw an exception if
+        /// there is not IPublishedContent assigned to the Helper this will
+        /// only ever happen if the Helper is constructed with an UmbracoContext
+        /// and it is not a front-end request.
+        /// </para>
         /// </remarks>
-        /// <exception cref="InvalidOperationException">Thrown if the UmbracoHelper is constructed with an UmbracoContext and it is not a front-end request</exception>
+        /// <exception cref="InvalidOperationException">Thrown if the
+        /// UmbracoHelper is constructed with an UmbracoContext and it is not a
+        /// front-end request.</exception>
         public IPublishedContent AssignedContentItem
         {
             get
             {
-                if (_currentPage == null)
-                    throw new InvalidOperationException("Cannot return the " + typeof(IPublishedContent).Name + " because the " + typeof(UmbracoHelper).Name + " was constructed with an " + typeof(UmbracoContext).Name + " and the current request is not a front-end request.");
+                if (_currentPage != null)
+                {
+                    return _currentPage;
+                }
 
-                return _currentPage;
+                throw new InvalidOperationException(
+                    $"Cannot return the {nameof(IPublishedContent)} because the {nameof(UmbracoHelper)} was constructed with an {nameof(UmbracoContext)} and the current request is not a front-end request."
+                    );
+
             }
         }
 
         /// <summary>
-        /// Renders the template for the specified pageId and an optional altTemplateId.
+        /// Renders the template for the specified pageId and an optional altTemplateId
         /// </summary>
         /// <param name="pageId"></param>
         /// <param name="altTemplateId">If not specified, will use the template assigned to the node</param>
@@ -285,30 +295,6 @@ namespace Umbraco.Web
         #endregion
 
         #region Membership
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the IsProtected method that only specifies path")]
-        public bool IsProtected(int documentId, string path)
-        {
-            return IsProtected(path.EnsureEndsWith("," + documentId));
-        }
-
-        /// <summary>
-        /// Check if a document object is protected by the "Protect Pages" functionality in umbraco
-        /// </summary>
-        /// <param name="path">The full path of the document object to check</param>
-        /// <returns>True if the document object is protected</returns>
-        public bool IsProtected(string path)
-        {
-            return MembershipHelper.IsProtected(path);
-        }
-
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("Use the MemberHasAccess method that only specifies path")]
-        public bool MemberHasAccess(int nodeId, string path)
-        {
-            return MemberHasAccess(path.EnsureEndsWith("," + nodeId));
-        }
 
         /// <summary>
         /// Check if the current user has access to a document
@@ -601,37 +587,38 @@ namespace Umbraco.Web
             return ContentQuery.ContentAtRoot();
         }
 
-        private static bool ConvertIdObjectToInt(object id, out int intId)
+        internal static bool ConvertIdObjectToInt(object id, out int intId)
         {
-            var s = id as string;
-            if (s != null)
+            switch (id)
             {
-                return int.TryParse(s, out intId);
-            }
+                case string s:
+                    return int.TryParse(s, out intId);
 
-            if (id is int)
-            {
-                intId = (int) id;
-                return true;
+                case int i:
+                    intId = i;
+                    return true;
+
+                default:
+                    intId = default;
+                    return false;
             }
-            intId = default(int);
-            return false;
         }
 
-        private static bool ConvertIdObjectToGuid(object id, out Guid guidId)
+        internal static bool ConvertIdObjectToGuid(object id, out Guid guidId)
         {
-            var s = id as string;
-            if (s != null)
+            switch (id)
             {
-                return Guid.TryParse(s, out guidId);
+                case string s:
+                    return Guid.TryParse(s, out guidId);
+
+                case Guid g:
+                    guidId = g;
+                    return true;
+
+                default:
+                    guidId = default;
+                    return false;
             }
-            if (id is Guid)
-            {
-                guidId = (Guid) id;
-                return true;
-            }
-            guidId = default(Guid);
-            return false;
         }
 
         private static bool ConvertIdsObjectToInts(IEnumerable<object> ids, out IEnumerable<int> intIds)
@@ -665,18 +652,24 @@ namespace Umbraco.Web
             return true;
         }
 
-        private static bool ConvertIdObjectToUdi(object id, out Udi guidId)
+        /// <remarks>Had to change to internal for testing.</remarks>
+        internal static bool ConvertIdObjectToUdi(object id, out Udi guidId)
         {
-            if (id is string s)
-                return Udi.TryParse(s, out guidId);
-            if (id is Udi)
+            switch (id)
             {
-                guidId = (Udi) id;
-                return true;
+                case string s:
+                    return Udi.TryParse(s, out guidId);
+
+                case Udi u:
+                    guidId = u;
+                    return true;
+
+                default:
+                    guidId = default;
+                    return false;
             }
-            guidId = null;
-            return false;
         }
+
 
         #endregion
 
@@ -886,7 +879,7 @@ namespace Umbraco.Web
         {
             return StringUtilities.ReplaceLineBreaksForHtml(text);
         }
-        
+
         /// <summary>
         /// Generates a hash based on the text string passed in.  This method will detect the
         /// security requirements (is FIPS enabled) and return an appropriate hash.
@@ -1051,7 +1044,7 @@ namespace Umbraco.Web
         }
 
         #endregion
-        
+
         /// <summary>
         /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which
         /// Umbraco can decrypt during the routing process in order to delegate the request to a specific MVC Controller.

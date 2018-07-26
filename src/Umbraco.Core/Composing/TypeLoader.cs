@@ -494,7 +494,7 @@ namespace Umbraco.Core.Composing
                     if (--attempts == 0)
                         throw;
 
-                    _logger.Logger.Debug<TypeLoader>($"Attempted to get filestream for file {path} failed, {attempts} attempts left, pausing for {pauseMilliseconds} milliseconds");
+                    _logger.Logger.Debug<TypeLoader>(() => $"Attempted to get filestream for file {path} failed, {attempts} attempts left, pausing for {pauseMilliseconds} milliseconds");
                     Thread.Sleep(pauseMilliseconds);
                 }
             }

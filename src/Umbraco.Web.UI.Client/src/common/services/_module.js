@@ -1,1 +1,1 @@
-angular.module("umbraco.services", ["umbraco.security", "umbraco.resources"]);
+angular.module("umbraco.services", ["umbraco.interceptors", "umbraco.resources"]);

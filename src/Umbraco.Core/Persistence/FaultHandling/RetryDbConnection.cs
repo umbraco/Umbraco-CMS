@@ -177,8 +177,7 @@ namespace Umbraco.Core.Persistence.FaultHandling
             set
             {
                 if (value == null) throw new ArgumentNullException(nameof(value));
-                var connection = value as RetryDbConnection;
-                if (connection == null) throw new ArgumentException("Value is not a FaultHandlingDbConnection instance.");
+                if (!(value is RetryDbConnection connection)) throw new ArgumentException("Value is not a FaultHandlingDbConnection instance.");
                 if (_connection != null && _connection != connection) throw new Exception("Value is another FaultHandlingDbConnection instance.");
                 _connection = connection;
                 _inner.Connection = connection.Inner;

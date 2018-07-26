@@ -50,8 +50,9 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
     $scope.preValues = [];
 
     if ($routeParams.create) {
-
+        
         $scope.page.loading = true;
+        $scope.showIdentifier = false;
 
         //we are creating so get an empty data type item
         dataTypeResource.getScaffold($routeParams.id)
@@ -76,6 +77,8 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
     function loadDataType() {
 
         $scope.page.loading = true;
+
+        $scope.showIdentifier = true;
 
         //we are editing so get the content item from the server
         dataTypeResource.getById($routeParams.id)
@@ -143,7 +146,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
             dataTypeResource.save($scope.content, $scope.preValues, $routeParams.create)
                 .then(function(data) {
 
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                    formHelper.resetForm({ scope: $scope });
 
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,

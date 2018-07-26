@@ -9,7 +9,8 @@
   text-align: center;
   cursor: pointer;
   display: block;
-  padding: 12px 10px 8px 10px;
+  padding: 4px 10px 0 10px;
+  border-bottom: 2px solid transparent;
   min-width: 70px;
   border-right: 1px solid @gray-9;
   box-sizing: border-box;
@@ -17,7 +18,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  height: @editorHeaderHeight;
 }
 
 .umb-sub-views-nav-item:focus {
@@ -31,6 +32,7 @@
 
 .umb-sub-views-nav-item.is-active {
   color: @turquoise-d1;
+  border-bottom-color: @turquoise-d1;
 }
 
 .show-validation .umb-sub-views-nav-item.-has-error {

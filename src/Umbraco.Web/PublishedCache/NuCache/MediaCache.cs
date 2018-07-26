@@ -34,14 +34,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             // ignore preview, there's only draft for media
             var n = _snapshot.Get(contentId);
-            return n?.Draft;
+            return n?.Published;
         }
 
         public override IPublishedContent GetById(bool preview, Guid contentId)
         {
             // ignore preview, there's only draft for media
             var n = _snapshot.Get(contentId);
-            return n?.Draft;
+            return n?.Published;
         }
 
         public override bool HasById(bool preview, int contentId)
@@ -73,7 +73,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var c = _snapshot.GetAtRoot();
 
             // ignore preview, there's only draft for media
-            return c.Select(n => n.Draft);
+            return c.Select(n => n.Published);
         }
 
         public override bool HasContent(bool preview)

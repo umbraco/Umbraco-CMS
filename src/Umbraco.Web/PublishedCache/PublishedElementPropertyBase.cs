@@ -37,7 +37,28 @@ namespace Umbraco.Web.PublishedCache
         }
 
         public override bool HasValue(string culture = null, string segment = null)
-            => _sourceValue != null && (!(_sourceValue is string s) || !string.IsNullOrWhiteSpace(s));
+        {
+            var hasValue = PropertyType.IsValue(_sourceValue, PropertyValueLevel.Source);
+            if (hasValue.HasValue) return hasValue.Value;
+
+            GetCacheLevels(out var cacheLevel, out var referenceCacheLevel);
+
+            lock (_locko)
+            {
+                var value = GetInterValue();
+                hasValue = PropertyType.IsValue(value, PropertyValueLevel.Inter);
+                if (hasValue.HasValue) return hasValue.Value;
+
+                var cacheValues = GetCacheValues(cacheLevel);
+                if (!cacheValues.ObjectInitialized)
+                {
+                    cacheValues.ObjectValue = PropertyType.ConvertInterToObject(Element, referenceCacheLevel, value, IsPreviewing);
+                    cacheValues.ObjectInitialized = true;
+                }
+                value = cacheValues.ObjectValue;
+                return PropertyType.IsValue(value, PropertyValueLevel.Object) ?? false;
+            }
+        }
 
         // used to cache the CacheValues of this property
         // ReSharper disable InconsistentlySynchronizedField

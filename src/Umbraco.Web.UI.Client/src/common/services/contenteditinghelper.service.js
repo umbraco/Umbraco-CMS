@@ -30,6 +30,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
         /** Used by the content editor and mini content editor to perform saving operations */
         //TODO: Make this a more helpful/reusable method for other form operations! we can simplify this form most forms
+        //         = this is already done in the formhelper service
         contentEditorPerformSave: function (args) {
             if (!angular.isObject(args)) {
                 throw "args must be an object";
@@ -59,7 +60,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 return args.saveMethod(args.content, $routeParams.create, fileManager.getFiles())
                     .then(function (data) {
 
-                        formHelper.resetForm({ scope: args.scope, notifications: data.notifications });
+                        formHelper.resetForm({ scope: args.scope });
 
                         self.handleSuccessfulSave({
                             scope: args.scope,
@@ -71,7 +72,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         });
 
                         args.scope.busy = false;
-                        return $q.when(data);
+                        return $q.resolve(data);
 
                     }, function (err) {
                         self.handleSaveError({
@@ -81,12 +82,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                                 rebindCallback.apply(self, [args.content, err.data]);
                             }
                         });
-                        //show any notifications
-                        if (angular.isArray(err.data.notifications)) {
-                            for (var i = 0; i < err.data.notifications.length; i++) {
-                                notificationsService.showNotification(err.data.notifications[i]);
-                            }
-                        }
+                        
                         args.scope.busy = false;
                         return $q.reject(err);
                     });

@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Persistence.Factories
@@ -14,11 +13,11 @@ namespace Umbraco.Core.Persistence.Factories
     // IMediaType (media types)
     // IMemberType (member types)
     //
-    internal class ContentTypeFactory
+    internal static class ContentTypeFactory
     {
         #region IContentType
 
-        public IContentType BuildContentTypeEntity(ContentTypeDto dto)
+        public static IContentType BuildContentTypeEntity(ContentTypeDto dto)
         {
             var contentType = new ContentType(dto.NodeDto.ParentId);
 
@@ -42,7 +41,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region IMediaType
 
-        public IMediaType BuildMediaTypeEntity(ContentTypeDto dto)
+        public static IMediaType BuildMediaTypeEntity(ContentTypeDto dto)
         {
             var contentType = new MediaType(dto.NodeDto.ParentId);
             try
@@ -66,12 +65,12 @@ namespace Umbraco.Core.Persistence.Factories
 
         #region IMemberType
 
-        public IMemberType BuildMemberTypeEntity(ContentTypeDto dto)
+        public static IMemberType BuildMemberTypeEntity(ContentTypeDto dto)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<MemberTypeDto> BuildMemberTypeDtos(IMemberType entity)
+        public static IEnumerable<MemberTypeDto> BuildMemberTypeDtos(IMemberType entity)
         {
             var memberType = entity as MemberType;
             if (memberType == null || memberType.PropertyTypes.Any() == false)
@@ -105,14 +104,14 @@ namespace Umbraco.Core.Persistence.Factories
             entity.CreateDate = dto.NodeDto.CreateDate;
             entity.Path = dto.NodeDto.Path;
             entity.Level = dto.NodeDto.Level;
-            entity.CreatorId = dto.NodeDto.UserId.Value;
+            entity.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
             entity.AllowedAsRoot = dto.AllowAtRoot;
             entity.IsContainer = dto.IsContainer;
             entity.Trashed = dto.NodeDto.Trashed;
             entity.Variations = (ContentVariation) dto.Variations;
         }
 
-        public ContentTypeDto BuildContentTypeDto(IContentTypeBase entity)
+        public static ContentTypeDto BuildContentTypeDto(IContentTypeBase entity)
         {
             Guid nodeObjectType;
             if (entity is IContentType)

@@ -113,7 +113,66 @@ namespace Umbraco.Web.Editors
                 .ToList();
         }
 
+        /// <summary>
+        /// Returns a list of content types where a particular composition content type is used
+        /// </summary>
+        /// <param name="type">Type of content Type, eg documentType or mediaType</param>      
+        /// <param name="contentTypeId">Id of composition content type</param>
+        /// <returns></returns>
+        protected IEnumerable<EntityBasic> PerformGetWhereCompositionIsUsedInContentTypes(int contentTypeId,
+            UmbracoObjectTypes type)
+        {
+            IContentTypeComposition source = null;
 
+            //below is all ported from the old doc type editor and comes with the same weaknesses /insanity / magic
+
+            IContentTypeComposition[] allContentTypes;
+
+            switch (type)
+            {
+                case UmbracoObjectTypes.DocumentType:
+                    if (contentTypeId > 0)
+                    {
+                        source = Services.ContentTypeService.Get(contentTypeId);
+                        if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                    }
+                    allContentTypes = Services.ContentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+                    break;
+
+                case UmbracoObjectTypes.MediaType:
+                    if (contentTypeId > 0)
+                    {
+                        source = Services.ContentTypeService.Get(contentTypeId);
+                        if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                    }
+                    allContentTypes = Services.ContentTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+                    break;
+
+                case UmbracoObjectTypes.MemberType:
+                    if (contentTypeId > 0)
+                    {
+                        source = Services.MemberTypeService.Get(contentTypeId);
+                        if (source == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+                    }
+                    allContentTypes = Services.MemberTypeService.GetAll().Cast<IContentTypeComposition>().ToArray();
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException("The entity type was not a content type");
+            }
+
+            var contentTypesWhereCompositionIsUsed = Services.ContentTypeService.GetWhereCompositionIsUsedInContentTypes(source, allContentTypes);
+           return contentTypesWhereCompositionIsUsed
+                .Select(x => Mapper.Map<IContentTypeComposition, EntityBasic>(x))
+                .Select(x =>
+                {
+                    //translate the name
+                    x.Name = TranslateItem(x.Name);               
+
+                    return x;
+                })
+                .ToList();
+        }
         protected string TranslateItem(string text)
         {
             if (text == null)

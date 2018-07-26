@@ -52,7 +52,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             sql.OrderBy<LanguageDto>(dto => dto.Id);
 
             // get languages
-            var languages = Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto).ToList();
+            var languages = Database.Fetch<LanguageDto>(sql).Select(ConvertFromDto).OrderBy(x => x.Id).ToList();
+
+            // fix inconsistencies: there has to be a default language, and it has to be mandatory
+            var defaultLanguage = languages.FirstOrDefault(x => x.IsDefaultVariantLanguage) ?? languages.First();
+            defaultLanguage.IsDefaultVariantLanguage = true;
+            defaultLanguage.Mandatory = true;
 
             // initialize the code-id map
             lock (_codeIdMap)
@@ -139,8 +144,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 IsolatedCache.ClearAllCache();
             }
 
-            var factory = new LanguageFactory();
-            var dto = factory.BuildDto(entity);
+;
+            var dto = LanguageFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
@@ -163,9 +168,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 //We need to clear the whole cache since all languages will be updated
                 IsolatedCache.ClearAllCache();
             }
-
-            var factory = new LanguageFactory();
-            var dto = factory.BuildDto(entity);
+            
+            var dto = LanguageFactory.BuildDto(entity);
 
             Database.Update(dto);
 
@@ -197,8 +201,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected ILanguage ConvertFromDto(LanguageDto dto)
         {
-            var factory = new LanguageFactory();
-            var entity = factory.BuildEntity(dto);
+            var entity = LanguageFactory.BuildEntity(dto);
             return entity;
         }
         

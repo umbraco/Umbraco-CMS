@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, dialogService, $timeout, angularHelper, $http) {
+    .factory('userService', function ($rootScope, eventsService, $q, $location, $log, requestRetryQueue, authResource, dialogService, $timeout, angularHelper, $http) {
 
         var currentUser = null;
         var lastUserId = null;
@@ -32,10 +32,10 @@ angular.module('umbraco.services')
             loginDialog = null;
 
             if (success) {
-                securityRetryQueue.retryAll(currentUser.name);
+                requestRetryQueue.retryAll(currentUser.name);
             }
             else {
-                securityRetryQueue.cancelAll();
+                requestRetryQueue.cancelAll();
                 $location.path('/');
             }
         }
@@ -172,8 +172,8 @@ angular.module('umbraco.services')
         }
 
         // Register a handler for when an item is added to the retry queue
-        securityRetryQueue.onItemAddedCallbacks.push(function (retryItem) {
-            if (securityRetryQueue.hasMore()) {
+        requestRetryQueue.onItemAddedCallbacks.push(function (retryItem) {
+            if (requestRetryQueue.hasMore()) {
                 userAuthExpired();
             }
         });

@@ -159,7 +159,7 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string affectedDetails, string eventType, string eventDetails)
         {
-            if (performingUserId < 0 && performingUserId != Constants.Security.SuperId) throw new ArgumentOutOfRangeException(nameof(performingUserId));
+            if (performingUserId < 0 && performingUserId != Constants.Security.SuperUserId) throw new ArgumentOutOfRangeException(nameof(performingUserId));
             if (string.IsNullOrWhiteSpace(perfomingDetails)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(perfomingDetails));
             if (string.IsNullOrWhiteSpace(eventType)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventType));
             if (string.IsNullOrWhiteSpace(eventDetails)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventDetails));

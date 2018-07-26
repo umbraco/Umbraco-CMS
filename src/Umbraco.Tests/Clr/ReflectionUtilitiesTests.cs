@@ -269,7 +269,7 @@ namespace Umbraco.Tests.Clr
         }
 
         [Test]
-        public void SetterCanCastUnsafeValue()
+        public void PropertySetterCanCastUnsafeValue()
         {
             // test that we can emit property setters that cast from eg 'object'
 
@@ -308,6 +308,9 @@ namespace Umbraco.Tests.Clr
             setterInt4(object4, 42);
             Assert.AreEqual(42, object4.IntValue);
 
+            // fixme the code below runs fine with ReSharper test running within VisualStudio
+            // but it crashes when running via vstest.console.exe - unless some settings are required?
+
             // converting works
             setterInt4(object4, 42.0);
             Assert.AreEqual(42, object4.IntValue);
@@ -317,7 +320,7 @@ namespace Umbraco.Tests.Clr
         }
 
         [Test]
-        public void SetterCanCastObject()
+        public void PropertySetterCanCastObject()
         {
             // Class5 inherits from Class4 and ClassValue is defined on Class4
 
@@ -336,7 +339,7 @@ namespace Umbraco.Tests.Clr
         }
 
         [Test]
-        public void SetterCanCastUnsafeObject()
+        public void PropertySetterCanCastUnsafeObject()
         {
             var type5 = typeof(Class5);
             var propClass4 = type5.GetProperty("ClassValue");
@@ -353,7 +356,7 @@ namespace Umbraco.Tests.Clr
         }
 
         [Test]
-        public void GetterCanCastValue()
+        public void PropertyGetterCanCastValue()
         {
             var type4 = typeof(Class4);
             var propClassA4 = type4.GetProperty("ClassAValue");
@@ -386,7 +389,7 @@ namespace Umbraco.Tests.Clr
         }
 
         [Test]
-        public void GetterCanCastObject()
+        public void PropertyGetterCanCastObject()
         {
             var type5 = typeof(Class5);
             var propClass4 = type5.GetProperty("ClassValue");
@@ -407,7 +410,7 @@ namespace Umbraco.Tests.Clr
         }
 
         [Test]
-        public void CanEmitCastGetters()
+        public void EmitPropertyCastGetterEmits()
         {
             // test that we can emit property getters that cast the returned value to 'object'
 
@@ -569,6 +572,22 @@ namespace Umbraco.Tests.Clr
         // unbox.any    [mscorlib]System.Double
         // conv.i4
         public void SetIntValue2(Class4 object4, object d) => object4.IntValue = (int) (double) d;
+
+        public void SetIntValue3(Class4 object4, object v)
+        {
+            if (v is int i)
+                object4.IntValue = i;
+            else
+                object4.IntValue = Convert.ToInt32(v);
+        }
+
+        public void SetIntValue4(Class4 object4, object v)
+        {
+            if (v is int i)
+                object4.IntValue = i;
+            else
+                object4.IntValue = (int) Convert.ChangeType(v, typeof(int));
+        }
 
         // get field
         public int GetIntField(Class1 object1) => object1.Field1;

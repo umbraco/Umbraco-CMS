@@ -7,6 +7,7 @@ var sort = require('gulp-sort');
 var connect = require('gulp-connect');
 var open = require('gulp-open');
 var runSequence = require('run-sequence');
+const imagemin = require('gulp-imagemin');
 
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
@@ -78,7 +79,7 @@ var sources = {
         filters: { files: ["src/common/filters/**/*.js"], out: "umbraco.filters.js" },
         resources: { files: ["src/common/resources/**/*.js"], out: "umbraco.resources.js" },
         services: { files: ["src/common/services/**/*.js"], out: "umbraco.services.js" },
-        security: { files: ["src/common/security/**/*.js"], out: "umbraco.security.js" }
+        security: { files: ["src/common/interceptors/**/*.js"], out: "umbraco.interceptors.js" }
     },
 
     //selectors for copying all views into the build
@@ -139,7 +140,7 @@ gulp.task('dependencies', function () {
     //as we do multiple things in this task, we merge the multiple streams
     var stream = new MergeStream();
 
-    //Tinymce
+    //Tinymce plugins/themes
     stream.add(
         gulp.src(["./bower_components/tinymce/plugins/**",
             "./bower_components/tinymce/themes/**"],
@@ -206,6 +207,17 @@ gulp.task('dependencies', function () {
     //css, fonts and image files
     stream.add( 
             gulp.src(sources.globs.assets)
+				.pipe(imagemin([
+                    imagemin.gifsicle({interlaced: true}),
+                    imagemin.jpegtran({progressive: true}),
+                    imagemin.optipng({optimizationLevel: 5}),
+                    imagemin.svgo({
+                        plugins: [
+                            {removeViewBox: true},
+                            {cleanupIDs: false}
+                        ]
+                    })
+                ]))
                 .pipe(gulp.dest(root + targets.assets))
         );
 

@@ -38,7 +38,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                     Text = "hello",
                     Trashed = false,
                     UniqueId = Guid.NewGuid(),
-                    UserId = Constants.Security.SuperId
+                    UserId = Constants.Security.SuperUserId
                 };
                 var result = scope.Database.Insert(node);
                 var entity = Mock.Of<IEntity>(e => e.Id == node.NodeId);
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 scope.Database.Insert(userDto);
 
                 var userNew = Mock.Of<IUser>(e => e.Id == userDto.Id);
-                var userAdmin = Mock.Of<IUser>(e => e.Id == Constants.Security.SuperId);
+                var userAdmin = Mock.Of<IUser>(e => e.Id == Constants.Security.SuperUserId);
 
                 for (var i = 0; i < 10; i++)
                 {
@@ -155,7 +155,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 scope.Database.Insert(userDto);
 
                 var userNew = Mock.Of<IUser>(e => e.Id == userDto.Id);
-                var userAdmin = Mock.Of<IUser>(e => e.Id == Constants.Security.SuperId);
+                var userAdmin = Mock.Of<IUser>(e => e.Id == Constants.Security.SuperUserId);
 
                 for (var i = 0; i < 10; i++)
                 {

@@ -108,17 +108,14 @@ namespace Umbraco.Tests.Integration
         private IContent CreateBranch()
         {
             var content1 = MockedContent.CreateSimpleContent(_contentType, "Content1");
-            content1.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content1);
 
             // 2 (published)
             // .1 (published)
             // .2 (not published)
             var content2 = MockedContent.CreateSimpleContent(_contentType, "Content2", content1);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
             var content21 = MockedContent.CreateSimpleContent(_contentType, "Content21", content2);
-            content21.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content21);
             var content22 = MockedContent.CreateSimpleContent(_contentType, "Content22", content2);
             ServiceContext.ContentService.Save(content22);
@@ -137,12 +134,10 @@ namespace Umbraco.Tests.Integration
             // .1 (published)
             // .2 (not published)
             var content4 = MockedContent.CreateSimpleContent(_contentType, "Content4", content1);
-            content4.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content4);
             content4.Name = "Content4X";
             ServiceContext.ContentService.Save(content4);
             var content41 = MockedContent.CreateSimpleContent(_contentType, "Content41", content4);
-            content41.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content41);
             var content42 = MockedContent.CreateSimpleContent(_contentType, "Content42", content4);
             ServiceContext.ContentService.Save(content42);
@@ -151,16 +146,77 @@ namespace Umbraco.Tests.Integration
             // .1 (published)
             // .2 (not published)
             var content5 = MockedContent.CreateSimpleContent(_contentType, "Content5", content1);
-            content5.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content5);
             var content51 = MockedContent.CreateSimpleContent(_contentType, "Content51", content5);
-            content51.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content51);
             var content52 = MockedContent.CreateSimpleContent(_contentType, "Content52", content5);
             ServiceContext.ContentService.Save(content52);
             ServiceContext.ContentService.Unpublish(content5);
 
             return content1;
+        }
+
+        #endregion
+
+        #region Validate Setup
+
+        [Test]
+        public void CreatedBranchIsOk()
+        {
+            var content1 = CreateBranch();
+
+            var children1 = Children(content1).ToArray();
+
+            var content2 = children1[0];
+            var children2 = Children(content2).ToArray();
+            var content21 = children2[0];
+            var content22 = children2[1];
+
+            var content3 = children1[1];
+            var children3 = Children(content3).ToArray();
+            var content31 = children3[0];
+            var content32 = children3[1];
+
+            var content4 = children1[2];
+            var children4 = Children(content4).ToArray();
+            var content41 = children4[0];
+            var content42 = children4[1];
+
+            var content5 = children1[3];
+            var children5 = Children(content5).ToArray();
+            var content51 = children5[0];
+            var content52 = children5[1];
+
+            Assert.IsTrue(content1.Published);
+            Assert.IsFalse(content1.Edited);
+
+            Assert.IsTrue(content2.Published);
+            Assert.IsFalse(content2.Edited);
+            Assert.IsTrue(content21.Published);
+            Assert.IsFalse(content21.Edited);
+            Assert.IsFalse(content22.Published);
+            Assert.IsTrue(content22.Edited);
+
+            Assert.IsFalse(content3.Published);
+            Assert.IsTrue(content3.Edited);
+            Assert.IsFalse(content31.Published);
+            Assert.IsTrue(content31.Edited);
+            Assert.IsFalse(content32.Published);
+            Assert.IsTrue(content32.Edited);
+
+            Assert.IsTrue(content4.Published);
+            Assert.IsTrue(content4.Edited);
+            Assert.IsTrue(content41.Published);
+            Assert.IsFalse(content41.Edited);
+            Assert.IsFalse(content42.Published);
+            Assert.IsTrue(content42.Edited);
+
+            Assert.IsFalse(content5.Published);
+            Assert.IsTrue(content5.Edited);
+            Assert.IsTrue(content51.Published);
+            Assert.IsFalse(content51.Edited);
+            Assert.IsFalse(content52.Published);
+            Assert.IsTrue(content52.Edited);
         }
 
         #endregion
@@ -441,7 +497,6 @@ namespace Umbraco.Tests.Integration
 
             var content = ServiceContext.ContentService.GetRootContent().FirstOrDefault();
             Assert.IsNotNull(content);
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
 
             ResetEvents();
@@ -478,7 +533,6 @@ namespace Umbraco.Tests.Integration
 
             var content = ServiceContext.ContentService.GetRootContent().FirstOrDefault();
             Assert.IsNotNull(content);
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
 
             ResetEvents();
@@ -515,7 +569,6 @@ namespace Umbraco.Tests.Integration
 
             var content = ServiceContext.ContentService.GetRootContent().FirstOrDefault();
             Assert.IsNotNull(content);
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
 
             ResetEvents();
@@ -555,7 +608,6 @@ namespace Umbraco.Tests.Integration
 
             ResetEvents();
             content.Name = "changed";
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
 
             Assert.AreEqual(2, _msgCount);
@@ -576,12 +628,10 @@ namespace Umbraco.Tests.Integration
 
             var content = ServiceContext.ContentService.GetRootContent().FirstOrDefault();
             Assert.IsNotNull(content);
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
 
             ResetEvents();
             content.Name = "changed";
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
 
             Assert.AreEqual(2, _msgCount);
@@ -590,7 +640,7 @@ namespace Umbraco.Tests.Integration
             var m = 0;
             Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p+p", _events[i++].ToString());
             m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i++].ToString());
+            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content.Id}", _events[i++].ToString());
         }
 
         [Test]
@@ -608,7 +658,6 @@ namespace Umbraco.Tests.Integration
 
             ResetEvents();
             content.Name = "changed";
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
 
             Assert.AreEqual(2, _msgCount);
@@ -621,35 +670,6 @@ namespace Umbraco.Tests.Integration
         }
 
         [Test]
-        public void PublishPublishedContent()
-        {
-            // rule: when a content is published,
-            // - repository : refresh (p)
-            // - published page cache :: refresh
-            // note: whenever the published cache is refreshed, subscribers must
-            // assume that the unpublished cache is also refreshed, with the same
-            // values, and deal with it.
-
-            var content = ServiceContext.ContentService.GetRootContent().FirstOrDefault();
-            Assert.IsNotNull(content);
-            content.TryPublishValues();
-            ServiceContext.ContentService.SaveAndPublish(content);
-
-            ResetEvents();
-            content.Name = "changed";
-            content.TryPublishValues();
-            ServiceContext.ContentService.SaveAndPublish(content);
-
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
-            var i = 0;
-            var m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content.Id}.p+p", _events[i++].ToString());
-            m++;
-            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{content.Id}", _events[i++].ToString());
-        }
-
-        [Test]
         public void UnpublishContent()
         {
             // rule: when a content is unpublished,
@@ -658,7 +678,6 @@ namespace Umbraco.Tests.Integration
 
             var content = ServiceContext.ContentService.GetRootContent().FirstOrDefault();
             Assert.IsNotNull(content);
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
 
             ResetEvents();
@@ -682,7 +701,6 @@ namespace Umbraco.Tests.Integration
 
             var content = ServiceContext.ContentService.GetRootContent().FirstOrDefault();
             Assert.IsNotNull(content);
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
             content.Name = "changed";
             ServiceContext.ContentService.Save(content);
@@ -743,7 +761,6 @@ namespace Umbraco.Tests.Integration
             ServiceContext.ContentService.Unpublish(content1);
 
             ResetEvents();
-            content1.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content1);
 
             Assert.AreEqual(2, _msgCount);
@@ -775,32 +792,32 @@ namespace Umbraco.Tests.Integration
             var content1 = CreateBranch();
             ServiceContext.ContentService.Unpublish(content1);
 
-            ResetEvents();
-            ServiceContext.ContentService.SaveAndPublishBranch(content1, false);
+            // branch is:
 
-            Assert.AreEqual(6, _msgCount);
-            Assert.AreEqual(6, _events.Count);
+            ResetEvents();
+            ServiceContext.ContentService.SaveAndPublishBranch(content1, force: false); // force = false, don't publish unpublished items
+
+            foreach (var e in _events)
+                Console.WriteLine(e);
+
+            Assert.AreEqual(3, _msgCount);
+            Assert.AreEqual(3, _events.Count);
             var i = 0;
             var m = 0;
             var content1C = Children(content1).ToArray();
             var content2C = Children(content1C[0]).ToArray();
             var content4C = Children(content1C[2]).ToArray();
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.u+p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p+p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p+p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p+p", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content4C[0].Id}.p+p", _events[i++].ToString());
-            m++;
+
+            // force:false => only republish the root node + nodes that are edited
+            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.u+p", _events[i++].ToString());        // content1 was unpublished, now published
+
+            // change: only content4 shows here, because it has changes - others don't need to be published
+            //Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p+p", _events[i++].ToString());    // content1/content2
+            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p+p", _events[i++].ToString());    // content1/content4
+            //Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p+p", _events[i++].ToString());    // content1/content2/content21
+            //Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p+p", _events[i++].ToString());    // content1/content4/content41
+
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString()); // repub content1
-            /*
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished/{1}", m, content1C[0].Id), _events[i++].ToString()); // repub content1.content2
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished,Refresh/{1}", m, content1C[2].Id), _events[i++].ToString()); // repub content1.content4
-            var c = ServiceContext.ContentService.GetPublishedVersion(((ContentCacheRefresher.JsonPayload)_events[i - 1].EventArgs).Id);
-            Assert.IsTrue(c.Published); // get the published one
-            Assert.AreEqual("Content4X", c.Name); // published has new name
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished/{1}", m, content2C[0].Id), _events[i++].ToString()); // repub content1.content2.content21
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished/{1}", m, content4C[0].Id), _events[i].ToString()); // repub content1.content4.content41
-            */
         }
 
         [Test]
@@ -812,10 +829,13 @@ namespace Umbraco.Tests.Integration
             ServiceContext.ContentService.Unpublish(content1);
 
             ResetEvents();
-            ServiceContext.ContentService.SaveAndPublishBranch(content1, true);
+            ServiceContext.ContentService.SaveAndPublishBranch(content1, force: true); // force = true, also publish unpublished items
 
-            Assert.AreEqual(14, _msgCount);
-            Assert.AreEqual(14, _events.Count);
+            foreach (var e in _events)
+                Console.WriteLine(e);
+
+            Assert.AreEqual(10, _msgCount);
+            Assert.AreEqual(10, _events.Count);
             var i = 0;
             var m = 0;
             var content1C = Children(content1).ToArray();
@@ -823,43 +843,26 @@ namespace Umbraco.Tests.Integration
             var content3C = Children(content1C[1]).ToArray();
             var content4C = Children(content1C[2]).ToArray();
             var content5C = Children(content1C[3]).ToArray();
+
+            // force:true => all nodes are republished, refreshing all nodes - but only with changes - published w/out changes are not repub
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1.Id}.u+p", _events[i++].ToString());
 
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p+p", _events[i++].ToString());
+            //Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[0].Id}.p+p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[1].Id}.u+p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[2].Id}.p+p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content1C[3].Id}.u+p", _events[i++].ToString());
 
             // remember: ordered by level, sortOrder
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p+p", _events[i++].ToString());
+            //Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[0].Id}.p+p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[0].Id}.u+p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p+p", _events[i++].ToString());
-            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p+p", _events[i++].ToString());
+            //Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[0].Id}.p+p", _events[i++].ToString());
+            //Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[0].Id}.p+p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content2C[1].Id}.u+p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content3C[1].Id}.u+p", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content4C[1].Id}.u+p", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentRepository/Refresh/{content5C[1].Id}.u+p", _events[i++].ToString());
-            m++;
+            Assert.AreEqual($"{m++:000}: ContentRepository/Refresh/{content5C[1].Id}.u+p", _events[i++].ToString());
+
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshBranch/{content1.Id}", _events[i++].ToString()); // repub content1
-            /*
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished/{1}", m, content1C[0].Id), _events[i++].ToString()); // repub content1.content2
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished,Refresh/{1}", m, content1C[1].Id), _events[i++].ToString()); // repub content1.content3
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished,Refresh/{1}", m, content1C[2].Id), _events[i++].ToString()); // repub content1.content4
-            var c = ServiceContext.ContentService.GetPublishedVersion(((ContentCacheRefresher.JsonPayload)_events[i - 1].EventArgs).Id);
-            Assert.IsTrue(c.Published); // get the published one
-            Assert.AreEqual("Content4X", c.Name); // published has new name
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished,Refresh/{1}", m, content1C[3].Id), _events[i++].ToString()); // repub content1.content5
-
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished/{1}", m, content2C[0].Id), _events[i++].ToString()); // repub content1.content2.content21
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished,Refresh/{1}", m, content3C[0].Id), _events[i++].ToString()); // repub content1.content3.content31
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished/{1}", m, content4C[0].Id), _events[i++].ToString()); // repub content1.content4.content41
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished/{1}", m, content5C[0].Id), _events[i++].ToString()); // repub content1.content5.content51
-
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished,Refresh/{1}", m, content2C[1].Id), _events[i++].ToString()); // repub content1.content2.content22
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished,Refresh/{1}", m, content3C[1].Id), _events[i++].ToString()); // repub content1.content3.content32
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished,Refresh/{1}", m, content4C[1].Id), _events[i++].ToString()); // repub content1.content4.content42
-            Assert.AreEqual(string.Format("{0:000}: ContentCacheRefresher/RefreshPublished,Refresh/{1}", m, content5C[1].Id), _events[i].ToString()); // repub content1.content5.content52
-            */
         }
 
         #endregion
@@ -986,7 +989,6 @@ namespace Umbraco.Tests.Integration
             var content = CreateContent();
             Assert.IsNotNull(content);
 
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
 
             ResetEvents();
@@ -1010,7 +1012,6 @@ namespace Umbraco.Tests.Integration
             var content = CreateContent();
             Assert.IsNotNull(content);
 
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
             ServiceContext.ContentService.MoveToRecycleBin(content);
 
@@ -1035,7 +1036,6 @@ namespace Umbraco.Tests.Integration
             var content = CreateContent();
             Assert.IsNotNull(content);
 
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
             content.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content);
@@ -1206,7 +1206,6 @@ namespace Umbraco.Tests.Integration
         {
             var content = CreateContent();
             Assert.IsNotNull(content);
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
 
             ResetEvents();
@@ -1226,7 +1225,6 @@ namespace Umbraco.Tests.Integration
         {
             var content = CreateContent();
             Assert.IsNotNull(content);
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
             content.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content);
@@ -1248,11 +1246,9 @@ namespace Umbraco.Tests.Integration
         {
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
-            content1.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content1);
             var content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
             ServiceContext.ContentService.Unpublish(content1);
 
@@ -1334,7 +1330,6 @@ namespace Umbraco.Tests.Integration
         {
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
-            content1.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content1);
             var content2 = CreateContent();
             Assert.IsNotNull(content2);
@@ -1356,7 +1351,6 @@ namespace Umbraco.Tests.Integration
         {
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
-            content1.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content1);
             content1.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content1);
@@ -1382,7 +1376,6 @@ namespace Umbraco.Tests.Integration
             Assert.IsNotNull(content1);
             var content2 = CreateContent();
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
 
             ResetEvents();
@@ -1404,11 +1397,9 @@ namespace Umbraco.Tests.Integration
             Assert.IsNotNull(content1);
             var content2 = CreateContent();
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
             var content3 = CreateContent();
             Assert.IsNotNull(content3);
-            content3.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content3);
             ServiceContext.ContentService.Unpublish(content2);
 
@@ -1429,11 +1420,9 @@ namespace Umbraco.Tests.Integration
         {
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
-            content1.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content1);
             var content2 = CreateContent();
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
 
             ResetEvents();
@@ -1453,15 +1442,12 @@ namespace Umbraco.Tests.Integration
         {
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
-            content1.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content1);
             var content2 = CreateContent();
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
             var content3 = CreateContent(content2.Id);
             Assert.IsNotNull(content3);
-            content3.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content3);
             ServiceContext.ContentService.Unpublish(content2);
 
@@ -1482,13 +1468,11 @@ namespace Umbraco.Tests.Integration
         {
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
-            content1.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content1);
             content1.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content1);
             var content2 = CreateContent();
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
 
             ResetEvents();
@@ -1508,17 +1492,14 @@ namespace Umbraco.Tests.Integration
         {
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
-            content1.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content1);
             content1.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content1);
             var content2 = CreateContent();
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
             var content3 = CreateContent(content2.Id);
             Assert.IsNotNull(content3);
-            content3.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content3);
             ServiceContext.ContentService.Unpublish(content2);
 
@@ -1539,16 +1520,13 @@ namespace Umbraco.Tests.Integration
         {
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
-            content1.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content1);
             var content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
             ServiceContext.ContentService.Unpublish(content1);
             var content3 = CreateContent();
             Assert.IsNotNull(content3);
-            content3.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content3);
 
             ResetEvents();
@@ -1568,20 +1546,16 @@ namespace Umbraco.Tests.Integration
         {
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
-            content1.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content1);
             var content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
             ServiceContext.ContentService.Unpublish(content1);
             var content3 = CreateContent();
             Assert.IsNotNull(content3);
-            content3.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content3);
             var content4 = CreateContent(content3.Id);
             Assert.IsNotNull(content4);
-            content4.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content4);
             ServiceContext.ContentService.Unpublish(content3);
 
@@ -1602,18 +1576,15 @@ namespace Umbraco.Tests.Integration
         {
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
-            content1.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content1);
             var content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
             content2.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content2);
             ServiceContext.ContentService.Unpublish(content1);
             var content3 = CreateContent();
             Assert.IsNotNull(content3);
-            content3.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content3);
 
             ResetEvents();
@@ -1633,22 +1604,18 @@ namespace Umbraco.Tests.Integration
         {
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
-            content1.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content1);
             var content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
             content2.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content2);
             ServiceContext.ContentService.Unpublish(content1);
             var content3 = CreateContent();
             Assert.IsNotNull(content3);
-            content3.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content3);
             var content4 = CreateContent(content3.Id);
             Assert.IsNotNull(content4);
-            content4.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content4);
             ServiceContext.ContentService.Unpublish(content3);
 
@@ -1669,11 +1636,9 @@ namespace Umbraco.Tests.Integration
         {
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
-            content1.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content1);
             var content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
             ServiceContext.ContentService.Unpublish(content1);
             var content3 = CreateContent();
@@ -1696,11 +1661,9 @@ namespace Umbraco.Tests.Integration
         {
             var content1 = CreateContent();
             Assert.IsNotNull(content1);
-            content1.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content1);
             var content2 = CreateContent(content1.Id);
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
             content2.Properties.First().SetValue("changed");
             ServiceContext.ContentService.Save(content2);
@@ -1780,7 +1743,6 @@ namespace Umbraco.Tests.Integration
 
             var content2 = CreateContent();
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
 
             ResetEvents();
@@ -1834,11 +1796,9 @@ namespace Umbraco.Tests.Integration
 
             var content2 = CreateContent();
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
             var content3 = CreateContent(content2.Id);
             Assert.IsNotNull(content3);
-            content3.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content3);
             ServiceContext.ContentService.Unpublish(content2);
 
@@ -1893,7 +1853,6 @@ namespace Umbraco.Tests.Integration
 
             var content2 = CreateContent();
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
 
             ServiceContext.ContentService.Move(content1, content2.Id);
@@ -2003,11 +1962,9 @@ namespace Umbraco.Tests.Integration
 
             var content2 = CreateContent();
             Assert.IsNotNull(content2);
-            content2.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content2);
             var content3 = CreateContent(content2.Id);
             Assert.IsNotNull(content3);
-            content3.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content3);
             ServiceContext.ContentService.Unpublish(content2);
 
@@ -2083,7 +2040,6 @@ namespace Umbraco.Tests.Integration
         {
             var content = CreateContent();
             Assert.IsNotNull(content);
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
 
             ResetEvents();
@@ -2103,7 +2059,6 @@ namespace Umbraco.Tests.Integration
         {
             var content = CreateContent();
             Assert.IsNotNull(content);
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
             var content2 = CreateContent();
             Assert.IsNotNull(content2);
@@ -2126,7 +2081,6 @@ namespace Umbraco.Tests.Integration
         {
             var content = CreateBranch();
             Assert.IsNotNull(content);
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
 
             ResetEvents();
@@ -2168,17 +2122,14 @@ namespace Umbraco.Tests.Integration
         {
             var content = CreateContent();
             Assert.IsNotNull(content);
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
             var v1 = content.VersionId;
 
             content.Properties.First().SetValue("changed");
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
             var v2 = content.VersionId;
 
             content.Properties.First().SetValue("again");
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
             var v3 = content.VersionId;
 
@@ -2187,7 +2138,7 @@ namespace Umbraco.Tests.Integration
             Console.WriteLine(v3);
 
             ResetEvents();
-            content.CopyValues(ServiceContext.ContentService.GetVersion(v2));
+            content.CopyFrom(ServiceContext.ContentService.GetVersion(v2));
             ServiceContext.ContentService.Save(content);
 
             Assert.AreEqual(2, _msgCount);
@@ -2212,12 +2163,10 @@ namespace Umbraco.Tests.Integration
             Assert.IsFalse(content.IsPropertyDirty("Published"));
             Assert.IsFalse(content.WasPropertyDirty("Published"));
 
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
             Assert.IsFalse(content.IsPropertyDirty("Published"));
             Assert.IsTrue(content.WasPropertyDirty("Published")); // has just been published
 
-            content.TryPublishValues();
             ServiceContext.ContentService.SaveAndPublish(content);
             Assert.IsFalse(content.IsPropertyDirty("Published"));
             Assert.IsFalse(content.WasPropertyDirty("Published")); // was published already

@@ -8,7 +8,7 @@
                 name="vm.page.name"
                 name-locked="true"
                 on-back="vm.back()"
-                show-back-button="true"
+                show-back-button="vm.showBackButton"
                 hide-icon="true"
                 hide-description="true"
                 hide-alias="true">
@@ -28,8 +28,10 @@
                                     ng-options="culture.name as culture.displayName for culture in vm.availableCultures"
                                     val-server-field="IsoCode"
                                     required></select>
-                            <span class="help-inline" val-msg-for="newLang" val-toggle-msg="required">Required</span>
-                            <span class="help-inline" val-msg-for="newLang" val-toggle-msg="valServerField"></span>
+                            <span ng-messages="editLanguageForm.newLang.$error" show-validation-on-submit >
+                                <span class="help-inline" ng-message="required">Required</span>
+                                <span class="help-inline" ng-message="valServerField">{{editLanguageForm.newLang.errorMsg}}</span>
+                            </span>                            
                         </umb-control-group>
 
                         <umb-control-group label="@general_settings">

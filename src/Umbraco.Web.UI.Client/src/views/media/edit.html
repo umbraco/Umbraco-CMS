@@ -6,7 +6,7 @@
       ng-submit="save()"
       val-form-manager>
 
-      <umb-editor-view ng-if="!page.loading" umb-tabs>
+      <umb-editor-view ng-if="!page.loading">
 
          <umb-editor-header
             name="content.name"
@@ -14,9 +14,7 @@
             hide-icon="true"
             hide-description="true"
             hide-alias="true"
-            navigation="content.apps"
-            on-back="backToListView()"
-            show-back-button="{{page.listViewPath}}">
+            navigation="content.apps">
          </umb-editor-header>
 
          <umb-editor-container>

@@ -29,31 +29,43 @@ namespace Umbraco.Core.Models
         int VersionId { get; }
 
         /// <summary>
-        /// Sets the name of the content item for a specified language.
+        /// Sets the name of the content item for a specified culture.
         /// </summary>
         /// <remarks>
-        /// <para>When <paramref name="culture"/> is <c>null</c>, sets the invariant
-        /// language, which sets the <see cref="TreeEntityBase.Name"/> property.</para>
+        /// <para>When <paramref name="culture"/> is null, sets the invariant
+        /// culture name, which sets the <see cref="TreeEntityBase.Name"/> property.</para>
+        /// <para>When <paramref name="culture"/> is not null, throws if the content
+        /// type does not vary by culture.</para>
         /// </remarks>
-        void SetName(string value, string culture);
+        void SetCultureName(string value, string culture);
 
         /// <summary>
         /// Gets the name of the content item for a specified language.
         /// </summary>
         /// <remarks>
-        /// <para>When <paramref name="culture"/> is <c>null</c>, gets the invariant
-        /// language, which is the value of the <see cref="TreeEntityBase.Name"/> property.</para>
+        /// <para>When <paramref name="culture"/> is null, gets the invariant
+        /// culture name, which is the value of the <see cref="TreeEntityBase.Name"/> property.</para>
+        /// <para>When <paramref name="culture"/> is not null, and the content type
+        /// does not vary by culture, returns null.</para>
         /// </remarks>
-        string GetName(string culture);
+        string GetCultureName(string culture);
 
         /// <summary>
         /// Gets the names of the content item.
         /// </summary>
         /// <remarks>
-        /// <para>Because a dictionary key cannot be <c>null</c> this cannot get the invariant
-        /// name, which must be get or set via the <see cref="TreeEntityBase.Name"/> property.</para>
+        /// <para>Because a dictionary key cannot be <c>null</c> this cannot contain the invariant
+        /// culture name, which must be get or set via the <see cref="TreeEntityBase.Name"/> property.</para>
         /// </remarks>
-        IReadOnlyDictionary<string, string> Names { get; }
+        IReadOnlyDictionary<string, string> CultureNames { get; }
+
+        /// <summary>
+        /// Gets the available cultures.
+        /// </summary>
+        /// <remarks>
+        /// <para>Cannot contain the invariant culture, which is always available.</para>
+        /// </remarks>
+        IEnumerable<string> AvailableCultures { get; }
 
         /// <summary>
         /// Gets a value indicating whether a given culture is available.
@@ -61,13 +73,20 @@ namespace Umbraco.Core.Models
         /// <remarks>
         /// <para>A culture becomes available whenever the content name for this culture is
         /// non-null, and it becomes unavailable whenever the content name is null.</para>
+        /// <para>Returns <c>false</c> for the invariant culture, in order to be consistent
+        /// with <seealso cref="AvailableCultures"/>, even though the invariant culture is
+        /// always available.</para>
         /// </remarks>
         bool IsCultureAvailable(string culture);
 
         /// <summary>
         /// Gets the date a culture was created.
         /// </summary>
-        DateTime GetCultureDate(string culture);
+        /// <remarks>
+        /// <para>When <paramref name="culture" /> is <c>null</c>, returns <c>null</c>.</para>
+        /// <para>If the specified culture is not available, returns <c>null</c>.</para>
+        /// </remarks>
+        DateTime? GetCultureDate(string culture);
 
         /// <summary>
         /// List of properties, which make up all the data available for this Content object
@@ -97,47 +116,40 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets the value of a Property
         /// </summary>
+        /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
         object GetValue(string propertyTypeAlias, string culture = null, string segment = null, bool published = false);
 
         /// <summary>
         /// Gets the typed value of a Property
         /// </summary>
+        /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
         TValue GetValue<TValue>(string propertyTypeAlias, string culture = null, string segment = null, bool published = false);
 
         /// <summary>
         /// Sets the (edited) value of a Property
         /// </summary>
+        /// <remarks>Values 'null' and 'empty' are equivalent for culture and segment.</remarks>
         void SetValue(string propertyTypeAlias, object value, string culture = null, string segment = null);
+
+        /// <summary>
+        /// Copies values from another document.
+        /// </summary>
+        void CopyFrom(IContent other, string culture = "*");
+
+        // fixme validate published cultures?
 
         /// <summary>
         /// Checks if the content and property values are valid in order to be persisted.
         /// </summary>
-        /// <param name="culture"></param>
-        /// <param name="segment"></param>
-        /// <returns></returns>
-        bool IsValid(string culture = null, string segment = null);
+        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
+        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
+        bool IsValid(string culture = "*");
 
         /// <summary>
-        /// Gets a value indicating if all properties values are valid.
+        /// Validates the content item's properties.
         /// </summary>
-        //fixme - needs API review as this is not used apart from in tests
-        //Property[] ValidateAllProperties();
-
-        /// <summary>
-        /// Validates the content item's properties for the provided culture/segment
-        /// </summary>
-        /// <param name="culture"></param>
-        /// <param name="segment"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// This will not perform validation for properties that do not match the required ContentVariation based on the culture/segment values provided
-        /// </remarks>
-        Property[] ValidateProperties(string culture = null, string segment = null);
-
-        /// <summary>
-        /// Gets a value indicating if the culture properties values are valid.
-        /// </summary>
-        //fixme - needs API review as this is not used apart from in tests
-        //Property[] ValidatePropertiesForCulture(string culture = null);
+        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
+        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
+        Property[] ValidateProperties(string culture = "*");
     }
 }

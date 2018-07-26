@@ -12,7 +12,7 @@
                 icon="vm.userGroup.icon"
                 hide-description="true"
                 on-back="vm.goToPage(vm.breadcrumbs[0])"
-                show-back-button="true">
+                show-back-button="vm.showBackButton">
             </umb-editor-header>
 
             <umb-editor-container>
@@ -210,40 +210,5 @@
         </umb-editor-view>
 
     </form>
-
-    <umb-overlay
-        ng-if="vm.sectionPicker.show"
-        model="vm.sectionPicker"
-        view="vm.sectionPicker.view"
-        position="right">
-    </umb-overlay>
-
-    <umb-overlay
-        ng-if="vm.contentPicker.show"
-        model="vm.contentPicker"
-        view="vm.contentPicker.view"
-        position="right">
-    </umb-overlay>
-    
-    <umb-overlay
-        ng-if="vm.mediaPicker.show"
-        model="vm.mediaPicker"
-        view="vm.mediaPicker.view"
-        position="right">
-    </umb-overlay>
-
-    <umb-overlay
-        ng-if="vm.userPicker.show"
-        model="vm.userPicker"
-        view="vm.userPicker.view"
-        position="right">
-    </umb-overlay>
-
-    <umb-overlay
-        ng-if="vm.nodePermissions.show"
-        model="vm.nodePermissions"
-        view="vm.nodePermissions.view"
-        position="right">
-    </umb-overlay>
 
 </div>

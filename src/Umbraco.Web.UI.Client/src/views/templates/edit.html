@@ -99,7 +99,8 @@
 
                     <umb-keyboard-shortcuts-overview
                         model="vm.page.keyboardShortcutsOverview"
-                        show-overlay="vm.showKeyboardShortcut">
+                        show-overlay="vm.showKeyboardShortcut"
+                        on-close="vm.closeShortcuts()">
                     </umb-keyboard-shortcuts-overview>
 
                 </umb-editor-footer-content-left>
@@ -124,13 +125,6 @@
     </form>
 
     <umb-overlay
-       ng-if="vm.insertOverlay.show"
-       model="vm.insertOverlay"
-       view="vm.insertOverlay.view"
-       position="right">
-   </umb-overlay>
-
-    <umb-overlay
        ng-if="vm.macroPickerOverlay.show"
        model="vm.macroPickerOverlay"
        view="vm.macroPickerOverlay.view"
@@ -145,30 +139,9 @@
     </umb-overlay>
 
     <umb-overlay
-        ng-if="vm.dictionaryItemOverlay.show"
-        model="vm.dictionaryItemOverlay"
-        position="right"
-        view="vm.dictionaryItemOverlay.view">
-    </umb-overlay>
-
-    <umb-overlay
-        ng-if="vm.queryBuilderOverlay.show"
-        model="vm.queryBuilderOverlay"
-        position="right"
-        view="vm.queryBuilderOverlay.view">
-    </umb-overlay>
-
-    <umb-overlay
        ng-if="vm.sectionsOverlay.show"
        model="vm.sectionsOverlay"
        view="vm.sectionsOverlay.view"
-       position="right">
-   </umb-overlay>
-
-   <umb-overlay
-       ng-if="vm.partialItemOverlay.show"
-       model="vm.partialItemOverlay"
-       view="vm.partialItemOverlay.view"
        position="right">
    </umb-overlay>
    

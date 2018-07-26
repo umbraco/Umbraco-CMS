@@ -9,7 +9,7 @@
 (function() {
     'use strict';
 
-    function PermissionsController($scope, contentTypeResource, iconHelper, contentTypeHelper, localizationService) {
+    function PermissionsController($scope, contentTypeResource, iconHelper, contentTypeHelper, localizationService, overlayService) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
@@ -23,6 +23,7 @@
 
         vm.addChild = addChild;
         vm.removeChild = removeChild;
+        vm.toggle = toggle;
 
         /* ---------- INIT ---------- */
 
@@ -30,7 +31,9 @@
 
         function init() {
 
-            childNodeSelectorOverlayTitle = localizationService.localize("contentTypeEditor_chooseChildNode");
+            localizationService.localize("contentTypeEditor_chooseChildNode").then(function(value){
+                childNodeSelectorOverlayTitle = value;
+            });
 
             contentTypeResource.getAll().then(function(contentTypes){
 
@@ -50,20 +53,25 @@
         }
 
         function addChild($event) {
-            vm.childNodeSelectorOverlay = {
+            var childNodeSelectorOverlay = {
                 view: "itempicker",
                 title: childNodeSelectorOverlayTitle,
                 availableItems: vm.contentTypes,
                 selectedItems: vm.selectedChildren,
+                position: "target",
                 event: $event,
-                show: true,
                 submit: function(model) {
                     vm.selectedChildren.push(model.selectedItem);
                     $scope.model.allowedContentTypes.push(model.selectedItem.id);
-                    vm.childNodeSelectorOverlay.show = false;
-                    vm.childNodeSelectorOverlay = null;
+                    overlayService.close();
+                },
+                close: function() {
+                    overlayService.close();
                 }
             };
+
+            overlayService.open(childNodeSelectorOverlay);
+
         }
 
         function removeChild(selectedChild, index) {
@@ -73,6 +81,18 @@
            // remove from content type model
            var selectedChildIndex = $scope.model.allowedContentTypes.indexOf(selectedChild.id);
            $scope.model.allowedContentTypes.splice(selectedChildIndex, 1);
+        }
+
+        /**
+         * Toggle the $scope.model.allowAsRoot value to either true or false
+         */
+        function toggle(){
+            if($scope.model.allowAsRoot){
+                $scope.model.allowAsRoot = false;
+                return;
+            }
+
+            $scope.model.allowAsRoot = true;
         }
 
     }

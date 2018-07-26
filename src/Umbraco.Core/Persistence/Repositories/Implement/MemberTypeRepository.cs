@@ -212,14 +212,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 entity.AddPropertyType(standardPropertyType.Value, Constants.Conventions.Member.StandardPropertiesGroupName);
             }
-
-            var factory = new ContentTypeFactory();
-
+            
             EnsureExplicitDataTypeForBuiltInProperties(entity);
             PersistNewBaseContentType(entity);
 
             //Handles the MemberTypeDto (cmsMemberType table)
-            var memberTypeDtos = factory.BuildMemberTypeDtos(entity);
+            var memberTypeDtos = ContentTypeFactory.BuildMemberTypeDtos(entity);
             foreach (var memberTypeDto in memberTypeDtos)
             {
                 Database.Insert(memberTypeDto);
@@ -247,15 +245,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         new { ParentId = entity.ParentId, NodeObjectType = NodeObjectTypeId });
                 entity.SortOrder = maxSortOrder + 1;
             }
-
-            var factory = new ContentTypeFactory();
-
+            
             EnsureExplicitDataTypeForBuiltInProperties(entity);
             PersistUpdatedBaseContentType(entity);
 
             // remove and insert - handle cmsMemberType table
             Database.Delete<MemberTypeDto>("WHERE NodeId = @Id", new { Id = entity.Id });
-            var memberTypeDtos = factory.BuildMemberTypeDtos(entity);
+            var memberTypeDtos = ContentTypeFactory.BuildMemberTypeDtos(entity);
             foreach (var memberTypeDto in memberTypeDtos)
             {
                 Database.Insert(memberTypeDto);
@@ -311,12 +307,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             if (dtos == null || dtos.Any() == false)
                 return Enumerable.Empty<IMemberType>();
-
-            var factory = new MemberTypeReadOnlyFactory();
+            
             return dtos.Select(x =>
             {
                 bool needsSaving;
-                var memberType = factory.BuildEntity(x, out needsSaving);
+                var memberType = MemberTypeReadOnlyFactory.BuildEntity(x, out needsSaving);
                 if (needsSaving) PersistUpdatedItem(memberType);
                 return memberType;
             }).ToList();

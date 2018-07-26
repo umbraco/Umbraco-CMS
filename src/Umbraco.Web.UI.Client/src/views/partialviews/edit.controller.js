@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PartialViewsEditController($scope, $routeParams, codefileResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, angularHelper, $timeout, contentEditingHelper, localizationService, templateHelper) {
+    function PartialViewsEditController($scope, $routeParams, codefileResource, assetsService, notificationsService, editorState, navigationService, appState, macroService, angularHelper, $timeout, contentEditingHelper, localizationService, templateHelper, editorService) {
 
         var vm = this;
 
@@ -48,9 +48,17 @@
 
         //Keyboard shortcuts for help dialog
         vm.page.keyboardShortcutsOverview = [];
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getGeneralShortcuts());
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getEditorShortcuts());
-        vm.page.keyboardShortcutsOverview.push(templateHelper.getPartialViewEditorShortcuts());
+
+        templateHelper.getGeneralShortcuts().then(function(data){
+            vm.page.keyboardShortcutsOverview.push(data);
+        });
+        templateHelper.getEditorShortcuts().then(function(data){
+            vm.page.keyboardShortcutsOverview.push(data);
+        });
+        templateHelper.getPartialViewEditorShortcuts().then(function(data){
+            vm.page.keyboardShortcutsOverview.push(data);
+        });
+
 
         // bind functions to view model
         vm.save = save;
@@ -118,16 +126,12 @@
         }
 
         function openInsertOverlay() {
-
-            vm.insertOverlay = {
-                view: "insert",
+            var insertOverlay = {
                 allowedTypes: {
                     macro: true,
                     dictionary: true,
                     umbracoField: true
                 },
-                hideSubmitButton: true,
-                show: true,
                 submit: function(model) {
 
                     switch(model.insert.type) {
@@ -135,30 +139,24 @@
                             var macroObject = macroService.collectValueData(model.insert.selectedMacro, model.insert.macroParams, "Mvc");
                             insert(macroObject.syntax);
                             break;
-
                         case "dictionary":
                         	var code = templateHelper.getInsertDictionarySnippet(model.insert.node.name);
                         	insert(code);
                             break;
-                            
                         case "umbracoField":
                             insert(model.insert.umbracoField);
                             break;
                     }
-
-                    vm.insertOverlay.show = false;
-                    vm.insertOverlay = null;
-
+                    editorService.close();
                 },
-                close: function(oldModel) {
+                close: function() {
                     // close the dialog
-                    vm.insertOverlay.show = false;
-                    vm.insertOverlay = null;
+                    editorService.close();
                     // focus editor
                     vm.editor.focus();
                 }
             };
-
+            editorService.insertCodeSnippet(insertOverlay);
         }
 
 
@@ -168,7 +166,6 @@
                 view: "macropicker",
                 dialogData: {},
                 show: true,
-                title: "Insert macro",
                 submit: function (model) {
 
                     var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, "Mvc");
@@ -212,56 +209,55 @@
 
 
         function openDictionaryItemOverlay() {
-            vm.dictionaryItemOverlay = {
-                view: "treepicker",
-                section: "settings",
-                treeAlias: "dictionary",
-                entityType: "dictionary",
-                multiPicker: false,
-                show: true,
-                title: "Insert dictionary item",
-                emptyStateMessage: localizationService.localize("emptyStates_emptyDictionaryTree"),
-                select: function(node){
 
-                    var code = templateHelper.getInsertDictionarySnippet(node.name);
-                	insert(code);
+            var labelKeys = [
+                "template_insertDictionaryItem",
+                "emptyStates_emptyDictionaryTree"
+            ];
 
-                	vm.dictionaryItemOverlay.show = false;
-                    vm.dictionaryItemOverlay = null;
-                },
-                close: function (model) {
-                    // close dialog
-                    vm.dictionaryItemOverlay.show = false;
-                    vm.dictionaryItemOverlay = null;
-                    // focus editor
-                    vm.editor.focus();
-                }
-            };
+            localizationService.localizeMany(labelKeys).then(function(values){
+                var title = values[0];
+                var emptyStateMessage = values[1];
+
+                var dictionaryItem = {
+                    section: "settings",
+                    treeAlias: "dictionary",
+                    entityType: "dictionary",
+                    multiPicker: false,
+                    title: title,
+                    emptyStateMessage: emptyStateMessage,
+                    select: function(node){
+                        var code = templateHelper.getInsertDictionarySnippet(node.name);
+                        insert(code);
+                        editorService.close();
+                    },
+                    close: function (model) {
+                        // close dialog
+                        editorService.close();
+                        // focus editor
+                        vm.editor.focus();
+                    }
+                };
+                editorService.treePicker(dictionaryItem);
+            });
         }
 
         function openQueryBuilderOverlay() {
-            vm.queryBuilderOverlay = {
-                view: "querybuilder",
-                show: true,
+            var queryBuilder = {
                 title: "Query for content",
-
                 submit: function (model) {
-
                     var code = templateHelper.getQuerySnippet(model.result.queryExpression);
                     insert(code);
-                    
-                    vm.queryBuilderOverlay.show = false;
-                    vm.queryBuilderOverlay = null;
+                    editorService.close();
                 },
-
-                close: function (model) {
+                close: function () {
                     // close dialog
-                    vm.queryBuilderOverlay.show = false;
-                    vm.queryBuilderOverlay = null;
+                    editorService.close();
                     // focus editor
                     vm.editor.focus();   
                 }
             };
+            editorService.queryBuilder(queryBuilder);
         }
 
         /* Local functions */

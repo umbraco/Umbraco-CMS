@@ -9,6 +9,7 @@ using Umbraco.Web.WebServices;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Composing;
 using Umbraco.Web._Legacy.UI;
+using Umbraco.Core.Services;
 
 namespace umbraco.presentation.webservices
 {
@@ -123,7 +124,9 @@ namespace umbraco.presentation.webservices
 
             AuthorizeRequest(true);
 
-            return library.NiceUrl(nodeId);
+            var umbHelper =  new UmbracoHelper(Current.UmbracoContext, Current.Services, Current.ApplicationCache);
+
+            return umbHelper.Url(nodeId);
         }
 
         [WebMethod]

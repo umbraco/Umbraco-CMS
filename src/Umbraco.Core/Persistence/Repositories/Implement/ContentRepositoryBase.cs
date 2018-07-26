@@ -272,7 +272,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (orderBySystemField == false || orderBy.InvariantEquals(dbfield) == false)
             {
                 // get alias, if aliased
-                var matches = VersionableRepositoryBaseAliasRegex.For(SqlContext.SqlSyntax).Matches(sql.SQL);
+                var matches = SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
                 var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(dbfield));
                 if (match != null) dbfield = match.Groups[2].Value;
 
@@ -304,7 +304,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // note: ContentTypeAlias is not properly managed because it's not part of the query to begin with!
 
             // get alias, if aliased
-            var matches = VersionableRepositoryBaseAliasRegex.For(SqlContext.SqlSyntax).Matches(sql.SQL);
+            var matches = SqlContext.SqlSyntax.AliasRegex.Matches(sql.SQL);
             var match = matches.Cast<Match>().FirstOrDefault(m => m.Groups[1].Value.InvariantEquals(dbfield));
             if (match != null) dbfield = match.Groups[2].Value;
 

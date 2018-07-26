@@ -259,6 +259,8 @@ Use this directive to construct a header inside the main editor window.
 
             scope.openIconPicker = function() {
                 var iconPicker = {
+                    icon: scope.icon.split(' ')[0],
+                    color: scope.icon.split(' ')[1],
                     submit: function(model) {
                         if (model.icon) {
                             if (model.color) {
@@ -313,6 +315,7 @@ Use this directive to construct a header inside the main editor window.
                 name: "=",
                 nameLocked: "=",
                 menu: "=",
+                hideMenu: "<?",
                 icon: "=",
                 hideIcon: "@",
                 alias: "=",
@@ -321,10 +324,11 @@ Use this directive to construct a header inside the main editor window.
                 hideDescription: "@",
                 descriptionLocked: "@",
                 variants: "=",
+                hideChangeVariant: "<?",
                 navigation: "=",
                 key: "=",
                 onBack: "&?",
-                showBackButton: "@?",
+                showBackButton: "<?",
                 splitViewOpen: "=?",
                 onOpenInSplitView: "&?",
                 onCloseSplitView: "&?"

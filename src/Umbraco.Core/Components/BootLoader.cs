@@ -73,8 +73,11 @@ namespace Umbraco.Core.Components
             var componentTypeList = componentTypes
                 .Where(x =>
                 {
+                    // use the min level specified by the attribute if any
+                    // otherwise, user components have Run min level, anything else is Unknown (always run)
                     var attr = x.GetCustomAttribute<RuntimeLevelAttribute>();
-                    return attr == null || level >= attr.MinLevel;
+                    var minLevel = attr?.MinLevel ?? (x.Implements<IUmbracoUserComponent>() ? RuntimeLevel.Run : RuntimeLevel.Unknown);
+                    return level >= minLevel;
                 })
                 .ToList();
 
@@ -108,7 +111,7 @@ namespace Umbraco.Core.Components
             catch (Exception e)
             {
                 // in case of an error, force-dump everything to log
-                _logger.Info<BootLoader>(GetComponentsReport(requirements));
+                _logger.Info<BootLoader>(() => GetComponentsReport(requirements));
                 _logger.Error<BootLoader>("Failed to sort components.", e);
                 throw;
             }
@@ -350,8 +353,9 @@ namespace Umbraco.Core.Components
 
             using (_proflog.DebugDuration<BootLoader>($"Terminating. (log components when >{LogThresholdMilliseconds}ms)", "Terminated."))
             {
-                foreach (var component in _components)
+                for (var i = _components.Length - 1; i >= 0; i--) // terminate components in reverse order
                 {
+                    var component = _components[i];
                     var componentType = component.GetType();
                     using (_proflog.DebugDuration<BootLoader>($"Terminating {componentType.FullName}.", $"Terminated {componentType.FullName}.", thresholdMilliseconds: LogThresholdMilliseconds))
                     {

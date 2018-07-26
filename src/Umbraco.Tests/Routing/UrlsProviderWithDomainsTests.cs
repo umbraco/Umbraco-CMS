@@ -186,7 +186,7 @@ namespace Umbraco.Tests.Routing
             {
                 new DefaultUrlProvider(settings.RequestHandler, Logger, globalSettings.Object, new SiteDomainHelper())
             }, globalSettings:globalSettings.Object);
-            
+
             SetDomains1();
 
             var currentUri = new Uri(currentUrl);
@@ -415,7 +415,9 @@ namespace Umbraco.Tests.Routing
 
             var result = umbracoContext.UrlProvider.GetOtherUrls(100111).ToArray();
 
-            Assert.AreEqual(2, result.Count());
+            foreach (var x in result) Console.WriteLine(x);
+
+            Assert.AreEqual(2, result.Length);
             Assert.IsTrue(result.Contains("http://domain1a.com/en/1001-1-1/"));
             Assert.IsTrue(result.Contains("http://domain1b.com/en/1001-1-1/"));
         }

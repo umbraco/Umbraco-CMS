@@ -87,6 +87,23 @@
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#contentPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a content picker in infinite editing, the submit callback returns an array of selected items
+         * @returns {Object} editor object
+         */
+        function contentPicker(editor) {
+            editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+            editor.size = "small";
+            editor.section = "content";
+            editor.treeAlias = "content";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#mediaEditor
          * @methodOf umbraco.services.editorService
          *
@@ -142,14 +159,131 @@
             open(editor);
         }
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#documentTypeEditor
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the document type editor in infinite editing, the submit callback returns the saved document type
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function documentTypeEditor(editor) {
+            editor.view = "views/documenttypes/edit.html";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#mediaTypeEditor
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the media type editor in infinite editing, the submit callback returns the saved media type
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function mediaTypeEditor(editor) {
+            editor.view = "views/mediatypes/edit.html";
+            open(editor);
+        }
+
+        function queryBuilder(editor) {
+            editor.view = "views/common/infiniteeditors/querybuilder/querybuilder.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        function treePicker(editor) {
+            editor.view = "views/common/infiniteeditors/treepicker/treepicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        function nodePermissions(editor) {
+            editor.view = "views/common/infiniteeditors/nodepermissions/nodepermissions.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        function insertCodeSnippet(editor) {
+            editor.view = "views/common/infiniteeditors/insertcodesnippet/insertcodesnippet.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#userGroupPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the user group picker in infinite editing, the submit callback returns an array of the selected user groups
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function userGroupPicker(editor) {
+            editor.view = "views/common/infiniteeditors/usergrouppicker/usergrouppicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#sectionPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the section picker in infinite editing, the submit callback returns an array of the selected sections
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function sectionPicker(editor) {
+            editor.view = "views/common/infiniteeditors/sectionpicker/sectionpicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#sectionPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the section picker in infinite editing, the submit callback returns an array of the selected users
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function userPicker(editor) {
+            editor.view = "views/common/infiniteeditors/userpicker/userpicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
         var service = {
             getEditors: getEditors,
             open: open,
             close: close,
             mediaEditor: mediaEditor,
             contentEditor: contentEditor,
+            contentPicker: contentPicker,
             mediaPicker: mediaPicker,
-            iconPicker: iconPicker
+            iconPicker: iconPicker,
+            documentTypeEditor: documentTypeEditor,
+            mediaTypeEditor: mediaTypeEditor,
+            queryBuilder: queryBuilder,
+            treePicker: treePicker,
+            nodePermissions: nodePermissions,
+            insertCodeSnippet: insertCodeSnippet,
+            userGroupPicker: userGroupPicker,
+            sectionPicker: sectionPicker,
+            userPicker: userPicker
         };
 
         return service;

@@ -1,19 +1,46 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper) {
+    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper, editorService) {
 
         function link(scope, element, attrs, ctrl) {
 
             var evts = [];
             var isInfoTab = false;
+            var labels = {};
             scope.publishStatus = {};
 
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
+            scope.allowChangeDocumentType = false;
             
             function onInit() {
 
-                scope.allowOpen = true;
+                userService.getCurrentUser().then(function(user){
+                        // only allow change of media type if user has access to the settings sections
+                        angular.forEach(user.sections, function(section){
+                            if(section.alias === "settings") {
+                                scope.allowChangeDocumentType = true;
+                            }
+                        });
+                    });
+
+                var keys = [
+                    "general_deleted", 
+                    "content_unpublished", 
+                    "content_published",
+                    "content_publishedPendingChanges"
+                ];
+
+                localizationService.localizeMany(keys)
+                    .then(function(data){
+                        labels.deleted = data[0];
+                        labels.unpublished = data[1];
+                        labels.published = data[2];
+                        labels.publishedPendingChanges = data[3];
+
+                        setNodePublishStatus(scope.node);
+
+                    });
 
                 scope.datePickerConfig = {
                     pickDate: true,
@@ -40,8 +67,6 @@
 
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
-
-                setNodePublishStatus(scope.node);
                 
             }
 
@@ -50,9 +75,17 @@
                 loadAuditTrail();
             };
 
-            scope.openDocumentType = function (documentType) {               
-                var url = "/settings/documenttypes/edit/" + documentType.id;
-                $location.url(url);
+            scope.openDocumentType = function (documentType) {
+                var editor = {
+                    id: documentType.id,
+                    submit: function(model) {
+                        editorService.close();
+                    },
+                    close: function() {
+                        editorService.close();
+                    }
+                };
+                editorService.documentTypeEditor(editor);
             };
 
             scope.updateTemplate = function (templateAlias) {
@@ -125,25 +158,25 @@
                 
                 // deleted node
                 if(node.trashed === true) {
-                    scope.publishStatus.label = localizationService.localize("general_deleted");
+                    scope.publishStatus.label = labels.deleted;
                     scope.publishStatus.color = "danger";
                 }
 
                 // unpublished node
                 if(node.published === false && node.trashed === false) {
-                    scope.publishStatus.label = localizationService.localize("content_unpublished");
+                    scope.publishStatus.label = labels.unpublished;
                     scope.publishStatus.color = "gray";
                 }
 
                 // published node
                 if(node.publishDate && node.published === true) {
-                    scope.publishStatus.label = localizationService.localize("content_published");
+                    scope.publishStatus.label = labels.published;
                     scope.publishStatus.color = "success";
                 }
 
                 // published node with pending changes
                 if (node.edited === true && node.publishDate) {
-                    scope.publishStatus.label = localizationService.localize("content_publishedPendingChanges");
+                    scope.publishStatus.label = labels.publishedPendingChanges;
                     scope.publishStatus.color = "success"
                 }
 

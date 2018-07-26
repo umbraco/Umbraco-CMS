@@ -37,6 +37,7 @@ namespace Umbraco.Core.Persistence.Dtos
         public int State { get; set; }
 
         [Column("comment")]
+        [NullSetting(NullSetting = NullSettings.Null)]
         public string Comment { get; set; }
     }
 }

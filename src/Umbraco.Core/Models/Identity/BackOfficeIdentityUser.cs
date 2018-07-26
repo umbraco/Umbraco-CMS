@@ -33,6 +33,7 @@ namespace Umbraco.Core.Models.Identity
         private string[] _allowedSections;
         private int[] _startMediaIds;
         private int[] _startContentIds;
+        private DateTime? _lastPasswordChangeDateUtc;
 
         /// <summary>
         ///  Used to construct a new instance without an identity
@@ -134,6 +135,15 @@ namespace Umbraco.Core.Models.Identity
         {
             get => _userName;
             set => _beingDirty.SetPropertyValueAndDetectChanges(value, ref _userName, Ps.Value.UserNameSelector);
+        }
+
+        /// <summary>
+        /// LastPasswordChangeDateUtc so we can track changes to it
+        /// </summary>
+        public override DateTime? LastPasswordChangeDateUtc
+        {
+            get { return _lastPasswordChangeDateUtc; }
+            set { _beingDirty.SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangeDateUtc, Ps.Value.LastPasswordChangeDateUtcSelector); }
         }
 
         /// <summary>
@@ -419,6 +429,7 @@ namespace Umbraco.Core.Models.Identity
             public readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.Email);
             public readonly PropertyInfo UserNameSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.UserName);
             public readonly PropertyInfo LastLoginDateUtcSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, DateTime?>(x => x.LastLoginDateUtc);
+            public readonly PropertyInfo LastPasswordChangeDateUtcSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, DateTime?>(x => x.LastPasswordChangeDateUtc);
             public readonly PropertyInfo EmailConfirmedSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, bool>(x => x.EmailConfirmed);
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.Name);
             public readonly PropertyInfo AccessFailedCountSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, int>(x => x.AccessFailedCount);
@@ -439,5 +450,6 @@ namespace Umbraco.Core.Models.Identity
                 groups => groups.GetHashCode());
 
         }
+        
     }
 }

@@ -62,7 +62,9 @@ namespace Umbraco.Web.Editors
             public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetNiceUrl", "id", typeof(int), typeof(Guid), typeof(Udi))));
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetNiceUrl", "id", typeof(int), typeof(Guid), typeof(Udi)),
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))    
+                ));
             }
         }
 
@@ -75,7 +77,7 @@ namespace Umbraco.Web.Editors
         public bool AllowsCultureVariation()
         {
             var contentTypes = Services.ContentTypeService.GetAll();
-            return contentTypes.Any(contentType => contentType.Variations.HasAny(ContentVariation.CultureNeutral | ContentVariation.CultureSegment));
+            return contentTypes.Any(contentType => contentType.VariesByCulture());
         }
 
         /// <summary>
@@ -281,10 +283,47 @@ namespace Umbraco.Web.Editors
                 HandleContentNotFound(id);
                 return null;//irrelevant since the above throws
             }
+            var content = MapToDisplay(foundContent, culture);
+            return content;
+        }
+
+        /// <summary>
+        /// Gets the content json for the content id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [OutgoingEditorModelEvent]
+        [EnsureUserPermissionForContent("id")]
+        public ContentItemDisplay GetById(Guid id, string culture = null)
+        {
+            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
+            if (foundContent == null)
+            {
+                HandleContentNotFound(id);
+                return null;//irrelevant since the above throws
+            }
 
             var content = MapToDisplay(foundContent, culture);
             return content;
         }
+
+        /// <summary>
+        /// Gets the content json for the content id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [OutgoingEditorModelEvent]
+        [EnsureUserPermissionForContent("id")]
+        public ContentItemDisplay GetById(Udi id, string culture = null)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi != null)
+            {
+                return GetById(guidUdi.Guid, culture);
+            }
+
+            throw new HttpResponseException(HttpStatusCode.NotFound);
+        }   
 
         /// <summary>
         /// Gets an empty content item for the
@@ -311,7 +350,7 @@ namespace Umbraco.Web.Editors
             var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == Constants.Conventions.PropertyGroups.ListViewGroupName);
             mapped.Tabs = mapped.Tabs.Except(new[] { containerTab });
 
-            if (contentType.Variations.Has(ContentVariation.CultureNeutral))
+            if (contentType.VariesByCulture())
             {
                 //Remove all variants except for the default since currently the default must be saved before other variants can be edited
                 //TODO: Allow for editing all variants at once ... this will be a future task
@@ -458,12 +497,6 @@ namespace Umbraco.Web.Editors
                     }));
 
             return pagedResult;
-        }
-
-        [Obsolete("Dont use this, it is incorrectly named, use HasPermission instead")]
-        public bool GetHasPermission(string permissionToCheck, int nodeId)
-        {
-            return HasPermission(permissionToCheck, nodeId);
         }
 
         /// <summary>
@@ -716,11 +749,10 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         private void PublishInternal(ContentItemSave contentItem, ref PublishResult publishStatus, ref bool wasCancelled)
         {
-            if (!contentItem.PersistedContent.ContentType.Variations.Has(ContentVariation.CultureNeutral))
+            if (!contentItem.PersistedContent.ContentType.VariesByCulture())
             {
                 //its invariant, proceed normally
-                contentItem.PersistedContent.TryPublishValues();
-                publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, Security.CurrentUser.Id);
+                publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, userId: Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedCancelledByEvent;
             }
             else
@@ -767,20 +799,20 @@ namespace Umbraco.Web.Editors
                 if (canPublish)
                 {
                     //try to publish all the values on the model
-                    canPublish = TryPublishValues(contentItem, otherVariantsToValidate, allLangs);
+                    canPublish = PublishCulture(contentItem, otherVariantsToValidate, allLangs);
                 }
 
                 if (canPublish)
                 {
                     //proceed to publish if all validation still succeeds
-                    publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, Security.CurrentUser.Id);
+                    publishStatus = Services.ContentService.SavePublishing(contentItem.PersistedContent, Security.CurrentUser.Id);
                     wasCancelled = publishStatus.Result == PublishResultType.FailedCancelledByEvent;
                 }
                 else
                 {
                     //can only save
                     var saveResult = Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id);
-                    publishStatus = new PublishResult(PublishResultType.Failed, null, contentItem.PersistedContent);
+                    publishStatus = new PublishResult(PublishResultType.FailedCannotPublish, null, contentItem.PersistedContent);
                     wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
                 }
             }
@@ -793,16 +825,15 @@ namespace Umbraco.Web.Editors
         /// <param name="otherVariantsToValidate"></param>
         /// <param name="allLangs"></param>
         /// <returns></returns>
-        private bool TryPublishValues(ContentItemSave contentItem, IEnumerable<ContentVariationPublish> otherVariantsToValidate, IDictionary<string, ILanguage> allLangs)
+        private bool PublishCulture(ContentItemSave contentItem, IEnumerable<ContentVariationPublish> otherVariantsToValidate, IDictionary<string, ILanguage> allLangs)
         {
             var culturesToPublish = new List<string> { contentItem.Culture };
-            if (!contentItem.Culture.IsNullOrWhiteSpace())
-                culturesToPublish.Add(null); //we need to publish the invariant values if culture is specified, so we can pass in null
             culturesToPublish.AddRange(otherVariantsToValidate.Select(x => x.Culture));
 
             foreach(var culture in culturesToPublish)
             {
-                var valid = contentItem.PersistedContent.TryPublishValues(culture);
+                // publishing any culture, implies the invariant culture
+                var valid = contentItem.PersistedContent.PublishCulture(culture);
                 if (!valid)
                 {
                     var errMsg = Services.TextService.Localize("speechBubbles/contentCultureUnexpectedValidationError", new[] { allLangs[culture].CultureName });
@@ -834,8 +865,7 @@ namespace Umbraco.Web.Editors
                 return HandleContentNotFound(id, false);
             }
 
-            foundContent.TryPublishValues(); // fixme variants?
-            var publishResult = Services.ContentService.SaveAndPublish(foundContent, Security.GetUserId().ResultOr(0));
+            var publishResult = Services.ContentService.SavePublishing(foundContent, Security.GetUserId().ResultOr(0));
             if (publishResult.Success == false)
             {
                 var notificationModel = new SimpleNotificationModel();
@@ -975,7 +1005,7 @@ namespace Umbraco.Web.Editors
         {
             var toMove = ValidateMoveOrCopy(move);
 
-            Services.ContentService.Move(toMove, move.ParentId);
+            Services.ContentService.Move(toMove, move.ParentId, Security.GetUserId().ResultOr(0));
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
@@ -992,7 +1022,7 @@ namespace Umbraco.Web.Editors
         {
             var toCopy = ValidateMoveOrCopy(copy);
 
-            var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, Security.CurrentUser.Id);
+            var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, Security.GetUserId().ResultOr(0));
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(c.Path, Encoding.UTF8, "application/json");
@@ -1013,8 +1043,8 @@ namespace Umbraco.Web.Editors
 
             if (foundContent == null)
                 HandleContentNotFound(id);
-           
-            var unpublishResult = Services.ContentService.Unpublish(foundContent, culture: culture, userId: Security.CurrentUser.Id);
+
+            var unpublishResult = Services.ContentService.Unpublish(foundContent, culture: culture, userId: Security.GetUserId().ResultOr(0));
 
             var content = MapToDisplay(foundContent, culture);
 
@@ -1029,7 +1059,7 @@ namespace Umbraco.Web.Editors
 
                 content.AddSuccessNotification(
                     Services.TextService.Localize("content/unPublish"),
-                    unpublishResult.Result == UnpublishResultType.SuccessVariant
+                    unpublishResult.Result == UnpublishResultType.SuccessCulture
                         ? Services.TextService.Localize("speechBubbles/contentVariationUnpublished", new[] { culture })
                         : Services.TextService.Localize("speechBubbles/contentUnpublished"));
 
@@ -1183,13 +1213,13 @@ namespace Umbraco.Web.Editors
         private void MapPropertyValues(ContentItemSave contentItem)
         {
             //Don't update the name if it is empty
-            if (contentItem.Name.IsNullOrWhiteSpace() == false)
+            if (!contentItem.Name.IsNullOrWhiteSpace())
             {
-                //set the name according to the culture settings
-                if (contentItem.PersistedContent.ContentType.Variations.HasFlag(ContentVariation.CultureNeutral))
+                if (contentItem.PersistedContent.ContentType.VariesByCulture())
                 {
-                    if (contentItem.Culture.IsNullOrWhiteSpace()) throw new InvalidOperationException($"Cannot save a content item that is {ContentVariation.CultureNeutral} with a culture specified");
-                    contentItem.PersistedContent.SetName(contentItem.Name, contentItem.Culture);
+                    if (contentItem.Culture.IsNullOrWhiteSpace())
+                        throw new InvalidOperationException($"Cannot set culture name without a culture.");
+                    contentItem.PersistedContent.SetCultureName(contentItem.Name, contentItem.Culture);
                 }
                 else
                 {
@@ -1220,7 +1250,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            bool Varies(Property property) => property.PropertyType.Variations.Has(ContentVariation.CultureNeutral);
+            bool Varies(Property property) => property.PropertyType.VariesByCulture();
 
             MapPropertyValues<IContent, ContentItemSave>(
                 contentItem,
@@ -1299,7 +1329,7 @@ namespace Umbraco.Web.Editors
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedByParent",
-                                    new[] { string.Format("{0} ({1})", status.Content.Name, status.Content.Id) }).Trim());
+                                new[] { $"{status.Content.Name} ({status.Content.Id})" }).Trim());
                     break;
                 case PublishResultType.FailedCancelledByEvent:
                     AddCancelMessage(display, "publish", "speechBubbles/contentPublishedFailedByEvent");
@@ -1308,32 +1338,36 @@ namespace Umbraco.Web.Editors
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedAwaitingRelease",
-                                    new[] { string.Format("{0} ({1})", status.Content.Name, status.Content.Id) }).Trim());
+                                new[] { $"{status.Content.Name} ({status.Content.Id})" }).Trim());
                     break;
                 case PublishResultType.FailedHasExpired:
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedExpired",
-                                    new[]
-                                    {
-                                                                string.Format("{0} ({1})", status.Content.Name, status.Content.Id),
-                                    }).Trim());
+                                new[] { $"{status.Content.Name} ({status.Content.Id})", }).Trim());
                     break;
                 case PublishResultType.FailedIsTrashed:
-                    //TODO: We should add proper error messaging for this!
+                    display.AddWarningNotification(
+                        Services.TextService.Localize("publish"),
+                        "publish/contentPublishedFailedIsTrashed"); // fixme properly localize!
                     break;
                 case PublishResultType.FailedContentInvalid:
                     display.AddWarningNotification(
                             Services.TextService.Localize("publish"),
                             Services.TextService.Localize("publish/contentPublishedFailedInvalid",
-                                    new[]
-                                    {
-                                                                string.Format("{0} ({1})", status.Content.Name, status.Content.Id),
-                                                                string.Join(",", status.InvalidProperties.Select(x => x.Alias))
-                                    }).Trim());
+                                new[]
+                                {
+                                    $"{status.Content.Name} ({status.Content.Id})",
+                                    string.Join(",", status.InvalidProperties.Select(x => x.Alias))
+                                }).Trim());
+                    break;
+                case PublishResultType.FailedByCulture:
+                    display.AddWarningNotification(
+                        Services.TextService.Localize("publish"),
+                        "publish/contentPublishedFailedByCulture"); // fixme properly localize!
                     break;
                 default:
-                    throw new IndexOutOfRangeException();
+                    throw new IndexOutOfRangeException($"PublishedResultType \"{status.Result}\" was not expected.");
             }
         }
 
@@ -1422,17 +1456,16 @@ namespace Umbraco.Web.Editors
         {
             //A culture must exist in the mapping context if this content type is CultureNeutral since for a culture variant to be edited,
             // the Cuture property of ContentItemDisplay must exist (at least currently).
-            if (culture == null && content.ContentType.Variations.Has(ContentVariation.CultureNeutral))
+            if (culture == null && content.ContentType.VariesByCulture())
             {
                 //If a culture is not explicitly sent up, then it means that the user is editing the default variant language.
                 culture = Services.LocalizationService.GetDefaultLanguageIsoCode();
             }
 
-            var display = ContextMapper.Map<IContent, ContentItemDisplay>(content, UmbracoContext,
+            var display = ContextMapper.Map<IContent, ContentItemDisplay>(content, 
                 new Dictionary<string, object> { { ContextMapper.CultureKey, culture } });
 
             return display;
         }
-
     }
 }

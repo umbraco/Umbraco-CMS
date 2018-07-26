@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -40,7 +41,16 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             DecimalColumnDefinition = string.Format(DecimalColumnDefinitionFormat, DefaultDecimalPrecision, DefaultDecimalScale);
 
             InitColumnTypeMap();
+
+            // ReSharper disable VirtualMemberCallInConstructor
+            // ok to call virtual GetQuotedXxxName here - they don't depend on any state
+            var col = Regex.Escape(GetQuotedColumnName("column")).Replace("column", @"\w+");
+            var fld = Regex.Escape(GetQuotedTableName("table") + ".").Replace("table", @"\w+") + col;
+            // ReSharper restore VirtualMemberCallInConstructor
+            AliasRegex = new Regex("(" + fld + @")\s+AS\s+(" + col + ")", RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.IgnoreCase);
         }
+
+        public Regex AliasRegex { get; }
 
         public string GetWildcardPlaceholder()
         {
@@ -135,41 +145,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         {
             //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
             return $"upper({column}) LIKE upper(@{paramIndex})";
-        }
-
-        [Obsolete("Use the overload with the parameter index instead")]
-        public virtual string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType)
-        {
-            //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
-            return $"upper({column}) = '{value.ToUpper()}'";
-        }
-
-        [Obsolete("Use the overload with the parameter index instead")]
-        public virtual string GetStringColumnStartsWithComparison(string column, string value, TextColumnType columnType)
-        {
-            //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
-            return $"upper({column}) LIKE '{value.ToUpper()}%'";
-        }
-
-        [Obsolete("Use the overload with the parameter index instead")]
-        public virtual string GetStringColumnEndsWithComparison(string column, string value, TextColumnType columnType)
-        {
-            //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
-            return $"upper({column}) LIKE '%{value.ToUpper()}'";
-        }
-
-        [Obsolete("Use the overload with the parameter index instead")]
-        public virtual string GetStringColumnContainsComparison(string column, string value, TextColumnType columnType)
-        {
-            //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
-            return $"upper({column}) LIKE '%{value.ToUpper()}%'";
-        }
-
-        [Obsolete("Use the overload with the parameter index instead")]
-        public virtual string GetStringColumnWildcardComparison(string column, string value, TextColumnType columnType)
-        {
-            //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
-            return $"upper({column}) LIKE '{value.ToUpper()}'";
         }
 
         public virtual string GetConcat(params string[] args)

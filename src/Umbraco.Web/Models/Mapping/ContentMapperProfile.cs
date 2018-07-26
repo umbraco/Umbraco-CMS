@@ -14,18 +14,25 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentMapperProfile : Profile
     {
-        public ContentMapperProfile(IUserService userService, ILocalizedTextService textService, IContentService contentService, IContentTypeService contentTypeService, IDataTypeService dataTypeService, ILocalizationService localizationService, ILogger logger)
+        public ContentMapperProfile(
+            ContentUrlResolver contentUrlResolver,
+            ContentTreeNodeUrlResolver<IContent, ContentTreeController> contentTreeNodeUrlResolver,
+            TabsAndPropertiesResolver<IContent, ContentItemDisplay> tabsAndPropertiesResolver,
+            IUserService userService,
+            ILocalizedTextService textService,
+            IContentService contentService,
+            IContentTypeService contentTypeService,
+            IDataTypeService dataTypeService,
+            ILocalizationService localizationService,
+            ILogger logger)
         {
             // create, capture, cache
             var contentOwnerResolver = new OwnerResolver<IContent>(userService);
             var creatorResolver = new CreatorResolver(userService);
             var actionButtonsResolver = new ActionButtonsResolver(userService, contentService);
-            var tabsAndPropertiesResolver = new TabsAndPropertiesResolver<IContent, ContentItemDisplay>(textService);
             var childOfListViewResolver = new ContentChildOfListViewResolver(contentService, contentTypeService);
             var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>();
-            var contentTreeNodeUrlResolver = new ContentTreeNodeUrlResolver<IContent, ContentTreeController>();
             var defaultTemplateResolver = new DefaultTemplateResolver();
-            var contentUrlResolver = new ContentUrlResolver(textService, contentService, logger);
             var variantResolver = new ContentItemDisplayVariationResolver(localizationService);
 
             //FROM IContent TO ContentItemDisplay

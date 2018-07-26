@@ -83,7 +83,7 @@ namespace Umbraco.Core.Runtime
 
                 try
                 {
-                    Logger.Debug<CoreRuntime>($"Runtime: {GetType().FullName}");
+                    Logger.Debug<CoreRuntime>(() => $"Runtime: {GetType().FullName}");
 
                     AquireMainDom(container);
                     DetermineRuntimeLevel(container);
@@ -141,11 +141,11 @@ namespace Umbraco.Core.Runtime
                     var dbfactory = container.GetInstance<IUmbracoDatabaseFactory>();
                     SetRuntimeStateLevel(dbfactory, Logger);
 
-                    Logger.Debug<CoreRuntime>($"Runtime level: {_state.Level}");
+                    Logger.Debug<CoreRuntime>(() => $"Runtime level: {_state.Level}");
 
                     if (_state.Level == RuntimeLevel.Upgrade)
                     {
-                        Logger.Debug<CoreRuntime>($"Configure database factory for upgrades.");
+                        Logger.Debug<CoreRuntime>(() => $"Configure database factory for upgrades.");
                         dbfactory.ConfigureForUpgrade();
                     }
                 }
@@ -258,12 +258,20 @@ namespace Umbraco.Core.Runtime
                 logger.Debug<CoreRuntime>("No local version, need to install Umbraco.");
                 _state.Level = RuntimeLevel.Install;
             }
-            else if (localVersion != codeVersion)
+            else if (localVersion < codeVersion)
             {
                 // there *is* a local version, but it does not match the code version
                 // need to upgrade
-                logger.Debug<CoreRuntime>($"Local version \"{localVersion}\" != code version \"{codeVersion}\", need to upgrade Umbraco.");
+                logger.Debug<CoreRuntime>(() => $"Local version \"{localVersion}\" < code version \"{codeVersion}\", need to upgrade Umbraco.");
                 _state.Level = RuntimeLevel.Upgrade;
+            }
+            else if (localVersion > codeVersion)
+            {
+                logger.Warn<CoreRuntime>(() => $"Local version \"{localVersion}\" > code version \"{codeVersion}\", downgrading is not supported.");
+                _state.Level = RuntimeLevel.BootFailed;
+
+                // in fact, this is bad enough that we want to throw
+                throw new BootFailedException($"Local version \"{localVersion}\" > code version \"{codeVersion}\", downgrading is not supported.");
             }
             else if (databaseFactory.Configured == false)
             {
@@ -284,7 +292,7 @@ namespace Umbraco.Core.Runtime
             {
                 connect = databaseFactory.CanConnect;
                 if (connect) break;
-                logger.Debug<CoreRuntime>(i == 0
+                logger.Debug<CoreRuntime>(() => i == 0
                     ? "Could not immediately connect to database, trying again."
                     : "Could not connect to database.");
                 Thread.Sleep(1000);
@@ -293,7 +301,7 @@ namespace Umbraco.Core.Runtime
             if (connect == false)
             {
                 // cannot connect to configured database, this is bad, fail
-                logger.Debug<CoreRuntime>("Could not connect to database.");
+                logger.Debug<CoreRuntime>(() => "Could not connect to database.");
                 _state.Level = RuntimeLevel.BootFailed;
 
                 // in fact, this is bad enough that we want to throw
@@ -357,7 +365,7 @@ namespace Umbraco.Core.Runtime
             _state.CurrentMigrationState = state;
             _state.FinalMigrationState = umbracoPlan.FinalState;
 
-            logger.Debug<CoreRuntime>($"Final upgrade state is \"{_state.FinalMigrationState}\", database contains \"{state ?? "<null>"}\".");
+            logger.Debug<CoreRuntime>(() => $"Final upgrade state is \"{_state.FinalMigrationState}\", database contains \"{state ?? "<null>"}\".");
 
             return state == _state.FinalMigrationState;
         }

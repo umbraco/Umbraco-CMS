@@ -8,7 +8,9 @@ angular.module("umbraco")
         $scope.model.subtitle = "Umbraco version" + " " + $scope.version;
 
         if(!$scope.model.title) {
-            $scope.model.title = localizationService.localize("general_user");
+            localizationService.localize("general_user").then(function(value){
+                $scope.model.title = value;
+            });
         }
 
         $scope.externalLoginProviders = externalLoginInfo.providers;
@@ -145,7 +147,7 @@ angular.module("umbraco")
                         $scope.changePasswordModel.value.generatedPassword = data.value;
                     }
 
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                    formHelper.resetForm({ scope: $scope });
 
                     $scope.changePasswordButtonState = "success";
                     $timeout(function() {
