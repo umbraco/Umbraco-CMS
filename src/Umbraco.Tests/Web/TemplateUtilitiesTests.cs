@@ -82,7 +82,8 @@ namespace Umbraco.Tests.Web
         [Test]
         public void StripDataUdiAttributesHtmlNullInput()
         {
-            Assert.Throws<ArgumentNullException>(() => TemplateUtilities.StripUdiDataAttributes(null));
+            HtmlDocument htmlDocument = null;
+            Assert.Throws<ArgumentNullException>(() => TemplateUtilities.StripUdiDataAttributes(htmlDocument));
         }
 
         [Test]
@@ -111,6 +112,28 @@ namespace Umbraco.Tests.Web
             var htmlDocOutput = TemplateUtilities.StripUdiDataAttributes(htmlDocInput);
 
             Assert.AreEqual(expected, htmlDocOutput.DocumentNode.OuterHtml);
+        }
+
+        [Test]
+        public void StripDataUdiAttributesUsingSrtringOnLinks()
+        {
+            var input = "hello <a data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"/my-test-url\"> world</a> ";
+            var expected = "hello <a href=\"/my-test-url\"> world</a> ";
+           
+            var result = TemplateUtilities.StripUdiDataAttributes(input);
+
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void StripDataUdiAttributesUsingStringOnImages()
+        {
+            var input = "hello <img data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ";
+            var expected = "hello <img src=\"imageofcats.jpg\"> world ";
+
+            var result = TemplateUtilities.StripUdiDataAttributes(input);
+
+            Assert.AreEqual(expected, result);
         }
     }
 }

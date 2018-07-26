@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -174,6 +175,11 @@ namespace Umbraco.Web.Templates
             return text.CleanForXss(ignoreFromClean);
         }
 
+        /// <summary>
+        /// Strips data-udi attributes from rich text
+        /// </summary>
+        /// <param name="input">A HtmlDocument</param>
+        /// <returns>A HtmlDocument stripped from the data-uid attributes</returns>
         public static HtmlDocument StripUdiDataAttributes(HtmlDocument input)
         {
             if (input == null)
@@ -194,6 +200,27 @@ namespace Umbraco.Web.Templates
             }
 
             return input;
+        }
+
+        /// <summary>
+        /// Strips data-udi attributes from rich text
+        /// </summary>
+        /// <param name="input">A html string</param>
+        /// <returns>A string stripped from the data-uid attributes</returns>
+        public static string StripUdiDataAttributes(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return string.Empty;
+            }
+
+
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(input);
+
+            var strippedHtmlDoc = StripUdiDataAttributes(htmlDoc);
+
+            return strippedHtmlDoc.DocumentNode.OuterHtml;
         }
     }
 }
