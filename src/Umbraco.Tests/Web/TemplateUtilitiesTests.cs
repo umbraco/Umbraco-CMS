@@ -34,11 +34,11 @@ namespace Umbraco.Tests.Web
         //this one has an invalid char so won't match
         [TestCase("hello href=\"{localLink:umb^://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"{localLink:umb^://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ")]
         // with a-tag with data-udi attribute, that needs to be stripped
-        [TestCase("hello <a data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"> world</a> ", "hello <a href=\"/my-test-url\"> world</a> ")]
+        [TestCase("hello <a data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"> world</a> ", "hello <a  href=\"/my-test-url\"> world</a> ")]
         // with a-tag with data-udi attribute spelled wrong, so don't need stripping
         [TestCase("hello <a data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"> world</a> ", "hello <a data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"/my-test-url\"> world</a> ")]
         // with a img-tag with data-udi id, that needs to be strippde
-        [TestCase("hello <img data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ", "hello <img src=\"imageofcats.jpg\"> world ")]
+        [TestCase("hello <img data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ", "hello <img  src=\"imageofcats.jpg\"> world ")]
         // with a img-tag with data-udi id spelled wrong, so don't need stripping
         [TestCase("hello <img data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ", "hello <img data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ")]
         public void ParseLocalLinks(string input, string result)
@@ -118,7 +118,7 @@ namespace Umbraco.Tests.Web
         public void StripDataUdiAttributesUsingSrtringOnLinks()
         {
             var input = "hello <a data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"/my-test-url\"> world</a> ";
-            var expected = "hello <a href=\"/my-test-url\"> world</a> ";
+            var expected = "hello <a  href=\"/my-test-url\"> world</a> ";
            
             var result = TemplateUtilities.StripUdiDataAttributes(input);
 
@@ -129,7 +129,7 @@ namespace Umbraco.Tests.Web
         public void StripDataUdiAttributesUsingStringOnImages()
         {
             var input = "hello <img data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ";
-            var expected = "hello <img src=\"imageofcats.jpg\"> world ";
+            var expected = "hello <img  src=\"imageofcats.jpg\"> world ";
 
             var result = TemplateUtilities.StripUdiDataAttributes(input);
 

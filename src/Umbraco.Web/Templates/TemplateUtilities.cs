@@ -111,6 +111,9 @@ namespace Umbraco.Web.Templates
         private static readonly Regex ResolveUrlPattern = new Regex("(=[\"\']?)(\\W?\\~(?:.(?![\"\']?\\s+(?:\\S+)=|[>\"\']))+.)[\"\']?",
             RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
 
+        private static readonly Regex UdiDataAttributePattern = new Regex("data-udi=\"[^\\\"]*\"",
+            RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
         /// <summary>
         /// The RegEx matches any HTML attribute values that start with a tilde (~), those that match are passed to ResolveUrl to replace the tilde with the application path.
         /// </summary>
@@ -195,12 +198,7 @@ namespace Umbraco.Web.Templates
             }
 
 
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(input);
-
-            var strippedHtmlDoc = StripUdiDataAttributes(htmlDoc);
-
-            return strippedHtmlDoc.DocumentNode.OuterHtml;
+            return UdiDataAttributePattern.Replace(input, string.Empty);
         }
     }
 }
