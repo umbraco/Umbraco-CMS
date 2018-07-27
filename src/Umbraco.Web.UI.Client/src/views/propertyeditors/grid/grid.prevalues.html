@@ -111,8 +111,8 @@
                     <i class="icon icon-navigation handle"></i>
 
                     <a href="#" prevent-default ng-click="removeConfigValue(model.value.config, $index)">
+                        <i class="icon icon-delete red"></i>
                         {{configValue.label}}
-                        <i class="icon icon-delete red hover-show"></i>
                     </a>
                 </li>
             </ul>
@@ -129,7 +129,6 @@
         </umb-control-group>
 
 
-
         <umb-control-group label="@grid_styles"
                            description="@grid_stylesDetails">
 
@@ -141,8 +140,8 @@
                     <i class="icon icon-navigation handle"></i>
 
                     <a href="#" prevent-default ng-click="removeConfigValue(model.value.styles, $index)">
+                        <i class="icon icon-delete red"></i>
                         {{style.label}}
-                        <i class="icon icon-delete red hover-show"></i>
                     </a>
 
                 </li>
@@ -150,7 +149,7 @@
 
             <ul class="unstyled list-icons">
                 <li>
-                    <i class="icon icon-brush turquoise"></i>
+                    <i class="icon icon-settings-alt-2 turquoise"></i>
                     <a href="#" ng-click="editStyles()" prevent-default>
                         <localize key="general_edit" />
                     </a>
