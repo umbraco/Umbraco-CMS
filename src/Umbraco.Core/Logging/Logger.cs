@@ -5,11 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using log4net;
-using log4net.Config;
+using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Diagnostics;
-using log4net.Util;
+using Serilog;
 
 namespace Umbraco.Core.Logging
 {
@@ -25,15 +24,20 @@ namespace Umbraco.Core.Logging
         public Logger(FileInfo log4NetConfigFile)
             : this()
         {
-            XmlConfigurator.Configure(log4NetConfigFile);
+            //XmlConfigurator.Configure(log4NetConfigFile);
         }
 
         // private for CreateWithDefaultConfiguration
         private Logger()
         {
-            // add custom global properties to the log4net context that we can use in our logging output
-            GlobalContext.Properties["processId"] = Process.GetCurrentProcess().Id;
-            GlobalContext.Properties["appDomainId"] = AppDomain.CurrentDomain.Id;
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug() //Set to highest level of logging (as any sinks may want to restrict it to Errors only)
+                .Enrich.WithProcessId()
+                .Enrich.WithProcessName()
+                .Enrich.WithThreadId()
+                .Enrich.WithProperty("AppDomainId", AppDomain.CurrentDomain.Id)
+                .Enrich.WithProperty("AppDomainAppId", HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty))
+                .CreateLogger();
         }
 
         /// <summary>
