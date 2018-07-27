@@ -224,7 +224,6 @@ namespace Umbraco.Core.Composing
                     "Dynamic,",
                     "HtmlDiff,",
                     "Iesi.Collections,",
-                    "log4net,",
                     "Microsoft.",
                     "Newtonsoft.",
                     "NHibernate.",
