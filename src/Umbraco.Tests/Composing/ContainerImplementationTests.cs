@@ -10,7 +10,7 @@ namespace Umbraco.Tests.Composing
     [TestFixture]
     public class ContainerImplementationTests
     {
-        private IContainer CreateContainer() => Core.Composing.LightInject.LightInjectContainer.Create();
+        private IContainer CreateContainer() => ContainerFactory.Create();
 
         [Test]
         public void CanRegisterSingletonInterface()

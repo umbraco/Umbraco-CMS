@@ -17,7 +17,7 @@ namespace Umbraco.Tests.Composing
         {
             Current.Reset();
 
-            _container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
+            _container = Current.Container = ContainerFactory.Create();
         }
 
         [TearDown]

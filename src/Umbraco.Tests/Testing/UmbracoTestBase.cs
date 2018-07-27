@@ -113,7 +113,7 @@ namespace Umbraco.Tests.Testing
             // but hey, never know, better avoid garbage-in
             Reset();
 
-            Container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
+            Container = Current.Container = ContainerFactory.Create();
 
             TestObjects = new TestObjects(Container);
 

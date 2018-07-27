@@ -26,7 +26,7 @@ namespace Umbraco.Tests.IO
             var config = SettingsForTests.GetDefaultUmbracoSettings();
             SettingsForTests.ConfigureSettings(config);
 
-            _container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
+            _container = Current.Container = ContainerFactory.Create();
 
             _container.Register(_ => Mock.Of<ILogger>());
             _container.Register<FileSystems>();

@@ -65,7 +65,7 @@ namespace Umbraco.Tests.PropertyEditors
         {
             try
             {
-                var container = Current.Container = Core.Composing.LightInject.LightInjectContainer.Create();
+                var container = Current.Container = ContainerFactory.Create();
 
                 container.RegisterCollectionBuilder<PropertyValueConverterCollectionBuilder>();
 
