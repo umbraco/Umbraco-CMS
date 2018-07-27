@@ -5,11 +5,11 @@ angular.module("umbraco")
         var $typeahead;
 
         $scope.isLoading = true;
-        $scope.tagToAdd = "";	
-		
+        $scope.tagToAdd = "";
+
 		function setModelValue(val) {
-			
-			$scope.model.value = val || $scope.model.value;			
+
+			$scope.model.value = val || $scope.model.value;
 			if ($scope.model.value) {
                 if (!$scope.model.config.storageType || $scope.model.config.storageType !== "Json") {
                     //it is csv
@@ -20,9 +20,9 @@ angular.module("umbraco")
                        if($scope.model.value.length > 0) {
 						  // split the csv string, and remove any duplicate values
 						  var tempArray = $scope.model.value.split(',').map(function(v) {
-							 return v.trim(); 
+							 return v.trim();
 						  });
-						   
+
                           $scope.model.value = tempArray.filter(function(v, i, self) {
 							  return self.indexOf(v) === i;
 						  });
@@ -40,7 +40,7 @@ angular.module("umbraco")
             $scope.isLoading = false;
 
             //load current value
-			setModelValue();            
+			setModelValue();
 
             // Method required by the valPropertyValidator directive (returns true if the property editor has at least one tag selected)
             $scope.validateMandatory = function () {
@@ -64,7 +64,7 @@ angular.module("umbraco")
 
             $scope.addTagOnEnter = function (e) {
                 var code = e.keyCode || e.which;
-                if (code == 13) { //Enter keycode   
+                if (code == 13) { //Enter keycode
                     if ($element.find('.tags-' + $scope.model.alias).parent().find(".tt-dropdown-menu .tt-cursor").length === 0) {
                         //this is required, otherwise the html form will attempt to submit.
                         e.preventDefault();
@@ -83,16 +83,37 @@ angular.module("umbraco")
                 $typeahead.typeahead('val', '');
             };
 
-
+            // Set the visible prompt to -1 to ensure it will not be visible
+            $scope.promptIsVisible = "-1";
 
             $scope.removeTag = function (tag) {
                 var i = $scope.model.value.indexOf(tag);
+
                 if (i >= 0) {
+                    // Make sure to hide the prompt so it does not stay open because another item gets a new number in the array index
+                    $scope.promptIsVisible = "-1";
+
+                    // Remove the tag from the index
                     $scope.model.value.splice(i, 1);
+
                     //this is required to re-validate
                     $scope.propertyForm.tagCount.$setViewValue($scope.model.value.length);
                 }
             };
+
+            $scope.showPrompt = function (idx, tag){
+
+                var i = $scope.model.value.indexOf(tag);
+
+                // Make the prompt visible for the clicked tag only
+                if (i === idx) {
+                    $scope.promptIsVisible = i;
+                }
+            }
+
+            $scope.hidePrompt = function(){
+                $scope.promptIsVisible = "-1";
+            }
 
             //vice versa
             $scope.model.onValueChanged = function (newVal, oldVal) {
