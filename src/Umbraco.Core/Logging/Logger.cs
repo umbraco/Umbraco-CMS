@@ -52,7 +52,7 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Error(Type reporting, string message, Exception exception = null)
         {
-            var logger = LogManager.GetLogger(reporting);
+            var logger = Log.Logger;
             if (logger == null) return;
 
             var dump = false;
@@ -114,135 +114,127 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Warn(Type reporting, string format)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            logger.Warn(format);
+            var logger = Log.Logger;
+            logger?.Warning(format);
         }
 
         /// <inheritdoc/>
         public void Warn(Type reporting, Func<string> messageBuilder)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            logger.Warn(messageBuilder());
+            var logger = Log.Logger;
+            logger?.Warning(messageBuilder());
         }
 
         /// <inheritdoc/>
-        public void Warn(Type reporting, string format, params object[] args)
-        {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            logger.WarnFormat(format, args);
-        }
+        //public void Warn(Type reporting, string format, params object[] args)
+        //{
+        //    var logger = Log.Logger;
+        //    if (logger == null) return;
+        //    logger.WarnFormat(format, args);
+        //}
 
-        /// <inheritdoc/>
-        public void Warn(Type reporting, string format, params Func<object>[] args)
-        {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            logger.WarnFormat(format, args.Select(x => x.Invoke()).ToArray());
-        }
+        ///// <inheritdoc/>
+        //public void Warn(Type reporting, string format, params Func<object>[] args)
+        //{
+        //    var logger = LogManager.GetLogger(reporting);
+        //    if (logger == null || logger.IsWarnEnabled == false) return;
+        //    logger.WarnFormat(format, args.Select(x => x.Invoke()).ToArray());
+        //}
 
         /// <inheritdoc/>
         public void Warn(Type reporting, Exception exception, string message)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            logger.Warn(message, exception);
+            var logger = Log.Logger;
+            logger?.Warning(message, exception);
         }
 
         /// <inheritdoc/>
         public void Warn(Type reporting, Exception exception, Func<string> messageBuilder)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            logger.Warn(messageBuilder(), exception);
+            var logger = Log.Logger;
+            logger?.Warning(messageBuilder(), exception);
         }
 
-        /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, string format, params object[] args)
-        {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            // there is no WarnFormat overload that accepts an exception
-            // format the message the way log4net would do it (see source code LogImpl.cs)
-            var message = new SystemStringFormat(CultureInfo.InvariantCulture, format, args);
-            logger.Warn(message, exception);
-        }
+        ///// <inheritdoc/>
+        //public void Warn(Type reporting, Exception exception, string format, params object[] args)
+        //{
+        //    var logger = LogManager.GetLogger(reporting);
+        //    if (logger == null || logger.IsWarnEnabled == false) return;
+        //    // there is no WarnFormat overload that accepts an exception
+        //    // format the message the way log4net would do it (see source code LogImpl.cs)
+        //    var message = new SystemStringFormat(CultureInfo.InvariantCulture, format, args);
+        //    logger.Warn(message, exception);
+        //}
 
-        /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, string format, params Func<object>[] args)
-        {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            // there is no WarnFormat overload that accepts an exception
-            // format the message the way log4net would do it (see source code LogImpl.cs)
-            var message = new SystemStringFormat(CultureInfo.InvariantCulture, format, args.Select(x => x.Invoke()).ToArray());
-            logger.Warn(message, exception);
-        }
+        ///// <inheritdoc/>
+        //public void Warn(Type reporting, Exception exception, string format, params Func<object>[] args)
+        //{
+        //    var logger = LogManager.GetLogger(reporting);
+        //    if (logger == null || logger.IsWarnEnabled == false) return;
+        //    // there is no WarnFormat overload that accepts an exception
+        //    // format the message the way log4net would do it (see source code LogImpl.cs)
+        //    var message = new SystemStringFormat(CultureInfo.InvariantCulture, format, args.Select(x => x.Invoke()).ToArray());
+        //    logger.Warn(message, exception);
+        //}
 
         /// <inheritdoc/>
         public void Info(Type reporting, string message)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsInfoEnabled == false) return;
-            logger.Info(message);
+            var logger = Log.Logger;
+            logger?.Information(message);
         }
 
         /// <inheritdoc/>
         public void Info(Type reporting, Func<string> generateMessage)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsInfoEnabled == false) return;
-            logger.Info(generateMessage());
+            var logger = Log.Logger;
+            logger?.Information(generateMessage());
         }
 
-        /// <inheritdoc/>
-        public void Info(Type reporting, string format, params object[] args)
-        {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsInfoEnabled == false) return;
-            logger.InfoFormat(format, args);
-        }
+        ///// <inheritdoc/>
+        //public void Info(Type reporting, string format, params object[] args)
+        //{
+        //    var logger = LogManager.GetLogger(reporting);
+        //    if (logger == null || logger.IsInfoEnabled == false) return;
+        //    logger.InfoFormat(format, args);
+        //}
 
-        /// <inheritdoc/>
-        public void Info(Type reporting, string format, params Func<object>[] args)
-        {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsInfoEnabled == false) return;
-            logger.InfoFormat(format, args.Select(x => x.Invoke()).ToArray());
-        }
+        ///// <inheritdoc/>
+        //public void Info(Type reporting, string format, params Func<object>[] args)
+        //{
+        //    var logger = LogManager.GetLogger(reporting);
+        //    if (logger == null || logger.IsInfoEnabled == false) return;
+        //    logger.InfoFormat(format, args.Select(x => x.Invoke()).ToArray());
+        //}
 
         /// <inheritdoc/>
         public void Debug(Type reporting, string message)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsDebugEnabled == false) return;
-            logger.Debug(message);
+            var logger = Log.Logger;
+            logger?.Debug(message);
         }
 
         /// <inheritdoc/>
         public void Debug(Type reporting, Func<string> messageBuilder)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsDebugEnabled == false) return;
-            logger.Debug(messageBuilder());
+            var logger = Log.Logger;
+            logger?.Debug(messageBuilder());
         }
 
-        /// <inheritdoc/>
-        public void Debug(Type reporting, string format, params object[] args)
-        {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsDebugEnabled == false) return;
-            logger.DebugFormat(format, args);
-        }
+        ///// <inheritdoc/>
+        //public void Debug(Type reporting, string format, params object[] args)
+        //{
+        //    var logger = LogManager.GetLogger(reporting);
+        //    if (logger == null || logger.IsDebugEnabled == false) return;
+        //    logger.DebugFormat(format, args);
+        //}
 
-        /// <inheritdoc/>
-        public void Debug(Type reporting, string format, params Func<object>[] args)
-        {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsDebugEnabled == false) return;
-            logger.DebugFormat(format, args.Select(x => x.Invoke()).ToArray());
-        }
+        ///// <inheritdoc/>
+        //public void Debug(Type reporting, string format, params Func<object>[] args)
+        //{
+        //    var logger = LogManager.GetLogger(reporting);
+        //    if (logger == null || logger.IsDebugEnabled == false) return;
+        //    logger.DebugFormat(format, args.Select(x => x.Invoke()).ToArray());
+        //}
     }
 }
