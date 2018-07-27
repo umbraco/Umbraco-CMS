@@ -157,34 +157,7 @@ namespace Umbraco.Web.Templates
         {
             return text.CleanForXss(ignoreFromClean);
         }
-
-        /// <summary>
-        /// Strips data-udi attributes from rich text
-        /// </summary>
-        /// <param name="input">A HtmlDocument</param>
-        /// <returns>A HtmlDocument stripped from the data-uid attributes</returns>
-        public static HtmlDocument StripUdiDataAttributes(HtmlDocument input)
-        {
-            if (input == null)
-            {
-                throw new ArgumentNullException(nameof(input));
-            }
-            
-            var dataUdiTags = input.DocumentNode.SelectNodes("//a[@data-udi] | //img[@data-udi]");
-
-            if (dataUdiTags == null)
-            {
-                return input;
-            }
-
-            foreach (var tag in dataUdiTags)
-            {
-                tag.Attributes.Remove("data-udi");               
-            }
-
-            return input;
-        }
-
+        
         /// <summary>
         /// Strips data-udi attributes from rich text
         /// </summary>
