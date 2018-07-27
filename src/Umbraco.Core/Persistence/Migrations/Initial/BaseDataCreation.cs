@@ -310,6 +310,9 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             relationType = new RelationTypeDto { Id = 2, Alias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias, ChildObjectType = new Guid(Constants.ObjectTypes.Document), ParentObjectType = new Guid(Constants.ObjectTypes.Document), Dual = false, Name = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName };
             relationType.UniqueId = (relationType.Alias + "____" + relationType.Name).ToGuid();
             _database.Insert("umbracoRelationType", "id", false, relationType);
+            relationType = new RelationTypeDto { Id = 3, Alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias, ChildObjectType = new Guid(Constants.ObjectTypes.Media), ParentObjectType = new Guid(Constants.ObjectTypes.Media), Dual = false, Name = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName };
+            relationType.UniqueId = (relationType.Alias + "____" + relationType.Name).ToGuid();
+            _database.Insert("umbracoRelationType", "id", false, relationType);
         }
 
         private void CreateCmsTaskTypeData()

@@ -656,6 +656,7 @@
         <key alias="submit">Submit</key>
         <key alias="type">Type</key>
         <key alias="typeToSearch">Type to search...</key>
+        <key alias="under">under</key>
         <key alias="up">Up</key>
         <key alias="update">Update</key>
         <key alias="upgrade">Upgrade</key>
@@ -2192,5 +2193,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     </area>
     <area alias="textbox">
         <key alias="characters_left">characters left</key>
+    </area>
+    <area alias="recycleBin">
+        <key alias="contentTrashed">Trashed content with Id: {0} related to original parent content with Id: {1}</key>
+        <key alias="mediaTrashed">Trashed media with Id: {0} related to original parent media item with Id: {1}</key>
+        <key alias="itemCannotBeRestored">Cannot automatically restore this item</key>
+        <key alias="noRestoreRelation">There is no 'restore' relation found for this node. Use the Move menu item to move it manually.</key>
+        <key alias="restoreUnderRecycled">The item you want to restore it under ('%0%') is in the recycle bin. Use the Move menu item to move the item manually.</key>
     </area>
 </language>
