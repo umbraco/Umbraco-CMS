@@ -195,6 +195,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return GetOptionalTextElement("loginBackgroundImage", string.Empty); }
         }
 
+        [ConfigurationProperty("EnableStrippingUdiDataAttributes")]
+        internal InnerTextConfigurationElement<bool> EnableStrippingUdiDataAttributes
+        {
+            get { return GetOptionalTextElement("EnableStrippingUdiDataAttributes", true); }
+        }
+
         string IContentSection.NotificationEmailAddress
         {
             get { return Notifications.NotificationEmailAddress; }
@@ -358,6 +364,10 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return LoginBackgroundImage; }
         }
-        
+
+        bool IContentSection.EnableStrippingUdiDataAttributes
+        {
+            get { return EnableStrippingUdiDataAttributes; }
+        }
     }
 }
