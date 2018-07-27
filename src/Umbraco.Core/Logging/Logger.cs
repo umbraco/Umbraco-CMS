@@ -28,7 +28,7 @@ namespace Umbraco.Core.Logging
             XmlConfigurator.Configure(log4NetConfigFile);
         }
 
-        // private for CreateWithDefaultLog4NetConfiguration
+        // private for CreateWithDefaultConfiguration
         private Logger()
         {
             // add custom global properties to the log4net context that we can use in our logging output
@@ -40,7 +40,7 @@ namespace Umbraco.Core.Logging
         /// Creates a logger with the default log4net configuration discovered (i.e. from the web.config).
         /// </summary>
         /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
-        public static Logger CreateWithDefaultLog4NetConfiguration()
+        public static Logger CreateWithDefaultConfiguration()
         {
             return new Logger();
         }

@@ -3,7 +3,6 @@ using System.Reflection;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
-using log4net;
 using LightInject;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
@@ -27,7 +26,7 @@ namespace Umbraco.Core
         /// </summary>
         protected virtual ILogger GetLogger()
         {
-            return Logger.CreateWithDefaultLog4NetConfiguration();
+            return Logger.CreateWithDefaultConfiguration();
         }
 
         // events - in the order they trigger
