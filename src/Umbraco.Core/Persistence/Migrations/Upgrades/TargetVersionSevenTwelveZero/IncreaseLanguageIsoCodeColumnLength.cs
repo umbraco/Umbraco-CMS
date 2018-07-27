@@ -13,10 +13,21 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZ
 
         public override void Up()
         {
+            Execute.Code(database =>
+            {
+                database.Execute("DROP INDEX [umbracoLanguage].[IX_umbracoLanguage_languageISOCode]");
+                return null;
+            });
+
             Alter.Table("umbracoLanguage")
                 .AlterColumn("languageISOCode")
                 .AsString(14)
                 .Nullable();
+
+            Create.Index("IX_umbracoLanguage_languageISOCode")
+                .OnTable("umbracoLanguage")
+                .OnColumn("languageISOCode")
+                .Unique();
         }
 
         public override void Down()
