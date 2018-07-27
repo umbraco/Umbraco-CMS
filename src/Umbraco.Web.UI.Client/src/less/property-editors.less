@@ -3,20 +3,20 @@
 // --------------------------------------------------
 .umb-editor {
   min-width:66.6%;
-	
+
 	&-pull {
 		float:left;
 		width:66.6%;
 	}
-	
+
 	&-push {
 		float:right;
-	} 
+	}
 }
 
 .umb-editor-tiny {
   width: 60px;
-	
+
 	&.umb-editor-push {
 		width:30%;
 		min-width:0;
@@ -53,7 +53,7 @@
 		float:right;
 		width:35%;
 	}
-	
+
 	&--pull, &--push {
 		.umb-editor {
 			min-width:0;
@@ -372,7 +372,7 @@ ul.color-picker li a  {
     > li:not(.unsortable) {
         cursor: move;
     }
-} 
+}
 
 .umb-sortable-thumbnails li:hover .umb-sortable-thumbnails__actions  {
     opacity: 1;
@@ -902,10 +902,39 @@ ul.color-picker li a  {
 //
 // Tags
 // --------------------------------------------------
-.umb-tags{border: @gray-10 solid 1px; padding: 10px; font-size: 13px; text-shadow: none;}
-.umb-tags .tag{cursor: pointer;  margin: 7px; padding: 7px; background: @turquoise}
-.umb-tags .tag i{padding: 2px;}
-.umb-tags input{border: none; background: @white}
+.umb-tags{
+    border: @gray-10 solid 1px;
+    padding: 10px;
+    font-size: 13px;
+    text-shadow: none;
+
+    .tag{
+        cursor: default;
+        margin: 7px;
+        padding: 10px;
+        background: @turquoise;
+        position: relative;
+
+        .icon-trash{
+            cursor: pointer;
+            padding: 2px;
+            font-size: 12px;
+            position: relative;
+            right: -6px;
+        }
+
+        .umb_confirm-action__overlay.-left{
+            top: 6px;
+            left: auto;
+            right: 15px;
+        }
+    }
+
+    input{
+        border: none;
+        background: @white;
+    }
+}
 
 //
 // Date/time picker
