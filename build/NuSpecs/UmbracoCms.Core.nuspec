@@ -51,6 +51,7 @@
       <dependency id="Newtonsoft.Json" version="[11.0.2,11.999999)" />
       <dependency id="NPoco" version="[3.9.3,3.999999)" />
       <dependency id="Semver" version="[2.0.4,2.999999)" />
+      <dependency id="Serilog" version="[2.7.1,2.999999)" />
       <dependency id="System.Reflection.Primitives" version="[4.3.0,4.999999)" />
       <dependency id="System.Runtime.Handles" version="[4.3.0,4.999999)" />
       <dependency id="System.Security.Cryptography.X509Certificates" version="[4.3.2,4.999999)" />

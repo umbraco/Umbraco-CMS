@@ -74,6 +74,9 @@
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NPoco" Version="3.9.3" />
     <PackageReference Include="Semver" Version="2.0.4" />
+    <PackageReference Include="Serilog">
+      <Version>2.7.1</Version>
+    </PackageReference>
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
   <ItemGroup>
