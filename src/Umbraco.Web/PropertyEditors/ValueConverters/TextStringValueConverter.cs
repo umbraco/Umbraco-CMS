@@ -32,7 +32,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             var sourceString = source.ToString();
 
             // ensures string is parsed for {localLink} and urls are resolved correctly
-            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, false);
+            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview);
             sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
 
             return sourceString;

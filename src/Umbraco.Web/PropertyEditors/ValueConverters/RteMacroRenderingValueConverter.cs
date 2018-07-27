@@ -72,7 +72,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             var sourceString = source.ToString();
 
             // ensures string is parsed for {localLink} and urls are resolved correctly
-            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview, false);
+            sourceString = TemplateUtilities.ParseInternalLinks(sourceString, preview);
             sourceString = TemplateUtilities.ResolveUrlsFromTextString(sourceString);
 
             // ensure string is parsed for macros and macros are executed correctly
@@ -84,8 +84,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             if (doc.ParseErrors.Any() == false && doc.DocumentNode != null)
             {
-                doc = TemplateUtilities.StripUdiDataAttributes(doc);
-
                 // Find all images with rel attribute
                 var imgNodes = doc.DocumentNode.SelectNodes("//img[@rel]");
 
@@ -115,8 +113,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                         return doc.DocumentNode.OuterHtml;
                     }
                 }
-
-                return doc.DocumentNode.OuterHtml;
             }
 
             return sourceString;

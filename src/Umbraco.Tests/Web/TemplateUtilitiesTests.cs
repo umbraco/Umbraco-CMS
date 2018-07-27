@@ -27,25 +27,21 @@ namespace Umbraco.Tests.Web
             Udi.ResetUdiTypes();
         }
 
-        [TestCase("", "", true)]
-        [TestCase("hello href=\"{localLink:1234}\" world ", "hello href=\"/my-test-url\" world ", true)]
-        [TestCase("hello href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"/my-test-url\" world ", true)]
-        [TestCase("hello href=\"{localLink:umb://document-type/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/my-test-url\" world ", true)]
+        [TestCase("", "")]
+        [TestCase("hello href=\"{localLink:1234}\" world ", "hello href=\"/my-test-url\" world ")]
+        [TestCase("hello href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"/my-test-url\" world ")]
+        [TestCase("hello href=\"{localLink:umb://document-type/9931BDE0AAC34BABB838909A7B47570E}\" world ", "hello href=\"/my-test-url\" world ")]
         //this one has an invalid char so won't match
-        [TestCase("hello href=\"{localLink:umb^://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"{localLink:umb^://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", true)]
+        [TestCase("hello href=\"{localLink:umb^://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ", "hello href=\"{localLink:umb^://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\" world ")]
         // with a-tag with data-udi attribute, that needs to be stripped
-        [TestCase("hello <a data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"> world</a> ", "hello <a href=\"/my-test-url\"> world</a> ", true)]
+        [TestCase("hello <a data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"> world</a> ", "hello <a href=\"/my-test-url\"> world</a> ")]
         // with a-tag with data-udi attribute spelled wrong, so don't need stripping
-        [TestCase("hello <a data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"> world</a> ", "hello <a data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"/my-test-url\"> world</a> ", true)]
+        [TestCase("hello <a data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"> world</a> ", "hello <a data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"/my-test-url\"> world</a> ")]
         // with a img-tag with data-udi id, that needs to be strippde
-        [TestCase("hello <img data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ", "hello <img src=\"imageofcats.jpg\"> world ", true)]
+        [TestCase("hello <img data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ", "hello <img src=\"imageofcats.jpg\"> world ")]
         // with a img-tag with data-udi id spelled wrong, so don't need stripping
-        [TestCase("hello <img data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ", "hello <img data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ", true)]
-        //with a-tag with data-udi attribute and  strip udi data attributes set to false
-        [TestCase("hello <a data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"{localLink:umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570E}\"> world</a> ", "hello <a data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" href=\"/my-test-url\"> world</a> ", false)]
-        // with a img-tag with data-udi id nd  strip udi data attributes set to false
-        [TestCase("hello <img data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ", "hello <img data-udi=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ", false)]
-        public void ParseLocalLinks(string input, string result, bool stripUdiDataAttributes)
+        [TestCase("hello <img data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ", "hello <img data-uid=\"umb://document-type/9931BDE0-AAC3-4BAB-B838-909A7B47570\" src=\"imageofcats.jpg\"> world ")]
+        public void ParseLocalLinks(string input, string result)
         {
             var serviceCtxMock = MockHelper.GetMockedServiceContext();
 
@@ -77,7 +73,7 @@ namespace Umbraco.Tests.Web
                 new[] { testUrlProvider.Object },
                 true))
             {
-                var output = TemplateUtilities.ParseInternalLinks(input, umbCtx.UrlProvider, stripUdiDataAttributes);
+                var output = TemplateUtilities.ParseInternalLinks(input, umbCtx.UrlProvider);
 
                 Assert.AreEqual(result, output);
             }

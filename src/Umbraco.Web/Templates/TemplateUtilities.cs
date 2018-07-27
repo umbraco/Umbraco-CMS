@@ -19,7 +19,7 @@ namespace Umbraco.Web.Templates
     public static class TemplateUtilities
     {
         //TODO: Pass in an Umbraco context!!!!!!!! Don't rely on the singleton so things are more testable
-        internal static string ParseInternalLinks(string text, bool preview, bool stripUdiDataAttributes = true)
+        internal static string ParseInternalLinks(string text, bool preview)
         {
             // save and set for url provider
             var inPreviewMode = UmbracoContext.Current.InPreviewMode;
@@ -27,7 +27,7 @@ namespace Umbraco.Web.Templates
 
             try
             {
-                text = ParseInternalLinks(text, stripUdiDataAttributes);
+                text = ParseInternalLinks(text);
             }
             finally
             {
@@ -43,9 +43,8 @@ namespace Umbraco.Web.Templates
         /// </summary>
         /// <param name="text"></param>
         /// <param name="urlProvider"></param>
-        /// <param name="stripUdiDataAttributes"></param>
         /// <returns></returns>
-        public static string ParseInternalLinks(string text, UrlProvider urlProvider, bool stripUdiDataAttributes = true)
+        public static string ParseInternalLinks(string text, UrlProvider urlProvider)
         {
             if (urlProvider == null) throw new ArgumentNullException("urlProvider");
 
@@ -82,11 +81,8 @@ namespace Umbraco.Web.Templates
                 }
             }
 
-            if (stripUdiDataAttributes)
-            {
-                text = StripUdiDataAttributes(text);
-            }
-            
+            text = StripUdiDataAttributes(text);
+
             return text;
         }
 
@@ -94,10 +90,9 @@ namespace Umbraco.Web.Templates
         /// Parses the string looking for the {localLink} syntax and updates them to their correct links.
         /// </summary>
         /// <param name="text"></param>
-        /// <param name="stripUdiDataAttributes"></param>
         /// <returns></returns>
         [Obsolete("Use the overload specifying all dependencies instead")]
-        public static string ParseInternalLinks(string text,bool stripUdiDataAttributes = true)
+        public static string ParseInternalLinks(string text)
         {   
             //don't attempt to proceed without a context as we cannot lookup urls without one
             if (UmbracoContext.Current == null || UmbracoContext.Current.RoutingContext == null)
