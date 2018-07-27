@@ -266,9 +266,6 @@
     <Content Include="Config\imageprocessor\cache.config">
       <SubType>Designer</SubType>
     </Content>
-    <None Include="Config\log4net.Release.config">
-      <DependentUpon>log4net.config</DependentUpon>
-    </None>
     <None Include="Config\FileSystemProviders.Release.config">
       <DependentUpon>FileSystemProviders.config</DependentUpon>
     </None>
@@ -548,7 +545,6 @@
     <Content Include="Config\umbracoSettings.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\log4net.config" />
     <Content Include="Config\FileSystemProviders.config" />
     <Content Include="Config\EmbeddedMedia.config" />
     <Content Include="Config\BackOfficeTours\getting-started.json" />
