@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
+using Umbraco.Web.Models.TemplateQuery;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using System;
-using System.Diagnostics;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Models.TemplateQuery;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Editors
 {
@@ -66,7 +66,7 @@ namespace Umbraco.Web.Editors
             var sb = new StringBuilder();
             var indention = Environment.NewLine + "\t\t\t\t\t\t";
 
-            sb.Append("Model.Content.Site()");
+            sb.Append("Model.Root()");
 
             var timer = new Stopwatch();
 
@@ -103,7 +103,7 @@ namespace Umbraco.Web.Editors
                     {
                         // we did not find the path
                         sb.Clear();
-                        sb.AppendFormat("Umbraco.TypedContent({0})", model.Source.Id);
+                        sb.AppendFormat("Umbraco.Content({0})", model.Source.Id);
                         pointerNode = targetNode;
                     }
                 }
@@ -195,10 +195,16 @@ namespace Umbraco.Web.Editors
 
                     timer.Stop();
 
-                    var direction = model.Sort.Direction == "ascending" ? string.Empty : " desc";
-
                     sb.Append(indention);
-                    sb.AppendFormat(".OrderBy(\"{0}{1}\")", model.Sort.Property.Alias, direction);
+
+                    if (model.Sort.Direction == "ascending")
+                    {
+                        sb.AppendFormat(".OrderBy(x => x.{0})", model.Sort.Property.Alias);
+                    }
+                    else
+                    {
+                        sb.AppendFormat(".OrderByDescending(x => x.{0})", model.Sort.Property.Alias);
+                    }
                 }
 
                 if (model.Take > 0)
@@ -293,7 +299,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentTypeModel> GetContentTypes()
         {
             var contentTypes = Services.ContentTypeService.GetAll()
-                .Select(x => new ContentTypeModel { Alias = x.Alias, Name = Services.TextService.Localize("template/contentOfType", tokens: new string[] { x.Name } ) })
+                .Select(x => new ContentTypeModel { Alias = x.Alias, Name = Services.TextService.Localize("template/contentOfType", tokens: new string[] { x.Name }) })
                 .OrderBy(x => x.Name).ToList();
 
             contentTypes.Insert(0, new ContentTypeModel { Alias = string.Empty, Name = Services.TextService.Localize("template/allContent") });
