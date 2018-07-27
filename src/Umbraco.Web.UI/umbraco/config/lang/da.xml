@@ -133,6 +133,8 @@
     <key alias="undo">Fortryd</key>
     <key alias="redo">Genskab</key>
     <key alias="deleteTag">Slet tag</key>
+    <key alias="confirmActionCancel">Fortryd</key>
+    <key alias="confirmActionConfirm">Bekræft</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">For</key>
