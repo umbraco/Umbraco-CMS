@@ -4,8 +4,10 @@ using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using LightInject;
+using Serilog;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Core
 {
@@ -200,7 +202,10 @@ namespace Umbraco.Core
         {
             HandleApplicationEnd();
             OnApplicationEnd(sender, evargs);
-            LogManager.Shutdown();
+
+            //Not sure if we need to do this - as my POC approach I never had to deal with this
+            //As the LightInject container when tearing down will dispose of Serilog AFAIK
+            Log.CloseAndFlush();
         }
 
         #endregion
