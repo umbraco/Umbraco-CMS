@@ -37,6 +37,7 @@ namespace Umbraco.Core.Logging
                 .Enrich.WithThreadId()
                 .Enrich.WithProperty("AppDomainId", AppDomain.CurrentDomain.Id)
                 .Enrich.WithProperty("AppDomainAppId", HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty))
+                .WriteTo.File(AppDomain.CurrentDomain.BaseDirectory + "\\logs\\warren.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
         }
 
