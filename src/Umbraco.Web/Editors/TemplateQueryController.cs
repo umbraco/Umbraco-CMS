@@ -255,12 +255,10 @@ namespace Umbraco.Web.Editors
                         ? contents.OrderBy(x => x.Id)
                         : contents.OrderByDescending(x => x.Id);
                 case "createDate":
-
                     return sortExpression.Direction == "ascending"
                         ? contents.OrderBy(x => x.CreateDate)
                         : contents.OrderByDescending(x => x.CreateDate);
                 case "publishDate":
-
                     return sortExpression.Direction == "ascending"
                         ? contents.OrderBy(x => x.UpdateDate)
                         : contents.OrderByDescending(x => x.UpdateDate);
@@ -269,7 +267,6 @@ namespace Umbraco.Web.Editors
                         ? contents.OrderBy(x => x.Name)
                         : contents.OrderByDescending(x => x.Name);
                 default:
-
                     return sortExpression.Direction == "ascending"
                         ? contents.OrderBy(x => x.Name)
                         : contents.OrderByDescending(x => x.Name);
@@ -281,10 +278,10 @@ namespace Umbraco.Web.Editors
             var aliases = new List<string>();
 
             if (targetNode == null || targetNode.Id == current.Id) return aliases;
+
             if (targetNode.Id != current.Id)
             {
                 aliases.Add(targetNode.ContentType.Alias);
-
             }
 
             aliases.AddRange(this.GetChildContentTypeAliases(targetNode.Parent, current));
