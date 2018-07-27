@@ -62,6 +62,7 @@
     $global:node_path = $env:path
     $nodePath = $this.BuildEnv.NodePath
     $gitExe = (Get-Command git).Source
+    if (-not $gitExe) { $gitExe = (Get-Command git).Path }
     $gitPath = [System.IO.Path]::GetDirectoryName($gitExe)
     $env:path = "$nodePath;$gitPath"
 
