@@ -1,21 +1,29 @@
 ﻿using AutoMapper;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using System.Web.Http;
+using System.Xml;
+using System.Xml.Linq;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.UI;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
+using Notification = Umbraco.Web.Models.ContentEditing.Notification;
 
 namespace Umbraco.Web.Editors
 {
@@ -440,6 +448,94 @@ namespace Umbraco.Web.Editors
             response.Headers.Add("x-filename", $"{contentType.Alias}.udt");
 
             return response;
+        }
+
+        [HttpPost]
+        public HttpResponseMessage Import(string file)
+        {
+            var filePath = Path.Combine(IOHelper.MapPath(SystemDirectories.Data), file);
+            if (string.IsNullOrEmpty(file) || !System.IO.File.Exists(filePath))
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+
+            var xd = new XmlDocument();
+            xd.XmlResolver = null;
+            xd.Load(filePath);
+
+            var userId = Security.GetUserId();
+            var element = XElement.Parse(xd.InnerXml);
+            Current.Services.PackagingService.ImportContentTypes(element, userId);
+
+            // Try to clean up the temporary file.
+            try
+            {
+                System.IO.File.Delete(filePath);
+            }
+            catch (Exception ex)
+            {
+                Current.Logger.Error(typeof(ContentTypeController), "Error cleaning up temporary udt file in App_Data: " + ex.Message, ex);
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        [HttpPost]
+        [FileUploadCleanupFilter(false)]
+        public async Task<ContentTypeImportModel> Upload()
+        {
+            if (Request.Content.IsMimeMultipartContent() == false)
+            {
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            }
+
+            var root = IOHelper.MapPath("~/App_Data/TEMP/FileUploads");
+            //ensure it exists
+            Directory.CreateDirectory(root);
+            var provider = new MultipartFormDataStreamProvider(root);
+            var result = await Request.Content.ReadAsMultipartAsync(provider);
+
+            //must have a file
+            if (result.FileData.Count == 0)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            }
+
+            var model = new ContentTypeImportModel();
+            var file = result.FileData[0];
+            var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
+            var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
+            if (ext.InvariantEquals("udt"))
+            {
+                //TODO: Currently it has to be here, it's not ideal but that's the way it is right now
+                var tempDir = IOHelper.MapPath(SystemDirectories.Data);
+
+                //ensure it's there
+                Directory.CreateDirectory(tempDir);
+
+                model.TempFileName = "justDelete_" + Guid.NewGuid() + ".udt";
+                var tempFileLocation = Path.Combine(tempDir, model.TempFileName);
+                System.IO.File.Copy(file.LocalFileName, tempFileLocation, true);
+
+                var xd = new XmlDocument
+                {
+                    XmlResolver = null
+                };
+                xd.Load(tempFileLocation);
+
+                model.Alias = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Alias")?.FirstChild.Value;
+                model.Name = xd.DocumentElement?.SelectSingleNode("//DocumentType/Info/Name")?.FirstChild.Value;
+            }
+            else
+            {
+                model.Notifications.Add(new Notification(
+                    Services.TextService.Localize("speechBubbles/operationFailedHeader"),
+                    Services.TextService.Localize("media/disallowedFileType"),
+                    SpeechBubbleIcon.Warning));
+            }
+
+            return model;
+
         }
     }
 }
