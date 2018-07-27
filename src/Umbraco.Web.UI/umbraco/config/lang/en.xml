@@ -139,6 +139,8 @@
         <key alias="undo">Undo</key>
         <key alias="redo">Redo</key>
         <key alias="deleteTag">Delete tag</key>
+        <key alias="confirmActionCancel">Cancel</key>
+        <key alias="confirmActionConfirm">Confirm</key>
     </area>
     <area alias="auditTrails">
         <key alias="atViewingFor">Viewing for</key>
