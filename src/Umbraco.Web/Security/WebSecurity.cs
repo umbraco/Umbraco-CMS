@@ -289,7 +289,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public bool IsAuthenticated()
         {
-            return _httpContext.User.Identity.IsAuthenticated && _httpContext.GetCurrentIdentity(false) != null;
+            return _httpContext.User != null && _httpContext.User.Identity.IsAuthenticated && _httpContext.GetCurrentIdentity(false) != null;
         }
 
         protected override void DisposeResources()
