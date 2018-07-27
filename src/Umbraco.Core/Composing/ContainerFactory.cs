@@ -31,6 +31,7 @@ namespace Umbraco.Core.Composing
             {
                 throw new Exception($"Container factory '${configuredTypeName}' did not return an IContainer implementation.");
             }
+
             return container;
         }
     }
