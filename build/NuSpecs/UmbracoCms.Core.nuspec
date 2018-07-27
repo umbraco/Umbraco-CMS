@@ -54,6 +54,7 @@
       <dependency id="Serilog" version="[2.7.1,2.999999)" />
       <dependency id="Serilog.Enrichers.Process" version="[2.0.1,2.999999)" />
       <dependency id="Serilog.Enrichers.Thread" version="[3.0.0,3.999999)" />
+      <dependency id="Serilog.Sinks.File" version="[4.0.0,4.999999)" />
       <dependency id="System.Reflection.Primitives" version="[4.3.0,4.999999)" />
       <dependency id="System.Runtime.Handles" version="[4.3.0,4.999999)" />
       <dependency id="System.Security.Cryptography.X509Certificates" version="[4.3.2,4.999999)" />
