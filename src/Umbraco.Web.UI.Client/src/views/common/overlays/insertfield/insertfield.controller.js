@@ -118,20 +118,26 @@
 
         function generateOutputSample() {
 
-            var pageField = (vm.field !== undefined ? '@Umbraco.Field("' + vm.field + '"' : "")
-                + (vm.altField !== undefined ? ', altFieldAlias:"' + vm.altField + '"' : "")
-                + (vm.altText !== undefined ? ', altText:"' + vm.altText + '"' : "")
-                + (vm.insertBefore !== undefined ? ', insertBefore:"' + vm.insertBefore + '"' : "")
-                + (vm.insertAfter !== undefined ? ', insertAfter:"' + vm.insertAfter + '"' : "")
-                + (vm.recursive !== false ? ', recursive: ' + vm.recursive : "")
-                + (vm.date !== false ? ', formatAsDate: ' + vm.date : "")
-                + (vm.dateTime !== false ? ', formatAsDateWithTimeSeparator:"' + vm.dateTimeSeparator + '"' : "")
-                + (vm.casingUpper !== false ? ', casing: ' + "RenderFieldCaseType.Upper" : "")
-                + (vm.casingLower !== false ? ', casing: ' + "RenderFieldCaseType.Lower" : "")
-                + (vm.encodeHtml !== false ? ', encoding: ' + "RenderFieldEncodingType.Html" : "")
-                + (vm.encodeUrl !== false ? ', encoding: ' + "RenderFieldEncodingType.Url" : "")
-                + (vm.convertLinebreaks !== false ? ', convertLineBreaks: ' + "true" : "")
+            var pageField = (vm.field !== undefined ? '@Model.Value("' + vm.field + '"' : "")
+                + (vm.recursive !== false ? ', recurse: ' + vm.recursive : "")
+                + (vm.altText !== undefined ? ', defaultValue:"' + vm.altText + '"' : "")
                 + (vm.field ? ')' : "");
+
+            // TODO: determine the items here to keep as helpers and add them back into the insertfield.html view, then make them work above
+            //var pageField = (vm.field !== undefined ? '@Umbraco.Field("' + vm.field + '"' : "")
+            //    + (vm.altField !== undefined ? ', altFieldAlias:"' + vm.altField + '"' : "")
+            //    + (vm.altText !== undefined ? ', altText:"' + vm.altText + '"' : "")
+            //    + (vm.insertBefore !== undefined ? ', insertBefore:"' + vm.insertBefore + '"' : "")
+            //    + (vm.insertAfter !== undefined ? ', insertAfter:"' + vm.insertAfter + '"' : "")
+            //    + (vm.recursive !== false ? ', recursive: ' + vm.recursive : "")
+            //    + (vm.date !== false ? ', formatAsDate: ' + vm.date : "")
+            //    + (vm.dateTime !== false ? ', formatAsDateWithTimeSeparator:"' + vm.dateTimeSeparator + '"' : "")
+            //    + (vm.casingUpper !== false ? ', casing: ' + "RenderFieldCaseType.Upper" : "")
+            //    + (vm.casingLower !== false ? ', casing: ' + "RenderFieldCaseType.Lower" : "")
+            //    + (vm.encodeHtml !== false ? ', encoding: ' + "RenderFieldEncodingType.Html" : "")
+            //    + (vm.encodeUrl !== false ? ', encoding: ' + "RenderFieldEncodingType.Url" : "")
+            //    + (vm.convertLinebreaks !== false ? ', convertLineBreaks: ' + "true" : "")
+            //    + (vm.field ? ')' : "");
 
             $scope.model.umbracoField = pageField;
             
