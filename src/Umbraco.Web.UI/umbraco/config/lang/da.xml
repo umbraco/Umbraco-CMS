@@ -132,6 +132,7 @@
     <key alias="saveAndGenerateModels">Gem og generer modeller</key>
     <key alias="undo">Fortryd</key>
     <key alias="redo">Genskab</key>
+    <key alias="deleteTag">Slet tag</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">For</key>
@@ -153,7 +154,7 @@
     <key alias="smallRollBack">Indhold tilbagerullet</key>
     <key alias="smallSendToPublish">Sendt til udgivelse</key>
     <key alias="smallSendToTranslate">Sendt til oversættelse</key>
-  </area>  
+  </area>
   <area alias="changeDocType">
     <key alias="changeDocTypeInstruction">For at skifte det valgte indholds dokumenttype, skal du først vælge en ny dokumenttype, som er gyldig på denne placering.</key>
     <key alias="changeDocTypeInstruction2">Kontroller derefter, at alle egenskaber bliver overført rigtigt til den nye dokumenttype, og klik derefter på Gem.</key>
@@ -211,7 +212,7 @@
     <key alias="routeError">Dette dokument er udgivet, men dets url ville kollidere med indholdet %0%</key>
     <key alias="publish">Udgiv</key>
     <key alias="published">Udgivet</key>
-    <key alias="publishedPendingChanges">Udgivet (Ventede ændringer)</key>    
+    <key alias="publishedPendingChanges">Udgivet (Ventede ændringer)</key>
     <key alias="publish">Udgivet</key>
     <key alias="publishStatus">Udgivelsesstatus</key>
     <key alias="releaseDate">Udgivelsesdato</key>
@@ -985,7 +986,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="imagecropper">
     <key alias="reset">Nulstil</key>
   </area>
-  
+
 
   <area alias="rollback">
     <key alias="currentVersion">Nuværende version</key>
@@ -1149,19 +1150,19 @@ Mange hilsner fra Umbraco robotten
 
     <key alias="insertMacro">Makro</key>
     <key alias="insertMacroDesc">
-      En makro er et element, som kan have forskellige indstillinger, når det indsættes. 
+      En makro er et element, som kan have forskellige indstillinger, når det indsættes.
       Brug det som en genbrugelig del af dit design såsom gallerier, formularer og lister.
     </key>
 
     <key alias="insertPageField">Sideværdi</key>
     <key alias="insertPageFieldDesc">
-      Viser værdien af et felt fra den nuværende side. Kan indstilles til at bruge rekursive værdier eller 
+      Viser værdien af et felt fra den nuværende side. Kan indstilles til at bruge rekursive værdier eller
       vise en standardværdi i tilfælde af, at feltet er tomt.
     </key>
 
     <key alias="insertPartialView">Partial view</key>
     <key alias="insertPartialViewDesc">
-      Et Partial View er et skabelonelement, som kan indsættes i andre skabeloner og derved 
+      Et Partial View er et skabelonelement, som kan indsættes i andre skabeloner og derved
       genbruges og deles på tværs af sideskabelonerne.
     </key>
 
@@ -1172,7 +1173,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="renderBody">Indsæt en underliggende skabelon</key>
     <key alias="renderBodyDesc">
       <![CDATA[
-      Henter indholdet af en underliggende skabelon ind, ved at 
+      Henter indholdet af en underliggende skabelon ind, ved at
       indsætte et <code>@RenderBody()</code> element.
       ]]>
     </key>
@@ -1181,8 +1182,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="defineSection">Definer en sektion</key>
     <key alias="defineSectionDesc">
       <![CDATA[
-         Definerer en del af din skabelon som en navngivet sektion, ved at 
-         omkranse den i <code>@section { ... }</code>. Herefter kan denne sektion flettes ind i 
+         Definerer en del af din skabelon som en navngivet sektion, ved at
+         omkranse den i <code>@section { ... }</code>. Herefter kan denne sektion flettes ind i
          overliggende skabelon ved at indsætte et <code>@RenderSection</code> element.
       ]]>
     </key>
@@ -1190,15 +1191,15 @@ Mange hilsner fra Umbraco robotten
     <key alias="renderSection">Indsæt en sektion</key>
     <key alias="renderSectionDesc">
       <![CDATA[
-      Henter indholdet af en sektion fra den underliggende skabelon ind, ved at indsætte et 
-      <code>@RenderSection(name)</code> element. Den underliggende skabelon skal have 
+      Henter indholdet af en sektion fra den underliggende skabelon ind, ved at indsætte et
+      <code>@RenderSection(name)</code> element. Den underliggende skabelon skal have
       defineret en sektion via et <code>@section [name]{ ... }</code> element.
       ]]>
     </key>
 
     <key alias="sectionName">Sektionsnavn</key>
     <key alias="sectionMandatory">Sektionen er obligatorisk</key>
-    
+
     <key alias="sectionMandatoryDesc">
       Hvis obligatorisk, skal underskabelonen indeholde en <code>@section</code> -definition.
     </key>
@@ -1210,7 +1211,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="iWant">Returner</key>
     <key alias="allContent">alt indhold</key>
     <key alias="contentOfType">indhold af typen &quot;%0%&quot;</key>
-    
+
     <key alias="from">fra</key>
     <key alias="websiteRoot">mit website</key>
     <key alias="where">hvor</key>
@@ -1242,14 +1243,14 @@ Mange hilsner fra Umbraco robotten
 
     <key alias="template">Skabelon</key>
   </area>
-  
+
   <area alias="grid">
     <key alias="rte">Rich Text Editor</key>
     <key alias="media">Billede</key>
     <key alias="macro">Macro</key>
     <key alias="embed">Embed</key>
     <key alias="headline">Overskrift</key>
-    <key alias="quote">Citat</key>  
+    <key alias="quote">Citat</key>
     <key alias="insertControl">Vælg indholdstype</key>
     <key alias="chooseLayout">Vælg layout</key>
     <key alias="addRows">Tilføj række</key>
