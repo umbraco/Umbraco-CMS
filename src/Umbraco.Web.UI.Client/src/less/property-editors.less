@@ -902,28 +902,39 @@ ul.color-picker li a  {
 //
 // Tags
 // --------------------------------------------------
-.umb-tags{border: @gray-10 solid 1px; padding: 10px; font-size: 13px; text-shadow: none;}
-.umb-tags .tag{
-    cursor: default;
-    margin: 7px;
+.umb-tags{
+    border: @gray-10 solid 1px;
     padding: 10px;
-    background: @turquoise;
-    position: relative;
+    font-size: 13px;
+    text-shadow: none;
 
-    .umb_confirm-action__overlay.-left{
-        top: 6px;
-        left: auto;
-        right: 15px;
+    .tag{
+        cursor: default;
+        margin: 7px;
+        padding: 10px;
+        background: @turquoise;
+        position: relative;
+
+        .icon-trash{
+            cursor: pointer;
+            padding: 2px;
+            font-size: 12px;
+            position: relative;
+            right: -6px;
+        }
+
+        .umb_confirm-action__overlay.-left{
+            top: 6px;
+            left: auto;
+            right: 15px;
+        }
+    }
+
+    input{
+        border: none;
+        background: @white;
     }
 }
-.umb-tags .tag .icon-trash{
-    cursor: pointer;
-    padding: 2px;
-    font-size: 12px;
-    position: relative;
-    right: -6px;
-}
-.umb-tags input{border: none; background: @white;}
 
 //
 // Date/time picker
