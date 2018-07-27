@@ -2,7 +2,7 @@
 <language alias="en_us" intName="English (US)" localName="English (US)" lcid="" culture="en-US">
     <creator>
         <name>The Umbraco community</name>
-        <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+        <link>https://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
     </creator>
     <area alias="actions">
         <key alias="assignDomain">Culture and Hostnames</key>
@@ -755,7 +755,7 @@
               <p>To proceed, please edit the "web.config" file (using Visual Studio or your favourite text editor), scroll to the bottom, add the connection string for your database in the key named "UmbracoDbDSN" and save the file. </p>
               <p>
               Click the <strong>retry</strong> button when
-              done.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+              done.<br /><a href="https://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 			              More information on editing web.config here.</a></p>]]>
         </key>
         <key alias="databaseText">

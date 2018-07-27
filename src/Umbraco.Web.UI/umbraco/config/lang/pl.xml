@@ -2,7 +2,7 @@
 <language alias="pl" intName="Polish" localName="polski" lcid="21" culture="pl-PL">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Zarządzanie hostami</key>
@@ -688,7 +688,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
                 <p>Aby kontynuować, dokonaj edycji pliku "web.config" (używając Visual Studio lub dowolnego edytora tekstu), przemieść kursor na koniec pliku, dodaj parametry połączenia do Twojej bazy danych w kluczu o nazwie "umbracoDbDSN" i zapisz plik.</p> 
                 <p>
                 Kliknij <strong>ponów próbę</strong> kiedy 
-                skończysz.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+                skończysz.<br /><a href="https://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
                 Tu znajdziesz więcej informacji na temat edycji pliku "web.config".</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Aby zakończyć ten etap instalacji, będziesz musiał podać parametry połączenia do Twojego serwera baz danych ("connection string").<br />
                 Skontaktuj się z Twoim dostawą usług internetowych jeśli zajdzie taka potrzeba. 
