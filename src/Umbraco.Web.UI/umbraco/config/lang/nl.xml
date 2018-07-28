@@ -518,6 +518,7 @@
     <key alias="submit">Verstuur</key>
     <key alias="type">Typen</key>
     <key alias="typeToSearch">Typ om te zoeken...</key>
+    <key alias="under">onder</key>
     <key alias="up">Omhoog</key>
     <key alias="update">Update</key>
     <key alias="upgrade">Upgrade</key>
@@ -1640,4 +1641,11 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
     <key alias="enabledConfirm">URL tracker staat nu aan.</key>
     <key alias="enableError">Fout bij het aanzetten van de URL tracker. Meer informatie kan gevonden worden in de log file.</key>
   </area>
+    <area alias="recycleBin">
+        <key alias="contentTrashed">Content verwijderd met id : {0} gerelateerd aan aan bovenliggend item met Id: {1}</key>
+        <key alias="mediaTrashed">Media verwijderd met id: {0} gerelateerd aan aan bovenliggend item met Id: {1}</key>
+        <key alias="itemCannotBeRestored">Kan dit item niet automatisch herstellen</key>
+        <key alias="noRestoreRelation">Er is geen 'herstel' relatie gevonden voor dit item. Gebruik de "Verplaats" optie om het manueel terug te zetten</key>
+        <key alias="restoreUnderRecycled">Het item dat u wil herstellen onder ('%0%') zit in de prullenbak. Gebruik de "Verplaats" optie om het manueel terug te zetten</key>
+    </area>
 </language>
