@@ -70,6 +70,14 @@ namespace Umbraco.Web.Models.PublishedContent
                     return TryGetValueWithRecursiveFallback(content, alias, culture, segment, defaultValue, out var value1) ? value1 : defaultValue;
                 case ValueFallback.Language:
                     return TryGetValueWithLanguageFallback(content, alias, culture, segment, defaultValue, out var value2) ? value2 : defaultValue;
+                case ValueFallback.RecurseThenLanguage:
+                    return TryGetValueWithRecursiveFallback(content, alias, culture, segment, defaultValue, out var value3)
+                        ? value3
+                        : TryGetValueWithLanguageFallback(content, alias, culture, segment, defaultValue, out var value4) ? value4 : defaultValue;
+                case ValueFallback.LanguageThenRecurse:
+                    return TryGetValueWithLanguageFallback(content, alias, culture, segment, defaultValue, out var value5)
+                        ? value5
+                        : TryGetValueWithRecursiveFallback(content, alias, culture, segment, defaultValue, out var value6) ? value6 : defaultValue;
                 default:
                     throw new NotSupportedException($"Fallback {GetType().Name} does not support policy code '{fallback}'.");
             }

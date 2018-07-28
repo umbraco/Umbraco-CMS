@@ -32,6 +32,16 @@
                 /// Fallback to other languages.
                 /// </summary>
                 public const int Language = 2;
+
+                /// <summary>
+                /// Recurse up the tree.  If content not found, fallback to other languages.
+                /// </summary>
+                public const int RecurseThenLanguage = 3;
+
+                /// <summary>
+                /// Fallback to other languages.  If content not found, recurse up the tree.
+                /// </summary>
+                public const int LanguageThenRecurse = 4;
             }
         }
     }

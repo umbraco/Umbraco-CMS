@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Moq;
@@ -66,9 +67,9 @@ namespace Umbraco.Tests.PublishedContent
             var contentType1 = factory.CreateContentType(1, "ContentType1", Enumerable.Empty<string>(), props);
 
             var prop1 = new SolidPublishedPropertyWithLanguageVariants
-                {
-                    Alias = "welcomeText",
-                };
+            {
+                Alias = "welcomeText",
+            };
             prop1.SetSourceValue("en-US", "Welcome", true);
             prop1.SetValue("en-US", "Welcome", true);
             prop1.SetSourceValue("de", "Willkommen");
@@ -77,16 +78,16 @@ namespace Umbraco.Tests.PublishedContent
             prop1.SetValue("nl", "Welkom");
 
             var prop2 = new SolidPublishedPropertyWithLanguageVariants
-                {
-                    Alias = "welcomeText2",
-                };
+            {
+                Alias = "welcomeText2",
+            };
             prop2.SetSourceValue("en-US", "Welcome", true);
             prop2.SetValue("en-US", "Welcome", true);
 
             var prop3 = new SolidPublishedPropertyWithLanguageVariants
-                {
-                    Alias = "welcomeText",
-                };
+            {
+                Alias = "welcomeText",
+            };
             prop3.SetSourceValue("en-US", "Welcome", true);
             prop3.SetValue("en-US", "Welcome", true);
 
@@ -201,6 +202,33 @@ namespace Umbraco.Tests.PublishedContent
             var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
             var value = content.Value("welcomeText2", fallback: Core.Constants.Content.ValueFallback.Recurse);
             Assert.AreEqual("Welcome", value);
+        }
+
+        [Test]
+        public void Can_Get_Content_With_Recursive_Priority()
+        {
+            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
+            var value = content.Value("welcomeText", "nl", fallback: Core.Constants.Content.ValueFallback.RecurseThenLanguage);
+
+            // No Dutch value is directly assigned. Check has fallen back to Dutch value from parent.
+            Assert.AreEqual("Welkom", value);
+        }
+
+        [Test]
+        public void Can_Get_Content_With_Fallback_Language_Priority()
+        {
+            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
+            var value = content.Value("welcomeText", "nl", fallback: Core.Constants.Content.ValueFallback.LanguageThenRecurse);
+
+            // No Dutch value is directly assigned.  Check has fallen back to English value from language variant.
+            Assert.AreEqual("Welcome", value);
+        }
+
+        [Test]
+        public void Throws_For_Non_Supported_Fallback()
+        {
+            var content = UmbracoContext.Current.ContentCache.GetAtRoot().First().Children.First();
+            Assert.Throws<NotSupportedException>(() => content.Value("welcomeText", "nl", fallback: 999));
         }
     }
 }
