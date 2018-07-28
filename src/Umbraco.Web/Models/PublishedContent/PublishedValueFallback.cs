@@ -17,10 +17,10 @@ namespace Umbraco.Web.Models.PublishedContent
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedValueFallback"/> class.
         /// </summary>
-        /// <param name="localizationService"></param>
-        public PublishedValueFallback(ILocalizationService localizationService)
+        /// <param name="serviceContext"></param>
+        public PublishedValueFallback(ServiceContext serviceContext)
         {
-            _localizationService = localizationService;
+            _localizationService = serviceContext.LocalizationService;
         }
 
         /// <inheritdoc />
