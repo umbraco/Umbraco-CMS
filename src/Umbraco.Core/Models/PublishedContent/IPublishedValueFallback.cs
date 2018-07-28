@@ -115,6 +115,7 @@
         /// <param name="culture">The requested culture.</param>
         /// <param name="segment">The requested segment.</param>
         /// <param name="defaultValue">An optional default value.</param>
+        /// <param name="fallback">Integer value defining method to use for fallback when content not found</param>
         /// <returns>A fallback value, or null.</returns>
         /// <remarks>
         /// <para>This method is called whenever getting the property value for the specified alias, culture and
@@ -132,6 +133,7 @@
         /// <param name="culture">The requested culture.</param>
         /// <param name="segment">The requested segment.</param>
         /// <param name="defaultValue">An optional default value.</param>
+        /// <param name="fallback">Integer value defining method to use for fallback when content not found</param>
         /// <returns>A fallback value, or null.</returns>
         /// <remarks>
         /// <para>This method is called whenever getting the property value for the specified alias, culture and
