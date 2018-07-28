@@ -5,9 +5,9 @@ var app = angular.module('umbraco', [
 	'umbraco.services',
 	'umbraco.httpbackend',
     'ngCookies',
-    'ngMobile',
     'ngSanitize',
-    'tmh.dynamicLocale'
+    'tmh.dynamicLocale',
+    'hmTouchEvents'
 ]);
 
 /* For Angular 1.4: we need to load in Route, animate and touch seperately

@@ -27,10 +27,10 @@
             //    angular.module('umbraco.views', []);
             //    angular.module('ngCookies', []);
             //    angular.module('ngSanitize', []);
-            //    angular.module('ngMobile', []);
             //    angular.module('tmh.dynamicLocale', []);
             //    angular.module('ngFileUpload', []);
             //    angular.module('LocalStorageModule', []);
+            //    angular.module('hmTouchEvents', []);
             //});
 
             beforeEach(module("umbraco"));

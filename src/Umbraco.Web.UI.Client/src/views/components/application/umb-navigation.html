@@ -7,19 +7,19 @@
     <!-- navigation container -->
     <div id="navigation" ng-show="showNavigation" class="fill umb-modalcolumn" ng-animate="'slide'" nav-resize>
 
-        <div ng-swipe-left="nav.hideNavigation()" class="navigation-inner-container span6">
+        <div hm-swipeleft="nav.hideNavigation()" class="navigation-inner-container span6">
 
             <!-- the search -->
             <div ng-controller="Umbraco.SearchController" ng-if="authenticated">
 
                 <!-- Search form -->
-        <div data-element="global-search" id="search-form">
+                <div data-element="global-search" id="search-form">
                     <div class="umb-modalcolumn-header">
 
                         <form class="form-search" novalidate>
                             <i class="icon-search"></i>
-              <input data-element="global-search-field"
-                     type="text"
+                            <input data-element="global-search-field"
+                                   type="text"
                                    hotkey="ctrl+space"
                                    id="search-field"
                                    ng-model="searchTerm"
@@ -90,7 +90,7 @@
         <div class="offset6" id="navOffset" style="z-index: 10">
 
             <!-- The context menu -->
-            <div id='contextMenu' class="umb-modalcolumn fill shadow" ng-swipe-left="nav.hideMenu()" ng-show="showContextMenu" ng-animate="'slide'">
+            <div id='contextMenu' class="umb-modalcolumn fill shadow" hm-swipeleft="nav.hideMenu()" ng-show="showContextMenu" ng-animate="'slide'">
                 <umb-context-menu menu-dialog-title="{{menuDialogTitle}}"
                                   current-section="{{currentSection}}"
                                   current-node="menuNode"
@@ -98,10 +98,9 @@
                 </umb-context-menu>
             </div>
 
-
             <!-- Tree dialogs -->
             <div id="dialog" class='umb-modalcolumn fill shadow'
-                 ng-swipe-left="nav.hideDialog()"
+                 hm-swipeleft="nav.hideDialog()"
                  ng-show="showContextMenuDialog" ng-animate="'slide'">
                 <div class='umb-modalcolumn-header'>
                     <h1>{{menuDialogTitle}}</h1>

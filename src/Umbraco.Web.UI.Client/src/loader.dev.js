@@ -13,7 +13,6 @@ LazyLoad.js(
         'lib/angular/angular-ui-sortable.js',
 
         'lib/angular/1.1.5/angular-mocks.js',
-        'lib/angular/1.1.5/angular-mobile.min.js',
         'lib/underscore/underscore-min.js',
 
         'lib/angular-dynamic-locale/tmhDynamicLocale.min.js',

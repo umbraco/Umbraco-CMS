@@ -70,7 +70,6 @@ namespace Umbraco.Web.UI.JavaScript {
         ///    &apos;lib/jquery-ui-touch-punch/jquery.ui.touch-punch.js&apos;,
         ///
         ///    &apos;lib/angular/1.1.5/angular-cookies.min.js&apos;,
-        ///    &apos;lib/angular/1.1.5/angular-mobile.js&apos;,
         ///    &apos;lib/angular/1.1.5/angular-sanitize.min.js&apos;,
         ///
         ///    &apos;lib/angular/angular-ui-sortable.js&apos;,

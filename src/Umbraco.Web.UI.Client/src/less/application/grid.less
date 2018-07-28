@@ -4,56 +4,60 @@
 /* CONTAINS BASIC APPLICATION LAYOUT, POSITIONING AND AREA DIMENSIONS */
 
 html, body {
-  height: 100%;
-  overflow: hidden;
+    height: 100%;
+    overflow: hidden;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-
-  font-family: @baseFontFamily;
-  font-size: @baseFontSize;
-  line-height: @baseLineHeight;
-  color: @textColor;
-  background-color: @bodyBackground;
-
-  // better font rendering
-  -webkit-font-smoothing: antialiased;
-  font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    font-family: @baseFontFamily;
+    font-size: @baseFontSize;
+    line-height: @baseLineHeight;
+    color: @textColor;
+    background-color: @bodyBackground;
+    // better font rendering
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 
 .padded {
-  padding: 20px
+    padding: 20px
 }
 
 
 #layout {
-  position: relative;
-  height: 100%;
-  padding: 0;
-  z-index: 1;
+    position: relative;
+    height: 100%;
+    padding: 0;
+    z-index: 1;
 }
 
 #mainwrapper {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  margin: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
 }
 
-body.umb-drawer-is-visible #mainwrapper{
+body.umb-drawer-is-visible #mainwrapper {
     left: @drawerWidth;
 }
 
 #contentwrapper, #contentcolumn {
-  position: absolute;
-  top: 0px; bottom: 0px; right: 0px; left: 80px;
-  z-index: 10;
-  margin: 0
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    left: 80px;
+    z-index: 10;
+    margin: 0
 }
 
 #umb-notifications-wrapper {
@@ -61,44 +65,44 @@ body.umb-drawer-is-visible #mainwrapper{
 }
 
 #contentcolumn {
-  left: 0px;
+    left: 0px;
 }
 
 #contentcolumn iframe#right {
-  display: block;
-  position: relative;
-  height: 100%;
-  width: 100%;
-  border: none;
+    display: block;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    border: none;
 }
 
 #leftcolumn {
-  height: 100%;
-  z-index: 1100;
-  width: 80px;
-  float: left;
-  position: absolute;
+    height: 100%;
+    z-index: 1100;
+    width: 80px;
+    float: left;
+    position: absolute;
 }
 
 #applications {
-  z-index: 1000;
-  height: 100%;
-  left: 0px;
-  top: 0;
-  bottom: 0;
-  position: absolute;
-  text-align: center;
-  box-shadow: -10px 0px 25px rgba(0, 0, 0, 0.3)
+    z-index: 1000;
+    height: 100%;
+    left: 0px;
+    top: 0;
+    bottom: 0;
+    position: absolute;
+    text-align: center;
+    box-shadow: -10px 0px 25px rgba(0, 0, 0, 0.3)
 }
 
 #applications-tray {
-  z-index: 900;
-  left: 80px;
-  top: 0;
-  bottom: 0;
-  position: absolute;
-  height: 100%;
-  text-align: center;
+    z-index: 900;
+    left: 80px;
+    top: 0;
+    bottom: 0;
+    position: absolute;
+    height: 100%;
+    text-align: center;
 }
 
 #search-form {
@@ -135,17 +139,16 @@ body.umb-drawer-is-visible #mainwrapper{
 }
 
 #navigation {
-  left: 80px;
-  top: 0;
-  bottom: 0;
-  position: absolute;
-  z-index: 100;
-  background: @white;
-  height: 100%;
-
+    left: 80px;
+    top: 0;
+    bottom: 0;
+    position: absolute;
+    z-index: 100;
+    background: @white;
+    height: 100%;
 }
 
-.navigation-inner-container{
+.navigation-inner-container {
     position: absolute;
     top: 0px;
     bottom: 0px;
@@ -154,21 +157,23 @@ body.umb-drawer-is-visible #mainwrapper{
     padding-top: 100px;
     border-right: 1px solid @purple-l3;
     z-index: 100;
+    display: flex;
+    flex-direction: column;
 }
 
 #dialog {
-  min-width: 500px;
-  left: 100%;
-  top: 0;
-  position: absolute;
-  z-index: 50;
-  display: inline-block;
+    min-width: 500px;
+    left: 100%;
+    top: 0;
+    position: absolute;
+    z-index: 50;
+    display: inline-block;
 }
 
 #tree {
-  padding: 0px;
-  z-index: 100 !important;
-  overflow: auto;
+    padding: 0px;
+    z-index: 100 !important;
+    overflow: auto;
 }
 
 #tree .umb-tree {
@@ -176,29 +181,29 @@ body.umb-drawer-is-visible #mainwrapper{
 }
 
 #search-results {
-  z-index: 200;
+    z-index: 200;
 }
 
 #contextMenu {
-  z-index: 50;
-  position: absolute;
-  top: 0px;
-  left: 100%;
-  min-width: 250px;
+    z-index: 50;
+    position: absolute;
+    top: 0px;
+    left: 100%;
+    min-width: 250px;
 }
 
 #speechbubble {
-  z-index: 1060;
-  position: absolute;
-  bottom: 100px;
-  left: 0;
-  right: 0;
-  border-bottom: none;
-  margin: auto;
-  padding: 0px;
-  border: none;
-  background: none;
-  border-radius: 0;
+    z-index: 1060;
+    position: absolute;
+    bottom: 100px;
+    left: 0;
+    right: 0;
+    border-bottom: none;
+    margin: auto;
+    padding: 0px;
+    border: none;
+    background: none;
+    border-radius: 0;
 }
 
 .ui-resizable-e {
@@ -211,26 +216,40 @@ body.umb-drawer-is-visible #mainwrapper{
     border: solid 1px @purple-l3;
     border-top: none;
     border-bottom: none;
-    position:absolute;
-    z-index:9999 !important;
+    position: absolute;
+    z-index: 9999 !important;
 }
 
 @media (min-width: 1101px) {
-  #contentwrapper, #umb-notifications-wrapper {left: 440px;}
-  #speechbubble {left: 360px;}
+    #contentwrapper, #umb-notifications-wrapper {
+        left: 440px;
+    }
+
+    #speechbubble {
+        left: 360px;
+    }
 }
 
 //empty section modification
-.emptySection #contentwrapper, .emptySection #umb-notifications-wrapper {left: 80px;}
-.emptySection #speechbubble {left: 0;}
-.emptySection #navigation {display: none}
+.emptySection #contentwrapper, .emptySection #umb-notifications-wrapper {
+    left: 80px;
+}
+
+.emptySection #speechbubble {
+    left: 0;
+}
+
+.emptySection #navigation {
+    display: none
+}
 
 .login-only #speechbubble {
     z-index: 10000;
     left: 0 !important;
 }
+
 .login-only #speechbubble ul {
-    padding-left:20px
+    padding-left: 20px
 }
 
 @media (max-width: 767px) {
@@ -239,22 +258,28 @@ body.umb-drawer-is-visible #mainwrapper{
     #leftcolumn {
         width: 61px;
     }
+
     #applications ul.sections {
         width: 61px;
     }
+
     ul.sections.sections-tray {
         width: 61px;
     }
+
     #applications-tray {
         left: 60px;
     }
+
     #navigation, #umb-notifications-wrapper {
         left: 60px;
     }
+
     #contentwrapper, #contentcolumn {
         left: 30px;
     }
-    #umbracoMainPageBody .umb-modal-left.fade.in { 
+
+    #umbracoMainPageBody .umb-modal-left.fade.in {
         margin-left: 61px;
     }
 }
@@ -265,27 +290,33 @@ body.umb-drawer-is-visible #mainwrapper{
     #leftcolumn {
         width: 41px;
     }
+
     #applications ul.sections {
         width: 41px;
     }
+
     #applications ul.sections-tray {
         width: 41px;
     }
+
     ul.sections.sections-tray {
         width: 41px;
     }
+
     #applications-tray {
         left: 40px;
     }
+
     #navigation, #umb-notifications-wrapper {
         left: 40px;
     }
+
     #contentwrapper, #contentcolumn {
         left: 20px;
     }
 
     #umbracoMainPageBody .umb-modal-left.fade.in {
         margin-left: 41px;
-        width: 85%!important;
+        width: 85% !important;
     }
 }
