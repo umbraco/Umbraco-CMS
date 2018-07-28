@@ -24,31 +24,45 @@ namespace Umbraco.Web.Models.PublishedContent
         }
 
         /// <inheritdoc />
-        public object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue)
+        public object GetValue(IPublishedProperty property, string culture, string segment, object defaultValue, int fallback)
         {
-            // no fallback here
-            return defaultValue;
+            return GetValue<object>(property, culture, segment, defaultValue, fallback);
         }
 
         /// <inheritdoc />
-        public T GetValue<T>(IPublishedProperty property, string culture, string segment, T defaultValue)
+        public T GetValue<T>(IPublishedProperty property, string culture, string segment, T defaultValue, int fallback)
         {
-            // no fallback here
-            return defaultValue;
+            switch (fallback)
+            {
+                case ValueFallback.None:
+                case ValueFallback.Default:
+                    return defaultValue;
+                case ValueFallback.Language:
+                    return TryGetValueWithLanguageFallback(property, culture, segment, defaultValue, out var value2) ? value2 : defaultValue;
+                default:
+                    throw NotSupportedFallbackMethod(fallback);
+            }
         }
 
         /// <inheritdoc />
-        public object GetValue(IPublishedElement content, string alias, string culture, string segment, object defaultValue)
+        public object GetValue(IPublishedElement content, string alias, string culture, string segment, object defaultValue, int fallback)
         {
-            // no fallback here
-            return defaultValue;
+            return GetValue<object>(content, alias, culture, segment, defaultValue, fallback);
         }
 
         /// <inheritdoc />
-        public T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue)
+        public T GetValue<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue, int fallback)
         {
-            // no fallback here
-            return defaultValue;
+            switch (fallback)
+            {
+                case ValueFallback.None:
+                case ValueFallback.Default:
+                    return defaultValue;
+                case ValueFallback.Language:
+                    return TryGetValueWithLanguageFallback(content, alias, culture, segment, defaultValue, out var value2) ? value2 : defaultValue;
+                default:
+                    throw NotSupportedFallbackMethod(fallback);
+            }
         }
 
         /// <inheritdoc />
@@ -79,12 +93,17 @@ namespace Umbraco.Web.Models.PublishedContent
                         ? value5
                         : TryGetValueWithRecursiveFallback(content, alias, culture, segment, defaultValue, out var value6) ? value6 : defaultValue;
                 default:
-                    throw new NotSupportedException($"Fallback {GetType().Name} does not support policy code '{fallback}'.");
+                    throw NotSupportedFallbackMethod(fallback);
             }
         }
 
+        private NotSupportedException NotSupportedFallbackMethod(int fallback)
+        {
+            return new NotSupportedException($"Fallback {GetType().Name} does not support policy code '{fallback}'.");
+        }
+
         // tries to get a value, recursing the tree
-        protected static bool TryGetValueWithRecursiveFallback<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, out T value)
+        private static bool TryGetValueWithRecursiveFallback<T>(IPublishedContent content, string alias, string culture, string segment, T defaultValue, out T value)
         {
             IPublishedProperty property = null; // if we are here, content's property has no value
             IPublishedProperty noValueProperty = null;
@@ -117,6 +136,74 @@ namespace Umbraco.Web.Models.PublishedContent
 
             value = defaultValue;
             return false;
+        }
+
+        // tries to get a value, falling back onto other languages
+        private bool TryGetValueWithLanguageFallback<T>(IPublishedProperty property, string culture, string segment, T defaultValue, out T value)
+        {
+            value = defaultValue;
+
+            if (culture.IsNullOrWhiteSpace()) return false;
+
+            var visited = new HashSet<int>();
+
+            var language = _localizationService.GetLanguageByIsoCode(culture);
+            if (language == null) return false;
+
+            while (true)
+            {
+                if (language.FallbackLanguageId == null) return false;
+
+                var language2Id = language.FallbackLanguageId.Value;
+                if (visited.Contains(language2Id)) return false;
+                visited.Add(language2Id);
+
+                var language2 = _localizationService.GetLanguageById(language2Id);
+                if (language2 == null) return false;
+                var culture2 = language2.IsoCode;
+
+                if (property.HasValue(culture2, segment))
+                {
+                    value = property.Value<T>(culture2, segment);
+                    return true;
+                }
+
+                language = language2;
+            }
+        }
+
+        // tries to get a value, falling back onto other languages
+        private bool TryGetValueWithLanguageFallback<T>(IPublishedElement content, string alias, string culture, string segment, T defaultValue, out T value)
+        {
+            value = defaultValue;
+
+            if (culture.IsNullOrWhiteSpace()) return false;
+
+            var visited = new HashSet<int>();
+
+            var language = _localizationService.GetLanguageByIsoCode(culture);
+            if (language == null) return false;
+
+            while (true)
+            {
+                if (language.FallbackLanguageId == null) return false;
+
+                var language2Id = language.FallbackLanguageId.Value;
+                if (visited.Contains(language2Id)) return false;
+                visited.Add(language2Id);
+
+                var language2 = _localizationService.GetLanguageById(language2Id);
+                if (language2 == null) return false;
+                var culture2 = language2.IsoCode;
+
+                if (content.HasValue(alias, culture2, segment))
+                {
+                    value = content.Value<T>(alias, culture2, segment);
+                    return true;
+                }
+
+                language = language2;
+            }
         }
 
         // tries to get a value, falling back onto other languages
@@ -156,6 +243,5 @@ namespace Umbraco.Web.Models.PublishedContent
                 language = language2;
             }
         }
-
     }
 }

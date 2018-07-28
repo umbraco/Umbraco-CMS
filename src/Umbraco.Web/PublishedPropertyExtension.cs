@@ -16,19 +16,19 @@ namespace Umbraco.Web
 
         #region Value
 
-        public static object Value(this IPublishedProperty property, string culture = null, string segment = null, object defaultValue = default)
+        public static object Value(this IPublishedProperty property, string culture = null, string segment = null, object defaultValue = default, int fallback = 0)
         {
             if (property.HasValue(culture, segment))
                 return property.GetValue(culture, segment);
 
-            return PublishedValueFallback.GetValue(property, culture, segment, defaultValue);
+            return PublishedValueFallback.GetValue(property, culture, segment, defaultValue, fallback);
         }
 
         #endregion
 
         #region Value<T>
 
-        public static T Value<T>(this IPublishedProperty property, string culture = null, string segment = null, T defaultValue = default, ICollection<int> visitedLanguages = null)
+        public static T Value<T>(this IPublishedProperty property, string culture = null, string segment = null, T defaultValue = default, int fallback = 0)
         {
             // for Value<T> when defaultValue is not specified, and HasValue() is false, we still want to convert the result (see below)
             // but we have no way to tell whether default value is specified or not - we could do it with overloads, but then defaultValue
@@ -65,7 +65,7 @@ namespace Umbraco.Web
             //convert = source.TryConvertTo<T>();
             //if (convert.Success) return convert.Result;
 
-            return defaultValue;
+            return PublishedValueFallback.GetValue(property, culture, segment, defaultValue, fallback);
         }
 
         #endregion

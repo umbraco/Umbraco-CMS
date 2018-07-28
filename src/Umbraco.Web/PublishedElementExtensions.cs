@@ -100,6 +100,7 @@ namespace Umbraco.Web
         /// <param name="culture">The variation language.</param>
         /// <param name="segment">The variation segment.</param>
         /// <param name="defaultValue">The default value.</param>
+        /// <param name="fallback">Optional fallback strategy.</param>
         /// <returns>The value of the content's property identified by the alias, if it exists, otherwise a default value.</returns>
         /// <remarks>
         /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
@@ -107,7 +108,7 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static object Value(this IPublishedElement content, string alias, string culture = null, string segment = null, object defaultValue = default)
+        public static object Value(this IPublishedElement content, string alias, string culture = null, string segment = null, object defaultValue = default, int fallback = 0)
         {
             var property = content.GetProperty(alias);
 
@@ -119,7 +120,7 @@ namespace Umbraco.Web
             // and if HasValue is false, what we get is 'null' - but the converter may instead have been able to return an
             // empty enumerable, which would be way nicer - so we need a way to tell that 'no defaultValue has been provided'?
 
-            return PublishedValueFallback.GetValue(content, alias, culture, segment, defaultValue);
+            return PublishedValueFallback.GetValue(content, alias, culture, segment, defaultValue, fallback);
         }
 
         #endregion
@@ -135,6 +136,7 @@ namespace Umbraco.Web
         /// <param name="culture">The variation language.</param>
         /// <param name="segment">The variation segment.</param>
         /// <param name="defaultValue">The default value.</param>
+        /// <param name="fallback">Optional fallback strategy.</param>
         /// <returns>The value of the content's property identified by the alias, converted to the specified type.</returns>
         /// <remarks>
         /// <para>The value comes from <c>IPublishedProperty</c> field <c>Value</c> ie it is suitable for use when rendering content.</para>
@@ -142,14 +144,14 @@ namespace Umbraco.Web
         /// <para>If eg a numeric property wants to default to 0 when value source is empty, this has to be done in the converter.</para>
         /// <para>The alias is case-insensitive.</para>
         /// </remarks>
-        public static T Value<T>(this IPublishedElement content, string alias, string culture = null, string segment = null, T defaultValue = default)
+        public static T Value<T>(this IPublishedElement content, string alias, string culture = null, string segment = null, T defaultValue = default, int fallback = 0)
         {
             var property = content.GetProperty(alias);
 
             if (property != null && property.HasValue(culture, segment))
                 return property.Value<T>(culture, segment);
 
-            return PublishedValueFallback.GetValue<T>(content, alias, culture, segment, defaultValue);
+            return PublishedValueFallback.GetValue<T>(content, alias, culture, segment, defaultValue, fallback);
         }
 
         #endregion
