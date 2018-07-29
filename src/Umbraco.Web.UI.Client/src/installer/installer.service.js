@@ -21,7 +21,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 					"At least 2 people have named their cat 'Umbraco'",
 					'On an average day, more than 1000 people download Umbraco',
 					'<a target="_blank" href="https://umbraco.tv">umbraco.tv</a> is the premier source of Umbraco video tutorials to get you started',
-					'You can find the world\'s friendliest CMS community at <a target="_blank" href="https://our.umbraco.org">our.umbraco.org</a>',
+					'You can find the world\'s friendliest CMS community at <a target="_blank" href="https://our.umbraco.com">our.umbraco.com</a>',
 					'You can become a certified Umbraco developer by attending one of the official courses',
 					'Umbraco works really well on tablets',
 					'You have 100% control over your markup and design when crafting a website in Umbraco',
@@ -121,7 +121,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 			}
 		},
 
-		//loads available packages from our.umbraco.org
+		//loads available packages from our.umbraco.com
 		getPackages : function(){
 			return $http.get(Umbraco.Sys.ServerVariables.installApiBaseUrl + "GetPackages");
 		},
