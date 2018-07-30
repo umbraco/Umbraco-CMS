@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Diagnostics;
 using Serilog;
+using Serilog.Events;
 
 namespace Umbraco.Core.Logging
 {
@@ -37,7 +35,11 @@ namespace Umbraco.Core.Logging
                 .Enrich.WithThreadId()
                 .Enrich.WithProperty("AppDomainId", AppDomain.CurrentDomain.Id)
                 .Enrich.WithProperty("AppDomainAppId", HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty))
-                .WriteTo.File(AppDomain.CurrentDomain.BaseDirectory + "\\logs\\warren.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File(AppDomain.CurrentDomain.BaseDirectory + @"\App_Data\Logs\UmbracoTraceLog.txt", //Our main app Logfile
+                    rollingInterval: RollingInterval.Day,
+                    restrictedToMinimumLevel: LogEventLevel.Debug,
+                    retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Level:u4}  {Message:lj}{NewLine}{Exception}")
                 .CreateLogger();
         }
 
@@ -146,14 +148,14 @@ namespace Umbraco.Core.Logging
         public void Warn(Type reporting, Exception exception, string message)
         {
             var logger = Log.Logger;
-            logger?.Warning(message, exception);
+            logger?.ForContext(reporting).Warning(message, exception);
         }
 
         /// <inheritdoc/>
         public void Warn(Type reporting, Exception exception, Func<string> messageBuilder)
         {
             var logger = Log.Logger;
-            logger?.Warning(messageBuilder(), exception);
+            logger?.ForContext(reporting).Warning(messageBuilder(), exception);
         }
 
         ///// <inheritdoc/>
@@ -182,14 +184,14 @@ namespace Umbraco.Core.Logging
         public void Info(Type reporting, string message)
         {
             var logger = Log.Logger;
-            logger?.Information(message);
+            logger?.ForContext(reporting).Information(message);
         }
 
         /// <inheritdoc/>
         public void Info(Type reporting, Func<string> generateMessage)
         {
             var logger = Log.Logger;
-            logger?.Information(generateMessage());
+            logger?.ForContext(reporting).Information(generateMessage());
         }
 
         ///// <inheritdoc/>
@@ -212,14 +214,14 @@ namespace Umbraco.Core.Logging
         public void Debug(Type reporting, string message)
         {
             var logger = Log.Logger;
-            logger?.Debug(message);
+            logger?.ForContext(reporting).Debug(message);
         }
 
         /// <inheritdoc/>
         public void Debug(Type reporting, Func<string> messageBuilder)
         {
             var logger = Log.Logger;
-            logger?.Debug(messageBuilder());
+            logger?.ForContext(reporting).Debug(messageBuilder());
         }
 
         ///// <inheritdoc/>
