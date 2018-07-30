@@ -503,7 +503,7 @@ namespace Umbraco.Web
                     httpContext.Response.Headers.Remove("X-AspNet-Version");
                     httpContext.Response.Headers.Remove("X-AspNetMvc-Version");
                 }
-                catch (PlatformNotSupportedException ex)
+                catch (PlatformNotSupportedException)
                 {
                     // can't remove headers this way on IIS6 or cassini.
                 }
