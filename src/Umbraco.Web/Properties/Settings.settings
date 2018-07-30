@@ -12,7 +12,7 @@
       <Value Profile="(Default)">Somthing</Value>
     </Setting>
     <Setting Name="umbraco_org_umbraco_our_Repository" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">http://our.umbraco.org/umbraco/webservices/api/repository.asmx</Value>
+      <Value Profile="(Default)">https://our.umbraco.com/umbraco/webservices/api/repository.asmx</Value>
     </Setting>
   </Settings>
 </SettingsFile>

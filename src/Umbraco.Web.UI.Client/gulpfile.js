@@ -351,7 +351,7 @@ gulp.task('docs', [], function (cb) {
         title: "Umbraco Backoffice UI API Documentation",
         dest: 'docs/api',
         styles: ['docs/umb-docs.css'],
-        image: "https://our.umbraco.org/assets/images/logo.svg"
+        image: "https://our.umbraco.com/assets/images/logo.svg"
     }
 
     return gulpDocs.sections({
