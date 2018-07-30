@@ -105,7 +105,7 @@
                 mask.show();
                 
                 var data = { nodeId: self._opts.nodeId, language: self.language ? self.language : 0, domains: self.domains };
-                $.post(self._opts.restServiceLocation + 'SaveLanguageAndDomains', ko.toJSON(data), function (json) {
+                $.post(self._opts.restServiceLocation + 'PostSaveLanguageAndDomains', ko.toJSON(data), function (json) {
                     mask.hide();
 
                     if (json.Valid) {

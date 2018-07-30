@@ -2,35 +2,39 @@
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-using System.Web.Services;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Security;
 
-namespace Umbraco.Web.WebServices
+namespace Umbraco.Web
 {
-    /// <summary>
-    /// An abstract web service class exposing common umbraco objects
-    /// </summary>
-    public abstract class UmbracoWebService : WebService
+    public abstract class UmbracoHttpHandler : IHttpHandler
     {
         private UrlHelper _url;
 
-        protected UmbracoWebService()
-        {
-            UmbracoContext = Current.UmbracoContext;
-            Umbraco = new UmbracoHelper(UmbracoContext, Current.Services, Current.ApplicationCache);
+        protected UmbracoHttpHandler()
+            : this(Current.UmbracoContext, Current.Services, Current.ApplicationCache)
+        { }
 
+        protected UmbracoHttpHandler(UmbracoContext umbracoContext, ServiceContext services, CacheHelper appCache)
+        {
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
+            UmbracoContext = umbracoContext;
+            Umbraco = new UmbracoHelper(umbracoContext, services, appCache);
+
+            // fixme inject somehow
             Logger = Current.Logger;
             ProfilingLogger = Current.ProfilingLogger;
             Services = Current.Services;
-            GlobalSettings = UmbracoConfig.For.GlobalSettings();
         }
+
+        public abstract void ProcessRequest(HttpContext context);
+
+        public abstract bool IsReusable { get; }
 
         /// <summary>
         /// Gets the logger.
@@ -58,11 +62,6 @@ namespace Umbraco.Web.WebServices
         public ServiceContext Services { get; }
 
         /// <summary>
-        /// Gets the global settings.
-        /// </summary>
-        public IGlobalSettings GlobalSettings { get; }
-
-        /// <summary>
         /// Gets the web security helper.
         /// </summary>
         public WebSecurity Security => UmbracoContext.Security;
@@ -71,6 +70,6 @@ namespace Umbraco.Web.WebServices
         /// Gets the Url helper.
         /// </summary>
         /// <remarks>This URL helper is created without any route data and an empty request context.</remarks>
-        public UrlHelper Url => _url ?? (_url = new UrlHelper(Context.Request.RequestContext));
+        public UrlHelper Url => _url ?? (_url = new UrlHelper(HttpContext.Current.Request.RequestContext));
     }
 }

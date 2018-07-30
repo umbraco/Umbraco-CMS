@@ -7,11 +7,6 @@
     public interface IShortStringHelper
     {
         /// <summary>
-        /// Gets the JavaScript code defining client-side short string services.
-        /// </summary>
-        string GetShortStringServicesJavaScript(string controllerPath);
-
-        /// <summary>
         /// Cleans a string to produce a string that can safely be used in an alias.
         /// </summary>
         /// <param name="text">The text to filter.</param>

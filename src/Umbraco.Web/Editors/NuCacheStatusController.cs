@@ -6,7 +6,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.WebApi;
 
-namespace Umbraco.Web.WebServices
+namespace Umbraco.Web.Editors
 {
     public class NuCacheStatusController : UmbracoAuthorizedApiController
     {

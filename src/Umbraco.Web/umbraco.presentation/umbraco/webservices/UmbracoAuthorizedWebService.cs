@@ -5,8 +5,10 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Web;
+using Umbraco.Web.WebServices;
 
-namespace Umbraco.Web.WebServices
+namespace umbraco.presentation.webservices
 {
     /// <summary>
     /// An abstract web service class that has the methods and properties to correct validate an Umbraco user

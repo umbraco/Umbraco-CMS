@@ -17,6 +17,7 @@ namespace Umbraco.Web.WebServices
     /// This controller does not contain methods to query for content, media or members based on tags, those methods would require
     /// authentication and should not be exposed publicly.
     /// </remarks>
+    // TODO: This controller should be moved to a more suitable place.
     public class TagsController : UmbracoApiController
     {
         public TagsController()

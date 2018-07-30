@@ -5,7 +5,7 @@ using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
-namespace Umbraco.Web.WebServices
+namespace Umbraco.Web.Editors
 {
     [ValidateAngularAntiForgeryToken]
     public class XmlDataIntegrityController : UmbracoAuthorizedApiController

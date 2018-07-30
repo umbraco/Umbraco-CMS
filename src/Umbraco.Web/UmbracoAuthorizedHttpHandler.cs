@@ -6,7 +6,7 @@ using Umbraco.Web.Security;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 
-namespace Umbraco.Web.WebServices
+namespace Umbraco.Web
 {
     public abstract class UmbracoAuthorizedHttpHandler : UmbracoHttpHandler
     {
