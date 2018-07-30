@@ -1,25 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Security;
 using System.Web;
-using System.Web.Security;
-using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Services;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Web.Composing;
-using ContainerExtensions = Umbraco.Core.Composing.ContainerExtensions;
-using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Security
 {
@@ -58,7 +53,7 @@ namespace Umbraco.Web.Security
             {
                 return false;
             }
-            var helper = ContainerExtensions.GetInstance<MembershipHelper>(Current.Container);
+            var helper = Current.Container.GetInstance<MembershipHelper>();
             return helper.IsMemberAuthorized(allowAll, allowTypes, allowGroups, allowMembers);
         }
 
