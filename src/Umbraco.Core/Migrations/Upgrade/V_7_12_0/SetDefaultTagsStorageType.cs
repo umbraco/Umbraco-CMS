@@ -1,54 +1,47 @@
 ﻿using System;
 using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZero
+namespace Umbraco.Core.Migrations.Upgrade.V_7_12_0
 {
     /// <summary>
     /// Set the default storageType for the tags datatype to "CSV" to ensure backwards compatibilty since the default is going to be JSON in new versions
-    /// </summary>
-    
-    [Migration("7.12.0", 1, Constants.System.UmbracoMigrationName)]
-    public class SetDefaultTagsStorageType: MigrationBase
+    /// </summary>    
+    public class SetDefaultTagsStorageType : MigrationBase
     {
-        public SetDefaultTagsStorageType(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)
+        public SetDefaultTagsStorageType(IMigrationContext context) : base(context)
         {
         }
 
-        public override void Up()
+        public override void Migrate()
         {
             if (Context?.Database == null) return;
-            
+
             // We need to get all datatypes with an alias of "umbraco.tags" so we can loop over them and set the missing values if needed
             var datatypes = Context.Database.Fetch<DataTypeDto>("SELECT * FROM cmsDataType");
-            var tagsDataTypes = datatypes.Where(x => string.Equals(x.PropertyEditorAlias, Constants.PropertyEditors.TagsAlias, StringComparison.InvariantCultureIgnoreCase));
-            var dataTypePreValues = Context.Database.Fetch<DataTypePreValueDto>("SELECT * FROM cmsDataTypePrevalues");
+            var tagsDataTypes = datatypes.Where(x => string.Equals(x.EditorAlias, Constants.PropertyEditors.Aliases.Tags, StringComparison.InvariantCultureIgnoreCase));
 
             foreach (var datatype in tagsDataTypes)
             {
-                // We need to check if the node has a "storageType" set
-                var result = dataTypePreValues.FirstOrDefault(x =>
-                    x.DataTypeNodeId == datatype.DataTypeId
-                    && string.Equals(x.Alias, "storageType", StringComparison.InvariantCultureIgnoreCase));
+                var dataTypePreValues = JsonConvert.DeserializeObject<JObject>(datatype.Configuration);
 
-                // if the "storageType" has not been set we do so by adding a new row in the table for the nodid and set it
-                if (result == null)
+                // We need to check if the node has a "storageType" set
+                if (!dataTypePreValues.ContainsKey("storageType"))
                 {
-                    Insert.IntoTable("CmsDataTypePrevalues").Row(new
-                    {
-                        datatypeNodeId = datatype.DataTypeId,
-                        value = "Csv",
-                        sortOrder = 2,
-                        alias = "storageType"
-                    });
+                    dataTypePreValues["storageType"] = "Csv";
                 }
+
+                Update.Table(Constants.DatabaseSchema.Tables.DataType)
+                    .Set(new { config = JsonConvert.SerializeObject(dataTypePreValues) })
+                    .Where(new { nodeId = datatype.NodeId })
+                    .Do();
             }
         }
 
-        public override void Down()
-        {
-        }
+
     }
 }

@@ -1,38 +1,30 @@
 ﻿using System;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Persistence.Dtos;
 
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZero
+namespace Umbraco.Core.Migrations.Upgrade.V_7_12_0
 {
-    [Migration("7.12.0", 0, Constants.System.UmbracoMigrationName)]
     public class AddRelationTypeForMediaFolderOnDelete : MigrationBase
     {
-        public AddRelationTypeForMediaFolderOnDelete(ISqlSyntaxProvider sqlSyntax, ILogger logger)
-            : base(sqlSyntax, logger)
+
+        public AddRelationTypeForMediaFolderOnDelete(IMigrationContext context) : base(context)
         {
         }
 
-        public override void Up()
+        public override void Migrate()
         {
             var exists = Context.Database.FirstOrDefault<RelationTypeDto>("WHERE alias=@alias", new { alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias });
             if (exists == null)
             {
-                var relationTypeDto = new RelationTypeDto
+                Insert.IntoTable(Constants.DatabaseSchema.Tables.RelationType).Row(new
                 {
-                    Alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias,
-                    Name = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName,
-                    ChildObjectType = Guid.Parse(Constants.ObjectTypes.MediaType),
-                    ParentObjectType = Guid.Parse(Constants.ObjectTypes.MediaType),
-                    Dual = false
-                };
-
-                Context.Database.Insert(relationTypeDto);
+                    alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias,
+                    name = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName,
+                    childObjectType = Constants.ObjectTypes.MediaType,
+                    parentObjectType = Constants.ObjectTypes.MediaType,
+                    dual = false
+                }).Do();
             }
         }
 
-        public override void Down()
-        { }
     }
 }
