@@ -504,37 +504,6 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
-        /// Returns a template as a template node which can be traversed (parent, children)
-        /// </summary>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        [Obsolete("Use GetDescendants instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public TemplateNode GetTemplateNode(string alias)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _templateRepository.GetTemplateNode(alias);
-            }
-        }
-
-        /// <summary>
-        /// Given a template node in a tree, this will find the template node with the given alias if it is found in the hierarchy, otherwise null
-        /// </summary>
-        /// <param name="anyNode"></param>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        [Obsolete("Use GetDescendants instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public TemplateNode FindTemplateInTree(TemplateNode anyNode, string alias)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _templateRepository.FindTemplateInTree(anyNode, alias);
-            }
-        }
-
-        /// <summary>
         /// Saves a <see cref="Template"/>
         /// </summary>
         /// <param name="template"><see cref="Template"/> to save</param>
