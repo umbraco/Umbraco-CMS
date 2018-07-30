@@ -314,6 +314,9 @@ namespace Umbraco.Core.Migrations.Install
             relationType = new RelationTypeDto { Id = 2, Alias = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias, ChildObjectType = Constants.ObjectTypes.Document, ParentObjectType = Constants.ObjectTypes.Document, Dual = false, Name = Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteName };
             relationType.UniqueId = (relationType.Alias + "____" + relationType.Name).ToGuid();
             _database.Insert(Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
+            relationType = new RelationTypeDto { Id = 3, Alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias, ChildObjectType = Constants.ObjectTypes.Media, ParentObjectType = Constants.ObjectTypes.Media, Dual = false, Name = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName };
+            relationType.UniqueId = (relationType.Alias + "____" + relationType.Name).ToGuid();
+            _database.Insert(Constants.DatabaseSchema.Tables.RelationType, "id", false, relationType);
         }
 
         private void CreateTaskTypeData()

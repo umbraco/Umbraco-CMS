@@ -1,5 +1,5 @@
-angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController",
-    function ($scope, relationResource, contentResource, navigationService, appState, treeService, localizationService) {
+angular.module("umbraco").controller("Umbraco.Editors.Media.RestoreController",
+    function ($scope, relationResource, mediaResource, navigationService, appState, treeService, localizationService) {
 		var dialogOptions = $scope.dialogOptions;
 
 		var node = dialogOptions.currentNode;
@@ -26,21 +26,21 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 				$scope.target = { id: -1, name: "Root" };
 
 			} else {
-			    contentResource.getById($scope.relation.parentId).then(function (data) {
-					$scope.target = data;
+			    mediaResource.getById($scope.relation.parentId).then(function (data) {
+                    $scope.target = data;
 
-					// make sure the target item isn't in the recycle bin
-					if($scope.target.path.indexOf("-20") !== -1) {
-						$scope.error = {
+                    // make sure the target item isn't in the recycle bin
+                    if ($scope.target.path.indexOf("-20") !== -1) {
+                        $scope.error = {
                             errorMsg: localizationService.localize('recycleBin_itemCannotBeRestored'),
-							data: {
+                            data: {
                                 Message: localizationService.localize('recycleBin_restoreUnderRecycled').then(function (value) {
                                     value.replace('%0%', $scope.target.name);
                                 })
-							}
-						};
-						$scope.success = false;
-					}
+                            }
+                        };
+                        $scope.success = false;
+                    }
 
 				}, function (err) {
 					$scope.success = false;
@@ -55,7 +55,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 
 		$scope.restore = function () {
 			// this code was copied from `content.move.controller.js`
-			contentResource.move({ parentId: $scope.target.id, id: node.id })
+			mediaResource.move({ parentId: $scope.target.id, id: node.id })
 				.then(function (path) {
 
 					$scope.success = true;
@@ -66,14 +66,14 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.RestoreController"
 					//get the currently edited node (if any)
 					var activeNode = appState.getTreeState("selectedNode");
 
-					//we need to do a double sync here: first sync to the moved content - but don't activate the node,
-					//then sync to the currenlty edited content (note: this might not be the content that was moved!!)
+					//we need to do a double sync here: first sync to the moved media item - but don't activate the node,
+					//then sync to the currenlty edited media item (note: this might not be the media item that was moved!!)
 
-					navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false }).then(function (args) {
+					navigationService.syncTree({ tree: "media", path: path, forceReload: true, activate: false }).then(function (args) {
 						if (activeNode) {
 							var activeNodePath = treeService.getPath(activeNode).join();
 							//sync to this node now - depending on what was copied this might already be synced but might not be
-							navigationService.syncTree({ tree: "content", path: activeNodePath, forceReload: false, activate: true });
+							navigationService.syncTree({ tree: "media", path: activeNodePath, forceReload: false, activate: true });
 						}
 					});
 
