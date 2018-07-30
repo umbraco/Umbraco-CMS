@@ -18,8 +18,7 @@ function dataTypeHelper() {
                     description: preVals[i].description,
                     label: preVals[i].label,
                     view: preVals[i].view,
-                    value: preVals[i].value,
-                    prevalues: preVals[i].prevalues
+                    value: preVals[i].value
                 });
             }
 

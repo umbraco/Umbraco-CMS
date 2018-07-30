@@ -386,7 +386,6 @@
     <Compile Include="Models\Membership\UserProfile.cs" />
     <Compile Include="Models\Membership\UserState.cs" />
     <Compile Include="Models\Membership\UserType.cs" />
-    <Compile Include="Models\PreValueInnerListItem.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeConverter.cs" />
     <Compile Include="Models\Rdbms\AuditEntryDto.cs" />
     <Compile Include="Models\Rdbms\ConsentDto.cs" />
