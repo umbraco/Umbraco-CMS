@@ -1,13 +1,12 @@
 using System;
-using Umbraco.Core.Logging;
 using System.Linq;
 using System.Web;
+using umbraco.businesslogic.Exceptions;
+using umbraco.BusinessLogic;
+using umbraco.interfaces;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
-using umbraco.BusinessLogic;
-using umbraco.businesslogic.Exceptions;
-using umbraco.interfaces;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 
@@ -132,8 +131,8 @@ namespace umbraco.BasePages
             if (permissions.IndexOf(Action) > -1 && (Path.Contains("-20") || ("," + Path + ",").Contains("," + getUser().StartNodeId.ToString() + ",")))
                 return true;
 
-	        var user = getUser();
-	        LogHelper.Info<UmbracoEnsuredPage>("User {0} has insufficient permissions in UmbracoEnsuredPage: '{1}', '{2}', '{3}'", () => user.Name, () => Path, () => permissions, () => Action);
+            var user = getUser();
+            LogHelper.Info<UmbracoEnsuredPage>("User {0} has insufficient permissions in UmbracoEnsuredPage: '{1}', '{2}', '{3}'", () => user.Name, () => Path, () => permissions, () => Action);
             return false;
         }
 

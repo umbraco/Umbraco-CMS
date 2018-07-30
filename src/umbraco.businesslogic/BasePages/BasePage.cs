@@ -1,24 +1,17 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Web;
 using System.Linq;
+using System.Web;
 using System.Web.Mvc;
-using System.Web.Routing;
-using System.Web.Security;
 using System.Web.UI;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using Umbraco.Core;
+using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 
 namespace umbraco.BasePages
 {
@@ -108,17 +101,17 @@ namespace umbraco.BasePages
             }
         }
 
-	    private UrlHelper _url;
-		/// <summary>
-		/// Returns a UrlHelper
-		/// </summary>
-		/// <remarks>
-		/// This URL helper is created without any route data and an empty request context
-		/// </remarks>
-	    public UrlHelper Url
-	    {
-		    get { return _url ?? (_url = new UrlHelper(Context.Request.RequestContext)); }
-	    }
+        private UrlHelper _url;
+        /// <summary>
+        /// Returns a UrlHelper
+        /// </summary>
+        /// <remarks>
+        /// This URL helper is created without any route data and an empty request context
+        /// </remarks>
+        public UrlHelper Url
+        {
+            get { return _url ?? (_url = new UrlHelper(Context.Request.RequestContext)); }
+        }
 
         /// <summary>
         /// Returns a refernce of an instance of ClientTools for access to the pages client API
@@ -315,7 +308,7 @@ namespace umbraco.BasePages
                 Culture = ui.Culture(u)
 
             });
-			LogHelper.Info<BasePage>("User {0} (Id: {1}) logged in", () => u.Name, () => u.Id);
+            LogHelper.Info<BasePage>("User {0} (Id: {1}) logged in", () => u.Name, () => u.Id);
         }
 
 
