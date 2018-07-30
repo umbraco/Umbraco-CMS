@@ -70,7 +70,6 @@ namespace Umbraco.Core
             // create the container for the application, and configure.
             // the boot manager is responsible for registrations
             var container = GetContainer();
-            container.RegisterSingleton(x => container);
             Current.Container = container;
 
             // register the essential stuff,
