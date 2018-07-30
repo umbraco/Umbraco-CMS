@@ -6,7 +6,7 @@ using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {
-    [Weight(1000)]
+	[Weight(1000)]
     public class ImageThumbnailProvider : AbstractThumbnailProvider
     {        
         protected override IEnumerable<string> SupportedExtensions

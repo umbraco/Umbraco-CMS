@@ -109,16 +109,16 @@ namespace Umbraco.Tests.Persistence
 
             //re-create it
             dbSqlServer.Execute(@"CREATE TABLE [umbracoServer](
-    [id] [int] IDENTITY(1,1) NOT NULL,
-    [address] [nvarchar](500) NOT NULL,
-    [computerName] [nvarchar](255) NOT NULL,
-    [registeredDate] [datetime] NOT NULL CONSTRAINT [DF_umbracoServer_registeredDate]  DEFAULT (getdate()),
-    [lastNotifiedDate] [datetime] NOT NULL,
-    [isActive] [bit] NOT NULL,
-    [isMaster] [bit] NOT NULL,
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[address] [nvarchar](500) NOT NULL,
+	[computerName] [nvarchar](255) NOT NULL,
+	[registeredDate] [datetime] NOT NULL CONSTRAINT [DF_umbracoServer_registeredDate]  DEFAULT (getdate()),
+	[lastNotifiedDate] [datetime] NOT NULL,
+	[isActive] [bit] NOT NULL,
+	[isMaster] [bit] NOT NULL,
  CONSTRAINT [PK_umbracoServer] PRIMARY KEY CLUSTERED 
 (
-    [id] ASC
+	[id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 )");
             var data = new List<ServerRegistrationDto>();

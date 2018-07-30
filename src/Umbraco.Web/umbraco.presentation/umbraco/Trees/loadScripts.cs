@@ -8,6 +8,7 @@ using umbraco.interfaces;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 
+
 namespace umbraco
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -26,13 +27,13 @@ namespace umbraco
         {
             Javascript.Append(
                 @"
-            function openScriptEditor(id) {
-                UmbClientMgr.contentFrame('settings/scripts/editScript.aspx?file=' + id);
-            }
+			function openScriptEditor(id) {
+			    UmbClientMgr.contentFrame('settings/scripts/editScript.aspx?file=' + id);
+			}
             function openScriptFolder(id) {
-                return false;
-            }
-        ");
+			    return false;
+			}
+		");
         }
 
         protected override string FilePath

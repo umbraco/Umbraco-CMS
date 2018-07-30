@@ -101,17 +101,17 @@ namespace umbraco.BasePages
             }
         }
 
-        private UrlHelper _url;
-        /// <summary>
-        /// Returns a UrlHelper
-        /// </summary>
-        /// <remarks>
-        /// This URL helper is created without any route data and an empty request context
-        /// </remarks>
-        public UrlHelper Url
-        {
-            get { return _url ?? (_url = new UrlHelper(Context.Request.RequestContext)); }
-        }
+	    private UrlHelper _url;
+		/// <summary>
+		/// Returns a UrlHelper
+		/// </summary>
+		/// <remarks>
+		/// This URL helper is created without any route data and an empty request context
+		/// </remarks>
+	    public UrlHelper Url
+	    {
+		    get { return _url ?? (_url = new UrlHelper(Context.Request.RequestContext)); }
+	    }
 
         /// <summary>
         /// Returns a refernce of an instance of ClientTools for access to the pages client API
@@ -308,7 +308,7 @@ namespace umbraco.BasePages
                 Culture = ui.Culture(u)
 
             });
-            LogHelper.Info<BasePage>("User {0} (Id: {1}) logged in", () => u.Name, () => u.Id);
+			LogHelper.Info<BasePage>("User {0} (Id: {1}) logged in", () => u.Name, () => u.Id);
         }
 
 
