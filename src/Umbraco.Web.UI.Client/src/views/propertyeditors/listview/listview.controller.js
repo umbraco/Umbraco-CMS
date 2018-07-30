@@ -52,7 +52,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
    $scope.isNew = false;
    $scope.actionInProgress = false;
    $scope.selection = [];
-   $scope.folders = [];   
+   $scope.folders = [];
    $scope.page = {};
    $scope.listViewResultSet = {
       totalPages: 0,
@@ -72,7 +72,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
          "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
          "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
          "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
-         "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
+         "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M
          "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
          "canUnpublish": _.contains(currentUserPermissions, 'U'), //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
       };
@@ -82,7 +82,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
    $scope.buttonPermissions = null;
 
    //When we are dealing with 'content', we need to deal with permissions on child nodes.
-   // Currently there is no real good way to 
+   // Currently there is no real good way to
    if ($scope.entityType === "content") {
 
       var idsWithPermissions = null;
@@ -271,8 +271,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
          if (reloadFolders && $scope.entityType === 'media') {
             //The folders aren't loaded - we only need to do this once since we're never changing node ids
             mediaResource.getChildFolders($scope.contentId)
-                    .then(function (folders) {
-                       $scope.folders = folders;
+                    .then(function (page) {
+                       $scope.folders = page.items;
                        $scope.viewLoaded = true;
                     });
 
@@ -454,7 +454,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
 
    function performMove(target) {
 
-       //NOTE: With the way this applySelected/serial works, I'm not sure there's a better way currently to return 
+       //NOTE: With the way this applySelected/serial works, I'm not sure there's a better way currently to return
        // a specific value from one of the methods, so we'll have to try this way. Even though the first method
        // will fire once per every node moved, the destination path will be the same and we need to use that to sync.
        var newPath = null;
@@ -604,7 +604,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
       getContentTypesCallback(id).then(function (items) {
            $scope.listViewAllowedTypes = items;
       });
-       
+
       $scope.contentId = id;
       $scope.isTrashed = id === "-20" || id === "-21";
 
