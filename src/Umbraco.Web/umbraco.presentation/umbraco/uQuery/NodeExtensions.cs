@@ -200,7 +200,7 @@ namespace umbraco
         /// <summary>
         /// Functionally similar to the XPath axis 'descendant'
         /// Make the All Descendants LINQ queryable
-        /// taken from: http://our.umbraco.org/wiki/how-tos/useful-helper-extension-methods-%28linq-null-safe-access%29
+        /// taken from: https://our.umbraco.com/wiki/how-tos/useful-helper-extension-methods-%28linq-null-safe-access%29
         /// </summary>
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <returns>Node as IEnumerable</returns>
@@ -212,7 +212,7 @@ namespace umbraco
         /// <summary>
         /// Functionally similar to the XPath axis 'descendant'
         /// Make the All Descendants LINQ queryable
-        /// taken from: http://our.umbraco.org/wiki/how-tos/useful-helper-extension-methods-%28linq-null-safe-access%29
+        /// taken from: https://our.umbraco.com/wiki/how-tos/useful-helper-extension-methods-%28linq-null-safe-access%29
         /// </summary>
         /// <param name="node">an umbraco.interfaces.INode object</param>
         /// <returns>INode as IEnumerable</returns>
@@ -293,7 +293,7 @@ namespace umbraco
         /// Functionally similar to the XPath axis 'child'
         /// Make the imediate Children LINQ queryable
         /// Performance optimised for just imediate children.
-        /// taken from: http://our.umbraco.org/wiki/how-tos/useful-helper-extension-methods-%28linq-null-safe-access%29
+        /// taken from: https://our.umbraco.com/wiki/how-tos/useful-helper-extension-methods-%28linq-null-safe-access%29
         /// </summary>
         /// <param name="node">an umbraco.presentation.nodeFactory.Node object</param>
         /// <returns>Node as IEnumerable</returns>
@@ -306,7 +306,7 @@ namespace umbraco
         /// Functionally similar to the XPath axis 'child'
         /// Make the imediate Children LINQ queryable
         /// Performance optimised for just imediate children.
-        /// taken from: http://our.umbraco.org/wiki/how-tos/useful-helper-extension-methods-%28linq-null-safe-access%29
+        /// taken from: https://our.umbraco.com/wiki/how-tos/useful-helper-extension-methods-%28linq-null-safe-access%29
         /// </summary>
         /// <param name="node">an umbraco.interfaces.INode object</param>
         /// <returns>INode as IEnumerable</returns>
