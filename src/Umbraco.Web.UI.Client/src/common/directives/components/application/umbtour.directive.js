@@ -8,7 +8,7 @@
 <b>Added in Umbraco 7.8</b>. The tour component is a global component and is already added to the umbraco markup. 
 In the Umbraco UI the tours live in the "Help drawer" which opens when you click the Help-icon in the bottom left corner of Umbraco. 
 You can easily add you own tours to the Help-drawer or show and start tours from 
-anywhere in the Umbraco backoffice. To see a real world example of a custom tour implementation, install <a href="https://our.umbraco.org/projects/starter-kits/the-starter-kit/">The Starter Kit</a> in Umbraco 7.8
+anywhere in the Umbraco backoffice. To see a real world example of a custom tour implementation, install <a href="https://our.umbraco.com/projects/starter-kits/the-starter-kit/">The Starter Kit</a> in Umbraco 7.8
 
 <h1><b>Extending the help drawer with custom tours</b></h1>
 The easiet way to add new tours to Umbraco is through the Help-drawer. All it requires is a my-tour.json file. 

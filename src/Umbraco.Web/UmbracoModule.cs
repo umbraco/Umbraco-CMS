@@ -491,7 +491,7 @@ namespace Umbraco.Web
 
             //disable asp.net headers (security)
             // This is the correct place to modify headers according to MS:
-            // https://our.umbraco.org/forum/umbraco-7/using-umbraco-7/65241-Heap-error-from-header-manipulation?p=0#comment220889
+            // https://our.umbraco.com/forum/umbraco-7/using-umbraco-7/65241-Heap-error-from-header-manipulation?p=0#comment220889
 		    app.PostReleaseRequestState += (sender, args) =>
 		    {
                 var httpContext = ((HttpApplication)sender).Context;
