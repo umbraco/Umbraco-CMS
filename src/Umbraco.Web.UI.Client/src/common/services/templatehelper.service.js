@@ -22,7 +22,8 @@
         function getQuerySnippet(queryExpression) {
             var code = "\n@{\n" + "\tvar selection = " + queryExpression + ";\n}\n";
                 code += "<ul>\n" +
-                            "\t@foreach(var item in selection){\n" +
+                            "\t@foreach (var item in selection)\n" +
+                            "\t{\n" +
                                 "\t\t<li>\n" +
                                     "\t\t\t<a href=\"@item.Url\">@item.Name</a>\n" +
                                 "\t\t</li>\n" +
