@@ -12,7 +12,6 @@ namespace Umbraco.Tests.Models.Collections
     public abstract class Item : IEntity, ICanBeDirty
     {
         private bool _hasIdentity;
-        private int? _hash;
         private int _id;
         private Guid _key;
 
