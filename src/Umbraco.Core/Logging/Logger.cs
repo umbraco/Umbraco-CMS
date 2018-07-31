@@ -44,14 +44,14 @@ namespace Umbraco.Core.Logging
                 .Enrich.WithProperty("AppDomainAppId", HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty))
 
                 //Main .txt logfile - in similar format to older Log4Net output
-                .WriteTo.File(AppDomain.CurrentDomain.BaseDirectory + @"\App_Data\Logs\UmbracoTraceLog.txt",
+                .WriteTo.File($@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog{Environment.MachineName}.txt",
                     rollingInterval: RollingInterval.Day,
                     restrictedToMinimumLevel: LogEventLevel.Debug,
                     retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Level:u4}  {Message:lj}{NewLine}{Exception}")
 
                 //.clef format (Compact log event format, that can be imported into local SEQ & will make searching/filtering logs easier)
-                .WriteTo.File(new CompactJsonFormatter(), AppDomain.CurrentDomain.BaseDirectory + @"\App_Data\Logs\UmbracoTraceLog.json", 
+                .WriteTo.File(new CompactJsonFormatter(), $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog{Environment.MachineName}.json", 
                     rollingInterval: RollingInterval.Day, //Create a new JSON file every day
                     retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
                     restrictedToMinimumLevel: LogEventLevel.Debug)
