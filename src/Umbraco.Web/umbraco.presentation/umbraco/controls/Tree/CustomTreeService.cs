@@ -11,6 +11,7 @@ using umbraco.cms.businesslogic;
 using umbraco.cms.presentation.Trees;
 using umbraco.controls.Tree;
 using Umbraco.Core.Services;
+using Umbraco.Web;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebServices;
 

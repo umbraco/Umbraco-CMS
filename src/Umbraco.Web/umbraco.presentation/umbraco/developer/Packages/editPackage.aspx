@@ -204,7 +204,7 @@
                         during installation and uninstallation.
                         <br />
                         All actions are formed as a xml node, containing data for the action to be performed.
-                        <a href="https://our.umbraco.org/documentation/Reference/Packaging/
+                        <a href="https://our.umbraco.com/documentation/Reference/Packaging/
 " target="_blank">Package actions documentation</a>
                     </p>
                     <asp:CustomValidator ID="actionsVal" runat="server" OnServerValidate="validateActions"

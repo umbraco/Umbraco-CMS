@@ -128,11 +128,8 @@
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="CodeAnnotations\ActionMetadataAttribute.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
-    <Compile Include="CodeAnnotations\UmbracoExperimentalFeatureAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoObjectTypeAttribute.cs" />
-    <Compile Include="CodeAnnotations\UmbracoProposedPublicAttribute.cs" />
     <Compile Include="CodeAnnotations\UmbracoUdiTypeAttribute.cs" />
-    <Compile Include="CodeAnnotations\UmbracoWillObsoleteAttribute.cs" />
     <Compile Include="Collections\CompositeNStringNStringKey.cs" />
     <Compile Include="Collections\CompositeStringStringKey.cs" />
     <Compile Include="Collections\CompositeIntStringKey.cs" />
@@ -316,6 +313,10 @@
     <Compile Include="Logging\RollingFileCleanupAppender.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\Upgrade\V_7_10_0\RenamePreviewFolder.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_12_0\AddRelationTypeForMediaFolderOnDelete.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_12_0\IncreaseLanguageIsoCodeColumnLength.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_12_0\RenameTrueFalseField.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_12_0\SetDefaultTagsStorageType.cs" />
     <Compile Include="Migrations\Upgrade\V_7_12_0\UpdateUmbracoConsent.cs" />
     <Compile Include="Migrations\Upgrade\V_7_8_0\AddIndexToPropertyTypeAliasColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_7_8_0\AddInstructionCountColumn.cs" />
@@ -402,6 +403,7 @@
     <Compile Include="PropertyEditors\ParameterEditorCollection.cs" />
     <Compile Include="PropertyEditors\PropertyEditorCollection.cs" />
     <Compile Include="PropertyEditors\PropertyEditorTagsExtensions.cs" />
+    <Compile Include="PropertyEditors\PropertyValueLevel.cs" />
     <Compile Include="PropertyEditors\SliderPropertyEditorConfiguration.cs" />
     <Compile Include="PropertyEditors\TagConfiguration.cs" />
     <Compile Include="PropertyEditors\ValueConverters\ImageCropperValue.cs" />
@@ -545,7 +547,6 @@
     <Compile Include="ListExtensions.cs" />
     <Compile Include="Logging\AppDomainTokenConverter.cs" />
     <Compile Include="Logging\AsyncForwardingAppenderBase.cs" />
-    <Compile Include="Logging\AsynchronousRollingFileAppender.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\ImageProcessorLogger.cs" />
@@ -1435,7 +1436,6 @@
     <Compile Include="Strategies\ManifestWatcherComponent.cs" />
     <Compile Include="Strategies\RelateOnCopyComponent.cs" />
     <Compile Include="Strategies\RelateOnTrashComponent.cs" />
-    <Compile Include="StringAliasCaseType.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="Strings\CleanStringType.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
@@ -1447,7 +1447,6 @@
     <Compile Include="Strings\Diff.cs" />
     <Compile Include="Strings\IShortStringHelper.cs" />
     <Compile Include="Strings\IUrlSegmentProvider.cs" />
-    <Compile Include="Strings\StringAliasCaseTypeExtensions.cs" />
     <Compile Include="Strings\UrlSegmentProviderCollection.cs" />
     <Compile Include="Strings\UrlSegmentProviderCollectionBuilder.cs" />
     <Compile Include="Strings\Utf8ToAsciiConverter.cs" />

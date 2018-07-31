@@ -210,7 +210,7 @@ namespace Umbraco.Tests.Published
             public int SourceConverts { get; private set; }
             public int InterConverts { get; private set; }
 
-            public bool IsValue(object value)
+            public bool? IsValue(object value, PropertyValueLevel level)
                 => value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
 
             public bool IsConverter(PublishedPropertyType propertyType)

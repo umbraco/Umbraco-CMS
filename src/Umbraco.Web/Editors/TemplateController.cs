@@ -185,7 +185,6 @@ namespace Umbraco.Web.Editors
                 }
 
                 var template = Services.FileService.CreateTemplateWithIdentity(display.Name, display.Content, master);
-                //template = Services.FileService.GetTemplate(template.Id);
                 Mapper.Map(template, display);
             }
 

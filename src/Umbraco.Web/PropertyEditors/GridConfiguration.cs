@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.PropertyEditors;
+﻿using Newtonsoft.Json.Linq;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -7,10 +8,12 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class GridConfiguration
     {
+        //fixme: Make these strongly typed, for now this works though
         [ConfigurationField("items", "Grid", "views/propertyeditors/grid/grid.prevalues.html", Description = "Grid configuration")]
-        public string Items { get; set; }
+        public JObject Items { get; set; }
 
+        //fixme: Make these strongly typed, for now this works though
         [ConfigurationField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration")]
-        public string Rte { get; set; }
+        public JObject Rte { get; set; }
     }
 }

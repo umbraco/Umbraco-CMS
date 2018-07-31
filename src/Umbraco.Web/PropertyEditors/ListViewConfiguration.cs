@@ -10,7 +10,7 @@ namespace Umbraco.Web.PropertyEditors
     {
         [ConfigurationField("pageSize", "Page Size", "number", Description = "Number of items per page")]
         public int PageSize { get; set; }
-
+        
         [ConfigurationField("displayAtTabNumber", "Display At Tab Number", "number", Description = "Which tab position that the list of child items will be displayed")]
         public int DisplayAtTabNumber { get; set; }
 

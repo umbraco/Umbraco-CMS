@@ -7,6 +7,9 @@
     <ul class="thumbnails color-picker">
         <li ng-repeat="(key, val) in model.config.items" ng-class="{active: isActiveColor(val)}">
             <a ng-click="toggleItem(val)" class="thumbnail" hex-bg-color="{{val.value}}">
+                <div class="check_circle">
+                    <i class="icon icon-check small"></i>
+                </div>
             </a>
             <span class="color-label" ng-if="model.useLabel" ng-bind="val.label"></span>
         </li>

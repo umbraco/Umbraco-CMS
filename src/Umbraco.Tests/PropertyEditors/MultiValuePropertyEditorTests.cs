@@ -22,7 +22,7 @@ namespace Umbraco.Tests.PropertyEditors
     /// multiple values such as the drop down list, check box list, color picker, etc....
     /// </summary>
     [TestFixture]
-    public class MultiValuePropertyEditorTests
+    public class MultiValuePropertyEditorTests 
     {
         //TODO: Test the other formatting methods for the drop down classes
 

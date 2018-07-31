@@ -170,21 +170,6 @@ namespace Umbraco.Core.Services
         IEnumerable<ITemplate> GetTemplateChildren(int masterTemplateId);
 
         /// <summary>
-        /// Returns a template as a template node which can be traversed (parent, children)
-        /// </summary>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        TemplateNode GetTemplateNode(string alias);
-
-        /// <summary>
-        /// Given a template node in a tree, this will find the template node with the given alias if it is found in the hierarchy, otherwise null
-        /// </summary>
-        /// <param name="anyNode"></param>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        TemplateNode FindTemplateInTree(TemplateNode anyNode, string alias);
-
-        /// <summary>
         /// Saves a <see cref="ITemplate"/>
         /// </summary>
         /// <param name="template"><see cref="ITemplate"/> to save</param>
@@ -358,6 +343,5 @@ namespace Umbraco.Core.Services
         /// <param name="snippetName">The name of the snippet</param>
         /// <returns>The content of the partial view.</returns>
         string GetPartialViewSnippetContent(string snippetName);
-        
     }
 }

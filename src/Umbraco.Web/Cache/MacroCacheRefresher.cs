@@ -101,7 +101,6 @@ namespace Umbraco.Web.Cache
         {
             return new[]
                 {
-                    CacheKeys.MacroCacheKey, // umbraco.cms.businesslogic.macro.Macro objects cache
                     CacheKeys.MacroContentCacheKey, // macro render cache
                 };
         }

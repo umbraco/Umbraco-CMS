@@ -60,9 +60,6 @@ namespace Umbraco.Web.Cache
             _idkMap.ClearCache(id);
             CacheHelper.ClearPartialViewCache();
 
-            CacheHelper.RuntimeCache.ClearCacheByKeySearch($"{CacheKeys.MemberLibraryCacheKey}_{id}");
-            CacheHelper.RuntimeCache.ClearCacheByKeySearch($"{CacheKeys.MemberBusinessLogicCacheKey}{id}");
-
             var memberCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMember>();
             if (memberCache)
                 memberCache.Result.ClearCacheItem(RepositoryCacheKeys.GetKey<IMember>(id));

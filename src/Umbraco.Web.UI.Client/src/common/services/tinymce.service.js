@@ -156,13 +156,13 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 
 						var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
 						editor.dom.setAttrib(imgElm, 'style', s);
-						editor.dom.setAttrib(imgElm, 'id', null);
 
 						if (img.url) {
 							var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
 							editor.dom.setAttrib(imgElm, 'data-mce-src', src);
 						}
-					}
+                    }
+				    editor.dom.setAttrib(imgElm, 'id', null);
 				}, 500);
 			}
 		},
@@ -761,9 +761,14 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 		 * @param {string} input the string to parse      
 		 */
 		getAnchorNames: function (input) {
-			var anchorPattern = /<a id=\\"(.*?)\\">/gi;
+            var anchors = [];
+            if (!input) {
+                return anchors;
+            }
+                
+		    var anchorPattern = /<a id=\\"(.*?)\\">/gi;
 			var matches = input.match(anchorPattern);
-			var anchors = [];
+			
 
 			if (matches) {
 				anchors = matches.map(function (v) {
