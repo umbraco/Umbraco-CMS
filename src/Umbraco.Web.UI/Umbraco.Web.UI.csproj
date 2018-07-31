@@ -279,6 +279,9 @@
       <DependentUpon>HealthChecks.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Config\serilog.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Config\umbracoSettings.Release.config">
       <DependentUpon>umbracoSettings.config</DependentUpon>
       <SubType>Designer</SubType>

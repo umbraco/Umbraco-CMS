@@ -28,6 +28,8 @@ namespace Umbraco.Core.Logging
         // private for CreateWithDefaultConfiguration
         private Logger()
         {
+            Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug() //Set to highest level of logging (as any sinks may want to restrict it to Errors only)
                 .Enrich.WithProcessId()
@@ -40,7 +42,9 @@ namespace Umbraco.Core.Logging
                     restrictedToMinimumLevel: LogEventLevel.Debug,
                     retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Level:u4}  {Message:lj}{NewLine}{Exception}")
+                .ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + @"\config\serilog.config")
                 .CreateLogger();
+
         }
 
         /// <summary>
