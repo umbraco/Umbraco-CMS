@@ -293,7 +293,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
         createContainer: function (parentId, name) {
 
             return umbRequestHelper.resourcePromise(
-                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateContainer", { parentId: parentId, name: name })),
+                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateContainer", { parentId: parentId, name: encodeURIComponent(name) })),
                 'Failed to create a folder under parent id ' + parentId);
 
         },
