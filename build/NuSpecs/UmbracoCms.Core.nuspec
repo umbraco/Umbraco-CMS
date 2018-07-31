@@ -72,8 +72,6 @@
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.xml" target="lib\Umbraco.Web.UI.xml" />
     <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.xml" target="lib\Umbraco.Examine.xml" />
 
-    <file src="tools\install.core.ps1" target="tools\install.ps1" />
-
     <!-- symbols -->
     <file src="$BuildTmp$\bin\Umbraco.Core.pdb" target="lib" />
     <file src="$BuildTmp$\..\src\Umbraco.Core\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Core" />
