@@ -7,6 +7,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.UI.Pages;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
+using Umbraco.Web.Editors;
 using Umbraco.Web.WebServices;
 using Umbraco.Web._Legacy.Actions;
 
@@ -75,7 +76,7 @@ namespace umbraco.dialogs
         protected string GetRestServicePath()
         {
             const string action = "ListDomains";
-            var path = Url.GetUmbracoApiService<DomainsApiController>(action);
+            var path = Url.GetUmbracoApiService<ContentController>(action);
             return path.TrimEnd(action).EnsureEndsWith('/');
         }
     }

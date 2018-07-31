@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Dtos
         [Column("languageISOCode")]
         [Index(IndexTypes.UniqueNonClustered)]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [Length(10)]
+        [Length(14)]
         public string IsoCode { get; set; }
 
         /// <summary>

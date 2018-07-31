@@ -26,7 +26,7 @@ namespace Umbraco.Core.PropertyEditors
             Delimiter = ',';
             ReplaceTags = true;
             TagGroup = "default";
-            StorageType = TagsStorageType.Csv;
+            StorageType = TagsStorageType.Json;
         }
 
         /// <summary>

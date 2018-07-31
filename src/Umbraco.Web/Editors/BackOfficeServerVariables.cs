@@ -254,7 +254,7 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetTags(""))
                         },
                         {
-                            "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementApiController>(
+                            "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
                                 controller => controller.GetIndexerDetails())
                         },
                         {

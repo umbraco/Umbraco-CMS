@@ -879,8 +879,7 @@ values (4,1041,'default', 0, 'group')
 SET IDENTITY_INSERT [cmsDataTypePreValues] OFF
 ;
 /* 3.1 SQL changes */
-INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'packager', 0, 1, 3, N'Packages', N'folder.gif', N'folder_o.gif', N'umbraco', N'loadPackager') 
-;
+
 INSERT INTO [umbracoAppTree] ([appAlias], [treeAlias], [treeSilent], [treeInitialize], [treeSortOrder], [treeTitle], [treeIconClosed], [treeIconOpen], [treeHandlerAssembly], [treeHandlerType]) VALUES (N'developer', N'packagerPackages', 0, 0, 1, N'Packager Packages', N'folder.gif', N'folder_o.gif', N'umbraco', N'loadPackages');
 
 
