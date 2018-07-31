@@ -12,18 +12,20 @@ using Serilog.Formatting.Compact;
 namespace Umbraco.Core.Logging
 {
     ///<summary>
-    /// Implements <see cref="ILogger"/> on top of log4net.
+    /// Implements <see cref="ILogger"/> on top of Serilog.
     ///</summary>
     public class Logger : ILogger
     {
         /// <summary>
-        /// Initialize a new instance of the <see cref="Logger"/> class with a log4net configuration file.
+        /// Initialize a new instance of the <see cref="Logger"/> class with a configuration file.
         /// </summary>
-        /// <param name="log4NetConfigFile"></param>
-        public Logger(FileInfo log4NetConfigFile)
+        /// <param name="logConfigFile"></param>
+        public Logger(FileInfo logConfigFile)
             : this()
         {
-            //XmlConfigurator.Configure(log4NetConfigFile);
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + logConfigFile)
+                .CreateLogger();
         }
 
         // private for CreateWithDefaultConfiguration
@@ -44,14 +46,16 @@ namespace Umbraco.Core.Logging
                 .Enrich.WithProperty("AppDomainAppId", HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty))
 
                 //Main .txt logfile - in similar format to older Log4Net output
-                .WriteTo.File($@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog{Environment.MachineName}.txt",
+                //Ends with ..txt as Date is inserted before file extension substring
+                .WriteTo.File($@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog.{Environment.MachineName}..txt",
                     rollingInterval: RollingInterval.Day,
                     restrictedToMinimumLevel: LogEventLevel.Debug,
                     retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Level:u4}  {Message:lj}{NewLine}{Exception}")
 
                 //.clef format (Compact log event format, that can be imported into local SEQ & will make searching/filtering logs easier)
-                .WriteTo.File(new CompactJsonFormatter(), $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog{Environment.MachineName}.json", 
+                //Ends with ..txt as Date is inserted before file extension substring
+                .WriteTo.File(new CompactJsonFormatter(), $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog.{Environment.MachineName}..json", 
                     rollingInterval: RollingInterval.Day, //Create a new JSON file every day
                     retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
                     restrictedToMinimumLevel: LogEventLevel.Debug)
