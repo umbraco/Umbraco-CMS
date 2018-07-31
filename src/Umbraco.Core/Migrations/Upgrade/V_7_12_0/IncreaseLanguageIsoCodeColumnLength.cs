@@ -1,14 +1,10 @@
-﻿using Umbraco.Core.Logging;
-using Umbraco.Core.Migrations;
-using Umbraco.Core.Persistence.SqlSyntax;
-
-namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZero
+﻿namespace Umbraco.Core.Migrations.Upgrade.V_7_12_0
 {
     public class IncreaseLanguageIsoCodeColumnLength : MigrationBase
     {
-        public IncreaseLanguageIsoCodeColumnLength(IMigrationContext context) : base(context)
-        {
-        }
+        public IncreaseLanguageIsoCodeColumnLength(IMigrationContext context)
+            : base(context)
+        { }
 
         public override void Migrate()
         {
@@ -26,7 +22,5 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZ
                 .Unique()
                 .Do();
         }
-
-
     }
 }
