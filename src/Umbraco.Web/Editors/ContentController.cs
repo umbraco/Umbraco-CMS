@@ -19,7 +19,6 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Web.PublishedCache;
@@ -29,9 +28,9 @@ using Umbraco.Web.Models;
 using Umbraco.Web.WebServices;
 using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
-using ContentVariation = Umbraco.Core.Models.ContentVariation;
 using Language = Umbraco.Web.Models.ContentEditing.Language;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
 
 namespace Umbraco.Web.Editors
@@ -653,7 +652,7 @@ namespace Umbraco.Web.Editors
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the modelstate to the outgoing object and throw a validation message
-                    var forDisplay = MapToDisplay(contentItem.PersistedContent, contentItem.Culture);
+                    var forDisplay = MapToDisplay(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
 
@@ -693,7 +692,7 @@ namespace Umbraco.Web.Editors
             }
 
             //get the updated model
-            var display = MapToDisplay(contentItem.PersistedContent, contentItem.Culture);
+            var display = MapToDisplay(contentItem.PersistedContent);
 
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
@@ -757,6 +756,8 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         private void PublishInternal(ContentItemSave contentItem, ref PublishResult publishStatus, ref bool wasCancelled)
         {
+            if (publishStatus == null) throw new ArgumentNullException(nameof(publishStatus));
+
             if (!contentItem.PersistedContent.ContentType.VariesByCulture())
             {
                 //its invariant, proceed normally
@@ -767,47 +768,35 @@ namespace Umbraco.Web.Editors
             {
                 var canPublish = true;
 
+                //All variants in this collection should have a culture if we get here! but we'll double check and filter here
+                var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
+
                 //check if we are publishing other variants and validate them
                 var allLangs = Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase);
-                var otherVariantsToValidate = contentItem.PublishVariations.Where(x => !x.Culture.InvariantEquals(contentItem.Culture)).ToList();
-
+                
                 //validate any mandatory variants that are not in the list
-                var mandatoryLangs = Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLangs.Values)
-                    .Where(x => otherVariantsToValidate.All(v => !v.Culture.InvariantEquals(x.IsoCode))) //don't include variants above
-                    .Where(x => !x.IsoCode.InvariantEquals(contentItem.Culture)) //don't include the current variant
-                    .Where(x => x.Mandatory);
+                var mandatoryLangs = Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLangs.Values).Where(x => x.Mandatory);
+
                 foreach (var lang in mandatoryLangs)
                 {
-                    //cannot continue publishing since a required language that is not currently being published isn't published
-                    if (!contentItem.PersistedContent.IsCulturePublished(lang.IsoCode))
+                    //Check if a mandatory language is missing from being published
+                    //TODO: This logic is wrong, we need to also check if this language doesn't already have a published version
+                    if (cultureVariants.Any(x => x.Culture == lang.IsoCode && !x.Publish))
                     {
-                        var errMsg = Services.TextService.Localize("speechBubbles/contentReqCulturePublishError", new[] { allLangs[lang.IsoCode].CultureName });
-                        ModelState.AddModelError("publish_variant_" + lang.IsoCode + "_", errMsg);
-                        canPublish = false;
-                    }
-                }
-
-                if (canPublish)
-                {
-                    //validate all other variants to be published
-                    foreach (var publishVariation in otherVariantsToValidate)
-                    {
-                        //validate the content item and the culture property values, we don't need to validate any invariant property values here because they will have
-                        //been validated in the post.
-                        var valid = contentItem.PersistedContent.IsValid(publishVariation.Culture);
-                        if (!valid)
+                        //cannot continue publishing since a required language that is not currently being published isn't published
+                        if (!contentItem.PersistedContent.IsCulturePublished(lang.IsoCode))
                         {
-                            var errMsg = Services.TextService.Localize("speechBubbles/contentCultureValidationError", new[] { allLangs[publishVariation.Culture].CultureName });
-                            ModelState.AddModelError("publish_variant_" + publishVariation.Culture + "_", errMsg);
+                            var errMsg = Services.TextService.Localize("speechBubbles/contentReqCulturePublishError", new[] { allLangs[lang.IsoCode].CultureName });
+                            ModelState.AddModelError("publish_variant_" + lang.IsoCode + "_", errMsg);
                             canPublish = false;
                         }
                     }
                 }
-
+                
                 if (canPublish)
                 {
                     //try to publish all the values on the model
-                    canPublish = PublishCulture(contentItem, otherVariantsToValidate, allLangs);
+                    canPublish = PublishCulture(contentItem.PersistedContent, cultureVariants, allLangs);
                 }
 
                 if (canPublish)
@@ -827,25 +816,22 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// This will call TryPublishValues on the content item for each culture that needs to be published including the invariant culture
+        /// This will call PublishCulture on the content item for each culture that needs to be published including the invariant culture
         /// </summary>
-        /// <param name="contentItem"></param>
-        /// <param name="otherVariantsToValidate"></param>
+        /// <param name="persistentContent"></param>
+        /// <param name="cultureVariants"></param>
         /// <param name="allLangs"></param>
         /// <returns></returns>
-        private bool PublishCulture(ContentItemSave contentItem, IEnumerable<ContentVariationPublish> otherVariantsToValidate, IDictionary<string, ILanguage> allLangs)
+        private bool PublishCulture(IContent persistentContent, IEnumerable<ContentVariantSave> cultureVariants, IDictionary<string, ILanguage> allLangs)
         {
-            var culturesToPublish = new List<string> { contentItem.Culture };
-            culturesToPublish.AddRange(otherVariantsToValidate.Select(x => x.Culture));
-
-            foreach(var culture in culturesToPublish)
+            foreach(var variant in cultureVariants.Where(x => x.Publish))
             {
                 // publishing any culture, implies the invariant culture
-                var valid = contentItem.PersistedContent.PublishCulture(culture);
+                var valid = persistentContent.PublishCulture(variant.Culture);
                 if (!valid)
                 {
-                    var errMsg = Services.TextService.Localize("speechBubbles/contentCultureUnexpectedValidationError", new[] { allLangs[culture].CultureName });
-                    ModelState.AddModelError("publish_variant_" + culture + "_", errMsg);
+                    var errMsg = Services.TextService.Localize("speechBubbles/contentCultureUnexpectedValidationError", new[] { allLangs[variant.Culture].CultureName });
+                    ModelState.AddModelError("publish_variant_" + variant.Culture + "_", errMsg);
                     return false;
                 }
             }
@@ -1220,8 +1206,11 @@ namespace Umbraco.Web.Editors
         /// <param name="contentSave"></param>
         private void MapPropertyValues(ContentItemSave contentSave)
         {
-            //set the names for the variants
-            foreach(var variant in contentSave.Variants)
+            //inline method to determine if a property type varies
+            bool Varies(Property property) => property.PropertyType.VariesByCulture();
+
+            //loop through each variant, set the correct name and property values
+            foreach (var variant in contentSave.Variants)
             {
                 //Don't update the name if it is empty
                 if (!variant.Name.IsNullOrWhiteSpace())
@@ -1237,6 +1226,12 @@ namespace Umbraco.Web.Editors
                         contentSave.PersistedContent.Name = variant.Name;
                     }
                 }
+
+                //for each variant, map the property values
+                MapPropertyValues<IContent, ContentItemSave>(
+                    contentSave,
+                    (save, property) => Varies(property) ? property.GetValue(variant.Culture) : property.GetValue(),         //get prop val
+                    (save, property, v) => { if (Varies(property)) property.SetValue(v, variant.Culture); else property.SetValue(v); });  //set prop val
             }
 
             //TODO: We need to support 'send to publish'
@@ -1262,13 +1257,6 @@ namespace Umbraco.Web.Editors
                     contentSave.PersistedContent.Template = template;
                 }
             }
-
-            bool Varies(Property property) => property.PropertyType.VariesByCulture();
-
-            MapPropertyValues<IContent, ContentItemSave>(
-                contentSave,
-                (save, property) => Varies(property) ? property.GetValue(save.Culture) : property.GetValue(),         //get prop val
-                (save, property, v) => { if (Varies(property)) property.SetValue(v, save.Culture); else property.SetValue(v); });  //set prop val
         }
 
         /// <summary>

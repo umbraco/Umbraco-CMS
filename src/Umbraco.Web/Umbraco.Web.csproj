@@ -213,8 +213,6 @@
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />
     <Compile Include="Models\ContentEditing\ContentVariantSave.cs" />
     <Compile Include="Models\ContentEditing\ContentVariationDisplay.cs" />
-    <Compile Include="Models\ContentEditing\ContentVariation.cs" />
-    <Compile Include="Models\ContentEditing\ContentVariationPublish.cs" />
     <Compile Include="Models\ContentEditing\DomainDisplay.cs" />
     <Compile Include="Models\ContentEditing\DomainSave.cs" />
     <Compile Include="Models\ContentEditing\CreatedDocumentTypeCollectionResult.cs" />

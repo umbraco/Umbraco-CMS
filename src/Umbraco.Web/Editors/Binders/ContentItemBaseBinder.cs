@@ -1,49 +1,28 @@
 ﻿using System;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Formatting;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
 using System.Web.Http.Controllers;
-using System.Web.Http.ModelBinding.Binders;
-using System.Web.Http.Validation;
-using System.Web.ModelBinding;
-using System.Web.Mvc;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
-using Umbraco.Web.WebApi.Filters;
 using IModelBinder = System.Web.Http.ModelBinding.IModelBinder;
 using ModelBindingContext = System.Web.Http.ModelBinding.ModelBindingContext;
-using ModelMetadata = System.Web.Http.Metadata.ModelMetadata;
-using ModelMetadataProvider = System.Web.Http.Metadata.ModelMetadataProvider;
-using MutableObjectModelBinder = System.Web.Http.ModelBinding.Binders.MutableObjectModelBinder;
 using Task = System.Threading.Tasks.Task;
 
 namespace Umbraco.Web.Editors.Binders
-{
-    /// <inheritdoc />
+{    
     /// <summary>
     /// Binds the content model to the controller action for the posted multi-part Post
     /// </summary>
     internal abstract class ContentItemBaseBinder<TPersisted, TModelSave> : IModelBinder
-    where TPersisted : class, IContentBase
-        //where TModelSave : ContentBaseItemSave<TPersisted>
+        where TPersisted : class, IContentBase
+        where TModelSave : IContentSave<TPersisted>
     {
         protected Core.Logging.ILogger Logger { get; }
         protected ServiceContext Services { get; }

@@ -44,12 +44,12 @@ namespace Umbraco.Web.Editors
         /// <param name="contentItem"></param>
         /// <param name="getPropertyValue"></param>
         /// <param name="savePropertyValue"></param>
-        protected void MapPropertyValues<TPersisted, TSaved>(
+        internal void MapPropertyValues<TPersisted, TSaved>(
             TSaved contentItem,
             Func<TSaved, Property, object> getPropertyValue,
             Action<TSaved, Property, object> savePropertyValue)
             where TPersisted : IContentBase
-            where TSaved : ContentBaseSave<TPersisted>
+            where TSaved : IContentSave<TPersisted>
         {
             // map the property values
             foreach (var propertyDto in contentItem.ContentDto.Properties)
@@ -69,6 +69,7 @@ namespace Umbraco.Web.Editors
                 // get the property
                 var property = contentItem.PersistedContent.Properties[propertyDto.Alias];
 
+                //TODO: Need to update this API to support variants and/or basically any sort of 'key'
                 // prepare files, if any
                 var files = contentItem.UploadedFiles.Where(x => x.PropertyAlias == propertyDto.Alias).ToArray();
                 foreach (var file in files)
@@ -99,9 +100,7 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        protected void HandleInvalidModelState<T, TPersisted>(ContentItemDisplayBase<T, TPersisted> display)
-            where TPersisted : IContentBase
-            where T : ContentPropertyBasic
+        protected void HandleInvalidModelState(IErrorModel display)
         {
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             if (!ModelState.IsValid)

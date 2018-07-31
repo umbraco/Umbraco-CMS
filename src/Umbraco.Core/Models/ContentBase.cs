@@ -376,30 +376,7 @@ namespace Umbraco.Core.Models
         #endregion
 
         #region Validation
-
-        /// <inheritdoc />
-        public bool IsValid(string culture = "*")
-        {
-            culture = culture.NullOrWhiteSpaceAsNull();
-
-            if (culture == null)
-            {
-                if (Name.IsNullOrWhiteSpace()) return false;
-                return ValidateProperties(null).Length == 0;
-            }
-
-            if (culture != "*")
-            {
-                var name = GetCultureName(culture);
-                if (name.IsNullOrWhiteSpace()) return false;
-                return ValidateProperties(culture).Length == 0;
-            }
-
-            // 'all cultures'
-            // those that have a name are ok, those without a name... we don't validate
-            return AvailableCultures.All(c => ValidateProperties(c).Length == 0);
-        }
-
+        
         /// <inheritdoc />
         public virtual Property[] ValidateProperties(string culture = "*")
         {

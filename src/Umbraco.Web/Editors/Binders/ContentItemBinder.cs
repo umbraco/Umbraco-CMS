@@ -17,6 +17,7 @@ using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors.Binders
 {
+    /// <inheritdoc />
     internal class ContentItemBinder : ContentItemBaseBinder<IContent, ContentItemSave>
     {
         public ContentItemBinder() : this(Current.Logger, Current.Services, Current.UmbracoContextAccessor)
