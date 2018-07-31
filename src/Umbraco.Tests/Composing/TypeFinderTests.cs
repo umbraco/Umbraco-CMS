@@ -356,7 +356,6 @@ namespace Umbraco.Tests.Composing
                     "Dynamic,",
                     "HtmlDiff,",
                     "Iesi.Collections,",
-                    "log4net,",
                     "Microsoft.",
                     "Newtonsoft.",
                     "NHibernate.",
