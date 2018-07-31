@@ -70,7 +70,7 @@ umbraco/presentation/packages/uComponents/MultiNodePicker/CustomTreeService.asmx
 src/Umbraco.Tests/config/applications.config
 src/Umbraco.Tests/config/trees.config
 src/Umbraco.Web.UI/web.config
-src/Umbraco.Web.UI/Config/ClientDependency.config
+src/Umbraco.Web.UI/[Cc]onfig/ClientDependency.config
 src/Umbraco.Tests/config/404handlers.config
 src/Umbraco.Web.UI/[Vv]iews/*.cshtml
 src/Umbraco.Web.UI/[Vv]iews/*.vbhtml
