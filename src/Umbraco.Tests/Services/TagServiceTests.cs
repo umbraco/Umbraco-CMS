@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -52,7 +53,7 @@ namespace Umbraco.Tests.Services
             // get it back
             content1 = contentService.GetById(content1.Id);
             var tagsValue = content1.GetValue("tags").ToString();
-            var tagsValues = tagsValue.Split(',');
+            var tagsValues = JsonConvert.DeserializeObject<string[]>(tagsValue);
             Assert.AreEqual(3, tagsValues.Length);
             Assert.Contains("pig", tagsValues);
             Assert.Contains("goat", tagsValues);
