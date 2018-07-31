@@ -332,10 +332,8 @@ namespace Umbraco.Core.Services
         public ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0)
         {
             // file might already be on disk, if so grab the content to avoid overwriting
-            var template = new Template(name, name)
-            {
-                Content = GetViewContent(name) ?? content
-            };
+            var template = new Template(name, name);
+            template.Content = GetViewContent(template.Alias) ?? content;
 
             if (masterTemplate != null)
             {
