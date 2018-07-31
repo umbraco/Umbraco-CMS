@@ -35,7 +35,6 @@ namespace Umbraco.Core.Logging
             //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log-{Date}.txt" />
             Environment.SetEnvironmentVariable("BASEDIR", AppDomain.CurrentDomain.BaseDirectory, EnvironmentVariableTarget.Process);
 
-
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug() //Set to highest level of logging (as any sinks may want to restrict it to Errors only)
                 .Enrich.WithProcessId()
@@ -60,11 +59,10 @@ namespace Umbraco.Core.Logging
                 //Read any custom user configuration of logging from serilog config file
                 .ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + @"\config\serilog.config")
                 .CreateLogger();
-
         }
 
         /// <summary>
-        /// Creates a logger with the default log4net configuration discovered (i.e. from the web.config).
+        /// Creates a logger with some pre-definied configuration and remainder from config file
         /// </summary>
         /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
         public static Logger CreateWithDefaultConfiguration()
@@ -178,28 +176,6 @@ namespace Umbraco.Core.Logging
             logger?.ForContext(reporting).Warning(messageBuilder(), exception);
         }
 
-        ///// <inheritdoc/>
-        //public void Warn(Type reporting, Exception exception, string format, params object[] args)
-        //{
-        //    var logger = LogManager.GetLogger(reporting);
-        //    if (logger == null || logger.IsWarnEnabled == false) return;
-        //    // there is no WarnFormat overload that accepts an exception
-        //    // format the message the way log4net would do it (see source code LogImpl.cs)
-        //    var message = new SystemStringFormat(CultureInfo.InvariantCulture, format, args);
-        //    logger.Warn(message, exception);
-        //}
-
-        ///// <inheritdoc/>
-        //public void Warn(Type reporting, Exception exception, string format, params Func<object>[] args)
-        //{
-        //    var logger = LogManager.GetLogger(reporting);
-        //    if (logger == null || logger.IsWarnEnabled == false) return;
-        //    // there is no WarnFormat overload that accepts an exception
-        //    // format the message the way log4net would do it (see source code LogImpl.cs)
-        //    var message = new SystemStringFormat(CultureInfo.InvariantCulture, format, args.Select(x => x.Invoke()).ToArray());
-        //    logger.Warn(message, exception);
-        //}
-
         /// <inheritdoc/>
         public void Info(Type reporting, string message)
         {
@@ -214,22 +190,6 @@ namespace Umbraco.Core.Logging
             logger?.ForContext(reporting).Information(generateMessage());
         }
 
-        ///// <inheritdoc/>
-        //public void Info(Type reporting, string format, params object[] args)
-        //{
-        //    var logger = LogManager.GetLogger(reporting);
-        //    if (logger == null || logger.IsInfoEnabled == false) return;
-        //    logger.InfoFormat(format, args);
-        //}
-
-        ///// <inheritdoc/>
-        //public void Info(Type reporting, string format, params Func<object>[] args)
-        //{
-        //    var logger = LogManager.GetLogger(reporting);
-        //    if (logger == null || logger.IsInfoEnabled == false) return;
-        //    logger.InfoFormat(format, args.Select(x => x.Invoke()).ToArray());
-        //}
-
         /// <inheritdoc/>
         public void Debug(Type reporting, string message)
         {
@@ -243,21 +203,5 @@ namespace Umbraco.Core.Logging
             var logger = Log.Logger;
             logger?.ForContext(reporting).Debug(messageBuilder());
         }
-
-        ///// <inheritdoc/>
-        //public void Debug(Type reporting, string format, params object[] args)
-        //{
-        //    var logger = LogManager.GetLogger(reporting);
-        //    if (logger == null || logger.IsDebugEnabled == false) return;
-        //    logger.DebugFormat(format, args);
-        //}
-
-        ///// <inheritdoc/>
-        //public void Debug(Type reporting, string format, params Func<object>[] args)
-        //{
-        //    var logger = LogManager.GetLogger(reporting);
-        //    if (logger == null || logger.IsDebugEnabled == false) return;
-        //    logger.DebugFormat(format, args.Select(x => x.Invoke()).ToArray());
-        //}
     }
 }
