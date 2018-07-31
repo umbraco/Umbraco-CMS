@@ -22,7 +22,7 @@ namespace Umbraco.Web.Templates
         {
             using (UmbracoContext.Current.ForcedPreview(preview)) // force for url provider
             {
-                text = ParseInternalLinks(text);
+                text = ParseInternalLinks(text, UmbracoContext.Current.UrlProvider);
             }
 
             return text;
@@ -69,21 +69,6 @@ namespace Umbraco.Web.Templates
             return text;
         }
 
-        /// <summary>
-        /// Parses the string looking for the {localLink} syntax and updates them to their correct links.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        [Obsolete("Use the overload specifying all dependencies instead")]
-        public static string ParseInternalLinks(string text)
-        {
-            //don't attempt to proceed without a context as we cannot lookup urls without one
-            if (UmbracoContext.Current == null)
-                return text;
-
-            var urlProvider = UmbracoContext.Current.UrlProvider;
-            return ParseInternalLinks(text, urlProvider);
-        }
 
         // static compiled regex for faster performance
         private static readonly Regex LocalLinkPattern = new Regex(@"href=""[/]?(?:\{|\%7B)localLink:([a-zA-Z0-9-://]+)(?:\}|\%7D)",

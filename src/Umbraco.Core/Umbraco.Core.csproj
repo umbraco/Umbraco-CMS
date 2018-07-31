@@ -547,7 +547,6 @@
     <Compile Include="ListExtensions.cs" />
     <Compile Include="Logging\AppDomainTokenConverter.cs" />
     <Compile Include="Logging\AsyncForwardingAppenderBase.cs" />
-    <Compile Include="Logging\AsynchronousRollingFileAppender.cs" />
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\ImageProcessorLogger.cs" />

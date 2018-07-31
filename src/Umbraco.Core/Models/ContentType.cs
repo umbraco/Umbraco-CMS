@@ -136,15 +136,5 @@ namespace Umbraco.Core.Models
 
             return result;
         }
-
-        /// <summary>
-        /// Creates a deep clone of the current entity with its identity/alias and it's property identities reset
-        /// </summary>
-        /// <returns></returns>
-        [Obsolete("Use DeepCloneWithResetIdentities instead")]
-        public IContentType Clone(string alias)
-        {
-            return DeepCloneWithResetIdentities(alias);
-        }
     }
 }
