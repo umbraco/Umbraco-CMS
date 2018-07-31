@@ -22,8 +22,12 @@
 .umb-editor-header {
 	background: @gray-10;
 	border-bottom: 1px solid @purple-l3;
-	flex: 0 0 99px;
 	position: relative;
+
+    @media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {  
+        /* IE10+ specific styles go here */  
+        flex: 0 0 99px;
+    }
 }
 
 .umb-editor-header__actions-menu {
