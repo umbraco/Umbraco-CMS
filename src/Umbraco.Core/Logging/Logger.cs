@@ -21,7 +21,6 @@ namespace Umbraco.Core.Logging
         /// </summary>
         /// <param name="logConfigFile"></param>
         public Logger(FileInfo logConfigFile)
-            : this()
         {
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + logConfigFile)

@@ -516,7 +516,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="UmbracoExamine\TestFiles\umbraco.config" />
-    <None Include="unit-test-log4net.config">
+    <None Include="unit-test-logger.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
