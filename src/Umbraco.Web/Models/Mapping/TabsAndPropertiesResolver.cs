@@ -79,6 +79,7 @@ namespace Umbraco.Web.Models.Mapping
                 IsActive = true
             };
 
+            //TODO: This should deserialize to ListViewConfiguration
             var listViewConfig = editor.GetConfigurationEditor().ToConfigurationEditor(dt.Configuration);
             //add the entity type to the config
             listViewConfig["entityType"] = entityType;

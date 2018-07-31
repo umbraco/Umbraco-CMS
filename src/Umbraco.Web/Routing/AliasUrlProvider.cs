@@ -54,25 +54,36 @@ namespace Umbraco.Web.Routing
         public IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
             var node = umbracoContext.ContentCache.GetById(id);
-            if (node == null)
-                return Enumerable.Empty<string>();
+            if (node == null) return Enumerable.Empty<string>();
 
             if (!node.HasProperty(Constants.Conventions.Content.UrlAlias))
                 return Enumerable.Empty<string>();
 
             var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
 
+            // look for domains, walking up the tree
             var n = node;
             var domainUris = domainHelper.DomainsForNode(n.Id, current, false);
             while (domainUris == null && n != null) // n is null at root
             {
                 // move to parent node
                 n = n.Parent;
-                domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current, false);
+                domainUris = n == null ? null : domainHelper.DomainsForNode(n.Id, current, excludeDefault: false);
             }
+
+            // determine whether the alias property varies
+            var varies = node.GetProperty(Constants.Conventions.Content.UrlAlias).PropertyType.VariesByCulture();
 
             if (domainUris == null)
             {
+                // no domain
+                // if the property is invariant, then url "/<alias>" is ok
+                // if the property varies, then what are we supposed to do?
+                //  the content finder may work, depending on the 'current' culture,
+                //  but there's no way we can return something meaningful here
+                if (varies)
+                    return Enumerable.Empty<string>();
+
                 var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias);
                 if (string.IsNullOrWhiteSpace(umbracoUrlName))
                     return Enumerable.Empty<string>();
@@ -83,10 +94,20 @@ namespace Umbraco.Web.Routing
             }
             else
             {
+                // some domains: one url per domain, which is "<domain>/<alias>"
                 var result = new List<string>();
                 foreach(var domainUri in domainUris)
                 {
-                    var umbracoUrlName = node.Value<string>(Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture.Name);
+                    // if the property is invariant, get the invariant value, url is "<domain>/<invariant-alias>"
+                    // if the property varies, get the variant value, url is "<domain>/<variant-alias>"
+
+                    // but! only if the culture is published, else ignore
+                    if (varies && !node.HasCulture(domainUri.Culture.Name)) continue;
+
+                    var umbracoUrlName = varies
+                        ? node.Value<string>(Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture.Name)
+                        : node.Value<string>(Constants.Conventions.Content.UrlAlias);
+
                     if (!string.IsNullOrWhiteSpace(umbracoUrlName))
                     {
                         var path = "/" + umbracoUrlName;

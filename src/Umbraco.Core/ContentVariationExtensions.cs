@@ -76,6 +76,26 @@ namespace Umbraco.Core
         public static bool VariesByCultureAndSegment(this PublishedContentType contentType) => contentType.Variations.VariesByCultureAndSegment();
 
         /// <summary>
+        /// Determines whether the property type is invariant.
+        /// </summary>
+        public static bool VariesByNothing(this PublishedPropertyType propertyType) => propertyType.Variations.VariesByNothing();
+
+        /// <summary>
+        /// Determines whether the property type varies by culture.
+        /// </summary>
+        public static bool VariesByCulture(this PublishedPropertyType propertyType) => propertyType.Variations.VariesByCulture();
+
+        /// <summary>
+        /// Determines whether the property type varies by segment.
+        /// </summary>
+        public static bool VariesBySegment(this PublishedPropertyType propertyType) => propertyType.Variations.VariesBySegment();
+
+        /// <summary>
+        /// Determines whether the property type varies by culture and segment.
+        /// </summary>
+        public static bool VariesByCultureAndSegment(this PublishedPropertyType propertyType) => propertyType.Variations.VariesByCultureAndSegment();
+
+        /// <summary>
         /// Determines whether a variation is invariant.
         /// </summary>
         public static bool VariesByNothing(this ContentVariation variation) => variation == ContentVariation.Nothing;

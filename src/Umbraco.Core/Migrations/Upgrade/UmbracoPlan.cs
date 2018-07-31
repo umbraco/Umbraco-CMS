@@ -5,6 +5,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade.V_7_12_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
+using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZero;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -113,6 +114,10 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             Chain<ContentVariationMigration>("{1350617A-4930-4D61-852F-E3AA9E692173}");
             Chain<UpdateUmbracoConsent>("{39E5B1F7-A50B-437E-B768-1723AEC45B65}"); // from 7.12.0
+            Chain<AddRelationTypeForMediaFolderOnDelete>("{0541A62B-EF87-4CA2-8225-F0EB98ECCC9F}"); // from 7.12.0
+            Chain<IncreaseLanguageIsoCodeColumnLength>("{EB34B5DC-BB87-4005-985E-D983EA496C38}"); // from 7.12.0
+            Chain<RenameTrueFalseField>("{517CE9EA-36D7-472A-BF4B-A0D6FB1B8F89}"); // from 7.12.0
+            Chain<SetDefaultTagsStorageType>("{BBD99901-1545-40E4-8A5A-D7A675C7D2F2}"); // from 7.12.0
             //FINAL
 
 
@@ -127,13 +132,13 @@ namespace Umbraco.Core.Migrations.Upgrade
             From("{init-7.11.0}").Chain("{init-7.10.0}"); // same as 7.10.0
             From("{init-7.11.1}").Chain("{init-7.10.0}"); // same as 7.10.0
 
-            // 7.12.0 has a migration, define a custom chain which copies the chain
-            // going from {init-7.10.0} to former final, and then goes straight to
-            // main chain, skipping the migration
+            // 7.12.0 has migrations, define a custom chain which copies the chain
+            // going from {init-7.10.0} to former final (1350617A) , and then goes straight to
+            // main chain, skipping the migrations
             //
             From("{init-7.12.0}");
             //        copy from        copy to (former final)                    main chain
-            CopyChain("{init-7.10.0}", "{1350617A-4930-4D61-852F-E3AA9E692173}", "{39E5B1F7-A50B-437E-B768-1723AEC45B65}");
+            CopyChain("{init-7.10.0}", "{1350617A-4930-4D61-852F-E3AA9E692173}", "{BBD99901-1545-40E4-8A5A-D7A675C7D2F2}");
         }
     }
 }

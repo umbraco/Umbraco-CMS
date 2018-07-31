@@ -135,7 +135,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(relationTypes, Is.Not.Null);
                 Assert.That(relationTypes.Any(), Is.True);
                 Assert.That(relationTypes.Any(x => x == null), Is.False);
-                Assert.That(relationTypes.Count(), Is.EqualTo(4));
+                Assert.That(relationTypes.Count(), Is.EqualTo(5));
             }
         }
 
@@ -170,7 +170,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var exists = repository.Exists(3);
-                var doesntExist = repository.Exists(5);
+                var doesntExist = repository.Exists(6);
 
                 // Assert
                 Assert.That(exists, Is.True);
@@ -192,7 +192,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 int count = repository.Count(query);
 
                 // Assert
-                Assert.That(count, Is.EqualTo(4));
+                Assert.That(count, Is.EqualTo(5));
             }
         }
 

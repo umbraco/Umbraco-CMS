@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Models
             //ensure that nothing is marked as dirty
             contentType.ResetDirtyProperties(false);
 
-            var clone = (ContentType)contentType.Clone("newAlias");
+            var clone = (ContentType)contentType.DeepCloneWithResetIdentities("newAlias");
 
             Assert.AreEqual("newAlias", clone.Alias);
             Assert.AreNotEqual("newAlias", contentType.Alias);

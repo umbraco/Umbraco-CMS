@@ -156,13 +156,13 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 
 						var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
 						editor.dom.setAttrib(imgElm, 'style', s);
-						editor.dom.setAttrib(imgElm, 'id', null);
 
 						if (img.url) {
 							var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
 							editor.dom.setAttrib(imgElm, 'data-mce-src', src);
 						}
-					}
+                    }
+				    editor.dom.setAttrib(imgElm, 'id', null);
 				}, 500);
 			}
 		},

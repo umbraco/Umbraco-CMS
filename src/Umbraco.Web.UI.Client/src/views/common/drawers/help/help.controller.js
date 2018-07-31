@@ -48,15 +48,17 @@
             setSectionName();
 
             userService.getCurrentUser().then(function (user) {
-
+                
                 vm.userType = user.userType;
                 vm.userLang = user.locale;
+
+                vm.hasAccessToSettings = _.contains(user.allowedSections, 'settings');                
 
                 evts.push(eventsService.on("appState.treeState.changed", function (e, args) {
                     handleSectionChange();
                 }));
 
-                findHelp(vm.section, vm.tree, vm.usertype, vm.userLang);
+                findHelp(vm.section, vm.tree, vm.userType, vm.userLang);
 
             });
             
@@ -81,17 +83,20 @@
                     vm.tree = $routeParams.tree;
 
                     setSectionName();
-                    findHelp(vm.section, vm.tree, vm.usertype, vm.userLang);
+                    findHelp(vm.section, vm.tree, vm.userType, vm.userLang);
 
                 }
             });
         }
 
         function findHelp(section, tree, usertype, userLang) {
+
+            if (vm.hasAccessToSettings) {
+                helpService.getContextHelpForPage(section, tree).then(function (topics) {
+                    vm.topics = topics;
+                });
+            }
             
-            helpService.getContextHelpForPage(section, tree).then(function (topics) {
-                vm.topics = topics;
-            });
 
             var rq = {};
             rq.section = vm.section;
@@ -113,10 +118,12 @@
                 rq.path = rq.section + "/" + $routeParams.tree + "/" + $routeParams.method;
             }
 
-            helpService.findVideos(rq).then(function(videos){
-    	        vm.videos = videos;
-            });
-            
+
+            if (vm.hasAccessToSettings) {
+                helpService.findVideos(rq).then(function (videos) {
+                    vm.videos = videos;
+                });
+            }                       
         }
 
         function setSectionName() {
