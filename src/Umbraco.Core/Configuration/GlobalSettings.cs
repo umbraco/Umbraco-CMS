@@ -215,10 +215,7 @@ namespace Umbraco.Core.Configuration
                 ConfigurationManager.RefreshSection("appSettings");
             }
         }
-        
-        [Obsolete("Use IOHelper.GetRootDirectorySafe() instead")]
-        public static string FullPathToRoot => IOHelper.GetRootDirectorySafe();
-
+              
         /// <summary>
         /// Gets a value indicating whether umbraco is running in [debug mode].
         /// </summary>

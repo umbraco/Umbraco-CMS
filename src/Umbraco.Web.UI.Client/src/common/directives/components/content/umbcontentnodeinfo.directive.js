@@ -68,6 +68,9 @@
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
                 
+                // Declare a fallback URL for the <umb-node-preview/> directive
+                scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
+
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
@@ -87,6 +90,11 @@
                 };
                 editorService.documentTypeEditor(editor);
             };
+
+            scope.openTemplate = function () {
+                var url = "/settings/templates/edit/" + scope.node.templateId;
+                $location.url(url);
+            }
 
             scope.updateTemplate = function (templateAlias) {
 

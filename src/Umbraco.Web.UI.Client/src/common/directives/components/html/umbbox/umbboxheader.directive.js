@@ -27,7 +27,7 @@ Use this directive to construct a title. Recommended to use it inside an {@link 
         </umb-box-content>
     </umb-box>
 </pre>
-{@link https://our.umbraco.org/documentation/extending/language-files/ Here you can see more about the language files}
+{@link https://our.umbraco.com/documentation/extending/language-files/ Here you can see more about the language files}
 
 <h3>Use in combination with:</h3>
 <ul>

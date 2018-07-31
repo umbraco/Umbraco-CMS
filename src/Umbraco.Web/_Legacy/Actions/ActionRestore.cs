@@ -1,82 +1,31 @@
 ﻿namespace Umbraco.Web._Legacy.Actions
 {
     /// <summary>
-    /// This action is invoked when the content item is to be restored from the recycle bin
+    /// This action is invoked when the content/media item is to be restored from the recycle bin
     /// </summary>
     public class ActionRestore : IAction
     {
         //create singleton
-        private static readonly ActionRestore SingletonInstance = new ActionRestore();
 
         private ActionRestore() { }
 
-        public static ActionRestore Instance
-        {
-            get { return SingletonInstance; }
-        }
+        public static ActionRestore Instance { get; } = new ActionRestore();
 
         #region IAction Members
 
-        public char Letter
-        {
-            get
-            {
-                return 'V';
-            }
-        }
+        public char Letter => 'V';
 
-        public string JsFunctionName
-        {
-            get
-            {
-                return null;
-            }
-        }
+        public string JsFunctionName => null;
 
-        public string JsSource
-        {
-            get
-            {
+        public string JsSource => null;
 
-                return null;
-            }
-        }
+        public string Alias => "restore";
 
-        public string Alias
-        {
-            get
-            {
+        public string Icon => "undo";
 
-                return "restore";
-            }
-        }
+        public bool ShowInNotifier => true;
 
-        public string Icon
-        {
-            get
-            {
-
-                return "undo";
-            }
-        }
-
-        public bool ShowInNotifier
-        {
-            get
-            {
-
-                return true;
-            }
-        }
-
-        public bool CanBePermissionAssigned
-        {
-            get
-            {
-
-                return false;
-            }
-        }
+        public bool CanBePermissionAssigned => false;
 
         #endregion
     }
