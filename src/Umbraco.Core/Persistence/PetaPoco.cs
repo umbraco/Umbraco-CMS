@@ -337,7 +337,7 @@ namespace Umbraco.Core.Persistence
 			        _transaction = _sharedConnection.BeginTransaction(isolationLevel);
 			    }
 
-			    catch (Exception e)
+			    catch (Exception)
 			    {
 			        throw;
 			    }

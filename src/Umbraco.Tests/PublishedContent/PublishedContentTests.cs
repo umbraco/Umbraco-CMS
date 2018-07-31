@@ -935,7 +935,6 @@ namespace Umbraco.Tests.PublishedContent
         {
             // the converter args
             PublishedPropertyType argPropertyType = null;
-            object argSource = null;
             bool argPreview = false;
 
             var pt1 = new PublishedPropertyType("legend", 0, Constants.PropertyEditors.TextboxAlias);
