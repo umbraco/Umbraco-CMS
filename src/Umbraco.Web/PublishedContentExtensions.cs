@@ -229,6 +229,17 @@ namespace Umbraco.Web
 
         #endregion
 
+        #region Variations
+
+        /// <summary>
+        /// Determines whether the content has a culture.
+        /// </summary>
+        /// <remarks>Culture is case-insensitive.</remarks>
+        public static bool HasCulture(this IPublishedContent content, string culture)
+            => content.Cultures.ContainsKey(culture);
+
+        #endregion
+
         #region Search
 
         public static IEnumerable<PublishedSearchResult> Search(this IPublishedContent content, string term, bool useWildCards = true, string indexName = null)
