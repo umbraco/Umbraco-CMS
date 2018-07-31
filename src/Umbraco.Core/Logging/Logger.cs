@@ -31,6 +31,11 @@ namespace Umbraco.Core.Logging
         {
             Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
 
+            //Set this environment variable - so that it can be used in external config file
+            //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log-{Date}.txt" />
+            Environment.SetEnvironmentVariable("BASEDIR", AppDomain.CurrentDomain.BaseDirectory, EnvironmentVariableTarget.Process);
+
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug() //Set to highest level of logging (as any sinks may want to restrict it to Errors only)
                 .Enrich.WithProcessId()
