@@ -44,12 +44,12 @@ function startUpDynamicContentController($timeout, $scope, dashboardResource, as
             {
                 title: "Documentation",
                 description: "Find the answers to your Umbraco questions",
-                url: "https://our.umbraco.org/documentation/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=documentation/"
+                url: "https://our.umbraco.com/documentation/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=documentation/"
             },
             {
                 title: "Community",
                 description: "Find the answers or ask your Umbraco questions",
-                url: "https://our.umbraco.org/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=our_forum"
+                url: "https://our.umbraco.com/?utm_source=core&utm_medium=dashboard&utm_content=text&utm_campaign=our_forum"
             },
             {
                 title: "Umbraco.tv",
@@ -75,7 +75,7 @@ function startUpDynamicContentController($timeout, $scope, dashboardResource, as
                 title: "Our Umbraco - The Friendliest Community",
                 description: "Our Umbraco - the official community site is your one stop for everything Umbraco. Whether you need a question answered or looking for cool plugins, the world's best and friendliest community is just a click away.",
                 img: "views/dashboard/default/ourumbraco.jpg",
-                url: "https://our.umbraco.org/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=our",
+                url: "https://our.umbraco.com/?utm_source=core&utm_medium=dashboard&utm_content=image&utm_campaign=our",
                 altText: "Our Umbraco",
                 buttonText: "Visit Our Umbraco"
             }

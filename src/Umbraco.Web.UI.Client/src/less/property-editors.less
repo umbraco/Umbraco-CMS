@@ -134,32 +134,38 @@ div.umb-codeeditor .umb-btn-toolbar {
 // Color picker
 // --------------------------------------------------
 ul.color-picker li {
-  padding: 2px;
-  margin: 3px;
-  border: 2px solid transparent;
-  width: 60px;
+    padding: 2px;
+    margin: 3px;
+    border: 2px solid transparent;
+    width: 60px;
 
-  .thumbnail{
-      min-width: auto;
-      width: 58px;
-      padding: 0;
-  }
-}
-ul.color-picker li.active {
-  border: 2px dashed @gray-8;
-}
-ul.color-picker li a  {
-  height: 50px;
-  display:block;
-  cursor:pointer;
-}
+    &.active {
+        .check_circle {
+            opacity: 1;
+        }
+    }
 
+    .thumbnail{
+        min-width: auto;
+        width: inherit;
+        padding: 0;
+    }
 
+    a {
+        height: 50px;
+        display:flex;
+        align-items: center;
+        justify-content: center;
+        cursor:pointer;
+        margin: 0 0 5px;
+    }
+}
 
 /* pre-value editor */
 .control-group.color-picker-preval {
     .thumbnail {
         width: 36px;
+        min-width: auto;
         border: none;
         cursor: move;
         border-radius: 3px;

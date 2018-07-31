@@ -132,7 +132,7 @@
         <table border="0" style="width: 100%;">
             <tr>
                 <td>
-                    <strong style="color: Red;">Remember:</strong> .xslt and .ascx files for your macros
+                    <strong style="color: Red;">Remember:</strong> .ascx files for your macros
                     will be added automaticly, but you will still need to add <strong>assemblies</strong>,
                     <strong>images</strong> and <strong>script files</strong> manually to the list below.
                 </td>
@@ -204,7 +204,7 @@
                         during installation and uninstallation.
                         <br />
                         All actions are formed as a xml node, containing data for the action to be performed.
-                        <a href="https://our.umbraco.com/documentation/Reference/Packaging/
+                        <a href="https://our.umbraco.org/documentation/Reference/Packaging/
 " target="_blank">Package actions documentation</a>
                     </p>
                     <asp:CustomValidator ID="actionsVal" runat="server" OnServerValidate="validateActions"

@@ -1610,4 +1610,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="noRestoreRelation">Der findes ikke nogen "Genopret" relation for dette dokument/medie. Brug "Flyt" muligheden fra menuen for at flytte det manuelt.</key>
     <key alias="restoreUnderRecycled">Det dokument/medie du ønsker at genoprette under ('%0%') er i skraldespanden. Brug "Flyt" muligheden fra menuen for at flytte det manuelt.</key>
   </area>
+  <area alias="recycleBin">
+    <key alias="contentTrashed">Slettet indhold med Id: {0} Relateret til original "parent" med id: {1}</key>
+    <key alias="mediaTrashed">Slettet medie med Id: {0} relateret til original "parent" / mappe med id: {1}</key>
+    <key alias="itemCannotBeRestored">Kan ikke automatisk genoprette dette dokument/medie</key>
+    <key alias="noRestoreRelation">Der findes ikke nogen "Genopret" relation for dette dokument/medie. Brug "Flyt" muligheden fra menuen for at flytte det manuelt.</key>
+    <key alias="restoreUnderRecycled">Det dokument/medie du ønsker at genoprette under ('%0%') er i skraldespanden. Brug "Flyt" muligheden fra menuen for at flytte det manuelt.</key>
+  </area>
 </language>
