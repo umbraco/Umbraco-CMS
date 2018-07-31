@@ -313,6 +313,10 @@
     <Compile Include="Logging\RollingFileCleanupAppender.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\Upgrade\V_7_10_0\RenamePreviewFolder.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_12_0\AddRelationTypeForMediaFolderOnDelete.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_12_0\IncreaseLanguageIsoCodeColumnLength.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_12_0\RenameTrueFalseField.cs" />
+    <Compile Include="Migrations\Upgrade\V_7_12_0\SetDefaultTagsStorageType.cs" />
     <Compile Include="Migrations\Upgrade\V_7_12_0\UpdateUmbracoConsent.cs" />
     <Compile Include="Migrations\Upgrade\V_7_8_0\AddIndexToPropertyTypeAliasColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_7_8_0\AddInstructionCountColumn.cs" />

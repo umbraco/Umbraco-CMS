@@ -10,6 +10,6 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_12_0
             : base(context)
         { }
         
-        public override void Migrate()        {            Alter.Table("umbracoConsent").AlterColumn("comment").AsString().Nullable();        }
+        public override void Migrate()        {            Alter.Table("umbracoConsent").AlterColumn("comment").AsString().Nullable().Do();        }
     }
 }

@@ -19,11 +19,11 @@ Umbraco is a free open source Content Management System built on the ASP.NET pla
 
 ## Umbraco - The Friendly CMS
 
-For the first time on the Microsoft platform, there is a free user and developer friendly CMS that makes it quick and easy to create websites - or a breeze to build complex web applications. Umbraco has award-winning integration capabilities and supports ASP.NET MVC or Web Forms, including User and Custom Controls, out of the box. 
+For the first time on the Microsoft platform, there is a free user and developer friendly CMS that makes it quick and easy to create websites - or a breeze to build complex web applications. Umbraco has award-winning integration capabilities and supports ASP.NET MVC or Web Forms, including User and Custom Controls, out of the box.
 
 Umbraco is not only loved by developers, but is a content editors dream. Enjoy intuitive editing tools, media management, responsive views and approval workflows to send your content live.
 
-Used by more than 443,000 active websites including Carlsberg, Segway, Amazon and Heinz and **The Official ASP.NET and IIS.NET website from Microsoft** ([https://asp.net](https://asp.net) / [https://iis.net](https://iis.net)), you can be sure that the technology is proven, stable and scales. Backed by the team at Umbraco HQ, and supported by a dedicated community of over 220,000 craftspeople globally, you can trust that Umbraco is a safe choice and is here to stay. 
+Used by more than 443,000 active websites including Carlsberg, Segway, Amazon and Heinz and **The Official ASP.NET and IIS.NET website from Microsoft** ([https://asp.net](https://asp.net) / [https://iis.net](https://iis.net)), you can be sure that the technology is proven, stable and scales. Backed by the team at Umbraco HQ, and supported by a dedicated community of over 220,000 craftspeople globally, you can trust that Umbraco is a safe choice and is here to stay.
 
 To view more examples, please visit [https://umbraco.com/case-studies-testimonials/](https://umbraco.com/case-studies-testimonials/)
 
@@ -46,6 +46,6 @@ Umbraco is contribution focused and community driven. If you want to contribute 
 
 ## Found a bug?
 
-Another way you can contribute to Umbraco is by providing issue reports. For information on how to submit an issue report refer to our [online guide for reporting issues](https://our.umbraco.com/contribute/report-an-issue-or-request-a-feature).
+Another way you can contribute to Umbraco is by providing issue reports. For information on how to submit an issue report refer to our [online guide for reporting issues](CONTRIBUTING_DETAILED.md#reporting-bugs).
 
 To view existing issues, please visit [http://issues.umbraco.org](http://issues.umbraco.org).

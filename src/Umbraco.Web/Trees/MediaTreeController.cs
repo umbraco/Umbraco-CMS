@@ -132,6 +132,12 @@ namespace Umbraco.Web.Trees
             if (item.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
                 menu.DefaultMenuAlias = null;
+                menu.Items.Insert(2, new MenuItem(ActionRestore.Instance, Services.TextService.Localize("actions", ActionRestore.Instance.Alias)));
+            }
+            else
+            {
+                //set the default to create
+                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
             }
 
             return menu;

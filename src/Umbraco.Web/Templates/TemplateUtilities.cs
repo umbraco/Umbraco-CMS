@@ -18,11 +18,17 @@ namespace Umbraco.Web.Templates
     public static class TemplateUtilities
     {
         //TODO: Pass in an Umbraco context!!!!!!!! Don't rely on the singleton so things are more testable
+        [Obsolete("Use the overload specifying an UmbracoContext")]
         internal static string ParseInternalLinks(string text, bool preview)
         {
-            using (UmbracoContext.Current.ForcedPreview(preview)) // force for url provider
+            return ParseInternalLinks(text, preview, UmbracoContext.Current);
+        }
+
+        internal static string ParseInternalLinks(string text, bool preview, UmbracoContext umbracoContext)
+        {
+            using (umbracoContext.ForcedPreview(preview)) // force for url provider
             {
-                text = ParseInternalLinks(text, UmbracoContext.Current.UrlProvider);
+                text = ParseInternalLinks(text, umbracoContext.UrlProvider);
             }
 
             return text;
