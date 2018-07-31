@@ -419,7 +419,7 @@
   $ubuild.DefineMethod("VerifyNuGet",
   {
     $this.VerifyNuGetConsistency(
-      ("UmbracoCms", "UmbracoCms.Core"),
+      ("UmbracoCms", "UmbracoCms.Core", "UmbracoCms.Web"),
       ("Umbraco.Core", "Umbraco.Web", "Umbraco.Web.UI", "Umbraco.Examine"))
     if ($this.OnError()) { return }
   })
