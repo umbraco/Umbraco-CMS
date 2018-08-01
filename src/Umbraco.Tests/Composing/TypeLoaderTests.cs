@@ -279,7 +279,7 @@ AnotherContentFinder
         public void Resolves_Trees()
         {
             var trees = _typeLoader.GetTrees();
-            Assert.AreEqual(4, trees.Count());
+            Assert.AreEqual(3, trees.Count());
         }
 
         [Test]
@@ -288,7 +288,7 @@ AnotherContentFinder
             var types = _typeLoader.GetDataEditors();
             Assert.AreEqual(43, types.Count());
         }
-        
+
         /// <summary>
         /// This demonstrates this issue: http://issues.umbraco.org/issue/U4-3505 - the TypeList was returning a list of assignable types
         /// not explicit types which is sort of ideal but is confusing so we'll do it the less confusing way.
