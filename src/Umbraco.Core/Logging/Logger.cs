@@ -8,6 +8,7 @@ using Umbraco.Core.Diagnostics;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
+using Umbraco.Core.Logging.SerilogExtensions;
 
 namespace Umbraco.Core.Logging
 {
@@ -43,6 +44,7 @@ namespace Umbraco.Core.Logging
                 .Enrich.WithThreadId()
                 .Enrich.WithProperty("AppDomainId", AppDomain.CurrentDomain.Id)
                 .Enrich.WithProperty("AppDomainAppId", HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty))
+                .Enrich.With<Log4NetLevelMapperEnricher>()
 
                 //Main .txt logfile - in similar format to older Log4Net output
                 //Ends with ..txt as Date is inserted before file extension substring
@@ -50,7 +52,7 @@ namespace Umbraco.Core.Logging
                     rollingInterval: RollingInterval.Day,
                     restrictedToMinimumLevel: LogEventLevel.Debug,
                     retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Level:u4}  {Message:lj}{NewLine}{Exception}")
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Log4NetLevel}  {Message:lj}{NewLine}{Exception}")
 
                 //.clef format (Compact log event format, that can be imported into local SEQ & will make searching/filtering logs easier)
                 //Ends with ..txt as Date is inserted before file extension substring
