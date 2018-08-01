@@ -42,7 +42,12 @@ namespace Umbraco.Web.Editors.Filters
             var contentItemValidator = new ContentItemValidationHelper<IMedia, MediaItemSave>(_logger, _umbracoContextAccessor);
 
             if (ValidateUserAccess(model, actionContext))
-                contentItemValidator.ValidateItem(actionContext, model, model, model.ContentDto);
+            {
+                //now do each validation step
+                if (!contentItemValidator.ValidateExistingContent(model, actionContext)) return;
+                if (!contentItemValidator.ValidateProperties(model, model, actionContext)) return;
+                if (!contentItemValidator.ValidatePropertyData(model, model, model.PropertyCollectionDto, actionContext.ModelState)) return;
+            }
         }
 
         /// <summary>

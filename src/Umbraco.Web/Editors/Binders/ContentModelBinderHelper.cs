@@ -56,7 +56,7 @@ namespace Umbraco.Web.Editors.Binders
         /// </summary>
         /// <param name="saveModel"></param>
         /// <param name="dto"></param>
-        public void MapPropertyValuesFromSaved(IContentProperties<ContentPropertyBasic> saveModel, ContentItemDto dto)
+        public void MapPropertyValuesFromSaved(IContentProperties<ContentPropertyBasic> saveModel, ContentPropertyCollectionDto dto)
         {
             //NOTE: Don't convert this to linq, this is much quicker
             foreach (var p in saveModel.Properties)

@@ -43,30 +43,13 @@ namespace Umbraco.Web.Editors.Filters
         {
         }
 
-        ///// <summary>
-        ///// Validates the content item and updates the Response and ModelState accordingly
-        ///// </summary>
-        ///// <param name="actionContext"></param>
-        ///// <param name="argumentName"></param>
-        //public void ValidateItem(HttpActionContext actionContext, string argumentName)
+        //public void ValidateItem(HttpActionContext actionContext, TModelSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, ContentPropertyCollectionDto dto)
         //{
-        //    if (!(actionContext.ActionArguments[argumentName] is TModelSave model))
-        //    {
-        //        actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "No " + typeof(TModelSave) + " found in request");
-        //        return;
-        //    }
-
-        //    ValidateItem(actionContext, model);
-
+        //    //now do each validation step
+        //    if (ValidateExistingContent(model, actionContext) == false) return;
+        //    if (ValidateProperties(model, modelWithProperties, actionContext) == false) return;
+        //    if (ValidatePropertyData(model, modelWithProperties, dto, actionContext.ModelState) == false) return;
         //}
-
-        public void ValidateItem(HttpActionContext actionContext, TModelSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, ContentItemDto dto)
-        {
-            //now do each validation step
-            if (ValidateExistingContent(model, actionContext) == false) return;
-            if (ValidateProperties(model, modelWithProperties, actionContext) == false) return;
-            if (ValidatePropertyData(model, modelWithProperties, dto, actionContext.ModelState) == false) return;
-        }
 
         /// <summary>
         /// Ensure the content exists
@@ -74,7 +57,7 @@ namespace Umbraco.Web.Editors.Filters
         /// <param name="postedItem"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        protected virtual bool ValidateExistingContent(TModelSave postedItem, HttpActionContext actionContext)
+        public virtual bool ValidateExistingContent(TModelSave postedItem, HttpActionContext actionContext)
         {
             var persistedContent = postedItem.PersistedContent;
             if (persistedContent == null)
@@ -93,7 +76,7 @@ namespace Umbraco.Web.Editors.Filters
         /// <param name="modelWithProperties"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        protected virtual bool ValidateProperties(TModelSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, HttpActionContext actionContext)
+        public virtual bool ValidateProperties(TModelSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, HttpActionContext actionContext)
         {
             var persistedContent = model.PersistedContent;
             return ValidateProperties(modelWithProperties.Properties.ToList(), persistedContent.Properties.ToList(), actionContext);
@@ -138,7 +121,7 @@ namespace Umbraco.Web.Editors.Filters
         public virtual bool ValidatePropertyData(
             TModelSave model,
             IContentProperties<ContentPropertyBasic> modelWithProperties,
-            ContentItemDto dto,
+            ContentPropertyCollectionDto dto,
             ModelStateDictionary modelState)
         {
             var properties = modelWithProperties.Properties.ToList();

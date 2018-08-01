@@ -452,7 +452,7 @@ namespace Umbraco.Web.Editors
 
             MapPropertyValues<IMedia, MediaItemSave>(
                 contentItem,
-                contentItem.ContentDto,
+                contentItem.PropertyCollectionDto,
                 (save, property) => property.GetValue(),        //get prop val
                 (save, property, v) => property.SetValue(v));   //set prop val
 

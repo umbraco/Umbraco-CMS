@@ -52,17 +52,28 @@ namespace Umbraco.Web.Editors.Binders
 
             model.PersistedContent = ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
 
-            //TODO: Implement this!
-            ////create the dto from the persisted model
-            //if (model.PersistedContent != null)
-            //{
-            //    model.ContentDto = MapFromPersisted(model);
-            //}
-            //if (model.ContentDto != null)
-            //{
-            //    //now map all of the saved values to the dto
-            //    _modelBinderHelper.MapPropertyValuesFromSaved(model, model.ContentDto);
-            //}
+            //create the dto from the persisted model
+            if (model.PersistedContent != null)
+            {
+                foreach (var variant in model.Variants)
+                {
+                    if (variant.Culture.IsNullOrWhiteSpace())
+                    {
+                        //map the property dto collection (no culture is passed to the mapping context so it will be invariant)
+                        variant.PropertyCollectionDto = Mapper.Map<ContentPropertyCollectionDto>(model.PersistedContent);
+                    }
+                    else
+                    {
+                        //map the property dto collection with the culture of the current variant
+                        variant.PropertyCollectionDto = Mapper.Map<ContentPropertyCollectionDto>(
+                            model.PersistedContent,
+                            options => options.Items[ResolutionContextExtensions.CultureKey] = variant.Culture);
+                    }
+
+                    //now map all of the saved values to the dto
+                    _modelBinderHelper.MapPropertyValuesFromSaved(variant, variant.PropertyCollectionDto);
+                }
+            }
 
             return true;
         }
@@ -84,17 +95,6 @@ namespace Umbraco.Web.Editors.Binders
                 model.ParentId,
                 contentType);
         }
-
-        private static ContentItemDto MapFromPersisted(ContentItemSave model)
-        {
-            return MapFromPersisted(model.PersistedContent);
-        }
-
-        internal static ContentItemDto MapFromPersisted(IContent content)
-        {
-            return Mapper.Map<ContentItemDto>(content);
-        }
-
         
     }
 }

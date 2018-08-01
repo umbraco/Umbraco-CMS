@@ -86,15 +86,9 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
-            //FROM IContent TO ContentItemDto<IContent>
-            CreateMap<IContent, ContentItemDto>()
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src =>
-                    Udi.Create(src.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, src.Key)))
-                .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))
-                .ForMember(dest => dest.Updater, opt => opt.Ignore())
-                .ForMember(dest => dest.Icon, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
+            //FROM IContent TO ContentPropertyCollectionDto
+            //NOTE: the property mapping for cultures relies on a culture being set in the mapping context
+            CreateMap<IContent, ContentPropertyCollectionDto>();
         }
     }
 }

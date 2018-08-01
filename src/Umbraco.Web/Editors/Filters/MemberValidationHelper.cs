@@ -56,7 +56,7 @@ namespace Umbraco.Web.Editors.Filters
         /// <param name="modelState"></param>
         /// <param name="modelWithProperties"></param>
         /// <returns></returns>
-        public override bool ValidatePropertyData(MemberSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, ContentItemDto dto, ModelStateDictionary modelState)
+        public override bool ValidatePropertyData(MemberSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, ContentPropertyCollectionDto dto, ModelStateDictionary modelState)
         {
             if (model.Username.IsNullOrWhiteSpace())
             {
@@ -103,7 +103,7 @@ namespace Umbraco.Web.Editors.Filters
         /// <param name="modelWithProperties"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        protected override bool ValidateProperties(MemberSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, HttpActionContext actionContext)
+        public override bool ValidateProperties(MemberSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, HttpActionContext actionContext)
         {
             var propertiesToValidate = model.Properties.ToList();
             var defaultProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();

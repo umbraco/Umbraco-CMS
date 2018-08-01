@@ -32,6 +32,15 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "publish")]
         public bool Publish { get; set; }
 
-     
+        /// <summary>
+        /// The property DTO object is used to gather all required property data including data type information etc... for use with validation - used during inbound model binding
+        /// </summary>
+        /// <remarks>
+        /// We basically use this object to hydrate all required data from the database into one object so we can validate everything we need
+        /// instead of having to look up all the data individually.
+        /// This is not used for outgoing model information.
+        /// </remarks>
+        [IgnoreDataMember]
+        internal ContentPropertyCollectionDto PropertyCollectionDto { get; set; }
     }
 }

@@ -90,9 +90,12 @@ namespace Umbraco.Tests.Models.Mapping
             var content = MockedContent.CreateSimpleContent(contentType);
             FixUsers(content);
 
-            var result = Mapper.Map<IContent, ContentItemDto>(content);
+            var result = Mapper.Map<IContent, ContentPropertyCollectionDto>(content);
 
-            AssertContentItem(result, content);
+            foreach (var p in content.Properties)
+            {
+                AssertProperty(result, p);
+            }
         }
 
         [Test]
@@ -102,9 +105,12 @@ namespace Umbraco.Tests.Models.Mapping
             var content = MockedMedia.CreateMediaImage(contentType, -1);
             FixUsers(content);
 
-            var result = Mapper.Map<IMedia, ContentItemDto>(content);
+            var result = Mapper.Map<IMedia, ContentPropertyCollectionDto>(content);
 
-            AssertContentItem(result, content);
+            foreach (var p in content.Properties)
+            {
+                AssertProperty(result, p);
+            }
         }
 
         [Test]
@@ -288,7 +294,7 @@ namespace Umbraco.Tests.Models.Mapping
                 Assert.AreEqual(pDto.Value, p.GetValue().ToString());
         }
 
-        private void AssertProperty(ContentItemBasic<ContentPropertyDto> result, Property p)
+        private void AssertProperty(IContentProperties<ContentPropertyDto> result, Property p)
         {
             AssertBasicProperty(result, p);
 

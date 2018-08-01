@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Umbraco.Core.Models;
@@ -72,7 +73,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public ContentItemBasic()
         {
             //ensure its not null
-            _properties = new List<T>();
+            _properties = Enumerable.Empty<T>();
         }
 
         private IEnumerable<T> _properties;

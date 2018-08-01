@@ -50,12 +50,9 @@ namespace Umbraco.Web.Editors.Binders
             //create the dto from the persisted model
             if (model.PersistedContent != null)
             {
-                model.ContentDto = MapFromPersisted(model);
-            }
-            if (model.ContentDto != null)
-            {
+                model.PropertyCollectionDto = Mapper.Map<IMember, ContentPropertyCollectionDto>(model.PersistedContent);
                 //now map all of the saved values to the dto
-                _modelBinderHelper.MapPropertyValuesFromSaved(model, model.ContentDto);
+                _modelBinderHelper.MapPropertyValuesFromSaved(model, model.PropertyCollectionDto);
             }
 
             model.Name = model.Name.Trim();
@@ -202,15 +199,6 @@ namespace Umbraco.Web.Editors.Binders
                 }
             }
         }
-
-        private ContentItemDto MapFromPersisted(MemberSave model)
-        {
-            //need to explicitly cast since it's an explicit implementation
-            var saveModel = (IContentSave<IMember>)model;
-
-            return Mapper.Map<IMember, ContentItemDto>(saveModel.PersistedContent);
-        }
-
         
     }
 }

@@ -397,7 +397,7 @@ namespace Umbraco.Web.Editors
             //use the base method to map the rest of the properties
             base.MapPropertyValues<IMember, MemberSave>(
                 contentItem,
-                contentItem.ContentDto,
+                contentItem.PropertyCollectionDto,
                 (save, property) => property.GetValue(),        //get prop val
                 (save, property, v) => property.SetValue(v));   //set prop val
         }

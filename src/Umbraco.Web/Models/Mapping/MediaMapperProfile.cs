@@ -69,15 +69,15 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
             //FROM IMedia TO ContentItemDto<IMedia>
-            CreateMap<IMedia, ContentItemDto>()
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(Constants.UdiEntityType.Media, src.Key)))
-                .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => mediaOwnerResolver.Resolve(src)))
-                .ForMember(dest => dest.Published, opt => opt.Ignore())
-                .ForMember(dest => dest.Edited, opt => opt.Ignore())
-                .ForMember(dest => dest.Updater, opt => opt.Ignore())
-                .ForMember(dest => dest.Icon, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
+            CreateMap<IMedia, ContentPropertyCollectionDto>();
+            //.ForMember(dest => dest.Udi, opt => opt.MapFrom(src => Udi.Create(Constants.UdiEntityType.Media, src.Key)))
+            //.ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => mediaOwnerResolver.Resolve(src)))
+            //.ForMember(dest => dest.Published, opt => opt.Ignore())
+            //.ForMember(dest => dest.Edited, opt => opt.Ignore())
+            //.ForMember(dest => dest.Updater, opt => opt.Ignore())
+            //.ForMember(dest => dest.Icon, opt => opt.Ignore())
+            //.ForMember(dest => dest.Alias, opt => opt.Ignore())
+            //.ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
         }
     }
 }

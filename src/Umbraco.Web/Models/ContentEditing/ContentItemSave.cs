@@ -69,10 +69,6 @@ namespace Umbraco.Web.Models.ContentEditing
             set => ((IContentSave<IContent>)this).PersistedContent = value;
         }
 
-        ////Non explicit internal getter so we don't need to explicitly cast in our own code
-        //[IgnoreDataMember]
-        //internal ContentItemDto<IContent> ContentDto { get;set; }
-
         #endregion
 
     }

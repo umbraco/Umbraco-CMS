@@ -41,7 +41,7 @@ namespace Umbraco.Web.Models.ContentEditing
         }
 
         /// <summary>
-        /// The DTO object used to gather all required content data including data type information etc... for use with validation - used during inbound model binding
+        /// The property DTO object is used to gather all required property data including data type information etc... for use with validation - used during inbound model binding
         /// </summary>
         /// <remarks>
         /// We basically use this object to hydrate all required data from the database into one object so we can validate everything we need
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// This is not used for outgoing model information.
         /// </remarks>
         [IgnoreDataMember]
-        internal ContentItemDto ContentDto { get; set; }
+        internal ContentPropertyCollectionDto PropertyCollectionDto { get; set; }
 
         #endregion
 
