@@ -52,9 +52,11 @@ namespace Umbraco.Web.Editors.Filters
         /// We need to manually validate a few things here like email and login to make sure they are valid and aren't duplicates
         /// </summary>
         /// <param name="model"></param>
+        /// <param name="dto"></param>
         /// <param name="modelState"></param>
+        /// <param name="modelWithProperties"></param>
         /// <returns></returns>
-        public override bool ValidatePropertyData(MemberSave model, ModelStateDictionary modelState)
+        public override bool ValidatePropertyData(MemberSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, ContentItemDto dto, ModelStateDictionary modelState)
         {
             if (model.Username.IsNullOrWhiteSpace())
             {
@@ -89,7 +91,7 @@ namespace Umbraco.Web.Editors.Filters
                     $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}login");
             }
 
-            return base.ValidatePropertyData(model, modelState);
+            return base.ValidatePropertyData(model, modelWithProperties, dto, modelState);
         }
 
         /// <summary>
@@ -98,9 +100,10 @@ namespace Umbraco.Web.Editors.Filters
         /// This also validates any posted data for fields that are sensitive.
         /// </summary>
         /// <param name="model"></param>
+        /// <param name="modelWithProperties"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        protected override bool ValidateProperties(MemberSave model, HttpActionContext actionContext)
+        protected override bool ValidateProperties(MemberSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, HttpActionContext actionContext)
         {
             var propertiesToValidate = model.Properties.ToList();
             var defaultProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();

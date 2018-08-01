@@ -56,7 +56,7 @@ namespace Umbraco.Tests.Models.Mapping
             var content = MockedMedia.CreateMediaImage(contentType, -1);
             FixUsers(content);
 
-            var result = Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>(content);
+            var result = Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>(content);
 
             AssertBasics(result, content);
 
@@ -73,7 +73,7 @@ namespace Umbraco.Tests.Models.Mapping
             var content = MockedContent.CreateSimpleContent(contentType);
             FixUsers(content);
 
-            var result = Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>(content);
+            var result = Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(content);
 
             AssertBasics(result, content);
 
@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Models.Mapping
             var content = MockedContent.CreateSimpleContent(contentType);
             FixUsers(content);
 
-            var result = Mapper.Map<IContent, ContentItemDto<IContent>>(content);
+            var result = Mapper.Map<IContent, ContentItemDto>(content);
 
             AssertContentItem(result, content);
         }
@@ -102,7 +102,7 @@ namespace Umbraco.Tests.Models.Mapping
             var content = MockedMedia.CreateMediaImage(contentType, -1);
             FixUsers(content);
 
-            var result = Mapper.Map<IMedia, ContentItemDto<IMedia>>(content);
+            var result = Mapper.Map<IMedia, ContentItemDto>(content);
 
             AssertContentItem(result, content);
         }
@@ -247,7 +247,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(content.Properties.Count(), invariantContent.Properties.Count(x => x.Alias.StartsWith("_umb_") == false));
         }
 
-        private void AssertBasics<T, TPersisted>(ContentItemBasic<T, TPersisted> result, TPersisted content)
+        private void AssertBasics<T, TPersisted>(ContentItemBasic<T> result, TPersisted content)
             where T : ContentPropertyBasic
             where TPersisted : IContentBase
         {
@@ -288,8 +288,7 @@ namespace Umbraco.Tests.Models.Mapping
                 Assert.AreEqual(pDto.Value, p.GetValue().ToString());
         }
 
-        private void AssertProperty<TPersisted>(ContentItemBasic<ContentPropertyDto, TPersisted> result, Property p)
-            where TPersisted : IContentBase
+        private void AssertProperty(ContentItemBasic<ContentPropertyDto> result, Property p)
         {
             AssertBasicProperty(result, p);
 
@@ -303,7 +302,7 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(Current.PropertyEditors[p.PropertyType.PropertyEditorAlias], pDto.PropertyEditor);
         }
 
-        private void AssertContentItem<T>(ContentItemBasic<ContentPropertyDto, T> result, T content)
+        private void AssertContentItem<T>(ContentItemBasic<ContentPropertyDto> result, T content)
             where T : IContentBase
         {
             AssertBasics(result, content);

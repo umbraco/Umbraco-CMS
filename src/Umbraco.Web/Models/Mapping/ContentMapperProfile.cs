@@ -75,7 +75,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Tabs, opt => opt.ResolveUsing(tabsAndPropertiesResolver));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
-            CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
+            CreateMap<IContent, ContentItemBasic<ContentPropertyBasic>>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src =>
                     Udi.Create(src.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, src.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))
@@ -87,7 +87,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
 
             //FROM IContent TO ContentItemDto<IContent>
-            CreateMap<IContent, ContentItemDto<IContent>>()
+            CreateMap<IContent, ContentItemDto>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(src =>
                     Udi.Create(src.Blueprint ? Constants.UdiEntityType.DocumentBlueprint : Constants.UdiEntityType.Document, src.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => contentOwnerResolver.Resolve(src)))

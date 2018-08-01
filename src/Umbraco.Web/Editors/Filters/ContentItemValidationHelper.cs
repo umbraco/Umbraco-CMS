@@ -37,35 +37,35 @@ namespace Umbraco.Web.Editors.Filters
     /// </remarks>
     internal class ContentItemValidationHelper<TPersisted, TModelSave>: ContentItemValidationHelper
         where TPersisted : class, IContentBase
-        where TModelSave: IContentSave<TPersisted>, IContentProperties<ContentPropertyBasic>
+        where TModelSave: IContentSave<TPersisted>
     {
         public ContentItemValidationHelper(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor) : base(logger, umbracoContextAccessor)
         {
         }
 
-        /// <summary>
-        /// Validates the content item and updates the Response and ModelState accordingly
-        /// </summary>
-        /// <param name="actionContext"></param>
-        /// <param name="argumentName"></param>
-        public void ValidateItem(HttpActionContext actionContext, string argumentName)
-        {
-            if (!(actionContext.ActionArguments[argumentName] is TModelSave model))
-            {
-                actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "No " + typeof(TModelSave) + " found in request");
-                return;
-            }
+        ///// <summary>
+        ///// Validates the content item and updates the Response and ModelState accordingly
+        ///// </summary>
+        ///// <param name="actionContext"></param>
+        ///// <param name="argumentName"></param>
+        //public void ValidateItem(HttpActionContext actionContext, string argumentName)
+        //{
+        //    if (!(actionContext.ActionArguments[argumentName] is TModelSave model))
+        //    {
+        //        actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, "No " + typeof(TModelSave) + " found in request");
+        //        return;
+        //    }
 
-            ValidateItem(actionContext, model);
+        //    ValidateItem(actionContext, model);
 
-        }
+        //}
 
-        public void ValidateItem(HttpActionContext actionContext, TModelSave model)
+        public void ValidateItem(HttpActionContext actionContext, TModelSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, ContentItemDto dto)
         {
             //now do each validation step
             if (ValidateExistingContent(model, actionContext) == false) return;
-            if (ValidateProperties(model, actionContext) == false) return;
-            if (ValidatePropertyData(model, actionContext.ModelState) == false) return;
+            if (ValidateProperties(model, modelWithProperties, actionContext) == false) return;
+            if (ValidatePropertyData(model, modelWithProperties, dto, actionContext.ModelState) == false) return;
         }
 
         /// <summary>
@@ -90,12 +90,13 @@ namespace Umbraco.Web.Editors.Filters
         /// Ensure all of the ids in the post are valid
         /// </summary>
         /// <param name="model"></param>
+        /// <param name="modelWithProperties"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        protected virtual bool ValidateProperties(TModelSave model, HttpActionContext actionContext)
+        protected virtual bool ValidateProperties(TModelSave model, IContentProperties<ContentPropertyBasic> modelWithProperties, HttpActionContext actionContext)
         {
             var persistedContent = model.PersistedContent;
-            return ValidateProperties(model.Properties.ToList(), persistedContent.Properties.ToList(), actionContext);
+            return ValidateProperties(modelWithProperties.Properties.ToList(), persistedContent.Properties.ToList(), actionContext);
         }
 
         /// <summary>
@@ -127,15 +128,20 @@ namespace Umbraco.Web.Editors.Filters
         /// Validates the data for each property
         /// </summary>
         /// <param name="model"></param>
+        /// <param name="modelWithProperties"></param>
+        /// <param name="dto"></param>
         /// <param name="modelState"></param>
         /// <returns></returns>
         /// <remarks>
         /// All property data validation goes into the modelstate with a prefix of "Properties"
         /// </remarks>
-        public virtual bool ValidatePropertyData(TModelSave model, ModelStateDictionary modelState)
+        public virtual bool ValidatePropertyData(
+            TModelSave model,
+            IContentProperties<ContentPropertyBasic> modelWithProperties,
+            ContentItemDto dto,
+            ModelStateDictionary modelState)
         {
-            var properties = model.Properties.ToList();
-            var dto = model.ContentDto;
+            var properties = modelWithProperties.Properties.ToList();
 
             foreach (var p in dto.Properties)
             {

@@ -8,49 +8,65 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors.Binders
 {
-    /// <inheritdoc />
     /// <summary>
     /// The model binder for <see cref="T:Umbraco.Web.Models.ContentEditing.MediaItemSave" />
     /// </summary>
-    internal class MediaItemBinder : ContentItemBaseBinder<IMedia, MediaItemSave>
+    internal class MediaItemBinder : IModelBinder
     {
-        public MediaItemBinder() : this(Current.Logger, Current.Services, Current.UmbracoContextAccessor)
+        private readonly ContentModelBinderHelper _modelBinderHelper;
+        private readonly ServiceContext _services;
+
+        public MediaItemBinder() : this(Current.Services)
         {
         }
 
-        public MediaItemBinder(Core.Logging.ILogger logger, ServiceContext services, IUmbracoContextAccessor umbracoContextAccessor)
-            : base(logger, services, umbracoContextAccessor)
+        public MediaItemBinder(ServiceContext services)
         {
+            _services = services;
+            _modelBinderHelper = new ContentModelBinderHelper();
         }
 
         /// <summary>
-        /// Overridden to trim the name
+        /// Creates the model from the request and binds it to the context
         /// </summary>
         /// <param name="actionContext"></param>
         /// <param name="bindingContext"></param>
         /// <returns></returns>
-        public override bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
+        public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
         {
-            var result = base.BindModel(actionContext, bindingContext);
-            if (result)
+            var model = _modelBinderHelper.BindModelFromMultipartRequest<MediaItemSave>(actionContext, bindingContext);
+            if (model == null) return false;
+
+            model.PersistedContent = ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
+
+            //create the dto from the persisted model
+            if (model.PersistedContent != null)
             {
-                var model = (MediaItemSave) bindingContext.Model;
-                model.Name = model.Name.Trim();
+                model.ContentDto = MapFromPersisted(model);
             }
-            return result;
+            if (model.ContentDto != null)
+            {
+                //now map all of the saved values to the dto
+                _modelBinderHelper.MapPropertyValuesFromSaved(model, model.ContentDto);
+            }
+
+            model.Name = model.Name.Trim();
+
+            return true;
         }
 
-        protected override IMedia GetExisting(MediaItemSave model)
+        private IMedia GetExisting(MediaItemSave model)
         {
-            return Services.MediaService.GetById(Convert.ToInt32(model.Id));
+            return _services.MediaService.GetById(Convert.ToInt32(model.Id));
         }
 
-        protected override IMedia CreateNew(MediaItemSave model)
+        private IMedia CreateNew(MediaItemSave model)
         {
-            var mediaType = Services.MediaTypeService.Get(model.ContentTypeAlias);
+            var mediaType = _services.MediaTypeService.Get(model.ContentTypeAlias);
             if (mediaType == null)
             {
                 throw new InvalidOperationException("No media type found with alias " + model.ContentTypeAlias);
@@ -58,9 +74,9 @@ namespace Umbraco.Web.Editors.Binders
             return new Core.Models.Media(model.Name, model.ParentId, mediaType);
         }
 
-        protected override ContentItemDto<IMedia> MapFromPersisted(MediaItemSave model)
+        private ContentItemDto MapFromPersisted(MediaItemSave model)
         {
-            return Mapper.Map<IMedia, ContentItemDto<IMedia>>(model.PersistedContent);
+            return Mapper.Map<IMedia, ContentItemDto>(model.PersistedContent);
         }
     }
 }

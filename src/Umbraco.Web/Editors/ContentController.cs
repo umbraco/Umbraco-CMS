@@ -432,8 +432,8 @@ namespace Umbraco.Web.Editors
         /// Gets the children for the content id passed in
         /// </summary>
         /// <returns></returns>
-        [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IContent>>), "Items")]
-        public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
+        [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(
                 int id,
                 int pageNumber = 0,  //TODO: This should be '1' as it's not the index
                 int pageSize = 0,
@@ -449,8 +449,8 @@ namespace Umbraco.Web.Editors
         /// Gets the children for the content id passed in
         /// </summary>
         /// <returns></returns>
-        [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IContent>>), "Items")]
-        public PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>> GetChildren(
+        [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(
                 int id,
                 string includeProperties,
                 int pageNumber = 0,  //TODO: This should be '1' as it's not the index
@@ -487,12 +487,12 @@ namespace Umbraco.Web.Editors
 
             if (totalChildren == 0)
             {
-                return new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(0, 0, 0);
+                return new PagedResult<ContentItemBasic<ContentPropertyBasic>>(0, 0, 0);
             }
 
-            var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(totalChildren, pageNumber, pageSize);
+            var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(totalChildren, pageNumber, pageSize);
             pagedResult.Items = children.Select(content =>
-                Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>(content,
+                Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(content,
                     opts =>
                     {
                         // if there's a list of property aliases to map - we will make sure to store this in the mapping context.
@@ -1230,6 +1230,7 @@ namespace Umbraco.Web.Editors
                 //for each variant, map the property values
                 MapPropertyValues<IContent, ContentItemSave>(
                     contentSave,
+                    null, //TODO: Fix this!
                     (save, property) => Varies(property) ? property.GetValue(variant.Culture) : property.GetValue(),         //get prop val
                     (save, property, v) => { if (Varies(property)) property.SetValue(v, variant.Culture); else property.SetValue(v); });  //set prop val
             }

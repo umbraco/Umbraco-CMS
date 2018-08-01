@@ -191,7 +191,7 @@ namespace Umbraco.Web.Editors
         /// <param name="pageNumber"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildFolders(int id, int pageNumber = 1, int pageSize = 1000)
+        public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildFolders(int id, int pageNumber = 1, int pageSize = 1000)
         {
             //Suggested convention for folder mediatypes - we can make this more or less complicated as long as we document it...
             //if you create a media type, which has an alias that ends with ...Folder then its a folder: ex: "secureFolder", "bannerFolder", "Folder"
@@ -203,28 +203,28 @@ namespace Umbraco.Web.Editors
 
             if (folderTypes.Length == 0)
             {
-                return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(0, pageNumber, pageSize);
+                return new PagedResult<ContentItemBasic<ContentPropertyBasic>>(0, pageNumber, pageSize);
             }
 
             long total;
             var children = Services.MediaService.GetPagedChildren(id, pageNumber - 1, pageSize, out total, "Name", Direction.Ascending, true, null, folderTypes.ToArray());
 
-            return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(total, pageNumber, pageSize)
+            return new PagedResult<ContentItemBasic<ContentPropertyBasic>>(total, pageNumber, pageSize)
             {
-                Items = children.Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>)
+                Items = children.Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>)
             };
         }
 
         /// <summary>
         /// Returns the root media objects
         /// </summary>
-        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>))]
-        public IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>> GetRootMedia()
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>))]
+        public IEnumerable<ContentItemBasic<ContentPropertyBasic>> GetRootMedia()
         {
             //TODO: Add permissions check!
 
             return Services.MediaService.GetRootMedia()
-                           .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
+                           .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>);
         }
 
         #region GetChildren
@@ -240,8 +240,8 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Returns the child media objects - using the entity INT id
         /// </summary>
-        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
-        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(int id,
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(int id,
             int pageNumber = 0,
             int pageSize = 0,
             string orderBy = "SortOrder",
@@ -254,14 +254,14 @@ namespace Umbraco.Web.Editors
             if (id == Constants.System.Root && UserStartNodes.Length > 0 && UserStartNodes.Contains(Constants.System.Root) == false)
             {
                 if (pageNumber > 0)
-                    return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(0, 0, 0);
+                    return new PagedResult<ContentItemBasic<ContentPropertyBasic>>(0, 0, 0);
                 var nodes = Services.MediaService.GetByIds(UserStartNodes).ToArray();
                 if (nodes.Length == 0)
-                    return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(0, 0, 0);
+                    return new PagedResult<ContentItemBasic<ContentPropertyBasic>>(0, 0, 0);
                 if (pageSize < nodes.Length) pageSize = nodes.Length; // bah
-                var pr = new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(nodes.Length, pageNumber, pageSize)
+                var pr = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(nodes.Length, pageNumber, pageSize)
                 {
-                    Items = nodes.Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>)
+                    Items = nodes.Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>)
                 };
                 return pr;
             }
@@ -295,12 +295,12 @@ namespace Umbraco.Web.Editors
 
             if (totalChildren == 0)
             {
-                return new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(0, 0, 0);
+                return new PagedResult<ContentItemBasic<ContentPropertyBasic>>(0, 0, 0);
             }
 
-            var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>>(totalChildren, pageNumber, pageSize);
+            var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic>>(totalChildren, pageNumber, pageSize);
             pagedResult.Items = children
-                .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>);
+                .Select(Mapper.Map<IMedia, ContentItemBasic<ContentPropertyBasic>>);
 
             return pagedResult;
         }
@@ -316,8 +316,8 @@ namespace Umbraco.Web.Editors
         /// <param name="orderBySystemField"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
-        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(Guid id,
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(Guid id,
            int pageNumber = 0,
            int pageSize = 0,
            string orderBy = "SortOrder",
@@ -344,8 +344,8 @@ namespace Umbraco.Web.Editors
         /// <param name="orderBySystemField"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic, IMedia>>), "Items")]
-        public PagedResult<ContentItemBasic<ContentPropertyBasic, IMedia>> GetChildren(Udi id,
+        [FilterAllowedOutgoingMedia(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
+        public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(Udi id,
            int pageNumber = 0,
            int pageSize = 0,
            string orderBy = "SortOrder",
@@ -452,6 +452,7 @@ namespace Umbraco.Web.Editors
 
             MapPropertyValues<IMedia, MediaItemSave>(
                 contentItem,
+                contentItem.ContentDto,
                 (save, property) => property.GetValue(),        //get prop val
                 (save, property, v) => property.SetValue(v));   //set prop val
 

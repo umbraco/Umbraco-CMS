@@ -10,7 +10,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// A model representing a content item to be saved
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
-    public abstract class ContentBaseSave<TPersisted> : ContentItemBasic<ContentPropertyBasic, TPersisted>, IContentSave<TPersisted>
+    public abstract class ContentBaseSave<TPersisted> : ContentItemBasic<ContentPropertyBasic>, IContentSave<TPersisted>
         where TPersisted : IContentBase
     {
         protected ContentBaseSave()
@@ -31,12 +31,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <inheritdoc />
         [IgnoreDataMember]
         TPersisted IContentSave<TPersisted>.PersistedContent { get; set; }
-
-        //These need explicit implementation because we are using internal models
-        /// <inheritdoc />
-        [IgnoreDataMember]
-        ContentItemDto<TPersisted> IContentSave<TPersisted>.ContentDto { get; set; }
-
+        
         //Non explicit internal getter so we don't need to explicitly cast in our own code
         [IgnoreDataMember]
         internal TPersisted PersistedContent
@@ -45,13 +40,16 @@ namespace Umbraco.Web.Models.ContentEditing
             set => ((IContentSave<TPersisted>) this).PersistedContent = value;
         }
 
-        //Non explicit internal getter so we don't need to explicitly cast in our own code
+        /// <summary>
+        /// The DTO object used to gather all required content data including data type information etc... for use with validation - used during inbound model binding
+        /// </summary>
+        /// <remarks>
+        /// We basically use this object to hydrate all required data from the database into one object so we can validate everything we need
+        /// instead of having to look up all the data individually.
+        /// This is not used for outgoing model information.
+        /// </remarks>
         [IgnoreDataMember]
-        internal ContentItemDto<TPersisted> ContentDto
-        {
-            get => ((IContentSave<TPersisted>)this).ContentDto;
-            set => ((IContentSave<TPersisted>) this).ContentDto = value;
-        }
+        internal ContentItemDto ContentDto { get; set; }
 
         #endregion
 

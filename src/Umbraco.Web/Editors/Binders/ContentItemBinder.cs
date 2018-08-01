@@ -3,40 +3,78 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web.Http;
 using System.Web.Http.Controllers;
+using System.Web.Http.ModelBinding;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Editors.Filters;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
+using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors.Binders
 {
-    /// <inheritdoc />
-    internal class ContentItemBinder : ContentItemBaseBinder<IContent, ContentItemSave>
+    /// <summary>
+    /// The model binder for <see cref="T:Umbraco.Web.Models.ContentEditing.ContentItemSave" />
+    /// </summary>
+    internal class ContentItemBinder : IModelBinder
     {
+        private readonly ServiceContext _services;
+        private readonly ContentModelBinderHelper _modelBinderHelper;
+
         public ContentItemBinder() : this(Current.Logger, Current.Services, Current.UmbracoContextAccessor)
         {
         }
 
         public ContentItemBinder(ILogger logger, ServiceContext services, IUmbracoContextAccessor umbracoContextAccessor)
-            : base(logger, services, umbracoContextAccessor)
         {
-        }
-        
-        protected override IContent GetExisting(ContentItemSave model)
-        {
-            return Services.ContentService.GetById(model.Id);
+            _services = services;
+            _modelBinderHelper = new ContentModelBinderHelper();
         }
 
-        protected override IContent CreateNew(ContentItemSave model)
+        /// <summary>
+        /// Creates the model from the request and binds it to the context
+        /// </summary>
+        /// <param name="actionContext"></param>
+        /// <param name="bindingContext"></param>
+        /// <returns></returns>
+        public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
         {
-            var contentType = Services.ContentTypeService.Get(model.ContentTypeAlias);
+            var model = _modelBinderHelper.BindModelFromMultipartRequest<ContentItemSave>(actionContext, bindingContext);
+            if (model == null) return false;
+
+            model.PersistedContent = ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
+
+            //TODO: Implement this!
+            ////create the dto from the persisted model
+            //if (model.PersistedContent != null)
+            //{
+            //    model.ContentDto = MapFromPersisted(model);
+            //}
+            //if (model.ContentDto != null)
+            //{
+            //    //now map all of the saved values to the dto
+            //    _modelBinderHelper.MapPropertyValuesFromSaved(model, model.ContentDto);
+            //}
+
+            return true;
+        }
+
+        private IContent GetExisting(ContentItemSave model)
+        {
+            return _services.ContentService.GetById(model.Id);
+        }
+
+        private IContent CreateNew(ContentItemSave model)
+        {
+            var contentType = _services.ContentTypeService.Get(model.ContentTypeAlias);
             if (contentType == null)
             {
                 throw new InvalidOperationException("No content type found with alias " + model.ContentTypeAlias);
@@ -47,14 +85,14 @@ namespace Umbraco.Web.Editors.Binders
                 contentType);
         }
 
-        protected override ContentItemDto<IContent> MapFromPersisted(ContentItemSave model)
+        private static ContentItemDto MapFromPersisted(ContentItemSave model)
         {
             return MapFromPersisted(model.PersistedContent);
         }
 
-        internal static ContentItemDto<IContent> MapFromPersisted(IContent content)
+        internal static ContentItemDto MapFromPersisted(IContent content)
         {
-            return Mapper.Map<ContentItemDto<IContent>>(content);
+            return Mapper.Map<ContentItemDto>(content);
         }
 
         

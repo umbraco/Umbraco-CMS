@@ -115,6 +115,7 @@
     <Compile Include="Editors\BackOfficeAssetsController.cs" />
     <Compile Include="Editors\BackOfficeModel.cs" />
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
+    <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\IContentSave.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
     <Compile Include="Editors\CodeFileController.cs" />
@@ -999,7 +1000,7 @@
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="UrlHelperRenderExtensions.cs" />
-    <Compile Include="Editors\Binders\ContentItemBaseBinder.cs" />
+    <Compile Include="Editors\Binders\ContentModelBinderHelper.cs" />
     <Compile Include="WebApi\IsBackOfficeAttribute.cs" />
     <Compile Include="Editors\Binders\ContentItemBinder.cs" />
     <Compile Include="Editors\Binders\MediaItemBinder.cs" />

@@ -66,9 +66,8 @@ namespace Umbraco.Web.Models.ContentEditing
     /// A model representing a basic content item with properties
     /// </summary>
     [DataContract(Name = "content", Namespace = "")]
-    public class ContentItemBasic<T, TPersisted> : ContentItemBasic, IContentProperties<T>
+    public class ContentItemBasic<T> : ContentItemBasic, IContentProperties<T>
         where T : ContentPropertyBasic
-        where TPersisted : IContentBase
     {
         public ContentItemBasic()
         {

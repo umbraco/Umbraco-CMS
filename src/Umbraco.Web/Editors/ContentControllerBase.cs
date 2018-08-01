@@ -18,7 +18,7 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web.Editors
 {
     /// <summary>
-    /// An abstract base controller used for media/content (and probably members) to try to reduce code replication.
+    /// An abstract base controller used for media/content/members to try to reduce code replication.
     /// </summary>
     [OutgoingDateTimeFormat]
     public abstract class ContentControllerBase : BackOfficeNotificationsController
@@ -42,17 +42,19 @@ namespace Umbraco.Web.Editors
         /// <typeparam name="TPersisted"></typeparam>
         /// <typeparam name="TSaved"></typeparam>
         /// <param name="contentItem"></param>
+        /// <param name="dto"></param>
         /// <param name="getPropertyValue"></param>
         /// <param name="savePropertyValue"></param>
         internal void MapPropertyValues<TPersisted, TSaved>(
             TSaved contentItem,
+            ContentItemDto dto,
             Func<TSaved, Property, object> getPropertyValue,
             Action<TSaved, Property, object> savePropertyValue)
             where TPersisted : IContentBase
             where TSaved : IContentSave<TPersisted>
         {
             // map the property values
-            foreach (var propertyDto in contentItem.ContentDto.Properties)
+            foreach (var propertyDto in dto.Properties)
             {
                 // get the property editor
                 if (propertyDto.PropertyEditor == null)

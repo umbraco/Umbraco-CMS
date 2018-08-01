@@ -123,7 +123,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.Ignore());
 
             //FROM IMember TO ContentItemDto<IMember>
-            CreateMap<IMember, ContentItemDto<IMember>>()
+            CreateMap<IMember, ContentItemDto>()
                 .ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
                 .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => memberOwnerResolver.Resolve(src)))
                 .ForMember(dest => dest.Published, opt => opt.Ignore())

@@ -32,7 +32,7 @@ namespace Umbraco.Web.Editors.Filters
         {
             var model = (MemberSave)actionContext.ActionArguments["contentItem"];
             var contentItemValidator = new MemberValidationHelper(_logger, _umbracoContextAccessor);
-            contentItemValidator.ValidateItem(actionContext, model);
+            contentItemValidator.ValidateItem(actionContext, model, model, model.ContentDto);
         }
     }
 }

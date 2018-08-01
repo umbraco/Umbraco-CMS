@@ -181,7 +181,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// This is not used for outgoing model information.
         /// </remarks>
         [IgnoreDataMember]
-        internal ContentItemDto<IContent> ContentDto { get; set; }
+        internal ContentItemDto ContentDto { get; set; }
 
         /// <summary>
         /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.

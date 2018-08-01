@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Net;
-using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using System.Web.Security;
@@ -12,49 +9,58 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.WebApi.Filters;
 using System.Linq;
-using System.Net.Http;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Web;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Logging;
-using Umbraco.Web.Editors.Filters;
 
 namespace Umbraco.Web.Editors.Binders
 {
-    /// <inheritdoc />
     /// <summary>
     /// The model binder for <see cref="T:Umbraco.Web.Models.ContentEditing.MemberSave" />
     /// </summary>
-    internal class MemberBinder : ContentItemBaseBinder<IMember, MemberSave>
+    internal class MemberBinder : IModelBinder
     {
+        private readonly ContentModelBinderHelper _modelBinderHelper;
+        private readonly ServiceContext _services;
 
-        public MemberBinder() : this(Current.Logger, Current.Services, Current.UmbracoContextAccessor)
+        public MemberBinder() : this(Current.Services)
         {
         }
 
-        public MemberBinder(ILogger logger, ServiceContext services, IUmbracoContextAccessor umbracoContextAccessor)
-            : base(logger, services, umbracoContextAccessor)
+        public MemberBinder(ServiceContext services)
         {
+            _services = services;
+            _modelBinderHelper = new ContentModelBinderHelper();
         }
 
         /// <summary>
-        /// Overridden to trim the name
+        /// Creates the model from the request and binds it to the context
         /// </summary>
         /// <param name="actionContext"></param>
         /// <param name="bindingContext"></param>
         /// <returns></returns>
-        public override bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
+        public bool BindModel(HttpActionContext actionContext, ModelBindingContext bindingContext)
         {
-            var result = base.BindModel(actionContext, bindingContext);
-            if (result)
+            var model = _modelBinderHelper.BindModelFromMultipartRequest<MemberSave>(actionContext, bindingContext);
+            if (model == null) return false;
+
+            model.PersistedContent = ContentControllerBase.IsCreatingAction(model.Action) ? CreateNew(model) : GetExisting(model);
+
+            //create the dto from the persisted model
+            if (model.PersistedContent != null)
             {
-                var model = (MemberSave)bindingContext.Model;
-                model.Name = model.Name.Trim();
+                model.ContentDto = MapFromPersisted(model);
             }
-            return result;
+            if (model.ContentDto != null)
+            {
+                //now map all of the saved values to the dto
+                _modelBinderHelper.MapPropertyValuesFromSaved(model, model.ContentDto);
+            }
+
+            model.Name = model.Name.Trim();
+
+            return true;
         }
 
         /// <summary>
@@ -62,9 +68,9 @@ namespace Umbraco.Web.Editors.Binders
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        protected override IMember GetExisting(MemberSave model)
+        private IMember GetExisting(MemberSave model)
         {
-            var scenario = Services.MemberService.GetMembershipScenario();
+            var scenario = _services.MemberService.GetMembershipScenario();
             var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
             switch (scenario)
             {
@@ -111,7 +117,7 @@ namespace Umbraco.Web.Editors.Binders
 
         private IMember GetExisting(Guid key)
         {
-            var member = Services.MemberService.GetByKey(key);
+            var member = _services.MemberService.GetByKey(key);
             if (member == null)
             {
                 throw new InvalidOperationException("Could not find member with key " + key);
@@ -128,13 +134,13 @@ namespace Umbraco.Web.Editors.Binders
         /// <remarks>
         /// Depending on whether a custom membership provider is configured this will return different results.
         /// </remarks>
-        protected override IMember CreateNew(MemberSave model)
+        private IMember CreateNew(MemberSave model)
         {
             var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
             if (provider.IsUmbracoMembershipProvider())
             {
-                var contentType = Services.MemberTypeService.Get(model.ContentTypeAlias);
+                var contentType = _services.MemberTypeService.Get(model.ContentTypeAlias);
                 if (contentType == null)
                 {
                     throw new InvalidOperationException("No member type found wth alias " + model.ContentTypeAlias);
@@ -155,7 +161,7 @@ namespace Umbraco.Web.Editors.Binders
 
                 //If the default Member type exists, we'll use that to create the IMember - that way we can associate the custom membership
                 // provider to our data - eventually we can support editing custom properties with a custom provider.
-                var memberType = Services.MemberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
+                var memberType = _services.MemberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
                 if (memberType != null)
                 {
                     FilterContentTypeProperties(memberType, memberType.PropertyTypes.Select(x => x.Alias).ToArray());
@@ -197,12 +203,12 @@ namespace Umbraco.Web.Editors.Binders
             }
         }
 
-        protected override ContentItemDto<IMember> MapFromPersisted(MemberSave model)
+        private ContentItemDto MapFromPersisted(MemberSave model)
         {
             //need to explicitly cast since it's an explicit implementation
             var saveModel = (IContentSave<IMember>)model;
 
-            return Mapper.Map<IMember, ContentItemDto<IMember>>(saveModel.PersistedContent);
+            return Mapper.Map<IMember, ContentItemDto>(saveModel.PersistedContent);
         }
 
         

@@ -60,12 +60,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <inheritdoc />
         [IgnoreDataMember]
         IContent IContentSave<IContent>.PersistedContent { get; set; }
-
-        //These need explicit implementation because we are using internal models
-        /// <inheritdoc />
-        [IgnoreDataMember]
-        ContentItemDto<IContent> IContentSave<IContent>.ContentDto { get; set; }
-
+        
         //Non explicit internal getter so we don't need to explicitly cast in our own code
         [IgnoreDataMember]
         internal IContent PersistedContent
@@ -74,13 +69,9 @@ namespace Umbraco.Web.Models.ContentEditing
             set => ((IContentSave<IContent>)this).PersistedContent = value;
         }
 
-        //Non explicit internal getter so we don't need to explicitly cast in our own code
-        [IgnoreDataMember]
-        internal ContentItemDto<IContent> ContentDto
-        {
-            get => ((IContentSave<IContent>)this).ContentDto;
-            set => ((IContentSave<IContent>)this).ContentDto = value;
-        }
+        ////Non explicit internal getter so we don't need to explicitly cast in our own code
+        //[IgnoreDataMember]
+        //internal ContentItemDto<IContent> ContentDto { get;set; }
 
         #endregion
 
