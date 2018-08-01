@@ -355,7 +355,6 @@
     <Content Include="Umbraco_client\Dialogs\SortDialog.js" />
     <Content Include="Umbraco_Client\Dialogs\AssignDomain2.js" />
     <Content Include="Umbraco_Client\Dialogs\AssignDomain2.css" />
-    <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
     <Content Include="Umbraco_Client\PunyCode\punycode.min.js" />
     <Content Include="Umbraco_Client\Tablesorting\img\asc.gif" />
     <Content Include="Umbraco_Client\Tablesorting\img\desc.gif" />
@@ -399,7 +398,6 @@
     <Content Include="Umbraco\Dialogs\rollBack.aspx" />
     <Content Include="Umbraco\Dialogs\sendToTranslation.aspx" />
     <Content Include="Umbraco\Dialogs\treePicker.aspx" />
-    <Content Include="Umbraco\Dialogs\umbracoField.aspx" />
     <Content Include="Umbraco\Dialogs\viewAuditTrail.aspx" />
     <Content Include="Umbraco\Config\Create\UI.xml" />
     <Content Include="Umbraco\Config\Lang\en.xml">
