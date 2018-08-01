@@ -48,7 +48,7 @@ namespace Umbraco.Web.Editors.Binders
 
             var result = GetMultiPartResult(actionContext);
 
-            var model = GetModel(actionContext, bindingContext, result);
+            var model = GetModel(actionContext, result);
             bindingContext.Model = model;
 
             return bindingContext.Model != null;
@@ -100,10 +100,9 @@ namespace Umbraco.Web.Editors.Binders
         /// Builds the model from the request contents
         /// </summary>
         /// <param name="actionContext"></param>
-        /// <param name="bindingContext"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        private TModelSave GetModel(HttpActionContext actionContext, ModelBindingContext bindingContext, MultipartFormDataStreamProvider result)
+        private TModelSave GetModel(HttpActionContext actionContext, MultipartFormDataStreamProvider result)
         {
             if (result.FormData["contentItem"] == null)
             {
@@ -178,10 +177,14 @@ namespace Umbraco.Web.Editors.Binders
         /// </summary>
         /// <param name="saveModel"></param>
         /// <param name="dto"></param>
-        private static void MapPropertyValuesFromSaved(IContentProperties<ContentPropertyBasic> saveModel, ContentItemDto<TPersisted> dto)
+        protected virtual void MapPropertyValuesFromSaved(TModelSave saveModel, ContentItemDto<TPersisted> dto)
         {
+            //TODO: This needs to be overridden for content but I'm pretty sure these DTO models won't even work for content
+            //Continue if this is a property model (i.e. media or members)
+            if (!(saveModel is IContentProperties<ContentPropertyBasic> propertyModel)) return;
+
             //NOTE: Don't convert this to linq, this is much quicker
-            foreach (var p in saveModel.Properties)
+            foreach (var p in propertyModel.Properties)
             {
                 foreach (var propertyDto in dto.Properties)
                 {
@@ -190,6 +193,7 @@ namespace Umbraco.Web.Editors.Binders
                     break;
                 }
             }
+
         }
 
         protected abstract TPersisted GetExisting(TModelSave model);
