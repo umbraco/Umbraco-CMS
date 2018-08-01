@@ -20,7 +20,6 @@ namespace umbraco.controls.Tree
     [ClientDependency(0, ClientDependencyType.Javascript, "Application/NamespaceManager.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "Application/UmbracoApplicationActions.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "Application/UmbracoUtils.js", "UmbracoClient")]
-    [ClientDependency(10, ClientDependencyType.Javascript, "Application/JQuery/jquery.metadata.min.js", "UmbracoClient")]
     [ClientDependency(11, ClientDependencyType.Javascript, "Tree/jquery.tree.js", "UmbracoClient")]
     [ClientDependency(12, ClientDependencyType.Javascript, "Tree/UmbracoContext.js", "UmbracoClient")]
     [ClientDependency(12, ClientDependencyType.Javascript, "Tree/jquery.tree.contextmenu.js", "UmbracoClient")]

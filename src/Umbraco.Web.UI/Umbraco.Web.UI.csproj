@@ -377,7 +377,6 @@
     <Content Include="Umbraco\Dialogs\empty.htm" />
     <Content Include="Umbraco\Dialogs\republish.aspx" />
     <Content Include="Umbraco\Dialogs\SendPublish.aspx" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.metadata.min.js" />
     <Content Include="Umbraco_Client\Application\UmbracoUtils.js" />
     <Content Include="Umbraco_Client\Application\UmbracoApplicationActions.js" />
     <Content Include="Umbraco_Client\Application\NamespaceManager.js" />
