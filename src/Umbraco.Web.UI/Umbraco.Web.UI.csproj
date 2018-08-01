@@ -527,7 +527,6 @@
     <Content Include="Umbraco_Client\Scrollingmenu\style.css" />
     <Content Include="Umbraco_Client\Tablesorting\tableDragAndDrop.js" />
     <Content Include="Umbraco_Client\Ui\default.css" />
-    <Content Include="Umbraco_Client\Ui\default.js" />
     <Content Include="Umbraco_Client\Ui\jquery.js" />
     <Content Include="App_Browsers\w3cvalidator.browser" />
     <Content Include="App_Browsers\Form.browser" />
