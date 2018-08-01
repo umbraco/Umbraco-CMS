@@ -15,8 +15,10 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_12_0
             var exists = Context.Database.FirstOrDefault<RelationTypeDto>("WHERE alias=@alias", new { alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias });
             if (exists == null)
             {
-                Insert.IntoTable(Constants.DatabaseSchema.Tables.RelationType).Row(new
+                var uniqueId = (Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias + "____" + Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName).ToGuid();
+                Insert.IntoTable("umbracoRelationType").Row(new
                 {
+                    typeUniqueId = uniqueId,
                     alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias,
                     name = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName,
                     childObjectType = Constants.ObjectTypes.MediaType,
