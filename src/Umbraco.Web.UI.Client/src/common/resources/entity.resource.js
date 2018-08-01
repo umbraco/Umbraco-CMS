@@ -46,7 +46,7 @@ function entityResource($q, $http, umbRequestHelper) {
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
-                       "GetSafeAlias", { value: value, camelCase: camelCase })),
+                        "GetSafeAlias", { value: encodeURIComponent(value), camelCase: camelCase })),
                'Failed to retrieve content type scaffold');
         },
 
