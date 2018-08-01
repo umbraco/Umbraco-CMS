@@ -251,6 +251,23 @@
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#insertField
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the insert field editor in infinite editing, the submit callback returns the code snippet
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function insertField(editor) {
+            editor.view = "views/common/infiniteeditors/insertfield/insertfield.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#sectionPicker
          * @methodOf umbraco.services.editorService
          *
@@ -283,6 +300,7 @@
             insertCodeSnippet: insertCodeSnippet,
             userGroupPicker: userGroupPicker,
             sectionPicker: sectionPicker,
+            insertField: insertField,
             userPicker: userPicker
         };
 

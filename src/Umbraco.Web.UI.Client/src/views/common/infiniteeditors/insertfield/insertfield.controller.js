@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function InsertFieldController($scope, $http, contentTypeResource, localizationService) {
+    function InsertFieldController($scope, contentTypeResource, localizationService) {
         
         var vm = this;
 
@@ -29,6 +29,8 @@
         vm.setCasingOption = setCasingOption;
         vm.setEncodingOption = setEncodingOption;
         vm.generateOutputSample = generateOutputSample;
+        vm.submit = submit;
+        vm.close = close;
 
         function onInit() {
 
@@ -139,10 +141,21 @@
 
         }
 
-        onInit();
+        function submit(model) {
+            if($scope.model.submit) {
+                $scope.model.submit(model);
+            }
+        }
 
+        function close() {
+            if($scope.model.close) {
+                $scope.model.close();
+            }
+        }
+
+        onInit();
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Overlays.InsertFieldController", InsertFieldController);
+    angular.module("umbraco").controller("Umbraco.Editors.InsertFieldController", InsertFieldController);
 })();
