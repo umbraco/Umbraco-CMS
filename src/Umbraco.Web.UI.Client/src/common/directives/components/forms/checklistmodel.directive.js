@@ -1,6 +1,6 @@
 /*
   
-  http://vitalets.github.io/checklist-model/
+  https://vitalets.github.io/checklist-model/
   <label ng-repeat="role in roles">
     <input type="checkbox" checklist-model="user.roles" checklist-value="role.id"> {{role.text}}
   </label>
@@ -44,7 +44,7 @@ angular.module('umbraco.directives')
     return arr;
   }
 
-  // http://stackoverflow.com/a/19228302/1458162
+  // https://stackoverflow.com/a/19228302/1458162
   function postLinkFn(scope, elem, attrs) {
     // compile with `ng-model` pointing to `checked`
     $compile(elem)(scope);
