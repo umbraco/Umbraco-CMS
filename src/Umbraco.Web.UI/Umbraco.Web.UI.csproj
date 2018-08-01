@@ -384,7 +384,6 @@
     <Content Include="Umbraco_Client\Application\JQuery\jquery.metadata.min.js" />
     <Content Include="Umbraco_Client\Application\UmbracoUtils.js" />
     <Content Include="Umbraco_Client\Application\UmbracoApplicationActions.js" />
-    <Content Include="Umbraco_Client\Application\UmbracoClientManager.js" />
     <Content Include="Umbraco_Client\Application\NamespaceManager.js" />
     <Content Include="Umbraco\Translation\details.aspx" />
     <Content Include="Umbraco_Client\Modal\modalBackground.gif" />
