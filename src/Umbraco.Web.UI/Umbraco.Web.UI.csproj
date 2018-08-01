@@ -529,7 +529,6 @@
     <Content Include="Umbraco_Client\Ui\default.css" />
     <Content Include="Umbraco_Client\Ui\default.js" />
     <Content Include="Umbraco_Client\Ui\jquery.js" />
-    <Content Include="Umbraco_Client\Ui\jqueryui.js" />
     <Content Include="App_Browsers\w3cvalidator.browser" />
     <Content Include="App_Browsers\Form.browser" />
     <Content Include="Umbraco\Masterpages\default.Master" />
