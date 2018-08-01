@@ -1094,7 +1094,6 @@
     <Compile Include="_Legacy\Controls\Panel.cs" />
     <Compile Include="_Legacy\Controls\ProgressBar.cs" />
     <Compile Include="_Legacy\Controls\PropertyPanel.cs" />
-    <Compile Include="_Legacy\Controls\ScrollingMenu.cs" />
     <Compile Include="_Legacy\Controls\Splitter.cs" />
     <Compile Include="_Legacy\Controls\TabPage.cs" />
     <Compile Include="_Legacy\Controls\TabView.cs" />

@@ -517,8 +517,6 @@
     <Content Include="Umbraco_Client\Menuicon\style.css" />
     <Content Include="Umbraco_Client\Modal\modal.js" />
     <Content Include="Umbraco_Client\Modal\style.css" />
-    <Content Include="Umbraco_Client\Scrollingmenu\javascript.js" />
-    <Content Include="Umbraco_Client\Scrollingmenu\style.css" />
     <Content Include="Umbraco_Client\Tablesorting\tableDragAndDrop.js" />
     <Content Include="App_Browsers\w3cvalidator.browser" />
     <Content Include="App_Browsers\Form.browser" />
