@@ -300,6 +300,27 @@
             open(editor);
         }
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#itemPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the section picker in infinite editing, the submit callback returns an array of the selected items
+         * 
+         * @param {Array} editor.availableItems Array of available items.
+         * @param {Array} editor.selectedItems Array of selected items. When passed in the selected items will be filtered from the available items.
+         * @param {Boolean} editor.filter Set to false to hide the filter.
+         * @param {Callback} editor.submit Submits the editor.
+         * @param {Callback} editor.close Closes the editor.
+         * @returns {Object} editor object
+         */
+        function itemPicker(editor) {
+            editor.view = "views/common/infiniteeditors/itempicker/itempicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
         var service = {
             getEditors: getEditors,
             open: open,
@@ -319,7 +340,8 @@
             sectionPicker: sectionPicker,
             insertField: insertField,
             templateSections: templateSections,
-            userPicker: userPicker
+            userPicker: userPicker,
+            itemPicker: itemPicker
         };
 
         return service;

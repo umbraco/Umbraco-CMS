@@ -558,16 +558,11 @@
 
             localizationService.localize("template_mastertemplate").then(function(value){
                 var title = value;
-
-                vm.masterTemplateOverlay = {
-                    view: "itempicker",
+                var masterTemplate = {
                     title: title,
                     availableItems: availableMasterTemplates,
-                    show: true,
                     submit: function(model) {
-    
                         var template = model.selectedItem;
-    
                         if (template && template.alias) {
                             vm.template.masterTemplateAlias = template.alias;
                             setLayout(template.alias + ".cshtml");
@@ -575,18 +570,16 @@
                             vm.template.masterTemplateAlias = null;
                             setLayout(null);
                         }
-    
-                        vm.masterTemplateOverlay.show = false;
-                        vm.masterTemplateOverlay = null;
+                        editorService.close();
                     },
                     close: function(oldModel) {
                         // close dialog
-                        vm.masterTemplateOverlay.show = false;
-                        vm.masterTemplateOverlay = null;
+                        editorService.close();
                         // focus editor
                         vm.editor.focus();
                     }
                 };
+                editorService.itemPicker(masterTemplate);
             });
 
         }
