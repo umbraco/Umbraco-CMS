@@ -79,7 +79,7 @@ angular.module("umbraco")
                 addTag($scope.tagToAdd);
                 $scope.tagToAdd = "";
                 //this clears the value stored in typeahead so it doesn't try to add the text again
-                // http://issues.umbraco.org/issue/U4-4947
+                // https://issues.umbraco.org/issue/U4-4947
                 $typeahead.typeahead('val', '');
             };
 
