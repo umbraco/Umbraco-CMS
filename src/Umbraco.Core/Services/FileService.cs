@@ -13,7 +13,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
- 
+
 namespace Umbraco.Core.Services
 {
     /// <summary>
@@ -332,8 +332,10 @@ namespace Umbraco.Core.Services
         public ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0)
         {
             // file might already be on disk, if so grab the content to avoid overwriting
-            var template = new Template(name, name);
-            template.Content = GetViewContent(template.Alias) ?? content;
+            var template = new Template(name, name)
+            {
+                Content = GetViewContent(name) ?? content
+            };
 
             if (masterTemplate != null)
             {
