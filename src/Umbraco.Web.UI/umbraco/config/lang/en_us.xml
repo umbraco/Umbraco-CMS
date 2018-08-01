@@ -2031,9 +2031,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     </area>
     <area alias="validation">
         <key alias="validation">Validation</key>
-        <key alias="validateAsEmail">Validate as email</key>
+        <key alias="validateAsEmail">Validate as an email</key>
         <key alias="validateAsNumber">Validate as a number</key>
-        <key alias="validateAsUrl">Validate as a Url</key>
+        <key alias="validateAsUrl">Validate as a url</key>
         <key alias="enterCustomValidation">...or enter a custom validation</key>
         <key alias="fieldIsMandatory">Field is mandatory</key>
         <key alias="validationRegExp">Enter a regular expression</key>
