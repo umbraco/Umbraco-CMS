@@ -357,15 +357,10 @@
     <Content Include="Umbraco_Client\Dialogs\AssignDomain2.css" />
     <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
     <Content Include="Umbraco_Client\PunyCode\punycode.min.js" />
-    <Content Include="Umbraco_Client\Splitbutton\InsertMacroSplitButton.js" />
     <Content Include="Umbraco_Client\Tablesorting\img\asc.gif" />
     <Content Include="Umbraco_Client\Tablesorting\img\desc.gif" />
     <Content Include="Umbraco_Client\Tablesorting\jquery.tablesorter.min.js" />
-    <Content Include="Umbraco_Client\Splitbutton\jquery.splitbutton.js" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.hotkeys.js" />
-    <Content Include="Umbraco_Client\Splitbutton\Images\splitbutton_hover.png" />
-    <Content Include="Umbraco_Client\Splitbutton\Images\splitbutton_downarrow.png" />
-    <Content Include="Umbraco_Client\Splitbutton\splitbutton.css" />
     <Content Include="Umbraco_Client\Modal\jquery.simplemodal.1.4.1.custom.js" />
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
