@@ -370,7 +370,6 @@
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
     <Content Include="Umbraco_Client\Ui\base2.js" />
-    <Content Include="Umbraco_Client\Ui\json2.js" />
     <Content Include="Umbraco\endPreview.aspx" />
     <Content Include="Umbraco\Dialogs\Preview.aspx" />
     <Content Include="Umbraco\Controls\Tree\TreeControl.ascx" />
