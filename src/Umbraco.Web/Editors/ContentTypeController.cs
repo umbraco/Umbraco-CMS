@@ -275,6 +275,19 @@ namespace Umbraco.Web.Editors
                             template = tryCreateTemplate.Result.Entity;
                         }
 
+                        // If the alias has been manually updated before the first save,
+                        // make sure to also update the first allowed template, as the
+                        // name will come back as a SafeAlias of the document type name,
+                        // not as the actual document type alias.
+                        // For more info: http://issues.umbraco.org/issue/U4-11059
+                        if (ctSave.DefaultTemplate != template.Alias)
+                        {
+                            var allowedTemplates = ctSave.AllowedTemplates.ToArray();
+                            if (allowedTemplates.Any())
+                                allowedTemplates[0] = template.Alias;
+                            ctSave.AllowedTemplates = allowedTemplates;
+                        }
+
                         //make sure the template alias is set on the default and allowed template so we can map it back
                         ctSave.DefaultTemplate = template.Alias;
 
