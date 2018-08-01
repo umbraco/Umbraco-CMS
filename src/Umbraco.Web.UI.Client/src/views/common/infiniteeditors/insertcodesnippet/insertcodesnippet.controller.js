@@ -52,28 +52,20 @@
         }
 
         function openPageFieldOverlay() {
-            vm.pageFieldOverlay = {
-                submitButtonLabel: "Insert",
-                closeButtonlabel: "Cancel",
-                view: "insertfield",
-                show: true,
+            var insertFieldEditor = {
                 submit: function(model) {
-
                   $scope.model.insert = {
                       "type": "umbracoField",
                       "umbracoField": model.umbracoField
                   };
-
                   $scope.model.submit($scope.model);
-
-                  vm.pageFieldOverlay.show = false;
-                  vm.pageFieldOverlay = null;
+                  editorService.close();
                 },
                 close: function (model) {
-                    vm.pageFieldOverlay.show = false;
-                    vm.pageFieldOverlay = null;
+                    editorService.close();
                 }
             };
+            editorService.insertField(insertFieldEditor);
         }
 
         function openDictionaryItemOverlay() {
