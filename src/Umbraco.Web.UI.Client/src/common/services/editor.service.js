@@ -268,6 +268,23 @@
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#templateSections
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the template sections editor in infinite editing, the submit callback returns the type to insert
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function templateSections(editor) {
+            editor.view = "views/common/infiniteeditors/templatesections/templatesections.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#sectionPicker
          * @methodOf umbraco.services.editorService
          *
@@ -301,6 +318,7 @@
             userGroupPicker: userGroupPicker,
             sectionPicker: sectionPicker,
             insertField: insertField,
+            templateSections: templateSections,
             userPicker: userPicker
         };
 
