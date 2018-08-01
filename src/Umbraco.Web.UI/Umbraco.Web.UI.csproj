@@ -511,10 +511,6 @@
     <Content Include="Umbraco\Webservices\codeEditorSave.asmx" />
     <Content Include="Umbraco\Webservices\legacyAjaxCalls.asmx" />
     <Content Include="Umbraco\Webservices\nodeSorter.asmx" />
-    <Content Include="Umbraco_Client\Menuicon\Images\buttonbg.gif" />
-    <Content Include="Umbraco_Client\Menuicon\Images\buttonbgdown.gif" />
-    <Content Include="Umbraco_Client\Menuicon\Images\split.gif" />
-    <Content Include="Umbraco_Client\Menuicon\style.css" />
     <Content Include="Umbraco_Client\Modal\modal.js" />
     <Content Include="Umbraco_Client\Modal\style.css" />
     <Content Include="Umbraco_Client\Tablesorting\tableDragAndDrop.js" />
