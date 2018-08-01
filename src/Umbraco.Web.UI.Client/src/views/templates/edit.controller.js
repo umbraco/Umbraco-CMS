@@ -510,12 +510,8 @@
 
 
         function openSectionsOverlay() {
-
-            vm.sectionsOverlay = {
-                view: "templatesections",
+            var templateSections = {
                 isMaster: vm.template.isMasterTemplate,
-                submitButtonLabel: "Insert",
-                show: true,
                 submit: function(model) {
 
                     if (model.insertType === 'renderBody') {
@@ -533,18 +529,15 @@
                         wrap(code);
                     }
 
-                    vm.sectionsOverlay.show = false;
-                    vm.sectionsOverlay = null;
+                    editorService.close();
 
                 },
                 close: function(model) {
-                    // close dialog
-                    vm.sectionsOverlay.show = false;
-                    vm.sectionsOverlay = null;
-                    // focus editor
+                    editorService.close();
                     vm.editor.focus();
                 }
             }
+            editorService.templateSections(templateSections);
         }
 
         function openMasterTemplateOverlay() {
