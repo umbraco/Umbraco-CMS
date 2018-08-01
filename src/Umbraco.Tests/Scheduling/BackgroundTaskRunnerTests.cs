@@ -945,8 +945,6 @@ namespace Umbraco.Tests.Scheduling
                 throw new NotImplementedException();
             }
 
-            private int i;
-
             public async Task RunAsync(CancellationToken token)
             {
                 Console.WriteLine("boom");
