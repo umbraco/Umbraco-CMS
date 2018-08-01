@@ -28,27 +28,22 @@
         }
 
         function openMacroPicker() {
-
-            vm.macroPickerOverlay = {
-                view: "macropicker",
+            var macroPicker = {
                 dialogData: {},
-                show: true,
                 submit: function(model) {
-
                     $scope.model.insert = {
                         "type": "macro",
                         "macroParams": model.macroParams,
                         "selectedMacro": model.selectedMacro
                     };
-
                     $scope.model.submit($scope.model);
-
-                    vm.macroPickerOverlay.show = false;
-                    vm.macroPickerOverlay = null;
-
+                    editorService.close();
+                },
+                close: function() {
+                    editorService.close();
                 }
             };
-
+            editorService.macroPicker(macroPicker);
         }
 
         function openPageFieldOverlay() {
