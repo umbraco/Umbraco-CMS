@@ -407,24 +407,17 @@
 
 
         function openPageFieldOverlay() {
-            vm.pageFieldOverlay = {
-                submitButtonLabel: "Insert",
-                closeButtonlabel: "Cancel",
-                view: "insertfield",
-                show: true,
+            var insertFieldEditor = {
                 submit: function (model) {
                     insert(model.umbracoField);
-                    vm.pageFieldOverlay.show = false;
-                    vm.pageFieldOverlay = null;
+                    editorService.close();
                 },
-                close: function (model) {
-                    // close the dialog
-                    vm.pageFieldOverlay.show = false;
-                    vm.pageFieldOverlay = null;
-                    // focus editor
-                    vm.editor.focus();                    
+                close: function () {
+                    editorService.close();
+                    vm.editor.focus();
                 }
             };
+            editorService.insertField(insertFieldEditor);
         }
 
 
