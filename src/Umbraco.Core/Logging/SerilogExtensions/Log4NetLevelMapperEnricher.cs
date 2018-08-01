@@ -28,15 +28,15 @@ namespace Umbraco.Core.Logging.SerilogExtensions
                     break;
 
                 case LogEventLevel.Information:
-                    log4NetLevel = "INFO";
+                    log4NetLevel = "INFO ";
                     break;
 
                 case LogEventLevel.Verbose:
-                    log4NetLevel = "ALL";
+                    log4NetLevel = "ALL  ";
                     break;
 
                 case LogEventLevel.Warning:
-                    log4NetLevel = "WARN";
+                    log4NetLevel = "WARN ";
                     break;
             }
 
