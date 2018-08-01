@@ -52,7 +52,7 @@ namespace Umbraco.Core.Logging
                     rollingInterval: RollingInterval.Day,
                     restrictedToMinimumLevel: LogEventLevel.Debug,
                     retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Log4NetLevel}  {Message:lj}{NewLine}{Exception}")
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Log4NetLevel}  {SourceContext} - {Message:lj}{NewLine}{Exception}")
 
                 //.clef format (Compact log event format, that can be imported into local SEQ & will make searching/filtering logs easier)
                 //Ends with ..txt as Date is inserted before file extension substring
