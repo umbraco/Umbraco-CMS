@@ -20,10 +20,7 @@
     <umbClient:JsApplicationLib runat="server" />
     <umbClient:JsJQueryCore runat="server" />
     <umbClient:JsUmbracoApplicationCore runat="server" />
-
-
-    <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" Priority="5" />
-
+    
     <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
 </head>
 

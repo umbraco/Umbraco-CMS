@@ -15,8 +15,6 @@
    <umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="1" />
    <umb:JsInclude ID="JsInclude4" runat="server" FilePath="lib/jquery-migrate/jquery-migrate.min.js" PathNameAlias="UmbracoRoot" Priority="1" />
    <umb:JsInclude ID="JsInclude6" runat="server" FilePath="ui/base2.js" PathNameAlias="UmbracoClient" Priority="1" />
- 
-    <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" Priority="5" />
 
 </head>
 <body style="overflow: scroll">
