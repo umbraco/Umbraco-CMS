@@ -1,4 +1,6 @@
-﻿using Umbraco.Core.Logging;
+﻿using System.Linq;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZero
@@ -13,12 +15,21 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZ
 
         public override void Up()
         {
-            Execute.Code(database =>
-            {
-                database.Execute("DROP INDEX [umbracoLanguage].[IX_umbracoLanguage_languageISOCode]");
-                return null;
-            });
+            var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)
+                .Select(x => new DbIndexDefinition()
+                {
+                    TableName = x.Item1,
+                    IndexName = x.Item2,
+                    ColumnName = x.Item3,
+                    IsUnique = x.Item4
+                }).ToArray();
 
+            //Ensure the index exists before dropping it
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoLanguage_languageISOCode")))
+            {
+                Delete.Index("IX_umbracoLanguage_languageISOCode").OnTable("umbracoLanguage");
+            }
+            
             Alter.Table("umbracoLanguage")
                 .AlterColumn("languageISOCode")
                 .AsString(14)
