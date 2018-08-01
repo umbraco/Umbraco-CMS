@@ -358,7 +358,6 @@
     <Content Include="Umbraco_Client\Tablesorting\img\asc.gif" />
     <Content Include="Umbraco_Client\Tablesorting\img\desc.gif" />
     <Content Include="Umbraco_Client\Tablesorting\jquery.tablesorter.min.js" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.hotkeys.js" />
     <Content Include="Umbraco_Client\Modal\jquery.simplemodal.1.4.1.custom.js" />
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
