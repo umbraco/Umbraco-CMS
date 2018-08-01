@@ -14,8 +14,6 @@ namespace Umbraco.Web.UI.Bundles
     [ClientDependency(ClientDependencyType.Javascript, "Application/UmbracoUtils.js", "UmbracoClient", Priority = 1, Group = 0)]
     [ClientDependency(ClientDependencyType.Javascript, "ui/json2.js", "UmbracoClient", Priority = 2, Group = 0)]
     [ClientDependency(ClientDependencyType.Javascript, "ui/base2.js", "UmbracoClient", Priority = 3, Group = 0)]
-    [ClientDependency(ClientDependencyType.Javascript, "UI/knockout.js", "UmbracoClient", Priority = 4, Group = 0)]
-    [ClientDependency(ClientDependencyType.Javascript, "UI/knockout.mapping.js", "UmbracoClient", Priority = 5, Group = 0)]
     public class JsApplicationLib : Control
     {
     }
