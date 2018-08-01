@@ -321,6 +321,24 @@
             open(editor);
         }
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#macroPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a macro picker in infinite editing, the submit callback returns an array of the selected items
+         * 
+         * @param {Callback} editor.submit Submits the editor.
+         * @param {Callback} editor.close Closes the editor.
+         * @returns {Object} editor object
+         */
+        function macroPicker(editor) {
+            editor.view = "views/common/infiniteeditors/macropicker/macropicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
         var service = {
             getEditors: getEditors,
             open: open,
@@ -341,7 +359,8 @@
             insertField: insertField,
             templateSections: templateSections,
             userPicker: userPicker,
-            itemPicker: itemPicker
+            itemPicker: itemPicker,
+            macroPicker: macroPicker
         };
 
         return service;
