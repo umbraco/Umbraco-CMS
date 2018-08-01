@@ -26,6 +26,12 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
         }
     };
 
+    $scope.close = function() {
+        if($scope.model.close) {
+            $scope.model.close();
+        }
+    }
+
     /** changes the view to edit the params of the selected macro */
     /** if there is pnly one macro, and it has parameters - editor can skip selecting the Macro **/
     function editParams(insertIfNoParameters) {
