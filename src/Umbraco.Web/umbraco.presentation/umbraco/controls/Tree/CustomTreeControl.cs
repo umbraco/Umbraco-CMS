@@ -18,7 +18,6 @@ namespace umbraco.controls.Tree
     /// to re-register the ClientDependencies.
     /// </remarks>
     [ClientDependency(0, ClientDependencyType.Javascript, "Application/NamespaceManager.js", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Javascript, "Application/UmbracoClientManager.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "Application/UmbracoApplicationActions.js", "UmbracoClient")]
     [ClientDependency(ClientDependencyType.Javascript, "Application/UmbracoUtils.js", "UmbracoClient")]
     [ClientDependency(10, ClientDependencyType.Javascript, "Application/JQuery/jquery.metadata.min.js", "UmbracoClient")]
