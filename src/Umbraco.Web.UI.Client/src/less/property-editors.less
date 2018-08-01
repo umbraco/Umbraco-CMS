@@ -139,12 +139,6 @@ ul.color-picker li {
     border: 2px solid transparent;
     width: 60px;
 
-    &.active {
-        .check_circle {
-            opacity: 1;
-        }
-    }
-
     .thumbnail{
         min-width: auto;
         width: inherit;
@@ -180,13 +174,13 @@ ul.color-picker li {
     div.color-picker-prediv {
         display: inline-flex;
         align-items: center;
+        max-width: 80%;
 
         pre {
-            display: inline;
+            display: inline-flex;
             font-family: monospace;
             margin-right: 10px;
             margin-left: 10px;
-            width: 50%;
             white-space: nowrap;
             overflow: hidden;
             margin-bottom: 0;
@@ -194,21 +188,28 @@ ul.color-picker li {
             padding-top: 7px;
             padding-bottom: 7px;
             background: #f7f7f7;
+            flex: 0 0 auto;
         }
 
         span {
             margin-left: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
 
     input[type="text"] {
-        min-width: 40%;
-        width: 320px;
-        display: inline-block;
+        display: flex;
+        flex: 1 1 100px;
         margin-top: 1px;
+        margin-right: 15px;
+        min-width: auto;
+        width: auto;
     }
 
     .sp-replacer {
+        display: inline-flex;
         margin-right: 18px;
     }
 

@@ -110,11 +110,14 @@ namespace Umbraco.Web.Routing
             foreach (var (text, infos) in dmsg)
                 ret.Add(UrlInfo.Message(text, infos.Count == cultures.Count ?  null : string.Join(", ", infos.Select(x => x.Culture))));
 
-            // fixme - need to add 'others' urls
-            // but, when?
-            //// get the 'other' urls
-            //foreach(var otherUrl in urlProvider.GetOtherUrls(content.Id))
-            //    urls.Add(otherUrl);
+            // get the 'other' urls - ie not what you'd get with GetUrl() but urls that would route to the document, nevertheless.
+            // for these 'other' urls, we don't check whether they are routable, collide, anything - we just report them.
+            // also, we are not dealing with cultures at all - that will have to wait
+            foreach(var otherUrl in umbracoContext.UrlProvider.GetOtherUrls(content.Id))
+            {
+                if (urls.Any(x => x.IsUrl && x.Text == otherUrl)) continue;
+                ret.Add(UrlInfo.Url(otherUrl));
+            }
 
             return ret;
         }

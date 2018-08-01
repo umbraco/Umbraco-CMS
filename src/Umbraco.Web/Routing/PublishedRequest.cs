@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading;
 using System.Web;
 using umbraco;
 using Umbraco.Core.Configuration;
@@ -345,7 +346,7 @@ namespace Umbraco.Web.Routing
         /// </summary>
         public CultureInfo Culture
         {
-            get { return _culture; }
+            get { return _culture ?? Thread.CurrentThread.CurrentCulture; }
             set
             {
                 EnsureWriteable();

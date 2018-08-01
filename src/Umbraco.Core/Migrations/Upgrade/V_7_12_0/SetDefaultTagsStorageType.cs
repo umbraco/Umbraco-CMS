@@ -22,7 +22,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_12_0
             if (Context?.Database == null) return;
 
             // We need to get all datatypes with an alias of "umbraco.tags" so we can loop over them and set the missing values if needed
-            var datatypes = Context.Database.Fetch<DataTypeDto>("SELECT * FROM cmsDataType");
+            var datatypes = Context.Database.Fetch<DataTypeDto>();
             var tagsDataTypes = datatypes.Where(x => string.Equals(x.EditorAlias, Constants.PropertyEditors.Aliases.Tags, StringComparison.InvariantCultureIgnoreCase));
 
             foreach (var datatype in tagsDataTypes)
