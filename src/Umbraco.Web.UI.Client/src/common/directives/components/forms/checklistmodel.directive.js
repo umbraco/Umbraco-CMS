@@ -19,7 +19,7 @@ angular.module('umbraco.directives')
     return false;
   }
 
-  // add
+  // add 
   function add(arr, item) {
     arr = angular.isArray(arr) ? arr : [];
     for (var i = 0; i < arr.length; i++) {
