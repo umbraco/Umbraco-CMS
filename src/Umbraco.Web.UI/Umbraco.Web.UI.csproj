@@ -348,8 +348,6 @@
     <Content Include="Umbraco\Dialogs\ChangeDocType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.min.js" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.unobtrusive.min.js" />
     <Content Include="Umbraco_Client\Dialogs\SortDialog.css" />
     <Content Include="Umbraco_client\Dialogs\SortDialog.js" />
     <Content Include="Umbraco_Client\Dialogs\AssignDomain2.js" />
