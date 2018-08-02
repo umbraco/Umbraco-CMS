@@ -36,7 +36,7 @@ angular.module("umbraco.directives")
         // this will greatly improve performance since there's potentially a lot of nodes being rendered = a LOT of watches!
 
         template: '<li data-element="tree-item-{{node.dataElement}}" ng-class="{\'current\': (node == currentNode), \'has-children\': node.hasChildren}" on-right-click="altSelect(node, $event)">' +
-            '<div ng-class="getNodeCssClass(node)" hm-swiperight="options(node, $event)" ng-dblclick="load(node)" >' +
+            '<div ng-class="getNodeCssClass(node)" hm-swiperight="options(node, $event)" ng-dblclick="load(node)" hm-manager-options="{ \'cssProps\': { \'userSelect\': \'auto\' } }">' +
             //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
             //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' + 
             '<ins data-element="tree-item-expand" ng-class="{\'icon-navigation-right\': !node.expanded || node.metaData.isContainer, \'icon-navigation-down\': node.expanded && !node.metaData.isContainer}" ng-click="load(node)">&nbsp;</ins>' +

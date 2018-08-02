@@ -99,7 +99,7 @@ angular.module('umbraco.services')
         var scope = options.scope || $rootScope.$new();
 
         //Modal dom obj and set id to old-dialog-service - used until we get all dialogs moved the the new overlay directive
-        dialog.element = $('<div hm-swiperight="swipeHide($event)" data-backdrop="false"></div>');
+        dialog.element = $('<div hm-swiperight="swipeHide($event)" hm-manager-options="{ \'cssProps\': { \'userSelect\': \'auto\' } }" data-backdrop="false"></div>');
         var id = "old-dialog-service";
 
         if (options.inline) {
