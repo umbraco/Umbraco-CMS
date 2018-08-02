@@ -273,11 +273,6 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "dialogs/importDocumentType.aspx",
                             Current.Services.TextService.Localize("actions/importDocumentType")));
-                case "UmbClientMgr.appActions().actionAudit()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/viewAuditTrail.aspx?nodeId=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            Current.Services.TextService.Localize("actions/auditTrail")));
 
             }
             return Attempt<LegacyUrlAction>.Fail();

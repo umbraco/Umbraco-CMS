@@ -301,13 +301,7 @@ Umbraco.Application.Actions = function() {
                 UmbClientMgr.openModalWindow("dialogs/importDocumentType.aspx?rnd=" + this._utils.generateRandom(), uiKeys['actions_importDocumentType'], true, 460, 400);
             }
         },
-
-        actionAudit: function() {
-            /// <summary></summary>
-
-            UmbClientMgr.openModalWindow('dialogs/viewAuditTrail.aspx?nodeId=' + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_auditTrail'], true, 550, 500);
-        },
-
+        
         actionPackage: function() {
             /// <summary></summary>
         },

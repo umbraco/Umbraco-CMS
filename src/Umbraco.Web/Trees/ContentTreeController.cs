@@ -231,7 +231,6 @@ namespace Umbraco.Web.Trees
             AddActionNode<ActionSort>(item, menu, true, true);
 
             AddActionNode<ActionRollback>(item, menu, convert: true);
-            AddActionNode<ActionAudit>(item, menu, convert: true);
             AddActionNode<ActionToPublish>(item, menu, convert: true);
             AddActionNode<ActionAssignDomain>(item, menu, convert: true);
             AddActionNode<ActionRights>(item, menu, convert: true);
