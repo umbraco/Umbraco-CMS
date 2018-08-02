@@ -53,7 +53,7 @@
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
-    <div class="umb-dialog-body">
+    <div>
         <umb:JsInclude ID="JsInclude1" runat="server" FilePath="js/umbracoCheckKeys.js" PathNameAlias="UmbracoRoot" />
 
         <cc1:Feedback ID="feedBackMsg" runat="server" />

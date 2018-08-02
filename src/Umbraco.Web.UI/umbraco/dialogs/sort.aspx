@@ -16,7 +16,7 @@
     <umb:JsInclude ID="JsInclude1" runat="server" FilePath="tablesorting/jquery.tablesorter.min.js" PathNameAlias="UmbracoClient" />
     <umb:JsInclude ID="JsInclude2" runat="server" FilePath="tablesorting/tableDragAndDrop.js" PathNameAlias="UmbracoClient" />
 
-    <div class="umb-dialog-body">
+    <div>
         <cc1:Pane runat="server">
 
           <div id="loading" style="display: none; margin-bottom: 35px;">

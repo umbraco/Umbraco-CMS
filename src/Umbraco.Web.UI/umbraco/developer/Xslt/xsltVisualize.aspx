@@ -36,7 +36,7 @@
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">
 
-    <div class="umb-dialog-body">
+    <div>
 
         <cc1:Pane ID="Pane1" runat="server" Text="Visualize XSLT">
 

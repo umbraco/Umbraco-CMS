@@ -2,7 +2,7 @@
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
-    <div class="umb-dialog-body form-horizontal">
+    <div class="form-horizontal">
     
         <cc1:Pane ID="pane_form" runat="server">
 

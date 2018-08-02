@@ -54,7 +54,7 @@
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
-    <div class="umb-dialog-body">
+    <div>
         <umb:JsInclude ID="JsInclude1" runat="server" FilePath="js/umbracoCheckKeys.js" PathNameAlias="UmbracoRoot" />
 
         <cc1:Feedback ID="feedBackMsg" runat="server" />
@@ -62,7 +62,8 @@
         <cc1:Pane ID="pp_selectVersion" runat="server" Text="Select a version to compare with the current version">
             <cc1:PropertyPanel id="pp_currentVersion" Text="Current version" runat="server">
                 <asp:Literal ID="currentVersionTitle" runat="server" />
-                <small>(<asp:Literal ID="currentVersionMeta" runat="server" />)</small></cc1:PropertyPanel>
+                <small>(<asp:Literal ID="currentVersionMeta" runat="server" />)</small>
+            </cc1:PropertyPanel>
             <cc1:PropertyPanel ID="pp_rollBackTo" Text="Rollback to" runat="server">
                 <asp:DropDownList OnSelectedIndexChanged="version_load" ID="allVersions" runat="server" Width="400px" AutoPostBack="True" CssClass="guiInputTextTiny" />
             </cc1:PropertyPanel>
@@ -95,5 +96,5 @@
     <div runat="server" id="pl_buttons" class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
         <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel")%></a>
         <asp:Button ID="Button1" runat="server" Visible="false" CssClass="btn btn-primary" OnClick="doRollback_Click"></asp:Button>
-    </div>  
+    </div>
 </asp:Content>

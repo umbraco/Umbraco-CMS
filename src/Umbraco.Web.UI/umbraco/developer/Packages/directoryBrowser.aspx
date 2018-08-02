@@ -18,7 +18,7 @@
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
-    <div class="umb-dialog-body">
+    <div>
         <cc1:Pane runat="server" Width="100px" ID="pane">
             <asp:PlaceHolder runat="server" ID="Output"></asp:PlaceHolder>
         </cc1:Pane>

@@ -27,7 +27,7 @@
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
 
-    <div class="umb-dialog-body">
+    <div>
 
         <cc1:Feedback ID="feedback" runat="server" />
         <div id="komask"></div>
