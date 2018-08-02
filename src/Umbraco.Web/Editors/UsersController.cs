@@ -246,7 +246,7 @@ namespace Umbraco.Web.Editors
             {
                 if (userStates == null || userStates.Any() == false)
                 {
-                    userStates = new[] { UserState.Active, UserState.Invited, UserState.LockedOut };
+                    userStates = new[] { UserState.Active, UserState.Invited, UserState.LockedOut, UserState.Inactive };
                 }
             }
 
