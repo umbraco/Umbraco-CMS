@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentSortController($scope, $timeout, contentResource) {
+    function ContentSortController($scope, $timeout, contentResource, navigationService) {
 
         var vm = this;
         var parentId = $scope.currentNode.parentId;
@@ -38,9 +38,14 @@
                 sortedIds: _.map(vm.children, function(child){ return child.id; })
             };
 
-            contentResource.sort(args).then(function(){
-                vm.saveButtonState = "success";
-            });
+            contentResource.sort(args)
+                .then(function(){
+                    navigationService.syncTree({ tree: "content", path: $scope.currentNode.path, forceReload: true, activate: false });
+                    vm.saveButtonState = "success";
+                }).catch(function(error) {
+                    vm.error = error;
+                    vm.saveButtonState = "error";
+                });
         }
 
         function fixSortableHelper(e, ui) {

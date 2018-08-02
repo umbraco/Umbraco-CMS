@@ -3,16 +3,20 @@
         <div class="umb-dialog-body with-footer">
             
             <div class="umb-pane">
+
+                <div ng-if="vm.error">
+                    <div class="alert alert-error">
+                        <div>{{vm.error.errorMsg}}</div>
+                    </div>
+                </div>
     
                 <umb-load-indicator
                     ng-show="vm.loading">
                 </umb-load-indicator>
     
                 <div ng-if="!vm.loading">
-    
                     <p class="abstract"><localize key="sort_sortHelp"></localize></p>
-    
-                    <table class="table">
+                    <table class="table" ng-if="vm.children">
                         <thead>
                             <tr>
                                 <th><localize key="general_name"></localize></th>
@@ -28,7 +32,12 @@
                             </tr>
                         </tbody>
                     </table>
-    
+
+                    <umb-empty-state
+                        ng-if="!vm.children"
+                        position="center">
+                        <localize key="sort_sortEmptyState"></localize>
+                    </umb-empty-state>
                 </div>
     
             </div>
@@ -40,9 +49,10 @@
                 type="button"
                 button-style="link"
                 action="nav.hideDialog()"
-                label-key="general_cancel">
+                label-key="general_close">
             </umb-button>
             <umb-button
+                ng-if="vm.children"
                 type="button" 
                 action="vm.save()"
                 state="vm.saveButtonState"
