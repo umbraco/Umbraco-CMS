@@ -450,7 +450,7 @@ namespace Umbraco.Web.Editors
                 contentItem.PersistedContent.Name = contentItem.Name;
             }
 
-            MapPropertyValues<IMedia, MediaItemSave>(
+            MapPropertyValuesForPersistence<IMedia, MediaItemSave>(
                 contentItem,
                 contentItem.PropertyCollectionDto,
                 (save, property) => property.GetValue(),        //get prop val

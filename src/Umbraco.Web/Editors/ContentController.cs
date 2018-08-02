@@ -617,17 +617,8 @@ namespace Umbraco.Web.Editors
         [OutgoingEditorModelEvent]
         public ContentItemDisplay PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
-            throw new NotImplementedException("Implement this!");
-            //var contentItemDisplay = PostSaveInternal(contentItem, content => Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id));
-            ////ensure the active culture is still selected
-            //if (!contentItem.Culture.IsNullOrWhiteSpace())
-            //{
-            //    foreach (var contentVariation in contentItemDisplay.Variants)
-            //    {
-            //        contentVariation.IsCurrent = contentVariation.Language.IsoCode.InvariantEquals(contentItem.Culture);
-            //    }
-            //}
-            //return contentItemDisplay;
+            var contentItemDisplay = PostSaveInternal(contentItem, content => Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id));
+            return contentItemDisplay;
         }
 
         private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod)
@@ -1228,9 +1219,9 @@ namespace Umbraco.Web.Editors
                 }
 
                 //for each variant, map the property values
-                MapPropertyValues<IContent, ContentItemSave>(
+                MapPropertyValuesForPersistence<IContent, ContentItemSave>(
                     contentSave,
-                    null, //TODO: Fix this!
+                    variant.PropertyCollectionDto,
                     (save, property) => Varies(property) ? property.GetValue(variant.Culture) : property.GetValue(),         //get prop val
                     (save, property, v) => { if (Varies(property)) property.SetValue(v, variant.Culture); else property.SetValue(v); });  //set prop val
             }

@@ -45,7 +45,7 @@ namespace Umbraco.Web.Editors
         /// <param name="dto"></param>
         /// <param name="getPropertyValue"></param>
         /// <param name="savePropertyValue"></param>
-        internal void MapPropertyValues<TPersisted, TSaved>(
+        internal void MapPropertyValuesForPersistence<TPersisted, TSaved>(
             TSaved contentItem,
             ContentPropertyCollectionDto dto,
             Func<TSaved, Property, object> getPropertyValue,
