@@ -117,7 +117,7 @@ namespace Umbraco.Web.Trees
 
                 //these two are the standard items
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
-                menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(null, "content", "content");
+                menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias), true);
 
                 //filter the standard items
                 FilterUserAllowedMenuItems(menu, nodeActions);
@@ -228,7 +228,7 @@ namespace Umbraco.Web.Trees
             AddActionNode<ActionCopy>(item, menu);
             AddActionNode<ActionChangeDocType>(item, menu, convert: true);
 
-            AddActionNode<ActionSort>(item, menu, true, true);
+            AddActionNode<ActionSort>(item, menu, true);
 
             AddActionNode<ActionRollback>(item, menu, convert: true);
             AddActionNode<ActionToPublish>(item, menu, convert: true);

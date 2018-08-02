@@ -1,0 +1,54 @@
+<div ng-controller="Umbraco.Editors.Content.SortController as vm" ng-cloak>
+    
+        <div class="umb-dialog-body with-footer">
+            
+            <div class="umb-pane">
+    
+                <umb-load-indicator
+                    ng-show="vm.loading">
+                </umb-load-indicator>
+    
+                <div ng-if="!vm.loading">
+    
+                    <p class="abstract"><localize key="sort_sortHelp"></localize></p>
+    
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="w-100"><localize key="general_name"></localize></th>
+                                <th class="nowrap"><localize key="sort_sortCreationDate"></localize></th>
+                                <th class="nowrap"><localize key="sort_sortOrder"></localize></th>
+                            </tr>
+                        </thead>
+                        <tbody ui-sortable="vm.sortableOptions" ng-model="vm.nodes">
+                            <tr ng-repeat="node in vm.nodes" class="cursor-move">
+                                <td>{{ node.name }}</td>
+                                <td>{{ node.creationDate }}</td>
+                                <td>{{ node.sortOrder }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+    
+                </div>
+    
+            </div>
+    
+        </div>
+    
+        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+            <a class="btn btn-link" ng-click="nav.hideDialog()">
+                <localize key="general_cancel">Cancel</localize>
+            </a>
+    
+            <umb-button
+                type="button" 
+                action="vm.save()"
+                state="vm.saveButtonState"
+                button-style="success"
+                label-key="buttons_save">
+            </umb-button>
+    
+        </div>
+    
+    </div>
+    

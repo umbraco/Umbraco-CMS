@@ -216,12 +216,6 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "createFolder.aspx?nodeId=" + nodeId + "&nodeType=" + nodeType + "&nodeName=" + nodeName + "&rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/create")));
-                case "UmbClientMgr.appActions().actionSort()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/sort.aspx?id=" + nodeId + "&nodeType=" + nodeType + "&app=" + currentSection + "&rnd=" + DateTime.UtcNow.Ticks,
-                            Current.Services.TextService.Localize("actions/sort")));
-
                 case "UmbClientMgr.appActions().actionProtect()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
