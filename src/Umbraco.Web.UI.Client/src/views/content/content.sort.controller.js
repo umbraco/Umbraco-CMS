@@ -1,12 +1,13 @@
 (function () {
     "use strict";
 
-    function ContentSortController($scope, $timeout) {
+    function ContentSortController($scope, $timeout, contentResource) {
 
         var vm = this;
+        var parentId = $scope.currentNode.parentId;
 
         vm.loading = false;
-        vm.nodes = [];
+        vm.children = [];
         vm.saveButtonState = "init";
         vm.sortableOptions = {
             distance: 10,
@@ -19,35 +20,16 @@
 
         vm.save = save;
 
-
-        function activate() {
+        function onInit() {
 
             vm.loading = true;
 
-            // fake loading
-            $timeout(function () {
-
-                vm.loading = false;
-
-                vm.nodes = [
-                    {
-                        "name": "Node 1",
-                        "creationDate": "date",
-                        "sortOrder": 0
-                    },
-                    {
-                        "name": "Node 2",
-                        "creationDate": "date",
-                        "sortOrder": 1
-                    },
-                    {
-                        "name": "Node 3",
-                        "creationDate": "date",
-                        "sortOrder": 2
-                    }
-                ];
-
-            }, 1000);
+            contentResource.getChildren(parentId)
+                .then(function(data){
+                    vm.children = data.items;
+                    vm.loading = false;
+                    console.log(vm.children);
+                });
         }
 
         function save() {
@@ -70,7 +52,7 @@
             return ui;
         }
 
-        activate();
+        onInit();
 
     }
 

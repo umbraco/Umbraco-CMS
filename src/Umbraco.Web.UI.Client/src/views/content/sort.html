@@ -15,16 +15,16 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th class="w-100"><localize key="general_name"></localize></th>
-                                <th class="nowrap"><localize key="sort_sortCreationDate"></localize></th>
-                                <th class="nowrap"><localize key="sort_sortOrder"></localize></th>
+                                <th><localize key="general_name"></localize></th>
+                                <th><localize key="sort_sortCreationDate"></localize></th>
+                                <th><localize key="sort_sortOrder"></localize></th>
                             </tr>
                         </thead>
-                        <tbody ui-sortable="vm.sortableOptions" ng-model="vm.nodes">
-                            <tr ng-repeat="node in vm.nodes" class="cursor-move">
-                                <td>{{ node.name }}</td>
-                                <td>{{ node.creationDate }}</td>
-                                <td>{{ node.sortOrder }}</td>
+                        <tbody ui-sortable="vm.sortableOptions" ng-model="vm.children">
+                            <tr ng-repeat="child in vm.children" class="cursor-move">
+                                <td>{{ child.name }}</td>
+                                <td>{{ child.createDate }}</td>
+                                <td>{{ child.sortOrder }}</td>
                             </tr>
                         </tbody>
                     </table>
