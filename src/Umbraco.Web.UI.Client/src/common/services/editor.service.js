@@ -234,6 +234,23 @@
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#templateEditor
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the user group picker in infinite editing, the submit callback returns the saved template
+         * @param {String} editor.id The template id
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function templateEditor(editor) {
+            editor.view = "views/templates/edit.html";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#sectionPicker
          * @methodOf umbraco.services.editorService
          *
@@ -355,6 +372,7 @@
             nodePermissions: nodePermissions,
             insertCodeSnippet: insertCodeSnippet,
             userGroupPicker: userGroupPicker,
+            templateEditor: templateEditor,
             sectionPicker: sectionPicker,
             insertField: insertField,
             templateSections: templateSections,

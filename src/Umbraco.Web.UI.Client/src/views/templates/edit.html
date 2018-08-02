@@ -106,16 +106,24 @@
                 </umb-editor-footer-content-left>
 
             <umb-editor-footer-content-right>
+                
+                <umb-button
+                    ng-if="model.infiniteMode"
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    action="vm.close()">
+                </umb-button>
 
-               <umb-button
-                  alias="save"
-                  type="submit"
-                  button-style="success"
-                  state="vm.page.saveButtonState"
-                  shortcut="ctrl+s"
-                  label="Save"
-                  label-key="buttons_save">
-               </umb-button>
+                <umb-button
+                    alias="save"
+                    type="submit"
+                    button-style="success"
+                    state="vm.page.saveButtonState"
+                    shortcut="ctrl+s"
+                    label="Save"
+                    label-key="buttons_save">
+                </umb-button>
 
             </umb-editor-footer-content-right>
 

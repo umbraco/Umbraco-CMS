@@ -5,6 +5,9 @@
 
         var vm = this;
         var oldMasterTemplateAlias = null;
+        var infiniteMode = $scope.model && $scope.model.infiniteMode;
+        var id = infiniteMode ? $scope.model.id : $routeParams.id;
+        var create = infiniteMode ? $scope.model.create : $routeParams.create;
 
         vm.page = {};
         vm.page.loading = true;
@@ -83,24 +86,25 @@
                 rebindCallback: function (orignal, saved) {}
             }).then(function (saved) {
 
-							if (!suppressNotification) {
-                localizationService.localizeMany(["speechBubbles_templateSavedHeader", "speechBubbles_templateSavedText"]).then(function(data){
-                    var header = data[0];
-                    var message = data[1];
-                    notificationsService.success(header, message);
-                });
-							}
-
+				if (!suppressNotification) {
+                    localizationService.localizeMany(["speechBubbles_templateSavedHeader", "speechBubbles_templateSavedText"]).then(function(data){
+                        var header = data[0];
+                        var message = data[1];
+                        notificationsService.success(header, message);
+                    });
+				}
 
                 vm.page.saveButtonState = "success";
                 vm.template = saved;
 
                 //sync state
-                editorState.set(vm.template);
+                if(!infiniteMode) {
+                    editorState.set(vm.template);
+                }
                 
                 // sync tree
                 // if master template alias has changed move the node to it's new location
-                if(oldMasterTemplateAlias !== vm.template.masterTemplateAlias) {
+                if(!infiniteMode && oldMasterTemplateAlias !== vm.template.masterTemplateAlias) {
                 
                     // When creating a new template the id is -1. Make sure We don't remove the root node.
                     if (vm.page.menu.currentNode.id !== "-1") {
@@ -119,14 +123,20 @@
                 } else {
 
                     // normal tree sync
-                    navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {
-                        vm.page.menu.currentNode = syncArgs.node;
-                    });
+                    if(!infiniteMode) {
+                        navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {
+                            vm.page.menu.currentNode = syncArgs.node;
+                        });
+                    }
 
                 }
 
                 // clear $dirty state on form
                 setFormState("pristine");
+
+                if(infiniteMode) {
+                    submit();
+                }
 
 
             }, function (err) {
@@ -154,18 +164,14 @@
                     vm.templates = templates;
                 });
 
-            if($routeParams.create){
-
-                templateResource.getScaffold(($routeParams.id)).then(function (template) {
+            if(create) {
+                templateResource.getScaffold((id)).then(function (template) {
             		vm.ready(template);
             	});
-
-            }else{
-
-            	templateResource.getById($routeParams.id).then(function(template){
+            } else {
+            	templateResource.getById(id).then(function(template){
                     vm.ready(template);
                 });
-
             }
 
         };
@@ -176,7 +182,7 @@
             vm.template = template;
 
 						// if this is a new template, bind to the blur event on the name
-						if ($routeParams.create) {
+						if (create) {
 							$timeout(function() {
 								var nameField = angular.element(document.querySelector('[data-element="editor-name-field"]'));
 								if (nameField) {
@@ -191,10 +197,12 @@
 					
 					
             //sync state
-            editorState.set(vm.template);
-            navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {
-                vm.page.menu.currentNode = syncArgs.node;
-            });
+            if(!infiniteMode) {
+                editorState.set(vm.template);
+                navigationService.syncTree({ tree: "templates", path: vm.template.path, forceReload: true }).then(function (syncArgs) {
+                    vm.page.menu.currentNode = syncArgs.node;
+                });
+            }
 
             // save state of master template to use for comparison when syncing the tree on save
             oldMasterTemplateAlias = angular.copy(template.masterTemplateAlias);
@@ -312,7 +320,7 @@
                     // initial cursor placement
                     // Keep cursor in name field if we are create a new template
                     // else set the cursor at the bottom of the code editor
-                    if(!$routeParams.create) {
+                    if(!create) {
                         $timeout(function(){
                             vm.editor.navigateFileEnd();
                             vm.editor.focus();
@@ -341,6 +349,8 @@
         vm.getMasterTemplateName = getMasterTemplateName;
         vm.removeMasterTemplate = removeMasterTemplate;
         vm.closeShortcuts = closeShortcuts;
+        vm.submit = submit;
+        vm.close = close;
 
         function openInsertOverlay() {
             var insertOverlay = {
@@ -683,6 +693,19 @@
 
         function closeShortcuts() {
             vm.showKeyboardShortcut = false;
+        }
+
+        function submit() {
+            if($scope.model.submit) {
+                $scope.model.template = vm.template;
+                $scope.model.submit($scope.model);
+            }
+        }
+
+        function close() {
+            if($scope.model.close) {
+                $scope.model.close();
+            }
         }
     
         vm.init();
