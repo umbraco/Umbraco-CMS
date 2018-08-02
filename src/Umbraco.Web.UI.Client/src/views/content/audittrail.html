@@ -1,0 +1,44 @@
+<div ng-controller="Umbraco.Editors.Content.AuditTrailController as vm" ng-cloak>
+    
+    <div class="umb-dialog-body with-footer">
+        
+        <div class="umb-pane">
+
+            <umb-load-indicator
+                ng-show="vm.loading">
+            </umb-load-indicator>
+
+            <div ng-if="!vm.loading">
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><localize key="general_action"></localize></th>
+                            <th><localize key="general_user"></localize></th>
+                            <th><localize key="general_date"></localize></th>
+                            <th><localize key="general_comment"></localize></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in vm.auditTrail">
+                            <td>{{ item.action }}</td>
+                            <td>{{ item.user }}</td>
+                            <td>{{ item.date }}</td>
+                            <td>{{ item.comment }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+        <a class="btn btn-link" ng-click="nav.hideDialog()">
+            <localize key="general_cancel">Cancel</localize>
+        </a>
+    </div>
+
+</div>
