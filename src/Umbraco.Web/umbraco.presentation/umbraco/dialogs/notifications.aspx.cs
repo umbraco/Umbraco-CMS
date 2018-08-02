@@ -56,7 +56,7 @@ namespace umbraco.dialogs
                         c.Checked = true;
 
                     uicontrols.PropertyPanel pp = new umbraco.uicontrols.PropertyPanel();
-                    pp.CssClass = "inline";
+                    pp.CssClass = "flex";
                     pp.Text = ui.Text("actions", a.Alias);
                     pp.Controls.Add(c);
 
