@@ -254,10 +254,7 @@ namespace Umbraco.Web.Editors
             var paged = new PagedUserResult(total, pageNumber, pageSize)
             {
                 Items = Mapper.Map<IEnumerable<UserBasic>>(result),
-                UserStates = hideDisabledUsers
-                                 ? Services.UserService.GetUserStates().Where(state => state.Key != UserState.Disabled)
-                                           .ToDictionary(state => state.Key, state => state.Value)
-                                 : Services.UserService.GetUserStates()
+                UserStates = Services.UserService.GetUserStates()
             };
 
             return paged;
