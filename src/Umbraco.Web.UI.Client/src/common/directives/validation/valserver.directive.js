@@ -19,7 +19,19 @@ function valServer(serverValidationManager) {
                 return;
             }
 
+            var currentProperty = umbPropCtrl.property;
+            var currentCulture = tabbedContent.content.language.culture;
             var watcher = null;
+
+            //default to 'value' if nothing is set
+            var fieldName = "value";
+            if (attr.valServer) {
+                fieldName = scope.$eval(attr.valServer);
+                if (!fieldName) {
+                    //eval returned nothing so just use the string
+                    fieldName = attr.valServer;
+                }
+            }
 
             //Need to watch the value model for it to change, previously we had  subscribed to 
             //modelCtrl.$viewChangeListeners but this is not good enough if you have an editor that
@@ -41,6 +53,8 @@ function valServer(serverValidationManager) {
 
                         if (modelCtrl.$invalid) {
                             modelCtrl.$setValidity('valServer', true);
+                            //clear the server validation entry
+                            serverValidationManager.removePropertyError(currentProperty.alias, currentCulture, fieldName);
                             stopWatch();
                         }
                     }, true);
@@ -53,19 +67,6 @@ function valServer(serverValidationManager) {
                     watcher = null;
                 }
             }
-
-            var currentProperty = umbPropCtrl.property;
-            var currentCulture = tabbedContent.content.language.culture;
-
-            //default to 'value' if nothing is set
-            var fieldName = "value";
-            if (attr.valServer) {
-                fieldName = scope.$eval(attr.valServer);
-                if (!fieldName) {
-                    //eval returned nothing so just use the string
-                    fieldName = attr.valServer;
-                }
-            }            
             
             //subscribe to the server validation changes
             serverValidationManager.subscribe(currentProperty.alias, currentCulture, fieldName, function (isValid, propertyErrors, allErrors) {

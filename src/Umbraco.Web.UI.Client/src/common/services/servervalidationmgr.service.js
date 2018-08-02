@@ -46,11 +46,30 @@ function serverValidationManager($timeout) {
         });
     }
 
+    function notifyCallbacks(self) {
+        for (var cb in callbacks) {
+            if (callbacks[cb].propertyAlias === null) {
+                //its a field error callback
+                var fieldErrors = getFieldErrors(self, callbacks[cb].fieldName);
+                if (fieldErrors.length > 0) {
+                    executeCallback(self, fieldErrors, callbacks[cb].callback);
+                }
+            }
+            else {
+                //its a property error
+                var propErrors = getPropertyErrors(self, callbacks[cb].propertyAlias, callbacks[cb].culture, callbacks[cb].fieldName);
+                if (propErrors.length > 0) {
+                    executeCallback(self, propErrors, callbacks[cb].callback);
+                }
+            }
+        }
+    }
+
     return {
         
         /**
          * @ngdoc function
-         * @name umbraco.services.serverValidationManager#subscribe
+         * @name notifyAndClearAllSubscriptions
          * @methodOf umbraco.services.serverValidationManager
          * @function
          *
@@ -63,28 +82,12 @@ function serverValidationManager($timeout) {
          *   so that any persisted validation errors are re-bound to their controls. Once they are re-binded this then clears the validation
          *   colleciton so that if another route change occurs, the previously persisted validation errors are not re-bound to the new item.
          */
-        executeAndClearAllSubscriptions: function() {
+        notifyAndClearAllSubscriptions: function() {
 
             var self = this;
 
             $timeout(function () {
-                
-                for (var cb in callbacks) {
-                    if (callbacks[cb].propertyAlias === null) {
-                        //its a field error callback
-                        var fieldErrors = getFieldErrors(self, callbacks[cb].fieldName);
-                        if (fieldErrors.length > 0) {
-                            executeCallback(self, fieldErrors, callbacks[cb].callback);
-                        }
-                    }
-                    else {
-                        //its a property error
-                        var propErrors = getPropertyErrors(self, callbacks[cb].propertyAlias, callbacks[cb].fieldName);
-                        if (propErrors.length > 0) {
-                            executeCallback(self, propErrors, callbacks[cb].callback);
-                        }
-                    }
-                }
+                notifyCallbacks(self);
                 //now that they are all executed, we're gonna clear all of the errors we have
                 self.clear();
             });
@@ -92,7 +95,25 @@ function serverValidationManager($timeout) {
 
         /**
          * @ngdoc function
-         * @name umbraco.services.serverValidationManager#subscribe
+         * @name notify
+         * @methodOf umbraco.services.serverValidationManager
+         * @function
+         *
+         * @description
+         * This method isn't used very often but can be used if all subscriptions need to be notified again. This can be
+         * handy if a view needs to be reloaded/rebuild like when switching variants in the content editor.
+         */
+        notify: function() {
+            var self = this;
+
+            $timeout(function () {
+                notifyCallbacks(self);
+            });
+        },
+
+        /**
+         * @ngdoc function
+         * @name subscribe
          * @methodOf umbraco.services.serverValidationManager
          * @function
          *

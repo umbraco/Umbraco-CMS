@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentAppContentController($scope, $timeout) {
+    function ContentAppContentController($scope, $timeout, serverValidationManager) {
 
         var vm = this;
         vm.loading = true;
@@ -9,6 +9,7 @@
         //TODO: Figure out what we need to do to maintain validation states since this will re-init the editor
         function onInit() {
             vm.content = $scope.model.viewModel;
+            serverValidationManager.notify();
             vm.loading = false;
         }
 

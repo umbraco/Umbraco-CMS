@@ -530,7 +530,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             args.rebindCallback();
                         }
 
-                        serverValidationManager.executeAndClearAllSubscriptions();
+                        serverValidationManager.notifyAndClearAllSubscriptions();
                     }
 
                     //indicates we've handled the server result

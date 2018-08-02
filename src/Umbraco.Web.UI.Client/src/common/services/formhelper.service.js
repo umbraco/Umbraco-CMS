@@ -116,7 +116,7 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
                     this.handleServerValidation(err.data.ModelState);
 
                     //execute all server validation events and subscribers
-                    serverValidationManager.executeAndClearAllSubscriptions();                    
+                    serverValidationManager.notifyAndClearAllSubscriptions();                    
                 }
                 else {
                     dialogService.ysodDialog(err);

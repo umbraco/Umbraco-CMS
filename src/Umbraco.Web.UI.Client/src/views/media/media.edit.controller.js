@@ -201,7 +201,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
                 // route but there might be server validation errors in the collection which we need to display
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors
                 // if there are any and then clear them so the collection no longer persists them.
-                serverValidationManager.executeAndClearAllSubscriptions();
+                serverValidationManager.notifyAndClearAllSubscriptions();
 
                 if(!infiniteMode) {
                     syncTreeNode($scope.content, data.path, true); 
