@@ -532,6 +532,7 @@
     <Compile Include="SingletonHttpContextAccessor.cs" />
     <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\MacroTreeController.cs" />
+    <Compile Include="Trees\StylesheetTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
     <Compile Include="Suspendable.cs" />
     <Compile Include="Trees\ContentBlueprintTreeController.cs" />
