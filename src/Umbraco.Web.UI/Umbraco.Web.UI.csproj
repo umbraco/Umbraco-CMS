@@ -180,14 +180,6 @@
     <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.designer.cs">
       <DependentUpon>ChangeDocType.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\dialogs\Sort.aspx.cs">
-      <DependentUpon>sort.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\dialogs\Sort.aspx.designer.cs">
-      <DependentUpon>sort.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="Umbraco\Masterpages\Default.Master.cs">
       <DependentUpon>default.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -348,8 +340,6 @@
     <Content Include="Umbraco\Dialogs\ChangeDocType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Umbraco_Client\Dialogs\SortDialog.css" />
-    <Content Include="Umbraco_client\Dialogs\SortDialog.js" />
     <Content Include="Umbraco_Client\Tablesorting\img\asc.gif" />
     <Content Include="Umbraco_Client\Tablesorting\img\desc.gif" />
     <Content Include="Umbraco_Client\Tablesorting\jquery.tablesorter.min.js" />
@@ -487,7 +477,6 @@
       <SubType>Form</SubType>
     </Content>
     <Content Include="Umbraco\Settings\EditDictionaryItem.aspx" />
-    <Content Include="Umbraco\Dialogs\sort.aspx" />
     <Content Include="Umbraco\treeInit.aspx" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="Umbraco\Webservices\ajax.js" />
