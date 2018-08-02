@@ -244,7 +244,10 @@ namespace Umbraco.Web.Editors
 
             if (hideDisabledUsers)
             {
-                filterQuery.Where(user => !user.IsApproved);
+                if (userStates == null || userStates.Any() == false)
+                {
+                    userStates = new[] { UserState.Active, UserState.Invited, UserState.LockedOut };
+                }
             }
 
             long pageIndex = pageNumber - 1;
