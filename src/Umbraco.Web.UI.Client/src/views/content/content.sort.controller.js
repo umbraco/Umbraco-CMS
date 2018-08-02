@@ -4,6 +4,7 @@
     function ContentSortController($scope, $timeout, contentResource) {
 
         var vm = this;
+        var parentId = $scope.currentNode.parentId;
         var id = $scope.currentNode.id;
 
         vm.loading = false;
