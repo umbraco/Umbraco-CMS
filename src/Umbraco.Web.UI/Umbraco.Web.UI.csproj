@@ -353,7 +353,6 @@
     <Content Include="Umbraco_Client\Tablesorting\img\asc.gif" />
     <Content Include="Umbraco_Client\Tablesorting\img\desc.gif" />
     <Content Include="Umbraco_Client\Tablesorting\jquery.tablesorter.min.js" />
-    <Content Include="Umbraco_Client\Modal\jquery.simplemodal.1.4.1.custom.js" />
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
     <Content Include="Umbraco\endPreview.aspx" />
@@ -376,8 +375,6 @@
     <Content Include="Umbraco_Client\Application\UmbracoApplicationActions.js" />
     <Content Include="Umbraco_Client\Application\NamespaceManager.js" />
     <Content Include="Umbraco\Translation\details.aspx" />
-    <Content Include="Umbraco_Client\Modal\modalBackground.gif" />
-    <Content Include="Umbraco_Client\Modal\modalGradiant.gif" />
     <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
     <Content Include="Umbraco\Dialogs\create.aspx" />
@@ -497,8 +494,6 @@
     <Content Include="Umbraco\Webservices\codeEditorSave.asmx" />
     <Content Include="Umbraco\Webservices\legacyAjaxCalls.asmx" />
     <Content Include="Umbraco\Webservices\nodeSorter.asmx" />
-    <Content Include="Umbraco_Client\Modal\modal.js" />
-    <Content Include="Umbraco_Client\Modal\style.css" />
     <Content Include="Umbraco_Client\Tablesorting\tableDragAndDrop.js" />
     <Content Include="App_Browsers\w3cvalidator.browser" />
     <Content Include="App_Browsers\Form.browser" />
