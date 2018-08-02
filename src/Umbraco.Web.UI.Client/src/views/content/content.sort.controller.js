@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentSortController($scope, $timeout, contentResource, navigationService) {
+    function ContentSortController($scope, $filter, contentResource, navigationService) {
 
         var vm = this;
         var parentId = $scope.currentNode.parentId;
@@ -10,16 +10,23 @@
         vm.loading = false;
         vm.children = [];
         vm.saveButtonState = "init";
+        vm.sortOrder = {};
         vm.sortableOptions = {
             distance: 10,
             tolerance: "pointer",
             opacity: 0.7,
             scroll: true,
             cursor: "move",
-            helper: fixSortableHelper
+            helper: fixSortableHelper,
+            update: function() {
+                // clear the sort order when drag and drop is used
+                vm.sortOrder.column = "";
+                vm.sortOrder.reverse = false;
+            }
         };
 
         vm.save = save;
+        vm.sort = sort;
 
         function onInit() {
             vm.loading = true;
@@ -54,6 +61,17 @@
                 $(this).width($(this).width());
             });
             return ui;
+        }
+
+        function sort(column) {
+            // reverse if it is already ordered by that column
+            if(vm.sortOrder.column === column) {
+                vm.sortOrder.reverse = !vm.sortOrder.reverse
+            } else {
+                vm.sortOrder.column = column;
+                vm.sortOrder.reverse = false;
+            }
+            vm.children = $filter('orderBy')(vm.children, vm.sortOrder.column, vm.sortOrder.reverse);
         }
 
         onInit();

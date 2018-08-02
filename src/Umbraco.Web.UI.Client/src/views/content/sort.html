@@ -16,16 +16,40 @@
     
                 <div ng-if="!vm.loading">
                     <p class="abstract"><localize key="sort_sortHelp"></localize></p>
-                    <table class="table" ng-if="vm.children">
+                    <table class="table table-condensed table-sortable" ng-if="vm.children">
                         <thead>
                             <tr>
-                                <th><localize key="general_name"></localize></th>
-                                <th><localize key="sort_sortCreationDate"></localize></th>
-                                <th><localize key="sort_sortOrder"></localize></th>
+                                <th>
+                                    <a ng-href="#" ng-click="vm.sort('name')" prevent-default>
+                                        <localize key="general_name"></localize>
+                                        <span ng-if="vm.sortOrder.column === 'name'">
+                                            <i ng-if="vm.sortOrder.reverse" class="icon-navigation-up"></i>
+                                            <i ng-if="!vm.sortOrder.reverse" class="icon-navigation-down"></i>
+                                        </span>
+                                    </a>
+                                </th>
+                                <th>
+                                    <a ng-href="#" ng-click="vm.sort('createDate')" prevent-default>
+                                        <localize key="sort_sortCreationDate"></localize>
+                                        <span ng-if="vm.sortOrder.column === 'createDate'">
+                                            <i ng-if="vm.sortOrder.reverse" class="icon-navigation-up"></i>
+                                            <i ng-if="!vm.sortOrder.reverse" class="icon-navigation-down"></i>
+                                        </span>
+                                    </a>
+                                </th>
+                                <th>
+                                    <a ng-href="#" ng-click="vm.sort('sortOrder')" prevent-default>
+                                        <localize key="sort_sortOrder"></localize>
+                                        <span ng-if="vm.sortOrder.column === 'sortOrder'">
+                                            <i ng-if="vm.sortOrder.reverse" class="icon-navigation-up"></i>
+                                            <i ng-if="!vm.sortOrder.reverse" class="icon-navigation-down"></i>
+                                        </span>
+                                    </a>
+                                </th>
                             </tr>
                         </thead>
                         <tbody ui-sortable="vm.sortableOptions" ng-model="vm.children">
-                            <tr ng-repeat="child in vm.children" class="cursor-move">
+                            <tr ng-repeat="child in vm.children">
                                 <td>{{ child.name }}</td>
                                 <td>{{ child.createDate }}</td>
                                 <td>{{ child.sortOrder }}</td>
