@@ -7,7 +7,7 @@
     <!-- navigation container -->
     <div id="navigation" ng-show="showNavigation" class="fill umb-modalcolumn" ng-animate="'slide'" nav-resize>
 
-        <div hm-swipeleft="nav.hideNavigation()" class="navigation-inner-container span6">
+        <div hm-swipeleft="nav.hideNavigation()" hm-manager-options="{ cssProps: { 'user-select': 'auto' } }" class="navigation-inner-container span6">
 
             <!-- the search -->
             <div ng-controller="Umbraco.SearchController" ng-if="authenticated">
@@ -90,7 +90,7 @@
         <div class="offset6" id="navOffset" style="z-index: 10">
 
             <!-- The context menu -->
-            <div id='contextMenu' class="umb-modalcolumn fill shadow" hm-swipeleft="nav.hideMenu()" ng-show="showContextMenu" ng-animate="'slide'">
+            <div id='contextMenu' class="umb-modalcolumn fill shadow" hm-swipeleft="nav.hideMenu()" hm-manager-options="{ cssProps: { 'user-select': 'auto' } }" ng-show="showContextMenu" ng-animate="'slide'">
                 <umb-context-menu menu-dialog-title="{{menuDialogTitle}}"
                                   current-section="{{currentSection}}"
                                   current-node="menuNode"
@@ -101,6 +101,7 @@
             <!-- Tree dialogs -->
             <div id="dialog" class='umb-modalcolumn fill shadow'
                  hm-swipeleft="nav.hideDialog()"
+                 hm-manager-options="{ cssProps: { 'user-select': 'auto' } }"
                  ng-show="showContextMenuDialog" ng-animate="'slide'">
                 <div class='umb-modalcolumn-header'>
                     <h1>{{menuDialogTitle}}</h1>
