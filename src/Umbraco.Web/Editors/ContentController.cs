@@ -25,12 +25,10 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.Validation;
-using Umbraco.Web.Models;
-using Umbraco.Web.WebServices;
 using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
-using ContentVariation = Umbraco.Core.Models.ContentVariation;
 using Language = Umbraco.Web.Models.ContentEditing.Language;
+using SortNode = Umbraco.Web.Models.ContentEditing.SortNode;
 
 namespace Umbraco.Web.Editors
 {
@@ -955,6 +953,35 @@ namespace Umbraco.Web.Editors
             Services.ContentService.EmptyRecycleBin();
 
             return Request.CreateNotificationSuccessResponse(Services.TextService.Localize("defaultdialogs/recycleBinIsEmpty"));
+        }
+
+        /// <summary>
+        /// Gets child nodes of the current node (parentId) to be sorted
+        /// </summary>
+        /// <param name="parentId">The current node in which to sort its children</param>
+        /// <returns></returns>
+        [HttpGet]
+        public SortNode GetContentSortOrder(int parentId)
+        {
+            var nodes = new List<SortNode>();
+            var parent = new SortNode { Id = parentId };
+
+            var entityService = Services.EntityService;
+
+            // Root node
+            if (parentId == -1)
+            {
+                var rootContent = entityService.GetRootEntities(UmbracoObjectTypes.Document);
+                nodes.AddRange(rootContent.Select(content => new SortNode(content.Id, content.SortOrder, content.Name, content.CreateDate)));
+            }
+            else
+            {
+                var children = entityService.GetChildren(parentId);
+                nodes.AddRange(children.Select(child => new SortNode(child.Id, child.SortOrder, child.Name, child.CreateDate)));
+            }
+
+            parent.SortNodes = nodes.ToArray();
+            return parent;
         }
 
         /// <summary>

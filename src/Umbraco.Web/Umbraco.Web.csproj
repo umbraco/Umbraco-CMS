@@ -226,6 +226,7 @@
     <Compile Include="Models\ContentEditing\Permission.cs" />
     <Compile Include="Models\ContentEditing\PostedFolder.cs" />
     <Compile Include="Models\ContentEditing\SnippetDisplay.cs" />
+    <Compile Include="Models\ContentEditing\SortNode.cs" />
     <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
     <Compile Include="Models\ContentEditing\TreeSearchResult.cs" />
     <Compile Include="Models\ContentEditing\UserDisplay.cs" />
