@@ -98,19 +98,7 @@ function valPropertyMsg(serverValidationManager) {
                 }
             }
 
-            //if there's any remaining errors in the server validation service then we should show them.
-            var showValidation = serverValidationManager.items.length > 0;
-            var hasError = false;
-
-            //create properties on our custom scope so we can use it in our template
-            scope.errorMsg = "";
-
-            var unsubscribe = [];
-
-            //listen for form validation changes.
-            //The alternative is to add a watch to formCtrl.$invalid but that would lead to many more watches then
-            // subscribing to this single watch.
-            valFormManager.onValidationStatusChanged(function (evt, args) {
+            function checkValidationStatus() {
                 if (formCtrl.$invalid) {
                     //first we need to check if the valPropertyMsg validity is invalid
                     if (formCtrl.$error.valPropertyMsg && formCtrl.$error.valPropertyMsg.length > 0) {
@@ -135,6 +123,31 @@ function valPropertyMsg(serverValidationManager) {
                     hasError = false;
                     scope.errorMsg = "";
                 }
+            }
+
+            //if there's any remaining errors in the server validation service then we should show them.
+            var showValidation = serverValidationManager.items.length > 0;
+            if (!showValidation) {
+                //We can either get the form submitted status by the parent directive valFormManager (if we add a property to it)
+                //or we can just check upwards in the DOM for the css class (easier for now).
+                //The initial hidden state can't always be hidden because when we switch variants in the content editor we cannot
+                //reset the status.
+                showValidation = element.closest(".show-validation").length > 0;
+            }
+            
+
+            var hasError = false;
+
+            //create properties on our custom scope so we can use it in our template
+            scope.errorMsg = "";
+
+            var unsubscribe = [];
+
+            //listen for form validation changes.
+            //The alternative is to add a watch to formCtrl.$invalid but that would lead to many more watches then
+            // subscribing to this single watch.
+            valFormManager.onValidationStatusChanged(function (evt, args) {
+                checkValidationStatus();
             });
 
             //listen for the forms saving event
@@ -190,6 +203,8 @@ function valPropertyMsg(serverValidationManager) {
                     stopWatch();
                     serverValidationManager.unsubscribe(currentProperty.alias, currentCulture, "");
                 });
+
+                //checkValidationStatus();
             }
 
             //when the scope is disposed we need to unsubscribe
