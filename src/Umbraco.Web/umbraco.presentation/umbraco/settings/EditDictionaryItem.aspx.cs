@@ -35,12 +35,12 @@ namespace umbraco.settings
             Panel1.hasMenu = true;
             Panel1.Text = Services.TextService.Localize("editdictionary") + ": " + currentItem.ItemKey;
 
-            var save = Panel1.Menu.NewButton();
-            save.Text = Services.TextService.Localize("save");
-            save.Click += save_Click;
-            save.ToolTip = Services.TextService.Localize("save");
-            save.ID = "save";
-            save.ButtonType = Umbraco.Web._Legacy.Controls.MenuButtonType.Primary;
+            //var save = Panel1.Menu.NewButton();
+            //save.Text = Services.TextService.Localize("save");
+            //save.Click += save_Click;
+            //save.ToolTip = Services.TextService.Localize("save");
+            //save.ID = "save";
+            //save.ButtonType = Umbraco.Web._Legacy.Controls.MenuButtonType.Primary;
 
             var p = new Umbraco.Web._Legacy.Controls.Pane();
 
