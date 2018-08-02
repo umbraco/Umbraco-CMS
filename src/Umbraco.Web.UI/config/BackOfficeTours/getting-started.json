@@ -54,7 +54,7 @@
             {
                 "element": "#applications [data-element='section-user']",
                 "title": "User profile",
-                "content": "Click on your <b>user avatar</b> to open the user profile dialog.",
+                "content": "Now click on your <b>user avatar</b> to open the user profile dialog.",
                 "event": "click",
                 "backdropOpacity": 0.6
             },
