@@ -36,10 +36,12 @@
         </div>
     
         <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-            <a class="btn btn-link" ng-click="nav.hideDialog()">
-                <localize key="general_cancel">Cancel</localize>
-            </a>
-    
+            <umb-button
+                type="button"
+                button-style="link"
+                action="nav.hideDialog()"
+                label-key="general_cancel">
+            </umb-button>
             <umb-button
                 type="button" 
                 action="vm.save()"
@@ -47,7 +49,6 @@
                 button-style="success"
                 label-key="buttons_save">
             </umb-button>
-    
         </div>
     
     </div>

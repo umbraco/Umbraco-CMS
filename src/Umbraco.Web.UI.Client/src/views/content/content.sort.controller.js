@@ -21,27 +21,25 @@
         vm.save = save;
 
         function onInit() {
-
             vm.loading = true;
-
             contentResource.getChildren(parentId)
                 .then(function(data){
                     vm.children = data.items;
                     vm.loading = false;
-                    console.log(vm.children);
                 });
         }
 
         function save() {
-
-            console.log(vm.nodes);
             vm.saveButtonState = "busy";
+            
+            var args = {
+                parentId: parentId,
+                sortedIds: _.map(vm.children, function(child){ return child.id; })
+            };
 
-            // fake loading
-            $timeout(function () {
+            contentResource.sort(args).then(function(){
                 vm.saveButtonState = "success";
-            }, 1000);
-
+            });
         }
 
         function fixSortableHelper(e, ui) {
