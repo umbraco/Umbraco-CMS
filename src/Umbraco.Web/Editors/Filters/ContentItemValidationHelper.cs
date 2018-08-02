@@ -148,7 +148,7 @@ namespace Umbraco.Web.Editors.Filters
                 // validate
                 var valueEditor = editor.GetValueEditor(p.DataType.Configuration);
                 foreach (var r in valueEditor.Validate(postedValue, p.IsRequired, p.ValidationRegExp))
-                    modelState.AddPropertyError(r, p.Alias);
+                    modelState.AddPropertyError(r, p.Alias, p.Culture);
             }
 
             return modelState.IsValid;

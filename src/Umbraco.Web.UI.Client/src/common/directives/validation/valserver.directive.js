@@ -7,13 +7,14 @@
     **/
 function valServer(serverValidationManager) {
     return {
-        require: ['ngModel', '?^umbProperty'],
+        require: ['ngModel', '?^^umbProperty', '?^^tabbedContent'],
         restrict: "A",
         link: function (scope, element, attr, ctrls) {
 
             var modelCtrl = ctrls[0];
             var umbPropCtrl = ctrls.length > 1 ? ctrls[1] : null;
-            if (!umbPropCtrl) {
+            var tabbedContent = ctrls.length > 2 ? ctrls[2] : null;
+            if (!umbPropCtrl || !tabbedContent) {
                 //we cannot proceed, this validator will be disabled
                 return;
             }
@@ -54,6 +55,7 @@ function valServer(serverValidationManager) {
             }
 
             var currentProperty = umbPropCtrl.property;
+            var currentCulture = tabbedContent.content.language.culture;
 
             //default to 'value' if nothing is set
             var fieldName = "value";
@@ -66,7 +68,7 @@ function valServer(serverValidationManager) {
             }            
             
             //subscribe to the server validation changes
-            serverValidationManager.subscribe(currentProperty.alias, fieldName, function (isValid, propertyErrors, allErrors) {
+            serverValidationManager.subscribe(currentProperty.alias, currentCulture, fieldName, function (isValid, propertyErrors, allErrors) {
                 if (!isValid) {
                     modelCtrl.$setValidity('valServer', false);
                     //assign an error msg property to the current validator
@@ -86,7 +88,7 @@ function valServer(serverValidationManager) {
             // but they are a different callback instance than the above.
             element.bind('$destroy', function () {
                 stopWatch();
-                serverValidationManager.unsubscribe(currentProperty.alias, fieldName);
+                serverValidationManager.unsubscribe(currentProperty.alias, currentCulture, fieldName);
             });
         }
     };

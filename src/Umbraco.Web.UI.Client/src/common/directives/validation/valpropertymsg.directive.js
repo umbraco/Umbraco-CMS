@@ -12,10 +12,7 @@
 function valPropertyMsg(serverValidationManager) {
 
     return {
-        scope: {
-            property: "="
-        },
-        require: ['^^form', '^^valFormManager'],
+        require: ['^^form', '^^valFormManager', '^^umbProperty', '^^tabbedContent'],
         replace: true,
         restrict: "E",
         template: "<div ng-show=\"errorMsg != ''\" class='alert alert-error property-error' >{{errorMsg}}</div>",
@@ -24,25 +21,31 @@ function valPropertyMsg(serverValidationManager) {
 
             //the property form controller api
             var formCtrl = ctrl[0];
-
             //the valFormManager controller api
             var valFormManager = ctrl[1];
+            //the property controller api
+            var umbPropCtrl = ctrl[2];
+            //the tabbed content controller api
+            var tabbedContent = ctrl[3];
+
+            var currentProperty = umbPropCtrl.property;
+            var currentCulture = tabbedContent.content.language.culture;
 
             var watcher = null;
 
             // Gets the error message to display
             function getErrorMsg() {
                 //this can be null if no property was assigned
-                if (scope.property) {
+                if (currentProperty) {
                     //first try to get the error msg from the server collection
-                    var err = serverValidationManager.getPropertyError(scope.property.alias, "");
+                    var err = serverValidationManager.getPropertyError(currentProperty.alias, null, "");
                     //if there's an error message use it
                     if (err && err.errorMsg) {
                         return err.errorMsg;
                     }
                     else {
                         //TODO: localize
-                        return scope.property.propertyErrorMessage ? scope.property.propertyErrorMessage : "Property has errors";
+                        return currentProperty.propertyErrorMessage ? currentProperty.propertyErrorMessage : "Property has errors";
                     }
 
                 }
@@ -59,8 +62,10 @@ function valPropertyMsg(serverValidationManager) {
             function startWatch() {
                 //if there's not already a watch
                 if (!watcher) {
-                    watcher = scope.$watch("property.value", function (newValue, oldValue) {
-                        
+                    watcher = scope.$watch(function () {
+                        return currentProperty.value;
+                    }, function (newValue, oldValue) {
+
                         if (!newValue || angular.equals(newValue, oldValue)) {
                             return;
                         }
@@ -133,7 +138,7 @@ function valPropertyMsg(serverValidationManager) {
             });
 
             //listen for the forms saving event
-            unsubscribe.push(scope.$on("formSubmitting", function(ev, args) {
+            unsubscribe.push(scope.$on("formSubmitting", function (ev, args) {
                 showValidation = true;
                 if (hasError && scope.errorMsg === "") {
                     scope.errorMsg = getErrorMsg();
@@ -145,7 +150,7 @@ function valPropertyMsg(serverValidationManager) {
             }));
 
             //listen for the forms saved event
-            unsubscribe.push(scope.$on("formSubmitted", function(ev, args) {
+            unsubscribe.push(scope.$on("formSubmitted", function (ev, args) {
                 showValidation = false;
                 scope.errorMsg = "";
                 formCtrl.$setValidity('valPropertyMsg', true);
@@ -160,8 +165,8 @@ function valPropertyMsg(serverValidationManager) {
             // indicate that a content property is invalid at the property level since developers may not actually implement
             // the correct field validation in their property editors.
 
-            if (scope.property) { //this can be null if no property was assigned
-                serverValidationManager.subscribe(scope.property.alias, "", function (isValid, propertyErrors, allErrors) {
+            if (currentProperty) { //this can be null if no property was assigned
+                serverValidationManager.subscribe(currentProperty.alias, currentCulture, "", function (isValid, propertyErrors, allErrors) {
                     hasError = !isValid;
                     if (hasError) {
                         //set the error message to the server message
@@ -183,7 +188,7 @@ function valPropertyMsg(serverValidationManager) {
                 // but they are a different callback instance than the above.
                 element.bind('$destroy', function () {
                     stopWatch();
-                    serverValidationManager.unsubscribe(scope.property.alias, "");
+                    serverValidationManager.unsubscribe(currentProperty.alias, currentCulture, "");
                 });
             }
 

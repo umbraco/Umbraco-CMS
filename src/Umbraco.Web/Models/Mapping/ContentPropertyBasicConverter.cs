@@ -70,7 +70,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //a culture needs to be in the context for a property type that can vary
             if (culture == null && property.PropertyType.VariesByCulture())
-                throw new InvalidOperationException($"No languageId found in mapping operation when one is required for the culture neutral property type {property.PropertyType.Alias}");
+                throw new InvalidOperationException($"No culture found in mapping operation when one is required for the culture variant property type {property.PropertyType.Alias}");
 
             //set the culture to null if it's an invariant property type
             culture = !property.PropertyType.VariesByCulture() ? null : culture;

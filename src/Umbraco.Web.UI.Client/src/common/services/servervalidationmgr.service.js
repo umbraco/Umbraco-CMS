@@ -28,11 +28,11 @@ function serverValidationManager($timeout) {
 
         //find errors for this field name
         return _.filter(self.items, function (item) {
-            return (item.propertyAlias === null && item.fieldName === fieldName);
+            return (item.propertyAlias === null && item.culture === null && item.fieldName === fieldName);
         });
     }
     
-    function getPropertyErrors(self, propertyAlias, fieldName) {
+    function getPropertyErrors(self, propertyAlias, culture, fieldName) {
         if (!angular.isString(propertyAlias)) {
             throw "propertyAlias must be a string";
         }
@@ -42,7 +42,7 @@ function serverValidationManager($timeout) {
 
         //find all errors for this property
         return _.filter(self.items, function (item) {            
-            return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+            return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
         });
     }
 
@@ -104,7 +104,7 @@ function serverValidationManager($timeout) {
          *  field alias to listen for.
          *  If propertyAlias is null, then this subscription is for a field property (not a user defined property).
          */
-        subscribe: function (propertyAlias, fieldName, callback) {
+        subscribe: function (propertyAlias, culture, fieldName, callback) {
             if (!callback) {
                 return;
             }
@@ -115,41 +115,46 @@ function serverValidationManager($timeout) {
                     return item.propertyAlias === null && item.fieldName === fieldName;
                 });
                 if (!exists1) {
-                    callbacks.push({ propertyAlias: null, fieldName: fieldName, callback: callback });
+                    callbacks.push({ propertyAlias: null, culture: null, fieldName: fieldName, callback: callback });
                 }
             }
             else if (propertyAlias !== undefined) {
+                if (!culture) {
+                    culture = null; // if empty or null, always make null
+                }
                 //don't add it if it already exists
                 var exists2 = _.find(callbacks, function (item) {
-                    return item.propertyAlias === propertyAlias && item.fieldName === fieldName;
+                    return item.propertyAlias === propertyAlias && item.culture === culture && item.fieldName === fieldName;
                 });
                 if (!exists2) {
-                    callbacks.push({ propertyAlias: propertyAlias, fieldName: fieldName, callback: callback });
+                    callbacks.push({ propertyAlias: propertyAlias, culture: culture, fieldName: fieldName, callback: callback });
                 }
             }
         },
         
-        unsubscribe: function (propertyAlias, fieldName) {
+        unsubscribe: function (propertyAlias, culture, fieldName) {
             
             if (propertyAlias === null) {
 
                 //remove all callbacks for the content field
                 callbacks = _.reject(callbacks, function (item) {
-                    return item.propertyAlias === null && item.fieldName === fieldName;
+                    return item.propertyAlias === null && item.culture === null && item.fieldName === fieldName;
                 });
 
             }
             else if (propertyAlias !== undefined) {
-                
+
+                if (!culture) {
+                    culture = null; // if empty or null, always make null
+                }
+
                 //remove all callbacks for the content property
                 callbacks = _.reject(callbacks, function (item) {
-                    return item.propertyAlias === propertyAlias &&
+                    return item.propertyAlias === propertyAlias && item.culture === culture &&
                     (item.fieldName === fieldName ||
                         ((item.fieldName === undefined || item.fieldName === "") && (fieldName === undefined || fieldName === "")));
                 });
             }
-
-            
         },
         
         
@@ -164,10 +169,15 @@ function serverValidationManager($timeout) {
          * This will always return any callbacks registered for just the property (i.e. field name is empty) and for ones with an 
          * explicit field name set.
          */
-        getPropertyCallbacks: function (propertyAlias, fieldName) {
+        getPropertyCallbacks: function (propertyAlias, culture, fieldName) {
+
+            if (!culture) {
+                culture = null; // if empty or null, always make null
+            }
+
             var found = _.filter(callbacks, function (item) {
                 //returns any callback that have been registered directly against the field and for only the property
-                return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (item.fieldName === undefined || item.fieldName === "")));
+                return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (item.fieldName === undefined || item.fieldName === "")));
             });
             return found;
         },
@@ -184,7 +194,7 @@ function serverValidationManager($timeout) {
         getFieldCallbacks: function (fieldName) {
             var found = _.filter(callbacks, function (item) {
                 //returns any callback that have been registered directly against the field
-                return (item.propertyAlias === null && item.fieldName === fieldName);
+                return (item.propertyAlias === null && item.culture === null && item.fieldName === fieldName);
             });
             return found;
         },
@@ -207,6 +217,7 @@ function serverValidationManager($timeout) {
             if (!this.hasFieldError(fieldName)) {
                 this.items.push({
                     propertyAlias: null,
+                    culture: null,
                     fieldName: fieldName,
                     errorMsg: errorMsg
                 });
@@ -231,24 +242,29 @@ function serverValidationManager($timeout) {
          * @description
          * Adds an error message for the content property
          */
-        addPropertyError: function (propertyAlias, fieldName, errorMsg) {
+        addPropertyError: function (propertyAlias, culture, fieldName, errorMsg) {
             if (!propertyAlias) {
                 return;
             }
-            
+
+            if (!culture) {
+                culture = null; // if empty or null, always make null
+            }
+
             //only add the item if it doesn't exist                
-            if (!this.hasPropertyError(propertyAlias, fieldName)) {
+            if (!this.hasPropertyError(propertyAlias, culture, fieldName)) {
                 this.items.push({
                     propertyAlias: propertyAlias,
+                    culture: culture,
                     fieldName: fieldName,
                     errorMsg: errorMsg
                 });
             }
             
             //find all errors for this item
-            var errorsForCallback = getPropertyErrors(this, propertyAlias, fieldName);
+            var errorsForCallback = getPropertyErrors(this, propertyAlias, culture, fieldName);
             //we should now call all of the call backs registered for this error
-            var cbs = this.getPropertyCallbacks(propertyAlias, fieldName);
+            var cbs = this.getPropertyCallbacks(propertyAlias, culture, fieldName);
             //call each callback for this error
             for (var cb in cbs) {
                 executeCallback(this, errorsForCallback, cbs[cb].callback);
@@ -264,14 +280,14 @@ function serverValidationManager($timeout) {
          * @description
          * Removes an error message for the content property
          */
-        removePropertyError: function (propertyAlias, fieldName) {
+        removePropertyError: function (propertyAlias, culture, fieldName) {
 
             if (!propertyAlias) {
                 return;
             }
             //remove the item
             this.items = _.reject(this.items, function (item) {
-                return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
             });
         },
         
@@ -316,10 +332,10 @@ function serverValidationManager($timeout) {
          * @description
          * Gets the error message for the content property
          */
-        getPropertyError: function (propertyAlias, fieldName) {
+        getPropertyError: function (propertyAlias, culture, fieldName) {
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
             });
             return err;
         },
@@ -336,7 +352,7 @@ function serverValidationManager($timeout) {
         getFieldError: function (fieldName) {
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === null && item.fieldName === fieldName);
+                return (item.propertyAlias === null && item.culture === null && item.fieldName === fieldName);
             });
             return err;
         },
@@ -348,12 +364,12 @@ function serverValidationManager($timeout) {
          * @function
          *
          * @description
-         * Checks if the content property + field name combo has an error
+         * Checks if the content property + culture + field name combo has an error
          */
-        hasPropertyError: function (propertyAlias, fieldName) {
+        hasPropertyError: function (propertyAlias, culture, fieldName) {
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
+                return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
             });
             return err ? true : false;
         },
@@ -370,7 +386,7 @@ function serverValidationManager($timeout) {
         hasFieldError: function (fieldName) {
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
-                return (item.propertyAlias === null && item.fieldName === fieldName);
+                return (item.propertyAlias === null && item.culture === null && item.fieldName === fieldName);
             });
             return err ? true : false;
         },

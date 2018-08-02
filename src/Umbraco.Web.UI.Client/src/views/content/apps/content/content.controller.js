@@ -6,14 +6,9 @@
         var vm = this;
         vm.loading = true;
 
+        //TODO: Figure out what we need to do to maintain validation states since this will re-init the editor
         function onInit() {
-
             vm.content = $scope.model.viewModel;
-
-            angular.forEach(vm.content.tabs, function (group) {
-                group.open = true;
-            });
-
             vm.loading = false;
         }
 
