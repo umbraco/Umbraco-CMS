@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.PropertyEditors.Validators
@@ -11,7 +12,7 @@ namespace Umbraco.Core.PropertyEditors.Validators
     {
         private readonly ILocalizedTextService _textService;
 
-        public RequiredValidator()
+        public RequiredValidator() : this(Current.Services.TextService)
         {
         }
 

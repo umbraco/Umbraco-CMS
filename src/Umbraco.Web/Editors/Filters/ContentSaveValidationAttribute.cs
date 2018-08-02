@@ -51,8 +51,8 @@ namespace Umbraco.Web.Editors.Filters
                 //validate for each variant
                 foreach (var variant in model.Variants)
                 {
-                    if (contentItemValidator.ValidateProperties(model, variant, actionContext) == false) return;
-                    if (contentItemValidator.ValidatePropertyData(model, variant, variant.PropertyCollectionDto, actionContext.ModelState) == false) return;
+                    if (contentItemValidator.ValidateProperties(model, variant, actionContext))
+                        contentItemValidator.ValidatePropertyData(model, variant, variant.PropertyCollectionDto, actionContext.ModelState);
                 }
             }
         }
