@@ -257,11 +257,6 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "dialogs/republish.aspx?rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/republish")));
-                case "UmbClientMgr.appActions().actionAssignDomain()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/assignDomain2.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            Current.Services.TextService.Localize("actions/assignDomain")));
                 case "UmbClientMgr.appActions().actionSendToTranslate()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(

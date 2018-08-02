@@ -232,7 +232,7 @@ namespace Umbraco.Web.Trees
 
             AddActionNode<ActionRollback>(item, menu, convert: true);
             AddActionNode<ActionToPublish>(item, menu, convert: true);
-            AddActionNode<ActionAssignDomain>(item, menu, convert: true);
+            AddActionNode<ActionAssignDomain>(item, menu);
             AddActionNode<ActionRights>(item, menu, convert: true);
             AddActionNode<ActionProtect>(item, menu, true, true);
 
