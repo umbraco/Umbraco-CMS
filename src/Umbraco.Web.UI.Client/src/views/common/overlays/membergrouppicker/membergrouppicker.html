@@ -1,5 +1,8 @@
 <div ng-controller="Umbraco.Overlays.MemberGroupPickerController">
 
+    {{model | json}} <br /> <br />
+    {{model.multiPicker}}
+
 	<umb-tree section="member"
 				 treealias="memberGroups"
 				 hideheader="true"
