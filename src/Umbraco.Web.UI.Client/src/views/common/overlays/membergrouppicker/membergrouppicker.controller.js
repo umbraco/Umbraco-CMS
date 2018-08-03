@@ -20,24 +20,23 @@ angular.module("umbraco").controller("Umbraco.Overlays.MemberGroupPickerControll
         }
 
         function selectMemberGroup(id) {
-            console.log(id, 'selectMemberGroupMethod');
            $scope.model.selectedMemberGroup = id;
         }
 
         function selectMemberGroups(id) {
-            console.log(id, 'selectMemberGroups');
 
-            //TODO:
-            // Need to check if the id already exists in the array
-            // If it does then we need to splice the value from the array instead
-            // OBS! Also check when the "selectMemberGroup" method is being used?
-           $scope.model.selectedMemberGroups.push(id);
+            if($scope.model.selectedMemberGroups.indexOf(id) === -1){
+                // If the id does not exists in the array then add it
+                $scope.model.selectedMemberGroups.push(id);
+            }
+            else{
+                // Otherwise we will remove it from the array instead
+                $scope.model.selectedMemberGroups.splice(id, 1);
+            }
         }
 
         /** Method used for selecting a node */
         function select(text, id) {
-
-            console.log(text, id, "selectMethod");
 
             if ($scope.model.multiPicker) {
                selectMemberGroups(id);
