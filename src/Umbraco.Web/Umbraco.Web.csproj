@@ -1993,10 +1993,10 @@
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
-    <WebReferenceUrl Include="http://our.umbraco.org/umbraco/webservices/api/repository.asmx">
+    <WebReferenceUrl Include="https://our.umbraco.com/umbraco/webservices/api/repository.asmx">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\org.umbraco.our\</RelPath>
-      <UpdateFromURL>http://our.umbraco.org/umbraco/webservices/api/repository.asmx</UpdateFromURL>
+      <UpdateFromURL>https://our.umbraco.com/umbraco/webservices/api/repository.asmx</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>

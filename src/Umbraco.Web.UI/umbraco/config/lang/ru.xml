@@ -2,7 +2,7 @@
 <language alias="ru" intName="Russian" localName="русский" lcid="" culture="ru-RU">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Языки и домены</key>
@@ -269,7 +269,7 @@
     <key alias="removeDate">Очистить дату</key>
     <key alias="routeError">ВНИМАНИЕ: этот документ опубликован, но его URL вступает в противоречие с документом %0%</key>
     <key alias="scheduledPublishServerTime">Это время будет соответствовать следующему времени на сервере:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Что это означает?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Что это означает?</a>]]></key>
     <key alias="setDate">Задать дату</key>
     <key alias="sortDone">Порядок сортировки обновлен</key>
     <key alias="sortHelp">Для сортировки узлов просто перетаскивайте узлы или нажмите на заголовке столбца. Вы можете выбрать несколько узлов, удерживая клавиши "shift" или "ctrl" при пометке</key>
@@ -287,10 +287,6 @@
     <key alias="urls">Ссылка на документ</key>
     <key alias="addTextBox">Добавить новое поле текста</key>
     <key alias="removeTextBox">Удалить это поле текста</key>
-  </area>
-  <area alias="contentPicker">
-    <key alias="pickedTrashedItem">Выбран элемент содержимого, который в настоящее время удален или находится в корзине</key>
-    <key alias="pickedTrashedItems">Выбраны элементы содержимого, которые в настоящее время удалены или находятся в корзине</key>
   </area>
   <area alias="contentTypeEditor">
     <key alias="compositions">Композиции</key>
@@ -901,7 +897,7 @@
 		<p>Для настройки откройте файл "web.config" с помощью любого текстового редактора и добавьте нужную информацию в строку подключения (параметр "UmbracoDbDSN"),
 		затем сохраните файл.</p>
 		<p>Нажмите кнопку "Повторить" когда все будет готово<br />
-		<a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7"
+		<a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7"
 		target="_blank">Более подробно о внесении изменений в файл "web.config" рассказано здесь.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Для завершения данного шага Вам нужно располагать некоторой информацией о Вашем сервере базы данных
 		(строка подключения "connection string")<br />
@@ -1125,11 +1121,6 @@
     <key alias="onlyAllowedFiles">Разрешены только типы файлов: </key>
     <key alias="maxFileSize">Максимально допустимый размер файла: </key>
     <key alias="mediaRoot">Начальный узел медиа</key>
-  </area>
-  <area alias="mediaPicker">
-      <key alias="pickedTrashedItem">Выбран медиа-элемент, который в настоящее время удален или находится в корзине</key>
-      <key alias="pickedTrashedItems">Выбраны медиа-элементы, которые в настоящее время удалены или находятся в корзине</key>
-      <key alias="deletedItem">Удаленный элемент</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Создать нового участника</key>

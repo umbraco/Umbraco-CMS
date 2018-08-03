@@ -207,7 +207,7 @@ namespace Umbraco.Core.Services
                 {
                     return repository.GetByUsername(username, includeSecurityData: true);
                 }
-                catch (DbException ex)
+                catch (DbException)
                 {
                     //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
                     //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
@@ -786,7 +786,7 @@ namespace Umbraco.Core.Services
                     var result = repository.Get(id);
                     return result;
                 }
-                catch (DbException ex)
+                catch (DbException)
                 {
                     //we need to handle this one specific case which is when we are upgrading to 7.7 since the user group
                     //tables don't exist yet. This is the 'easiest' way to deal with this without having to create special
