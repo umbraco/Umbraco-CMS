@@ -3,12 +3,12 @@
 
 /* Modalcolumn is used for menu panels */
 .umb-modalcolumn {
-	background: white;
+	background: @white;
 }
 
 .umb-modalcolumn-header {
-  background: @grayLighter;
-  border-bottom: 1px solid @grayLight;
+  background: @gray-10;
+  border-bottom: 1px solid @purple-l3;
   height: 94px;
   padding: 5px 20px 0px 20px;
   white-space: nowrap
@@ -76,13 +76,6 @@
 	padding: 0px;
 }
 
-.umb-dialog .umb-btn-toolbar {
-	text-align: right;
-	padding: 15px 20px 10px 20px;
-	margin-top: 30px;
-	clear: both;
-	background: #fff;
-}
 .umb-dialog .umb-btn-toolbar .umb-control-group{
 	border: none;
 	padding: none;
@@ -94,20 +87,22 @@
     top: 0px;
     left: 0px;
     right: 0px;
-    bottom: 90px;
+    bottom: 52px;
 }
 .umb-dialog-body .umb-pane{margin-top: 15px;}
 
 .umb-dialog-footer{
-		border-top: #efefef 1px solid;
-		position: absolute;
-	    overflow:auto;
-	    text-align: right;
-	    
-	    height: 60px;
-	    left: 0px;
-	    right: 0px;
-	    bottom: 0px;
+	position: absolute;
+	overflow:auto;
+	text-align: right; 
+	height: 32px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+    padding: 10px 20px;
+    margin: 0;
+    background: @gray-10;
+    border-top: 1px solid @purple-l3;
 }
 
 /*we will always make sure to wrap iframe dialogs in proper padding*/
@@ -186,7 +181,7 @@
 	width: 640px !important;
 }
 .umb-modal i {
-  font-size: 14px;
+  font-size: 20px;
 } 
 .umb-modal .breadcrumb {
 	background: none;

@@ -8,6 +8,8 @@ namespace Umbraco.Web.HealthCheck
     [DataContract(Name = "healtCheckAction", Namespace = "")]
     public class HealthCheckAction
     {
+        private readonly ILocalizedTextService _textService;
+
         /// <summary>
         /// Empty ctor used for serialization
         /// </summary>
@@ -51,7 +53,7 @@ namespace Umbraco.Web.HealthCheck
         /// The name of the action - this is used to name the fix button
         /// </summary>
         [DataMember(Name = "name")]
-        private string _name = UmbracoContext.Current.Application.Services.TextService.Localize("healthcheck/rectifyButton");
+        private string _name;
         public string Name
         {
             get { return _name; }

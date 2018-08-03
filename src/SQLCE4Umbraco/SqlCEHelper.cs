@@ -180,12 +180,16 @@ namespace SqlCE4Umbraco
         /// <returns>The return value of the command.</returns>
         protected override object ExecuteScalar(string commandText, SqlCeParameter[] parameters)
         {
-            #if DEBUG && DebugDataLayer
+#if DEBUG && DebugDataLayer
                 // Log Query Execution
                 Trace.TraceInformation(GetType().Name + " SQL ExecuteScalar: " + commandText);
-            #endif
-
-            return SqlCeApplicationBlock.ExecuteScalar(ConnectionString, CommandType.Text, commandText, parameters);
+#endif
+            using (var cc = UseCurrentConnection)
+            {
+                return SqlCeApplicationBlock.ExecuteScalar(
+                    (SqlCeConnection) cc.Connection, (SqlCeTransaction) cc.Transaction,
+                    CommandType.Text, commandText, parameters);
+            }
         }
 
         /// <summary>
@@ -198,12 +202,17 @@ namespace SqlCE4Umbraco
         /// </returns>
         protected override int ExecuteNonQuery(string commandText, SqlCeParameter[] parameters)
         {
-            #if DEBUG && DebugDataLayer
+#if DEBUG && DebugDataLayer
                 // Log Query Execution
                 Trace.TraceInformation(GetType().Name + " SQL ExecuteNonQuery: " + commandText);
-            #endif
+#endif
 
-            return SqlCeApplicationBlock.ExecuteNonQuery(ConnectionString, CommandType.Text, commandText, parameters);
+            using (var cc = UseCurrentConnection)
+            {
+                return SqlCeApplicationBlock.ExecuteNonQuery(
+                    (SqlCeConnection) cc.Connection, (SqlCeTransaction) cc.Transaction,
+                    CommandType.Text, commandText, parameters);
+            }
         }
 
         /// <summary>
@@ -216,13 +225,17 @@ namespace SqlCE4Umbraco
         /// </returns>
         protected override IRecordsReader ExecuteReader(string commandText, SqlCeParameter[] parameters)
         {
-            #if DEBUG && DebugDataLayer
+#if DEBUG && DebugDataLayer
                 // Log Query Execution
                 Trace.TraceInformation(GetType().Name + " SQL ExecuteReader: " + commandText);
-            #endif
+#endif
 
-            return new SqlCeDataReaderHelper(SqlCeApplicationBlock.ExecuteReader(ConnectionString, CommandType.Text,
-                                                            commandText, parameters));
+            using (var cc = UseCurrentConnection)
+            {
+                return new SqlCeDataReaderHelper(SqlCeApplicationBlock.ExecuteReader(
+                    (SqlCeConnection) cc.Connection, (SqlCeTransaction) cc.Transaction,
+                    CommandType.Text, commandText, parameters));
+            }
         }
 
 

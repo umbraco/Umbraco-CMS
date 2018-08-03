@@ -3,7 +3,7 @@
     /// <summary>
     /// Marker interface for aggregate roots
     /// </summary>
-    public interface IAggregateRoot : IEntity
+    public interface IAggregateRoot : IDeletableEntity
     {
          
     }

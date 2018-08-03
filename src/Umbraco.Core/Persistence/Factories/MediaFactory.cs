@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 
@@ -9,33 +10,30 @@ namespace Umbraco.Core.Persistence.Factories
     {
         private readonly IMediaType _contentType;
         private readonly Guid _nodeObjectTypeId;
-        private readonly int _id;
         private int _primaryKey;
 
-        public MediaFactory(IMediaType contentType, Guid nodeObjectTypeId, int id)
+        public MediaFactory(IMediaType contentType, Guid nodeObjectTypeId)
         {
             _contentType = contentType;
             _nodeObjectTypeId = nodeObjectTypeId;
-            _id = id;
         }
 
-        public MediaFactory(Guid nodeObjectTypeId, int id)
+        public MediaFactory(Guid nodeObjectTypeId)
         {
             _nodeObjectTypeId = nodeObjectTypeId;
-            _id = id;
         }
 
         #region Implementation of IEntityFactory<IMedia,ContentVersionDto>
 
-        public IMedia BuildEntity(ContentVersionDto dto)
+        public static IMedia BuildEntity(ContentVersionDto dto, IMediaType contentType)
         {
-            var media = new Models.Media(dto.ContentDto.NodeDto.Text, dto.ContentDto.NodeDto.ParentId, _contentType);
+            var media = new Models.Media(dto.ContentDto.NodeDto.Text, dto.ContentDto.NodeDto.ParentId, contentType);
 
             try
             {
                 media.DisableChangeTracking();
 
-                media.Id = _id;
+                media.Id = dto.NodeId;
                 media.Key = dto.ContentDto.NodeDto.UniqueId;
                 media.Path = dto.ContentDto.NodeDto.Path;
                 media.CreatorId = dto.ContentDto.NodeDto.UserId.Value;
@@ -55,17 +53,36 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 media.EnableChangeTracking();
             }
+
         }
 
-        public ContentVersionDto BuildDto(IMedia entity)
+        [Obsolete("Use the static BuildEntity instead so we don't have to allocate one of these objects everytime we want to map values")]
+        public IMedia BuildEntity(ContentVersionDto dto)
         {
-            var dto = new ContentVersionDto
-                                        {
-                                            NodeId = entity.Id,
-                                            VersionDate = entity.UpdateDate,
-                                            VersionId = entity.Version,
-                                            ContentDto = BuildContentDto(entity)
-                                        };
+            return BuildEntity(dto, _contentType);
+        }
+
+        public MediaDto BuildDto(IMedia entity)
+        {
+            var versionDto = new ContentVersionDto
+            {
+                NodeId = entity.Id,
+                VersionDate = entity.UpdateDate,
+                VersionId = entity.Version,
+                ContentDto = BuildContentDto(entity)
+            };
+
+            //Extract the media path for storage
+            string mediaPath;
+            TryMatch(entity.GetValue<string>("umbracoFile"), out mediaPath);
+
+            var dto = new MediaDto()
+            {
+                NodeId = entity.Id,
+                ContentVersionDto = versionDto,
+                MediaPath = mediaPath,
+                VersionId = entity.Version
+            };
             return dto;
         }
 
@@ -111,6 +128,31 @@ namespace Umbraco.Core.Persistence.Factories
                               };
 
             return nodeDto;
+        }
+
+        private static readonly Regex MediaPathPattern = new Regex(@"(/media/.+?)(?:['""]|$)", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Try getting a media path out of the string being stored for media
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="mediaPath"></param>
+        /// <returns></returns>
+        internal static bool TryMatch(string text, out string mediaPath)
+        {
+            mediaPath = null;
+
+            if (string.IsNullOrWhiteSpace(text))
+                return false;
+
+            var match = MediaPathPattern.Match(text);
+            if (match.Success == false || match.Groups.Count != 2)
+                return false;
+
+            
+            var url = match.Groups[1].Value;
+            mediaPath = url;
+            return true;
         }
     }
 }

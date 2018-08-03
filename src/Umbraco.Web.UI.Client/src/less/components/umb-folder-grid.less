@@ -7,7 +7,7 @@
 }
 
 .umb-folder-grid__folder {
-   background: @grayLighter;
+   background: @gray-10;
    margin: 5px;
    display: flex;
    align-items: center;
@@ -29,7 +29,7 @@
 
 .umb-folder-grid__folder:hover {
    text-decoration: none;
-   background-color: darken(@grayLighter, 5%);
+   background-color: @gray-9;
 }
 
 .umb-folder-grid__folder-description {
@@ -57,21 +57,21 @@
 
 .umb-folder-grid__action {
    opacity: 0;
-   border: 1px solid #ffffff;
-   width: 25px;
-   height: 25px;
-   background: rgba(0, 0, 0, 0.4);
+   border: 2px solid @white;
+   width: 26px;
+   height: 26px;
+   background: @gray-3;
    border-radius: 50px;
    box-sizing: border-box;
    display: flex;
    justify-content: center;
    align-items: center;
-   color: #ffffff;
+   color: @white;
    margin-left: 7px;
    cursor: pointer;
 }
 
 .umb-folder-grid__action.-selected {
    opacity: 1;
-   background: @blue;
+   background: @green;
 }

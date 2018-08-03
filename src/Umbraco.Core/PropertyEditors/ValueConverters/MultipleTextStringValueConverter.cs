@@ -8,6 +8,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
+    [DefaultPropertyValueConverter]
     [PropertyValueType(typeof(IEnumerable<string>))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class MultipleTextStringValueConverter : PropertyValueConverterBase
@@ -16,6 +17,8 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         {
             return Constants.PropertyEditors.MultipleTextstringAlias.Equals(propertyType.PropertyEditorAlias);
         }
+
+        private static readonly string[] NewLineDelimiters = { "\r\n", "\r", "\n" };
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
         {
@@ -52,7 +55,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             // Fall back on normal behaviour
             if (values.Any() == false)
             {
-                return sourceString.Split(Environment.NewLine.ToCharArray());
+                return sourceString.Split(NewLineDelimiters, StringSplitOptions.None);
             }
 
             return values.ToArray();

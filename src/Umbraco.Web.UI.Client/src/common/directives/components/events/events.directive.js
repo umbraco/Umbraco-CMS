@@ -155,21 +155,20 @@ angular.module('umbraco.directives')
                 var els = ["INPUT","A","BUTTON"];
                 if(els.indexOf(el) >= 0){return;}
 
-                // ignore children of links and buttons
                 // ignore clicks on new overlay
-                var parents = $(event.target).parents("a,button,.umb-overlay");
+                var parents = $(event.target).parents("a,button,.umb-overlay,.umb-tour");
                 if(parents.length > 0){
                     return;
                 }
 
                 // ignore clicks on dialog from old dialog service
-                var oldDialog = $(el).parents("#old-dialog-service");
+                var oldDialog = $(event.target).parents("#old-dialog-service");
                 if (oldDialog.length === 1) {
                     return;
                 }
 
                 // ignore clicks in tinyMCE dropdown(floatpanel)
-                var floatpanel = $(el).parents(".mce-floatpanel");
+                var floatpanel = $(event.target).closest(".mce-floatpanel");
                 if (floatpanel.length === 1) {
                     return;
                 }

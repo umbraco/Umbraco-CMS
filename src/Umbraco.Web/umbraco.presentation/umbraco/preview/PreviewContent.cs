@@ -99,7 +99,7 @@ namespace umbraco.presentation.preview
                 //Inject preview xml
                 parentId = document.Level == 1 ? -1 : document.ParentId;
                 var previewXml = document.ToPreviewXml(XmlContent);
-                if (document.ContentEntity.Published == false 
+                if (document.ContentEntity.Published == false
                     && ApplicationContext.Current.Services.ContentService.HasPublishedVersion(document.Id))
                     previewXml.Attributes.Append(XmlContent.CreateAttribute("isDraft"));
                 XmlContent = content.GetAddOrUpdateXmlNode(XmlContent, document.Id, document.Level, parentId, previewXml);
@@ -187,13 +187,9 @@ namespace umbraco.presentation.preview
 
         private static void CleanPreviewDirectory(int userId, DirectoryInfo dir)
         {
-            foreach (FileInfo file in dir.GetFiles(userId + "_*.config"))
-            {
-                DeletePreviewFile(userId, file);
-            }
             // also delete any files accessed more than 10 minutes ago
             var now = DateTime.Now;
-            foreach (FileInfo file in dir.GetFiles("*.config"))
+            foreach (var file in dir.GetFiles("*.config"))
             {
                 if ((now - file.LastAccessTime).TotalMinutes > 10)
                     DeletePreviewFile(userId, file);
@@ -205,6 +201,12 @@ namespace umbraco.presentation.preview
             try
             {
                 file.Delete();
+            }
+            catch (IOException)
+            {
+                // for *some* reason deleting the file can fail,
+                // and it will work later on (long-lasting locks, etc),
+                // so just ignore the exception
             }
             catch (Exception ex)
             {

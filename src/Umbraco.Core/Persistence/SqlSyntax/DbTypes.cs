@@ -4,6 +4,7 @@ using System.Data;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
+    //TODO: TSyntax should be removed, it's not used/needed here
     public class DbTypes<TSyntax>
         where TSyntax : ISqlSyntaxProvider
     {

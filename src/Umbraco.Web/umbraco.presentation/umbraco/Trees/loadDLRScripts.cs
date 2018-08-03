@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.ComponentModel;
+using System.Text;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core.IO;
 using Umbraco.Core;
@@ -6,9 +8,8 @@ using Umbraco.Core;
 
 namespace umbraco
 {
-    /// <summary>
-    /// Handles loading of python items into the developer application tree
-    /// </summary>
+    [Obsolete("This is no longer used and will be removed in future versions")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public class loadDLRScripts : FileSystemTree
     {
         public loadDLRScripts(string application) : base(application) { }

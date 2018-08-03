@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Umbraco.Core;
@@ -10,8 +11,10 @@ namespace Umbraco.Web.Security.Identity
     /// <summary>
     /// Options used to configure auto-linking external OAuth providers
     /// </summary>
-    public sealed class ExternalSignInAutoLinkOptions
+    public class ExternalSignInAutoLinkOptions
     {
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the overload specifying user groups instead and defaultAllowedSections now serves no purpose")]
         public ExternalSignInAutoLinkOptions(
             bool autoLinkExternalAccount = false,
             string defaultUserType = "editor", 
@@ -20,13 +23,28 @@ namespace Umbraco.Web.Security.Identity
         {
             Mandate.ParameterNotNullOrEmpty(defaultUserType, "defaultUserType");
 
-            _defaultUserType = defaultUserType;
-            _defaultAllowedSections = defaultAllowedSections ?? new[] { "content", "media" };
+            _defaultUserGroups = new[] {defaultUserType};
             _autoLinkExternalAccount = autoLinkExternalAccount;
             _defaultCulture = defaultCulture ?? GlobalSettings.DefaultUILanguage;
         }
 
-        private readonly string _defaultUserType;
+        /// <summary>
+        /// Creates a new <see cref="ExternalSignInAutoLinkOptions"/> instance
+        /// </summary>
+        /// <param name="autoLinkExternalAccount"></param>
+        /// <param name="defaultUserGroups">If null, the default will be the 'editor' group</param>
+        /// <param name="defaultCulture"></param>
+        public ExternalSignInAutoLinkOptions(
+            bool autoLinkExternalAccount = false,
+            string[] defaultUserGroups = null,
+            string defaultCulture = null)
+        {
+            _defaultUserGroups = defaultUserGroups ?? new[] { "editor" };
+            _autoLinkExternalAccount = autoLinkExternalAccount;
+            _defaultCulture = defaultCulture ?? GlobalSettings.DefaultUILanguage;
+        }
+
+        private readonly string[] _defaultUserGroups;
 
         /// <summary>
         /// A callback executed during account auto-linking and before the user is persisted
@@ -34,21 +52,34 @@ namespace Umbraco.Web.Security.Identity
         public Action<BackOfficeIdentityUser, ExternalLoginInfo> OnAutoLinking { get; set; }
 
         /// <summary>
-        /// The default User Type alias to use for auto-linking users
+        /// A callback executed during every time a user authenticates using an external login.
+        /// returns a boolean indicating if sign in should continue or not.
         /// </summary>
+        public Func<BackOfficeIdentityUser, ExternalLoginInfo, bool> OnExternalLogin { get; set; }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("Use the overload specifying user groups instead")]
         public string GetDefaultUserType(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
-            return _defaultUserType;
+            return _defaultUserGroups.Length == 0 ? "editor" : _defaultUserGroups[0];
         }
 
-        private readonly string[] _defaultAllowedSections;
-
         /// <summary>
-        /// The default allowed sections to use for auto-linking users
+        /// The default User group aliases to use for auto-linking users
         /// </summary>
+        /// <param name="umbracoContext"></param>
+        /// <param name="loginInfo"></param>
+        /// <returns></returns>
+        public string[] GetDefaultUserGroups(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
+        {
+            return _defaultUserGroups;
+        }
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("The default sections are based on the default user group, this is no longer used")]
         public string[] GetDefaultAllowedSections(UmbracoContext umbracoContext, ExternalLoginInfo loginInfo)
         {
-            return _defaultAllowedSections;
+            return new string[0];
         }
 
         private readonly bool _autoLinkExternalAccount;

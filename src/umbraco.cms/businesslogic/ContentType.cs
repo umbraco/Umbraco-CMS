@@ -5,6 +5,7 @@ using System.Threading;
 using System.Runtime.CompilerServices;
 using System.Linq;
 using System.Xml;
+using umbraco.BusinessLogic;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -206,7 +207,8 @@ namespace umbraco.cms.businesslogic
 
         internal static void Create(int nodeId, string alias, string iconUrl, bool formatAlias)
         {
-            SqlHelper.ExecuteNonQuery(
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery(
                                       "Insert into cmsContentType (nodeId,alias,icon) values (" + 
                                       nodeId + ",'" +
                                       (formatAlias ? helpers.Casing.SafeAliasWithForcingCheck(alias) : alias) +
@@ -222,8 +224,9 @@ namespace umbraco.cms.businesslogic
         /// </returns>
         public static ContentType GetByAlias(string Alias)
         {
-            return new ContentType(SqlHelper.ExecuteScalar<int>("SELECT nodeid FROM cmsContentType WHERE alias = @alias",
-                                   SqlHelper.CreateParameter("@alias", Alias)));
+            using (var sqlHelper = Application.SqlHelper)
+                return new ContentType(sqlHelper.ExecuteScalar<int>("SELECT nodeid FROM cmsContentType WHERE alias = @alias",
+                                   sqlHelper.CreateParameter("@alias", Alias)));
         }
 
         /// <summary>
@@ -233,10 +236,13 @@ namespace umbraco.cms.businesslogic
         /// <returns>The Id of the Tab on which the PropertyType is placed</returns>
         public static int getTabIdFromPropertyType(PropertyType pt)
         {
-            object tmp = SqlHelper.ExecuteScalar<object>("Select propertyTypeGroupId from cmsPropertyType where id = " + pt.Id.ToString());
-            if (tmp == DBNull.Value)
-                return 0;
-            return int.Parse(tmp.ToString());
+            using (var sqlHelper = Application.SqlHelper)
+            {
+                object tmp = sqlHelper.ExecuteScalar<object>("Select propertyTypeGroupId from cmsPropertyType where id = " + pt.Id.ToString());
+                if (tmp == DBNull.Value)
+                    return 0;
+                return int.Parse(tmp.ToString());
+            }
         }
 
         #endregion
@@ -292,16 +298,16 @@ namespace umbraco.cms.businesslogic
         {
             var ids = new List<int>();
             //get all the content item ids of the current content type
-            using (var dr = SqlHelper.ExecuteReader(@"SELECT DISTINCT cmsContent.nodeId FROM cmsContent 
+            using (var sqlHelper = Application.SqlHelper)
+            using (var dr = sqlHelper.ExecuteReader(@"SELECT DISTINCT cmsContent.nodeId FROM cmsContent 
                                                 INNER JOIN cmsContentType ON cmsContent.contentType = cmsContentType.nodeId 
                                                 WHERE cmsContentType.nodeId = @nodeId",
-                                                    SqlHelper.CreateParameter("@nodeId", this.Id)))
+                                                    sqlHelper.CreateParameter("@nodeId", this.Id)))
             {
                 while (dr.Read())
                 {
                     ids.Add(dr.GetInt("nodeId"));
                 }
-                dr.Close();
             }
             return ids;
         }
@@ -332,11 +338,12 @@ namespace umbraco.cms.businesslogic
         internal virtual void ClearXmlStructuresForContent()
         {
             //Remove all items from the cmsContentXml table that are of this current content type
-            SqlHelper.ExecuteNonQuery(@"DELETE FROM cmsContentXml WHERE nodeId IN
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery(@"DELETE FROM cmsContentXml WHERE nodeId IN
                                         (SELECT DISTINCT cmsContent.nodeId FROM cmsContent 
                                             INNER JOIN cmsContentType ON cmsContent.contentType = cmsContentType.nodeId 
                                             WHERE cmsContentType.nodeId = @nodeId)",
-                                      SqlHelper.CreateParameter("@nodeId", this.Id));
+                                      sqlHelper.CreateParameter("@nodeId", this.Id));
         }
 
         #endregion
@@ -362,9 +369,10 @@ namespace umbraco.cms.businesslogic
                 //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
                 if (ContentTypeItem == null)
                 {
-                    SqlHelper.ExecuteNonQuery("update cmsContentType set alias = @alias where nodeId = @id",
-                                              SqlHelper.CreateParameter("@alias", _alias),
-                                              SqlHelper.CreateParameter("@id", Id));
+                    using (var sqlHelper = Application.SqlHelper)
+                        sqlHelper.ExecuteNonQuery("update cmsContentType set alias = @alias where nodeId = @id",
+                                              sqlHelper.CreateParameter("@alias", _alias),
+                                              sqlHelper.CreateParameter("@id", Id));
                 }
                 else
                 {
@@ -391,7 +399,8 @@ namespace umbraco.cms.businesslogic
                 //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
                 if (ContentTypeItem == null)
                 {
-                    SqlHelper.ExecuteNonQuery("update cmsContentType set icon='" + value + "' where nodeid = " + Id);
+                    using (var sqlHelper = Application.SqlHelper)
+                        sqlHelper.ExecuteNonQuery("update cmsContentType set icon='" + value + "' where nodeid = " + Id);
                 }
                 else
                 {
@@ -418,10 +427,11 @@ namespace umbraco.cms.businesslogic
                 //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
                 if (ContentTypeItem == null)
                 {
-                    SqlHelper.ExecuteNonQuery(
+                    using (var sqlHelper = Application.SqlHelper)
+                        sqlHelper.ExecuteNonQuery(
                                           "update cmsContentType set isContainer = @isContainer where nodeId = @id",
-                                          SqlHelper.CreateParameter("@isContainer", value),
-                                          SqlHelper.CreateParameter("@id", Id));
+                                          sqlHelper.CreateParameter("@isContainer", value),
+                                          sqlHelper.CreateParameter("@id", Id));
                 }
                 else
                 {
@@ -444,10 +454,11 @@ namespace umbraco.cms.businesslogic
                 //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
                 if (ContentTypeItem == null)
                 {
-                    SqlHelper.ExecuteNonQuery(
+                    using (var sqlHelper = Application.SqlHelper)
+                        sqlHelper.ExecuteNonQuery(
                                           "update cmsContentType set allowAtRoot = @allowAtRoot where nodeId = @id",
-                                          SqlHelper.CreateParameter("@allowAtRoot", value),
-                                          SqlHelper.CreateParameter("@id", Id));
+                                          sqlHelper.CreateParameter("@allowAtRoot", value),
+                                          sqlHelper.CreateParameter("@id", Id));
                 }
                 else
                 {
@@ -492,10 +503,11 @@ namespace umbraco.cms.businesslogic
                 //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
                 if (ContentTypeItem == null)
                 {
-                    SqlHelper.ExecuteNonQuery(
+                    using (var sqlHelper = Application.SqlHelper)
+                        sqlHelper.ExecuteNonQuery(
                                           "update cmsContentType set description = @description where nodeId = @id",
-                                          SqlHelper.CreateParameter("@description", value),
-                                          SqlHelper.CreateParameter("@id", Id));
+                                          sqlHelper.CreateParameter("@description", value),
+                                          sqlHelper.CreateParameter("@id", Id));
                 }
                 else
                 {
@@ -521,10 +533,11 @@ namespace umbraco.cms.businesslogic
                 //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
                 if (ContentTypeItem == null)
                 {
-                    SqlHelper.ExecuteNonQuery(
+                    using (var sqlHelper = Application.SqlHelper)
+                        sqlHelper.ExecuteNonQuery(
                                           "update cmsContentType set thumbnail = @thumbnail where nodeId = @id",
-                                          SqlHelper.CreateParameter("@thumbnail", value),
-                                          SqlHelper.CreateParameter("@id", Id));
+                                          sqlHelper.CreateParameter("@thumbnail", value),
+                                          sqlHelper.CreateParameter("@id", Id));
                 }
                 else
                 {
@@ -598,18 +611,16 @@ namespace umbraco.cms.businesslogic
                         //its own + inherited property types, which is wrong. Once we are able to fully switch to the new api
                         //this should no longer be a problem as the composition always contains a correct list of property types.
                         var result = new Dictionary<int, PropertyType>();
-                        using (IRecordsReader dr =
-                            SqlHelper.ExecuteReader(
-                                "select id from cmsPropertyType where contentTypeId = @ctId order by sortOrder",
-                                SqlHelper.CreateParameter("@ctId", Id)))
+
+                        var ids = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                            "select id from cmsPropertyType where contentTypeId = @ctId order by sortOrder",
+                            new {ctId = Id});
+
+                        foreach (var id in ids)
                         {
-                            while (dr.Read())
-                            {
-                                int id = dr.GetInt("id");
-                                PropertyType pt = PropertyType.GetPropertyType(id);
-                                if (pt != null)
-                                    result.Add(pt.Id, pt);
-                            }
+                            var pt = PropertyType.GetPropertyType(id);
+                            if (pt != null)
+                                result.Add(pt.Id, pt);
                         }
 
                         // Get Property Types from the master content type
@@ -648,11 +659,10 @@ namespace umbraco.cms.businesslogic
                     if (ContentTypeItem == null)
                     {
                         //TODO Make this recursive, so it looks up Masters of the Master ContentType
-                        using (
-                            var dr =
-                                SqlHelper.ExecuteReader(
-                                    @"SELECT parentContentTypeId FROM cmsContentType2ContentType WHERE childContentTypeId = @id",
-                                    SqlHelper.CreateParameter("@id", Id)))
+                        using (var sqlHelper = Application.SqlHelper)
+                        using (var dr = sqlHelper.ExecuteReader(
+                            @"SELECT parentContentTypeId FROM cmsContentType2ContentType WHERE childContentTypeId = @id",
+                                sqlHelper.CreateParameter("@id", Id)))
                         {
                             while (dr.Read())
                             {
@@ -722,10 +732,11 @@ namespace umbraco.cms.businesslogic
             {
                 if (ContentTypeItem == null)
                 {
-                    SqlHelper.ExecuteNonQuery(
+                    using (var sqlHelper = Application.SqlHelper)
+                        sqlHelper.ExecuteNonQuery(
                         "INSERT INTO [cmsContentType2ContentType] (parentContentTypeId, childContentTypeId) VALUES (@parentContentTypeId, @childContentTypeId)",
-                        SqlHelper.CreateParameter("@parentContentTypeId", parentContentTypeId),
-                        SqlHelper.CreateParameter("@childContentTypeId", Id));
+                        sqlHelper.CreateParameter("@parentContentTypeId", parentContentTypeId),
+                        sqlHelper.CreateParameter("@childContentTypeId", Id));
 
                     MasterContentTypes.Add(parentContentTypeId);
                 }
@@ -739,15 +750,17 @@ namespace umbraco.cms.businesslogic
 
         public bool IsMaster()
         {
-            return SqlHelper.ExecuteScalar<int>("select count(*) from cmsContentType2ContentType where parentContentTypeId = @parentContentTypeId",
-                SqlHelper.CreateParameter("@parentContentTypeId", this.Id)) > 0;
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteScalar<int>("select count(*) from cmsContentType2ContentType where parentContentTypeId = @parentContentTypeId",
+                sqlHelper.CreateParameter("@parentContentTypeId", this.Id)) > 0;
         }
 
         public IEnumerable<ContentType> GetChildTypes()
         {
             var cts = new List<ContentType>();
-            using (var dr = SqlHelper.ExecuteReader(@"SELECT childContentTypeId FROM cmsContentType2ContentType WHERE parentContentTypeId = @parentContentTypeId",
-                SqlHelper.CreateParameter("@parentContentTypeId", Id)))
+            using (var sqlHelper = Application.SqlHelper)
+            using (var dr = sqlHelper.ExecuteReader(@"SELECT childContentTypeId FROM cmsContentType2ContentType WHERE parentContentTypeId = @parentContentTypeId",
+                sqlHelper.CreateParameter("@parentContentTypeId", Id)))
             {
                 while (dr.Read())
                 {
@@ -774,10 +787,11 @@ namespace umbraco.cms.businesslogic
 
                 RemoveMasterPropertyTypeData(contentTypeToRemove, this);
 
-                SqlHelper.ExecuteNonQuery(
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery(
                                           "DELETE FROM [cmsContentType2ContentType] WHERE parentContentTypeId = @parentContentTypeId AND childContentTypeId = @childContentTypeId",
-                                          SqlHelper.CreateParameter("@parentContentTypeId", parentContentTypeId),
-                                          SqlHelper.CreateParameter("@childContentTypeId", Id));
+                                          sqlHelper.CreateParameter("@parentContentTypeId", parentContentTypeId),
+                                          sqlHelper.CreateParameter("@childContentTypeId", Id));
                 MasterContentTypes.Remove(parentContentTypeId);
             }
         }
@@ -790,13 +804,14 @@ namespace umbraco.cms.businesslogic
                 {
                     // before we can remove a parent content type we need to remove all data that 
                     // relates to property types
-                    SqlHelper.ExecuteNonQuery(
+                    using (var sqlHelper = Application.SqlHelper)
+                        sqlHelper.ExecuteNonQuery(
                             @"delete cmsPropertyData from cmsPropertyData
                             inner join cmsContent on cmsContent.nodeId = cmsPropertyData.contentNodeId
                             where cmsPropertyData.propertyTypeId = @propertyType
                             and contentType = @contentType",
-                        SqlHelper.CreateParameter("@contentType", currentContentType.Id),
-                        SqlHelper.CreateParameter("@propertyType", pt.Id));
+                        sqlHelper.CreateParameter("@contentType", currentContentType.Id),
+                        sqlHelper.CreateParameter("@propertyType", pt.Id));
                 }
             }
 
@@ -850,7 +865,8 @@ namespace umbraco.cms.businesslogic
                 if (_allowedChildContentTypeIDs == null)
                 {
                     _allowedChildContentTypeIDs = new List<int>();
-                    using (var dr = SqlHelper.ExecuteReader("Select AllowedId from cmsContentTypeAllowedContentType where id=" + Id))
+                    using (var sqlHelper = Application.SqlHelper)
+                    using (var dr = sqlHelper.ExecuteReader("Select AllowedId from cmsContentTypeAllowedContentType where id=" + Id))
                     {
                         while (dr.Read())
                         {
@@ -869,11 +885,13 @@ namespace umbraco.cms.businesslogic
                 //Note that this is currently only done to support both DocumentType and MediaType, which use the new api and MemberType that doesn't.
                 if (ContentTypeItem == null)
                 {
-                    SqlHelper.ExecuteNonQuery(
+                    using (var sqlHelper = Application.SqlHelper)
+                        sqlHelper.ExecuteNonQuery(
                         "delete from cmsContentTypeAllowedContentType where id=" + Id);
                     foreach (int i in value)
                     {
-                        SqlHelper.ExecuteNonQuery(
+                        using (var sqlHelper = Application.SqlHelper)
+                            sqlHelper.ExecuteNonQuery(
                             "insert into cmsContentTypeAllowedContentType (id,AllowedId) values (" +
                             Id + "," + i + ")");
                     }
@@ -925,8 +943,8 @@ namespace umbraco.cms.businesslogic
         {
             var contentTypes = new List<ContentType>();
 
-            using (var dr =
-                SqlHelper.ExecuteReader(m_SQLOptimizedGetAll.Trim(), SqlHelper.CreateParameter("@nodeObjectType", nodeObjectType)))
+            using (var sqlHelper = Application.SqlHelper)
+            using (var dr = sqlHelper.ExecuteReader(m_SQLOptimizedGetAll.Trim(), sqlHelper.CreateParameter("@nodeObjectType", nodeObjectType)))
             {
                 while (dr.Read())
                 {
@@ -1110,12 +1128,14 @@ namespace umbraco.cms.businesslogic
             }
 
             //need to delete the allowed relationships between content types
-            SqlHelper.ExecuteNonQuery("delete from cmsContentTypeAllowedContentType where AllowedId=@allowedId or Id=@id",
-                SqlHelper.CreateParameter("@allowedId", Id),
-                SqlHelper.CreateParameter("@id", Id));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("delete from cmsContentTypeAllowedContentType where AllowedId=@allowedId or Id=@id",
+                sqlHelper.CreateParameter("@allowedId", Id),
+                sqlHelper.CreateParameter("@id", Id));
 
             // delete contenttype entrance
-            SqlHelper.ExecuteNonQuery("Delete from cmsContentType where NodeId = " + Id);
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("Delete from cmsContentType where NodeId = " + Id);
 
             // delete CMSNode entrance
             base.delete();
@@ -1188,7 +1208,8 @@ namespace umbraco.cms.businesslogic
             }
 
             // TODO: Load master content types
-            using (var dr = SqlHelper.ExecuteReader("Select allowAtRoot, isContainer, Alias,icon,thumbnail,description from cmsContentType where nodeid=" + Id)
+            using (var sqlHelper = Application.SqlHelper)
+            using (var dr = sqlHelper.ExecuteReader("Select allowAtRoot, isContainer, Alias,icon,thumbnail,description from cmsContentType where nodeid=" + Id)
                 )
             {
                 if (dr.Read())
@@ -1358,9 +1379,10 @@ namespace umbraco.cms.businesslogic
         private static void PopulatePropertyData(PropertyType pt, int contentTypeId)
         {
             // NH: PropertyTypeId inserted directly into SQL instead of as a parameter for SQL CE 4 compatibility
-            SqlHelper.ExecuteNonQuery(
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery(
                                       "insert into cmsPropertyData (contentNodeId, versionId, propertyTypeId) select contentId, versionId, " + pt.Id + " from cmsContent inner join cmsContentVersion on cmsContent.nodeId = cmsContentVersion.contentId where contentType = @contentTypeId",
-                                      SqlHelper.CreateParameter("@contentTypeId", contentTypeId));
+                                      sqlHelper.CreateParameter("@contentTypeId", contentTypeId));
         }
 
         #endregion
@@ -1559,10 +1581,12 @@ namespace umbraco.cms.businesslogic
             /// </summary>
             public void Delete()
             {
-                SqlHelper.ExecuteNonQuery("update cmsPropertyType set propertyTypeGroupId = NULL where propertyTypeGroupId = @id",
-                                          SqlHelper.CreateParameter("@id", Id));
-                SqlHelper.ExecuteNonQuery("delete from cmsPropertyTypeGroup where id = @id",
-                                          SqlHelper.CreateParameter("@id", Id));
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("update cmsPropertyType set propertyTypeGroupId = NULL where propertyTypeGroupId = @id",
+                                          sqlHelper.CreateParameter("@id", Id));
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("delete from cmsPropertyTypeGroup where id = @id",
+                                          sqlHelper.CreateParameter("@id", Id));
             }
 
             /// <summary>
@@ -1574,15 +1598,18 @@ namespace umbraco.cms.businesslogic
             {
                 try
                 {
-                    var tempCaption = SqlHelper.ExecuteScalar<string>("Select text from cmsPropertyTypeGroup where id = " + id.ToString());
-                    if (!tempCaption.StartsWith("#"))
-                        return tempCaption;
-                    var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
-                    if (lang != null)
+                    using (var sqlHelper = Application.SqlHelper)
                     {
-                        return new Dictionary.DictionaryItem(tempCaption.Substring(1, tempCaption.Length - 1)).Value(lang.id);
+                        var tempCaption = sqlHelper.ExecuteScalar<string>("Select text from cmsPropertyTypeGroup where id = " + id.ToString());
+                        if (!tempCaption.StartsWith("#"))
+                            return tempCaption;
+                        var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
+                        if (lang != null)
+                        {
+                            return new Dictionary.DictionaryItem(tempCaption.Substring(1, tempCaption.Length - 1)).Value(lang.id);
+                        }
+                        return "[" + tempCaption + "]";
                     }
-                    return "[" + tempCaption + "]";
                 }
                 catch
                 {
@@ -1599,8 +1626,11 @@ namespace umbraco.cms.businesslogic
             {
                 try
                 {
-                    var tempCaption = SqlHelper.ExecuteScalar<string>("Select text from cmsPropertyTypeGroup where id = " + id);
-                    return tempCaption;
+                    using (var sqlHelper = Application.SqlHelper)
+                    {
+                        var tempCaption = sqlHelper.ExecuteScalar<string>("Select text from cmsPropertyTypeGroup where id = " + id);
+                        return tempCaption;
+                    }
                 }
                 catch
                 {
@@ -1622,13 +1652,15 @@ namespace umbraco.cms.businesslogic
                 {
                     if (!_sortOrder.HasValue)
                     {
-                        _sortOrder = SqlHelper.ExecuteScalar<int>("select sortOrder from cmsPropertyTypeGroup where id = " + _id);
+                        using (var sqlHelper = Application.SqlHelper)
+                            _sortOrder = sqlHelper.ExecuteScalar<int>("select sortOrder from cmsPropertyTypeGroup where id = " + _id);
                     }
                     return _sortOrder.Value;
                 }
                 set
                 {
-                    SqlHelper.ExecuteNonQuery("update cmsPropertyTypeGroup set sortOrder = " + value + " where id =" + _id);
+                    using (var sqlHelper = Application.SqlHelper)
+                        sqlHelper.ExecuteNonQuery("update cmsPropertyTypeGroup set sortOrder = " + value + " where id =" + _id);
                 }
             }
 

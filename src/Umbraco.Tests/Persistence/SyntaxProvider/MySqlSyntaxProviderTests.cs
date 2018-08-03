@@ -28,7 +28,7 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
         public void Can_Generate_Create_Table_Statement()
         {
             var type = typeof(TagRelationshipDto);
-            var definition = DefinitionFactory.GetTableDefinition(type);
+            var definition = DefinitionFactory.GetTableDefinition(SqlSyntaxContext.SqlSyntaxProvider, type);
 
             string create = SqlSyntaxContext.SqlSyntaxProvider.Format(definition);
             string primaryKey = SqlSyntaxContext.SqlSyntaxProvider.FormatPrimaryKey(definition);

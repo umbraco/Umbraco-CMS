@@ -343,8 +343,13 @@ angular.module('umbraco.mocks').
                 {
                     results.push(decodeURIComponent(match[1].replace(/\+/g, " ")));
                 }
-
+                
                 return results;
+            },
+
+            getObjectPropertyFromJsonString: function(data, name) {
+                var obj = JSON.parse(data);
+                return obj[name];
             }
         };
     }]);

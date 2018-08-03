@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     /// and it wasn't a MySQL install. 
     /// see: http://issues.umbraco.org/issue/U4-5707
     /// </summary>
-    [Migration("7.0.0", 0, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.0.0", 0, Constants.System.UmbracoMigrationName)]
     public class AssignMissingKeysAndIndexes : MigrationBase
     {
         public AssignMissingKeysAndIndexes(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)

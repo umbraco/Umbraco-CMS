@@ -1,18 +1,18 @@
 @ECHO OFF
 SETLOCAL
-	:: SETLOCAL is on, so changes to the path not persist to the actual user's path
+REM SETLOCAL is on, so changes to the path not persist to the actual user's path
 
 git.exe --version
 IF %ERRORLEVEL%==9009 GOTO :trydefaultpath
+REM OK, DONE
 GOTO :EOF
-	:: Git is installed, no need to to anything else
 
 :trydefaultpath
 PATH=C:\Program Files (x86)\Git\cmd;C:\Program Files\Git\cmd;%PATH%
 git.exe --version
 IF %ERRORLEVEL%==9009 GOTO :showerror
+REM OK, DONE
 GOTO :EOF
-	:: Git is installed, no need to to anything else
 
 :showerror
 ECHO Git is not in your path and could not be found in C:\Program Files (x86)\Git\cmd nor in C:\Program Files\Git\cmd

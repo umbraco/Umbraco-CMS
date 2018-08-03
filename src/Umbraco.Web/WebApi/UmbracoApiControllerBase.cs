@@ -6,12 +6,14 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
 using Umbraco.Web.Security;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.WebApi
 {
     /// <summary>
     /// The base class for API controllers that expose Umbraco services - THESE ARE NOT AUTO ROUTED
     /// </summary>
+    [FeatureAuthorize]
     public abstract class UmbracoApiControllerBase : ApiController
     {
         protected UmbracoApiControllerBase()
@@ -35,7 +37,7 @@ namespace Umbraco.Web.WebApi
             InstanceId = Guid.NewGuid();
             _umbraco = umbracoHelper;            
         }
-
+        
         private UmbracoHelper _umbraco;
 
         /// <summary>

@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbSections
 * @restrict E
 **/
-function sectionsDirective($timeout, $window, navigationService, treeService, sectionResource, appState, eventsService, $location) {
+function sectionsDirective($timeout, $window, navigationService, treeService, sectionService, appState, eventsService, $location, historyService) {
     return {
         restrict: "E",    // restrict to an element
         replace: true,   // replace the html element with the template
@@ -31,7 +31,7 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
             };
 
 			function loadSections(){
-				sectionResource.getSections()
+			    sectionService.getSectionsForUser()
 					.then(function (result) {
 						scope.sections = result;
 						calculateHeight();
@@ -111,30 +111,13 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
                 scope.userDialog = null;
             }
 
-			scope.helpClick = function(){
-
-                if(scope.userDialog) {
-                    closeUserDialog();
-                }
-
-                if(!scope.helpDialog) {
-                    scope.helpDialog = {
-                        view: "help",
-                        show: true,
-                        close: function(oldModel) {
-                            closeHelpDialog();
-                        }
-                    };
-                } else {
-                    closeHelpDialog();
-                }
-
-			};
-
-            function closeHelpDialog() {
-                scope.helpDialog.show = false;
-                scope.helpDialog = null;
-            }
+            //toggle the help dialog by raising the global app state to toggle the help drawer
+            scope.helpClick = function () {
+                var showDrawer = appState.getDrawerState("showDrawer");
+                var drawer = { view: "help", show: !showDrawer };
+                appState.setDrawerState("view", drawer.view);
+                appState.setDrawerState("showDrawer", drawer.show);
+            };
 
 			scope.sectionClick = function (event, section) {
 
@@ -149,13 +132,21 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
                 if (scope.userDialog) {
                     closeUserDialog();
 			    }
-			    if (scope.helpDialog) {
-                    closeHelpDialog();
-			    }
+			    
 
 			    navigationService.hideSearch();
 			    navigationService.showTree(section.alias);
-			    $location.path("/" + section.alias);
+
+                //in some cases the section will have a custom route path specified, if there is one we'll use it
+                if (section.routePath) {
+                    $location.path(section.routePath);
+                }
+                else {
+                    var lastAccessed = historyService.getLastAccessedItemForSection(section.alias);
+                    var path = lastAccessed != null ? lastAccessed.link : section.alias;                  
+                    $location.path(path).search('');
+                }
+			    
 			};
 
 			scope.sectionDblClick = function(section){

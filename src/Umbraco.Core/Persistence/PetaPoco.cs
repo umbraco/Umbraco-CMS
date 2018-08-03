@@ -167,12 +167,12 @@ namespace Umbraco.Core.Persistence
 			var providerName = Constants.DatabaseProviders.SqlServer;
 			if (ConfigurationManager.ConnectionStrings[connectionStringName] != null)
 			{
-				if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName))
+				if (string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName) == false)
 					providerName = ConfigurationManager.ConnectionStrings[connectionStringName].ProviderName;
 			}
 			else
 			{
-				throw new InvalidOperationException("Can't find a connection string with the name '" + connectionStringName + "'");
+				throw new NullReferenceException("Can't find a connection string with the name '" + connectionStringName + "'");
 			}
 
 			// Store factory and connection string
@@ -181,7 +181,7 @@ namespace Umbraco.Core.Persistence
 			CommonConstruct();
 		}
 
-		internal enum DBType
+		public enum DBType
 		{
 			SqlServer,
 			SqlServerCE,
@@ -190,7 +190,9 @@ namespace Umbraco.Core.Persistence
 			Oracle,
             SQLite
 		}
-		DBType _dbType = DBType.SqlServer;
+		private DBType _dbType = DBType.SqlServer;
+
+        public DBType DatabaseType { get { return _dbType; } }
 
 		// Common initialization
 		private void CommonConstruct()
@@ -224,13 +226,18 @@ namespace Umbraco.Core.Persistence
 		// Automatically close one open shared connection
 		public void Dispose()
 		{
-			// Automatically close one open connection reference
-			//  (Works with KeepConnectionAlive and manually opening a shared connection)
-			CloseSharedConnection();
+		    Dispose(true);
 		}
 
-		// Set to true to keep the first opened connection alive until this object is disposed
-		public bool KeepConnectionAlive { get; set; }
+	    protected virtual void Dispose(bool disposing)
+	    {
+            // Automatically close one open connection reference
+            //  (Works with KeepConnectionAlive and manually opening a shared connection)
+            CloseSharedConnection();
+        }
+
+        // Set to true to keep the first opened connection alive until this object is disposed
+        public bool KeepConnectionAlive { get; set; }
 
 		// Open a connection (can be nested)
 		public void OpenSharedConnection()
@@ -325,8 +332,16 @@ namespace Umbraco.Core.Persistence
 			if (_transactionDepth == 1)
 			{
 				OpenSharedConnection();
-				_transaction = _sharedConnection.BeginTransaction(isolationLevel);
-				_transactionCancelled = false;
+			    try
+			    {
+			        _transaction = _sharedConnection.BeginTransaction(isolationLevel);
+			    }
+
+			    catch (Exception e)
+			    {
+			        throw;
+			    }
+                _transactionCancelled = false;
 				OnBeginTransaction();
 			}
             else if (isolationLevel > _transaction.IsolationLevel)
@@ -387,7 +402,7 @@ namespace Umbraco.Core.Persistence
         }
 
         // Helper to handle named parameters from object properties
-		static Regex rxParams = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
+		static readonly Regex rxParams = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
 		public static string ProcessParams(string _sql, object[] args_src, List<object> args_dest)
 		{
 			return rxParams.Replace(_sql, m =>
@@ -530,7 +545,7 @@ namespace Umbraco.Core.Persistence
 		}
 
 		// Create a command
-		static Regex rxParamsPrefix = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
+		static readonly Regex rxParamsPrefix = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
 		public IDbCommand CreateCommand(IDbConnection connection, string sql, params object[] args)
 		{
 			// Perform named argument replacements
@@ -651,8 +666,8 @@ namespace Umbraco.Core.Persistence
 			return ExecuteScalar<T>(sql.SQL, sql.Arguments);
 		}
 
-		Regex rxSelect = new Regex(@"\A\s*(SELECT|EXECUTE|CALL)\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
-		Regex rxFrom = new Regex(@"\A\s*FROM\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
+		static readonly Regex rxSelect = new Regex(@"\A\s*(SELECT|EXECUTE|CALL)\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
+		static readonly Regex rxFrom = new Regex(@"\A\s*FROM\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
 		string AddSelectClause<T>(string sql)
 		{
 			if (sql.StartsWith(";"))
@@ -686,9 +701,9 @@ namespace Umbraco.Core.Persistence
 			return Fetch<T>(sql.SQL, sql.Arguments);
 		}
 
-		static Regex rxColumns = new Regex(@"\A\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-		static Regex rxOrderBy = new Regex(@"\bORDER\s+BY\s+(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-		static Regex rxDistinct = new Regex(@"\ADISTINCT\s", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+		static readonly Regex rxColumns = new Regex(@"\A\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+		static readonly Regex rxOrderBy = new Regex(@"\bORDER\s+BY\s+(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+	    static readonly Regex rxDistinct = new Regex(@"\ADISTINCT\s", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 		public static bool SplitSqlForPaging(string sql, out string sqlCount, out string sqlSelectRemoved, out string sqlOrderBy)
 		{
 			sqlSelectRemoved = null;
@@ -708,10 +723,9 @@ namespace Umbraco.Core.Persistence
 				sqlCount = sql.Substring(0, g.Index) + "COUNT(" + m.Groups[1].ToString().Trim() + ") " + sql.Substring(g.Index + g.Length);
 			else
 				sqlCount = sql.Substring(0, g.Index) + "COUNT(*) " + sql.Substring(g.Index + g.Length);
-
-
-			// Look for an "ORDER BY <whatever>" clause
-			m = rxOrderBy.Match(sqlCount);
+            
+		    // Look for an "ORDER BY <whatever>" clause
+            m = rxOrderBy.Match(sqlCount);
 			if (!m.Success)
 			{
 				sqlOrderBy = null;
@@ -722,8 +736,7 @@ namespace Umbraco.Core.Persistence
 				sqlOrderBy = g.ToString();
 				sqlCount = sqlCount.Substring(0, g.Index) + sqlCount.Substring(g.Index + g.Length);
 			}
-
-			return true;
+            return true;
 		}
 
 	    /// <summary>
@@ -739,6 +752,11 @@ namespace Umbraco.Core.Persistence
 	    /// <param name="take"></param>
 	    internal virtual void BuildSqlDbSpecificPagingQuery(DBType databaseType, long skip, long take, string sql, string sqlSelectRemoved, string sqlOrderBy, ref object[] args, out string sqlPage)
 	    {
+            // this is overriden in UmbracoDatabase, and if running SqlServer >=2012, the database type
+            // is switched from SqlServer to SqlServerCE in order to use the better paging syntax that
+            // SqlCE supports, and SqlServer >=2012 too.
+            // so the first case is actually for SqlServer <2012, and second case is CE *and* SqlServer >=2012
+
             if (databaseType == DBType.SqlServer || databaseType == DBType.Oracle)
             {
                 sqlSelectRemoved = rxOrderBy.Replace(sqlSelectRemoved, "");
@@ -746,8 +764,16 @@ namespace Umbraco.Core.Persistence
                 {
                     sqlSelectRemoved = "peta_inner.* FROM (SELECT " + sqlSelectRemoved + ") peta_inner";
                 }
-                sqlPage = string.Format("SELECT * FROM (SELECT ROW_NUMBER() OVER ({0}) peta_rn, {1}) peta_paged WHERE peta_rn>@{2} AND peta_rn<=@{3}",
-                                        sqlOrderBy == null ? "ORDER BY (SELECT NULL)" : sqlOrderBy, sqlSelectRemoved, args.Length, args.Length + 1);
+
+                // split to ensure that peta_rn is the last field to be selected, else Page<int> would fail
+                // the resulting sql is not perfect, NPoco has a much nicer way to do it, but it would require
+                // importing large parts of NPoco
+                var pos = sqlSelectRemoved.IndexOf("FROM");
+                var sqlColumns = sqlSelectRemoved.Substring(0, pos);
+                var sqlFrom = sqlSelectRemoved.Substring(pos);
+
+                sqlPage = string.Format("SELECT * FROM (SELECT {0}, ROW_NUMBER() OVER ({1}) peta_rn {2}) peta_paged WHERE peta_rn>@{3} AND peta_rn<=@{4}",
+                                        sqlColumns, sqlOrderBy ?? "ORDER BY (SELECT NULL)", sqlFrom, args.Length, args.Length + 1);
                 args = args.Concat(new object[] { skip, skip + take }).ToArray();
             }
             else if (databaseType == DBType.SqlServerCE)
@@ -774,7 +800,7 @@ namespace Umbraco.Core.Persistence
 				throw new Exception("Unable to parse SQL statement for paged query");
 			if (_dbType == DBType.Oracle && sqlSelectRemoved.StartsWith("*"))
                 throw new Exception("Query must alias '*' when performing a paged query.\neg. select t.* from table t order by t.id");
-            
+
 		    BuildSqlDbSpecificPagingQuery(_dbType, skip, take, sql, sqlSelectRemoved, sqlOrderBy, ref args, out sqlPage);
 		}
 
@@ -792,7 +818,7 @@ namespace Umbraco.Core.Persistence
 			result.CurrentPage = page;
 			result.ItemsPerPage = itemsPerPage;
 			result.TotalItems = ExecuteScalar<long>(sqlCount, args);
-			result.TotalPages = result.TotalItems / itemsPerPage;
+		    result.TotalPages = result.TotalItems / itemsPerPage;
 			if ((result.TotalItems % itemsPerPage) != 0)
 				result.TotalPages++;
 
@@ -2520,5 +2546,4 @@ namespace Umbraco.Core.Persistence
 			}
 		}
 	}
-
 }

@@ -13,10 +13,39 @@ namespace Umbraco.Web.Mvc
 {
     public abstract class UmbracoVirtualNodeRouteHandler : IRouteHandler
     {
+        /// <summary>
+        /// Returns the UmbracoContext for this route handler
+        /// </summary>
+        /// <remarks>
+        /// By default this uses the UmbracoContext singleton, this could be overridden to check for null in the case
+        /// that this handler is used for a request where an UmbracoContext is not created by default see http://issues.umbraco.org/issue/U4-9384
+        /// <example>
+        /// <![CDATA[
+        /// protected override UmbracoContext GetUmbracoContext(RequestContext requestContext)
+        /// {
+        ///    var ctx = base.GetUmbracoContext(requestContext);
+        ///    //check if context is null, we know it will be null if we are dealing with a request that
+        ///    //has an extension and by default no Umb ctx is created for the request
+        ///    if (ctx == null) {
+        ///        //TODO: Here you can EnsureContext , please note that the requestContext is passed in 
+        ///        //therefore your should refrain from using other singletons like HttpContext.Current since
+        ///        //you will already have a reference to it. Also if you need an ApplicationContext you should
+        ///        //pass this in via a ctor instead of using the ApplicationContext.Current singleton.
+        ///    }
+        ///    return ctx;
+        /// }
+        /// ]]>
+        /// </example>
+        /// </remarks>
+        protected virtual UmbracoContext GetUmbracoContext(RequestContext requestContext)
+        {
+            return UmbracoContext.Current;
+        }
+
         public IHttpHandler GetHttpHandler(RequestContext requestContext)
         {
-            var umbracoContext = UmbracoContext.Current;
-
+            var umbracoContext = GetUmbracoContext(requestContext);
+            
             var found = FindContent(requestContext, umbracoContext);
             if (found == null) return new NotFoundHandler();
             

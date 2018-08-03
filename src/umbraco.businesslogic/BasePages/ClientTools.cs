@@ -52,7 +52,8 @@ namespace umbraco.BasePages
 			public static string ReloadContentFrameUrlIfPathLoaded(string url) {
                 return string.Format(ClientMgrScript + ".reloadContentFrameUrlIfPathLoaded('{0}');", url);
 			}
-            public static string ReloadLocation { get { return string.Format(ClientMgrScript + ".reloadLocation();"); } }
+            public static string ReloadLocation { get { return ClientMgrScript + ".reloadLocation();"; } }
+            public static string ReloadLocationIfMatched { get { return ClientMgrScript + ".reloadLocation('{0}');"; } }
             public static string ChildNodeCreated = GetMainTree + ".childNodeCreated();";
 			public static string SyncTree { get { return GetMainTree + ".syncTree('{0}', {1});"; } }
 			public static string ClearTreeCache { get { return GetMainTree + ".clearTreeCache();"; } }
@@ -277,21 +278,33 @@ namespace umbraco.BasePages
 			RegisterClientScript(string.Format(Scripts.ReloadActionNode, (!reselect).ToString().ToLower(), (!reloadChildren).ToString().ToLower()));
 			return this;
 		}
-		
-		/// <summary>
-		/// When the application searches for a node, it searches for nodes in specific tree types.
-		/// If SyncTree is used, it will sync the tree nodes with the active tree type, therefore if
-		/// a developer wants to sync a specific tree, they can call this method to set the type to sync.
-		/// </summary>
-		/// <remarks>
-		/// Each branch of a particular tree should theoretically be the same type, however, developers can
-		/// override the type of each branch in their BaseTree's but this is not standard practice. If there
-		/// are multiple types of branches in one tree, then only those branches that have the Active tree type
-		/// will be searched for syncing.
-		/// </remarks>
-		/// <param name="treeType"></param>
-		/// <returns></returns>
-		public ClientTools SetActiveTreeType(string treeType)
+
+        public ClientTools ReloadLocationIfMatched(string routePath)
+        {
+            RegisterClientScript(string.Format(Scripts.ReloadLocationIfMatched, routePath));
+            return this;
+        }
+
+        public ClientTools ReloadLocation()
+	    {
+	        RegisterClientScript(Scripts.ReloadLocation);
+	        return this;
+	    }
+
+        /// <summary>
+        /// When the application searches for a node, it searches for nodes in specific tree types.
+        /// If SyncTree is used, it will sync the tree nodes with the active tree type, therefore if
+        /// a developer wants to sync a specific tree, they can call this method to set the type to sync.
+        /// </summary>
+        /// <remarks>
+        /// Each branch of a particular tree should theoretically be the same type, however, developers can
+        /// override the type of each branch in their BaseTree's but this is not standard practice. If there
+        /// are multiple types of branches in one tree, then only those branches that have the Active tree type
+        /// will be searched for syncing.
+        /// </remarks>
+        /// <param name="treeType"></param>
+        /// <returns></returns>
+        public ClientTools SetActiveTreeType(string treeType)
 		{
 			RegisterClientScript(string.Format(Scripts.SetActiveTreeType, treeType));
 			return this;

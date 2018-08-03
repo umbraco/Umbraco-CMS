@@ -118,11 +118,9 @@ namespace umbraco.cms.businesslogic.Tags
                 sql += "left outer join cmsTagRelationship on (cmsTags.id = cmsTagRelationship.TagId and cmsTagRelationship.nodeId = " + string.Format("{0}", nodeId) + ") ";
                 sql += "where cmsTagRelationship.tagId is null and cmsTags.id = " + string.Format("{0}", id);
 
-                SqlHelper.ExecuteNonQuery(sql);
-
-
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery(sql);
             }
-
         }
 
         public static void MergeTagsToNode(int nodeId, string tags, string group)
@@ -164,7 +162,8 @@ namespace umbraco.cms.businesslogic.Tags
             sql += " inner join  cmsTags as OldTags on (cmsTagRelationship.tagId = OldTags.Id) ";
             sql += " where NewTagsSet.Id is null ";
             sql += " )";
-            SqlHelper.ExecuteNonQuery(sql);
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery(sql);
 
             //adds any tags found in csv that aren't in cmsTag for that group
             sql = "insert into cmsTags (Tag," + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + @") ";
@@ -172,7 +171,8 @@ namespace umbraco.cms.businesslogic.Tags
             sql += " " + TagSet + " ";
             sql += " left outer join cmsTags on (TagSet.Tag = cmsTags.Tag and TagSet." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + " = cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group") + ")";
             sql += " where cmsTags.Id is null ";
-            SqlHelper.ExecuteNonQuery(sql);
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery(sql);
 
             //adds any tags found in csv that aren't in tagrelationships
             sql = "insert into cmsTagRelationship (TagId,NodeId,propertyTypeId) ";
@@ -185,7 +185,8 @@ namespace umbraco.cms.businesslogic.Tags
             sql += "left outer join cmsTagRelationship ";
             sql += "on (cmsTagRelationship.TagId = NewTagsSet.Id and cmsTagRelationship.NodeId = " + string.Format("{0}", nodeId) + ") ";
             sql += "where cmsTagRelationship.tagId is null ";
-            SqlHelper.ExecuteNonQuery(sql);
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery(sql);
 
         }
 
@@ -195,10 +196,12 @@ namespace umbraco.cms.businesslogic.Tags
         /// <param name="tagId"></param>
         public static void RemoveTag(int tagId)
         {
-            SqlHelper.ExecuteNonQuery("DELETE FROM cmsTagRelationship WHERE (tagid = @tagId)",
-               SqlHelper.CreateParameter("@tagId", tagId));
-            SqlHelper.ExecuteNonQuery("DELETE FROM cmsTags WHERE (id = @tagId)",
-               SqlHelper.CreateParameter("@tagId", tagId));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("DELETE FROM cmsTagRelationship WHERE (tagid = @tagId)",
+                    sqlHelper.CreateParameter("@tagId", tagId));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("DELETE FROM cmsTags WHERE (id = @tagId)", 
+                    sqlHelper.CreateParameter("@tagId", tagId));
         }
 
         /// <summary>
@@ -207,8 +210,9 @@ namespace umbraco.cms.businesslogic.Tags
         /// <param name="nodeId"></param>
         public static void RemoveTagsFromNode(int nodeId)
         {
-            SqlHelper.ExecuteNonQuery("DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId",
-              SqlHelper.CreateParameter("@nodeId", nodeId));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("DELETE FROM cmsTagRelationship WHERE nodeId = @nodeId",
+                    sqlHelper.CreateParameter("@nodeId", nodeId));
         }
 
         /// <summary>
@@ -218,9 +222,10 @@ namespace umbraco.cms.businesslogic.Tags
         /// <param name="group"></param>
         public static void RemoveTagsFromNode(int nodeId, string group)
         {
-            SqlHelper.ExecuteNonQuery("DELETE FROM cmsTagRelationship WHERE (nodeId = @nodeId) AND EXISTS (SELECT id FROM cmsTags WHERE (cmsTagRelationship.tagId = id) AND (" + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + " = @group));",
-               SqlHelper.CreateParameter("@nodeId", nodeId),
-               SqlHelper.CreateParameter("@group", group));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("DELETE FROM cmsTagRelationship WHERE (nodeId = @nodeId) AND EXISTS (SELECT id FROM cmsTags WHERE (cmsTagRelationship.tagId = id) AND (" + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + " = @group));",
+                    sqlHelper.CreateParameter("@nodeId", nodeId),
+                    sqlHelper.CreateParameter("@group", group));
         }
 
         /// <summary>
@@ -234,17 +239,19 @@ namespace umbraco.cms.businesslogic.Tags
             int tagId = GetTagId(tag, group);
             if (tagId != 0)
             {
-                SqlHelper.ExecuteNonQuery("DELETE FROM cmsTagRelationship WHERE (nodeId = @nodeId and tagId = @tagId)",
-                    SqlHelper.CreateParameter("@nodeId", nodeId),
-                    SqlHelper.CreateParameter("@tagId", tagId));
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("DELETE FROM cmsTagRelationship WHERE (nodeId = @nodeId and tagId = @tagId)",
+                        sqlHelper.CreateParameter("@nodeId", nodeId),
+                        sqlHelper.CreateParameter("@tagId", tagId));
             }
         }
 
         public static int AddTag(string tag, string group)
         {
-            SqlHelper.ExecuteNonQuery("INSERT INTO cmsTags(tag," + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + ") VALUES (@tag,@group)",
-                SqlHelper.CreateParameter("@tag", tag.Trim()),
-                SqlHelper.CreateParameter("@group", group));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("INSERT INTO cmsTags(tag," + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + ") VALUES (@tag,@group)",
+                    sqlHelper.CreateParameter("@tag", tag.Trim()),
+                    sqlHelper.CreateParameter("@group", group));
             return GetTagId(tag, group);
         }
 
@@ -252,13 +259,15 @@ namespace umbraco.cms.businesslogic.Tags
         {
             int retval = 0;
             string sql = "SELECT id FROM cmsTags where tag=@tag AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + "=@group;";
-            object result = SqlHelper.ExecuteScalar<object>(sql,
-                SqlHelper.CreateParameter("@tag", tag),
-                SqlHelper.CreateParameter("@group", group));
+            using (var sqlHelper = Application.SqlHelper)
+            {
+                object result = sqlHelper.ExecuteScalar<object>(sql,
+                    sqlHelper.CreateParameter("@tag", tag),
+                    sqlHelper.CreateParameter("@group", group));
 
-            if (result != null)
-                retval = int.Parse(result.ToString());
-
+                if (result != null)
+                    retval = int.Parse(result.ToString());
+            }
             return retval;
         }
 
@@ -269,10 +278,10 @@ namespace umbraco.cms.businesslogic.Tags
                   WHERE cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + @" = @group AND cmsTagRelationship.nodeid = @nodeid
                   GROUP BY cmsTags.id, cmsTags.tag, cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group");
 
-            return ConvertSqlToTags(sql,
-                SqlHelper.CreateParameter("@group", group),
-                SqlHelper.CreateParameter("@nodeid", nodeId));
-
+            using (var sqlHelper = Application.SqlHelper)
+                return ConvertSqlToTags(sql,
+                    sqlHelper.CreateParameter("@group", group),
+                    sqlHelper.CreateParameter("@nodeid", nodeId));
         }
 
         /// <summary>
@@ -288,8 +297,8 @@ namespace umbraco.cms.businesslogic.Tags
                         WHERE cmsTagRelationShip.nodeid = @nodeId
                         GROUP BY cmsTags.id, cmsTags.tag, cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group");
 
-            return ConvertSqlToTags(sql, SqlHelper.CreateParameter("@nodeId", nodeId));
-
+            using (var sqlHelper = Application.SqlHelper)
+                return ConvertSqlToTags(sql, sqlHelper.CreateParameter("@nodeId", nodeId));
         }
 
         /// <summary>
@@ -305,8 +314,8 @@ namespace umbraco.cms.businesslogic.Tags
                             WHERE cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group") + @" = @group
                             GROUP BY cmsTags.id, cmsTags.tag, cmsTags." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("group");
 
-            return ConvertSqlToTags(sql, SqlHelper.CreateParameter("@group", group));
-
+            using (var sqlHelper = Application.SqlHelper)
+                return ConvertSqlToTags(sql, sqlHelper.CreateParameter("@group", group));
         }
 
         /// <summary>
@@ -334,14 +343,15 @@ namespace umbraco.cms.businesslogic.Tags
                             INNER JOIN umbracoNode ON cmsTagRelationShip.nodeId = umbracoNode.id
                             WHERE (cmsTags.tag IN ({0})) AND nodeObjectType=@nodeType";
 
-            using (IRecordsReader rr = SqlHelper.ExecuteReader(string.Format(sql, GetSqlStringArray(tags)),
-                SqlHelper.CreateParameter("@nodeType", Document._objectType)))
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader rr = sqlHelper.ExecuteReader(string.Format(sql, GetSqlStringArray(tags)),
+                sqlHelper.CreateParameter("@nodeType", Document._objectType)))
             {
                 while (rr.Read())
                 {
                     Document cnode = new Document(rr.GetInt("nodeid"));
 
-                    if (cnode != null && cnode.Published)
+                    if (cnode.Published)
                         docs.Add(cnode);
                 }
             }
@@ -355,7 +365,9 @@ namespace umbraco.cms.businesslogic.Tags
 
             string sql = @"SELECT DISTINCT cmsTagRelationShip.nodeid from cmsTagRelationShip
                             INNER JOIN cmsTags ON cmsTagRelationShip.tagid = cmsTags.id WHERE (cmsTags.tag IN (" + GetSqlStringArray(tags) + "))";
-            using (IRecordsReader rr = SqlHelper.ExecuteReader(sql))
+
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader rr = sqlHelper.ExecuteReader(sql))
             {
                 while (rr.Read())
                 {
@@ -364,12 +376,14 @@ namespace umbraco.cms.businesslogic.Tags
             }
             return nodes;
         }
+
         private static string GetSqlSet(string commaSeparatedArray, string group)
         {
             // create array
             var array = commaSeparatedArray.Trim().Split(',').ToList().ConvertAll(tag => string.Format("select '{0}' as Tag, '{1}' as " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group"), tag.Replace("'", ""), group)).ToArray();
             return "(" + string.Join(" union ", array).Replace("  ", " ") + ") as TagSet";
         }
+
         private static string GetSqlStringArray(string commaSeparatedArray)
         {
             // create array
@@ -382,7 +396,8 @@ namespace umbraco.cms.businesslogic.Tags
                 string trimmedItem = item.Trim();
                 if (trimmedItem.Length > 0)
                 {
-                    sqlArray.Append("'").Append(SqlHelper.EscapeString(trimmedItem)).Append("',");
+                    using (var sqlHelper = Application.SqlHelper)
+                        sqlArray.Append("'").Append(sqlHelper.EscapeString(trimmedItem)).Append("',");
                 }
             }
 
@@ -395,7 +410,8 @@ namespace umbraco.cms.businesslogic.Tags
         private static IEnumerable<Tag> ConvertSqlToTags(string sql, params IParameter[] param)
         {
             List<Tag> tags = new List<Tag>();
-            using (IRecordsReader rr = SqlHelper.ExecuteReader(sql, param))
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader rr = sqlHelper.ExecuteReader(sql, param))
             {
                 while (rr.Read())
                 {
@@ -411,13 +427,13 @@ namespace umbraco.cms.businesslogic.Tags
             return tags;
         }
 
-        private static ISqlHelper SqlHelper
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
+        protected static ISqlHelper SqlHelper
         {
-            get
-            {
-                return Application.SqlHelper;
-            }
+            get { return Application.SqlHelper; }
         }
-
     }
 }

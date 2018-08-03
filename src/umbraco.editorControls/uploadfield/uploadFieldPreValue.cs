@@ -19,6 +19,10 @@ namespace umbraco.editorControls.uploadfield
 		// referenced datatype
 		private cms.businesslogic.datatype.BaseDataType _datatype;
 
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         public static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -80,16 +84,19 @@ namespace umbraco.editorControls.uploadfield
 
 			// Generate data-string
             string data = _textboxThumbnails.Text;
-			// If the add new prevalue textbox is filled out - add the value to the collection.
-			IParameter[] SqlParams = new IParameter[] {
-										SqlHelper.CreateParameter("@value",data),
-										SqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
-			SqlHelper.ExecuteNonQuery("delete from cmsDataTypePreValues where datatypenodeid = @dtdefid",SqlParams);
-            // need to unlock the parameters (for SQL CE compat)
-            SqlParams = new IParameter[] {
-										SqlHelper.CreateParameter("@value",data),
-										SqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
-            SqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')", SqlParams);
+            // If the add new prevalue textbox is filled out - add the value to the collection.
+            using (var sqlHelper = Application.SqlHelper)
+            {
+                IParameter[] SqlParams = new IParameter[] {
+                                            sqlHelper.CreateParameter("@value",data),
+                                            sqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
+                sqlHelper.ExecuteNonQuery("delete from cmsDataTypePreValues where datatypenodeid = @dtdefid", SqlParams);
+                // need to unlock the parameters (for SQL CE compat)
+                SqlParams = new IParameter[] {
+                                            sqlHelper.CreateParameter("@value",data),
+                                            sqlHelper.CreateParameter("@dtdefid",_datatype.DataTypeDefinitionId)};
+                sqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')", SqlParams);
+            }
 		}
 
 		protected override void Render(HtmlTextWriter writer)
@@ -108,11 +115,14 @@ namespace umbraco.editorControls.uploadfield
 		{
 			get 
 			{
-                object configVal = SqlHelper.ExecuteScalar<object>("select value from cmsDataTypePreValues where datatypenodeid = @datatypenodeid", SqlHelper.CreateParameter("@datatypenodeid", _datatype.DataTypeDefinitionId));
-                if (configVal != null)
-                    return configVal.ToString();
-                else
-                    return "";
+                using (var sqlHelper = Application.SqlHelper)
+                {
+                    object configVal = sqlHelper.ExecuteScalar<object>("select value from cmsDataTypePreValues where datatypenodeid = @datatypenodeid", sqlHelper.CreateParameter("@datatypenodeid", _datatype.DataTypeDefinitionId));
+                    if (configVal != null)
+                        return configVal.ToString();
+                    else
+                        return "";
+                }
 			}
 		}
 

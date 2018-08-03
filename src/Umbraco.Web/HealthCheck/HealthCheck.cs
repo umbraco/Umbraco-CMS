@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using umbraco.interfaces;
 using Umbraco.Core;
 
 namespace Umbraco.Web.HealthCheck
@@ -9,7 +10,7 @@ namespace Umbraco.Web.HealthCheck
     /// The abstract health check class
     /// </summary>
     [DataContract(Name = "healtCheck", Namespace = "")]
-    public abstract class HealthCheck
+    public abstract class HealthCheck : IDiscoverable
     {
         protected HealthCheck(HealthCheckContext healthCheckContext)
         {

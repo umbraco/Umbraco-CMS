@@ -1,34 +1,86 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache',
-    function (userService, $log, $rootScope, $location, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache) {
-
+app.run(['userService', '$log', '$rootScope', '$location', 'queryStrings', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache', 'localStorageService', 'tourService', 'dashboardResource',
+  function (userService, $log, $rootScope, $location, queryStrings, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache, localStorageService, tourService, dashboardResource) {
+      
         //This sets the default jquery ajax headers to include our csrf token, we
         // need to user the beforeSend method because our token changes per user/login so
         // it cannot be static
         $.ajaxSetup({
             beforeSend: function (xhr) {
-                xhr.setRequestHeader("X-XSRF-TOKEN", $cookies["XSRF-TOKEN"]);
+                xhr.setRequestHeader("X-UMB-XSRF-TOKEN", $cookies["UMB-XSRF-TOKEN"]);
+              if (queryStrings.getParams().umbDebug === "true" || queryStrings.getParams().umbdebug === "true") {
+                xhr.setRequestHeader("X-UMB-DEBUG", "true");
+              }
             }
         });
 
         /** Listens for authentication and checks if our required assets are loaded, if/once they are we'll broadcast a ready event */
         eventsService.on("app.authenticated", function(evt, data) {
+            
             assetsService._loadInitAssets().then(function() {
-                appState.setGlobalState("isReady", true);
 
-                //send the ready event with the included returnToPath,returnToSearch data
-                eventsService.emit("app.ready", data);
-                returnToPath = null, returnToSearch = null;
+                // Loads the user's locale settings for Moment.
+                userService.loadMomentLocaleForCurrentUser().then(function() {
+
+                    //Register all of the tours on the server
+                    tourService.registerAllTours().then(function () {
+                        appReady(data);
+                        
+                        // Auto start intro tour
+                        tourService.getTourByAlias("umbIntroIntroduction").then(function (introTour) {
+                            // start intro tour if it hasn't been completed or disabled
+                            if (introTour && introTour.disabled !== true && introTour.completed !== true) {
+                                tourService.startTour(introTour);
+                            }
+                        });
+
+                    }, function(){
+                        appReady(data);
+                    });
+                });
             });
+
         });
+
+        function appReady(data) {
+            appState.setGlobalState("isReady", true);
+            //send the ready event with the included returnToPath,returnToSearch data
+            eventsService.emit("app.ready", data);
+            returnToPath = null, returnToSearch = null;
+        }
 
         /** execute code on each successful route */
         $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
 
-            if(current.params.section){
-                $rootScope.locationTitle = current.params.section + " - " + $location.$$host;
+            var deployConfig = Umbraco.Sys.ServerVariables.deploy;
+            var deployEnv, deployEnvTitle;
+            if (deployConfig) {
+                deployEnv = Umbraco.Sys.ServerVariables.deploy.CurrentWorkspace;
+                deployEnvTitle = "(" + deployEnv + ") ";
+            }
+
+            if(current.params.section) {
+
+                //Uppercase the current section, content, media, settings, developer, forms
+                var currentSection = current.params.section.charAt(0).toUpperCase() + current.params.section.slice(1);
+
+                var baseTitle = currentSection + " - " + $location.$$host;
+
+                //Check deploy for Global Umbraco.Sys obj workspace
+                if(deployEnv){
+                    $rootScope.locationTitle = deployEnvTitle + baseTitle;
+                }
+                else {
+                    $rootScope.locationTitle = baseTitle;
+                }
+                
             }
             else {
+
+                if(deployEnv) {
+                     $rootScope.locationTitle = deployEnvTitle + "Umbraco - " + $location.$$host;
+                }
+
                 $rootScope.locationTitle = "Umbraco - " + $location.$$host;
             }
 
@@ -67,4 +119,5 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
         //var touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints === 5 || window.DocumentTouch && document instanceof DocumentTouch);
         var touchDevice =  /android|webos|iphone|ipad|ipod|blackberry|iemobile|touch/i.test(navigator.userAgent.toLowerCase());
         appState.setGlobalState("touchDevice", touchDevice);
+
     }]);

@@ -7,8 +7,8 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
 {
-    [Migration("7.1.0", 4, GlobalSettings.UmbracoMigrationName)]
-    [Migration("6.2.0", 4, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.1.0", 4, Constants.System.UmbracoMigrationName)]
+    [Migration("6.2.0", 4, Constants.System.UmbracoMigrationName)]
     public class UpdateToNewMemberPropertyAliases : MigrationBase
     {
         public UpdateToNewMemberPropertyAliases(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)

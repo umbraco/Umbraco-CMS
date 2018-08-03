@@ -5,30 +5,29 @@
 	top: -30px;
 	padding-top: 30px;
 	box-shadow: inset 0px -40px 30px 25px rgba(255,255,255,1);
-	border-radius: 0px 0px 200px 200px;
-	-moz-border-radius: 0px 0px 200px 200px;
+    -moz-border-radius: 0px 0px 200px 200px;
 	-webkit-border-radius: 0px 0px 200px 200px;
+	border-radius: 0px 0px 200px 200px;
 
     small {
 	    font-size: 14px;
 	    opacity: .5;
     }
 
-    .umb-loader{
+    .umb-loader {
         width: 640px;
         height: 4px;
     }
-
 
     .video_player{
 		video {
 	        width: 100%;
 	        max-width: 640px;
-	        border: 1px solid #ededed;
+	        border: 1px solid @gray-9;
 	        border-left: none;
 	        border-bottom: none;
+            -moz-box-sizing:border-box;
 	        box-sizing:border-box;
-	        -moz-box-sizing:border-box;
 		}
 
 		input[type="range"] {
@@ -62,17 +61,17 @@
 		    width: 100%;
 		    height: 3px;
 		    margin-top: -13px;
-		    background-color: whitesmoke;
+		    background-color: @gray-10;
 		}
 
 		.progress-bar {
 		    display: block;
-		    box-sizing: border-box;
-		    -moz-box-sizing:border-box;
+            -moz-box-sizing:border-box;
+		    box-sizing: border-box;   
 		    max-width: 100%;
 		    width: 200px;
 		    height: 100%;
-		    background: #7c7e80;
+		    background: @gray-5;
 		}
 
 		.video-controls, .loader, .progress-bar {
@@ -95,7 +94,13 @@
 		}
 
 		.video_player video:hover + .video-controls .progress-bar, .video-controls:hover .progress-bar {
-			background: #2e99f4;
+			background: @turquoise-d1;
+		}
+	}
+
+	.forms-install-button {
+		.btn {
+			padding: 14px 40px;
 		}
 	}
 
@@ -106,22 +111,21 @@
 		line-height: 80px;
 		text-align: center;
 		position: relative;
+        display: flex;
+        justify-content: center;
 
-		i, h3 {
+		.icon, h3 {
 			display: inline-block;
 		}
 
-		i {
-			position: absolute;
-			top: 50%;
-			margin-top: -40px;
+		.icon {
+            font-size: 80px;
 		}
 
 		h3 {
-			margin: 0;
+			margin: 0 0 0 20px;
 			line-height: 80px;
 			font-weight: 700;
-			margin-left: 100px;
 			font-size: 36px;
 			letter-spacing: -1px;
 		}

@@ -32,7 +32,7 @@ namespace Umbraco.Tests.Routing
         }
 
 		/// <summary>
-		/// This checks that when we retrieve a NiceUrl for multiple items that there are no issues with cache overlap 
+		/// This checks that when we retrieve a NiceUrl for multiple items that there are no issues with cache overlap
 		/// and that they are all cached correctly.
         /// </summary>
 		[Test]
@@ -71,25 +71,19 @@ namespace Umbraco.Tests.Routing
 
             var cache = routingContext.UmbracoContext.ContentCache.InnerCache as PublishedContentCache;
             if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
+
             var cachedRoutes = cache.RoutesCache.GetCachedRoutes();
-			Assert.AreEqual(8, cachedRoutes.Count);
+            Assert.AreEqual(8, cachedRoutes.Count);
 
-			foreach (var sample in samples)
-			{
-				Assert.IsTrue(cachedRoutes.ContainsKey(sample.Key));
-				Assert.AreEqual(sample.Value, cachedRoutes[sample.Key]);
-			}
+            foreach (var sample in samples)
+            {
+                Assert.IsTrue(cachedRoutes.ContainsKey(sample.Key));
+                Assert.AreEqual(sample.Value, cachedRoutes[sample.Key]);
+            }
 
-			var cachedIds = cache.RoutesCache.GetCachedIds();
-			Assert.AreEqual(8, cachedIds.Count);
-
-			foreach (var sample in samples)
-			{
-				var key = sample.Value;
-				Assert.IsTrue(cachedIds.ContainsKey(key));
-				Assert.AreEqual(sample.Key, cachedIds[key]);
-			}
-		}
+            var cachedIds = cache.RoutesCache.GetCachedIds();
+            Assert.AreEqual(0, cachedIds.Count);
+        }
 
 		// test hideTopLevelNodeFromPath false
 		[TestCase(1046, "/home/")]
@@ -147,10 +141,10 @@ namespace Umbraco.Tests.Routing
 
             var routingContext = GetRoutingContext("http://example.com/test", 1111, umbracoSettings: _umbracoSettings);
 
-            
+
 
 			Assert.AreEqual("/home/sub1/custom-sub-1/", routingContext.UrlProvider.GetUrl(1177));
-            
+
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(true);
 			Assert.AreEqual("http://example.com/home/sub1/custom-sub-1/", routingContext.UrlProvider.GetUrl(1177));
 
@@ -173,14 +167,14 @@ namespace Umbraco.Tests.Routing
 
 			Assert.AreEqual("#", routingContext.UrlProvider.GetUrl(999999));
 
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(true);            
-            
+            requestMock.Setup(x => x.UseDomainPrefixes).Returns(true);
+
             Assert.AreEqual("#", routingContext.UrlProvider.GetUrl(999999));
 
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
 			routingContext.UrlProvider.Mode = UrlProviderMode.Absolute;
-			
+
             Assert.AreEqual("#", routingContext.UrlProvider.GetUrl(999999));
 		}
 	}

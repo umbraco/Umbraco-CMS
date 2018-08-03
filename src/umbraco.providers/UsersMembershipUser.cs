@@ -38,17 +38,7 @@ namespace umbraco.providers
             get { return _Language; }
             set { _Language = value; }
         }
-        private UserType _UserType;
 
-        /// <summary>
-        /// Gets or sets the type of the user.
-        /// </summary>
-        /// <value>The type of the user.</value>
-        public UserType UserType
-        {
-            get { return _UserType; }
-            set { _UserType = value; }
-        }         
         #endregion
 
         #region Constructors
@@ -78,16 +68,14 @@ namespace umbraco.providers
         /// <param name="lastLockoutDate">The last lockout date.</param>
         /// <param name="fullName">The full name.</param>
         /// <param name="language">The language.</param>
-        /// <param name="userType">Type of the user.</param>
         public UsersMembershipUser(string providerName, string name, object providerUserKey, string email, 
             string passwordQuestion, string comment, bool isApproved, bool isLockedOut, 
             DateTime creationDate, DateTime lastLoginDate, DateTime lastActivityDate, DateTime lastPasswordChangedDate, 
-            DateTime lastLockoutDate, string fullName, string language, UserType userType ) 
+            DateTime lastLockoutDate, string fullName, string language) 
             : base( providerName, name, providerUserKey, email, passwordQuestion, comment, isApproved, isLockedOut, 
                 creationDate, lastLoginDate, lastActivityDate, lastPasswordChangedDate, lastLockoutDate)
         {
             _FullName = fullName;
-            _UserType = userType;
             _Language = language;
         }
         #endregion       

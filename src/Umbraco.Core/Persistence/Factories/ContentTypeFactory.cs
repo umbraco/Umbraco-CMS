@@ -84,7 +84,8 @@ namespace Umbraco.Core.Persistence.Factories
                 NodeId = entity.Id,
                 PropertyTypeId = x.Id,
                 CanEdit = memberType.MemberCanEditProperty(x.Alias),
-                ViewOnProfile = memberType.MemberCanViewProperty(x.Alias)
+                ViewOnProfile = memberType.MemberCanViewProperty(x.Alias),
+                IsSensitive = memberType.IsSensitiveProperty(x.Alias)
             }).ToList();
             return dtos;
         }
@@ -122,7 +123,7 @@ namespace Umbraco.Core.Persistence.Factories
             else if (entity is IMemberType)
                 nodeObjectType = Constants.ObjectTypes.MemberTypeGuid;
             else
-                throw new Exception("oops: invalid entity.");
+                throw new Exception("Invalid entity.");
 
             var contentTypeDto = new ContentTypeDto
             {

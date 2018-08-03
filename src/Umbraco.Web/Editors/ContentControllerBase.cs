@@ -57,7 +57,7 @@ namespace Umbraco.Web.Editors
             where TPersisted : IContentBase
         {
             //Don't update the name if it is empty
-            if (!contentItem.Name.IsNullOrWhiteSpace())
+            if (contentItem.Name.IsNullOrWhiteSpace() == false)
             {
                 contentItem.PersistedContent.Name = contentItem.Name;
             }
@@ -88,35 +88,41 @@ namespace Umbraco.Web.Editors
             where TPersisted : IContentBase
         {
             //Map the property values
-            foreach (var p in contentItem.ContentDto.Properties)
+            foreach (var property in contentItem.ContentDto.Properties)
             {
                 //get the dbo property
-                var dboProperty = contentItem.PersistedContent.Properties[p.Alias];
+                var dboProperty = contentItem.PersistedContent.Properties[property.Alias];
 
                 //create the property data to send to the property editor
-                var d = new Dictionary<string, object>();
+                var dictionary = new Dictionary<string, object>();
                 //add the files if any
-                var files = contentItem.UploadedFiles.Where(x => x.PropertyAlias == p.Alias).ToArray();
+                var files = contentItem.UploadedFiles.Where(x => x.PropertyAlias == property.Alias).ToArray();
                 if (files.Length > 0)
                 {
-                    d.Add("files", files);
+                    dictionary.Add("files", files);                    
                 }
-                
-                var data = new ContentPropertyData(p.Value, p.PreValues, d);
+                foreach (var file in files)
+                    file.FileName = file.FileName.ToSafeFileName();
+
+                // add extra things needed to figure out where to put the files
+                dictionary.Add("cuid", contentItem.PersistedContent.Key);
+                dictionary.Add("puid", dboProperty.PropertyType.Key);
+
+                var data = new ContentPropertyData(property.Value, property.PreValues, dictionary);
 
                 //get the deserialized value from the property editor
-                if (p.PropertyEditor == null)
+                if (property.PropertyEditor == null)
                 {
-                    LogHelper.Warn<ContentController>("No property editor found for property " + p.Alias);
+                    LogHelper.Warn<ContentController>("No property editor found for property " + property.Alias);
                 }
                 else
                 {
-                    var valueEditor = p.PropertyEditor.ValueEditor;
+                    var valueEditor = property.PropertyEditor.ValueEditor;
                     //don't persist any bound value if the editor is readonly
                     if (valueEditor.IsReadOnly == false)
                     {                        
-                        var propVal = p.PropertyEditor.ValueEditor.ConvertEditorToDb(data, dboProperty.Value);
-                        var supportTagsAttribute = TagExtractor.GetAttribute(p.PropertyEditor);
+                        var propVal = property.PropertyEditor.ValueEditor.ConvertEditorToDb(data, dboProperty.Value);
+                        var supportTagsAttribute = TagExtractor.GetAttribute(property.PropertyEditor);
                         if (supportTagsAttribute != null)
                         {
                             TagExtractor.SetPropertyTags(dboProperty, data, propVal, supportTagsAttribute);

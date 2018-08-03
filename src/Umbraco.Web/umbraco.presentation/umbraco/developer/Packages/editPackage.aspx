@@ -36,7 +36,6 @@
                 ControlToValidate="packageVersion">*</asp:RequiredFieldValidator>
         </cc2:PropertyPanel>
         <cc2:PropertyPanel runat="server" ID="pp_file" Text="Package file (.zip):">
-            <asp:Button ID="bt_submitButton" runat="server" Text="Submit to repository" Visible="false" />
             <asp:Literal ID="packageUmbFile" runat="server" />
         </cc2:PropertyPanel>
     </cc2:Pane>
@@ -118,7 +117,7 @@
             <tr>
                 <td>
                     <strong style="color: Red;">Remember:</strong> .xslt and .ascx files for your macros
-                    will be added automaticly, but you will still need to add <strong>assemblies</strong>,
+                    will be added automatically, but you will still need to add <strong>assemblies</strong>,
                     <strong>images</strong> and <strong>script files</strong> manually to the list below.
                 </td>
             </tr>

@@ -1,7 +1,6 @@
 using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
 using umbraco.interfaces;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -23,6 +22,10 @@ namespace umbraco.editorControls
         private string _prevalue;
         private bool _displayTextBox;
 
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         public static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -103,8 +106,9 @@ namespace umbraco.editorControls
                     else
                         throw new ArgumentException("Datatype is not initialized");
 
-                    _prevalue =
-                        SqlHelper.ExecuteScalar<string>("Select [value] from cmsDataTypePreValues where DataTypeNodeId = " + defId);
+                    using (var sqlHelper = Application.SqlHelper)
+                        _prevalue =
+                            sqlHelper.ExecuteScalar<string>("Select [value] from cmsDataTypePreValues where DataTypeNodeId = " + defId);
                 }
                 return _prevalue;
             }
@@ -120,13 +124,16 @@ namespace umbraco.editorControls
 
                 _prevalue = value;
                 ensurePrevalue();
-                IParameter[] SqlParams = new IParameter[]
+                using (var sqlHelper = Application.SqlHelper)
+                {
+                    IParameter[] SqlParams = new IParameter[]
                     {
-                        SqlHelper.CreateParameter("@value", _textbox.Text),
-                        SqlHelper.CreateParameter("@dtdefid", defId)
+                        sqlHelper.CreateParameter("@value", _textbox.Text),
+                        sqlHelper.CreateParameter("@dtdefid", defId)
                     };
-                // update prevalue
-                SqlHelper.ExecuteNonQuery("update cmsDataTypePreValues set [value] = @value where datatypeNodeId = @dtdefid", SqlParams);
+                    // update prevalue
+                    sqlHelper.ExecuteNonQuery("update cmsDataTypePreValues set [value] = @value where datatypeNodeId = @dtdefid", SqlParams);
+                }
             }
         }
 
@@ -143,17 +150,19 @@ namespace umbraco.editorControls
                 else
                     throw new ArgumentException("Datatype is not initialized");
 
-
-                bool hasPrevalue = (SqlHelper.ExecuteScalar<int>("select count(id) from cmsDataTypePreValues where dataTypeNodeId = " + defId) > 0);
-                IParameter[] SqlParams = new IParameter[]
-                    {
-                        SqlHelper.CreateParameter("@value", _textbox.Text),
-                        SqlHelper.CreateParameter("@dtdefid", defId)
-                    };
-                if (!hasPrevalue)
+                using (var sqlHelper = Application.SqlHelper)
                 {
-                    SqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",
-                                              SqlParams);
+                    bool hasPrevalue = (sqlHelper.ExecuteScalar<int>("select count(id) from cmsDataTypePreValues where dataTypeNodeId = " + defId) > 0);
+                    IParameter[] SqlParams = new IParameter[]
+                        {
+                            sqlHelper.CreateParameter("@value", _textbox.Text),
+                            sqlHelper.CreateParameter("@dtdefid", defId)
+                        };
+                    if (!hasPrevalue)
+                    {
+                        sqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",
+                                                  SqlParams);
+                    }
                 }
                 _isEnsured = true;
             }
@@ -168,9 +177,9 @@ namespace umbraco.editorControls
         {
             // save the prevalue data and get on with you life ;)
             if (_datatype != null)
-                _datatype.DBType = (cms.businesslogic.datatype.DBTypes)Enum.Parse(typeof (cms.businesslogic.datatype.DBTypes), _dropdownlist.SelectedValue, true);
+                _datatype.DBType = (cms.businesslogic.datatype.DBTypes)Enum.Parse(typeof(cms.businesslogic.datatype.DBTypes), _dropdownlist.SelectedValue, true);
             else if (_datatypeOld != null)
-                _datatypeOld.DBType = (DBTypes)Enum.Parse(typeof (DBTypes), _dropdownlist.SelectedValue, true);
+                _datatypeOld.DBType = (DBTypes)Enum.Parse(typeof(DBTypes), _dropdownlist.SelectedValue, true);
 
 
             if (_displayTextBox)
@@ -186,8 +195,9 @@ namespace umbraco.editorControls
             _dropdownlist.RenderControl(writer);
             writer.Write("<br style='clear: both'/></div>");
 
-            
-            if (_displayTextBox) {
+
+            if (_displayTextBox)
+            {
                 writer.Write("<div class='propertyItem'><div class='propertyItemheader'>" + ui.Text("prevalue") + "</div>");
                 _textbox.RenderControl(writer);
                 writer.Write("<br style='clear: both'/></div>");
@@ -209,8 +219,9 @@ namespace umbraco.editorControls
 
         public static string GetPrevalueFromId(int Id)
         {
-            return SqlHelper.ExecuteScalar<string>("Select [value] from cmsDataTypePreValues where id = @id",
-                                                   SqlHelper.CreateParameter("@id", Id));
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteScalar<string>("Select [value] from cmsDataTypePreValues where id = @id",
+                    sqlHelper.CreateParameter("@id", Id));
         }
     }
 }

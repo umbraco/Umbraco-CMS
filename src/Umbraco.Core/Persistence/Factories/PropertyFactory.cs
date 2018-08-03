@@ -30,11 +30,11 @@ namespace Umbraco.Core.Persistence.Factories
             _updateDate = updateDate;
         }
 
-        public IEnumerable<Property> BuildEntity(PropertyDataDto[] dtos)
+        public static IEnumerable<Property> BuildEntity(IReadOnlyCollection<PropertyDataDto> dtos, PropertyType[] compositionTypeProperties, DateTime createDate, DateTime updateDate)
         {
             var properties = new List<Property>();
 
-            foreach (var propertyType in _compositionTypeProperties)
+            foreach (var propertyType in compositionTypeProperties)
             {
                 var propertyDataDto = dtos.LastOrDefault(x => x.PropertyTypeId == propertyType.Id);
                 var property = propertyDataDto == null
@@ -47,8 +47,8 @@ namespace Umbraco.Core.Persistence.Factories
                     //on initial construction we don't want to have dirty properties tracked
                     property.DisableChangeTracking();
 
-                    property.CreateDate = _createDate;
-                    property.UpdateDate = _updateDate;
+                    property.CreateDate = createDate;
+                    property.UpdateDate = updateDate;
                     // http://issues.umbraco.org/issue/U4-1946
                     property.ResetDirtyProperties(false);
                     properties.Add(property);
@@ -57,10 +57,16 @@ namespace Umbraco.Core.Persistence.Factories
                 {
                     property.EnableChangeTracking();
                 }
-                
+
             }
 
             return properties;
+        }
+
+        [Obsolete("Use the static method instead, there's no reason to allocate one of these classes everytime we want to map values")]
+        public IEnumerable<Property> BuildEntity(PropertyDataDto[] dtos)
+        {
+            return BuildEntity(dtos, _compositionTypeProperties, _createDate, _updateDate);
         }
 
         public IEnumerable<PropertyDataDto> BuildDto(IEnumerable<Property> properties)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.datatype; // DefaultData
 using umbraco.cms.businesslogic.property; // Property
 using umbraco.cms.businesslogic.relation; // RelationType
@@ -77,10 +77,13 @@ namespace umbraco.editorControls.PickerRelations
         {
             get
             {
-                return uQuery.GetUmbracoObjectType(
-                        uQuery.SqlHelper.ExecuteScalar<Guid>(
-                            "SELECT nodeObjectType FROM umbracoNode WHERE id = @id",
-                            uQuery.SqlHelper.CreateParameter("@id", this.CurrentContentId)));
+                using (var sqlHelper = Application.SqlHelper)
+                {
+                    var guid = sqlHelper.ExecuteScalar<Guid>(
+                        "SELECT nodeObjectType FROM umbracoNode WHERE id = @id",
+                        sqlHelper.CreateParameter("@id", this.CurrentContentId));
+                    return uQuery.GetUmbracoObjectType(guid);
+                }
             }
         }
 

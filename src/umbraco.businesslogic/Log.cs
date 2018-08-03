@@ -60,18 +60,7 @@ namespace umbraco.BusinessLogic
 
         #endregion
 
-        private static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
-        /// <summary>
-        /// Adds the specified log item to the log.
-        /// </summary>
-        /// <param name="type">The log type.</param>
-        /// <param name="user">The user adding the item.</param>
-        /// <param name="nodeId">The affected node id.</param>
-        /// <param name="comment">Comment.</param>
+        [Obsolete("Use IAuditService.Add instead")]
         public static void Add(LogTypes type, User user, int nodeId, string comment)
         {
             if (Instance.ExternalLogger != null)
@@ -123,13 +112,7 @@ namespace umbraco.BusinessLogic
             }
         }
 
-        /// <summary>
-        /// Adds the specified log item to the Umbraco log no matter if an external logger has been defined.
-        /// </summary>
-        /// <param name="type">The log type.</param>
-        /// <param name="user">The user adding the item.</param>
-        /// <param name="nodeId">The affected node id.</param>
-        /// <param name="comment">Comment.</param>
+        [Obsolete("Use IAuditService.Add instead")]
         public static void AddLocally(LogTypes type, User user, int nodeId, string comment)
         {
             if (comment.Length > 3999)
@@ -145,24 +128,13 @@ namespace umbraco.BusinessLogic
             AddSynced(type, user == null ? 0 : user.Id, nodeId, comment);
         }
 
-        /// <summary>
-        /// Adds the specified log item to the log without any user information attached.
-        /// </summary>
-        /// <param name="type">The log type.</param>
-        /// <param name="nodeId">The affected node id.</param>
-        /// <param name="comment">Comment.</param>
+        [Obsolete("Use IAuditService.Add instead")]
         public static void Add(LogTypes type, int nodeId, string comment)
         {
             Add(type, null, nodeId, comment);
         }
 
-        /// <summary>
-        /// Adds a log item to the log immidiately instead of Queuing it as a work item.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <param name="userId">The user id.</param>
-        /// <param name="nodeId">The node id.</param>
-        /// <param name="comment">The comment.</param>
+        [Obsolete("Use IAuditService.Add instead")]
         public static void AddSynced(LogTypes type, int userId, int nodeId, string comment)
         {
             var logTypeIsAuditType = type.GetType().GetField(type.ToString()).GetCustomAttributes(typeof(AuditTrailLogItem), true).Length != 0;
@@ -171,12 +143,13 @@ namespace umbraco.BusinessLogic
             {
                 try
                 {
-                    SqlHelper.ExecuteNonQuery(
+                    using (var sqlHelper = Application.SqlHelper)
+                        sqlHelper.ExecuteNonQuery(
                         "insert into umbracoLog (userId, nodeId, logHeader, logComment) values (@userId, @nodeId, @logHeader, @comment)",
-                        SqlHelper.CreateParameter("@userId", userId),
-                        SqlHelper.CreateParameter("@nodeId", nodeId),
-                        SqlHelper.CreateParameter("@logHeader", type.ToString()),
-                        SqlHelper.CreateParameter("@comment", comment));
+                        sqlHelper.CreateParameter("@userId", userId),
+                        sqlHelper.CreateParameter("@nodeId", nodeId),
+                        sqlHelper.CreateParameter("@logHeader", type.ToString()),
+                        sqlHelper.CreateParameter("@comment", comment));
                 }
                 catch (Exception e)
                 {
@@ -197,58 +170,68 @@ namespace umbraco.BusinessLogic
 				() => type.ToString(), () => userId, () => nodeId.ToString(CultureInfo.InvariantCulture), () => comment);            
         }
 
+        [Obsolete("Use IAuditService.GetPagedItems instead")]
         public List<LogItem> GetAuditLogItems(int NodeId)
         {
             if (UmbracoConfig.For.UmbracoSettings().Logging.ExternalLoggerEnableAuditTrail && ExternalLogger != null)
                 return ExternalLogger.GetAuditLogReader(NodeId);
-            
-            return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
-                "select userId, nodeId, logHeader, DateStamp, logComment from umbracoLog where nodeId = @id and logHeader not in ('open','system') order by DateStamp desc",
-                SqlHelper.CreateParameter("@id", NodeId)));
+
+            using (var sqlHelper = Application.SqlHelper)
+                return LogItem.ConvertIRecordsReader(sqlHelper.ExecuteReader(
+                    "select userId, nodeId, logHeader, DateStamp, logComment from umbracoLog where nodeId = @id and logHeader not in ('open','system') order by DateStamp desc",
+                    sqlHelper.CreateParameter("@id", NodeId)));
         }
 
+        [Obsolete("Use IAuditService.GetPagedItems instead")]
         public List<LogItem> GetLogItems(LogTypes type, DateTime sinceDate)
         {
             if (ExternalLogger != null)
                 return ExternalLogger.GetLogItems(type, sinceDate);
-            
-            return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
-                "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
-                SqlHelper.CreateParameter("@logHeader", type.ToString()),
-                SqlHelper.CreateParameter("@dateStamp", sinceDate)));
+
+            using (var sqlHelper = Application.SqlHelper)
+                return LogItem.ConvertIRecordsReader(sqlHelper.ExecuteReader(
+                    "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
+                    sqlHelper.CreateParameter("@logHeader", type.ToString()),
+                    sqlHelper.CreateParameter("@dateStamp", sinceDate)));
         }
 
+        [Obsolete("Use IAuditService.GetPagedItems instead")]
         public List<LogItem> GetLogItems(int nodeId)
         {
             if (ExternalLogger != null)
                 return ExternalLogger.GetLogItems(nodeId);
-            
-            return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
-                "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where id = @id order by dateStamp desc",
-                SqlHelper.CreateParameter("@id", nodeId)));
+
+            using (var sqlHelper = Application.SqlHelper)
+                return LogItem.ConvertIRecordsReader(sqlHelper.ExecuteReader(
+                    "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where id = @id order by dateStamp desc",
+                    sqlHelper.CreateParameter("@id", nodeId)));
         }
 
+        [Obsolete("Use IAuditService.GetPagedItems instead")]
         public List<LogItem> GetLogItems(User user, DateTime sinceDate)
         {
             if (ExternalLogger != null)
                 return ExternalLogger.GetLogItems(user, sinceDate);
-            
-            return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
-                "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and DateStamp >= @dateStamp order by dateStamp desc",
-                SqlHelper.CreateParameter("@user", user.Id),
-                SqlHelper.CreateParameter("@dateStamp", sinceDate)));
+
+            using (var sqlHelper = Application.SqlHelper)
+                return LogItem.ConvertIRecordsReader(sqlHelper.ExecuteReader(
+                    "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and DateStamp >= @dateStamp order by dateStamp desc",
+                    sqlHelper.CreateParameter("@user", user.Id),
+                    sqlHelper.CreateParameter("@dateStamp", sinceDate)));
         }
 
+        [Obsolete("Use IAuditService.GetPagedItems instead")]
         public List<LogItem> GetLogItems(User user, LogTypes type, DateTime sinceDate)
         {
             if (ExternalLogger != null)
                 return ExternalLogger.GetLogItems(user, type, sinceDate);
-            
-            return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
-                "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
-                SqlHelper.CreateParameter("@logHeader", type.ToString()),
-                SqlHelper.CreateParameter("@user", user.Id),
-                SqlHelper.CreateParameter("@dateStamp", sinceDate)));
+
+            using (var sqlHelper = Application.SqlHelper)
+                return LogItem.ConvertIRecordsReader(sqlHelper.ExecuteReader(
+                    "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
+                    sqlHelper.CreateParameter("@logHeader", type.ToString()),
+                    sqlHelper.CreateParameter("@user", user.Id),
+                    sqlHelper.CreateParameter("@dateStamp", sinceDate)));
         }
 
         public static void CleanLogs(int maximumAgeOfLogsInMinutes)
@@ -262,8 +245,9 @@ namespace umbraco.BusinessLogic
                     DateTime oldestPermittedLogEntry = DateTime.Now.Subtract(new TimeSpan(0, maximumAgeOfLogsInMinutes, 0));
                     var formattedDate = oldestPermittedLogEntry.ToString("yyyy-MM-dd HH:mm:ss");
 
-                    SqlHelper.ExecuteNonQuery("delete from umbracoLog where datestamp < @oldestPermittedLogEntry and logHeader in ('open','system')",
-                        SqlHelper.CreateParameter("@oldestPermittedLogEntry", oldestPermittedLogEntry));
+                    using (var sqlHelper = Application.SqlHelper)
+                        sqlHelper.ExecuteNonQuery("delete from umbracoLog where datestamp < @oldestPermittedLogEntry and logHeader in ('open','system')",
+                        sqlHelper.CreateParameter("@oldestPermittedLogEntry", oldestPermittedLogEntry));
 
                     LogHelper.Info<Log>(string.Format("Log scrubbed.  Removed all items older than {0}", formattedDate));
                 }
@@ -285,9 +269,10 @@ namespace umbraco.BusinessLogic
         [Obsolete("Use the Instance.GetAuditLogItems method which return a list of LogItems instead")]
         public static IRecordsReader GetAuditLogReader(int NodeId)
         {
-            return SqlHelper.ExecuteReader(
-                "select u.userName as [User], logHeader as Action, DateStamp as Date, logComment as Comment from umbracoLog inner join umbracoUser u on u.id = userId where nodeId = @id and logHeader not in ('open','system') order by DateStamp desc",
-                SqlHelper.CreateParameter("@id", NodeId));
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteReader(
+                    "select u.userName as [User], logHeader as Action, DateStamp as Date, logComment as Comment from umbracoLog inner join umbracoUser u on u.id = userId where nodeId = @id and logHeader not in ('open','system') order by DateStamp desc",
+                    sqlHelper.CreateParameter("@id", NodeId));
         }
 
         /// <summary>
@@ -299,10 +284,11 @@ namespace umbraco.BusinessLogic
         [Obsolete("Use the Instance.GetLogItems method which return a list of LogItems instead")]
         public static IRecordsReader GetLogReader(LogTypes Type, DateTime SinceDate)
         {
-            return SqlHelper.ExecuteReader(
-                "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
-                SqlHelper.CreateParameter("@logHeader", Type.ToString()),
-                SqlHelper.CreateParameter("@dateStamp", SinceDate));
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteReader(
+                    "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
+                    sqlHelper.CreateParameter("@logHeader", Type.ToString()),
+                    sqlHelper.CreateParameter("@dateStamp", SinceDate));
         }
 
         /// <summary>
@@ -313,9 +299,10 @@ namespace umbraco.BusinessLogic
         [Obsolete("Use the Instance.GetLogItems method which return a list of LogItems instead")]
         public static IRecordsReader GetLogReader(int NodeId)
         {
-            return SqlHelper.ExecuteReader(
-                "select u.userName, DateStamp, logHeader, logComment from umbracoLog inner join umbracoUser u on u.id = userId where nodeId = @id",
-                SqlHelper.CreateParameter("@id", NodeId));
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteReader(
+                    "select u.userName, DateStamp, logHeader, logComment from umbracoLog inner join umbracoUser u on u.id = userId where nodeId = @id",
+                    sqlHelper.CreateParameter("@id", NodeId));
         }
 
         /// <summary>
@@ -327,10 +314,11 @@ namespace umbraco.BusinessLogic
         [Obsolete("Use the Instance.GetLogItems method which return a list of LogItems instead")]
         public static IRecordsReader GetLogReader(User user, DateTime SinceDate)
         {
-            return SqlHelper.ExecuteReader(
-                "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and DateStamp >= @dateStamp order by dateStamp desc",
-                SqlHelper.CreateParameter("@user", user.Id),
-                SqlHelper.CreateParameter("@dateStamp", SinceDate));
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteReader(
+                    "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and DateStamp >= @dateStamp order by dateStamp desc",
+                    sqlHelper.CreateParameter("@user", user.Id),
+                    sqlHelper.CreateParameter("@dateStamp", SinceDate));
         }
 
         /// <summary>
@@ -343,11 +331,12 @@ namespace umbraco.BusinessLogic
         [Obsolete("Use the Instance.GetLogItems method which return a list of LogItems instead")]
         public static IRecordsReader GetLogReader(User user, LogTypes Type, DateTime SinceDate)
         {
-            return SqlHelper.ExecuteReader(
-                "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
-                SqlHelper.CreateParameter("@logHeader", Type.ToString()),
-                SqlHelper.CreateParameter("@user", user.Id),
-                SqlHelper.CreateParameter("@dateStamp", SinceDate));
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteReader(
+                    "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
+                    sqlHelper.CreateParameter("@logHeader", Type.ToString()),
+                    sqlHelper.CreateParameter("@user", user.Id),
+                    sqlHelper.CreateParameter("@dateStamp", SinceDate));
         }
 
         /// <summary>
@@ -367,10 +356,11 @@ namespace umbraco.BusinessLogic
                 ? string.Format(query, string.Empty, "limit 0," + numberOfResults) 
                 : string.Format(query, "top " + numberOfResults, string.Empty);
 
-            return SqlHelper.ExecuteReader(query, 
-                                           SqlHelper.CreateParameter("@logHeader", type.ToString()), 
-                                           SqlHelper.CreateParameter("@user", user.Id), 
-                                           SqlHelper.CreateParameter("@dateStamp", sinceDate));
+            using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteReader(query, 
+                            sqlHelper.CreateParameter("@logHeader", type.ToString()), 
+                            sqlHelper.CreateParameter("@user", user.Id), 
+                            sqlHelper.CreateParameter("@dateStamp", sinceDate));
         }
 
         #endregion
@@ -412,6 +402,9 @@ namespace umbraco.BusinessLogic
                     ConvertLogHeader(reader.GetString("logHeader")),
                     reader.GetString("logComment")));
             }
+
+            reader.Close();
+            reader.Dispose();
 
             return items;
 

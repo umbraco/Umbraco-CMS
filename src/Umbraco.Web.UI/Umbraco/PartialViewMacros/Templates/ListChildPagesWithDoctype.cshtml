@@ -1,19 +1,17 @@
+@using Umbraco.Core.Models
+@using Umbraco.Web
 @inherits Umbraco.Web.Macros.PartialViewMacroPage
 
 @*
-    This snippet shows how simple it is to fetch only children of a certain Document Type using Razor.
-    Be sure to change "DocumentTypeAlias" below to match your needs, such as "TextPage" or "NewsItems".
+    This snippet shows how simple it is to fetch only children of a certain Document Type.
+    
+    Be sure to change "IPublishedContent" below to match your needs, such as "TextPage" or "NewsItem".
     (You can find the alias of your Document Type by editing it in the Settings section)
 *@
 
-@{  var selection = CurrentPage.Children("DocumentTypeAlias").Where("Visible"); }
-@*
-    As an example of more querying, if you have a true/false property with the alias of shouldBeFeatured:
-    var selection= CurrentPage.Children("DocumentTypeAlias").Where("shouldBeFeatured == true").Where("Visible");
-*@
+@{  var selection = Model.Content.Children<IPublishedContent>().Where(x => x.IsVisible()).ToArray(); }
 
-
-@if (selection.Any())
+@if (selection.Length > 0)
 {
     <ul>
         @foreach (var item in selection)

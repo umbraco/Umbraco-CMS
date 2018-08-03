@@ -6,7 +6,7 @@ namespace Umbraco.Web.Routing
     /// <summary>
     /// Event args used for event launched during a request (like in the UmbracoModule)
     /// </summary>
-    internal class UmbracoRequestEventArgs : EventArgs
+    public class UmbracoRequestEventArgs : EventArgs
     {
         public UmbracoContext UmbracoContext { get; private set; }
         public HttpContextBase HttpContext { get; private set; }

@@ -16,6 +16,7 @@ namespace Umbraco.Core.Persistence.Factories
                 entity.DisableChangeTracking();
 
                 entity.Id = dto.Id;
+                entity.Key = dto.UniqueId;
                 entity.IsBidirectional = dto.Dual;
                 entity.Name = dto.Name;
 
@@ -38,10 +39,13 @@ namespace Umbraco.Core.Persistence.Factories
                 ChildObjectType = entity.ChildObjectType,
                 Dual = entity.IsBidirectional,
                 Name = entity.Name,
-                ParentObjectType = entity.ParentObjectType
+                ParentObjectType = entity.ParentObjectType,
+                UniqueId = entity.Key
             };
             if (entity.HasIdentity)
+            {
                 dto.Id = entity.Id;
+            }
 
             return dto;
         }

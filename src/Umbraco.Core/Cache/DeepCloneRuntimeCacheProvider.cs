@@ -26,6 +26,9 @@ namespace Umbraco.Core.Cache
 
         public DeepCloneRuntimeCacheProvider(IRuntimeCacheProvider innerProvider)
         {
+            if (innerProvider.GetType() == typeof(DeepCloneRuntimeCacheProvider))
+                throw new InvalidOperationException("A " + typeof(DeepCloneRuntimeCacheProvider) + " cannot wrap another instance of " + typeof(DeepCloneRuntimeCacheProvider));
+
             InnerProvider = innerProvider;
         }
 
@@ -105,9 +108,11 @@ namespace Umbraco.Core.Cache
                 var value = result.Value; // force evaluation now - this may throw if cacheItem throws, and then nothing goes into cache
                 if (value == null) return null; // do not store null values (backward compat)
 
+                //Clone/reset to go into the cache
                 return CheckCloneableAndTracksChanges(value);
             }, timeout, isSliding, priority, removedCallback, dependentFiles);
 
+            //Clone/reset to go out of the cache
             return CheckCloneableAndTracksChanges(cached);
         }
 

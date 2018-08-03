@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 
 namespace Umbraco.Core.Models.EntityBase
 {
@@ -101,6 +98,9 @@ namespace Umbraco.Core.Models.EntityBase
             set { SetPropertyValueAndDetectChanges(value, ref _updateDate, Ps.Value.UpdateDateSelector); }           
         }
 
+        [IgnoreDataMember]
+        public DateTime? DeletedDate { get; set; }
+
         internal virtual void ResetIdentity()
         {
             _hasIdentity = false;
@@ -113,8 +113,10 @@ namespace Umbraco.Core.Models.EntityBase
         /// </summary>
         internal virtual void AddingEntity()
         {
-            CreateDate = DateTime.Now;
-            UpdateDate = DateTime.Now;
+            if (IsPropertyDirty("CreateDate") == false || _createDate == default(DateTime))
+                CreateDate = DateTime.Now;
+            if (IsPropertyDirty("UpdateDate") == false || _updateDate == default(DateTime))
+                UpdateDate = DateTime.Now;
         }
 
         /// <summary>
@@ -122,7 +124,12 @@ namespace Umbraco.Core.Models.EntityBase
         /// </summary>
         internal virtual void UpdatingEntity()
         {
-            UpdateDate = DateTime.Now;
+            if (IsPropertyDirty("UpdateDate") == false || _updateDate == default(DateTime))
+                UpdateDate = DateTime.Now;
+
+            //this is just in case
+            if (_createDate == default(DateTime))
+                CreateDate = DateTime.Now;
         }
 
         /// <summary>

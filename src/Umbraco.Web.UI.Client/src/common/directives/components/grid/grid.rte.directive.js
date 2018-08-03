@@ -115,7 +115,9 @@ angular.module("umbraco.directives")
                                 toolbar: toolbar,
                                 content_css: stylesheets,
                                 style_formats: styleFormats,
-                                autoresize_bottom_margin: 0
+                                autoresize_bottom_margin: 0,
+                                //see http://archive.tinymce.com/wiki.php/Configuration:cache_suffix
+                                cache_suffix: "?umb__rnd=" + Umbraco.Sys.ServerVariables.application.cacheBuster
                             };
 
 
@@ -142,6 +144,12 @@ angular.module("umbraco.directives")
                                                 //cannot parse, we'll just leave it
                                             }
                                         }
+                                    }
+                                    if (val === "true") {
+                                        tinyMceConfig.customConfig[i] = true;
+                                    }
+                                    if (val === "false") {
+                                        tinyMceConfig.customConfig[i] = false;
                                     }
                                 }
 
@@ -172,6 +180,55 @@ angular.module("umbraco.directives")
 
                                 });
 
+                                // pin toolbar to top of screen if we have focus and it scrolls off the screen
+                                var pinToolbar = function () {
+
+                                    var _toolbar = $(editor.editorContainer).find(".mce-toolbar");
+                                    var toolbarHeight = _toolbar.height();
+
+                                    var _tinyMce = $(editor.editorContainer);
+                                    var tinyMceRect = _tinyMce[0].getBoundingClientRect();
+                                    var tinyMceTop = tinyMceRect.top;
+                                    var tinyMceBottom = tinyMceRect.bottom;
+                                    var tinyMceWidth = tinyMceRect.width;
+
+                                    var _tinyMceEditArea = _tinyMce.find(".mce-edit-area");
+
+                                    // set padding in top of mce so the content does not "jump" up
+                                    _tinyMceEditArea.css("padding-top", toolbarHeight);
+
+                                    if (tinyMceTop < 160 && ((160 + toolbarHeight) < tinyMceBottom)) {
+                                        _toolbar
+                                            .css("visibility", "visible")
+                                            .css("position", "fixed")
+                                            .css("top", "160px")
+                                            .css("margin-top", "0")
+                                            .css("width", tinyMceWidth);
+                                    } else {
+                                        _toolbar
+                                            .css("visibility", "visible")
+                                            .css("position", "absolute")
+                                            .css("top", "auto")
+                                            .css("margin-top", "0")
+                                            .css("width", tinyMceWidth);
+                                    }
+                                    
+                                };
+
+                                // unpin toolbar to top of screen
+                                var unpinToolbar = function() {
+
+                                    var _toolbar = $(editor.editorContainer).find(".mce-toolbar");
+                                    var _tinyMce = $(editor.editorContainer);
+                                    var _tinyMceEditArea = _tinyMce.find(".mce-edit-area");
+
+                                    // reset padding in top of mce so the content does not "jump" up
+                                    _tinyMceEditArea.css("padding-top", "0");
+                                        
+                                    _toolbar.css("position", "static");
+
+                                };
+
                                 //when we leave the editor (maybe)
                                 editor.on('blur', function (e) {
                                     editor.save();
@@ -185,6 +242,9 @@ angular.module("umbraco.directives")
                                             scope.onBlur();
                                         }
 
+                                        unpinToolbar();
+                                        $('.umb-panel-body').off('scroll', pinToolbar);
+
                                     });
                                 });
 
@@ -196,6 +256,9 @@ angular.module("umbraco.directives")
                                             scope.onFocus();
                                         }
 
+                                        pinToolbar();
+                                        $('.umb-panel-body').on('scroll', pinToolbar);
+
                                     });
                                 });
 
@@ -206,6 +269,9 @@ angular.module("umbraco.directives")
                                         if(scope.onClick){
                                             scope.onClick();
                                         }
+
+                                        pinToolbar();
+                                        $('.umb-panel-body').on('scroll', pinToolbar);
 
                                     });
                                 });
@@ -300,7 +366,7 @@ angular.module("umbraco.directives")
                             var unsubscribe = scope.$on("formSubmitting", function () {
                                 //TODO: Here we should parse out the macro rendered content so we can save on a lot of bytes in data xfer
                                 // we do parse it out on the server side but would be nice to do that on the client side before as well.
-                                scope.value = tinyMceEditor.getContent();
+                                scope.value = tinyMceEditor ? tinyMceEditor.getContent() : null;
                             });
 
                             //when the element is disposed we need to unsubscribe!
@@ -308,6 +374,9 @@ angular.module("umbraco.directives")
                             // element might still be there even after the modal has been hidden.
                             scope.$on('$destroy', function () {
                                 unsubscribe();
+								if (tinyMceEditor !== undefined && tinyMceEditor != null) {
+									tinyMceEditor.destroy()
+								}
                             });
 
                         });

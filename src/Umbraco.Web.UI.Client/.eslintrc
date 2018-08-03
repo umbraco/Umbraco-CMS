@@ -39,7 +39,7 @@
     "globals": {
         "angular": false,
         "_": false,
-        "$", false,
+        "$": false,
         "tinymce": false,
         "tinyMCE": false,
         "FileReader": false,
@@ -47,7 +47,7 @@
         "window": false,
         "LazyLoad": false,
         "ActiveXObject": false,
-        "Bloodhound", false
+        "Bloodhound": false
     }
 
 }

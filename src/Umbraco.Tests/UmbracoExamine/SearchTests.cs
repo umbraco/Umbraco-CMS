@@ -8,9 +8,13 @@ using Examine.LuceneEngine.Providers;
 using Lucene.Net.Store;
 using NUnit.Framework;
 using Examine.LuceneEngine.SearchCriteria;
+using Lucene.Net.Analysis.Standard;
+using Lucene.Net.Index;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class SearchTests : ExamineBaseTest
     {
@@ -18,19 +22,17 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Test_Sort_Order_Sorting()
         {
-            //var newIndexFolder = new DirectoryInfo(Path.Combine("App_Data\\SearchTests", Guid.NewGuid().ToString()));
-            //System.IO.Directory.CreateDirectory(newIndexFolder.FullName);
-
-            using (var luceneDir = new RAMDirectory())
-            //using (var luceneDir = new SimpleFSDirectory(newIndexFolder))
-            {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir, null,
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer, null,
                     new TestDataService()
-                        {
-                            ContentService = new TestContentService(TestFiles.umbraco_sort)
-                        });
-                indexer.RebuildIndex();
-                var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
+                    {
+                        ContentService = new TestContentService(TestFiles.umbraco_sort)
+                    },
+                    supportUnpublishedContent: true))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
+            {                
+                indexer.RebuildIndex();                
 
                 var s = (LuceneSearcher)searcher;
                 var luceneSearcher = s.GetSearcher();
@@ -67,25 +69,7 @@ namespace Umbraco.Tests.UmbracoExamine
                 currentSort = sort;
             }
             return true;
-        }
-
-        //[Test]
-        //public void Test_Index_Type_With_German_Analyzer()
-        //{
-        //    using (var luceneDir = new RAMDirectory())
-        //    {
-        //        var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir,
-        //            new GermanAnalyzer());
-        //        indexer.RebuildIndex();
-        //        var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);    
-        //    }
-        //}
-
-        //private readonly TestContentService _contentService = new TestContentService();
-        //private readonly TestMediaService _mediaService = new TestMediaService();
-        //private static UmbracoExamineSearcher _searcher;
-        //private static UmbracoContentIndexer _indexer;
-        //private Lucene.Net.Store.Directory _luceneDir;
+        }        
 
     }
 }

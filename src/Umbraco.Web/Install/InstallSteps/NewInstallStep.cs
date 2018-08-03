@@ -32,6 +32,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _applicationContext = applicationContext;
         }
 
+        //TODO: Change all logic in this step to use ASP.NET Identity NOT MembershipProviders
         private MembershipProvider CurrentProvider
         {
             get
@@ -81,7 +82,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 {
                     var client = new System.Net.WebClient();
                     var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email} };
-                    client.UploadValues("http://umbraco.org/base/Ecom/SubmitEmail/installer.aspx", values);
+                    client.UploadValues("https://shop.umbraco.com/base/Ecom/SubmitEmail/installer.aspx", values);
                 }
                 catch { /* fail in silence */ }
             }
@@ -118,7 +119,7 @@ namespace Umbraco.Web.Install.InstallSteps
         public override bool RequiresExecution(UserModel model)
         {
             //now we have to check if this is really a new install, the db might be configured and might contain data
-            var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
 
             //if there's already a version then there should def be a user but in some cases someone may have 
             // left a version number in there but cleared out their db conn string, in that case, it's really a new install.

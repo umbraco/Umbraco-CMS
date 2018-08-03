@@ -65,14 +65,6 @@ namespace Umbraco.Web.Routing
                 return null;
             }
 
-            if (route.StartsWith("err/"))
-            {
-                LogHelper.Debug<DefaultUrlProvider>(
-                    "Page with nodeId={0} has a colliding url with page with nodeId={1}.",
-                    () => id, () => route.Substring(4));
-                return "#err-" + route.Substring(4);
-            }
-
             var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
 
             // extract domainUri and path
@@ -114,9 +106,6 @@ namespace Umbraco.Web.Routing
                     () => id);
                 return null;
             }
-
-            if (route.StartsWith("err/"))
-                return null;
 
             var domainHelper = new DomainHelper(umbracoContext.Application.Services.DomainService);
 

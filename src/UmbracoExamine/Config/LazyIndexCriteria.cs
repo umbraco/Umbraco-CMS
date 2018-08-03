@@ -12,7 +12,8 @@ namespace UmbracoExamine.Config
         public LazyIndexCriteria(
             IndexSet set,
             IDataService svc,
-            IEnumerable<StaticField> indexFieldPolicies)
+            StaticFieldCollection indexFieldPolicies,
+            IEnumerable<IndexField> additionalUserFields = null)
         {
             if (set == null) throw new ArgumentNullException("set");
             if (indexFieldPolicies == null) throw new ArgumentNullException("indexFieldPolicies");
@@ -21,7 +22,7 @@ namespace UmbracoExamine.Config
             _lazyCriteria = new Lazy<IIndexCriteria>(() =>
             {
                 var attributeFields = set.IndexAttributeFields.Cast<IIndexField>().ToArray();
-                var userFields = set.IndexUserFields.Cast<IIndexField>().ToArray();
+                var userFields = set.IndexUserFields.Cast<IIndexField>().ToList();
                 var includeNodeTypes = set.IncludeNodeTypes.Cast<IIndexField>().Select(x => x.Name).ToArray();
                 var excludeNodeTypes = set.ExcludeNodeTypes.Cast<IIndexField>().Select(x => x.Name).ToArray();
                 var parentId = set.IndexParentId;
@@ -35,15 +36,16 @@ namespace UmbracoExamine.Config
                     foreach (var u in userProps)
                     {
                         var field = new IndexField() { Name = u };
-                        var policy = indexFieldPolicies.FirstOrDefault(x => x.Name == u);
-                        if (policy != null)
+
+                        StaticField policy;
+                        if (indexFieldPolicies.TryGetValue(u, out policy))
                         {
                             field.Type = policy.Type;
                             field.EnableSorting = policy.EnableSorting;
                         }
                         fields.Add(field);
                     }
-                    userFields = fields.ToArray();
+                    userFields = fields.ToList();
                 }
 
                 //if there are no attribute fields defined, we'll populate them from the data source (include them all)
@@ -55,8 +57,9 @@ namespace UmbracoExamine.Config
                     foreach (var s in sysProps)
                     {
                         var field = new IndexField() { Name = s };
-                        var policy = indexFieldPolicies.FirstOrDefault(x => x.Name == s);
-                        if (policy != null)
+
+                        StaticField policy;
+                        if (indexFieldPolicies.TryGetValue(s, out policy))
                         {
                             field.Type = policy.Type;
                             field.EnableSorting = policy.EnableSorting;
@@ -66,6 +69,19 @@ namespace UmbracoExamine.Config
                     attributeFields = fields.ToArray();
                 }
 
+                //merge in the additional user fields if any are defined
+                if (additionalUserFields != null)
+                {
+                    foreach (var field in additionalUserFields)
+                    {
+                        var f = field; //copy local
+                        if (userFields.Any(x => x.Name == f.Name) == false)
+                        {
+                            userFields.Add(f);
+                        }
+                    }
+                    
+                }
 
                 return new IndexCriteria(
                     attributeFields,

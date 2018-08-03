@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 {
     
-    [Migration("6.0.0", 10, GlobalSettings.UmbracoMigrationName)]
+    [Migration("6.0.0", 10, Constants.System.UmbracoMigrationName)]
     public class DeleteAppTables : MigrationBase
     {
         public DeleteAppTables(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)

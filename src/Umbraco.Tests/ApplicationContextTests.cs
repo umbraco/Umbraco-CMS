@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Tests
@@ -26,7 +27,7 @@ namespace Umbraco.Tests
             migrationEntryService.Setup(x => x.FindEntry(It.IsAny<string>(), It.IsAny<SemVersion>()))
                 .Returns(Mock.Of<IMigrationEntry>());
 
-            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
+            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IScopeProviderInternal>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
             dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(true);
             dbCtx.Setup(x => x.CanConnect).Returns(true);
 
@@ -48,7 +49,7 @@ namespace Umbraco.Tests
             migrationEntryService.Setup(x => x.FindEntry(It.IsAny<string>(), It.IsAny<SemVersion>()))
                 .Returns((IMigrationEntry)null);
 
-            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
+            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IScopeProviderInternal>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
             dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(true);
             dbCtx.Setup(x => x.CanConnect).Returns(true);
 
@@ -68,7 +69,7 @@ namespace Umbraco.Tests
 
             var migrationEntryService = new Mock<IMigrationEntryService>();
 
-            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
+            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IScopeProviderInternal>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
             dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(true);
             dbCtx.Setup(x => x.CanConnect).Returns(true);
 
@@ -88,7 +89,7 @@ namespace Umbraco.Tests
 
             var migrationEntryService = new Mock<IMigrationEntryService>();
 
-            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
+            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IScopeProviderInternal>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
             dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(false);
             dbCtx.Setup(x => x.CanConnect).Returns(true);
 
@@ -108,7 +109,7 @@ namespace Umbraco.Tests
 
             var migrationEntryService = new Mock<IMigrationEntryService>();
 
-            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
+            var dbCtx = new Mock<DatabaseContext>(Mock.Of<IScopeProviderInternal>(), Mock.Of<ILogger>(), new SqlCeSyntaxProvider(), "test");
             dbCtx.Setup(x => x.IsDatabaseConfigured).Returns(true);
             dbCtx.Setup(x => x.CanConnect).Returns(false);
 

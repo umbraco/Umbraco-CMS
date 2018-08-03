@@ -5,7 +5,7 @@ namespace Umbraco.Core.Packaging.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class MetaData
+    public class MetaData
     {
         public string Name { get; set; }
         public string Version { get; set; }

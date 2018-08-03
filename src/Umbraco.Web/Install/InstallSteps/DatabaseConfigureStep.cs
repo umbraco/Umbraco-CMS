@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Install.Models;
 
@@ -83,7 +84,7 @@ namespace Umbraco.Web.Install.InstallSteps
         private bool ShouldDisplayView()
         {
             //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
-            var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
 
             if (_applicationContext.DatabaseContext.IsConnectionStringConfigured(databaseSettings))
             {
@@ -94,8 +95,9 @@ namespace Umbraco.Web.Install.InstallSteps
                     result.DetermineInstalledVersion();
                     return false;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _applicationContext.ProfilingLogger.Logger.Error<DatabaseConfigureStep>("An error occurred, reconfiguring...", ex);
                     //something went wrong, could not connect so probably need to reconfigure
                     return true;
                 }

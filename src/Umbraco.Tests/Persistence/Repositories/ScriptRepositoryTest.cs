@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Repositories
@@ -34,7 +35,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Instantiate_Repository()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
@@ -48,7 +49,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Add_On_ScriptRepository()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
@@ -65,7 +66,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Update_On_ScriptRepository()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
@@ -89,7 +90,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Delete_On_ScriptRepository()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
@@ -108,7 +109,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Get_On_ScriptRepository()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
@@ -125,7 +126,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_On_ScriptRepository()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
@@ -151,7 +152,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_GetAll_With_Params_On_ScriptRepository()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
@@ -177,7 +178,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         public void Can_Perform_Exists_On_ScriptRepository()
         {
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
@@ -194,7 +195,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             const string content = "/// <reference name=\"MicrosoftAjax.js\"/>";
 
             // Arrange
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
@@ -225,7 +226,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             // unless noted otherwise, no changes / 7.2.8
 
-            var provider = new FileUnitOfWorkProvider();
+            var provider = new FileUnitOfWorkProvider(Mock.Of<IScopeProvider>());
             var unitOfWork = provider.GetUnitOfWork();
             var repository = new ScriptRepository(unitOfWork, _fileSystem, Mock.Of<IContentSection>());
 
@@ -235,6 +236,14 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.IsTrue(_fileSystem.FileExists("test-path-1.js"));
             Assert.AreEqual("test-path-1.js", script.Path);
             Assert.AreEqual("/scripts/test-path-1.js", script.VirtualPath);
+
+            //ensure you can prefix the same path as the root path name
+            script = new Script("scripts/path-2/test-path-2.js") { Content = "// script" };
+            repository.AddOrUpdate(script);
+            unitOfWork.Commit();
+            Assert.IsTrue(_fileSystem.FileExists("scripts/path-2/test-path-2.js"));
+            Assert.AreEqual("scripts\\path-2\\test-path-2.js", script.Path); 
+            Assert.AreEqual("/scripts/scripts/path-2/test-path-2.js", script.VirtualPath);
 
             script = new Script("path-2/test-path-2.js") { Content = "// script" };
             repository.AddOrUpdate(script);

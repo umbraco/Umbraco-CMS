@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using umbraco.DataLayer;
+using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.datatype
 {
@@ -14,7 +15,7 @@ namespace umbraco.cms.businesslogic.datatype
 
         public DataEditorSettingsStorage()
         {
-            var databaseSettings = ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName];
+            var databaseSettings = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName];
             var dataHelper = DataLayerHelper.CreateSqlHelper(databaseSettings.ConnectionString, false);
 
             init(DataLayerHelper.CreateSqlHelper(dataHelper.ConnectionString, false));
@@ -27,23 +28,21 @@ namespace umbraco.cms.businesslogic.datatype
 
         public List<Setting<string, string>> GetSettings(int dataTypeNodeID)
         {
-
             string sql = "select * from cmsDataTypePreValues where datatypenodeid = @datatypenodeid";
-            IRecordsReader settingsReader = sqlHelper.ExecuteReader(sql, sqlHelper.CreateParameter("@datatypenodeid", dataTypeNodeID));
-
-            List<Setting<string, string>> settings = new List<Setting<string, string>>();
-
-            while (settingsReader.Read())
+            using (IRecordsReader settingsReader = sqlHelper.ExecuteReader(sql, sqlHelper.CreateParameter("@datatypenodeid", dataTypeNodeID)))
             {
-                Setting<string, string> setting = new Setting<string, string>();
-                setting.Key = settingsReader.GetString("alias");
-                setting.Value = settingsReader.GetString("value");
-                settings.Add(setting);
+                List<Setting<string, string>> settings = new List<Setting<string, string>>();
+
+                while (settingsReader.Read())
+                {
+                    Setting<string, string> setting = new Setting<string, string>();
+                    setting.Key = settingsReader.GetString("alias");
+                    setting.Value = settingsReader.GetString("value");
+                    settings.Add(setting);
+                }
+
+                return settings;
             }
-
-            settingsReader.Dispose();
-
-            return settings;
         }
 
 

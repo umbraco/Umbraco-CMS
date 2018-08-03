@@ -119,12 +119,13 @@ namespace Umbraco.Web.UI.Controls
         /// </remarks>
         public UrlHelper Url
         {
-            get { return _url ?? (_url = new UrlHelper(new RequestContext(new HttpContextWrapper(Context), new RouteData()))); }
+            get { return _url ?? (_url = new UrlHelper(Context.Request.RequestContext)); }
         }
 
         /// <summary>
-        /// Returns the legacy SqlHelper
+        /// Unused, please do not use
         /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected ISqlHelper SqlHelper
         {
             get { return global::umbraco.BusinessLogic.Application.SqlHelper; }

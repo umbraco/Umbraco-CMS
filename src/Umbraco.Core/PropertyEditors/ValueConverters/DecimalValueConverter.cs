@@ -3,6 +3,7 @@ using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
+    [DefaultPropertyValueConverter]
     [PropertyValueType(typeof(decimal))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class DecimalValueConverter : PropertyValueConverterBase
@@ -21,7 +22,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             if (sourceString != null)
             {
                 decimal d;
-                return (decimal.TryParse(sourceString, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture,  out d)) ? d : 0M;
+                return (decimal.TryParse(sourceString, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture,  out d)) ? d : 0M;
             }
 
             // in the database an a decimal is an a decimal 

@@ -1,9 +1,9 @@
-﻿namespace Umbraco.Core.Logging
-{
-    using System;
-    using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
+using ImageProcessor.Common.Exceptions;
 
-    using ImageProcessor.Common.Exceptions;
+namespace Umbraco.Core.Logging
+{   
 
     /// <summary>
     /// A logger for explicitly logging ImageProcessor exceptions.
