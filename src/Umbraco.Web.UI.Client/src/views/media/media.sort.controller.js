@@ -47,7 +47,7 @@
 
             mediaResource.sort(args)
                 .then(function(){
-                    // navigationService.syncTree({ tree: "media", path: $scope.currentNode.path, forceReload: true, activate: false });
+                    navigationService.syncTree({ tree: "media", path: $scope.currentNode.path, forceReload: true, activate: false });
                     vm.saveButtonState = "success";
                 }, function(error) {
                     vm.error = error;
