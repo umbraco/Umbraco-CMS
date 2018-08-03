@@ -319,6 +319,7 @@
     <Compile Include="Cache\TemplateCacheRefresher.cs" />
     <Compile Include="Cache\UnpublishedPageCacheRefresher.cs" />
     <Compile Include="Cache\UserCacheRefresher.cs" />
+    <Compile Include="Editors\LocalizationController.cs" />
     <Compile Include="Editors\PreviewController.cs" />
     <Compile Include="Editors\BackOfficeAssetsController.cs" />
     <Compile Include="Features\DisabledFeatures.cs" />
@@ -343,9 +344,11 @@
     <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
     <Compile Include="Models\BackOfficeTourFilter.cs" />
     <Compile Include="Models\ContentEditing\BackOfficePreview.cs" />
+    <Compile Include="Models\ContentEditing\LanguageForContentTranslation.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeCollectionDisplay.cs" />
     <Compile Include="Models\Mapping\AutoMapperExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
+    <Compile Include="Models\Mapping\LocalizationModelMapper.cs" />
     <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />
     <Compile Include="Models\Trees\ExportMember.cs" />
     <Compile Include="PropertyEditors\DropdownFlexiblePropertyEditor.cs" />

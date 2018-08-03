@@ -277,10 +277,13 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetContextHelpForPage("","",""))
                         },
                         {
+                            "localizationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<LocalizationController>(
+                                controller => controller.GetAllLanguages())
+                        },
+                        {
                             "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
                                 controller => controller.GetSupportedMomentLocales())
                         }
-
                     }
                 },
                 {
