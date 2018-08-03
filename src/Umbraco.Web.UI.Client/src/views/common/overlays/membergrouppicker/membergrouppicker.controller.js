@@ -24,14 +24,15 @@ angular.module("umbraco").controller("Umbraco.Overlays.MemberGroupPickerControll
         }
 
         function selectMemberGroups(id) {
+            var index = $scope.model.selectedMemberGroups.indexOf(id);
 
-            if($scope.model.selectedMemberGroups.indexOf(id) === -1){
+            if(index === -1){
                 // If the id does not exists in the array then add it
                 $scope.model.selectedMemberGroups.push(id);
             }
             else{
                 // Otherwise we will remove it from the array instead
-                $scope.model.selectedMemberGroups.splice(id, 1);
+                $scope.model.selectedMemberGroups.splice(index, 1);
             }
         }
 
