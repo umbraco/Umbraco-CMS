@@ -986,6 +986,12 @@ namespace Umbraco.Web.Editors
                     Logger.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
                 }
+
+                if (sorted.ParentId > 0)
+                {
+                    Services.NotificationService.SendNotification(contentService.GetById(sorted.ParentId), ActionSort.Instance, UmbracoContext, Services.TextService, GlobalSettings);
+                }
+
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
