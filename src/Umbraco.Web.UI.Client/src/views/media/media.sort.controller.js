@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentSortController($scope, $filter, contentResource, navigationService) {
+    function MediaSortController($scope, $filter, mediaResource, navigationService) {
 
         var vm = this;
         var parentId = $scope.currentNode.parentId ? $scope.currentNode.parentId : "-1";
@@ -30,7 +30,7 @@
 
         function onInit() {
             vm.loading = true;
-            contentResource.getChildren(id)
+            mediaResource.getChildren(id)
                 .then(function(data){
                     vm.children = data.items;
                     vm.loading = false;
@@ -45,9 +45,9 @@
                 sortedIds: _.map(vm.children, function(child){ return child.id; })
             };
 
-            contentResource.sort(args)
+            mediaResource.sort(args)
                 .then(function(){
-                    navigationService.syncTree({ tree: "content", path: $scope.currentNode.path, forceReload: true, activate: false });
+                    navigationService.syncTree({ tree: "media", path: $scope.currentNode.path, forceReload: true, activate: false });
                     vm.saveButtonState = "success";
                 }).catch(function(error) {
                     vm.error = error;
@@ -78,5 +78,5 @@
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Editors.Content.SortController", ContentSortController);
+    angular.module("umbraco").controller("Umbraco.Editors.Media.SortController", MediaSortController);
 })();
