@@ -20,7 +20,7 @@ function valServer(serverValidationManager) {
             }
 
             var currentProperty = umbPropCtrl.property;
-            var currentCulture = tabbedContent.content.language.culture;
+            var currentCulture = tabbedContent && tabbedContent.content && tabbedContent.content.language ? tabbedContent.content.language.culture : null;
             var watcher = null;
 
             //default to 'value' if nothing is set
@@ -43,21 +43,21 @@ function valServer(serverValidationManager) {
             function startWatch() {
                 //if there's not already a watch
                 if (!watcher) {
-                    //watcher = scope.$watch(function () {
-                    //    return modelCtrl.$modelValue;
-                    //}, function (newValue, oldValue) {
+                    watcher = scope.$watch(function () {
+                        return modelCtrl.$modelValue;
+                    }, function (newValue, oldValue) {
 
-                    //    if (!newValue || angular.equals(newValue, oldValue)) {
-                    //        return;
-                    //    }
+                        if (!newValue || angular.equals(newValue, oldValue)) {
+                            return;
+                        }
 
-                    //    if (modelCtrl.$invalid) {
-                    //        modelCtrl.$setValidity('valServer', true);
-                    //        //clear the server validation entry
-                    //        serverValidationManager.removePropertyError(currentProperty.alias, currentCulture, fieldName);
-                    //        stopWatch();
-                    //    }
-                    //}, true);
+                        if (modelCtrl.$invalid) {
+                            modelCtrl.$setValidity('valServer', true);
+                            //clear the server validation entry
+                            serverValidationManager.removePropertyError(currentProperty.alias, currentCulture, fieldName);
+                            stopWatch();
+                        }
+                    }, true);
                 }
             }
 

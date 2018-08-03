@@ -12,7 +12,7 @@
 function valPropertyMsg(serverValidationManager) {
 
     return {
-        require: ['^^form', '^^valFormManager', '^^umbProperty', '^^tabbedContent'],
+        require: ['^^form', '^^valFormManager', '^^umbProperty', '?^^tabbedContent'],
         replace: true,
         restrict: "E",
         template: "<div ng-show=\"errorMsg != ''\" class='alert alert-error property-error' >{{errorMsg}}</div>",
@@ -26,10 +26,10 @@ function valPropertyMsg(serverValidationManager) {
             //the property controller api
             var umbPropCtrl = ctrl[2];
             //the tabbed content controller api
-            var tabbedContent = ctrl[3];
+            var tabbedContent = ctrl.length > 3 ? ctrl[3] : null;
 
             scope.currentProperty = umbPropCtrl.property;
-            var currentCulture = tabbedContent.content.language.culture;
+            var currentCulture = tabbedContent && tabbedContent.content && tabbedContent.content.language ? tabbedContent.content.language.culture : null;
 
             var watcher = null;
 
@@ -61,31 +61,32 @@ function valPropertyMsg(serverValidationManager) {
             // the form. Of course normal client-side validators will continue to execute. 
             function startWatch() {
                 //if there's not already a watch
-                //if (!watcher) {
-                //    watcher = scope.$watch("currentProperty.value", function (newValue, oldValue) {
+                if (!watcher) {
+                    watcher = scope.$watch("currentProperty.value",
+                        function (newValue, oldValue) {
 
-                //        if (!newValue || angular.equals(newValue, oldValue)) {
-                //            return;
-                //        }
+                            if (!newValue || angular.equals(newValue, oldValue)) {
+                                return;
+                            }
 
-                //        var errCount = 0;
-                //        for (var e in formCtrl.$error) {
-                //            if (angular.isArray(formCtrl.$error[e])) {
-                //                errCount++;
-                //            }
-                //        }
+                            var errCount = 0;
+                            for (var e in formCtrl.$error) {
+                                if (angular.isArray(formCtrl.$error[e])) {
+                                    errCount++;
+                                }
+                            }
 
-                //        //we are explicitly checking for valServer errors here, since we shouldn't auto clear
-                //        // based on other errors. We'll also check if there's no other validation errors apart from valPropertyMsg, if valPropertyMsg
-                //        // is the only one, then we'll clear.
+                            //we are explicitly checking for valServer errors here, since we shouldn't auto clear
+                            // based on other errors. We'll also check if there's no other validation errors apart from valPropertyMsg, if valPropertyMsg
+                            // is the only one, then we'll clear.
 
-                //        if ((errCount === 1 && angular.isArray(formCtrl.$error.valPropertyMsg)) || (formCtrl.$invalid && angular.isArray(formCtrl.$error.valServer))) {
-                //            scope.errorMsg = "";
-                //            formCtrl.$setValidity('valPropertyMsg', true);
-                //            stopWatch();
-                //        }
-                //    }, true);
-                //}
+                            if ((errCount === 1 && angular.isArray(formCtrl.$error.valPropertyMsg)) || (formCtrl.$invalid && angular.isArray(formCtrl.$error.valServer))) {
+                                scope.errorMsg = "";
+                                formCtrl.$setValidity('valPropertyMsg', true);
+                                stopWatch();
+                            }
+                        }, true);
+                }
             }
 
             //clear the watch when the property validator is valid again
@@ -132,7 +133,7 @@ function valPropertyMsg(serverValidationManager) {
                 //reset the status.
                 showValidation = element.closest(".show-validation").length > 0;
             }
-            
+
 
             var hasError = false;
 
@@ -202,7 +203,6 @@ function valPropertyMsg(serverValidationManager) {
                     serverValidationManager.unsubscribe(scope.currentProperty.alias, currentCulture, "");
                 });
 
-                //checkValidationStatus();
             }
 
             //when the scope is disposed we need to unsubscribe
