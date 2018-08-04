@@ -34,11 +34,7 @@ namespace Umbraco.Web.Trees
         [HttpQueryStringFilter("queryStrings")]
         public async Task<SectionRootNode> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings, bool onlyInitialized = true)
         {
-            // define valid application pattern
-            // only letters, numbers, hyphens, underscores
-            Regex validRegex = new Regex("^[a-zA-Z0-9_-]*$");
-
-            if (validRegex.IsMatch(application) == false) throw new HttpRequestValidationException();
+            application = application.CleanForXss();
 
             if (string.IsNullOrEmpty(application)) throw new HttpResponseException(HttpStatusCode.NotFound);
 
