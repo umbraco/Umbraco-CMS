@@ -800,10 +800,10 @@ Para fechar a tarefa de tradução vá até os detalhes e clique no botão "Fech
 
       Este é um email automatizado para informar que o documento '%1%' foi enviado para ser traduzido em '%5%' por %2%.
 
-      Vá para http://%3%/translation/details.aspx?id=%4% para editar.
+      Vá para %3%/translation/details.aspx?id=%4% para editar.
 
       Ou visite o Umbraco para ter uma visão geral das tarefas de tradução
-      http://%3%
+      %3%
 
       Tenha um bom dia!
 

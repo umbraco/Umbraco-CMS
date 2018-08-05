@@ -1752,10 +1752,10 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
       Ceci est un mail automatique pour vous informer que le document '%1%'
       a été envoyé pour traduction en '%5%' par %2%.
 
-      Allez sur http://%3%/translation/details.aspx?id=%4% pour l'éditer.
+      Allez sur %3%/translation/details.aspx?id=%4% pour l'éditer.
 
       Ou connectez-vous à Umbraco pour obtenir une vue d'ensemble des tâches de traduction qui vous sont assignées
-      http://%3%
+      %3%
 
       Bonne journée !
 

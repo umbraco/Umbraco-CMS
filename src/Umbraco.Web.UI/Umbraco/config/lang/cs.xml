@@ -934,10 +934,10 @@
       Toto je automatická zpráva informující Vás, že dokument '%1%'
       byl vyžádán k překladu do '%5%' uživatelem %2%.
 
-      Přejděte na http://%3%/translation/details.aspx?id=%4% pro editování.
+      Přejděte na %3%/translation/details.aspx?id=%4% pro editování.
 
       Anebo se přihlašte do umbraca, abyste získali přehled o svých překladatelských úlohách
-      http://%3%
+      %3%
 
       Mějte hezký den!
 

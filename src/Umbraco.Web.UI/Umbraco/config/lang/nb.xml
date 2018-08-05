@@ -923,7 +923,7 @@ Vennlig hilsen Umbraco roboten
 			Dette er en automatisk mail for å informere deg om at dokumentet '%1%'
 			har blitt anmodet oversatt til '%5%' av %2%.
 
-			Gå til http://%3%/Umbraco/translation/default.aspx?id=%4% for å redigere.
+			Gå til %3%/Umbraco/translation/default.aspx?id=%4% for å redigere.
 
 			Ha en fin dag!
 

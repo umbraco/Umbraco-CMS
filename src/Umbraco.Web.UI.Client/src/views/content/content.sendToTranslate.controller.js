@@ -1,21 +1,24 @@
 (function () {
     "use strict";
 
-    function ContentSendToTranslateController($scope, $q, usersResource, localizationResource) {
+    function ContentSendToTranslateController($scope, $q, usersResource, localizationResource, contentResource) {
 
         var vm = this;
 
-        vm.loading = true;
-        vm.translators = [];
-        vm.languages = [];
-        vm.sendToTranslationButtonState = "init";
         vm.buttonEnabled = false;
+        vm.error = null;
         vm.form = {
-            "translator": null,
-            "language": null,
-            "includeSubpages": false,
-            "comment": ""
-        }
+            id: parseInt($scope.dialogOptions.currentNode.id),
+            userId: null,
+            language: null,
+            includeSubPages: false,
+            comment: ""
+        };
+        vm.languages = [];
+        vm.loading = true;
+        vm.sendToTranslationButtonState = "init";
+        vm.success = null;
+        vm.translators = [];
 
         function $onInit() {
             $q.all([
@@ -36,29 +39,28 @@
                 vm.languages = result[1];
                 vm.form.language = result[2] ? result[2].isoCode : null;
 
-                
-
                 vm.loading = false;
             });
         }
 
-        vm.updateButtonDisabledState = function() {
-            vm.buttonEnabled = vm.form.language && vm.form.translator;
+        vm.updateButtonDisabledState = function () {
+            vm.buttonEnabled = vm.form.language && vm.form.userId;
         }
 
-        vm.sendToTranslation = function () {
+        vm.sendToTranslate = function () {
 
             vm.sendToTranslationButtonState = "busy";
 
-            // fake loading
-            /*$timeout(function () {
+            contentResource.sendToTranslate(vm.form).then(function () {
                 vm.sendToTranslationButtonState = "success";
-            }, 1000);*/
-
+                vm.success = true;
+            }, function (err) {
+                vm.sendToTranslationButtonState = "error";
+                vm.error = err;
+            });
         }
 
         $onInit();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.Content.SendToTranslateController", ContentSendToTranslateController);

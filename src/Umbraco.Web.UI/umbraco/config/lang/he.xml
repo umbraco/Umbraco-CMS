@@ -833,10 +833,10 @@ To manage your website, simply open the Umbraco back office and start adding con
 	  זוהי הודעה אוטומטית הבאה ליידע אותך בנוגע למסמך '%1%'
       שהוגשה בקשה לתירגום על '%5%' על ידי %2%.
 
-      לעריכה, לחץ על הלינק הבא: http://%3%/translation/details.aspx?id=%4% .
+      לעריכה, לחץ על הלינק הבא: %3%/translation/details.aspx?id=%4% .
 
       באפשרותך גם להיכנס למערכת על מנת לראות את כל משימות התירגום
-      http://%3%
+      %3%
       
       המשך יום נעים.
 	  

@@ -1377,10 +1377,10 @@
      您好！这是一封自动邮件来提醒您注意，%2%的文档'%1%'
      需要您翻译为'%5%' 
 
-     转到 http://%3%/translation/details.aspx?id=%4% 进行编辑
+     转到 %3%/translation/details.aspx?id=%4% 进行编辑
 
       或登录下列网址查看翻译任务
-      http://%3%
+      %3%
 
       Have a nice day!
 

@@ -1,16 +1,17 @@
-﻿using System;
+﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Mail;
 using System.Text;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
-using AutoMapper;
-using umbraco.BusinessLogic.Actions;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -23,9 +24,8 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
-using umbraco.cms.businesslogic.web;
-using umbraco.presentation.preview;
-using Umbraco.Core.Events;
+
+using Async = System.Threading.Tasks;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -68,7 +68,7 @@ namespace Umbraco.Web.Editors
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetNiceUrl", "id", typeof(int), typeof(Guid), typeof(Udi)),
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))    
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
                 ));
             }
         }
@@ -935,6 +935,82 @@ namespace Umbraco.Web.Editors
                 content.AddSuccessNotification(Services.TextService.Localize("content/unPublish"), Services.TextService.Localize("speechBubbles/contentUnpublished"));
                 return content;
             }
+        }
+
+        /// <summary>
+        /// Send a document to translator
+        /// </summary>
+        /// <param name="sendToTranslate"></param>
+        /// <returns></returns>
+        [EnsureUserPermissionForContent("sendToTranslate.Id", '5')]
+        public async Async.Task<HttpResponseMessage> PostSendToTranslate(SendToTranslate sendToTranslate)
+        {
+            var translator = Services.UserService.GetUserById(sendToTranslate.UserId);
+
+            if (translator == null)
+            {
+                return Request.CreateValidationErrorResponse("The translator could not be found");
+            }
+
+            var language = Services.LocalizationService.GetLanguageByIsoCode(sendToTranslate.Language);
+
+            if (language == null)
+            {
+                return Request.CreateValidationErrorResponse("The language is not supported");
+            }
+
+            var document = Services.ContentService.GetById(sendToTranslate.Id);
+
+            if (document == null)
+            {
+                return Request.CreateValidationErrorResponse("The document to translate could not be found");
+            }
+
+            var taskType = Services.TaskService.GetTaskTypeByAlias("toTranslate");
+            var applicationUri = new Uri(ApplicationContext.UmbracoApplicationUrl);
+            var emailSender = new EmailSender();
+
+            async Async.Task newTaskAsync(IContent content, bool sendMail = true)
+            {
+                Task task = new Task(taskType)
+                {
+                    Comment = sendToTranslate.Comment,
+                    AssigneeUserId = translator.Id,
+                    EntityId = content.Id
+                };
+
+                Services.TaskService.Save(task);
+
+                if (sendMail)
+                {
+                    var subjectVars = new[] { applicationUri.ToString(), content.Name };
+                    var bodyVars = new[] { translator.Name, content.Name, Security.CurrentUser.Name, applicationUri.ToString(), task.Id.ToString(), language.CultureInfo.DisplayName };
+
+                    var emailSubject = Services.TextService.Localize("translation/mailSubject", UserExtensions.GetUserCulture(translator.Language, Services.TextService), subjectVars);
+                    var emailBody = Services.TextService.Localize("translation/mailBody", UserExtensions.GetUserCulture(translator.Language, Services.TextService), bodyVars);
+
+                    var message = new MailMessage(translator.Email, Security.CurrentUser.Email)
+                    {
+                        Subject = emailSubject,
+                        Body = emailBody,
+                        IsBodyHtml = false
+                    };
+
+                    await emailSender.SendAsync(message);
+                }
+            }
+
+            await newTaskAsync(document);
+
+            if (sendToTranslate.IncludeSubPages && document.HasChildren())
+            {
+                foreach (var child in document.Children())
+                {
+                    await newTaskAsync(child, false);
+                }
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         /// <summary>

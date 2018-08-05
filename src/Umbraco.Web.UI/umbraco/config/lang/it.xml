@@ -822,10 +822,10 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
       Questa è un'email automatica per informarti che è stata richiesta una traduzione in '%5%' da %2%
       per il documento il documento '%1%'.
 
-      Vai al http://%3%/translation/details.aspx?id=%4% per effettuare la modifica.
+      Vai al %3%/translation/details.aspx?id=%4% per effettuare la modifica.
 
       Oppure effettua il login in Umbraco per avere una panoramica delle attività di traduzione
-      http://%3%
+      %3%
 
       Buona giornata!
 

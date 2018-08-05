@@ -196,6 +196,39 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
           * @ngdoc method
+          * @name umbraco.resources.contentResource#sendToTranslate
+          * @methodOf umbraco.resources.contentResource
+          *
+          * @description
+          * Send a node to a translator for review
+          *
+          * ##usage
+          * <pre>
+          * contentResource.sendToTranslate({ id: 1234, userId: 1, language: "en-US", includeSubPages: false, comment: "Foo" })
+          *    .then(function() {
+          *        alert("node sent to translation");
+          *    }, function(err){
+          *      alert("node not sent to translation:" + err.data.Message); 
+          *    });
+          * </pre> 
+          * @param {Object} args arguments object
+          * @param {Int} args.id the ID of the node to send
+          * @param {Int} args.userId the ID of translator
+          * @param {String} args.language ISO code of the target language
+          * @param {Boolean} args.includeSubPages if true, sends the children to translation as well
+          * @param {String} args.comment Comment attached to the translation request
+          * @returns {Promise} resourcePromise object.
+          *
+          */
+        sendToTranslate: function (args) {
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostSendToTranslate"),
+                    args),
+                'Failed to send content to translate');
+        },
+        
+        /**
+          * @ngdoc method
           * @name umbraco.resources.contentResource#unPublish
           * @methodOf umbraco.resources.contentResource
           *

@@ -1443,10 +1443,10 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
       To jest automatyczny e-mail informujący, że dokument '%1%' 
       został zgłoszony jako wymagający tłumaczenia na '%5%' przez %2%. 
 
-      Wejdź na http://%3%/translation/details.aspx?id=%4% aby edytować. 
+      Wejdź na %3%/translation/details.aspx?id=%4% aby edytować. 
 
       Lub zaloguj się do Umbraco, aby zobaczyć wszystkie zadania do tłumaczenia  
-      http://%3%.
+      %3%.
 
       Życzę miłego dnia! 
 

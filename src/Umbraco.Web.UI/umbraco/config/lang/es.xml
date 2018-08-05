@@ -1472,7 +1472,7 @@
 
         Este mail se ha generado automáticamente para informale que %2% ha solicitado que el documento '%1%' sea traducido en '%5%'. 
 
-        Para editarlo, vaya a la dirección http://%3%/translation/details.aspx?id=%4% o inicie la sesión en umbraco y vaya a http://%3% para ver las tareas pendientes de traducir. 
+        Para editarlo, vaya a la dirección %3%/translation/details.aspx?id=%4% o inicie la sesión en umbraco y vaya a %3% para ver las tareas pendientes de traducir. 
 
         Espero que tenga un buen dia. 
 

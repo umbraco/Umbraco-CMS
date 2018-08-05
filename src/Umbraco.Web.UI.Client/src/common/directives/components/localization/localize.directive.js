@@ -9,6 +9,7 @@ angular.module("umbraco.directives")
     * <div>
     *   <strong>Component</strong><br />
     *   Localize a specific token to put into the HTML as an item
+    *   Possibility to pass tokens by using them as an array to the "tokens" attribute
     * </div>
     * <div>
     *   <strong>Attribute</strong><br />
@@ -20,6 +21,7 @@ angular.module("umbraco.directives")
     * <!-- Component -->
     * <localize key="general_close">Close</localize>
     * <localize key="section_key">Fallback value</localize>
+    * <localize key="section_key" tokens="[ 'placeholder1', 'placeholder2' ]">Fallback value</localize>
     *
     * <!-- Attribute -->
     * <input type="text" localize="placeholder" placeholder="@placeholders_entername" />
@@ -30,16 +32,30 @@ angular.module("umbraco.directives")
     .directive('localize', function ($log, localizationService) {
         return {
             restrict: 'E',
-            scope:{
+            scope: {
                 key: '@'
             },
             replace: true,
 
             link: function (scope, element, attrs) {
                 var key = scope.key;
-                localizationService.localize(key).then(function(value){
-                    element.html(value);
-                });
+
+                if (!attrs["tokens"]) {
+                    localizationService.localize(key).then(function (value) {
+                        element.html(value);
+                    });
+                }
+                else {
+                    var unwatcher = scope.$watchCollection(function () { return scope.$parent.$eval(attrs["tokens"]) }, function (newValue, oldValue) {
+                        localizationService.localize(key, newValue).then(function (value) {
+                            element.html(value);
+                        });
+                    });
+
+                    scope.$on('$destroy', function () {
+                        unwatcher();
+                    });
+                }
             }
         };
     })
@@ -51,19 +67,19 @@ angular.module("umbraco.directives")
                 //Support one or more attribute properties to update
                 var keys = attrs.localize.split(',');
 
-                angular.forEach(keys, function(value, key){
+                angular.forEach(keys, function (value, key) {
                     var attr = element.attr(value);
 
-                    if(attr){
-                        if(attr[0] === '@'){
+                    if (attr) {
+                        if (attr[0] === '@') {
                             //If the translation key starts with @ then remove it
                             attr = attr.substring(1);
                         }
 
                         var t = localizationService.tokenize(attr, scope);
-                        
-                        localizationService.localize(t.key, t.tokens).then(function(val){
-                                element.attr(value, val);
+
+                        localizationService.localize(t.key, t.tokens).then(function (val) {
+                            element.attr(value, val);
                         });
                     }
                 });

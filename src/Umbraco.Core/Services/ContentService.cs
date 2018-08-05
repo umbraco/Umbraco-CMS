@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Mail;
 using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
@@ -694,7 +695,7 @@ namespace Umbraco.Core.Services
                     }
                     query.Where(x => x.Path.SqlStartsWith(string.Format("{0},", contentPath[0].Path), TextColumnType.NVarchar));
                 }
-                    
+
 
                 // get filter
                 IQuery<IContent> filterQuery = null;
@@ -991,7 +992,7 @@ namespace Umbraco.Core.Services
                     FROM umbracoNode
                     JOIN cmsDocument ON umbracoNode.id=cmsDocument.nodeId AND cmsDocument.published=@0
                     WHERE umbracoNode.trashed=@1 AND umbracoNode.id IN (@2)",
-                    true, false, ids);                    
+                    true, false, ids);
                 var x = uow.Database.Fetch<int>(sql);
                 return ids.Length == x.Count;
             }
@@ -1260,7 +1261,7 @@ namespace Umbraco.Core.Services
                 var repository = RepositoryFactory.CreateContentBlueprintRepository(uow);
                 var blueprint = repository.Get(id);
                 if (blueprint != null)
-                    ((Content) blueprint).IsBlueprint = true;
+                    ((Content)blueprint).IsBlueprint = true;
                 return blueprint;
             }
         }
@@ -1283,7 +1284,7 @@ namespace Umbraco.Core.Services
             if (content.ParentId != -1)
                 content.ParentId = -1;
 
-            ((Content) content).IsBlueprint = true;
+            ((Content)content).IsBlueprint = true;
 
             using (new WriteLock(Locker))
             {
@@ -1357,7 +1358,7 @@ namespace Umbraco.Core.Services
                 }
                 var blueprints = repository.GetByQuery(query).Select(x =>
                 {
-                    ((Content) x).IsBlueprint = true;
+                    ((Content)x).IsBlueprint = true;
                     return x;
                 }).ToArray();
 
@@ -1373,7 +1374,7 @@ namespace Umbraco.Core.Services
 
         public void DeleteBlueprintsOfType(int contentTypeId, int userId = 0)
         {
-            DeleteBlueprintsOfTypes(new[] {contentTypeId}, userId);
+            DeleteBlueprintsOfTypes(new[] { contentTypeId }, userId);
         }
 
         /// <summary>
@@ -1597,7 +1598,7 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
         public void DeleteContentOfType(int contentTypeId, int userId = 0)
         {
-            DeleteContentOfTypes(new[] {contentTypeId}, userId);
+            DeleteContentOfTypes(new[] { contentTypeId }, userId);
         }
 
         /// <summary>
@@ -1854,7 +1855,9 @@ namespace Umbraco.Core.Services
                         foreach (var tag in tags)
                             uow.Database.Insert(new TagRelationshipDto
                             {
-                                NodeId = copy.Id, TagId = tag.TagId, PropertyTypeId = tag.PropertyTypeId
+                                NodeId = copy.Id,
+                                TagId = tag.TagId,
+                                PropertyTypeId = tag.PropertyTypeId
                             });
                     }
                     uow.Commit(); // todo - this should flush, not commit
@@ -2143,7 +2146,7 @@ namespace Umbraco.Core.Services
                 }
                 return repository.GetByQuery(query).Select(x =>
                 {
-                    ((Content) x).IsBlueprint = true;
+                    ((Content)x).IsBlueprint = true;
                     return x;
                 });
             }
@@ -2567,7 +2570,7 @@ namespace Umbraco.Core.Services
                     //We need to check if children and their publish state to ensure that we 'republish' content that was previously published
                     if (published && previouslyPublished == false && HasChildren(content.Id))
                     {
-                    //TODO: Horrible for performance if there are lots of descendents! We should page if anything but this is crazy
+                        //TODO: Horrible for performance if there are lots of descendents! We should page if anything but this is crazy
                         var descendants = GetPublishedDescendants(content);
                         _publishingStrategy.PublishingFinalized(uow, descendants, false);
                     }
@@ -2707,7 +2710,7 @@ namespace Umbraco.Core.Services
                 return contentType;
             }
         }
-
+        
         #endregion
 
         #region Proxy Event Handlers

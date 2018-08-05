@@ -1245,7 +1245,7 @@ Om een vertalingstaak te sluiten, ga aub naar het detailoverzicht en klik op de 
       Dit is een geautomatiseerde mail om u op de hoogte te brengen dat document '%1%'
       is aangevraagd voor vertaling naar '%5%' door %2%.
 
-      Ga naar http://%3%/translation/details.aspx?id=%4% om te bewerken.
+      Ga naar %3%/translation/details.aspx?id=%4% om te bewerken.
 	  Of log in bij Umbraco om een overzicht te krijgen van al jouw vertalingen.
 
 	  
