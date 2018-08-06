@@ -12,6 +12,7 @@
 
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
             scope.allowChangeDocumentType = false;
+            scope.allowChangeTemplate = false;
             
             function onInit() {
 
@@ -20,6 +21,7 @@
                         angular.forEach(user.sections, function(section){
                             if(section.alias === "settings") {
                                 scope.allowChangeDocumentType = true;
+                                scope.allowChangeTemplate = true;
                             }
                         });
                     });

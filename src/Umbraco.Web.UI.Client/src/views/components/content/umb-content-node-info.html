@@ -197,7 +197,7 @@
                                 ng-change="updateTemplate(node.template)">
                             <option value=""><localize key="general_choose">Choose</localize>...</option>
                         </select>
-                        <a href="" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()" ng-if="node.template !== null">
+                        <a href="" ng-if="allowChangeTemplate" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()" ng-if="node.template !== null">
                             <localize key="general_open">Open</localize>
                         </a>
                     </div>
