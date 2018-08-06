@@ -102,7 +102,7 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        protected void HandleInvalidModelState(IErrorModel display)
+        protected virtual void HandleInvalidModelState(IErrorModel display)
         {
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             if (!ModelState.IsValid)

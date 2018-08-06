@@ -422,6 +422,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          */
         reBindChangedProperties: function (origContent, savedContent) {
 
+            //TODO: We should probably split out this logic to deal with media/members seperately to content
+            
             //a method to ignore built-in prop changes
             var shouldIgnore = function(propName) {
                 return _.some([
@@ -488,6 +490,27 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
                 var origVariant = origVariants[j];
                 var savedVariant = savedVariants[j];
+
+                //if it's content (not media/members), then we need to sync the variant specific data
+                if (origContent.variants) {
+
+                    //the variant property names we want to sync
+                    var variantPropertiesSync = ["active", "language", "isEdited", "state"];
+
+                    for (var b in origVariant) {
+
+                        var shouldCompare = _.some(variantPropertiesSync, function(e) {
+                            return e === b;
+                        });
+
+                        //only compare the explicit ones or ones we don't ignore
+                        if (shouldCompare || !shouldIgnore(b)) {
+                            if (!_.isEqual(origVariant[b], savedVariant[b])) {
+                                origVariant[b] = savedVariant[b];
+                            }
+                        }
+                    }
+                }
 
                 //get a list of properties since they are contained in tabs
                 var allOrigProps = this.getAllProps(origVariant);

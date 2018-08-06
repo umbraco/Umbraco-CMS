@@ -12,6 +12,12 @@
                 //expose the property/methods for other directives to use
                 this.content = $scope.content;
 
+                $scope.$watch("tabbedContentForm.$dirty",
+                    function (newValue, oldValue) {
+                        if (newValue === true) {
+                            $scope.content.isDirty = true;
+                        }
+                    });
             },
             link: function(scope) {
 

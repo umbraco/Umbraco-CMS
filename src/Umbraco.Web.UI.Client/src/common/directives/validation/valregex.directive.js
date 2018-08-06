@@ -41,7 +41,7 @@ function valRegex() {
             //An ngModel is supplied, assign a render function which is called when the model is changed
             var oldRender = ctrl.$render;
             ctrl.$render = function () {
-                patternValidator(newValue);
+                patternValidator(ctrl.$viewValue);
                 //call any previously set render method
                 if (oldRender) {
                     oldRender();

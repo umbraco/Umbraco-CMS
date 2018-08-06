@@ -49,7 +49,7 @@
         <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.pristineVariantFilter">
             <div>
                 <div ng-class="{'bold': variant.published}" style="margin-bottom: 2px;">{{ variant.language.name }}</div>
-                <div class="umb-permission__description" ng-if="!variant.validationError">{{ variant.state }}</div>
+                <div class="umb-permission__description">{{ variant.state }}</div>
             </div>
         </div>
     </div>

@@ -771,7 +771,7 @@ namespace Umbraco.Web.Editors
                 foreach (var lang in mandatoryLangs)
                 {
                     //Check if a mandatory language is missing from being published
-                    //TODO: This logic is wrong, we need to also check if this language doesn't already have a published version
+                    //fixme: This logic is wrong, we need to also check if this language doesn't already have a published version
                     if (cultureVariants.Any(x => x.Culture == lang.IsoCode && !x.Publish))
                     {
                         //cannot continue publishing since a required language that is not currently being published isn't published
@@ -821,13 +821,25 @@ namespace Umbraco.Web.Editors
                 var valid = persistentContent.PublishCulture(variant.Culture);
                 if (!valid)
                 {
-                    var errMsg = Services.TextService.Localize("speechBubbles/contentCultureUnexpectedValidationError", new[] { allLangs[variant.Culture].CultureName });
-                    ModelState.AddModelError("publish_variant_" + variant.Culture + "_", errMsg);
+                    AddCultureValidationError(variant.Culture, allLangs);
                     return false;
                 }
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Adds a generic culture error for use in displaying the culture validation error in the save/publish dialogs
+        /// </summary>
+        /// <param name="culture"></param>
+        /// <param name="allLangs"></param>
+        private void AddCultureValidationError(string culture, IDictionary<string, ILanguage> allLangs)
+        {
+            var key = "publish_variant_" + culture + "_";
+            if (ModelState.ContainsKey(key)) return;
+            var errMsg = Services.TextService.Localize("speechBubbles/contentCultureValidationError", new[] { allLangs[culture].CultureName });
+            ModelState.AddModelError(key, errMsg);
         }
 
         /// <summary>
@@ -1189,6 +1201,37 @@ namespace Umbraco.Web.Editors
             model.Valid = model.Domains.All(m => m.Duplicate == false);
 
             return model;
+        }
+
+        /// <summary>
+        /// Override to ensure there is culture specific errors in the result if any errors are for culture properties
+        /// </summary>
+        /// <param name="display"></param>
+        /// <remarks>
+        /// This is required to wire up the validation in the save/publish dialog
+        /// </remarks>
+        protected override void HandleInvalidModelState(IErrorModel display)
+        {
+            if (!ModelState.IsValid)
+            {
+                //Add any culture specific errors here
+                var cultureErrors = ModelState.Keys
+                    .Select(x => x.Split('.')) //split into parts
+                    .Where(x => x.Length >= 3 && x[0] == "_Properties") //only choose _Properties errors
+                    .Select(x => x[2]) //select the culture part
+                    .Where(x => !x.IsNullOrWhiteSpace()) //if it has a value
+                    .Distinct()
+                    .ToList();
+
+                var allLangs = Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase);
+
+                foreach (var cultureError in cultureErrors)
+                {
+                    AddCultureValidationError(cultureError, allLangs);
+                }
+            }
+                
+            base.HandleInvalidModelState(display);
         }
 
         /// <summary>

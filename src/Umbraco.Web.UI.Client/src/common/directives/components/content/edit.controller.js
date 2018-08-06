@@ -96,6 +96,18 @@
             else {
                 //this will mean there is only one
                 $scope.editors[0].content = activeVariant;
+
+                if ($scope.editors.length > 1) {
+                    //now re-sync any other editor content (i.e. if split view is open)
+                    for (var s = 1; s < $scope.editors.length; s++) {
+                        //get the variant from the scope model
+                        var variant = _.find($scope.content.variants, function (v) {
+                            return v.language.culture === $scope.editors[s].content.language.culture;
+                        });
+                        $scope.editors[s].content = initVariant(variant);
+                    }
+                }
+                
             }
         }
 
@@ -115,21 +127,31 @@
             if (variant.language) {
                 //if the variant list that defines the header drop down isn't assigned to the variant then assign it now
                 if (!variant.variants) {
-                    variant.variants = _.map($scope.content.variants, function (v) {
-                        return _.pick(v, "active", "language", "validationError", "isEdited", "state");
-                    });
+                    variant.variants = _.map($scope.content.variants,
+                        function(v) {
+                            return _.pick(v, "active", "language", "isEdited", "state");
+                        });
                 }
-                //ensure the current culture is set as the active one
-                for (var i = 0; i < variant.variants.length; i++) {
-                    if (variant.variants[i].language.culture === variant.language.culture) {
-                        variant.variants[i].active = true;
-                    }
-                    else {
-                        variant.variants[i].active = false;
-                    }
+                else {
+                    //merge the scope variants on top of the header variants collection (handy when needing to refresh)
+                    angular.extend(variant.variants,
+                        _.map($scope.content.variants,
+                            function(v) {
+                                return _.pick(v, "active", "language", "isEdited", "state");
+                            }));
                 }
             }
-            
+
+            //ensure the current culture is set as the active one
+            for (var i = 0; i < variant.variants.length; i++) {
+                if (variant.variants[i].language.culture === variant.language.culture) {
+                    variant.variants[i].active = true;
+                }
+                else {
+                    variant.variants[i].active = false;
+                }
+            }
+
             //then assign the variant to a view model to the content app
             var contentApp = _.find(variant.apps, function (a) {
                 return a.alias === "content";
@@ -281,7 +303,7 @@
                 $scope.page.buttonGroupState = "success";
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });
-
+                
                 return $q.when(data);
             },
                 function (err) {
@@ -291,6 +313,7 @@
                     }
 
                     $scope.page.buttonGroupState = "error";
+                    
                     return $q.reject(err);
                 });
         }
