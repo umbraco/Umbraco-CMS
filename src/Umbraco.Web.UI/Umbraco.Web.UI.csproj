@@ -457,7 +457,6 @@
     <Content Include="Umbraco\Masterpages\umbracoPage.Master" />
     <Content Include="Umbraco\Masterpages\umbracoDialog.Master" />
     <Content Include="Umbraco\Webservices\CheckForUpgrade.asmx" />
-    <Content Include="Umbraco\Settings\DictionaryItemList.aspx" />
     <Content Include="Umbraco\Translation\default.aspx" />
     <Content Include="Umbraco\Translation\preview.aspx" />
     <Content Include="Umbraco\Translation\xml.aspx" />
@@ -469,7 +468,6 @@
     <Content Include="Umbraco\ping.aspx">
       <SubType>Form</SubType>
     </Content>
-    <Content Include="Umbraco\Settings\EditDictionaryItem.aspx" />
     <Content Include="Umbraco\treeInit.aspx" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="Umbraco\Webservices\ajax.js" />
