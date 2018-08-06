@@ -441,6 +441,8 @@
     <Compile Include="Trees\UserPermissionsTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
     <Compile Include="Trees\UsersTreeController.cs" />
+    <Compile Include="UI\Bundles\JsApplicationLib.cs" />
+    <Compile Include="UI\Bundles\JsUmbracoApplicationCore.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
