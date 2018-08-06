@@ -368,7 +368,8 @@
                             name: v.name,
                             properties: getContentProperties(v.tabs),
                             culture: v.language.culture,
-                            publish: v.publish
+                            publish: v.publish,
+                            save: v.save
                         };
                     })
                 };

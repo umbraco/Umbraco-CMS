@@ -283,6 +283,15 @@
         // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
         function performSave(args) {
 
+            //update the 'save' boolean of each variant if they are flagged as being dirty
+            //TODO: This is also where we'd set this flag when we have the save dialog
+            for (var i = 0; i < $scope.content.variants.length; i++) {
+                var v = $scope.content.variants[i];
+                if (v.isDirty) {
+                    v.save = true;
+                }
+            }
+
             $scope.page.buttonGroupState = "busy";
 
             eventsService.emit("content.saving", { content: $scope.content, action: args.action });

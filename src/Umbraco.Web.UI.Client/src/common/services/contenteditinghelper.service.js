@@ -518,8 +518,9 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
                 //check for changed properties of the content
                 for (var p in allOrigProps) {
-                    var newProp = getNewProp(allOrigProps[p].alias, allOrigProps);
-                    if (newProp && !_.isEqual(allOrigProps[p].value, newProp.value)) {
+                    var alias = allOrigProps[p].alias;
+                    var newProp = getNewProp(alias, allNewProps);
+                    if (newProp && !_.isEqual(alias, newProp.value)) {
 
                         //they have changed so set the origContent prop to the new one
                         var origVal = allOrigProps[p].value;

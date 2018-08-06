@@ -27,8 +27,20 @@ namespace Umbraco.Web.Models.ContentEditing
         public string Culture { get; set; }
 
         /// <summary>
+        /// Indicates if the variant should be updated
+        /// </summary>
+        /// <remarks>
+        /// If this is false, this variant data will not be updated at all
+        /// </remarks>
+        [DataMember(Name = "save")]
+        public bool Save { get; set; }
+
+        /// <summary>
         /// Indicates if the variant should be published or unpublished
         /// </summary>
+        /// <remarks>
+        /// This option will have no affect if <see cref="Save"/> is false
+        /// </remarks>
         [DataMember(Name = "publish")]
         public bool Publish { get; set; }
 

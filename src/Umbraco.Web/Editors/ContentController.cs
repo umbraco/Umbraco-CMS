@@ -1246,6 +1246,9 @@ namespace Umbraco.Web.Editors
             //loop through each variant, set the correct name and property values
             foreach (var variant in contentSave.Variants)
             {
+                //Don't update anything for this variant if Save is not true
+                if (!variant.Save) continue;
+
                 //Don't update the name if it is empty
                 if (!variant.Name.IsNullOrWhiteSpace())
                 {
