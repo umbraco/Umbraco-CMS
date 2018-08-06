@@ -367,7 +367,7 @@
                         return {
                             name: v.name,
                             properties: getContentProperties(v.tabs),
-                            culture: v.language.culture,
+                            culture: v.language ? v.language.culture : null,
                             publish: v.publish,
                             save: v.save
                         };
