@@ -319,7 +319,6 @@
     <Compile Include="Cache\TemplateCacheRefresher.cs" />
     <Compile Include="Cache\UnpublishedPageCacheRefresher.cs" />
     <Compile Include="Cache\UserCacheRefresher.cs" />
-    <Compile Include="Editors\LocalizationController.cs" />
     <Compile Include="Editors\PreviewController.cs" />
     <Compile Include="Editors\BackOfficeAssetsController.cs" />
     <Compile Include="Features\DisabledFeatures.cs" />

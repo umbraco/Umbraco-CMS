@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentSendToTranslateController($scope, $q, usersResource, localizationResource, contentResource) {
+    function ContentSendToTranslateController($scope, $q, usersResource, contentResource) {
 
         var vm = this;
 
@@ -26,8 +26,8 @@
                     pageSize: Number.MAX_SAFE_INTEGER,
                     userGroups: ["translator"]
                 }),
-                localizationResource.getAllLanguages(),
-                localizationResource.getNodeCulture($scope.dialogOptions.currentNode.id)
+                contentResource.getAllLanguages(),
+                contentResource.getNodeCulture($scope.dialogOptions.currentNode.id)
             ]).then(function (result) {
                 vm.translators = result[0].items.map(function (u) {
                     return {

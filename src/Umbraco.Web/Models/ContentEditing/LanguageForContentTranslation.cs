@@ -5,7 +5,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// <summary>
     /// 
     /// </summary>
-    [DataContract(Name = "language", Namespace = "")]
+    [DataContract(Name = "content", Namespace = "")]
     public class LanguageForContentTranslation
     {
         /// <summary>

@@ -949,21 +949,21 @@ namespace Umbraco.Web.Editors
 
             if (translator == null)
             {
-                return Request.CreateValidationErrorResponse("The translator could not be found");
+                return Request.CreateResponse(HttpStatusCode.NotFound);
             }
 
             var language = Services.LocalizationService.GetLanguageByIsoCode(sendToTranslate.Language);
 
             if (language == null)
             {
-                return Request.CreateValidationErrorResponse("The language is not supported");
+                return Request.CreateResponse(HttpStatusCode.NotFound);
             }
 
             var document = Services.ContentService.GetById(sendToTranslate.Id);
 
             if (document == null)
             {
-                return Request.CreateValidationErrorResponse("The document to translate could not be found");
+                return Request.CreateResponse(HttpStatusCode.NotFound);
             }
 
             var taskType = Services.TaskService.GetTaskTypeByAlias("toTranslate");
@@ -1011,6 +1011,37 @@ namespace Umbraco.Web.Editors
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        /// <summary>
+        /// Returns all the langauge currently supported
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<LanguageForContentTranslation> GetAllLanguages()
+        {
+            return Mapper.Map<IEnumerable<ILanguage>, IEnumerable<LanguageForContentTranslation>>(Services.LocalizationService.GetAllLanguages());
+        }
+
+        /// <summary>
+        /// Returns the language of a node
+        /// </summary>
+        /// <param name="nodeId">ID of the node</param>
+        /// <returns></returns>
+        public LanguageForContentTranslation GetNodeCulture(int nodeId)
+        {
+            var domain = Services.DomainService.GetAssignedDomains(nodeId, true).FirstOrDefault();
+
+            if (domain != null)
+            {
+                var language = Services.LocalizationService.GetLanguageByIsoCode(domain.LanguageIsoCode);
+
+                if (language != null)
+                {
+                    return Mapper.Map<ILanguage, LanguageForContentTranslation>(language);
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
