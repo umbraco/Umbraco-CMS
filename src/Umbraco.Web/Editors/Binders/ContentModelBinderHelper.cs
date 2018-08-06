@@ -28,7 +28,7 @@ namespace Umbraco.Web.Editors.Binders
                 //The name that has been assigned in JS has 2 or more parts. The second part indicates the property id
                 // for which the file belongs, the remaining parts are just metadata that can be used by the property editor.
                 var parts = file.Headers.ContentDisposition.Name.Trim('\"').Split('_');
-                if (parts.Length != 2)
+                if (parts.Length < 2)
                 {
                     var response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest);
                     response.ReasonPhrase = "The request was not formatted correctly the file name's must be underscore delimited";
