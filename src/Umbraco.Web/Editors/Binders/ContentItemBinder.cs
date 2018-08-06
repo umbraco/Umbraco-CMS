@@ -91,7 +91,7 @@ namespace Umbraco.Web.Editors.Binders
                 throw new InvalidOperationException("No content type found with alias " + model.ContentTypeAlias);
             }
             return new Content(
-                model.PersistedContent.ContentType.VariesByCulture() ? null : model.Variants.First().Name,
+                contentType.VariesByCulture() ? null : model.Variants.First().Name,
                 model.ParentId,
                 contentType);
         }
