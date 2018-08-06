@@ -234,6 +234,23 @@
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#templateEditor
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the user group picker in infinite editing, the submit callback returns the saved template
+         * @param {String} editor.id The template id
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function templateEditor(editor) {
+            editor.view = "views/templates/edit.html";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#sectionPicker
          * @methodOf umbraco.services.editorService
          *
@@ -245,6 +262,40 @@
          */
         function sectionPicker(editor) {
             editor.view = "views/common/infiniteeditors/sectionpicker/sectionpicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#insertField
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the insert field editor in infinite editing, the submit callback returns the code snippet
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function insertField(editor) {
+            editor.view = "views/common/infiniteeditors/insertfield/insertfield.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#templateSections
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the template sections editor in infinite editing, the submit callback returns the type to insert
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function templateSections(editor) {
+            editor.view = "views/common/infiniteeditors/templatesections/templatesections.html";
             editor.size = "small";
             open(editor);
         }
@@ -266,6 +317,45 @@
             open(editor);
         }
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#itemPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the section picker in infinite editing, the submit callback returns an array of the selected items
+         * 
+         * @param {Array} editor.availableItems Array of available items.
+         * @param {Array} editor.selectedItems Array of selected items. When passed in the selected items will be filtered from the available items.
+         * @param {Boolean} editor.filter Set to false to hide the filter.
+         * @param {Callback} editor.submit Submits the editor.
+         * @param {Callback} editor.close Closes the editor.
+         * @returns {Object} editor object
+         */
+        function itemPicker(editor) {
+            editor.view = "views/common/infiniteeditors/itempicker/itempicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#macroPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a macro picker in infinite editing, the submit callback returns an array of the selected items
+         * 
+         * @param {Callback} editor.submit Submits the editor.
+         * @param {Callback} editor.close Closes the editor.
+         * @returns {Object} editor object
+         */
+        function macroPicker(editor) {
+            editor.view = "views/common/infiniteeditors/macropicker/macropicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
         var service = {
             getEditors: getEditors,
             open: open,
@@ -282,8 +372,13 @@
             nodePermissions: nodePermissions,
             insertCodeSnippet: insertCodeSnippet,
             userGroupPicker: userGroupPicker,
+            templateEditor: templateEditor,
             sectionPicker: sectionPicker,
-            userPicker: userPicker
+            insertField: insertField,
+            templateSections: templateSections,
+            userPicker: userPicker,
+            itemPicker: itemPicker,
+            macroPicker: macroPicker
         };
 
         return service;

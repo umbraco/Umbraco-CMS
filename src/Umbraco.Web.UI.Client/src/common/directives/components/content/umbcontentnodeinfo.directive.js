@@ -12,6 +12,7 @@
 
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
             scope.allowChangeDocumentType = false;
+            scope.allowChangeTemplate = false;
             
             function onInit() {
 
@@ -20,6 +21,7 @@
                         angular.forEach(user.sections, function(section){
                             if(section.alias === "settings") {
                                 scope.allowChangeDocumentType = true;
+                                scope.allowChangeTemplate = true;
                             }
                         });
                     });
@@ -92,15 +94,21 @@
             };
 
             scope.openTemplate = function () {
-                var url = "/settings/templates/edit/" + scope.node.templateId;
-                $location.url(url);
+                var templateEditor = {
+                    id: scope.node.templateId,
+                    submit: function(model) {
+                        editorService.close();
+                    },
+                    close: function() {
+                        editorService.close();
+                    }
+                };
+                editorService.templateEditor(templateEditor);
             }
 
             scope.updateTemplate = function (templateAlias) {
-
                 // update template value
                 scope.node.template = templateAlias;
-
             };
 
             scope.datePickerChange = function (event, type) {
