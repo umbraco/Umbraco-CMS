@@ -62,7 +62,7 @@
         }
 
         /**
-         * The content item(s) are loaded into an array and this will set the active content item based on the current culture.
+         * The content item(s) are loaded into an array and this will set the active content item based on the current culture (query string).
          * If the content item is invariant, then only one item exists in the array.
          */
         function setActiveCulture() {

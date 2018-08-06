@@ -1,6 +1,7 @@
 ﻿(function () {
     'use strict';
 
+    /** This directive is used to render out the current variant tabs and properties and exposes an API for other directives to consume  */
     function tabbedContentDirective() {
 
         var directive = {

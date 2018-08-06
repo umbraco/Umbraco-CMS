@@ -14,6 +14,10 @@
             templateUrl: 'views/components/content/variant-content.html',
             link: function (scope) {
 
+                /**
+                 * Adds a new editor to the editors array to show content in a split view
+                 * @param {any} selectedVariant
+                 */
                 scope.openInSplitView = function (selectedVariant) {
 
                     var selectedCulture = selectedVariant.language.culture;
@@ -52,6 +56,10 @@
                     }, 100);
                 };
 
+                /**
+                 * Changes the currently selected variant
+                 * @param {any} variantDropDownItem
+                 */
                 scope.selectVariant = function (variantDropDownItem) {
 
                     var editorIndex = _.findIndex(scope.editors, function (e) {
@@ -79,6 +87,7 @@
                     }
                 };
 
+                /** Closes the split view */
                 scope.closeSplitView = function () {
                     //TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
                     scope.editor.loading = true;
@@ -105,6 +114,8 @@
                 content: "=",
                 editor: "=",
                 editors: "=",
+                //TODO: I don't like having this callback defined and would like to make this directive a bit less
+                // coupled but right now don't have time
                 initVariant: "&"
             }
         };
