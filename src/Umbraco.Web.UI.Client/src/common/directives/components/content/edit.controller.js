@@ -140,15 +140,15 @@
                                 return _.pick(v, "active", "language", "isEdited", "state");
                             }));
                 }
-            }
 
-            //ensure the current culture is set as the active one
-            for (var i = 0; i < variant.variants.length; i++) {
-                if (variant.variants[i].language.culture === variant.language.culture) {
-                    variant.variants[i].active = true;
-                }
-                else {
-                    variant.variants[i].active = false;
+                //ensure the current culture is set as the active one
+                for (var i = 0; i < variant.variants.length; i++) {
+                    if (variant.variants[i].language.culture === variant.language.culture) {
+                        variant.variants[i].active = true;
+                    }
+                    else {
+                        variant.variants[i].active = false;
+                    }
                 }
             }
 
