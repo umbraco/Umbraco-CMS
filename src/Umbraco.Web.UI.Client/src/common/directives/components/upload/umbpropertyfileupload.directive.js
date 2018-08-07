@@ -22,7 +22,16 @@
             vm.files = [];
 
             //notify the callback
-            vm.onValueChanged({ value: null });
+            notifyValueChanged(null);
+        }
+
+        function notifyValueChanged(val) {
+
+            //notify the callback
+            vm.onValueChanged({ value: val });
+
+            //need to explicity setDirty here to track changes
+            vm.fileUploadForm.$setDirty();
         }
 
         /** Called when the component initializes */
@@ -119,10 +128,7 @@
                 return null;
             }
 
-            var thumbnailUrl = umbRequestHelper.getApiUrl(
-                "imagesApiBaseUrl",
-                "GetBigThumbnail",
-                [{ originalImagePath: file.fileName }]) + '&rnd=' + Math.random();
+            var thumbnailUrl = mediaHelper.getThumbnailFromPath(file.fileName);
 
             return thumbnailUrl;
         }
@@ -186,12 +192,8 @@
                 });
 
                 var newVal = updateModelFromSelectedFiles(args.files);
-                
-                //need to explicity setDirty here to track changes
-                vm.fileUploadForm.$setDirty();
 
-                //notify the callback
-                vm.onValueChanged({ value: newVal });
+                notifyValueChanged(newVal);
             }
 
             angularHelper.safeApply($scope);

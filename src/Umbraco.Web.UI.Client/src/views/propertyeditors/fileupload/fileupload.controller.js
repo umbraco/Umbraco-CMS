@@ -20,6 +20,11 @@
          */
         function valueChanged(value) {
             $scope.model.value = value;
+
+            //if the value is empty, then tell the server to clear the files
+            if (!$scope.model.value) {
+                $scope.model.value = { clearFiles: true };
+            }
         }
     };
 

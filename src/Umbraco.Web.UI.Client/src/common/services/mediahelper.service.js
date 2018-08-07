@@ -307,11 +307,8 @@ function mediaHelper(umbRequestHelper) {
             var thumbnailUrl = umbRequestHelper.getApiUrl(
                 "imagesApiBaseUrl",
                 "GetBigThumbnail",
-                [{ originalImagePath: imagePath }]);
-
-            //var ext = imagePath.substr(imagePath.lastIndexOf('.'));
-            //return imagePath.substr(0, imagePath.lastIndexOf('.')) + "_big-thumb" + ".jpg";
-
+                [{ originalImagePath: imagePath }]) + '&rnd=' + Math.random();
+            
             return thumbnailUrl;
         },
 

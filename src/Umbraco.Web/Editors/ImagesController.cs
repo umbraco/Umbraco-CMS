@@ -23,29 +23,6 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the big thumbnail image for the media id
-        /// </summary>
-        /// <param name="mediaId"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// If there is no media, image property or image file is found then this will return not found.
-        /// </remarks>
-        public HttpResponseMessage GetBigThumbnail(int mediaId)
-        {
-            var media = Services.MediaService.GetById(mediaId);
-            if (media == null)
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-
-            var imageProp = media.Properties[Constants.Conventions.Media.File];
-            if (imageProp == null)
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-
-            //fixme doesn't take into account variants
-            var imagePath = imageProp.GetValue().ToString();
-            return GetBigThumbnail(imagePath);
-        }
-
-        /// <summary>
         /// Gets the big thumbnail image for the original image path
         /// </summary>
         /// <param name="originalImagePath"></param>
@@ -58,30 +35,6 @@ namespace Umbraco.Web.Editors
             return string.IsNullOrWhiteSpace(originalImagePath)
                 ? Request.CreateResponse(HttpStatusCode.OK)
                 : GetResized(originalImagePath, 500);
-        }
-
-        /// <summary>
-        /// Gets a resized image for the media id
-        /// </summary>
-        /// <param name="mediaId"></param>
-        /// <param name="width"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// If there is no media, image property or image file is found then this will return not found.
-        /// </remarks>
-        public HttpResponseMessage GetResized(int mediaId, int width)
-        {
-            var media = Services.MediaService.GetById(mediaId);
-            if (media == null)
-                return new HttpResponseMessage(HttpStatusCode.NotFound);
-
-            var imageProp = media.Properties[Constants.Conventions.Media.File];
-            if (imageProp == null)
-                return new HttpResponseMessage(HttpStatusCode.NotFound);
-
-            //fixme doesn't take into account variants
-            var imagePath = imageProp.GetValue().ToString();
-            return GetResized(imagePath, width);
         }
 
         /// <summary>

@@ -70,10 +70,12 @@ namespace Umbraco.Web.Editors
 
                 // get the property
                 var property = contentItem.PersistedContent.Properties[propertyDto.Alias];
+                
+                // prepare files, if any matching property and culture
+                var files = contentItem.UploadedFiles
+                    .Where(x => x.PropertyAlias == propertyDto.Alias && x.Culture == propertyDto.Culture)
+                    .ToArray();
 
-                //TODO: Need to update this API to support variants and/or basically any sort of 'key'
-                // prepare files, if any
-                var files = contentItem.UploadedFiles.Where(x => x.PropertyAlias == propertyDto.Alias).ToArray();
                 foreach (var file in files)
                     file.FileName = file.FileName.ToSafeFileName();
 
