@@ -2,9 +2,7 @@
     function CreateNotifyController(
         $scope,
         contentResource,
-        notificationsService,
         navigationService,
-        localizationService,
         angularHelper) {
         var vm = this;
         var currentForm;
