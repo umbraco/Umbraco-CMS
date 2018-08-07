@@ -27,13 +27,13 @@
             vm.saveState = "busy";
             vm.saveError = false;
             vm.saveSuccces = false;
-            var selectedSting = "";
+            var selectedString = "";
             angular.forEach(notifyOptions, function (option) {
                 if (option.checked === true && option.notifyCode) {
-                    selectedSting += option.notifyCode;
+                    selectedString += option.notifyCode;
                 }
             })
-            contentResource.setNotifySettingsById($scope.currentNode.id, selectedSting).then(function () {
+            contentResource.setNotifySettingsById($scope.currentNode.id, selectedString).then(function () {
                 vm.saveState = "success";
                 vm.saveSuccces = true;
             }, function (error) {
