@@ -100,17 +100,7 @@ namespace Umbraco.Web.PropertyEditors
                 using (var filestream = File.OpenRead(file.TempFilePath))
                 {
                     _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
-
-                    // fixme - remove this code
-                    //var ext = _mediaFileSystem.GetExtension(filepath);
-                    //if (_mediaFileSystem.IsImageFile(ext))
-                    //{
-                    //    var preValues = editorValue.PreValues.FormatAsDictionary();
-                    //    var sizes = preValues.Any() ? preValues.First().Value.Value : string.Empty;
-                    //    using (var image = Image.FromStream(filestream))
-                    //        _mediaFileSystem.GenerateThumbnails(image, filepath, sizes);
-                    //}
-
+                    
                     // all related properties (auto-fill) are managed by FileUploadPropertyEditor
                     // when the content is saved (through event handlers)
 

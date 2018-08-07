@@ -57,7 +57,7 @@ namespace Umbraco.Web.Editors
         {
             return string.IsNullOrWhiteSpace(originalImagePath)
                 ? Request.CreateResponse(HttpStatusCode.OK)
-                : GetResized(originalImagePath, 500, "big-thumb");
+                : GetResized(originalImagePath, 500);
         }
 
         /// <summary>
@@ -95,18 +95,6 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         public HttpResponseMessage GetResized(string imagePath, int width)
         {
-            return GetResized(imagePath, width, Convert.ToString(width));
-        }
-
-        /// <summary>
-        /// Gets a resized image - if the requested max width is greater than the original image, only the original image will be returned.
-        /// </summary>
-        /// <param name="imagePath"></param>
-        /// <param name="width"></param>
-        /// <param name="sizeName"></param>
-        /// <returns></returns>
-        private HttpResponseMessage GetResized(string imagePath, int width, string sizeName)
-        {
             var ext = Path.GetExtension(imagePath);
 
             // we need to check if it is an image by extension
@@ -116,8 +104,9 @@ namespace Umbraco.Web.Editors
             //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file
             var response = Request.CreateResponse(HttpStatusCode.Found);
             var imageLastModified = _mediaFileSystem.GetLastModified(imagePath);
-            response.Headers.Location = new Uri($"{imagePath}?rnd={imageLastModified:yyyyMMddHHmmss}&width={width}", UriKind.Relative );
+            response.Headers.Location = new Uri($"{imagePath}?rnd={imageLastModified:yyyyMMddHHmmss}&upscale=false&width={width}", UriKind.Relative);
             return response;
         }
+        
     }
 }

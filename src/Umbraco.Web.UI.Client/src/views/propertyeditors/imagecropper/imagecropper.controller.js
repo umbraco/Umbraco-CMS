@@ -1,5 +1,3 @@
-//this controller simply tells the dialogs service to open a mediaPicker window
-//with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco')
     .controller("Umbraco.PropertyEditors.ImageCropperController",
     function ($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager, angularHelper) {
@@ -49,7 +47,10 @@ angular.module('umbraco')
         //crop a specific crop
         $scope.clear = function (crop) {
             //clear current uploaded files
-            fileManager.setFiles($scope.model.alias, []);
+            fileManager.setFiles({
+                propertyAlias: $scope.model.alias,
+                files: []
+            });
 
             //clear the ui
             $scope.imageSrc = undefined;
@@ -82,7 +83,7 @@ angular.module('umbraco')
 
             if (args.files && args.files[0]) {
 
-                fileManager.setFiles($scope.model.alias, args.files);
+                fileManager.setFiles({ propertyAlias: $scope.model.alias, files: args.files});
 
                 var reader = new FileReader();
                 reader.onload = function (e) {
@@ -101,7 +102,7 @@ angular.module('umbraco')
         //here we declare a special method which will be called whenever the value has changed from the server
         $scope.model.onValueChanged = function (newVal, oldVal) {
             //clear current uploaded files
-            fileManager.setFiles($scope.model.alias, []);
+            fileManager.setFiles({ propertyAlias: $scope.model.alias, files: [] });
         };
 
         var unsubscribe = $scope.$on("formSubmitting", function () {

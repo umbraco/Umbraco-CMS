@@ -1,6 +1,9 @@
-﻿<div>
-    <umb-file-upload-editor model-value="model.value"
-                            property-alias="{{model.alias}}"
-                            validation="model.validation">
-    </umb-file-upload-editor>
+﻿<div ng-controller="Umbraco.PropertyEditors.FileUploadController">
+    <pre><code>{{model.value}}</code></pre>
+
+    <umb-property-file-upload culture="{{model.culture}}"
+                              property-alias="{{model.alias}}"
+                              value="model.value"
+                              on-value-changed="valueChanged(value)">
+    </umb-property-file-upload>
 </div>

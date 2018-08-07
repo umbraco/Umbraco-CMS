@@ -75,6 +75,8 @@ namespace Umbraco.Web.Models.Mapping
             //set the culture to null if it's an invariant property type
             culture = !property.PropertyType.VariesByCulture() ? null : culture;
 
+            result.Culture = culture;
+
             // if no 'IncludeProperties' were specified or this property is set to be included - we will map the value and return.
             result.Value = editor.GetValueEditor().ToEditor(property, DataTypeService, culture);
             return result;

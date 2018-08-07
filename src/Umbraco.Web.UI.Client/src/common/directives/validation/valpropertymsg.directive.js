@@ -12,7 +12,7 @@
 function valPropertyMsg(serverValidationManager) {
 
     return {
-        require: ['^^form', '^^valFormManager', '^^umbProperty', '?^^tabbedContent'],
+        require: ['^^form', '^^valFormManager', '^^umbProperty'],
         replace: true,
         restrict: "E",
         template: "<div ng-show=\"errorMsg != ''\" class='alert alert-error property-error' >{{errorMsg}}</div>",
@@ -25,11 +25,9 @@ function valPropertyMsg(serverValidationManager) {
             var valFormManager = ctrl[1];
             //the property controller api
             var umbPropCtrl = ctrl[2];
-            //the tabbed content controller api
-            var tabbedContent = ctrl.length > 3 ? ctrl[3] : null;
-
+            
             scope.currentProperty = umbPropCtrl.property;
-            var currentCulture = tabbedContent && tabbedContent.content && tabbedContent.content.language ? tabbedContent.content.language.culture : null;
+            var currentCulture = scope.currentProperty.culture;
 
             var watcher = null;
 
