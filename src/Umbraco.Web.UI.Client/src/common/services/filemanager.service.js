@@ -33,9 +33,9 @@ function fileManager() {
                 throw "args.files must be an object";
             }
 
-            var culture = null;
-            if (args.culture) {
-                culture = args.culture;
+            //normalize to null
+            if (!args.culture) {
+                args.culture = null;
             }
 
             var metaData = [];
@@ -49,7 +49,7 @@ function fileManager() {
             });
             for (var i = 0; i < args.files.length; i++) {
                 //save the file object to the files collection
-                fileCollection.push({ alias: args.propertyAlias, file: args.files[i], culture: culture, metaData: metaData });
+                fileCollection.push({ alias: args.propertyAlias, file: args.files[i], culture: args.culture, metaData: metaData });
             }
         },
         

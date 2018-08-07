@@ -36,12 +36,18 @@ angular.module('umbraco')
         $scope.crop = function (crop) {
             $scope.currentCrop = crop;
             $scope.currentPoint = undefined;
+
+            //set form to dirty to track changes
+            $scope.imageCropperForm.$setDirty();
         };
 
         //done cropping
         $scope.done = function () {
             $scope.currentCrop = undefined;
             $scope.currentPoint = undefined;
+
+            //set form to dirty to track changes
+            $scope.imageCropperForm.$setDirty();
         };
 
         //crop a specific crop
@@ -49,6 +55,7 @@ angular.module('umbraco')
             //clear current uploaded files
             fileManager.setFiles({
                 propertyAlias: $scope.model.alias,
+                culture: $scope.model.culture,
                 files: []
             });
 
@@ -58,9 +65,8 @@ angular.module('umbraco')
                 delete $scope.model.value;
             }
 
-            // set form to dirty to tricker discard changes dialog
-            var currForm = angularHelper.getCurrentForm($scope);
-            currForm.$setDirty();
+            //set form to dirty to track changes
+            $scope.imageCropperForm.$setDirty();
         };
 
         //show previews
@@ -83,7 +89,11 @@ angular.module('umbraco')
 
             if (args.files && args.files[0]) {
 
-                fileManager.setFiles({ propertyAlias: $scope.model.alias, files: args.files});
+                fileManager.setFiles({
+                    propertyAlias: $scope.model.alias,
+                    culture: $scope.model.culture,
+                    files: args.files
+                });
 
                 var reader = new FileReader();
                 reader.onload = function (e) {
@@ -95,6 +105,9 @@ angular.module('umbraco')
                 };
 
                 reader.readAsDataURL(args.files[0]);
+
+                //set form to dirty to track changes
+                $scope.imageCropperForm.$setDirty();
             }
         });
 
@@ -102,7 +115,11 @@ angular.module('umbraco')
         //here we declare a special method which will be called whenever the value has changed from the server
         $scope.model.onValueChanged = function (newVal, oldVal) {
             //clear current uploaded files
-            fileManager.setFiles({ propertyAlias: $scope.model.alias, files: [] });
+            fileManager.setFiles({
+                propertyAlias: $scope.model.alias,
+                culture: $scope.model.culture,
+                files: []
+            });
         };
 
         var unsubscribe = $scope.$on("formSubmitting", function () {

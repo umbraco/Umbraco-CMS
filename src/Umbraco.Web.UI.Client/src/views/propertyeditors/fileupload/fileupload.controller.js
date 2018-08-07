@@ -14,6 +14,16 @@
         
         $scope.valueChanged = valueChanged;
 
+        //here we declare a special method which will be called whenever the value has changed from the server
+        $scope.model.onValueChanged = function (newVal, oldVal) {
+            //clear current uploaded files
+            fileManager.setFiles({
+                propertyAlias: $scope.model.alias,
+                culture: $scope.model.culture,
+                files: []
+            });
+        };
+
         /**
          * Called when the file selection value changes
          * @param {any} value

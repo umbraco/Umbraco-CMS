@@ -27,16 +27,7 @@ namespace Umbraco.Web.Models.Mapping
             propertyDto.Description = property.PropertyType.Description;
             propertyDto.Label = property.PropertyType.Name;
             propertyDto.DataType = DataTypeService.GetDataType(property.PropertyType.DataTypeId);
-
-            //Get the culture from the context which will be set during the mapping operation for each property
-            var culture = context.GetCulture();
-
-            //a culture needs to be in the context for a property type that can vary
-            if (culture == null && property.PropertyType.VariesByCulture())
-                throw new InvalidOperationException($"No culture found in mapping operation when one is required for the culture variant property type {property.PropertyType.Alias}");
-
-            propertyDto.Culture = culture;
-
+            
             return propertyDto;
         }
     }
