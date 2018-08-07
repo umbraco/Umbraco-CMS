@@ -25,12 +25,14 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.Validation;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebServices;
 using Umbraco.Web._Legacy.Actions;
 using Constants = Umbraco.Core.Constants;
 using ContentVariation = Umbraco.Core.Models.ContentVariation;
 using Language = Umbraco.Web.Models.ContentEditing.Language;
+
 
 namespace Umbraco.Web.Editors
 {
@@ -1473,5 +1475,40 @@ namespace Umbraco.Web.Editors
 
             return display;
         }
+		
+        [EnsureUserPermissionForContent("contentId", 'R')]
+        public List<NotifySetting> GetNotificationOptions(int contentId)
+        {
+            var notifications = new List<NotifySetting>();
+            if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            var content = Services.ContentService.GetById(contentId);
+            if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            var userNotifications = Services.NotificationService.GetUserNotifications(Security.CurrentUser, content.Path).ToList();
+
+            foreach (var a in Current.Actions.Where(x => x.ShowInNotifier))
+            {
+                var n = new NotifySetting
+                {
+                    Name = Services.TextService.Localize("actions", a.Alias),
+                    Checked = userNotifications.FirstOrDefault(x=> x.Action == a.Letter.ToString()) != null,
+                    NotifyCode = a.Letter.ToString()
+                };
+                notifications.Add(n);
+            }
+
+            return notifications;
+        }
+
+        public void PostNotificationOptions(int contentId, [FromUri] string[] notifyOptions)
+        {
+            if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            var content = Services.ContentService.GetById(contentId);
+            if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            Services.NotificationService.SetNotifications(Security.CurrentUser, content, notifyOptions);
+        }
+
     }
 }
