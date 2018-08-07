@@ -1159,20 +1159,21 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent("contentId", 'R')]
         public List<NotifySetting> GetNotificationOptions(int contentId)
         {
-            List<NotifySetting> notifications = new List<NotifySetting>();
+            var notifications = new List<NotifySetting>();
             if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
             var content = Services.ContentService.GetById(contentId);
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-            var node = new CMSNode(contentId);
-            ArrayList actionList = global::umbraco.BusinessLogic.Actions.Action.GetAll();
-            foreach (global::umbraco.interfaces.IAction a in actionList)
+
+            var actionList = ActionsResolver.Current.Actions;
+            foreach (var a in actionList)
             {
                 if (a.ShowInNotifier)
                 {
                     NotifySetting n = new NotifySetting
                     {
                         Name = ui.Text("actions", a.Alias),
-                        Checked = (UmbracoUser.GetNotifications(node.Path).IndexOf(a.Letter) > -1),
+                        Checked = (UmbracoUser.GetNotifications(content.Path).IndexOf(a.Letter) > -1),
                         NotifyCode = a.Letter.ToString()
                     };
                     notifications.Add(n);
@@ -1180,12 +1181,15 @@ namespace Umbraco.Web.Editors
             }
             return notifications;
         }
-        public void SetNotificationOptions(int contentId, string notifyOptions = "")
+
+        public void PostNotificationOptions(int contentId, string notifyOptions = "")
         {
             if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             var content = Services.ContentService.GetById(contentId);
+
             if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             var node = new CMSNode(contentId);
+
             global::umbraco.cms.businesslogic.workflow.Notification.UpdateNotifications(UmbracoUser, node, notifyOptions ?? "");
         }
     }
