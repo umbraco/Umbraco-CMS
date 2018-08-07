@@ -355,7 +355,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
-                        "SetNotificationOptions",
+                        "PostNotificationOptions",
                         { contentId: id, notifyOptions: options })),
                 'Failed to set notify settings for content id ' + id);
         },
