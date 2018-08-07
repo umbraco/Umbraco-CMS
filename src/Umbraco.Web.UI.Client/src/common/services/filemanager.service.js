@@ -43,9 +43,9 @@ function fileManager() {
                 metaData = args.metaData;
             }
 
-            //this will clear the files for the current property and then add the new ones for the current property
+            //this will clear the files for the current property/culture and then add the new ones for the current property
             fileCollection = _.reject(fileCollection, function (item) {
-                return item.alias === args.propertyAlias;
+                return item.alias === args.propertyAlias && (!args.culture || args.culture === item.culture);
             });
             for (var i = 0; i < args.files.length; i++) {
                 //save the file object to the files collection
