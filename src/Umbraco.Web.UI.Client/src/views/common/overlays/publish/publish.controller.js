@@ -79,8 +79,11 @@
                 var active = _.find(vm.variants, function (v) {
                     return v.active;
                 });
-                //ensure that the current one is selected
-                active.publish = true;
+
+                if (active) {
+                    //ensure that the current one is selected
+                    active.publish = true;
+                }
 
             } else {
                 //disable Publish button if we have nothing to publish
