@@ -152,6 +152,13 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
             }, function (response) {
 
+                if (!response.status && response.message && response.stack) {
+                    //this is a JS/angular error that we should deal with
+                    return $q.reject({
+                        errorMsg: response.message
+                    })
+                }
+
                 //invoke the callback
                 var result = callbacks.error.apply(this, [response.data, response.status, response.headers, response.config]);
 

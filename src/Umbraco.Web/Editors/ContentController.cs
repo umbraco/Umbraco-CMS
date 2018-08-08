@@ -396,7 +396,7 @@ namespace Umbraco.Web.Editors
         {
             var url = Umbraco.Url(id);
             var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(url, Encoding.UTF8, "application/json");
+            response.Content = new StringContent(url, Encoding.UTF8, "text/plain");
             return response;
         }
 
@@ -409,7 +409,7 @@ namespace Umbraco.Web.Editors
         {
             var url = Umbraco.UrlProvider.GetUrl(id);
             var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(url, Encoding.UTF8, "application/json");
+            response.Content = new StringContent(url, Encoding.UTF8, "text/plain");
             return response;
         }
 
@@ -1005,7 +1005,7 @@ namespace Umbraco.Web.Editors
             Services.ContentService.Move(toMove, move.ParentId, Security.GetUserId().ResultOr(0));
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
+            response.Content = new StringContent(toMove.Path, Encoding.UTF8, "text/plain");
             return response;
         }
 
@@ -1022,7 +1022,7 @@ namespace Umbraco.Web.Editors
             var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, Security.GetUserId().ResultOr(0));
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(c.Path, Encoding.UTF8, "application/json");
+            response.Content = new StringContent(c.Path, Encoding.UTF8, "text/plain");
             return response;
         }
 

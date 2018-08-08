@@ -344,7 +344,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
+                    }, { responseType: 'text' }),
                 'Failed to move content');
         },
 

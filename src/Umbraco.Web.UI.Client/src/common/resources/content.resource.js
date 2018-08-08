@@ -157,7 +157,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
+                    }, { responseType: 'text' }),
                 'Failed to move content');
         },
 
@@ -198,7 +198,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostCopy"),
-                    args),
+                    args, { responseType: 'text' }),
                 'Failed to copy content');
         },
 
@@ -467,7 +467,8 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
-                        "GetNiceUrl", [{ id: id }])),
+                        "GetNiceUrl", { id: id }),
+                    { responseType: 'text' }),
                 'Failed to retrieve url for id:' + id);
         },
 
