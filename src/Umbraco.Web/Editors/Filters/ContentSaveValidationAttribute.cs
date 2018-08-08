@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
@@ -13,50 +12,58 @@ using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web._Legacy.Actions;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.Editors.Filters
 {
     /// <summary>
-    /// Checks if the user has access to post a content item based on whether it's being created or saved.
+    /// Validates the incoming <see cref="ContentItemSave"/> model along with if the user is allowed to perform the operation
     /// </summary>
-    internal sealed class ContentPostValidateAttribute : ActionFilterAttribute
+    internal sealed class ContentSaveValidationAttribute : ActionFilterAttribute
     {
-        private readonly IContentService _contentService;
-        private readonly WebSecurity _security;
-        private readonly IUserService _userService;
-        private readonly IEntityService _entityService;
-
-        public ContentPostValidateAttribute()
+        public ContentSaveValidationAttribute(): this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.ContentService, Current.Services.UserService, Current.Services.EntityService, UmbracoContext.Current.Security)
         { }
 
-        // fixme wtf is this?
-        public ContentPostValidateAttribute(IContentService contentService, IUserService userService, IEntityService entityService, WebSecurity security)
+        public ContentSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IContentService contentService, IUserService userService, IEntityService entityService, WebSecurity security)
         {
+            _logger = logger;
+            _umbracoContextAccessor = umbracoContextAccessor;
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _security = security ?? throw new ArgumentNullException(nameof(security));
         }
 
-        // fixme all these should be injected properties
-
-        private IContentService ContentService
-            => _contentService ?? Current.Services.ContentService;
-
-        private WebSecurity Security
-            => _security ?? UmbracoContext.Current.Security;
-
-        private IUserService UserService
-            => _userService ?? Current.Services.UserService;
-
-        private IEntityService EntityService
-            => _entityService ?? Current.Services.EntityService;
-
-        public override bool AllowMultiple
-            => true;
+        private readonly ILogger _logger;
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly IContentService _contentService;
+        private readonly WebSecurity _security;
+        private readonly IUserService _userService;
+        private readonly IEntityService _entityService;
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            var contentItem = (ContentItemSave)actionContext.ActionArguments["contentItem"];
+            var model = (ContentItemSave)actionContext.ActionArguments["contentItem"];
+            var contentItemValidator = new ContentItemValidationHelper<IContent, ContentItemSave>(_logger, _umbracoContextAccessor);
+
+            if (ValidateUserAccess(model, actionContext))
+            {
+                //now do each validation step
+                if (contentItemValidator.ValidateExistingContent(model, actionContext) == false) return;
+                //validate for each variant
+                foreach (var variant in model.Variants)
+                {
+                    if (contentItemValidator.ValidateProperties(model, variant, actionContext))
+                        contentItemValidator.ValidatePropertyData(model, variant, variant.PropertyCollectionDto, actionContext.ModelState);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks if the user has access to post a content item based on whether it's being created or saved.
+        /// </summary>
+        /// <param name="actionContext"></param>
+        /// <param name="contentItem"></param>
+        private bool ValidateUserAccess(ContentItemSave contentItem, HttpActionContext actionContext)
+        {  
 
             //We now need to validate that the user is allowed to be doing what they are doing.
             //Based on the action we need to check different permissions.
@@ -89,7 +96,7 @@ namespace Umbraco.Web.Editors
 
                     if (contentItem.ParentId != Constants.System.Root)
                     {
-                        contentToCheck = ContentService.GetById(contentItem.ParentId);
+                        contentToCheck = _contentService.GetById(contentItem.ParentId);
                         contentIdToCheck = contentToCheck.Id;
                     }
                     else
@@ -104,7 +111,7 @@ namespace Umbraco.Web.Editors
                     permissionToCheck.Add(ActionToPublish.Instance.Letter);
                     if (contentItem.ParentId != Constants.System.Root)
                     {
-                        contentToCheck = ContentService.GetById(contentItem.ParentId);
+                        contentToCheck = _contentService.GetById(contentItem.ParentId);
                         contentIdToCheck = contentToCheck.Id;
                     }
                     else
@@ -121,7 +128,7 @@ namespace Umbraco.Web.Editors
 
                     if (contentItem.ParentId != Constants.System.Root)
                     {
-                        contentToCheck = ContentService.GetById(contentItem.ParentId);
+                        contentToCheck = _contentService.GetById(contentItem.ParentId);
                         contentIdToCheck = contentToCheck.Id;
                     }
                     else
@@ -135,12 +142,15 @@ namespace Umbraco.Web.Editors
 
             if (ContentController.CheckPermissions(
                 actionContext.Request.Properties,
-                Security.CurrentUser,
-                UserService, ContentService, EntityService,
+                _security.CurrentUser,
+                _userService, _contentService, _entityService,
                 contentIdToCheck, permissionToCheck.ToArray(), contentToCheck) == false)
             {
                 actionContext.Response = actionContext.Request.CreateUserNoAccessResponse();
+                return false;
             }
+
+            return true;
         }
     }
 }

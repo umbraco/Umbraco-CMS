@@ -99,9 +99,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
          canUnpublish: true
       };
 
-      $scope.$watch(function () {
-         return $scope.selection.length;
-      }, function (newVal, oldVal) {
+       $scope.$watch("selection.length", function (newVal, oldVal) {
 
          if ((idsWithPermissions == null && newVal > 0) || (idsWithPermissions != null)) {
 

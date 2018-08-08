@@ -152,6 +152,13 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
             }, function (response) {
 
+                if (!response.status && response.message && response.stack) {
+                    //this is a JS/angular error that we should deal with
+                    return $q.reject({
+                        errorMsg: response.message
+                    })
+                }
+
                 //invoke the callback
                 var result = callbacks.error.apply(this, [response.data, response.status, response.headers, response.config]);
 
@@ -221,7 +228,11 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     for (var f in args.files) {
                         //each item has a property alias and the file object, we'll ensure that the alias is suffixed to the key
                         // so we know which property it belongs to on the server side
-                        formData.append("file_" + args.files[f].alias, args.files[f].file);
+                        var fileKey = "file_" + args.files[f].alias + "_" + args.files[f].culture;
+                        if (angular.isArray(args.files[f].metaData) && args.files[f].metaData.length > 0) {
+                            fileKey += ("_" + args.files[f].metaData.join("_"));
+                        }
+                        formData.append(fileKey, args.files[f].file);
                     }
                 }).then(function (response) {
                     //success callback
