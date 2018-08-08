@@ -98,11 +98,6 @@ namespace Umbraco.Web
 
             // ok, process
 
-            // create the LegacyRequestInitializer
-            // and initialize legacy stuff
-            var legacyRequestInitializer = new LegacyRequestInitializer(httpContext.Request.Url, httpContext);
-            legacyRequestInitializer.InitializeRequest();
-
             // create the UmbracoContext singleton, one per request, and assign
             // replace existing if any (eg during app startup, a temp one is created)
             UmbracoContext.EnsureContext(
