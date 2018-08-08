@@ -1368,6 +1368,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="sortDone">Sorting complete.</key>
         <key alias="sortHelp">Drag the different items up or down below to set how they should be arranged. Or click the column headers to sort the entire collection of items</key>
         <key alias="sortPleaseWait"><![CDATA[Please wait. Items are being sorted, this can take a while.]]></key>
+        <key alias="sortEmptyState">This node has no child nodes to sort</key>
     </area>
     <area alias="speechBubbles">
         <key alias="validationFailedHeader">Validation</key>
@@ -2050,9 +2051,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     </area>
     <area alias="validation">
         <key alias="validation">Validation</key>
-        <key alias="validateAsEmail">Validate as email</key>
+        <key alias="validateAsEmail">Validate as an email address</key>
         <key alias="validateAsNumber">Validate as a number</key>
-        <key alias="validateAsUrl">Validate as a Url</key>
+        <key alias="validateAsUrl">Validate as a URL</key>
         <key alias="enterCustomValidation">...or enter a custom validation</key>
         <key alias="fieldIsMandatory">Field is mandatory</key>
         <key alias="validationRegExp">Enter a regular expression</key>
@@ -2222,5 +2223,9 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="itemCannotBeRestored">Cannot automatically restore this item</key>
         <key alias="noRestoreRelation">There is no 'restore' relation found for this node. Use the Move menu item to move it manually.</key>
         <key alias="restoreUnderRecycled">The item you want to restore it under ('%0%') is in the recycle bin. Use the Move menu item to move the item manually.</key>
+    </area>
+    <area alias="notify">
+        <key alias="notifySet">Select your notifications for</key>
+        <key alias="notificationsSavedFor">Notification settings saved for </key>
     </area>
 </language>

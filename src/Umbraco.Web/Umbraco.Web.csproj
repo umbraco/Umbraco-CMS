@@ -231,6 +231,7 @@
     <Compile Include="HtmlHelperBackOfficeExtensions.cs" />
     <Compile Include="Models\ContentEditing\IContentProperties.cs" />
     <Compile Include="Models\ContentEditing\ITabbedContent.cs" />
+    <Compile Include="Models\ContentEditing\NotifySetting.cs" />
     <Compile Include="Models\ContentEditing\Permission.cs" />
     <Compile Include="Models\ContentEditing\PostedFolder.cs" />
     <Compile Include="Models\ContentEditing\SnippetDisplay.cs" />
@@ -452,6 +453,9 @@
     <Compile Include="Trees\UserPermissionsTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
     <Compile Include="Trees\UsersTreeController.cs" />
+    <Compile Include="UI\Bundles\JsApplicationLib.cs" />
+    <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
+    <Compile Include="UI\Bundles\JsUmbracoApplicationCore.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -474,7 +478,6 @@
     <Compile Include="Editors\NuCacheStatusController.cs" />
     <Compile Include="_Legacy\Actions\Action.cs" />
     <Compile Include="_Legacy\Actions\ActionAssignDomain.cs" />
-    <Compile Include="_Legacy\Actions\ActionAudit.cs" />
     <Compile Include="_Legacy\Actions\ActionBrowse.cs" />
     <Compile Include="_Legacy\Actions\ActionChangeDocType.cs" />
     <Compile Include="_Legacy\Actions\ActionCollection.cs" />
@@ -971,10 +974,7 @@
     <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
     <Compile Include="Migrations\RebuildXmlCachesAfterUpgrade.cs" />
     <Compile Include="Components\PublicAccessComponent.cs" />
-    <Compile Include="UI\Bundles\JsApplicationLib.cs" />
     <Compile Include="UI\Bundles\JsJQueryCore.cs" />
-    <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
-    <Compile Include="UI\Bundles\JsUmbracoApplicationCore.cs" />
     <Compile Include="UI\Bundles\JsUmbracoApplicationUI.cs" />
     <Compile Include="UI\Bundles\JsUmbracoTree.cs" />
     <Compile Include="UI\CdfLogger.cs" />
@@ -989,13 +989,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\create.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.cs">
-      <DependentUpon>AssignDomain2.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.designer.cs">
-      <DependentUpon>AssignDomain2.aspx</DependentUpon>
     </Compile>
     <Compile Include="Controllers\UmbLoginController.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
@@ -1089,7 +1082,6 @@
     <Compile Include="Templates\TemplateUtilities.cs" />
     <Compile Include="Trees\PartialViewMacrosTreeController.cs" />
     <Compile Include="Trees\PartialViewsTreeController.cs" />
-    <Compile Include="UI\Controls\InsertMacroSplitButton.cs" />
     <Compile Include="UI\IAssignedApp.cs" />
     <Compile Include="_Legacy\BusinessLogic\Task.cs" />
     <Compile Include="_Legacy\BusinessLogic\Tasks.cs" />
@@ -1106,7 +1098,6 @@
     <Compile Include="_Legacy\Controls\Panel.cs" />
     <Compile Include="_Legacy\Controls\ProgressBar.cs" />
     <Compile Include="_Legacy\Controls\PropertyPanel.cs" />
-    <Compile Include="_Legacy\Controls\ScrollingMenu.cs" />
     <Compile Include="_Legacy\Controls\Splitter.cs" />
     <Compile Include="_Legacy\Controls\TabPage.cs" />
     <Compile Include="_Legacy\Controls\TabView.cs" />
@@ -1152,9 +1143,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\MacroCacheContent.cs" />
-    <Compile Include="umbraco.presentation\umbraco\dialogs\sort.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\masterpages\default.Master.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1311,13 +1299,6 @@
       <DependentUpon>importDocumenttype.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\notifications.aspx.cs">
-      <DependentUpon>notifications.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\notifications.aspx.designer.cs">
-      <DependentUpon>notifications.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx.cs">
       <DependentUpon>rollBack.aspx</DependentUpon>
     </Compile>
@@ -1330,27 +1311,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx.designer.cs">
       <DependentUpon>sendToTranslation.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx.cs">
-      <DependentUpon>viewAuditTrail.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx.designer.cs">
-      <DependentUpon>viewAuditTrail.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx.cs">
-      <DependentUpon>DictionaryItemList.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx.designer.cs">
-      <DependentUpon>DictionaryItemList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx.cs">
-      <DependentUpon>EditDictionaryItem.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx.designer.cs">
-      <DependentUpon>EditDictionaryItem.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\ITreeService.cs">
       <SubType>Code</SubType>
@@ -1455,17 +1415,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="umbraco.presentation\umbraco\webservices\CheckForUpgrade.asmx" />
-    <Content Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\translation\default.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\translation\preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\xml.aspx" />
-    <Content Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="umbraco.presentation\umbraco\webservices\legacyAjaxCalls.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\nodeSorter.asmx" />
@@ -1479,9 +1433,6 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\Preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\empty.htm" />
     <Content Include="umbraco.presentation\umbraco\dialogs\insertMasterpageContent.aspx">
@@ -1499,16 +1450,10 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\importDocumenttype.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\notifications.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\viewAuditTrail.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="Web References\org.umbraco.update\checkforupgrade.disco" />
@@ -1561,6 +1506,9 @@
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>umbraco_org_umbraco_update_CheckForUpgrade</CachedSettingsPropName>
     </WebReferenceUrl>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="umbraco.presentation\umbraco\settings\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!--
