@@ -421,7 +421,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          * This returns the list of changed content properties (does not include standard object property changes).
          */
         reBindChangedProperties: function (origContent, savedContent) {
-
+            
             //TODO: We should probably split out this logic to deal with media/members seperately to content
             
             //a method to ignore built-in prop changes
@@ -448,8 +448,9 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                     return i === propName;
                 });
             };
-            //check for changed built-in properties of the content
-            for (var o in origContent) {
+
+            //check for changed built-in properties of the content based on the server response object
+            for (var o in savedContent) {
 
                 //ignore the ones listed in the array
                 if (shouldIgnore(o)) {
@@ -494,10 +495,11 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 //if it's content (not media/members), then we need to sync the variant specific data
                 if (origContent.variants) {
 
-                    //the variant property names we want to sync
-                    var variantPropertiesSync = ["active", "language", "isEdited", "state"];
+                    //the variant property names we need to sync
+                    var variantPropertiesSync = ["isEdited", "state"];
 
-                    for (var b in origVariant) {
+                    //loop through the properties returned on the server object
+                    for (var b in savedVariant) {
 
                         var shouldCompare = _.some(variantPropertiesSync, function(e) {
                             return e === b;
