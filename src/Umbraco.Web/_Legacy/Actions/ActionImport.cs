@@ -45,7 +45,7 @@
         {
             get
             {
-                return "import";
+                return "importDocumentType";
             }
         }
 
