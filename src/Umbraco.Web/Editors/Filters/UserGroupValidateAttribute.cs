@@ -11,7 +11,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.Editors.Filters
 {
     internal sealed class UserGroupValidateAttribute : ActionFilterAttribute
     {

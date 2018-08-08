@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Web.Http.Filters;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.Editors.Filters
 {
     /// <summary>
     /// This sets the IsCurrentUser property on any outgoing <see cref="UserDisplay"/> model or any collection of <see cref="UserDisplay"/> models

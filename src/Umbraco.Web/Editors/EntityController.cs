@@ -18,6 +18,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Search;
 using Umbraco.Web.Trees;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
 {

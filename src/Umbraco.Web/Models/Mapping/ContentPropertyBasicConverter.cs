@@ -58,18 +58,19 @@ namespace Umbraco.Web.Models.Mapping
             // if it isn't one of the ones specified in 'includeProperties', we will just return the result without mapping the Value.
             if (context.Options.Items.ContainsKey("IncludeProperties"))
             {
-                var includeProperties = context.Options.Items["IncludeProperties"] as IEnumerable<string>;
-                if (includeProperties != null && includeProperties.Contains(property.Alias) == false)
+                if (context.Options.Items["IncludeProperties"] is IEnumerable<string> includeProperties
+                    && includeProperties.Contains(property.Alias) == false)
                 {
                     return result;
                 }
             }
 
+            //Get the culture from the context which will be set during the mapping operation for each property
             var culture = context.GetCulture();
 
             //a culture needs to be in the context for a property type that can vary
             if (culture == null && property.PropertyType.VariesByCulture())
-                throw new InvalidOperationException($"No languageId found in mapping operation when one is required for the culture neutral property type {property.PropertyType.Alias}");
+                throw new InvalidOperationException($"No culture found in mapping operation when one is required for the culture variant property type {property.PropertyType.Alias}");
 
             //set the culture to null if it's an invariant property type
             culture = !property.PropertyType.VariesByCulture() ? null : culture;

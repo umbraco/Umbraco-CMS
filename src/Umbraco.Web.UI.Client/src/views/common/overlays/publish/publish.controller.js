@@ -12,9 +12,7 @@
         vm.hasPristineVariants = false;
 
         //watch this model, if it's reset, then re init
-        $scope.$watch(function () {
-            return $scope.model.variants;
-        },
+        $scope.$watch("model.variants",
             function (newVal, oldVal) {
                 vm.variants = newVal;
                 if (oldVal && oldVal.length) {
@@ -39,7 +37,13 @@
         }
 
         function dirtyVariantFilter(variant) {
-            return (variant.current || variant.isEdited === true || (variant.isEdited === false && variant.state === "Unpublished"));
+            //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
+            // * the active one
+            // * it's editor is in a $dirty state
+            // * it has pending saves
+            // * it is unpublished
+            // * it is in NotCreated state
+            return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges" || variant.state === "NotCreated");
         }
 
         function pristineVariantFilter(variant) {
@@ -70,10 +74,18 @@
             if (vm.variants.length !== 0) {
                 //now sort it so that the current one is at the top
                 vm.variants = _.sortBy(vm.variants, function (v) {
-                    return v.current ? 0 : 1;
+                    return v.active ? 0 : 1;
                 });
-                //ensure that the current one is selected
-                vm.variants[0].publish = true;
+
+                var active = _.find(vm.variants, function (v) {
+                    return v.active;
+                });
+
+                if (active) {
+                    //ensure that the current one is selected
+                    active.publish = true;
+                }
+
             } else {
                 //disable Publish button if we have nothing to publish
                 $scope.model.disableSubmitButton = true;

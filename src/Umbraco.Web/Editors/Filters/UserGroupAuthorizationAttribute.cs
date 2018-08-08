@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Web.Editors.Filters
 {
     /// <summary>
     /// Authorizes that the current user has access to the user group Id in the request
