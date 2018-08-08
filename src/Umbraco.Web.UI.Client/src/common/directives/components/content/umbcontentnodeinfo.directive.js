@@ -8,7 +8,7 @@
             var evts = [];
             var isInfoTab = false;
             var labels = {};
-            scope.publishStatus = {};
+            scope.publishStatus = [];
 
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
             scope.allowChangeDocumentType = false;
@@ -171,31 +171,46 @@
             }
 
             function setNodePublishStatus(node) {
-                
+
                 // deleted node
-                if(node.trashed === true) {
-                    scope.publishStatus.label = labels.deleted;
-                    scope.publishStatus.color = "danger";
+                if (node.trashed === true) {
+                    scope.publishStatus.push({
+                        label: labels.deleted,
+                        color: "danger"
+                    });
+                    return;
                 }
 
-                // unpublished node
-                if(node.published === false && node.trashed === false) {
-                    scope.publishStatus.label = labels.unpublished;
-                    scope.publishStatus.color = "gray";
-                }
+                if (node.variants) {
+                    for (var i = 0; i < node.variants.length; i++) {
 
-                // published node
-                if(node.publishDate && node.published === true) {
-                    scope.publishStatus.label = labels.published;
-                    scope.publishStatus.color = "success";
-                }
+                        var variant = node.variants[i];
 
-                // published node with pending changes
-                if (node.edited === true && node.publishDate) {
-                    scope.publishStatus.label = labels.publishedPendingChanges;
-                    scope.publishStatus.color = "success"
-                }
+                        var status = {
+                            culture: variant.language ? variant.language.culture : null
+                        };
 
+                        // unpublished node
+                        if (variant.state === "Unpublished") {
+                            status.label = labels.unpublished;
+                            status.color = "gray";
+                        }
+
+                        // published node
+                        if (variant.state === "Published") {
+                            if (variant.isEdited === true) {
+                                // published node with pending changes
+                                status.label = labels.publishedPendingChanges;
+                            }
+                            else {
+                                status.label = labels.published;
+                            }
+                            status.color = "success";
+                        }
+
+                        scope.publishStatus.push(status);
+                    }
+                }
             }
 
             function setPublishDate(date) {
