@@ -496,7 +496,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 if (origContent.variants) {
 
                     //the variant property names we need to sync
-                    var variantPropertiesSync = ["isEdited", "state"];
+                    var variantPropertiesSync = ["state"];
 
                     //loop through the properties returned on the server object
                     for (var b in savedVariant) {

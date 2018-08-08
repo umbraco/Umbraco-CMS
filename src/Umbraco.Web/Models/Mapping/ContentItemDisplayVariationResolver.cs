@@ -54,12 +54,23 @@ namespace Umbraco.Web.Models.Mapping
                     variant.Language = x;
                     variant.Name = source.GetCultureName(x.IsoCode);
                     variant.Exists = source.IsCultureAvailable(x.IsoCode); // segments ??
-                    variant.PublishedState = (source.PublishedState == PublishedState.Unpublished //if the entire document is unpublished, then flag every variant as unpublished
+
+                    var publishedState = source.PublishedState == PublishedState.Unpublished //if the entire document is unpublished, then flag every variant as unpublished
                         ? PublishedState.Unpublished
                         : source.IsCulturePublished(x.IsoCode)
                             ? PublishedState.Published
-                            : PublishedState.Unpublished).ToString();
-                    variant.IsEdited = source.IsCultureEdited(x.IsoCode);
+                            : PublishedState.Unpublished;
+                    var isEdited = source.Id > 0 && source.IsCultureEdited(x.IsoCode);
+
+                    //now we can calculate the content state
+                    if (!isEdited && publishedState == PublishedState.Unpublished)
+                        variant.State = ContentSavedState.NotCreated;
+                    else if (isEdited && publishedState == PublishedState.Unpublished)
+                        variant.State = ContentSavedState.Draft;
+                    else if (!isEdited && publishedState == PublishedState.Published)
+                        variant.State = ContentSavedState.Published;
+                    else
+                        variant.State = ContentSavedState.PublishedPendingChanges;
                 }
 
                 return variants;

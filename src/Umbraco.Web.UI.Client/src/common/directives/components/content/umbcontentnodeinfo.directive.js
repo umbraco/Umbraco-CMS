@@ -30,15 +30,17 @@
                     "general_deleted", 
                     "content_unpublished", 
                     "content_published",
-                    "content_publishedPendingChanges"
+                    "content_publishedPendingChanges",
+                    "content_notCreated"
                 ];
 
                 localizationService.localizeMany(keys)
                     .then(function(data){
                         labels.deleted = data[0];
-                        labels.unpublished = data[1];
+                        labels.unpublished = data[1]; //aka draft
                         labels.published = data[2];
                         labels.publishedPendingChanges = data[3];
+                        labels.notCreated = data[4];
 
                         setNodePublishStatus(scope.node);
 
@@ -190,24 +192,26 @@
                             culture: variant.language ? variant.language.culture : null
                         };
 
-                        // unpublished node
-                        if (variant.state === "Unpublished") {
+                        if (variant.state === "NotCreated") {
+                            status.label = labels.notCreated;
+                            status.color = "gray";
+                        }
+                        else if (variant.state === "Draft") {
+                            // draft node
                             status.label = labels.unpublished;
                             status.color = "gray";
                         }
-
-                        // published node
-                        if (variant.state === "Published") {
-                            if (variant.isEdited === true) {
-                                // published node with pending changes
-                                status.label = labels.publishedPendingChanges;
-                            }
-                            else {
-                                status.label = labels.published;
-                            }
+                        else if (variant.state === "Published") {
+                            // published node
+                            status.label = labels.published;
                             status.color = "success";
                         }
-
+                        else if (variant.state === "PublishedPendingChanges") {
+                            // published node with pending changes
+                            status.label = labels.publishedPendingChanges;
+                            status.color = "success";
+                        }
+                        
                         scope.publishStatus.push(status);
                     }
                 }

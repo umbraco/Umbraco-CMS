@@ -129,7 +129,7 @@
                 if (!variant.variants) {
                     variant.variants = _.map($scope.content.variants,
                         function(v) {
-                            return _.pick(v, "active", "language", "isEdited", "state");
+                            return _.pick(v, "active", "language", "state");
                         });
                 }
                 else {
@@ -137,7 +137,7 @@
                     angular.extend(variant.variants,
                         _.map($scope.content.variants,
                             function(v) {
-                                return _.pick(v, "active", "language", "isEdited", "state");
+                                return _.pick(v, "active", "language", "state");
                             }));
                 }
 

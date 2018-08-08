@@ -231,8 +231,7 @@
         <key alias="routeErrorCannotRoute">This document is published but its url cannot be routed</key>
         <key alias="publish">Publish</key>
         <key alias="published">Published</key>
-        <key alias="publishedPendingChanges">Published (pending changes)</key>
-        <key alias="unpublishedPendingChanges">Unpublished (pending changes)</key>
+        <key alias="publishedPendingChanges">Published (pending changes)</key>>
         <key alias="publishStatus">Publication Status</key>
         <key alias="releaseDate">Publish at</key>
         <key alias="unpublishDate">Unpublish at</key>
@@ -245,7 +244,8 @@
         <key alias="altTextOptional">Alternative text (optional)</key>
         <key alias="type">Type</key>
         <key alias="unPublish">Unpublish</key>
-        <key alias="unpublished">Unpublished</key>
+        <key alias="unpublished">Not published</key>
+        <key alias="notCreated">Not created</key>
         <key alias="updateDate">Last edited</key>
         <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
         <key alias="uploadClear">Remove file(s)</key>
