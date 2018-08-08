@@ -42,7 +42,8 @@
             // * it's editor is in a $dirty state
             // * it has pending saves
             // * it is unpublished
-            return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges");
+            // * it is in NotCreated state
+            return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges" || variant.state === "NotCreated");
         }
 
         function pristineVariantFilter(variant) {
