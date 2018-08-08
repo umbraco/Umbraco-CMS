@@ -12,6 +12,9 @@ const imagemin = require('gulp-imagemin');
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
 
+// js
+const eslint = require('gulp-eslint');
+
 //Less + css
 var postcss = require('gulp-postcss');
 var less = require('gulp-less');
@@ -30,6 +33,11 @@ Helper functions
 function processJs(files, out) {
     
     return gulp.src(files)
+     // check for js errors
+     .pipe(eslint())
+     // outputs the lint results to the console
+     .pipe(eslint.format())
+     // sort files in stream by path or any custom sort comparator
      .pipe(sort())
      .pipe(concat(out))
      .pipe(wrap('(function(){\n%= body %\n})();'))
