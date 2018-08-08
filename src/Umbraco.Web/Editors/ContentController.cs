@@ -1157,7 +1157,7 @@ namespace Umbraco.Web.Editors
         }
 
         [EnsureUserPermissionForContent("contentId", 'R')]
-        public List<NotifySetting> GetNotificationOptions(int contentId)
+        public IEnumerable<NotifySetting> GetNotificationOptions(int contentId)
         {
             var notifications = new List<NotifySetting>();
             if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
