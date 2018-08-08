@@ -8,12 +8,13 @@
             
             <div class="umb-split-views">
                 <div class="umb-split-view" ng-class="{'umb-split-view--collapsed': editor.collapsed}" ng-repeat="editor in editors">
-                    <variant-content page="page"
-                                     content="content"
-                                     editor="editor"
-                                     editors="editors"
-                                     init-variant="initVariant(variant)">
-                    </variant-content>
+                    <umb-variant-content
+                        page="page"
+                        content="content"
+                        editor="editor"
+                        editors="editors"
+                        init-variant="initVariant(variant)">
+                    </umb-variant-content>
                 </div>
             </div>
 
