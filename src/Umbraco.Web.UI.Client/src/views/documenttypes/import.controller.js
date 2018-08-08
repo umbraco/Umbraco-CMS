@@ -64,10 +64,6 @@ angular.module("umbraco")
                 });
             };
 
-            $scope.cancel = function () {
-                navigationService.hideDialog();
-            };
-
             $scope.import = function () {
                 contentTypeResource.import(vm.model.tempFileName);
                 vm.state = "done";
