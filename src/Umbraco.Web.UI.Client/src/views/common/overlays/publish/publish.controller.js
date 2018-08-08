@@ -73,7 +73,7 @@
             if (vm.variants.length !== 0) {
                 //now sort it so that the current one is at the top
                 vm.variants = _.sortBy(vm.variants, function (v) {
-                    return v.current ? 0 : 1;
+                    return v.active ? 0 : 1;
                 });
 
                 var active = _.find(vm.variants, function (v) {
