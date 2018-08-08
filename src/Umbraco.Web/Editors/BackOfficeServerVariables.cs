@@ -279,6 +279,10 @@ namespace Umbraco.Web.Editors
                         {
                             "backOfficeAssetsApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<BackOfficeAssetsController>(
                                 controller => controller.GetSupportedMomentLocales())
+                        },
+                        {
+                            "translationApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<TranslationController>(
+                                controller => controller.GetTaskById(-1))
                         }
 
                     }

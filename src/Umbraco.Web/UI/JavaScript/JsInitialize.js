@@ -3,6 +3,8 @@
     'lib/angular/1.1.5/angular.min.js',
     'lib/underscore/underscore-min.js',
 
+    'lib/file-saver/FileSaver.min.js',
+
     'lib/moment/moment.min.js',
 
     'lib/jquery-ui/jquery-ui.min.js',

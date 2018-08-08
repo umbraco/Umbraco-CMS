@@ -11,16 +11,18 @@ using Umbraco.Core.Xml;
 
 namespace Umbraco.Core
 {
-	/// <summary>
-	/// Extension methods for xml objects
-	/// </summary>
-	internal static class XmlExtensions
-	{
+    /// <summary>
+    /// Extension methods for xml objects
+    /// </summary>
+    internal static class XmlExtensions
+    {
+        private static readonly string PROLOGUE = "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
+
         public static bool HasAttribute(this XmlAttributeCollection attributes, string attributeName)
         {
             return attributes.Cast<XmlAttribute>().Any(x => x.Name == attributeName);
-        }	
-		
+        }
+
         /// <summary>
         /// Selects a list of XmlNode matching an XPath expression.
         /// </summary>
@@ -248,21 +250,21 @@ namespace Umbraco.Core
 
             return default(T);
         }
-		public static T AttributeValue<T>(this XmlNode xml, string attributeName)
-		{
-			if (xml == null) throw new ArgumentNullException("xml");
-			if (xml.Attributes == null) return default(T);
+        public static T AttributeValue<T>(this XmlNode xml, string attributeName)
+        {
+            if (xml == null) throw new ArgumentNullException("xml");
+            if (xml.Attributes == null) return default(T);
 
-			if (xml.Attributes[attributeName] == null)
-				return default(T);
+            if (xml.Attributes[attributeName] == null)
+                return default(T);
 
-			var val = xml.Attributes[attributeName].Value;
-			var result = val.TryConvertTo<T>();
-			if (result.Success)
-				return result.Result;
+            var val = xml.Attributes[attributeName].Value;
+            var result = val.TryConvertTo<T>();
+            if (result.Success)
+                return result.Result;
 
-			return default(T);
-		}
+            return default(T);
+        }
 
         public static XElement GetXElement(this XmlNode node)
         {
@@ -292,20 +294,34 @@ namespace Umbraco.Core
         // .ToString(SaveOptions.*) is "a\r\nb" and cannot figure out how to get rid of "\r"
         // and when saving data we want nothing to change
         // this method will produce a string that respects the \r and \n in the data value
-	    public static string ToDataString(this XElement xml)
-	    {
-	        var settings = new XmlWriterSettings
-	        {
+        public static string ToDataString(this XElement xml)
+        {
+            var settings = new XmlWriterSettings
+            {
                 OmitXmlDeclaration = true,
-	            NewLineHandling = NewLineHandling.None,
+                NewLineHandling = NewLineHandling.None,
                 Indent = false
-	        };
-	        var output = new StringBuilder();
-	        using (var writer = XmlWriter.Create(output, settings))
-	        {
+            };
+            var output = new StringBuilder();
+            using (var writer = XmlWriter.Create(output, settings))
+            {
                 xml.WriteTo(writer);
             }
-	        return output.ToString();
-	    }
-	}
+            return output.ToString();
+        }
+
+        /// <summary>
+        /// [SEB] doc
+        /// </summary>
+        /// <param name="document"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        public static string ToStringWithPrologue(this XDocument document, SaveOptions options)
+        {
+            return string.Format("{0}{1}{2}",
+                PROLOGUE,
+                options == SaveOptions.OmitDuplicateNamespaces ? Environment.NewLine : string.Empty,
+                document.ToString(options));
+        }
+    }
 }

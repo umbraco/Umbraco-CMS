@@ -3,6 +3,7 @@ LazyLoad.js(
         'lib/jquery/jquery.min.js',
         'lib/jquery-ui/jquery-ui.min.js',
 
+        'lib/file-saver/FileSaver.min.js',
         
         /* 1.1.5 */
         'lib/angular/1.1.5/angular.min.js',

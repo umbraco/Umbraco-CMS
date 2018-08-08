@@ -319,6 +319,7 @@
     <Compile Include="Cache\TemplateCacheRefresher.cs" />
     <Compile Include="Cache\UnpublishedPageCacheRefresher.cs" />
     <Compile Include="Cache\UserCacheRefresher.cs" />
+    <Compile Include="Editors\ContentController.cs" />
     <Compile Include="Editors\PreviewController.cs" />
     <Compile Include="Editors\BackOfficeAssetsController.cs" />
     <Compile Include="Features\DisabledFeatures.cs" />
@@ -344,6 +345,8 @@
     <Compile Include="Models\BackOfficeTourFilter.cs" />
     <Compile Include="Models\ContentEditing\BackOfficePreview.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeCollectionDisplay.cs" />
+    <Compile Include="Models\ContentEditing\PropertyDisplay.cs" />
+    <Compile Include="Models\ContentEditing\TaskDisplay.cs" />
     <Compile Include="Models\Mapping\AutoMapperExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
     <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />
@@ -531,7 +534,9 @@
     <Compile Include="Security\Identity\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="SingletonHttpContextAccessor.cs" />
     <Compile Include="Trees\DictionaryTreeController.cs" />
-    <Compile Include="Trees\MacroTreeController.cs" />
+    <Compile Include="Trees\MacroTreeController - Copy.cs" />
+    <Compile Include="Trees\YourTasksTreeController.cs" />
+    <Compile Include="Trees\OpenTasksTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
     <Compile Include="Suspendable.cs" />
     <Compile Include="Trees\ContentBlueprintTreeController.cs" />
@@ -574,7 +579,7 @@
     <Compile Include="Cache\UserGroupPermissionsCacheRefresher.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Controllers\UmbProfileController.cs" />
-    <Compile Include="Editors\ContentController.cs" />
+    <Compile Include="Editors\TranslationController.cs" />
     <Compile Include="Controllers\UmbLoginStatusController.cs" />
     <Compile Include="Editors\ContentPostValidateAttribute.cs" />
     <Compile Include="Editors\ContentTypeControllerBase.cs" />
@@ -1879,7 +1884,9 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx" />
     <Content Include="umbraco.presentation\umbraco\webservices\TreeClientService.asmx" />
     <Content Include="umbraco.presentation\umbraco\members\search.aspx" />
-    <Content Include="umbraco.presentation\umbraco\translation\details.aspx" />
+    <Content Include="umbraco.presentation\umbraco\translation\details.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1915,7 +1922,9 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\translation\default.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\preview.aspx" />
-    <Content Include="umbraco.presentation\umbraco\translation\xml.aspx" />
+    <Content Include="umbraco.presentation\umbraco\translation\xml.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Macros\assemblyBrowser.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\getXsltStatus.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />

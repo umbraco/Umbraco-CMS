@@ -1733,7 +1733,7 @@ To manage your website, simply open the Umbraco back office and start adding con
      To close a translation task, please go to the Details view and click the "Close" button.
     ]]>
         </key>
-        <key alias="closeTask">close task</key>
+        <key alias="closeTask">Close task</key>
         <key alias="details">Translation details</key>
         <key alias="downloadAllAsXml">Download all translation tasks as XML</key>
         <key alias="downloadTaskAsXml">Download XML</key>
@@ -1817,6 +1817,9 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="xslt">XSLT Files</key>
         <key alias="analytics">Analytics</key>
         <key alias="users">Users</key>
+        <!-- [SEB] Translations -->
+        <key alias="yourTasks">Tasks created by you (new)</key>
+        <key alias="openTasks">Tasks assigned to you (new)</key>
     </area>
     <area alias="update">
         <key alias="updateAvailable">New update ready</key>

@@ -130,6 +130,8 @@
 
             public const string Users = "users";
 
+            public const string Translations = "translations";
+
             //TODO: Fill in the rest!
         }
     }
