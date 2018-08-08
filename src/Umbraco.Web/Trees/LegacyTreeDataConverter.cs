@@ -257,12 +257,6 @@ namespace Umbraco.Web.Trees
                             "dialogs/sendToTranslation.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/sendToTranslate")));
 
-                case "UmbClientMgr.appActions().actionImport()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/importDocumentType.aspx",
-                            Current.Services.TextService.Localize("actions/importDocumentType")));
-
             }
             return Attempt<LegacyUrlAction>.Fail();
         }

@@ -1,0 +1,72 @@
+﻿<div class="umb-dialog umb-pane" ng-controller="Umbraco.Editors.DocumentTypes.ImportController as vm">
+    <table class="propertyPane" id="Table1" cellspacing="0" cellpadding="4" width="360" border="0" runat="server">
+        <tr>
+            <td class="propertyContent" colspan="2">
+                <div ng-if="vm.state === 'upload'">
+                    <p>
+                        <span class="guiDialogNormal">
+                            <localize key="importDocumentTypeHelp">
+                                To import a document type, find the '.udt' file on your computer by clicking the 'Browse' button and click 'Import' (you'll be asked for confirmation on the next screen)
+                            </localize>
+                        </span>
+                    </p>
+                    <!-- Upload -->
+                    <div class="flex items-center justify-center">
+                        <form novalidate name="localPackageForm" class="flex flex-column justify-center items-center tc">
+                            <!-- Drag and drop files area -->
+                            <div ngf-drop
+                                 ng-hide="hideDropzone"
+                                 ng-model="filesHolder"
+                                 ngf-change="handleFiles($files, $event)"
+                                 class="umb-upload-local__dropzone"
+                                 ngf-drag-over-class="drag-over"
+                                 ngf-multiple="false"
+                                 ngf-allow-dir="false"
+                                 ngf-pattern="*.udt"
+                                 ngf-max-size="{{ maxFileSize }}"
+                                 ng-class="{'is-small': compact!=='false' || (done.length+queue.length) > 0 }">
+                                <div class="content">
+                                    <!-- Drag and drop illustration -->
+                                    <i class="icon-box" draggable="false"></i>
+                                    <small class="faded" draggable="false"><strong><localize key="packager_dropHere">Drop to upload</localize></strong></small>
+                                    <!-- Select files -->
+                                    <div class="umb-upload-local__select-file"
+                                         ngf-select
+                                         ng-model="filesHolder"
+                                         ngf-change="handleFiles($files, $event)"
+                                         ngf-multiple="true"
+                                         ngf-pattern="*.udt"
+                                         ngf-max-size="{{ maxFileSize }}">
+                                        - <localize key="packager_orClickHereToUpload">or click here to choose files</localize>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <a href="#" ng-click="cancel()">>
+                        <localize key="cancel">cancel</localize>
+                    </a>
+                </div>
+                <div ng-if="vm.state === 'confirm'">
+                    <strong>
+                        <localize key="name">Name</localize>:
+                    </strong>
+                    {{vm.model.name}}
+                    <br />
+                    <strong>
+                        <localize key="alias">Alias</localize>:
+                    </strong>
+                    {{vm.model.alias}}
+                    <br />
+                    <br />
+                    <button class="btn btn-primary" ng-click="import()">
+                        <localize key="actions_import">Import</localize>
+                    </button>
+                </div>
+                <div ng-if="vm.state === 'done'">
+                    {{vm.model.name}} has been imported!
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
