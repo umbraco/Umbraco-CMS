@@ -7,7 +7,7 @@
         var directive = {
             restrict: 'E',
             replace: true,
-            templateUrl: 'views/components/content/tabbed-content.html',
+            templateUrl: 'views/components/content/umb-tabbed-content.html',
             controller: function ($scope) {
                 
                 //expose the property/methods for other directives to use
@@ -40,6 +40,6 @@
 
     }
     
-    angular.module('umbraco.directives').directive('tabbedContent', tabbedContentDirective);
+    angular.module('umbraco.directives').directive('umbTabbedContent', tabbedContentDirective);
 
 })();

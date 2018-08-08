@@ -11,7 +11,7 @@
         var directive = {
             restrict: 'E',
             replace: true,
-            templateUrl: 'views/components/content/variant-content.html',
+            templateUrl: 'views/components/content/umb-variant-content.html',
             link: function (scope) {
 
                 /**
@@ -124,6 +124,6 @@
 
     }
 
-    angular.module('umbraco.directives').directive('variantContent', variantContentDirective);
+    angular.module('umbraco.directives').directive('umbVariantContent', variantContentDirective);
 
 })();
