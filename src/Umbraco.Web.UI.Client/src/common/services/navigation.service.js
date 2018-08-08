@@ -623,7 +623,7 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
             setMode("default");
 
             if(showMenu){
-                this.showMenu(undefined, { skipDefault: true, node: appState.getMenuState("currentNode") });
+                this.showMenu({ skipDefault: true, node: appState.getMenuState("currentNode") });
             }
         },
         /**
