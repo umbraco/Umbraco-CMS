@@ -8,7 +8,7 @@
             var evts = [];
             var isInfoTab = false;
             var labels = {};
-            scope.publishStatus = {};
+            scope.publishStatus = [];
 
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
             scope.allowChangeDocumentType = false;
@@ -30,15 +30,17 @@
                     "general_deleted", 
                     "content_unpublished", 
                     "content_published",
-                    "content_publishedPendingChanges"
+                    "content_publishedPendingChanges",
+                    "content_notCreated"
                 ];
 
                 localizationService.localizeMany(keys)
                     .then(function(data){
                         labels.deleted = data[0];
-                        labels.unpublished = data[1];
+                        labels.unpublished = data[1]; //aka draft
                         labels.published = data[2];
                         labels.publishedPendingChanges = data[3];
+                        labels.notCreated = data[4];
 
                         setNodePublishStatus(scope.node);
 
@@ -171,31 +173,48 @@
             }
 
             function setNodePublishStatus(node) {
-                
+
                 // deleted node
-                if(node.trashed === true) {
-                    scope.publishStatus.label = labels.deleted;
-                    scope.publishStatus.color = "danger";
+                if (node.trashed === true) {
+                    scope.publishStatus.push({
+                        label: labels.deleted,
+                        color: "danger"
+                    });
+                    return;
                 }
 
-                // unpublished node
-                if(node.published === false && node.trashed === false) {
-                    scope.publishStatus.label = labels.unpublished;
-                    scope.publishStatus.color = "gray";
-                }
+                if (node.variants) {
+                    for (var i = 0; i < node.variants.length; i++) {
 
-                // published node
-                if(node.publishDate && node.published === true) {
-                    scope.publishStatus.label = labels.published;
-                    scope.publishStatus.color = "success";
-                }
+                        var variant = node.variants[i];
 
-                // published node with pending changes
-                if (node.edited === true && node.publishDate) {
-                    scope.publishStatus.label = labels.publishedPendingChanges;
-                    scope.publishStatus.color = "success"
-                }
+                        var status = {
+                            culture: variant.language ? variant.language.culture : null
+                        };
 
+                        if (variant.state === "NotCreated") {
+                            status.label = labels.notCreated;
+                            status.color = "gray";
+                        }
+                        else if (variant.state === "Draft") {
+                            // draft node
+                            status.label = labels.unpublished;
+                            status.color = "gray";
+                        }
+                        else if (variant.state === "Published") {
+                            // published node
+                            status.label = labels.published;
+                            status.color = "success";
+                        }
+                        else if (variant.state === "PublishedPendingChanges") {
+                            // published node with pending changes
+                            status.label = labels.publishedPendingChanges;
+                            status.color = "success";
+                        }
+                        
+                        scope.publishStatus.push(status);
+                    }
+                }
             }
 
             function setPublishDate(date) {

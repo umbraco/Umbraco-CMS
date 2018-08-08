@@ -7,7 +7,34 @@
     * @description A helper object used to format/transform JSON Umbraco data, mostly used for persisting data to the server
     **/
     function umbDataFormatter() {
-        
+
+        /**
+         * maps the display properties to a property collection for persisting/POSTing
+         * @param {any} tabs
+         */
+        function getContentProperties(tabs) {
+
+            var properties = [];
+
+            _.each(tabs, function (tab) {
+
+                _.each(tab.properties, function (prop) {
+
+                    //don't include the custom generic tab properties
+                    //don't include a property that is marked readonly
+                    if (!prop.alias.startsWith("_umb_") && !prop.readonly) {
+                        properties.push({
+                            id: prop.id,
+                            alias: prop.alias,
+                            value: prop.value
+                        });
+                    }
+                });
+            });
+
+            return properties;
+        }
+
         return {
 
             formatChangePasswordModel: function(model) {
@@ -313,7 +340,7 @@
                 // we don't want to post all of the data as it is unecessary.
                 var saveModel = {
                     id: displayModel.id,
-                    properties: [],
+                    properties: getContentProperties(displayModel.tabs),
                     name: displayModel.name,
                     contentTypeAlias: displayModel.contentTypeAlias,
                     parentId: displayModel.parentId,
@@ -321,50 +348,31 @@
                     action: action
                 };
 
-                _.each(displayModel.tabs, function (tab) {
-
-                    _.each(tab.properties, function (prop) {
-
-                        //don't include the custom generic tab properties
-                        //don't include a property that is marked readonly
-                        if (!prop.alias.startsWith("_umb_") && !prop.readonly) {
-                            saveModel.properties.push({
-                                id: prop.id,
-                                alias: prop.alias,
-                                value: prop.value
-                            });
-                        }
-                    });
-                });
-
                 return saveModel;
             },
 
             /** formats the display model used to display the content to the model used to save the content  */
             formatContentPostData: function (displayModel, action) {
 
-                //this is basically the same as for media but we need to explicitly add some extra properties
-                var saveModel = this.formatMediaPostData(displayModel, action);
-
-                //get the selected variant and build the additional published variants
-                saveModel.publishVariations = [];
-
-                //if there's any variants than we need to set the language and include the variants to publish
-                if (displayModel.variants.length > 0) {
-                    _.each(displayModel.variants,
-                        function (d) {
-                            //set the selected variant if this is current
-                            if (d.current === true) {
-                                saveModel.culture = d.language.culture;
-                            }
-                            if (d.publish === true) {
-                                saveModel.publishVariations.push({
-                                    culture: d.language.culture,
-                                    segment: d.segment
-                                });
-                            }
-                        });
-                }
+                //NOTE: the display model inherits from the save model so we can in theory just post up the display model but 
+                // we don't want to post all of the data as it is unecessary.
+                var saveModel = {
+                    id: displayModel.id,
+                    name: displayModel.name,
+                    contentTypeAlias: displayModel.contentTypeAlias,
+                    parentId: displayModel.parentId,
+                    //set the action on the save model
+                    action: action,
+                    variants: _.map(displayModel.variants, function(v) {
+                        return {
+                            name: v.name,
+                            properties: getContentProperties(v.tabs),
+                            culture: v.language ? v.language.culture : null,
+                            publish: v.publish,
+                            save: v.save
+                        };
+                    })
+                };
 
                 var propExpireDate = displayModel.removeDate;
                 var propReleaseDate = displayModel.releaseDate;

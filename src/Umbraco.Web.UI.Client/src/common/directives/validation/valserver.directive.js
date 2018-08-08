@@ -7,18 +7,31 @@
     **/
 function valServer(serverValidationManager) {
     return {
-        require: ['ngModel', '?^umbProperty'],
+        require: ['ngModel', '?^^umbProperty', '?^^tabbedContent'],
         restrict: "A",
         link: function (scope, element, attr, ctrls) {
 
             var modelCtrl = ctrls[0];
             var umbPropCtrl = ctrls.length > 1 ? ctrls[1] : null;
-            if (!umbPropCtrl) {
+            var tabbedContent = ctrls.length > 2 ? ctrls[2] : null;
+            if (!umbPropCtrl || !tabbedContent) {
                 //we cannot proceed, this validator will be disabled
                 return;
             }
 
+            var currentProperty = umbPropCtrl.property;
+            var currentCulture = tabbedContent && tabbedContent.content && tabbedContent.content.language ? tabbedContent.content.language.culture : null;
             var watcher = null;
+
+            //default to 'value' if nothing is set
+            var fieldName = "value";
+            if (attr.valServer) {
+                fieldName = scope.$eval(attr.valServer);
+                if (!fieldName) {
+                    //eval returned nothing so just use the string
+                    fieldName = attr.valServer;
+                }
+            }
 
             //Need to watch the value model for it to change, previously we had  subscribed to 
             //modelCtrl.$viewChangeListeners but this is not good enough if you have an editor that
@@ -40,6 +53,8 @@ function valServer(serverValidationManager) {
 
                         if (modelCtrl.$invalid) {
                             modelCtrl.$setValidity('valServer', true);
+                            //clear the server validation entry
+                            serverValidationManager.removePropertyError(currentProperty.alias, currentCulture, fieldName);
                             stopWatch();
                         }
                     }, true);
@@ -52,21 +67,9 @@ function valServer(serverValidationManager) {
                     watcher = null;
                 }
             }
-
-            var currentProperty = umbPropCtrl.property;
-
-            //default to 'value' if nothing is set
-            var fieldName = "value";
-            if (attr.valServer) {
-                fieldName = scope.$eval(attr.valServer);
-                if (!fieldName) {
-                    //eval returned nothing so just use the string
-                    fieldName = attr.valServer;
-                }
-            }            
             
             //subscribe to the server validation changes
-            serverValidationManager.subscribe(currentProperty.alias, fieldName, function (isValid, propertyErrors, allErrors) {
+            serverValidationManager.subscribe(currentProperty.alias, currentCulture, fieldName, function (isValid, propertyErrors, allErrors) {
                 if (!isValid) {
                     modelCtrl.$setValidity('valServer', false);
                     //assign an error msg property to the current validator
@@ -86,7 +89,7 @@ function valServer(serverValidationManager) {
             // but they are a different callback instance than the above.
             element.bind('$destroy', function () {
                 stopWatch();
-                serverValidationManager.unsubscribe(currentProperty.alias, fieldName);
+                serverValidationManager.unsubscribe(currentProperty.alias, currentCulture, fieldName);
             });
         }
     };

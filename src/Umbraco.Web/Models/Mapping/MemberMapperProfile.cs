@@ -123,14 +123,14 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.Ignore());
 
             //FROM IMember TO ContentItemDto<IMember>
-            CreateMap<IMember, ContentItemDto<IMember>>()
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
-                .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => memberOwnerResolver.Resolve(src)))
-                .ForMember(dest => dest.Published, opt => opt.Ignore())
-                .ForMember(dest => dest.Edited, opt => opt.Ignore())
-                .ForMember(dest => dest.Updater, opt => opt.Ignore())
-                .ForMember(dest => dest.Icon, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore())
+            CreateMap<IMember, ContentPropertyCollectionDto>()
+                //.ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
+                //.ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => memberOwnerResolver.Resolve(src)))
+                //.ForMember(dest => dest.Published, opt => opt.Ignore())
+                //.ForMember(dest => dest.Edited, opt => opt.Ignore())
+                //.ForMember(dest => dest.Updater, opt => opt.Ignore())
+                //.ForMember(dest => dest.Icon, opt => opt.Ignore())
+                //.ForMember(dest => dest.Alias, opt => opt.Ignore())
                 //do no map the custom member properties (currently anyways, they were never there in 6.x)
                 .ForMember(dest => dest.Properties, opt => opt.ResolveUsing(src => memberDtoPropertiesResolver.Resolve(src)));
 

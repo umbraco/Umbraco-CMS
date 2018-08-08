@@ -7,10 +7,8 @@ namespace Umbraco.Web.Models.ContentEditing
     /// An abstract model representing a content item that can be contained in a list view
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <typeparam name="TPersisted"></typeparam>
-    public abstract class ListViewAwareContentItemDisplayBase<T, TPersisted> : ContentItemDisplayBase<T, TPersisted>
+    public abstract class ListViewAwareContentItemDisplayBase<T> : ContentItemDisplayBase<T>
         where T : ContentPropertyBasic
-        where TPersisted : IContentBase
     {
         /// <summary>
         /// Property indicating if this item is part of a list view parent

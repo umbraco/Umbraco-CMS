@@ -25,7 +25,7 @@
     "angular-i18n": "~1.7.2",
     "signalr": "^2.2.1",
     "typeahead.js": "~0.10.5",
-    "underscore": "~1.7.0",
+    "underscore": "~1.9.1",
     "rgrove-lazyload": "*",
     "bootstrap-social": "~4.8.0",
     "jquery": "2.2.4",

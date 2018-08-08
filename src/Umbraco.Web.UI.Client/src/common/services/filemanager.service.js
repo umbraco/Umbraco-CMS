@@ -23,14 +23,33 @@ function fileManager() {
          *  Attaches files to the current manager for the current editor for a particular property, if an empty array is set
          *   for the files collection that effectively clears the files for the specified editor.
          */
-        setFiles: function(propertyAlias, files) {
+        setFiles: function (args) {
+            
+            //propertyAlias, files
+            if (!angular.isString(args.propertyAlias)) {
+                throw "args.propertyAlias must be a non empty string";
+            }
+            if (!angular.isObject(args.files)) {
+                throw "args.files must be an object";
+            }
+
+            var culture = null;
+            if (args.culture) {
+                culture = args.culture;
+            }
+
+            var metaData = [];
+            if (angular.isArray(args.metaData)) {
+                metaData = args.metaData;
+            }
+
             //this will clear the files for the current property and then add the new ones for the current property
             fileCollection = _.reject(fileCollection, function (item) {
-                return item.alias === propertyAlias;
+                return item.alias === args.propertyAlias;
             });
-            for (var i = 0; i < files.length; i++) {
+            for (var i = 0; i < args.files.length; i++) {
                 //save the file object to the files collection
-                fileCollection.push({ alias: propertyAlias, file: files[i] });
+                fileCollection.push({ alias: args.propertyAlias, file: args.files[i], culture: culture, metaData: metaData });
             }
         },
         

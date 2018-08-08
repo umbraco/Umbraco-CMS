@@ -33,7 +33,7 @@ function valServerField(serverValidationManager) {
                     }));
 
                     //subscribe to the server validation changes
-                    serverValidationManager.subscribe(null, fieldName, function (isValid, fieldErrors, allErrors) {
+                    serverValidationManager.subscribe(null, null, fieldName, function (isValid, fieldErrors, allErrors) {
                         if (!isValid) {
                             ngModel.$setValidity('valServerField', false);
                             //assign an error msg property to the current validator
@@ -50,7 +50,7 @@ function valServerField(serverValidationManager) {
                     // NOTE: this is very important otherwise when this controller re-binds the previous subscriptsion will remain
                     // but they are a different callback instance than the above.
                     element.bind('$destroy', function () {
-                        serverValidationManager.unsubscribe(null, fieldName);
+                        serverValidationManager.unsubscribe(null, null, fieldName);
                     });
                 }
             });

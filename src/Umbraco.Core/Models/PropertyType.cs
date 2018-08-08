@@ -378,11 +378,11 @@ namespace Umbraco.Core.Models
         }
 
 
-        //fixme - perhaps this and other validation methods should be a service level (not a model) thing?
+        //fixme - this and other value validation methods should be a service level (not a model) thing. Changing this to internal for now
         /// <summary>
         /// Determines whether a value is valid for this property type.
         /// </summary>
-        public bool IsPropertyValueValid(object value)
+        internal bool IsPropertyValueValid(object value)
         {
             var editor = Current.PropertyEditors[_propertyEditorAlias]; // fixme inject?
             var configuration = Current.Services.DataTypeService.GetDataType(_dataTypeId).Configuration; // fixme inject?
