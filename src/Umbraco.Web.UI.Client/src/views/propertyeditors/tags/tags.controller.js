@@ -183,7 +183,7 @@ angular.module("umbraco")
                         tagsHound.get(query, function (suggestions) {
                             cb(removeCurrentTagsFromSuggestions(suggestions));
                         });
-                    },
+                    }
                 }).bind("typeahead:selected", function (obj, datum, name) {
                     angularHelper.safeApply($scope, function () {
                         addTag(datum["value"]);
