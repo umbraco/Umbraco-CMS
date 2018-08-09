@@ -23,14 +23,13 @@ namespace Umbraco.Web.Trees
             foreach (var task in Services.TaskService.GetTasks(assignedUser: Security.CurrentUser.Id))
             {
                 var entity = Services.ContentService.GetById(task.EntityId);
-
+                
                 var node = CreateTreeNode(task.Id.ToString(),
                     id,
                     null,
                     entity.Name,
                     "icon-document-dashed-line",
                     false,
-                    // Whi twice translation?
                     queryStrings.GetValue<string>("application") + queryStrings.GetValue<string>("application").EnsureStartsWith('/') + TreeAlias.EnsureStartsWith('/') + task.Id.ToString().EnsureStartsWith('/'));
 
                 nodes.Add(node);
