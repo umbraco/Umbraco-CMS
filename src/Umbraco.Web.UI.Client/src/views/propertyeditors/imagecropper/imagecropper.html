@@ -2,15 +2,12 @@
      ng-controller="Umbraco.PropertyEditors.ImageCropperController">
 
     <ng-form name="imageCropperForm">
-        <span class="fileinput-button umb-upload-button-big"
-              style="margin-bottom: 5px;"
-              ng-hide="imageSrc">
-            <i class="icon icon-page-up"></i>
-            <p><localize key="media_clickToUpload">Click to upload</localize></p>
-            <umb-single-file-upload></umb-single-file-upload>
-        </span>
 
-        <div ng-if="imageSrc">
+        <umb-property-file-upload culture="{{model.culture}}"
+                                  property-alias="{{model.alias}}"
+                                  value="model.value.src"
+                                  on-value-changed="fileChanged(value, files)"
+                                  hide-selection="true">
 
             <div class="imagecropper clearfix">
 
@@ -38,8 +35,7 @@
 
                 <div ng-if="!currentCrop" class="umb-cropper-imageholder clearfix">
                     <umb-image-gravity src="imageSrc"
-                                       center="model.value.focalPoint"
-                                       on-image-loaded="imageLoaded">
+                                       center="model.value.focalPoint">
                     </umb-image-gravity>
                     <a href class="btn btn-link btn-crop-delete" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
                 </div>
@@ -64,6 +60,8 @@
 
             </div>
 
-        </div>
+        </umb-property-file-upload>
+
     </ng-form>
+
 </div>

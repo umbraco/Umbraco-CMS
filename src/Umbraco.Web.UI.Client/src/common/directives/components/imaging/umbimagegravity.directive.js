@@ -14,7 +14,7 @@ angular.module("umbraco.directives")
 				scope: {
 					src: '=',
 					center: "=",
-					onImageLoaded: "="
+					onImageLoaded: "&?"
 				},
 				link: function(scope, element, attrs) {
 
@@ -109,7 +109,7 @@ angular.module("umbraco.directives")
 					    $timeout(function() {
 					        setDimensions();
 					        scope.loaded = true;
-					        if (angular.isFunction(scope.onImageLoaded)) {
+					        if (scope.onImageLoaded) {
 					            scope.onImageLoaded();
 					        }
 					    });

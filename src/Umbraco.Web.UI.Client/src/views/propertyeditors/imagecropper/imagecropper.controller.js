@@ -3,55 +3,107 @@ angular.module('umbraco')
     function ($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager, angularHelper) {
 
         var config = angular.copy($scope.model.config);
-        $scope.imageIsLoaded = false;
 
-        //move previously saved value to the editor
-        if ($scope.model.value) {
-            //backwards compat with the old file upload (incase some-one swaps them..)
-            if (angular.isString($scope.model.value)) {
-                config.src = $scope.model.value;
-                $scope.model.value = config;
-            } else if ($scope.model.value.crops) {
-                //sync any config changes with the editor and drop outdated crops
-                _.each($scope.model.value.crops, function (saved) {
-                    var configured = _.find(config.crops, function (item) { return item.alias === saved.alias });
+        $scope.fileChanged = fileChanged;
+        $scope.crop = crop;
+        $scope.done = done;
+        $scope.clear = clear;
+        //declare a special method which will be called whenever the value has changed from the server
+        $scope.model.onValueChanged = onValueChanged;
 
-                    if (configured && configured.height === saved.height && configured.width === saved.width) {
-                        configured.coordinates = saved.coordinates;
-                    }
-                });
-                $scope.model.value.crops = config.crops;
-
-                //restore focalpoint if missing
-                if (!$scope.model.value.focalPoint) {
-                    $scope.model.value.focalPoint = { left: 0.5, top: 0.5 };
-                }
+        /**
+         * Used to assign a new model value
+         * @param {any} src
+         */
+        function setModelValueWithSrc(src) {
+            if (!$scope.model.value || !$scope.model.value.src) {
+                //we are copying to not overwrite the original config
+                $scope.model.value = angular.extend(angular.copy($scope.model.config), { src: src });
             }
-
-            $scope.imageSrc = $scope.model.value.src;
         }
 
+        /**
+         * called whenever the value has changed from the server
+         * @param {any} newVal
+         * @param {any} oldVal
+         */
+        function onValueChanged(newVal, oldVal) {
+            //clear current uploaded files
+            fileManager.setFiles({
+                propertyAlias: $scope.model.alias,
+                culture: $scope.model.culture,
+                files: []
+            });
+        }
 
-        //crop a specific crop
-        $scope.crop = function (crop) {
+        /**
+         * Called when the file selection value changes
+         * @param {any} value
+         */
+        function fileChanged(value, files) {
+            setModelValueWithSrc(value);
+
+            if (files && files[0]) {
+                $scope.imageSrc = files[0].fileSrc;
+                //set form to dirty to track changes
+                $scope.imageCropperForm.$setDirty();
+            }
+        }
+
+        function onInit() {
+            //move previously saved value to the editor
+            if ($scope.model.value) {
+                //backwards compat with the old file upload (incase some-one swaps them..)
+                if (angular.isString($scope.model.value)) {
+                    setModelValueWithSrc($scope.model.value);
+                }
+                else if ($scope.model.value.crops) {
+                    //sync any config changes with the editor and drop outdated crops
+                    _.each($scope.model.value.crops, function (saved) {
+                        var configured = _.find(config.crops, function (item) { return item.alias === saved.alias });
+
+                        if (configured && configured.height === saved.height && configured.width === saved.width) {
+                            configured.coordinates = saved.coordinates;
+                        }
+                    });
+                    $scope.model.value.crops = config.crops;
+
+                    //restore focalpoint if missing
+                    if (!$scope.model.value.focalPoint) {
+                        $scope.model.value.focalPoint = { left: 0.5, top: 0.5 };
+                    }
+                }
+
+                $scope.imageSrc = $scope.model.value.src;
+            }
+        }
+
+        /**
+         * crop a specific crop
+         * @param {any} crop
+         */
+        function crop(crop) {
             $scope.currentCrop = crop;
-            $scope.currentPoint = undefined;
+            $scope.currentPoint = null;
 
             //set form to dirty to track changes
             $scope.imageCropperForm.$setDirty();
         };
 
-        //done cropping
-        $scope.done = function () {
-            $scope.currentCrop = undefined;
-            $scope.currentPoint = undefined;
+        /** done cropping */
+        function done() {
+            $scope.currentCrop = null;
+            $scope.currentPoint = null;
 
             //set form to dirty to track changes
             $scope.imageCropperForm.$setDirty();
         };
 
-        //crop a specific crop
-        $scope.clear = function (crop) {
+        /**
+         * crop a specific crop
+         * @param {any} crop
+         */
+        function clear(crop) {
             //clear current uploaded files
             fileManager.setFiles({
                 propertyAlias: $scope.model.alias,
@@ -60,70 +112,20 @@ angular.module('umbraco')
             });
 
             //clear the ui
-            $scope.imageSrc = undefined;
+            $scope.imageSrc = null;
             if ($scope.model.value) {
-                delete $scope.model.value;
+                $scope.model.value = null;
             }
 
             //set form to dirty to track changes
             $scope.imageCropperForm.$setDirty();
         };
 
-        //show previews
-        $scope.togglePreviews = function () {
-            if ($scope.showPreviews) {
-                $scope.showPreviews = false;
-                $scope.tempShowPreviews = false;
-            } else {
-                $scope.showPreviews = true;
-            }
-        };
-
-        $scope.imageLoaded = function() {
-            $scope.imageIsLoaded = true;
-        };
-
-        //on image selected, update the cropper
-        $scope.$on("filesSelected", function (ev, args) {
-            $scope.model.value = config;
-
-            if (args.files && args.files[0]) {
-
-                fileManager.setFiles({
-                    propertyAlias: $scope.model.alias,
-                    culture: $scope.model.culture,
-                    files: args.files
-                });
-
-                var reader = new FileReader();
-                reader.onload = function (e) {
-
-                    $scope.$apply(function () {
-                        $scope.imageSrc = e.target.result;
-                    });
-
-                };
-
-                reader.readAsDataURL(args.files[0]);
-
-                //set form to dirty to track changes
-                $scope.imageCropperForm.$setDirty();
-            }
-        });
-
-
-        //here we declare a special method which will be called whenever the value has changed from the server
-        $scope.model.onValueChanged = function (newVal, oldVal) {
-            //clear current uploaded files
-            fileManager.setFiles({
-                propertyAlias: $scope.model.alias,
-                culture: $scope.model.culture,
-                files: []
-            });
-        };
-
+        onInit();
+        
         var unsubscribe = $scope.$on("formSubmitting", function () {
-            $scope.done();
+            $scope.currentCrop = null;
+            $scope.currentPoint = null;
         });
 
         $scope.$on('$destroy', function () {

@@ -12,23 +12,15 @@
     */
     function fileUploadController($scope) {
         
-        $scope.valueChanged = valueChanged;
-
-        //here we declare a special method which will be called whenever the value has changed from the server
-        $scope.model.onValueChanged = function (newVal, oldVal) {
-            //clear current uploaded files
-            fileManager.setFiles({
-                propertyAlias: $scope.model.alias,
-                culture: $scope.model.culture,
-                files: []
-            });
-        };
+        $scope.fileChanged = fileChanged;
+        //declare a special method which will be called whenever the value has changed from the server
+        $scope.model.onValueChanged = onValueChanged;
 
         /**
          * Called when the file selection value changes
          * @param {any} value
          */
-        function valueChanged(value) {
+        function fileChanged(value) {
             $scope.model.value = value;
 
             //if the value is empty, then tell the server to clear the files
@@ -36,6 +28,21 @@
                 $scope.model.value = { clearFiles: true };
             }
         }
+
+        /**
+         * called whenever the value has changed from the server
+         * @param {any} newVal
+         * @param {any} oldVal
+         */
+        function onValueChanged(newVal, oldVal) {
+            //clear current uploaded files
+            fileManager.setFiles({
+                propertyAlias: $scope.model.alias,
+                culture: $scope.model.culture,
+                files: []
+            });
+        }
+        
     };
 
     angular.module("umbraco")
