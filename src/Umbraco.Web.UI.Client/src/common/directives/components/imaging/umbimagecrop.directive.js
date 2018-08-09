@@ -53,7 +53,7 @@ angular.module("umbraco.directives")
 					var $container = element.find(".crop-container");
 
 					//default constraints for drag n drop
-					var constraints = {left: {max: scope.dimensions.margin, min: scope.dimensions.margin}, top: {max: scope.dimensions.margin, min: scope.dimensions.margin}, };
+					var constraints = {left: {max: scope.dimensions.margin, min: scope.dimensions.margin}, top: {max: scope.dimensions.margin, min: scope.dimensions.margin} };
 					scope.constraints = constraints;
 
 

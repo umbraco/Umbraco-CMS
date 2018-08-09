@@ -106,7 +106,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 								hasChildren: false,
 								name: searchText,
 								metaData: {
-									listViewNode: child,
+									listViewNode: child
 								},
 								cssClass: "icon umb-tree-icon sprTree icon-search",
 								cssClasses: ["not-published"]
