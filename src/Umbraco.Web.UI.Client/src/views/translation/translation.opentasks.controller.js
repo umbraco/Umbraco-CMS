@@ -17,6 +17,7 @@ function TranslationOpenTasksController($scope, $window, $location, $routeParams
     $scope.previewId = null;
 
     $scope.download = function () {
+        // [SEB] Use translation.service ?
         translationResource.getTaskXml($routeParams.id).then(function (content) {
             saveAs(new Blob([content], { type: "application/xml" }), $scope.task.properties[0].value.split(' ').join('_'));
         })
@@ -36,7 +37,7 @@ function TranslationOpenTasksController($scope, $window, $location, $routeParams
         });
     }
 
-    $scope.handleUploadedFile = function (file) {
+    $scope.upload = function (file) {
         if (file !== null) {
             $scope.uploadButtonState = "busy";
             // [SEB] Error checking
@@ -45,7 +46,7 @@ function TranslationOpenTasksController($scope, $window, $location, $routeParams
             reader.onload = function () {
                 $scope.$apply(function () {
                     try {
-                        translationResource.submitTask($routeParams.id, $scope.task.nodeId, file.name, reader.result).then(function (id) {
+                        translationResource.submitTasks($routeParams.id, $scope.task.nodeId, file.name, reader.result).then(function (id) {
                             $scope.uploadButtonState = "success";
                             $scope.task.closed = true;
                             notificationsService.success("Upload", "The task has been bla bla");

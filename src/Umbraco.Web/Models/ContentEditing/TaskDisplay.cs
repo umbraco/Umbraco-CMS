@@ -12,6 +12,10 @@ namespace Umbraco.Web.Models.ContentEditing
     [ReadOnly(true)]
     public class TaskDisplay
     {
+        [DataMember(Name = "id")]
+        [ReadOnly(true)]
+        public int Id { get; set; }
+
         [DataMember(Name = "assignedBy")]
         [ReadOnly(true)]
         public UserDisplay AssignedBy { get; set; }

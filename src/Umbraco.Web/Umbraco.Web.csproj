@@ -346,6 +346,7 @@
     <Compile Include="Models\ContentEditing\BackOfficePreview.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeCollectionDisplay.cs" />
     <Compile Include="Models\ContentEditing\PropertyDisplay.cs" />
+    <Compile Include="Models\ContentEditing\ImportTaskResult.cs" />
     <Compile Include="Models\ContentEditing\TaskXml.cs" />
     <Compile Include="Models\ContentEditing\TaskDisplay.cs" />
     <Compile Include="Models\Mapping\AutoMapperExtensions.cs" />

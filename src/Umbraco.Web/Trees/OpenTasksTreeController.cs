@@ -16,6 +16,8 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class OpenTasksTreeController : TreeController
     {
+        private const string BASE_ROUTE = "/translation/translation";
+
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
@@ -23,19 +25,28 @@ namespace Umbraco.Web.Trees
             foreach (var task in Services.TaskService.GetTasks(assignedUser: Security.CurrentUser.Id))
             {
                 var entity = Services.ContentService.GetById(task.EntityId);
-                
+
                 var node = CreateTreeNode(task.Id.ToString(),
                     id,
                     null,
                     entity.Name,
                     "icon-document-dashed-line",
                     false,
-                    queryStrings.GetValue<string>("application") + queryStrings.GetValue<string>("application").EnsureStartsWith('/') + TreeAlias.EnsureStartsWith('/') + task.Id.ToString().EnsureStartsWith('/'));
+                    BASE_ROUTE + TreeAlias.EnsureStartsWith('/') + task.Id.ToString().EnsureStartsWith('/'));
 
                 nodes.Add(node);
             }
 
             return nodes;
+        }
+
+        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        {
+            var node = base.CreateRootNode(queryStrings);
+
+            node.RoutePath = BASE_ROUTE + "tasks".EnsureStartsWith('/') + "assignee".EnsureStartsWith('/');
+
+            return node;
         }
 
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)

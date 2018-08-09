@@ -12,13 +12,31 @@
     function translationResource($http, umbRequestHelper) {
 
         function closeTask(id) {
-
+            // [SEB] Should be put
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "translationApiBaseUrl",
                         "PostCloseTask", { id: id })),
                 'Failed to close the task');
+        }
+
+        function getAllTaskAssignedToMe() {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "translationApiBaseUrl",
+                        "GetAllTaskAssignedToCurrentUser")),
+                'Failed to get your tasks');
+        }
+
+        function getAllTaskCreatedByMe() {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "translationApiBaseUrl",
+                        "GetAllTaskCreatedByCurrentUser")),
+                'Failed to get your tasks');
         }
 
         function getTaskById(id) {
@@ -41,21 +59,32 @@
                 'Failed to get task XML');
         }
 
-        function submitTask(id, nodeId, filename, content) {
+        function getTasksXml(ids) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "translationApiBaseUrl",
+                        "GetTasksXml", { ids: ids })),
+                'Failed to get tasks XML');
+        }
+
+        function submitTasks(id, nodeId, filename, content) {
             return umbRequestHelper.resourcePromise(
                 $http.put(
                     umbRequestHelper.getApiUrl(
                         "translationApiBaseUrl",
-                        "PutSubmitTask"), { id: id, nodeId: nodeId, filename: filename, content: content }),
+                        "PutSubmitTasks"), { id: id, nodeId: nodeId, filename: filename, content: content }),
                 'Failed to submit the task');
         }
-
 
         var resource = {
             closeTask: closeTask,
             getTaskById: getTaskById,
             getTaskXml: getTaskXml,
-            submitTask: submitTask
+            submitTasks: submitTasks,
+            getAllTaskAssignedToMe: getAllTaskAssignedToMe,
+            getAllTaskCreatedByMe: getAllTaskCreatedByMe,
+            getTasksXml: getTasksXml
         };
 
         return resource;

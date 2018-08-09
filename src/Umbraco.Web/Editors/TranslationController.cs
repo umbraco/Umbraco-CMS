@@ -70,6 +70,30 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// 
         /// </summary>
+        /// <returns></returns>
+        public IEnumerable<TaskDisplay> GetAllTaskAssignedToCurrentUser()
+        {
+            return Services
+                .TaskService
+                .GetTasks(assignedUser: Security.CurrentUser.Id)
+                .Select(t => ConvertTask(t));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<TaskDisplay> GetAllTaskCreatedByCurrentUser()
+        {
+            return Services
+                .TaskService
+                .GetTasks(ownerUser: Security.CurrentUser.Id)
+                .Select(t => ConvertTask(t));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         public TaskDisplay GetTaskById(int id)
@@ -81,34 +105,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized));
             }
 
-            var document = Services.ContentService.GetById(task.EntityId);
-            var assignedBy = Services.UserService.GetUserById(task.OwnerUserId);
-            var assignedTo = Services.UserService.GetUserById(task.AssigneeUserId);
-
-            var t = new TaskDisplay
-            {
-                CreatedDate = task.CreateDate,
-                Closed = task.Closed,
-                AssignedBy = Mapper.Map<IUser, UserDisplay>(assignedBy),
-                AssignedTo = Mapper.Map<IUser, UserDisplay>(assignedTo),
-                Comment = task.Comment,
-                NodeId = document.Id,
-                TotalWords = CountWords(document),
-                Properties = new List<PropertyDisplay>
-                {
-                    new PropertyDisplay { Name = Services.TextService.Localize("nodeName"), Value = document.Name }
-                }
-            };
-
-            foreach (var prop in document.Properties)
-            {
-                if (prop.Value is string asString)
-                {
-                    t.Properties.Add(new PropertyDisplay { Name = prop.Alias, Value = asString });
-                }
-            }
-
-            return t;
+            return ConvertTask(task);
         }
 
         /// <summary>
@@ -119,23 +116,25 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage GetTaskXml(int id)
         {
             var task = Services.TaskService.GetTaskById(id);
-            var document = Services.ContentService.GetById(task.EntityId);
-            // [SEB] Move this in the TaskService
+            var xml = new XDocument(new XElement("tasks", GetTaskXElement(task)));
+
+            var response = Request.CreateResponse(HttpStatusCode.OK);
+            response.Content = new StringContent(xml.ToStringWithPrologue(SaveOptions.None), Encoding.UTF8, "application/json");
+
+            return response;
+        }
+
+        // [SEB] Use that one instead of the one above
+        public HttpResponseMessage GetTasksXml(string ids)
+        {
             var xml = new XDocument(new XElement("tasks"));
 
-            var taskElement = new XElement("task",
-                new XAttribute("Id", id),
-                new XAttribute("Date", task.CreateDate.ToString("o")),
-                new XAttribute("NodeId", task.EntityId),
-                new XAttribute("TotalWords", CountWords(document)));
+            foreach (var id in ids.Split(',').Select(i => int.Parse(i)))
+            {
+                var task = Services.TaskService.GetTaskById(id);
 
-            taskElement.Add(new XElement("Comment", task.Comment));
-            // [SEB] Url to preview
-            taskElement.Add(new XElement("PreviewUrl", "URL to preview"));
-
-            taskElement.Add(document.ToXml(Services.PackagingService, true));
-
-            xml.Root.Add(taskElement);
+                xml.Root.Add(GetTaskXElement(task));
+            }
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             response.Content = new StringContent(xml.ToStringWithPrologue(SaveOptions.None), Encoding.UTF8, "application/json");
@@ -148,55 +147,47 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public HttpResponseMessage PutSubmitTask(TaskFile data)
+        // [SEB] I don't use FileName & Id, remove them?
+        public List<ImportTaskResult> PutSubmitTasks(TaskFile data)
         {
             var match = Regex.Match(data.Content, @"data:(?<type>.+?);base64,(?<data>.+)");
             var base64Data = match.Groups["data"].Value;
             var contentType = match.Groups["type"].Value;
-            int id = 0;
+            var result = new List<ImportTaskResult>();
 
             if (contentType == MediaTypeNames.Text.Xml)
             {
                 var xml = XDocument.Parse(Encoding.UTF8.GetString(Convert.FromBase64String(base64Data)));
 
-                var taskXml = xml.Root.Element("task");
-                var entityXml = taskXml.Elements().FirstOrDefault(e => UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? e.Name.LocalName.InvariantEquals("node") : e.Attribute("isDoc") != null);
+                var tasksXml = xml.Root.Elements("task");
 
-                Task task = Services.TaskService.GetTaskById(int.Parse(taskXml.Attribute("Id").Value));
-
-                if (task != null && task.EntityId == data.NodeId && (task.AssigneeUserId == Security.CurrentUser.Id || task.OwnerUserId == Security.CurrentUser.Id))
+                foreach (var taskXml in tasksXml)
                 {
-                    id = ImportTask(entityXml);
+                    var entityXml = taskXml.Elements().FirstOrDefault(e => UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? e.Name.LocalName.InvariantEquals("node") : e.Attribute("isDoc") != null);
 
-                    // [SEB] Shouldn't we close all the task ?
-                    task.Closed = true;
-                    Services.TaskService.Save(task);
-                }
-                else
-                {
-                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                    Task task = Services.TaskService.GetTaskById(int.Parse(taskXml.Attribute("Id").Value));
+
+                    // [SEB] Use a Nullable Int for EntityId?
+                    if (task != null && (data.NodeId == -1 || task.EntityId == data.NodeId) && (task.AssigneeUserId == Security.CurrentUser.Id || task.OwnerUserId == Security.CurrentUser.Id))
+                    {
+                        result.Add(new ImportTaskResult { TaskId = task.Id, EntityId = ImportTask(entityXml) });
+
+                        // [SEB] Shouldn't we close all the task ?
+                        task.Closed = true;
+                        //Services.TaskService.Save(task);
+                    }
+                    else
+                    {
+                        result.Add(new ImportTaskResult { TaskId = int.Parse(taskXml.Attribute("Id").Value) });
+                    }
                 }
             }
             else
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError);
+                // [SEB] Handle ZIP files
             }
 
-            var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(id.ToString(), Encoding.UTF8, "application/json");
-
-            return response;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        public HttpResponseMessage PutSubmitTasks(List<TaskFile> data)
-        {
-
-            return null;
+            return result;
         }
 
         /// <summary>
@@ -330,6 +321,60 @@ namespace Umbraco.Web.Editors
             }
 
             return document.Id;
+        }
+
+        // [SEB] Use AutoMapper here?
+        private TaskDisplay ConvertTask(Task task)
+        {
+            var document = Services.ContentService.GetById(task.EntityId);
+            var assignedBy = Services.UserService.GetUserById(task.OwnerUserId);
+            var assignedTo = Services.UserService.GetUserById(task.AssigneeUserId);
+
+            var t = new TaskDisplay
+            {
+                Id = task.Id,
+                CreatedDate = task.CreateDate,
+                Closed = task.Closed,
+                AssignedBy = Mapper.Map<IUser, UserDisplay>(assignedBy),
+                AssignedTo = Mapper.Map<IUser, UserDisplay>(assignedTo),
+                Comment = task.Comment,
+                NodeId = document.Id,
+                TotalWords = CountWords(document),
+                Properties = new List<PropertyDisplay>
+                {
+                    new PropertyDisplay { Name = Services.TextService.Localize("nodeName"), Value = document.Name }
+                }
+            };
+
+            foreach (var prop in document.Properties)
+            {
+                if (prop.Value is string asString)
+                {
+                    t.Properties.Add(new PropertyDisplay { Name = prop.Alias, Value = asString });
+                }
+            }
+
+            return t;
+        }
+
+        // [SEB] Move this in the TaskService
+        private XElement GetTaskXElement(Task task)
+        {
+            var document = Services.ContentService.GetById(task.EntityId);
+
+            var taskElement = new XElement("task",
+                new XAttribute("Id", task.Id),
+                new XAttribute("Date", task.CreateDate.ToString("o")),
+                new XAttribute("NodeId", task.EntityId),
+                new XAttribute("TotalWords", CountWords(document)));
+
+            taskElement.Add(new XElement("Comment", task.Comment));
+            // [SEB] Url to preview
+            taskElement.Add(new XElement("PreviewUrl", "URL to preview"));
+
+            taskElement.Add(document.ToXml(Services.PackagingService, true));
+
+            return taskElement;
         }
     }
 }

@@ -16,6 +16,8 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class YourTasksTreeController : TreeController
     {
+        private const string BASE_ROUTE = "/translation/translation";
+
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
@@ -37,6 +39,15 @@ namespace Umbraco.Web.Trees
             }
 
             return nodes;
+        }
+
+        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        {
+            var node = base.CreateRootNode(queryStrings);
+
+            node.RoutePath = BASE_ROUTE + "tasks".EnsureStartsWith('/') + "owned".EnsureStartsWith('/');
+
+            return node;
         }
 
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
