@@ -32,13 +32,13 @@ namespace Umbraco.Core.Logging
         private Logger()
         {
             Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
-
+            
             //Set this environment variable - so that it can be used in external config file
             //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log-{Date}.txt" />
             Environment.SetEnvironmentVariable("BASEDIR", AppDomain.CurrentDomain.BaseDirectory, EnvironmentVariableTarget.Process);
 
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug() //Set to highest level of logging (as any sinks may want to restrict it to Errors only)
+                .MinimumLevel.Verbose() //Set to highest level of logging (as any sinks may want to restrict it to Errors only)
                 .Enrich.WithProcessId()
                 .Enrich.WithProcessName()
                 .Enrich.WithThreadId()
@@ -50,7 +50,7 @@ namespace Umbraco.Core.Logging
                 //Ends with ..txt as Date is inserted before file extension substring
                 .WriteTo.File($@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog.{Environment.MachineName}..txt",
                     rollingInterval: RollingInterval.Day,
-                    restrictedToMinimumLevel: LogEventLevel.Debug,
+                    restrictedToMinimumLevel: LogEventLevel.Verbose,
                     retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Log4NetLevel}  {SourceContext} - {Message:lj}{NewLine}{Exception}")
 
@@ -59,10 +59,11 @@ namespace Umbraco.Core.Logging
                 .WriteTo.File(new CompactJsonFormatter(), $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog.{Environment.MachineName}..json", 
                     rollingInterval: RollingInterval.Day, //Create a new JSON file every day
                     retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
-                    restrictedToMinimumLevel: LogEventLevel.Debug)
+                    restrictedToMinimumLevel: LogEventLevel.Verbose)
 
-                //Read any custom user configuration of logging from serilog config file
-                .ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + @"\config\serilog.config")
+                //A nested logger - where any configured sinks do not effect
+                .WriteTo.Logger(cfg =>
+                    cfg.ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + @"\config\serilog.config"))
                 .CreateLogger();
         }
 
