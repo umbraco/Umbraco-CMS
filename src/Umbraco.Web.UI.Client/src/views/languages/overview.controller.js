@@ -21,7 +21,7 @@
             var labelKeys = [
                 "treeHeaders_languages",
                 "general_mandatory",
-                "general_default",
+                "general_default"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (values) {

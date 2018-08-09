@@ -344,7 +344,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "Import", { file: file })),
                 "Failed to import document type " + file
             );
-        },
+        }
     };
 }
 angular.module('umbraco.resources').factory('contentTypeResource', contentTypeResource);

@@ -443,7 +443,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                     "removeDateMonth",
                     "removeDateDayNumber",
                     "removeDateDay",
-                    "removeDateTime",
+                    "removeDateTime"
                 ], function (i) {
                     return i === propName;
                 });
@@ -519,25 +519,32 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 var allNewProps = this.getAllProps(savedVariant);
 
                 //check for changed properties of the content
-                for (var p in allOrigProps) {
-                    var alias = allOrigProps[p].alias;
+                for (var k = 0; k < allOrigProps.length; k++) {
+
+                    var origProp = allOrigProps[k];
+                    var alias = origProp.alias;
                     var newProp = getNewProp(alias, allNewProps);
-                    if (newProp && !_.isEqual(alias, newProp.value)) {
+                    if (newProp && !_.isEqual(origProp.value, newProp.value)) {
 
                         //they have changed so set the origContent prop to the new one
-                        var origVal = allOrigProps[p].value;
-                        allOrigProps[p].value = newProp.value;
+                        var origVal = origProp.value;
+                        
+                        origProp.value = newProp.value;
 
                         //instead of having a property editor $watch their expression to check if it has
                         // been updated, instead we'll check for the existence of a special method on their model
                         // and just call it.
-                        if (angular.isFunction(allOrigProps[p].onValueChanged)) {
+                        if (angular.isFunction(origProp.onValueChanged)) {
                             //send the newVal + oldVal
-                            allOrigProps[p].onValueChanged(allOrigProps[p].value, origVal);
+                            origProp.onValueChanged(origProp.value, origVal);
                         }
 
-                        changed.push(allOrigProps[p]);
+                        changed.push(origProp);                        
                     }
+
+                }
+                for (var p in allOrigProps) {
+                    
                 }
             }
 
