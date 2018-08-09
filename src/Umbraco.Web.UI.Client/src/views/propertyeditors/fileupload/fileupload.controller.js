@@ -12,7 +12,7 @@
     */
     function fileUploadController($scope) {
         
-        $scope.fileChanged = fileChanged;
+        $scope.fileChanged = onFileChanged;
         //declare a special method which will be called whenever the value has changed from the server
         $scope.model.onValueChanged = onValueChanged;
 
@@ -20,7 +20,7 @@
          * Called when the file selection value changes
          * @param {any} value
          */
-        function fileChanged(value) {
+        function onFileChanged(value) {
             $scope.model.value = value;
 
             //if the value is empty, then tell the server to clear the files

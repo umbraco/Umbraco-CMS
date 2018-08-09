@@ -51,6 +51,19 @@
             vm.fileUploadForm.$setDirty();
         }
 
+        function notifyInit(val, files) {
+            if (!val) {
+                val = null;
+            }
+            if (!files) {
+                files = null;
+            }
+
+            if (vm.onInit) {
+                vm.onInit({ value: val, files: files });
+            }
+        }
+
         /** Called when the component initializes */
         function onInit() {
             $scope.$on("filesSelected", onFilesSelected);
@@ -85,7 +98,7 @@
             if (existingClientFiles.length > 0) {
                 updateModelFromSelectedFiles(existingClientFiles).then(function(newVal) {
                     //notify the callback
-                    vm.onValueChanged({ value: newVal, files: vm.files });
+                    notifyInit(newVal, vm.files);
                 });
             }
             else if (vm.value) {
@@ -101,12 +114,16 @@
                     f.fileSrc = getThumbnail(f);
                     return f;
                 });
+
+                //notify the callback
+                notifyInit();
             }
             else {
                 vm.files = [];
-            }
 
-            //vm.clearFiles = false;
+                //notify the callback
+                notifyInit();
+            }
         }
 
         ///** Method required by the valPropertyValidator directive (returns true if the property editor has at least one file selected) */
@@ -250,8 +267,9 @@
             culture: "@?",
             propertyAlias: "@",
             value: "<",
+            hideSelection: "<",
             onValueChanged: "&",
-            hideSelection: "<"
+            onInit: "&"
         },
         transclude: true,
         controllerAs: 'vm',

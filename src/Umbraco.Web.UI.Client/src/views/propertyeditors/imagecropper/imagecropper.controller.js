@@ -4,7 +4,8 @@ angular.module('umbraco')
 
         var config = angular.copy($scope.model.config);
 
-        $scope.fileChanged = fileChanged;
+        $scope.fileChanged = onFileChanged;
+        $scope.fileUploaderInit = onFileUploaderInit;
         $scope.crop = crop;
         $scope.done = done;
         $scope.clear = clear;
@@ -40,7 +41,7 @@ angular.module('umbraco')
          * Called when the file selection value changes
          * @param {any} value
          */
-        function fileChanged(value, files) {
+        function onFileChanged(value, files) {
             setModelValueWithSrc(value);
 
             if (files && files[0]) {
@@ -50,7 +51,11 @@ angular.module('umbraco')
             }
         }
 
-        function onInit() {
+        /**
+         * Called when the file uploader initializes
+         * @param {any} value
+         */
+        function onFileUploaderInit(value, files) {
             //move previously saved value to the editor
             if ($scope.model.value) {
                 //backwards compat with the old file upload (incase some-one swaps them..)
@@ -74,7 +79,14 @@ angular.module('umbraco')
                     }
                 }
 
-                $scope.imageSrc = $scope.model.value.src;
+                //if there are already files in the client assigned then set the src
+                if (files && files[0]) {
+                    $scope.imageSrc = files[0].fileSrc;
+                }
+                else {
+                    $scope.imageSrc = $scope.model.value.src;
+                }
+                
             }
         }
 
@@ -120,8 +132,6 @@ angular.module('umbraco')
             //set form to dirty to track changes
             $scope.imageCropperForm.$setDirty();
         };
-
-        onInit();
         
         var unsubscribe = $scope.$on("formSubmitting", function () {
             $scope.currentCrop = null;

@@ -383,6 +383,52 @@
                 saveModel.templateAlias = propTemplate ? propTemplate : null;
 
                 return saveModel;
+            },
+
+            /**
+             * This formats the server GET response for a content display item
+             * @param {} displayModel 
+             * @returns {} 
+             */
+            formatContentGetData: function(displayModel) {
+
+                //We need to check for invariant properties among the variant variants.
+                //When we detect this, we want to make sure that the property object instance is the
+                //same reference object between all variants instead of a copy (which it will be when
+                //return from the JSON structure).
+
+                if (displayModel.variants && displayModel.variants.length > 1) {
+
+                    var invariantProperties = [];
+
+                    //collect all invariant properties on the first first variant
+                    var firstVariant = displayModel.variants[0];
+                    _.each(firstVariant.tabs, function(tab, tabIndex) {
+                        _.each(tab.properties, function (property, propIndex) {
+                            //in theory if there's more than 1 variant, that means they would all have a language
+                            //but we'll do our safety checks anyways here
+                            if (firstVariant.language && !property.culture) {
+                                invariantProperties.push({
+                                    tabIndex: tabIndex,
+                                    propIndex: propIndex,
+                                    property: property
+                                });
+                            }
+                        });
+                    });
+                    
+
+                    //now assign this same invariant property instance to the same index of the other variants property array
+                    for (var j = 1; j < displayModel.variants.length; j++) {
+                        var variant = displayModel.variants[j];
+
+                        _.each(invariantProperties, function (invProp) {
+                            variant.tabs[invProp.tabIndex].properties[invProp.propIndex] = invProp.property;
+                        });
+                    }
+                }
+
+                return displayModel;
             }
         };
     }

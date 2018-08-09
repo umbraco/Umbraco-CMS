@@ -332,12 +332,15 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           */
         getById: function (id) {
             return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "contentApiBaseUrl",
-                        "GetById",
-                        { id: id })),
-                'Failed to retrieve data for content id ' + id);
+                    $http.get(
+                        umbRequestHelper.getApiUrl(
+                            "contentApiBaseUrl",
+                            "GetById",
+                            { id: id })),
+                    'Failed to retrieve data for content id ' + id)
+                .then(function(result) {
+                    return $q.when(umbDataFormatter.formatContentGetData(result));
+                });
         },
 
         getBlueprintById: function (id) {

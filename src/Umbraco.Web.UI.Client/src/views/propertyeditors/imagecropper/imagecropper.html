@@ -7,6 +7,7 @@
                                   property-alias="{{model.alias}}"
                                   value="model.value.src"
                                   on-value-changed="fileChanged(value, files)"
+                                  on-init="fileUploaderInit(value, files)"
                                   hide-selection="true">
 
             <div class="imagecropper clearfix">
