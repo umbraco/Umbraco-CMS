@@ -17,8 +17,8 @@
     'lib/ng-file-upload/ng-file-upload.min.js',
     'lib/angular-local-storage/angular-local-storage.min.js',
 
-    'lib/angular-hammer/hammer.min.js',
-    'lib/angular-hammer/angular.hammer.min.js', 
+    'lib/hammerjs/hammer.js',
+    'lib/angular-hammer/angular-hammer.js', 
 
     //"lib/ace-builds/src-min-noconflict/ace.js",
 
