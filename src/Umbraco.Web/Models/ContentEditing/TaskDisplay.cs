@@ -10,7 +10,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// </summary>
     [DataContract(Name = "task", Namespace = "")]
     [ReadOnly(true)]
-    public class TaskDisplay : UserBasic
+    public class TaskDisplay
     {
         [DataMember(Name = "assignedBy")]
         [ReadOnly(true)]
@@ -31,7 +31,11 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "comment")]
         [ReadOnly(true)]
         public string Comment { get; set; }
-        
+
+        [DataMember(Name = "nodeId")]
+        [ReadOnly(true)]
+        public int NodeId{ get; set; }
+
         [DataMember(Name = "totalWords")]
         [ReadOnly(true)]
         public int TotalWords{ get; set; }

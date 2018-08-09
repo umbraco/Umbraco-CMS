@@ -41,11 +41,21 @@
                 'Failed to get task XML');
         }
 
+        function submitTask(id, nodeId, filename, content) {
+            return umbRequestHelper.resourcePromise(
+                $http.put(
+                    umbRequestHelper.getApiUrl(
+                        "translationApiBaseUrl",
+                        "PutSubmitTask"), { id: id, nodeId: nodeId, filename: filename, content: content }),
+                'Failed to submit the task');
+        }
+
 
         var resource = {
             closeTask: closeTask,
             getTaskById: getTaskById,
-            getTaskXml: getTaskXml
+            getTaskXml: getTaskXml,
+            submitTask: submitTask
         };
 
         return resource;

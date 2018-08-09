@@ -346,6 +346,7 @@
     <Compile Include="Models\ContentEditing\BackOfficePreview.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeCollectionDisplay.cs" />
     <Compile Include="Models\ContentEditing\PropertyDisplay.cs" />
+    <Compile Include="Models\ContentEditing\TaskXml.cs" />
     <Compile Include="Models\ContentEditing\TaskDisplay.cs" />
     <Compile Include="Models\Mapping\AutoMapperExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
@@ -1920,8 +1921,12 @@
     <Content Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\translation\default.aspx" />
-    <Content Include="umbraco.presentation\umbraco\translation\preview.aspx" />
+    <Content Include="umbraco.presentation\umbraco\translation\default.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
+    <Content Include="umbraco.presentation\umbraco\translation\preview.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\translation\xml.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

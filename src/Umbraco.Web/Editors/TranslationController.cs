@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
+using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Http;
 using System.Xml.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
@@ -15,6 +18,8 @@ using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
 
 using Constants = Umbraco.Core.Constants;
+using Umbraco.Core.Logging;
+using System.Net.Mime;
 
 namespace Umbraco.Web.Editors
 {
@@ -45,6 +50,7 @@ namespace Umbraco.Web.Editors
         {
         }
 
+        // [SEB] Rename in PUT
         public HttpResponseMessage PostCloseTask(int id)
         {
             var task = Services.TaskService.GetTaskById(id);
@@ -86,6 +92,7 @@ namespace Umbraco.Web.Editors
                 AssignedBy = Mapper.Map<IUser, UserDisplay>(assignedBy),
                 AssignedTo = Mapper.Map<IUser, UserDisplay>(assignedTo),
                 Comment = task.Comment,
+                NodeId = document.Id,
                 TotalWords = CountWords(document),
                 Properties = new List<PropertyDisplay>
                 {
@@ -129,13 +136,74 @@ namespace Umbraco.Web.Editors
             taskElement.Add(document.ToXml(Services.PackagingService, true));
 
             xml.Root.Add(taskElement);
-            
+
             var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(xml.ToStringWithPrologue(SaveOptions.DisableFormatting), Encoding.UTF8, "application/json");
+            response.Content = new StringContent(xml.ToStringWithPrologue(SaveOptions.None), Encoding.UTF8, "application/json");
 
             return response;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PutSubmitTask(TaskFile data)
+        {
+            var match = Regex.Match(data.Content, @"data:(?<type>.+?);base64,(?<data>.+)");
+            var base64Data = match.Groups["data"].Value;
+            var contentType = match.Groups["type"].Value;
+            int id = 0;
+
+            if (contentType == MediaTypeNames.Text.Xml)
+            {
+                var xml = XDocument.Parse(Encoding.UTF8.GetString(Convert.FromBase64String(base64Data)));
+
+                var taskXml = xml.Root.Element("task");
+                var entityXml = taskXml.Elements().FirstOrDefault(e => UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? e.Name.LocalName.InvariantEquals("node") : e.Attribute("isDoc") != null);
+
+                Task task = Services.TaskService.GetTaskById(int.Parse(taskXml.Attribute("Id").Value));
+
+                if (task != null && task.EntityId == data.NodeId && (task.AssigneeUserId == Security.CurrentUser.Id || task.OwnerUserId == Security.CurrentUser.Id))
+                {
+                    id = ImportTask(entityXml);
+
+                    // [SEB] Shouldn't we close all the task ?
+                    task.Closed = true;
+                    Services.TaskService.Save(task);
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
+                }
+            }
+            else
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError);
+            }
+
+            var response = Request.CreateResponse(HttpStatusCode.OK);
+            response.Content = new StringContent(id.ToString(), Encoding.UTF8, "application/json");
+
+            return response;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PutSubmitTasks(List<TaskFile> data)
+        {
+
+            return null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
         private int CountWords(IContent document)
         {
             int words = CountWordsInString(document.Name);
@@ -156,6 +224,11 @@ namespace Umbraco.Web.Editors
             return words;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Text"></param>
+        /// <returns></returns>
         private int CountWordsInString(string Text)
         {
             string pattern = @"<(.|\n)*?>";
@@ -170,5 +243,93 @@ namespace Umbraco.Web.Editors
             return collection.Count;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="creator"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        private int ImportTask(XElement source, IUser creator = null)
+        {
+            // [SEB][ASK] Put that in the ContentService ?
+            creator = creator ?? Security.CurrentUser;
+
+            bool isLegacy = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema;
+            int id = int.Parse(source.Attribute("id").Value);
+
+            var document = Services.ContentService.GetById(id);
+
+            if (document == null || document.ParentId != int.Parse(source.Attribute("parentID").Value))
+            {
+                string nodeTypeAlias = isLegacy ? source.Attribute("nodeTypeAlias").Value : source.Name.LocalName;
+
+                Services.ContentService.CreateContent(
+                    source.Attribute("nodeName").Value,
+                    int.Parse(source.Attribute("parentID").Value),
+                    nodeTypeAlias,
+                    Security.CurrentUser.Id);
+            }
+            else
+            {
+                document.Name = source.Attribute("nodeName").Value;
+            }
+
+            document.CreateDate = DateTime.Parse(source.Attribute("createDate").Value);
+
+            var properties = source.Elements().Where(e => isLegacy ? e.Name.LocalName.InvariantEquals("data") : e.Attribute("isDoc") == null);
+
+            foreach (var propertyXml in properties)
+            {
+                var alias = isLegacy ? propertyXml.Attribute("alias").Value : propertyXml.Name.LocalName;
+                var property = document.Properties[alias];
+                var value = XmlHelper.GetNodeValue(propertyXml);
+
+                if (property != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(value))
+                    {
+                        var prevals = Services.DataTypeService.GetPreValuesCollectionByDataTypeId(property.PropertyType.DataTypeDefinitionId);
+
+                        if (prevals != null && prevals.PreValuesAsDictionary.Count != 0)
+                        {
+                            var list = new List<string>(value.Split(','));
+
+                            foreach (var preval in prevals.PreValuesAsDictionary)
+                            {
+                                string pval = preval.Value.Value;
+                                string pid = preval.Value.Id.ToString();
+
+                                if (list.Contains(pval))
+                                {
+                                    list[list.IndexOf(pval)] = pid;
+                                }
+                            }
+
+                            property.Value = string.Join(",", list);
+                        }
+                        else
+                        {
+                            property.Value = value;
+                        }
+                    }
+                }
+                else
+                {
+                    LogHelper.Warn<IContent>(string.Format("Couldn't import property '{0}' as the property type doesn't exist on this document type", alias));
+                }
+            }
+
+            Services.ContentService.Save(document);
+
+            // [SEB][ASK] is that really necessary as it seems that task are not nested? Legacy ?
+            var subTasks = source.Elements().Where(e => isLegacy ? e.Name.LocalName.InvariantEquals("node") : e.Attribute("isDoc") != null);
+
+            foreach (var subTask in subTasks)
+            {
+                ImportTask(subTask, creator);
+            }
+
+            return document.Id;
+        }
     }
 }

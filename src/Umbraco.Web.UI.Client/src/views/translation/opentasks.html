@@ -63,16 +63,31 @@
                         </div>
                         <div class="flx-i">
                             <umb-control-group label="@translation_uploadTranslationXml">
-                                <umb-button type="button" button-style="primary" label-key="general_upload">Upload</umb-button>
+                                <span ngf-select
+                                      ngf-change="handleUploadedFile($files, $event)"
+                                      ngf-multiple="false">
+                                    <umb-button type="button"
+                                                button-style="primary"
+                                                state="uploadButtonState"
+                                                label-key="general_upload">Upload</umb-button>
+                                </span>
                             </umb-control-group>
                         </div>
-                        <div class="flx-i" style="margin-left:50px;" ng-if="task.closed === false">
+                        <div class="flx-i" style="margin-left:50px;" ng-if="task.closed === false && previewId === null">
                             <umb-control-group label="@translation_closeTask">
                                 <umb-button type="button"
                                             action="close()"
                                             state="closeButtonState"
                                             button-style="danger"
                                             label-key="general_close">Close</umb-button>
+                            </umb-control-group>
+                        </div>
+                        <div class="flx-i" style="margin-left:50px;" ng-if="previewId !== null">
+                            <umb-control-group label="@general_preview">
+                                <umb-button type="button"
+                                            action="preview()"
+                                            button-style="primary"
+                                            label-key="general_preview">Preview</umb-button>
                             </umb-control-group>
                         </div>
                     </div>

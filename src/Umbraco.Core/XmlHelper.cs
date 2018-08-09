@@ -489,6 +489,16 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Gets the value of a XElement
+        /// </summary>
+        /// <param name="e">he XElement.</param>
+        /// <returns>the value as a string</returns>
+        public static string GetNodeValue(XElement e)
+        {
+            return GetNodeValue(e.GetXmlNode());
+        }
+
+        /// <summary>
         /// Determines whether the specified string appears to be XML.
         /// </summary>
         /// <param name="xml">The XML string.</param>
