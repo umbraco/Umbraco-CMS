@@ -204,7 +204,7 @@ Use this directive to construct a header inside the main editor window.
 (function () {
     'use strict';
 
-    function EditorHeaderDirective(iconHelper, editorService) {
+    function EditorHeaderDirective(iconHelper, editorService, $location, $routeParams) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -226,7 +226,7 @@ Use this directive to construct a header inside the main editor window.
 
             scope.goBack = function () {
                 if (scope.onBack) {
-                    scope.onBack();
+                    $location.path('/' + $routeParams.section + '/' + $routeParams.tree + '/' + $routeParams.method + '/' + scope.menu.currentNode.parentId);
                 }
             };
 

@@ -57,7 +57,7 @@
           },
           stop: function(e, ui) {
             updateTabsSortOrder();
-          },
+          }
         };
 
         scope.sortableOptionsProperty = {

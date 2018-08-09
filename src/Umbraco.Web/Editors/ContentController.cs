@@ -24,6 +24,7 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.Validation;
+using Umbraco.Web.Composing;
 using Umbraco.Web.Models;
 using Umbraco.Web.WebServices;
 using Umbraco.Web._Legacy.Actions;
@@ -32,6 +33,7 @@ using Language = Umbraco.Web.Models.ContentEditing.Language;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
+
 
 namespace Umbraco.Web.Editors
 {
@@ -396,7 +398,7 @@ namespace Umbraco.Web.Editors
         {
             var url = Umbraco.Url(id);
             var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(url, Encoding.UTF8, "application/json");
+            response.Content = new StringContent(url, Encoding.UTF8, "text/plain");
             return response;
         }
 
@@ -409,7 +411,7 @@ namespace Umbraco.Web.Editors
         {
             var url = Umbraco.UrlProvider.GetUrl(id);
             var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(url, Encoding.UTF8, "application/json");
+            response.Content = new StringContent(url, Encoding.UTF8, "text/plain");
             return response;
         }
 
@@ -983,6 +985,12 @@ namespace Umbraco.Web.Editors
                     Logger.Warn<ContentController>("Content sorting failed, this was probably caused by an event being cancelled");
                     return Request.CreateValidationErrorResponse("Content sorting failed, this was probably caused by an event being cancelled");
                 }
+
+                if (sorted.ParentId > 0)
+                {
+                    Services.NotificationService.SendNotification(contentService.GetById(sorted.ParentId), ActionSort.Instance, UmbracoContext, Services.TextService, GlobalSettings);
+                }
+
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -1005,7 +1013,7 @@ namespace Umbraco.Web.Editors
             Services.ContentService.Move(toMove, move.ParentId, Security.GetUserId().ResultOr(0));
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
+            response.Content = new StringContent(toMove.Path, Encoding.UTF8, "text/plain");
             return response;
         }
 
@@ -1022,7 +1030,7 @@ namespace Umbraco.Web.Editors
             var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal, copy.Recursive, Security.GetUserId().ResultOr(0));
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(c.Path, Encoding.UTF8, "application/json");
+            response.Content = new StringContent(c.Path, Encoding.UTF8, "text/plain");
             return response;
         }
 
@@ -1496,5 +1504,40 @@ namespace Umbraco.Web.Editors
             var display = Mapper.Map<ContentItemDisplay>(content);
             return display;
         }
+		
+        [EnsureUserPermissionForContent("contentId", 'R')]
+        public IEnumerable<NotifySetting> GetNotificationOptions(int contentId)
+        {
+            var notifications = new List<NotifySetting>();
+            if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            var content = Services.ContentService.GetById(contentId);
+            if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            var userNotifications = Services.NotificationService.GetUserNotifications(Security.CurrentUser, content.Path).ToList();
+
+            foreach (var a in Current.Actions.Where(x => x.ShowInNotifier))
+            {
+                var n = new NotifySetting
+                {
+                    Name = Services.TextService.Localize("actions", a.Alias),
+                    Checked = userNotifications.FirstOrDefault(x=> x.Action == a.Letter.ToString()) != null,
+                    NotifyCode = a.Letter.ToString()
+                };
+                notifications.Add(n);
+            }
+
+            return notifications;
+        }
+
+        public void PostNotificationOptions(int contentId, [FromUri] string[] notifyOptions)
+        {
+            if (contentId <= 0) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            var content = Services.ContentService.GetById(contentId);
+            if (content == null) throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+
+            Services.NotificationService.SetNotifications(Security.CurrentUser, content, notifyOptions);
+        }
+
     }
 }

@@ -157,7 +157,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
+                    }, { responseType: 'text' }),
                 'Failed to move content');
         },
 
@@ -198,7 +198,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("contentApiBaseUrl", "PostCopy"),
-                    args),
+                    args, { responseType: 'text' }),
                 'Failed to copy content');
         },
 
@@ -350,6 +350,29 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to retrieve data for content id ' + id);
         },
 
+        getNotifySettingsById: function (id) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetNotificationOptions",
+                        [{ contentId: id }])),
+                'Failed to retrieve data for content id ' + id);
+        },
+
+        setNotifySettingsById: function (id, options) {
+            if (!id) {
+                throw "contentId cannot be null";
+            }
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "PostNotificationOptions",
+                        { contentId: id, notifyOptions: options })),
+                'Failed to set notify settings for content id ' + id);
+        },
+
         /**
           * @ngdoc method
           * @name umbraco.resources.contentResource#getByIds
@@ -467,7 +490,8 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
-                        "GetNiceUrl", [{ id: id }])),
+                        "GetNiceUrl", { id: id }),
+                    { responseType: 'text' }),
                 'Failed to retrieve url for id:' + id);
         },
 

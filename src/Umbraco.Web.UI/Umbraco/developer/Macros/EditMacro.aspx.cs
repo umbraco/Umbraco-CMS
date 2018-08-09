@@ -217,11 +217,11 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Macros
             Parameters = TabView1.NewTabPage("Parameters");
             Parameters.Controls.Add(Panel2);
 
-            var save = TabView1.Menu.NewButton();
-            save.ButtonType = MenuButtonType.Primary;
-            save.Text = Services.TextService.Localize("save");
-            save.ID = "save";
-            save.Click += Save_Click;
+            //var save = TabView1.Menu.NewButton();
+            //save.ButtonType = MenuButtonType.Primary;
+            //save.Text = Services.TextService.Localize("save");
+            //save.ID = "save";
+            //save.Click += Save_Click;
         }
 
         void Save_Click(object sender, EventArgs e)

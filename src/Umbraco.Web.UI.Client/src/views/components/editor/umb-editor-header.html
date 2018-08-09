@@ -60,12 +60,15 @@
                     </span>
 
                     <umb-dropdown ng-if="vm.dropdownOpen" style="width: 100%; max-height: 250px; overflow-y: scroll; margin-top: 5px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
-                        <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.current}" ng-repeat="variant in variants">
+                        <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.active}" ng-repeat="variant in variants">
                             <a href="" class="umb-variant-switcher__name-wrapper" ng-click="selectVariant($event, variant)" prevent-default>
                                 <span class="umb-variant-switcher__name">{{variant.language.name}}</span>
-                                <span class="umb-variant-switcher__state" ng-if="variant.isEdited && variant.state === 'Published'"><localize key="content_publishedPendingChanges"></localize></span>
-                                <span class="umb-variant-switcher__state" ng-if="variant.isEdited && variant.state === 'Unpublished'"><localize key="content_unpublishedPendingChanges"></localize></span>
-                                <span class="umb-variant-switcher__state" ng-if="variant.isEdited === false">{{variant.state}}</span>
+                                <span ng-switch="variant.state">
+                                    <span class="umb-variant-switcher__state" ng-switch-when="NotCreated"><localize key="content_notCreated"></localize></span>
+                                    <span class="umb-variant-switcher__state" ng-switch-when="Draft"><localize key="content_unpublished"></localize></span>
+                                    <span class="umb-variant-switcher__state" ng-switch-when="PublishedPendingChanges"><localize key="content_publishedPendingChanges"></localize></span>
+                                    <span class="umb-variant-switcher__state" ng-switch-when="Published"><localize key="content_published"></localize></span>
+                                </span>
                             </a>
                                                         
                             <div ng-if="splitViewOpen !== true" class="umb-variant-switcher__split-view" ng-click="openInSplitView($event, variant)">Open in split view</div>

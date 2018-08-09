@@ -76,7 +76,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
                "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
                "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
                "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
-               "canUnpublish": _.contains(currentUserPermissions, 'U'), //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
+               "canUnpublish": _.contains(currentUserPermissions, 'U') //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
            };
        }
    }

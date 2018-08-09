@@ -71,7 +71,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Exists, opt => opt.Ignore())
                 .ForMember(dest => dest.Segment, opt => opt.Ignore())
                 .ForMember(dest => dest.Language, opt => opt.Ignore())
-                .ForMember(dest => dest.IsEdited, opt => opt.Ignore())
+                .ForMember(dest => dest.State, opt => opt.Ignore())
                 .ForMember(dest => dest.Tabs, opt => opt.ResolveUsing(tabsAndPropertiesResolver));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>

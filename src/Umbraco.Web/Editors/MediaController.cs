@@ -422,7 +422,7 @@ namespace Umbraco.Web.Editors
             Services.MediaService.Move(toMove, move.ParentId);
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
-            response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
+            response.Content = new StringContent(toMove.Path, Encoding.UTF8, "text/plain");
             return response;
         }
 

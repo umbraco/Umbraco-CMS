@@ -38,11 +38,7 @@ namespace Umbraco.Web.Models.Mapping
 
         public IEnumerable<ContentApp> Resolve(IContent source, ContentItemDisplay destination, IEnumerable<ContentApp> destMember, ResolutionContext context)
         {
-            var apps = new List<ContentApp>
-            {
-                 _contentApp,
-                _infoApp
-            };
+            var apps = new List<ContentApp>();
 
             if (source.ContentType.IsContainer)
             {
@@ -50,8 +46,11 @@ namespace Umbraco.Web.Models.Mapping
                 apps.AppendListViewApp(_dataTypeService, _propertyEditorCollection, source.ContentType.Alias, "content");
             }
 
+            apps.Add(_contentApp);
+            apps.Add(_infoApp);
+            
             return apps;
         }
-    }
+}
     
 }

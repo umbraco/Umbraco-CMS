@@ -1,7 +1,4 @@
-﻿using System;
-using Umbraco.Web.UI.Pages;
-
-namespace Umbraco.Web._Legacy.Actions
+﻿namespace Umbraco.Web._Legacy.Actions
 {
     /// <summary>
     /// This action is invoked when importing a document type
@@ -32,7 +29,7 @@ namespace Umbraco.Web._Legacy.Actions
         {
             get
             {
-                return string.Format("{0}.actionImport()", ClientTools.Scripts.GetAppActions);
+                return "";
             }
         }
 

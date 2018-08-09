@@ -42,7 +42,8 @@
             // * it's editor is in a $dirty state
             // * it has pending saves
             // * it is unpublished
-            return (variant.active || variant.isDirty || variant.isEdited === true || (variant.isEdited === false && variant.state === "Unpublished"));
+            // * it is in NotCreated state
+            return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges" || variant.state === "NotCreated");
         }
 
         function pristineVariantFilter(variant) {
@@ -73,14 +74,17 @@
             if (vm.variants.length !== 0) {
                 //now sort it so that the current one is at the top
                 vm.variants = _.sortBy(vm.variants, function (v) {
-                    return v.current ? 0 : 1;
+                    return v.active ? 0 : 1;
                 });
 
                 var active = _.find(vm.variants, function (v) {
                     return v.active;
                 });
-                //ensure that the current one is selected
-                active.publish = true;
+
+                if (active) {
+                    //ensure that the current one is selected
+                    active.publish = true;
+                }
 
             } else {
                 //disable Publish button if we have nothing to publish

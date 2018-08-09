@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
+using Newtonsoft.Json.Converters;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-
     /// <summary>
     /// Represents the variant info for a content item
     /// </summary>
@@ -66,16 +66,14 @@ namespace Umbraco.Web.Models.ContentEditing
         public string Segment { get; set; }
 
         [DataMember(Name = "state")]
-        public string PublishedState { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ContentSavedState State { get; set; }
 
         [DataMember(Name = "updateDate")]
         public DateTime UpdateDate { get; set; }
 
         [DataMember(Name = "createDate")]
         public DateTime CreateDate { get; set; }
-
-        //[DataMember(Name = "published")]
-        //public bool Published { get; set; }
 
         [DataMember(Name = "publishDate")]
         public DateTime? PublishDate { get; set; }
@@ -85,9 +83,6 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "exists")]
         public bool Exists { get; set; }
-
-        [DataMember(Name = "isEdited")]
-        public bool IsEdited { get; set; }
 
         ///// <summary>
         ///// Determines if this is the variant currently being edited

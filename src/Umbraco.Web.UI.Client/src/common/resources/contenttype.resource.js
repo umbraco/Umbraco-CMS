@@ -266,7 +266,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
+                    }, { responseType: 'text' }),
                 'Failed to move content');
         },
 
@@ -286,7 +286,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
+                    }, { responseType: 'text' }),
                 'Failed to copy content');
         },
 
@@ -333,7 +333,18 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                     notificationsService.error(value);
                 });
             });
-        }
+        },
+
+        import: function (file) {
+            if (!file) {
+                throw "file cannot be null";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "Import", { file: file })),
+                "Failed to import document type " + file
+            );
+        },
     };
 }
 angular.module('umbraco.resources').factory('contentTypeResource', contentTypeResource);

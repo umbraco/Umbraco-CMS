@@ -602,7 +602,7 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
 
                     //These will show up on the dialog controller's $scope under dialogOptions
                     currentNode: args.node,
-                    currentAction: args.action,
+                    currentAction: args.action
                 });
 
             //save the currently assigned dialog so it can be removed before a new one is created
@@ -623,7 +623,7 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
             setMode("default");
 
             if(showMenu){
-                this.showMenu(undefined, { skipDefault: true, node: appState.getMenuState("currentNode") });
+                this.showMenu({ skipDefault: true, node: appState.getMenuState("currentNode") });
             }
         },
         /**
