@@ -28,7 +28,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                 label: preVals[i].label,
                 view: preVals[i].view,
                 value: preVals[i].value,
-                config: preVals[i].config,
+                config: preVals[i].config
             });
         }
     }

@@ -58,7 +58,7 @@
                 sort: {
                     property: {
                         alias: "",
-                        name: "",
+                        name: ""
                     },
                     direction: "ascending", //This is the value for sorting sent to server
                     translation: {

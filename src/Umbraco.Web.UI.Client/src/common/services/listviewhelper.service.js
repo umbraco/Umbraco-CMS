@@ -506,7 +506,7 @@
                 canDelete: _.contains(intersectPermissions, 'D'), //Magic Char = D
                 canMove: _.contains(intersectPermissions, 'M'), //Magic Char = M
                 canPublish: _.contains(intersectPermissions, 'U'), //Magic Char = U
-                canUnpublish: _.contains(intersectPermissions, 'U'), //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
+                canUnpublish: _.contains(intersectPermissions, 'U') //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
             };
         }
 
