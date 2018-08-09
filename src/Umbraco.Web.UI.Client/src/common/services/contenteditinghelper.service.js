@@ -443,7 +443,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                     "removeDateMonth",
                     "removeDateDayNumber",
                     "removeDateDay",
-                    "removeDateTime",
+                    "removeDateTime"
                 ], function (i) {
                     return i === propName;
                 });

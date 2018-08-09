@@ -143,7 +143,7 @@
             templateUrl: 'views/propertyeditors/fileupload/fileupload.directive.html',
             controller: 'Umbraco.PropertyEditors.FileUploadController',
             scope: {
-                model: "=",
+                model: "="
             },
             link: function (scope, element, attrs, ctrl) {
 
