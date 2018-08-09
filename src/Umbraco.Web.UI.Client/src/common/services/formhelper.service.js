@@ -159,10 +159,18 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
 
                 //Check if this is for content properties - specific to content/media/member editors because those are special 
                 // user defined properties with custom controls.
-                if (parts.length > 2 && parts[0] === "_Properties") {
+                if (parts.length > 1 && parts[0] === "_Properties") {
 
                     var propertyAlias = parts[1];
-                    var culture = parts[2];
+
+                    var culture = null;
+                    if (parts.length > 2) {
+                        culture = parts[2];
+                        //special check in case the string is formatted this way
+                        if (culture === "null") {
+                            culture = null;
+                        }
+                    }
 
                     //if it contains 3 '.' then we will wire it up to a property's html field
                     if (parts.length > 3) {

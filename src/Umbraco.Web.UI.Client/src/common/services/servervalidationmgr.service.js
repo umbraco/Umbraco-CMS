@@ -140,8 +140,9 @@ function serverValidationManager($timeout) {
                 }
             }
             else if (propertyAlias !== undefined) {
+                //normalize culture to null
                 if (!culture) {
-                    culture = null; // if empty or null, always make null
+                    culture = null;
                 }
                 //don't add it if it already exists
                 var exists2 = _.find(callbacks, function (item) {
@@ -165,8 +166,9 @@ function serverValidationManager($timeout) {
             }
             else if (propertyAlias !== undefined) {
 
+                //normalize culture to null
                 if (!culture) {
-                    culture = null; // if empty or null, always make null
+                    culture = null;
                 }
 
                 //remove all callbacks for the content property
@@ -192,8 +194,9 @@ function serverValidationManager($timeout) {
          */
         getPropertyCallbacks: function (propertyAlias, culture, fieldName) {
 
+            //normalize culture to null
             if (!culture) {
-                culture = null; // if empty or null, always make null
+                culture = null;
             }
 
             var found = _.filter(callbacks, function (item) {
@@ -268,8 +271,9 @@ function serverValidationManager($timeout) {
                 return;
             }
 
+            //normalize culture to null
             if (!culture) {
-                culture = null; // if empty or null, always make null
+                culture = null;
             }
 
             //only add the item if it doesn't exist                
@@ -306,6 +310,12 @@ function serverValidationManager($timeout) {
             if (!propertyAlias) {
                 return;
             }
+
+            //normalize culture to null
+            if (!culture) {
+                culture = null;
+            }
+
             //remove the item
             this.items = _.reject(this.items, function (item) {
                 return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
@@ -354,6 +364,12 @@ function serverValidationManager($timeout) {
          * Gets the error message for the content property
          */
         getPropertyError: function (propertyAlias, culture, fieldName) {
+
+            //normalize culture to null
+            if (!culture) {
+                culture = null;
+            }
+
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
                 return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
@@ -388,6 +404,12 @@ function serverValidationManager($timeout) {
          * Checks if the content property + culture + field name combo has an error
          */
         hasPropertyError: function (propertyAlias, culture, fieldName) {
+
+            //normalize culture to null
+            if (!culture) {
+                culture = null;
+            }
+
             var err = _.find(this.items, function (item) {
                 //return true if the property alias matches and if an empty field name is specified or the field name matches
                 return (item.propertyAlias === propertyAlias && item.culture === culture && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));

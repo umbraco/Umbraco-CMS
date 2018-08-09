@@ -123,7 +123,8 @@ describe('contentEditingHelper tests', function () {
             var allProps = contentEditingHelper.getAllProps(content);
 
             //act
-            formHelper.handleServerValidation({ "_Properties.bodyText.value": ["Required"] });
+            //note the null, that's because culture is null
+            formHelper.handleServerValidation({ "_Properties.bodyText.null.value": ["Required"] });
 
             //assert
             expect(serverValidationManager.items.length).toBe(1);
@@ -143,7 +144,8 @@ describe('contentEditingHelper tests', function () {
                 {
                     "Name": ["Required"],
                     "UpdateDate": ["Invalid date"],
-                    "_Properties.bodyText.value": ["Required field"],
+                    //note the null, that's because culture is null
+                    "_Properties.bodyText.null.value": ["Required field"],
                     "_Properties.textarea": ["Invalid format"]
                 });
 
@@ -226,6 +228,7 @@ describe('contentEditingHelper tests', function () {
             //act
             var changed = contentEditingHelper.reBindChangedProperties(origContent, newContent);
 
+            
             //assert
             expect(changed.length).toBe(2);
             expect(changed[0].alias).toBe("grid");
