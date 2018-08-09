@@ -279,6 +279,9 @@
       <DependentUpon>HealthChecks.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Config\serilog.user.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Config\serilog.config">
       <SubType>Designer</SubType>
     </Content>

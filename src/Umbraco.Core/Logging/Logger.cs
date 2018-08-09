@@ -7,6 +7,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Diagnostics;
 using Serilog;
 using Serilog.Events;
+using Serilog.Filters;
 using Serilog.Formatting.Compact;
 using Umbraco.Core.Logging.SerilogExtensions;
 
@@ -34,9 +35,9 @@ namespace Umbraco.Core.Logging
             Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
             
             //Set this environment variable - so that it can be used in external config file
-            //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log-{Date}.txt" />
+            //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log.txt" />
             Environment.SetEnvironmentVariable("BASEDIR", AppDomain.CurrentDomain.BaseDirectory, EnvironmentVariableTarget.Process);
-
+            
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose() //Set to highest level of logging (as any sinks may want to restrict it to Errors only)
                 .Enrich.WithProcessId()
@@ -61,9 +62,12 @@ namespace Umbraco.Core.Logging
                     retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
                     restrictedToMinimumLevel: LogEventLevel.Verbose)
 
-                //A nested logger - where any configured sinks do not effect
+                //Read from main serilog.config file
+                .ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + @"\config\serilog.config")
+
+                //A nested logger - where any user configured sinks via config can not effect the main 'umbraco' logger above
                 .WriteTo.Logger(cfg =>
-                    cfg.ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + @"\config\serilog.config"))
+                    cfg.ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + @"\config\serilog.user.config"))
                 .CreateLogger();
         }
 
