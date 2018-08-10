@@ -9,8 +9,25 @@ angular.module('umbraco')
         $scope.crop = crop;
         $scope.done = done;
         $scope.clear = clear;
+        $scope.focalPointChanged = focalPointChanged;
         //declare a special method which will be called whenever the value has changed from the server
         $scope.model.onValueChanged = onValueChanged;
+
+        /**
+         * Called when the umgImageGravity component updates the focal point value
+         * @param {any} left
+         * @param {any} top
+         */
+        function focalPointChanged(left, top) {
+            //update the model focalpoint value
+            $scope.model.value.focalPoint = {
+                left: left,
+                top: top
+            };
+
+            //set form to dirty to track changes
+            $scope.imageCropperForm.$setDirty();
+        }
 
         /**
          * Used to assign a new model value

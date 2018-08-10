@@ -35,8 +35,10 @@
                 </div>
 
                 <div ng-if="!currentCrop" class="umb-cropper-imageholder clearfix">
+                    <pre><code>{{model.value.focalPoint | json}}</code></pre>
                     <umb-image-gravity src="imageSrc"
-                                       center="model.value.focalPoint">
+                                       center="model.value.focalPoint"
+                                       on-value-changed="focalPointChanged(left, top)">
                     </umb-image-gravity>
                     <a href class="btn btn-link btn-crop-delete" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
                 </div>

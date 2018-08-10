@@ -570,7 +570,7 @@ ul.color-picker li {
     .imagecropper .umb-cropper__container {
         position: relative;
         margin-bottom: 10px;
-        max-width: 100%;
+        max-width: 100%; 
         border: 1px solid @gray-10;
 
         @media (min-width: 769px) {
@@ -583,7 +583,7 @@ ul.color-picker li {
         top: 3px;
         right: 3px;
         cursor: pointer;
-        z-index: 1;
+        z-index: @zindexCropperOverlay + 1;
     }
 
     .umb-close-cropper:hover {

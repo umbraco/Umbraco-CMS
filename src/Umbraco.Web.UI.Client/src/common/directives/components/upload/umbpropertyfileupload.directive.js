@@ -276,7 +276,7 @@
         controller: umbPropertyFileUploadController
     };
 
-    angular.module("umbraco")
+    angular.module("umbraco.directives")
         .component('umbPropertyFileUpload', umbPropertyFileUploadComponent);
 
 })();

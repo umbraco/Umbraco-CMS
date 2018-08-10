@@ -32,6 +32,9 @@
             "rightIsOpen": false
         };
 
+        $scope.initVariant = initVariant;
+        $scope.splitViewChanged = splitViewChanged;
+
         function init(content) {
 
             if (infiniteMode) {
@@ -59,6 +62,12 @@
             $scope.content.apps[0].active = true;
 
             setActiveCulture();
+        }
+
+        /** This is called when the split view changes based on the umb-variant-content */
+        function splitViewChanged() {
+            //send an event downwards
+            $scope.$broadcast("editors.content.splitViewChanged", { editors: $scope.editors });
         }
 
         /**
@@ -555,8 +564,6 @@
                 notificationsService.error(error.headline, error.content);
             });
         };
-
-        $scope.initVariant = initVariant;
 
         /* publish method used in infinite editing */
         $scope.publishAndClose = function (content) {

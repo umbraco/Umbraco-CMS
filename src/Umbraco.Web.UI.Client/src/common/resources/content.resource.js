@@ -345,12 +345,15 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         getBlueprintById: function (id) {
             return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "contentApiBaseUrl",
-                        "GetBlueprintById",
-                        [{ id: id }])),
-                'Failed to retrieve data for content id ' + id);
+                    $http.get(
+                        umbRequestHelper.getApiUrl(
+                            "contentApiBaseUrl",
+                            "GetBlueprintById",
+                            [{ id: id }])),
+                    'Failed to retrieve data for content id ' + id)
+                .then(function(result) {
+                    return $q.when(umbDataFormatter.formatContentGetData(result));
+                });
         },
 
         getNotifySettingsById: function (id) {
@@ -405,12 +408,19 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             });
 
             return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "contentApiBaseUrl",
-                        "GetByIds",
-                        idQuery)),
-                'Failed to retrieve data for content with multiple ids');
+                    $http.get(
+                        umbRequestHelper.getApiUrl(
+                            "contentApiBaseUrl",
+                            "GetByIds",
+                            idQuery)),
+                    'Failed to retrieve data for content with multiple ids')
+                .then(function (result) {
+                    //each item needs to be re-formatted
+                    _.each(result, function(r) {
+                        umbDataFormatter.formatContentGetData(r)
+                    });
+                    return $q.when(result);
+                });
         },
 
 
@@ -449,23 +459,29 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getScaffold: function (parentId, alias) {
 
             return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "contentApiBaseUrl",
-                        "GetEmpty",
-                        [{ contentTypeAlias: alias }, { parentId: parentId }])),
-                'Failed to retrieve data for empty content item type ' + alias);
+                    $http.get(
+                        umbRequestHelper.getApiUrl(
+                            "contentApiBaseUrl",
+                            "GetEmpty",
+                            [{ contentTypeAlias: alias }, { parentId: parentId }])),
+                    'Failed to retrieve data for empty content item type ' + alias)
+                .then(function(result) {
+                    return $q.when(umbDataFormatter.formatContentGetData(result));
+                });
         },
 
         getBlueprintScaffold: function (parentId, blueprintId) {
 
             return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "contentApiBaseUrl",
-                        "GetEmpty",
-                        [{ blueprintId: blueprintId }, { parentId: parentId }])),
-                'Failed to retrieve blueprint for id ' + blueprintId);
+                    $http.get(
+                        umbRequestHelper.getApiUrl(
+                            "contentApiBaseUrl",
+                            "GetEmpty",
+                            [{ blueprintId: blueprintId }, { parentId: parentId }])),
+                    'Failed to retrieve blueprint for id ' + blueprintId)
+                .then(function(result) {
+                    return $q.when(umbDataFormatter.formatContentGetData(result));
+                });
         },
 
         /**
