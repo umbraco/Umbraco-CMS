@@ -35,7 +35,6 @@
     <file src="$BuildTmp$\WebApp\config\splashes\**" target="UmbracoFiles\Config\splashes" />
     <file src="$BuildTmp$\WebApp\config\BackOfficeTours\**" target="Content\Config\BackOfficeTours" />
     <file src="$BuildTmp$\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
-    <file src="$BuildTmp$\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
     <file src="$BuildTmp$\WebApp\Media\Web.config" target="Content\Media\Web.config" />
 
     <file src="$BuildTmp$\WebApp\App_Plugins\ModelsBuilder\modelsbuilder.htm" target="Content\App_Plugins\ModelsBuilder\modelsbuilder.htm" />
