@@ -36,9 +36,9 @@ namespace Umbraco.Web.Models.ContentEditing
         [ReadOnly(true)]
         public string Comment { get; set; }
 
-        [DataMember(Name = "nodeId")]
+        [DataMember(Name = "entityId")]
         [ReadOnly(true)]
-        public int NodeId{ get; set; }
+        public int EntityId{ get; set; }
 
         [DataMember(Name = "totalWords")]
         [ReadOnly(true)]

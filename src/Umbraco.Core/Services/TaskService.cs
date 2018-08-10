@@ -1,6 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
+using System.Xml.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -12,9 +13,19 @@ namespace Umbraco.Core.Services
 {
     public class TaskService : ScopeRepositoryService, ITaskService
     {
-        public TaskService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, ILogger logger, IEventMessagesFactory eventMessagesFactory)
+        private readonly IContentService _contentService;
+        private readonly IPackagingService _packagingService;
+
+        public TaskService(IDatabaseUnitOfWorkProvider provider,
+            RepositoryFactory repositoryFactory,
+            ILogger logger,
+            IEventMessagesFactory eventMessagesFactory,
+            IContentService contentService,
+            IPackagingService packagingService)
             : base(provider, repositoryFactory, logger, eventMessagesFactory)
         {
+            _contentService = contentService ?? throw new ArgumentNullException("contentService");
+            _packagingService = packagingService ?? throw new ArgumentNullException("packagingService");
         }
 
         public TaskType GetTaskTypeByAlias(string taskTypeAlias)
@@ -22,7 +33,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork())
             {
                 var repo = RepositoryFactory.CreateTaskTypeRepository(uow);
-                var ret =repo.GetByQuery(new Query<TaskType>().Where(type => type.Alias == taskTypeAlias)).FirstOrDefault();
+                var ret = repo.GetByQuery(new Query<TaskType>().Where(type => type.Alias == taskTypeAlias)).FirstOrDefault();
                 uow.Commit();
                 return ret;
             }
@@ -115,6 +126,25 @@ namespace Umbraco.Core.Services
                 uow.Commit();
                 return ret;
             }
+        }
+
+        public XElement GetTaskAsXml(Task task)
+        {
+            var document = _contentService.GetById(task.EntityId);
+
+            var taskElement = new XElement("task",
+                new XAttribute("Id", task.Id),
+                new XAttribute("Date", task.CreateDate.ToString("o")),
+                new XAttribute("NodeId", task.EntityId),
+                new XAttribute("TotalWords", _contentService.CountWords(document)));
+            
+            taskElement.Add(new XElement("Comment", task.Comment));
+            // [ASK] Can I use ApplicationContext here ?
+            taskElement.Add(new XElement("PreviewUrl", ApplicationContext.Current.UmbracoApplicationUrl.EnsureEndsWith("/") + "preview/?id=" + task.EntityId));
+
+            taskElement.Add(document.ToXml(_packagingService, true));
+
+            return taskElement;
         }
     }
 }

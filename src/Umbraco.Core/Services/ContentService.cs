@@ -4,9 +4,11 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Xml;
 using System.Xml.Linq;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -2209,6 +2211,123 @@ namespace Umbraco.Core.Services
                 Audit(uow, AuditType.Publish, "ContentService.RebuildXmlStructures completed, the xml has been regenerated in the database", 0, Constants.System.Root);
                 uow.Commit();
             }
+        }
+        
+        /// <summary>
+        /// Count the number of words contained in a document
+        /// </summary>
+        /// <param name="content">Document</param>
+        /// <returns>Number of words in the document</returns>
+        public int CountWords(IContent content)
+        {
+            int CountWordsInString(string Text)
+            {
+                string pattern = @"<(.|\n)*?>";
+                string tmpStr = Regex.Replace(Text, pattern, string.Empty);
+
+                tmpStr = tmpStr.Replace("\t", " ").Trim();
+                tmpStr = tmpStr.Replace("\n", " ");
+                tmpStr = tmpStr.Replace("\r", " ");
+
+                MatchCollection collection = Regex.Matches(tmpStr, @"[\S]+");
+
+                return collection.Count;
+            }
+
+            int words = CountWordsInString(content.Name);
+
+            foreach (Property p in content.Properties)
+            {
+                if (p.Value is string asString)
+                {
+                    var trimmed = asString.Trim();
+
+                    if (trimmed.IsNullOrWhiteSpace() == false)
+                    {
+                        words += CountWordsInString(trimmed);
+                    }
+                }
+            }
+
+            return words;
+        }
+
+        /// <summary>
+        /// Create or update a document based on a translation task
+        /// </summary>
+        /// <param name="source">Translation task XML</param>
+        /// <param name="creator">Creator</param>
+        /// <returns>ID of the document created/updated</returns>
+        public int ImportTaskXml(XElement source, IUser creator)
+        {
+            bool isLegacy = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema;
+            int id = int.Parse(source.Attribute("id").Value);
+
+            var document = GetById(id);
+
+            if (document == null || document.ParentId != int.Parse(source.Attribute("parentID").Value))
+            {
+                string nodeTypeAlias = isLegacy ? source.Attribute("nodeTypeAlias").Value : source.Name.LocalName;
+
+                CreateContent(
+                    source.Attribute("nodeName").Value,
+                    int.Parse(source.Attribute("parentID").Value),
+                    nodeTypeAlias,
+                    creator.Id);
+            }
+            else
+            {
+                document.Name = source.Attribute("nodeName").Value;
+            }
+
+            document.CreateDate = DateTime.Parse(source.Attribute("createDate").Value);
+
+            var properties = source.Elements().Where(e => isLegacy ? e.Name.LocalName.InvariantEquals("data") : e.Attribute("isDoc") == null);
+
+            foreach (var propertyXml in properties)
+            {
+                var alias = isLegacy ? propertyXml.Attribute("alias").Value : propertyXml.Name.LocalName;
+                var property = document.Properties[alias];
+                var value = XmlHelper.GetNodeValue(propertyXml);
+
+                if (property != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(value))
+                    {
+                        var prevals = _dataTypeService.GetPreValuesCollectionByDataTypeId(property.PropertyType.DataTypeDefinitionId);
+
+                        if (prevals != null && prevals.PreValuesAsDictionary.Count != 0)
+                        {
+                            var list = new List<string>(value.Split(','));
+
+                            foreach (var preval in prevals.PreValuesAsDictionary)
+                            {
+                                string pval = preval.Value.Value;
+                                string pid = preval.Value.Id.ToString();
+
+                                if (list.Contains(pval))
+                                {
+                                    list[list.IndexOf(pval)] = pid;
+                                }
+                            }
+
+                            property.Value = string.Join(",", list);
+                        }
+                        else
+                        {
+                            property.Value = value;
+                        }
+                    }
+                }
+                else
+                {
+                    LogHelper.Warn<IContent>(string.Format("Couldn't import property '{0}' as the property type doesn't exist on this document type", alias));
+                }
+            }
+
+            Save(document);
+
+            return document.Id;
         }
 
         #region Internal Methods

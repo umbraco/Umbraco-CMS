@@ -8,7 +8,7 @@
  * 
  */
 
-function TranslationOpenTasksController($scope, $window, $location, $routeParams, $q, localizationService, contentResource, translationResource, notificationsService, treeService, appState) {
+function TranslationOpenTasksController($scope, $window, $location, $routeParams, $q, $timeout, localizationService, contentResource, translationResource, notificationsService, treeService, navigationService, appState, treeService) {
     $scope.labels = {};
     $scope.loading = true;
     $scope.closeButtonState = "init";
@@ -46,10 +46,17 @@ function TranslationOpenTasksController($scope, $window, $location, $routeParams
             reader.onload = function () {
                 $scope.$apply(function () {
                     try {
-                        translationResource.submitTasks($routeParams.id, $scope.task.nodeId, file.name, reader.result).then(function (id) {
+                        translationResource.submitTasks($scope.task.entityId, reader.result).then(function (id) {
                             $scope.uploadButtonState = "success";
                             $scope.task.closed = true;
                             notificationsService.success("Upload", "The task has been bla bla");
+
+
+                            var selectedNode = appState.getTreeState("selectedNode");
+
+                            if (selectedNode) {
+                                treeService.removeNode(selectedNode);
+                            }
 
                             $scope.previewId = id;
                             // [SEB] refresh the properties
@@ -75,7 +82,6 @@ function TranslationOpenTasksController($scope, $window, $location, $routeParams
     }
 
     $scope.preview = function () {
-        // [SEB][ASK] Is it correct to reuse the preview page?
         var previewWindow = $window.open('preview/?init=true&id=' + $scope.previewId, 'umbpreview');
         var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?id=' + $scope.previewId;
         previewWindow.location.href = redirect;
@@ -90,8 +96,10 @@ function TranslationOpenTasksController($scope, $window, $location, $routeParams
         ]).then(function (result) {
             $scope.labels.pageTitle = result[0][0];
             $scope.task = result[1];
-
+            
             $scope.loading = false;
+
+            $timeout(function () { navigationService.syncTree({ tree: "openTasks", path: ["-1", $routeParams.id], forceReload: true, activate: true }); });
         });
     }
 

@@ -1772,13 +1772,18 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="taskAssignedBy">Assigned by</key>
         <key alias="taskOpened">Task opened</key>
         <key alias="totalWords">Total words</key>
-        <key alias="translateTo">Translate to</key>
         <key alias="translationDone">Translation completed.</key>
+        <key alias="translateTo">Translate to</key>
         <key alias="translationDoneHelp">You can preview the pages, you've just translated, by clicking below. If the original page is found, you will get a comparison of the 2 pages.</key>
         <key alias="translationFailed">Translation failed, the XML file might be corrupt</key>
         <key alias="translationOptions">Translation options</key>
         <key alias="translator">Translator</key>
         <key alias="uploadTranslationXml">Upload translation XML</key>
+
+        <!-- [SEB] translation -->
+        <key alias="translationDoneWithError">Translation partially succeed. Please see the table below to see which task failed.</key>
+        <key alias="noTask">There is currently no task in here.</key>
+        
     </area>
     <area alias="treeHeaders">
         <key alias="content">Content</key>
@@ -1818,8 +1823,8 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="analytics">Analytics</key>
         <key alias="users">Users</key>
         <!-- [SEB] Translations -->
-        <key alias="yourTasks">Tasks created by you (new)</key>
-        <key alias="openTasks">Tasks assigned to you (new)</key>
+        <key alias="ownerTranslationTasks">Tasks created by you (new)</key>
+        <key alias="assigneeTranslationTasks">Tasks assigned to you (new)</key>
     </area>
     <area alias="update">
         <key alias="updateAvailable">New update ready</key>

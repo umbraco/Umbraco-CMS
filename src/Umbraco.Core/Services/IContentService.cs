@@ -703,5 +703,20 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional id of the user creating the content</param>
         /// <returns><see cref="IContent"/></returns>
         IContent CreateContentWithIdentity(string name, int parentId, string contentTypeAlias, int userId = 0);
+
+        /// <summary>
+        /// Count the number of words contained in a document
+        /// </summary>
+        /// <param name="content">Document</param>
+        /// <returns>Number of words in the document</returns>
+        int CountWords(IContent content);
+
+        /// <summary>
+        /// Create or update a document based on a translation task
+        /// </summary>
+        /// <param name="source">Translation task XML</param>
+        /// <param name="creator">Creator</param>
+        /// <returns>ID of the document created/updated</returns>
+        int ImportTaskXml(XElement source, IUser creator);
     }
 }

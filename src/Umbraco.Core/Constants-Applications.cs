@@ -132,6 +132,10 @@
 
             public const string Translations = "translations";
 
+            public const string AssignedTranslationTasks = "assigneeTranslationTasks";
+
+            public const string OwnerTranslationTasks = "ownerTranslationTasks";
+
             //TODO: Fill in the rest!
         }
     }

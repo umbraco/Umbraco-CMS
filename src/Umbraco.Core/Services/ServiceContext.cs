@@ -180,7 +180,7 @@ namespace Umbraco.Core.Services
                 _publicAccessService = new Lazy<IPublicAccessService>(() => new PublicAccessService(provider, repositoryFactory, logger, eventMessagesFactory));
 
             if (_taskService == null)
-                _taskService = new Lazy<ITaskService>(() => new TaskService(provider, repositoryFactory, logger, eventMessagesFactory));
+                _taskService = new Lazy<ITaskService>(() => new TaskService(provider, repositoryFactory, logger, eventMessagesFactory, _contentService.Value, _packagingService.Value));
 
             if (_domainService == null)
                 _domainService = new Lazy<IDomainService>(() => new DomainService(provider, repositoryFactory, logger, eventMessagesFactory));

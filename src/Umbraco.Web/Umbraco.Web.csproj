@@ -346,11 +346,12 @@
     <Compile Include="Models\ContentEditing\BackOfficePreview.cs" />
     <Compile Include="Models\ContentEditing\DocumentTypeCollectionDisplay.cs" />
     <Compile Include="Models\ContentEditing\PropertyDisplay.cs" />
-    <Compile Include="Models\ContentEditing\ImportTaskResult.cs" />
+    <Compile Include="Models\ContentEditing\TranslationTaskImportSummary.cs" />
     <Compile Include="Models\ContentEditing\TaskXml.cs" />
     <Compile Include="Models\ContentEditing\TaskDisplay.cs" />
     <Compile Include="Models\Mapping\AutoMapperExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
+    <Compile Include="Models\Mapping\TranslationTaskModelMapper.cs" />
     <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />
     <Compile Include="Models\Trees\ExportMember.cs" />
     <Compile Include="PropertyEditors\DropdownFlexiblePropertyEditor.cs" />
@@ -537,8 +538,9 @@
     <Compile Include="SingletonHttpContextAccessor.cs" />
     <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\MacroTreeController - Copy.cs" />
-    <Compile Include="Trees\YourTasksTreeController.cs" />
-    <Compile Include="Trees\OpenTasksTreeController.cs" />
+    <Compile Include="Trees\TranslationTreeControllerBase.cs" />
+    <Compile Include="Trees\OwnerTranslationTaskTreeController.cs" />
+    <Compile Include="Trees\AssigneeTranslationTaskTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
     <Compile Include="Suspendable.cs" />
     <Compile Include="Trees\ContentBlueprintTreeController.cs" />

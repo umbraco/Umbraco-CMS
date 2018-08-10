@@ -4,94 +4,100 @@
  * @function
  * 
  * @description
- * Controls the recycle bin for content
+ * Controls the list of all assigned/owned translations of a user
  * 
  */
 
-function TranslationTasksController($scope, $routeParams, $location, $window, translationResource, notificationsService) {
+function TranslationTasksController($scope, $routeParams, $location, $window, $q, localizationService, translationResource, translationService, notificationsService, treeService) {
     $scope.loading = true;
     $scope.tasks = null;
     $scope.uploadButtonState = "init";
+    $scope.labels = {}
+    $scope.report = null;
 
-    $scope.download = function (task) {
-        translationResource.getTaskXml(task.id).then(function (content) {
-            saveAs(new Blob([content], { type: "text/xml" }), task.properties[0].value.split(' ').join('_'));
-        })
+    /**
+     * Download the XML of one or several tasks
+     * 
+     * @param {any} task Array of task
+     */
+    $scope.download = function (tasks) {
+        translationService.downloadXml(tasks);
     }
 
-    $scope.downloadAll = function () {
-        translationResource.getTasksXml($scope.tasks.map(function (t) { return t.id; }).join(',')).then(function (content) {
-            saveAs(new Blob([content], { type: "text/xml" }), "all.xml");
+    /**
+     * Hide the import summary
+     * */
+    $scope.hideReport = function () {
+        $scope.report = null;
+    }
+
+    /**
+     * Open the page for a task
+     * 
+     * @param {any} task Task
+     */
+    $scope.openTask = function (task) {
+        $location.path('/translation/translation/' + $routeParams.id + "/" + task.id);
+    }
+
+    /**
+     * Upload a file for import
+     * 
+     * @param {any} file Imported file
+     */
+    $scope.upload = function (file) {
+        $scope.uploadButtonState = "busy";
+
+        translationService.upload(file).then(function (report) {
+            $scope.report = report;
+
+            for (var i = 0, length = $scope.tasks.length; i < length; ++i) {
+                var task = $scope.tasks[i];
+                var outcome = report.outcome[task.id];
+
+                if (outcome) {
+                    task.done = true;
+                    task.entityId = outcome.entityId;
+                }
+            }
+
+            $scope.tasks.sort(function (t1, t2) {
+                if (t1.done === true && !t2.done) {
+                    return 1;
+                }
+
+                if (t2.done === true && !t1.done) {
+                    return -1;
+                }
+
+                return 0;
+            });
+
+            // [SEB][ASK]: The tree does not refresh
+            translationService.refreshTree($routeParams.id);
+
+            $scope.uploadButtonState = "success";
         });
     }
 
-    $scope.openTask = function (task) {
-        $location.path('/translation/translation/' + ($routeParams.id == "assignee" ? "opentasks/" : "yourtasks/") + task.id);
-    }
-
-    $scope.upload = function (file) {
-        if (file !== null) {
-            $scope.uploadButtonState = "busy";
-            // [SEB] Error checking
-            var reader = new FileReader();
-
-            reader.onload = function () {
-                $scope.$apply(function () {
-                    try {
-                        translationResource.submitTasks(-1, -1, file.name, reader.result).then(function (result) {
-
-                            console.log(result)
-
-                            for (var i = $scope.tasks.length - 1; i >= 0; --i) {
-                                var task = $scope.tasks[i];
-                                var r = result.filter(function (r) { return r.taskId === task.id });
-
-                                if (r[0].entityId !== null) {
-                                    task.done = true;
-                                    task.entityId = r[0].entityId;
-                                }
-                                else {
-                                    // [SEB] Error handling
-                                }
-                            }
-
-                            $scope.uploadButtonState = "success";
-                            notificationsService.success("Upload", "The task has been bla bla");
-
-                            // [SEB] refresh the properties
-                        });
-                    }
-                    catch (ex) {
-                        $scope.uploadButtonState = "error";
-                        // [SEB] Translation
-                        notificationsService.error("Upload", "The provided file is not valid");
-                    }
-                })
-            };
-
-            try {
-                reader.readAsDataURL(file[0]);
-            }
-            catch (ex) {
-                $scope.uploadButtonState = "error";
-                // [SEB] Translation
-                notificationsService.error("Upload", "The provided file could not be read");
-            }
-        }
-    }
-
+    /**
+     * Preview an imported tasl
+     * 
+     * @param {any} task Task
+     */
     $scope.preview = function (task) {
-        // [SEB][ASK] Is it correct to reuse the preview page?
-        var previewWindow = $window.open('preview/?init=true&id=' + task.entityId, 'umbpreview');
-        var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?id=' + task.entityId;
-        previewWindow.location.href = redirect;
+        translationService.preview(task);
     }
 
     function $onInit() {
-        ($routeParams.id == "assignee" ? translationResource.getAllTaskAssignedToMe() : translationResource.getAllTaskCreatedByMe()).then(function (tasks) {
-            $scope.tasks = tasks;
+        $q.all([
+            $routeParams.id == translationService.TaskUserType.ASSIGNEE ? translationResource.getAllTaskAssignedToMe() : translationResource.getAllTaskCreatedByMe(),
+            localizationService.localize($routeParams.id == translationService.TaskUserType.ASSIGNEE ? "translation_assignedTasks" : "translation_ownedTasks")
+        ]).then(function (result) {
+            $scope.tasks = result[0];
+            $scope.labels.pageTitle = result[1];
             $scope.loading = false;
-        })
+        });
     }
 
     $onInit();

@@ -311,11 +311,11 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// [SEB] doc
+        /// Convert a XML document to its string representation with a default prologue
         /// </summary>
-        /// <param name="document"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
+        /// <param name="document">XML to serialize</param>
+        /// <param name="options">Save options</param>
+        /// <returns>String representation of the XML document with a default prologue</returns>
         public static string ToStringWithPrologue(this XDocument document, SaveOptions options)
         {
             return string.Format("{0}{1}{2}",

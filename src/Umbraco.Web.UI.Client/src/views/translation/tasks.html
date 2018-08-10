@@ -1,6 +1,6 @@
 ﻿<umb-editor-view ng-controller="Umbraco.Editors.Translation.TasksController">
 
-    <umb-editor-header name="'To change'"
+    <umb-editor-header name="labels.pageTitle"
                        hide-icon="true"
                        hide-description="true"
                        hide-alias="true"
@@ -15,7 +15,7 @@
 
         <ng-container ng-if="loading === false">
             <ng-container ng-if="tasks.length === 0">
-                No task
+                <localize key="translation_noTask"></localize>
             </ng-container>
             <ng-container ng-if="tasks.length !== 0">
 
@@ -26,7 +26,7 @@
                             <div class="flx-i" style="margin-right:50px;">
                                 <umb-control-group label="@translation_downloadAllAsXml">
                                     <umb-button type="button"
-                                                action="downloadAll()"
+                                                action="download(tasks)"
                                                 button-style="primary"
                                                 label-key="general_download">Download</umb-button>
                                 </umb-control-group>
@@ -44,6 +44,23 @@
                                 </umb-control-group>
                             </div>
                         </div>
+
+                        <ng-container ng-if="report !== null">
+                            <div class="alert alert-success alert-dismissible" role="alert" style="margin-bottom:0;" ng-if="report.errorCount === 0 && report.successCount !== 0">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="color:#fff"><span aria-hidden="true" ng-click="hideReport()">&times;</span></button>
+                                <localize key="translation_translationDone"></localize>
+                            </div>
+
+                            <div class="alert alert-warning alert-dismissible" role="alert" style="margin-bottom:0;" ng-if="report.errorCount !== 0 && report.successCount !== 0">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="color:#fff"><span aria-hidden="true" ng-click="hideReport()">&times;</span></button>
+                                <localize key="translation_translationDoneWithError"></localize>
+                            </div>
+
+                            <div class="alert alert-error alert-dismissible" role="alert" style="margin-bottom:0;" ng-if="report.errorCount !== 0 && report.successCount === 0">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="color:#fff"><span aria-hidden="true" ng-click="hideReport()">&times;</span></button>
+                                <localize key="translation_translationFailed"></localize>
+                            </div>
+                        </ng-container>
                     </umb-box-content>
                 </umb-box>
                 <table class="table table-striped">
@@ -65,7 +82,7 @@
                     <tbody>
                         <tr ng-repeat="task in tasks track by $index">
                             <td class="bold">
-                                {{ task.properties[0].value }} <i class="icon-check color-green" style="margin-left:10px;" ng-if="task.done === true"></i>
+                                {{ task.properties[0].value }} <i class="icon-check color-green" style="margin-left:10px;" ng-if="task.done === true"></i><i class="icon-remove color-red" style="margin-left:10px;" ng-if="task.failed === true"></i>
                             </td>
                             <td>
                                 <div class="flex" style="align-items:center;">
@@ -88,7 +105,7 @@
                             <td>
                                 <umb-button type="button"
                                             ng-if="!task.done"
-                                            action="download(task)"
+                                            action="download([task])"
                                             button-style="primary"
                                             label-key="translation_downloadTaskAsXml">Download XML</umb-button>
                                 <umb-button type="button"

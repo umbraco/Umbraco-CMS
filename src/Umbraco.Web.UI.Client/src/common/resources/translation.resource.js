@@ -12,12 +12,11 @@
     function translationResource($http, umbRequestHelper) {
 
         function closeTask(id) {
-            // [SEB] Should be put
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "translationApiBaseUrl",
-                        "PostCloseTask", { id: id })),
+                        "PutCloseTask", { id: id })),
                 'Failed to close the task');
         }
 
@@ -49,16 +48,6 @@
                 'Failed to get translation task');
         }
 
-        function getTaskXml(id) {
-
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "translationApiBaseUrl",
-                        "GetTaskXml", { id: id })),
-                'Failed to get task XML');
-        }
-
         function getTasksXml(ids) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
@@ -68,19 +57,18 @@
                 'Failed to get tasks XML');
         }
 
-        function submitTasks(id, nodeId, filename, content) {
+        function submitTasks(entityId, content) {
             return umbRequestHelper.resourcePromise(
                 $http.put(
                     umbRequestHelper.getApiUrl(
                         "translationApiBaseUrl",
-                        "PutSubmitTasks"), { id: id, nodeId: nodeId, filename: filename, content: content }),
+                        "PutSubmitTasks"), { entityId: entityId, content: content }),
                 'Failed to submit the task');
         }
 
         var resource = {
             closeTask: closeTask,
             getTaskById: getTaskById,
-            getTaskXml: getTaskXml,
             submitTasks: submitTasks,
             getAllTaskAssignedToMe: getAllTaskAssignedToMe,
             getAllTaskCreatedByMe: getAllTaskCreatedByMe,

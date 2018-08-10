@@ -10,17 +10,9 @@ namespace Umbraco.Web.Models.ContentEditing
     [ReadOnly(true)]
     public class TaskFile
     {
-        [DataMember(Name = "id")]
+        [DataMember(Name = "entityId")]
         [ReadOnly(true)]
-        public int Id { get; set; }
-
-        [DataMember(Name = "nodeId")]
-        [ReadOnly(true)]
-        public int NodeId { get; set; }
-
-        [DataMember(Name = "filename")]
-        [ReadOnly(true)]
-        public string Filename { get; set; }
+        public int? EntityId { get; set; }
 
         [DataMember(Name = "content")]
         [ReadOnly(true)]
