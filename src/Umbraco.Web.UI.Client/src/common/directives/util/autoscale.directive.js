@@ -16,7 +16,7 @@
 **/
 
 angular.module("umbraco.directives")
-    .directive('autoScale', function ($window) {
+    .directive('autoScale', function ($window, $timeout, windowResizeListener) {
         return function (scope, el, attrs) {
 
             var totalOffset = 0;
@@ -26,12 +26,23 @@ angular.module("umbraco.directives")
                 totalOffset += offsety;
             }
 
-            setTimeout(function () {
-                el.height(window.height() - (el.offset().top + totalOffset));
-            }, 500);
+            $timeout(function () {
+                setElementSize();
+            });
 
-            window.bind("resize", function () {
+            function setElementSize() {
                 el.height(window.height() - (el.offset().top + totalOffset));
+            }
+
+            var resizeCallback = function() {
+                setElementSize();
+            };
+
+            windowResizeListener.register(resizeCallback);
+
+            //ensure to unregister from all events and kill jquery plugins
+            scope.$on('$destroy', function () {
+                windowResizeListener.unregister(resizeCallback);
             });
 
         };
