@@ -4,7 +4,8 @@ angular.module('umbraco')
 
         var config = angular.copy($scope.model.config);
 
-        $scope.fileChanged = onFileChanged;
+        $scope.filesSelected = onFileSelected;
+        $scope.filesChanged = onFilesChanged;
         $scope.fileUploaderInit = onFileUploaderInit;
         $scope.crop = crop;
         $scope.done = done;
@@ -55,12 +56,21 @@ angular.module('umbraco')
         }
 
         /**
-         * Called when the file selection value changes
+         * Called when the a new file is selected
          * @param {any} value
          */
-        function onFileChanged(value, files) {
+        function onFileSelected(value, files) {
             setModelValueWithSrc(value);
+            //set form to dirty to track changes
+            $scope.imageCropperForm.$setDirty();
+        }
 
+        /**
+         * Called when the file collection changes
+         * @param {any} value
+         * @param {any} files
+         */
+        function onFilesChanged(files) {
             if (files && files[0]) {
                 $scope.imageSrc = files[0].fileSrc;
                 //set form to dirty to track changes

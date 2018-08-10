@@ -32,10 +32,11 @@
             vm.files = [];
 
             //notify the callback
-            notifyValueChanged(null);
+            notifyFilesSelected(null);
+            notifyFilesChanged(null);
         }
 
-        function notifyValueChanged(val, files) {
+        function notifyFilesSelected(val, files) {
 
             if (!val) {
                 val = null;
@@ -45,10 +46,19 @@
             }
 
             //notify the callback
-            vm.onValueChanged({ value: val, files: files });
+            vm.onFilesSelected({ value: val, files: files });
 
             //need to explicity setDirty here to track changes
             vm.fileUploadForm.$setDirty();
+        }
+
+        function notifyFilesChanged(files) {
+            if (!files) {
+                files = null;
+            }
+
+            //notify the callback
+            vm.onFilesChanged({ files: files });
         }
 
         function notifyInit(val, files) {
@@ -84,19 +94,10 @@
 
             //TODO: need to figure out what we can do for things like Nested Content
 
-            //check the file manager to see if there's already local files pending for this editor
-            var existingClientFiles = _.map(
-                _.filter(fileManager.getFiles(),
-                    function(f) {
-                         return f.alias === vm.propertyAlias && f.culture === vm.culture;
-                    }),
-                function(f) {
-                    return f.file;
-                });
-
+            var existingClientFiles = checkPendingClientFiles();
             //create the property to show the list of files currently saved
             if (existingClientFiles.length > 0) {
-                updateModelFromSelectedFiles(existingClientFiles).then(function(newVal) {
+                updateModelFromSelectedFiles(existingClientFiles).then(function (newVal) {
                     //notify the callback
                     notifyInit(newVal, vm.files);
                 });
@@ -126,6 +127,25 @@
             }
         }
 
+        function checkPendingClientFiles() {
+
+            //normalize culture to null if it's not there
+            if (!vm.culture) {
+                vm.culture = null;
+            }
+
+            //check the file manager to see if there's already local files pending for this editor
+            var existingClientFiles = _.map(
+                _.filter(fileManager.getFiles(),
+                    function (f) {
+                        return f.alias === vm.propertyAlias && f.culture === vm.culture;
+                    }),
+                function (f) {
+                    return f.file;
+                });
+            return existingClientFiles;
+        }
+
         ///** Method required by the valPropertyValidator directive (returns true if the property editor has at least one file selected) */
         //function validateMandatory() {
         //    return {
@@ -143,9 +163,22 @@
 
             if (changes.value && !changes.value.isFirstChange() && changes.value.currentValue !== changes.value.previousValue) {
 
-                //if the value has been cleared, clear the files (ignore if the previous value is also falsy)
                 if (!changes.value.currentValue && changes.value.previousValue) {
+                    //if the value has been cleared, clear the files (ignore if the previous value is also falsy)
                     vm.files = [];
+                }
+                else if (changes.value.currentValue && !changes.value.previousValue && vm.files.length === 0) {
+                    //if a new value has been added after being cleared
+
+                    var existingClientFiles = checkPendingClientFiles();
+                    //create the property to show the list of files currently saved
+                    if (existingClientFiles.length > 0) {
+                        updateModelFromSelectedFiles(existingClientFiles).then(function () {
+                            //raise this event which means the files have changed but this wasn't the instance that
+                            //added the file
+                            notifyFilesChanged(vm.files);
+                        });
+                    }
                 }
 
                 //// here we need to check if the value change needs to trigger an update in the UI.
@@ -250,7 +283,8 @@
                     angularHelper.safeApply($scope,
                         function() {
                             //pass in the file names and the model files
-                            notifyValueChanged(newVal, vm.files);
+                            notifyFilesSelected(newVal, vm.files);
+                            notifyFilesChanged(vm.files);
                         });
                 });
             }
@@ -268,7 +302,14 @@
             propertyAlias: "@",
             value: "<",
             hideSelection: "<",
-            onValueChanged: "&",
+            /**
+             * Called when a file is selected on this instance
+             */
+            onFilesSelected: "&",
+            /**
+             * Called when the file collection changes (i.e. a new file has been selected but maybe it wasn't this instance that caused the change)
+             */
+            onFilesChanged: "&",
             onInit: "&"
         },
         transclude: true,

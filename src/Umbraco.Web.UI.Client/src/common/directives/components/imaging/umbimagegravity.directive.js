@@ -138,7 +138,9 @@
 
         /** Watches the one way binding changes */
         function onChanges(changes) {
-            if (changes.center && !changes.center.isFirstChange() && !angular.equals(changes.center.currentValue, changes.center.previousValue)) {
+            if (changes.center && !changes.center.isFirstChange()
+                && changes.center.currentValue
+                && !angular.equals(changes.center.currentValue, changes.center.previousValue)) {
                 //when center changes update the dimensions
                 setDimensions();
             }
