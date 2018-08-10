@@ -10,6 +10,20 @@ function angularHelper($log, $q) {
     return {
 
         /**
+         * Method used to re-run the $parsers for a given ngModel
+         * @param {} scope 
+         * @param {} ngModel 
+         * @returns {} 
+         */
+        revalidateNgModel: function (scope, ngModel) {
+            this.safeApply(scope, function() {
+                angular.forEach(ngModel.$parsers, function (parser) {
+                    parser(ngModel.$viewValue);
+                });
+            });
+        },
+
+        /**
          * Execute a list of promises sequentially. Unlike $q.all which executes all promises at once, this will execute them in sequence.
          * @param {} promises 
          * @returns {} 

@@ -54,14 +54,6 @@ describe('edit media controller tests', function () {
         it('it should have added an info app', function () {
             expect(scope.content.apps[1].alias).toBe("info");
         });
-
-        it('all other tabs than the info tab should have a properties collection', function () {
-            $(scope.content.tabs).each(function (i, tab) {
-                if (tab.id !== -1 && tab.alias !== '_umb_infoTab') {
-                    expect(tab.properties.length).toBeGreaterThan(0);
-                }
-            });
-        });
-
+        
     });
 });

@@ -215,15 +215,15 @@ namespace Umbraco.Core.Models
 
         /// <inheritdoc />
         public bool IsCulturePublished(string culture)
-            => _publishInfos != null && _publishInfos.ContainsKey(culture);
+            =>  _publishInfos != null && _publishInfos.ContainsKey(culture); //fixme should this return false if ID == 0?
 
         /// <inheritdoc />
         public bool WasCulturePublished(string culture)
-            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture);
+            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture); //fixme should this return false if ID == 0? 
 
         /// <inheritdoc />
         public bool IsCultureEdited(string culture)
-            => !IsCulturePublished(culture) || (_editedCultures != null && _editedCultures.Contains(culture));
+            => !IsCulturePublished(culture) || (_editedCultures != null && _editedCultures.Contains(culture)); //fixme should this return false if ID == 0?
 
         /// <inheritdoc/>
         [IgnoreDataMember]

@@ -33,12 +33,14 @@ namespace Umbraco.Web.Composing.CompositionRoots
             //register any resolvers, etc.. that the profiles use
             container.Register<ContentUrlResolver>();
             container.Register<ContentTreeNodeUrlResolver<IContent, ContentTreeController>>();
-            container.Register<TabsAndPropertiesResolver<IContent, ContentItemDisplay>>();
+            container.Register<TabsAndPropertiesResolver<IContent, ContentVariantDisplay>>();
             container.Register<TabsAndPropertiesResolver<IMedia, MediaItemDisplay>>();
             container.Register<ContentTreeNodeUrlResolver<IMedia, MediaTreeController>>();
             container.Register<MemberTabsAndPropertiesResolver>();
             container.Register<MemberTreeNodeUrlResolver>();
             container.Register<MemberBasicPropertiesResolver>();
+            container.Register<MediaAppResolver>();
+            container.Register<ContentAppResolver>();
         }
     }
 }

@@ -289,7 +289,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          * @function
          *
          * @description
-         * Returns all propertes contained for the content item (since the normal model has properties contained inside of tabs)
+         * Returns all propertes contained for the tabbed content item
          */
         getAllProps: function (content) {
             var allProps = [];
@@ -415,26 +415,19 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          * @function
          *
          * @description
-         * re-binds all changed property values to the origContent object from the savedContent object and returns an array of changed properties.
+         * Re-binds all changed property values to the origContent object from the savedContent object and returns an array of changed properties.
+         * This re-binds both normal object property values along with content property values and works for content, media and members.
+         * For variant content, this detects if the object contains the 'variants' property (i.e. for content) and re-binds all variant content properties.
+         * This returns the list of changed content properties (does not include standard object property changes).
          */
         reBindChangedProperties: function (origContent, savedContent) {
-
-            var changed = [];
-
-            //get a list of properties since they are contained in tabs
-            var allOrigProps = this.getAllProps(origContent);
-            var allNewProps = this.getAllProps(savedContent);
-
-            function getNewProp(alias) {
-                return _.find(allNewProps, function (item) {
-                    return item.alias === alias;
-                });
-            }
-
+            
+            //TODO: We should probably split out this logic to deal with media/members seperately to content
+            
             //a method to ignore built-in prop changes
             var shouldIgnore = function(propName) {
                 return _.some([
-                    "tabs",
+                    "variants",
                     "notifications",
                     "ModelState",
                     "tabs",
@@ -450,13 +443,14 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                     "removeDateMonth",
                     "removeDateDayNumber",
                     "removeDateDay",
-                    "removeDateTime",
+                    "removeDateTime"
                 ], function (i) {
                     return i === propName;
                 });
             };
-            //check for changed built-in properties of the content
-            for (var o in origContent) {
+
+            //check for changed built-in properties of the content based on the server response object
+            for (var o in savedContent) {
 
                 //ignore the ones listed in the array
                 if (shouldIgnore(o)) {
@@ -468,24 +462,89 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 }
             }
 
-            //check for changed properties of the content
-            for (var p in allOrigProps) {
-                var newProp = getNewProp(allOrigProps[p].alias);
-                if (newProp && !_.isEqual(allOrigProps[p].value, newProp.value)) {
+            //Now re-bind content properties. Since content has variants and media/members doesn't,
+            //we'll detect the variants property for content to distinguish if it's content vs media/members.
 
-                    //they have changed so set the origContent prop to the new one
-                    var origVal = allOrigProps[p].value;
-                    allOrigProps[p].value = newProp.value;
+            var origVariants = [];
+            var savedVariants = [];
+            if (origContent.variants) {
+                //it's contnet so assign the variants as they exist
+                origVariants = origContent.variants;
+                savedVariants = savedContent.variants;
+            }
+            else {
+                //it's media/member, so just add the object as-is to the variants collection
+                origVariants.push(origContent);
+                savedVariants.push(savedContent);
+            }
 
-                    //instead of having a property editor $watch their expression to check if it has
-                    // been updated, instead we'll check for the existence of a special method on their model
-                    // and just call it.
-                    if (angular.isFunction(allOrigProps[p].onValueChanged)) {
-                        //send the newVal + oldVal
-                        allOrigProps[p].onValueChanged(allOrigProps[p].value, origVal);
+            var changed = [];
+
+            function getNewProp(alias, allNewProps) {
+                return _.find(allNewProps, function (item) {
+                    return item.alias === alias;
+                });
+            }
+
+            //loop through each variant (i.e. tabbed content)
+            for (var j = 0; j < origVariants.length; j++) {
+
+                var origVariant = origVariants[j];
+                var savedVariant = savedVariants[j];
+
+                //if it's content (not media/members), then we need to sync the variant specific data
+                if (origContent.variants) {
+
+                    //the variant property names we need to sync
+                    var variantPropertiesSync = ["state"];
+
+                    //loop through the properties returned on the server object
+                    for (var b in savedVariant) {
+
+                        var shouldCompare = _.some(variantPropertiesSync, function(e) {
+                            return e === b;
+                        });
+
+                        //only compare the explicit ones or ones we don't ignore
+                        if (shouldCompare || !shouldIgnore(b)) {
+                            if (!_.isEqual(origVariant[b], savedVariant[b])) {
+                                origVariant[b] = savedVariant[b];
+                            }
+                        }
+                    }
+                }
+
+                //get a list of properties since they are contained in tabs
+                var allOrigProps = this.getAllProps(origVariant);
+                var allNewProps = this.getAllProps(savedVariant);
+
+                //check for changed properties of the content
+                for (var k = 0; k < allOrigProps.length; k++) {
+
+                    var origProp = allOrigProps[k];
+                    var alias = origProp.alias;
+                    var newProp = getNewProp(alias, allNewProps);
+                    if (newProp && !_.isEqual(origProp.value, newProp.value)) {
+
+                        //they have changed so set the origContent prop to the new one
+                        var origVal = origProp.value;
+                        
+                        origProp.value = newProp.value;
+
+                        //instead of having a property editor $watch their expression to check if it has
+                        // been updated, instead we'll check for the existence of a special method on their model
+                        // and just call it.
+                        if (angular.isFunction(origProp.onValueChanged)) {
+                            //send the newVal + oldVal
+                            origProp.onValueChanged(origProp.value, origVal);
+                        }
+
+                        changed.push(origProp);                        
                     }
 
-                    changed.push(allOrigProps[p]);
+                }
+                for (var p in allOrigProps) {
+                    
                 }
             }
 
@@ -530,7 +589,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                             args.rebindCallback();
                         }
 
-                        serverValidationManager.executeAndClearAllSubscriptions();
+                        //notify all validators (don't clear the server validations though since we need to maintain their state because of
+                        // how the variant switcher works in content). server validation state is always cleared when an editor first loads
+                        // and in theory when an editor is destroyed.
+                        serverValidationManager.notify();
                     }
 
                     //indicates we've handled the server result

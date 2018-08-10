@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Services
         /// <summary>
         /// Used to list out all ambiguous events that will require dispatching with a name
         /// </summary>
-        [Test]
+        [Test, Explicit]
         public void List_Ambiguous_Events()
         {
             var events = ServiceContext.ContentService.GetType().GetEvents(BindingFlags.Static | BindingFlags.Public);
