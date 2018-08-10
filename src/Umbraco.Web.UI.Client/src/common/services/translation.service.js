@@ -39,7 +39,7 @@
          * @param {any} task
          */
         function preview(task) {
-            // [ASK] Is it correct to reuse the preview page?
+            // [SEB][ASK] Is it correct to reuse the preview page?
             var previewWindow = $window.open('preview/?init=true&id=' + task.entityId, 'umbpreview');
 
             previewWindow.location.href = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?id=' + task.entityId;

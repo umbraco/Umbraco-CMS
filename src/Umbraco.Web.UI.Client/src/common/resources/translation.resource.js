@@ -13,7 +13,7 @@
 
         function closeTask(id) {
             return umbRequestHelper.resourcePromise(
-                $http.post(
+                $http.put(
                     umbRequestHelper.getApiUrl(
                         "translationApiBaseUrl",
                         "PutCloseTask", { id: id })),

@@ -151,7 +151,7 @@ namespace Umbraco.Web.Editors
         public TranslationTaskImportSummary PutSubmitTasks(TaskFile data)
         {
             var result = new TranslationTaskImportSummary();
-            
+
             var match = Regex.Match(data.Content, @"data:(?<type>.+?);base64,(?<data>.+)");
             var base64Data = match.Groups["data"].Value;
             var contentType = match.Groups["type"].Value;
@@ -212,7 +212,7 @@ namespace Umbraco.Web.Editors
                     if (task != null && (data.EntityId == null || task.EntityId == data.EntityId) && (task.AssigneeUserId == Security.CurrentUser.Id || task.OwnerUserId == Security.CurrentUser.Id))
                     {
                         task.Closed = true;
-                        //Services.TaskService.Save(task);
+                        Services.TaskService.Save(task);
 
                         result.Outcome.Add(task.Id, Services.ContentService.ImportTaskXml(entityXml, Security.CurrentUser));
                         result.SuccessCount++;

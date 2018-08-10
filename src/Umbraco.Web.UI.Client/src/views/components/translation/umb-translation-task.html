@@ -1,0 +1,124 @@
+﻿<div>
+    <umb-editor-view>
+        <umb-editor-header name="labels.pageTitle"
+                           hide-icon="true"
+                           hide-description="true"
+                           hide-alias="true"
+                           name-locked="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+
+            <div class="umb-loader-wrapper" ng-show="loading === true">
+                <div class="umb-loader"></div>
+            </div>
+
+            <ng-container ng-if="loading === false">
+                <umb-box>
+                    <umb-box-header title="Translation details"></umb-box-header>
+                    <umb-box-content class="block-form">
+                        <div class="flex">
+                            <div class="flx-i" style="margin-right:50px;">
+                                <umb-control-group label="@translation_taskOpened">
+                                    {{ task.createdDate | date:'fullDate' }}
+                                </umb-control-group>
+                            </div>
+                            <div class="flx-i" style="margin-right:50px;">
+                                <umb-control-group label="@translation_taskAssignedBy">
+                                    <div class="flex" style="align-items:center;">
+                                        <umb-avatar size="xs"
+                                                    name="{{ task.assignedBy.name }}"
+                                                    img-src="{{ task.assignedBy.avatars[0] }}"
+                                                    img-srcset="{{ task.assignedBy.avatars[1] }} 2x, {{ task.assignedBy.avatars[2] }} 3x">
+                                        </umb-avatar>
+                                        <div style="margin-left:15px">{{ task.assignedBy.name }}</div>
+                                    </div>
+                                </umb-control-group>
+                            </div>
+                            <div class="flx-i" style="margin-right:50px;">
+                                <umb-control-group label="@translation_totalWords">
+                                    {{ task.totalWords | number }}
+                                </umb-control-group>
+                            </div>
+                            <div class="flx-i" ng-if="task.comment">
+                                <umb-control-group label="@general_comment">
+                                    {{ task.comment }}
+                                </umb-control-group>
+                            </div>
+                        </div>
+                    </umb-box-content>
+                </umb-box>
+
+                <umb-box>
+                    <umb-box-header title="Translation options"></umb-box-header>
+                    <umb-box-content class="block-form">
+                        <div class="flex">
+                            <div class="flx-i" style="margin-right:50px;">
+                                <umb-control-group label="@translation_downloadTaskAsXml">
+                                    <umb-button type="button"
+                                                action="download()"
+                                                button-style="primary"
+                                                label-key="general_download">Download</umb-button>
+                                </umb-control-group>
+                            </div>
+                            <div class="flx-i">
+                                <umb-control-group label="@translation_uploadTranslationXml">
+                                    <span ngf-select
+                                          ngf-change="upload($files)"
+                                          ngf-multiple="false">
+                                        <umb-button type="button"
+                                                    button-style="primary"
+                                                    state="uploadButtonState"
+                                                    label-key="general_upload">Upload</umb-button>
+                                    </span>
+                                </umb-control-group>
+                            </div>
+                            <div class="flx-i" style="margin-left:50px;" ng-if="task.closed === false && outcome === null">
+                                <umb-control-group label="@translation_closeTask">
+                                    <umb-button type="button"
+                                                action="close()"
+                                                state="closeButtonState"
+                                                button-style="danger"
+                                                label-key="general_close">Close</umb-button>
+                                </umb-control-group>
+                            </div>
+                            <div class="flx-i" style="margin-left:50px;" ng-if="outcome !== null">
+                                <umb-control-group label="@general_preview">
+                                    <umb-button type="button"
+                                                action="preview()"
+                                                button-style="primary"
+                                                label-key="general_preview">Preview</umb-button>
+                                </umb-control-group>
+                            </div>
+                        </div>
+                    </umb-box-content>
+                </umb-box>
+
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>
+                                <localize key="general_name">Name</localize>
+                            </th>
+                            <th>
+                                <localize key="general_value">Tab</localize>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="property in task.properties track by $index">
+                            <td class="bold">
+                                {{ property.name }}
+                            </td>
+                            <td>
+                                {{ property.value }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </ng-container>
+        </umb-editor-container>
+
+    </umb-editor-view>
+</div>
