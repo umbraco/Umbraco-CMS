@@ -121,12 +121,21 @@ namespace Umbraco.Core.Models.Identity
         }
 
         /// <summary>
+        /// LastPasswordChangeDateUtc so we can track changes to it
+        /// </summary>
+        public override DateTime? LastPasswordChangeDateUtc
+        {
+            get { return _lastPasswordChangeDateUtc; }
+            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _lastPasswordChangeDateUtc, Ps.Value.LastPasswordChangeDateUtcSelector); }
+        }
+
+        /// <summary>
         /// Override LastLoginDateUtc so we can track changes to it
         /// </summary>
         public override DateTime? LastLoginDateUtc
         {
             get { return _lastLoginDateUtc; }
-            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _lastLoginDateUtc, Ps.Value.LastLoginDateUtcSelector); }            
+            set { _tracker.SetPropertyValueAndDetectChanges(value, ref _lastLoginDateUtc, Ps.Value.LastLoginDateUtcSelector); }
         }
 
         /// <summary>
@@ -392,6 +401,7 @@ namespace Umbraco.Core.Models.Identity
             public readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.Email);
             public readonly PropertyInfo UserNameSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.UserName);
             public readonly PropertyInfo LastLoginDateUtcSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, DateTime?>(x => x.LastLoginDateUtc);
+            public readonly PropertyInfo LastPasswordChangeDateUtcSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, DateTime?>(x => x.LastPasswordChangeDateUtc);
             public readonly PropertyInfo EmailConfirmedSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, bool>(x => x.EmailConfirmed);
             public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, string>(x => x.Name);
             public readonly PropertyInfo AccessFailedCountSelector = ExpressionHelper.GetPropertyInfo<BackOfficeIdentityUser, int>(x => x.AccessFailedCount);
@@ -419,6 +429,7 @@ namespace Umbraco.Core.Models.Identity
         private int _id;
         private bool _hasIdentity = false;
         private DateTime? _lastLoginDateUtc;
+        private DateTime? _lastPasswordChangeDateUtc;
         private bool _emailConfirmed;
         private string _name;
         private int _accessFailedCount;

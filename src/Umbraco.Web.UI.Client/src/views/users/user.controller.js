@@ -347,8 +347,10 @@
             vm.unlockUserButtonState = "busy";
             usersResource.unlockUsers([vm.user.id]).then(function (data) {
                 vm.user.userState = 0;
+                vm.user.failedPasswordAttempts = 0;
                 setUserDisplayState();
                 vm.unlockUserButtonState = "success";
+                
                 formHelper.showNotifications(data);
             }, function (error) {
                 vm.unlockUserButtonState = "error";
