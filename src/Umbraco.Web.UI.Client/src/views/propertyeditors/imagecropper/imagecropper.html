@@ -36,7 +36,6 @@
                 </div>
 
                 <div ng-if="!currentCrop" class="umb-cropper-imageholder clearfix">
-                    <pre><code>{{model.value.focalPoint | json}}</code></pre>
                     <umb-image-gravity src="imageSrc"
                                        center="model.value.focalPoint"
                                        on-value-changed="focalPointChanged(left, top)">
