@@ -543,9 +543,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                     }
 
                 }
-                for (var p in allOrigProps) {
-                    
-                }
             }
 
             return changed;

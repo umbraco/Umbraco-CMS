@@ -10,7 +10,7 @@
      * The controller for the file upload property editor.
      *
     */
-    function fileUploadController($scope) {
+    function fileUploadController($scope, fileManager) {
         
         $scope.fileChanged = onFileChanged;
         //declare a special method which will be called whenever the value has changed from the server
@@ -22,11 +22,6 @@
          */
         function onFileChanged(value) {
             $scope.model.value = value;
-
-            //if the value is empty, then tell the server to clear the files
-            if (!$scope.model.value) {
-                $scope.model.value = { clearFiles: true };
-            }
         }
 
         /**
