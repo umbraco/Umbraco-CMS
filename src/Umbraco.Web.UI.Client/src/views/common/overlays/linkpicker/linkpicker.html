@@ -29,13 +29,13 @@
                class="umb-editor umb-textstring"
                ng-model="model.target.name" />
     </umb-control-group>
-
+    {{ model.target }}
     <umb-control-group label="@defaultdialogs_classLinkPicker">
         <input type="text"
                localize="placeholder"
                placeholder="@placeholders_class"
                class="umb-editor umb-textstring"
-               ng-model="model.class" />
+               ng-model="model.target.class" />
     </umb-control-group>
 
     <umb-control-group ng-if="showTarget" label="@content_target">

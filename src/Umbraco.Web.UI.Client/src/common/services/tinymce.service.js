@@ -802,7 +802,8 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					href: href,
 					title: target.name,
 					target: target.target ? target.target : null,
-					rel: target.rel ? target.rel : null
+                    rel: target.rel ? target.rel : null,
+                    class: target.class ? target.class : null
 				};
 
 				if (hasUdi) {

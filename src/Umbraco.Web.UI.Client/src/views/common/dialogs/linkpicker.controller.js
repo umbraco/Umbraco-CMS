@@ -3,6 +3,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, userService, localizationService, tinyMceService) {
 		var dialogOptions = $scope.dialogOptions;
 
+	    console.log("dialogOptions", $scope.dialogOptions);
+
 		var searchText = "Search...";
 		localizationService.localize("general_search").then(function (value) {
 			searchText = value + "...";
@@ -10,7 +12,6 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 
 		$scope.dialogTreeEventHandler = $({});
         $scope.target = {};
-	    $scope.class = "";
 		$scope.searchInfo = {
 			searchFromId: null,
 			searchFromName: null,
@@ -19,35 +20,38 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 			selectedSearchResults: []
 		}
 
-		if (dialogOptions.currentTarget) {
-			$scope.target = dialogOptions.currentTarget;
+        if (dialogOptions.currentTarget) {
+            $scope.target = dialogOptions.currentTarget;
+            console.log("target", $scope.target);
+            //if we have a node ID, we fetch the current node to build the form data
+            if ($scope.target.id || $scope.target.udi) {
 
-			//if we have a node ID, we fetch the current node to build the form data
-			if ($scope.target.id || $scope.target.udi) {
+                var id = $scope.target.udi ? $scope.target.udi : $scope.target.id;
 
-				var id = $scope.target.udi ? $scope.target.udi : $scope.target.id;
+                if (!$scope.target.path) {
+                    entityResource.getPath(id, "Document").then(function(path) {
+                        $scope.target.path = path;
+                        //now sync the tree to this path
+                        $scope.dialogTreeEventHandler.syncTree({
+                            path: $scope.target.path,
+                            tree: "content"
+                        });
+                    });
+                }
 
-				if (!$scope.target.path) {
-					entityResource.getPath(id, "Document").then(function (path) {
-						$scope.target.path = path;
-						//now sync the tree to this path
-						$scope.dialogTreeEventHandler.syncTree({
-							path: $scope.target.path,
-							tree: "content"
-						});
-					});
-				}
-
-				// if a link exists, get the properties to build the anchor name list
-				contentResource.getById(id).then(function (resp) {
-					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-					$scope.model.target.url = resp.urls[0];
-				});
-			} else if ($scope.target.url.length) {
-				// a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
-				$scope.target.url = $scope.model.url.substring(0, $scope.model.url.search(/(#|\?)/));
-			}
-		}
+                // if a link exists, get the properties to build the anchor name list
+                contentResource.getById(id).then(function(resp) {
+                    $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
+                    $scope.model.target.url = resp.urls[0];
+                    console.log("resp:44", resp);
+                });
+            } else if ($scope.target.url.length) {
+                // a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
+                $scope.target.url = $scope.model.url.substring(0, $scope.model.url.search(/(#|\?)/));
+            }
+        } else {
+            console.log("no");
+        }
 
 		if (dialogOptions.anchors) {
 			$scope.anchorValues = dialogOptions.anchors;
@@ -82,7 +86,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 				} else {
 					contentResource.getById(args.node.id).then(function (resp) {
 						$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-						$scope.model.target.url = resp.urls[0];
+                        $scope.model.target.url = resp.urls[0];
+					    console.log("resp:85", resp);
 					});
 				}
 
