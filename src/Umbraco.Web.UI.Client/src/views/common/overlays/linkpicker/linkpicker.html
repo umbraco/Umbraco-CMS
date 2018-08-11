@@ -30,6 +30,14 @@
                ng-model="model.target.name" />
     </umb-control-group>
 
+    <umb-control-group label="@defaultdialogs_classLinkPicker">
+        <input type="text"
+               localize="placeholder"
+               placeholder="@placeholders_class"
+               class="umb-editor umb-textstring"
+               ng-model="model.class" />
+    </umb-control-group>
+
     <umb-control-group ng-if="showTarget" label="@content_target">
         <label class="checkbox no-indent">
             <input type="checkbox"

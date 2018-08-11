@@ -9,7 +9,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 		});
 
 		$scope.dialogTreeEventHandler = $({});
-		$scope.target = {};
+        $scope.target = {};
+	    $scope.class = "";
 		$scope.searchInfo = {
 			searchFromId: null,
 			searchFromName: null,
@@ -74,7 +75,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 				$scope.currentNode.selected = true;
 				$scope.target.id = args.node.id;
 				$scope.target.udi = args.node.udi;
-				$scope.target.name = args.node.name;
+                $scope.target.name = args.node.name;
 
 				if (args.node.id < 0) {
 					$scope.target.url = "/";
