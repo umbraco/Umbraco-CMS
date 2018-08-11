@@ -162,6 +162,7 @@
   </area>
   <area alias="defaultdialogs">
     <key alias="nodeNameLinkPicker">Titolo del Link</key>
+    <key alias="classLinkPicker">Link class</key>
     <key alias="urlLinkPicker">Link</key>
     <key alias="anchorInsert">Nome</key>
     <key alias="assignDomain">Gestione alias Hostnames</key>

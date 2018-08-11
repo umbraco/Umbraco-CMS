@@ -341,7 +341,7 @@
     </area>
     <area alias="defaultdialogs">
         <key alias="nodeNameLinkPicker">Link title</key>
-        <key alias="classLinkPicker">Class</key>
+        <key alias="classLinkPicker">Link class</key>
         <key alias="urlLinkPicker">Link</key>
         <key alias="anchorLinkPicker">Anchor / querystring</key>
         <key alias="anchorInsert">Name</key>
