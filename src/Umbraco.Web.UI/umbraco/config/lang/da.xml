@@ -332,6 +332,7 @@
   </area>
   <area alias="defaultdialogs">
     <key alias="nodeNameLinkPicker">Link titel</key>
+    <key alias="classLinkPicker">Link class</key>
     <key alias="urlLinkPicker">Link</key>
     <key alias="anchorInsert">Navn på lokalt link</key>
     <key alias="assignDomain">Rediger domæner</key>
@@ -440,6 +441,7 @@
     <key alias="email">Indtast din e-mail</key>
     <key alias="enterMessage">Indtast en besked...</key>
     <key alias="usernameHint">Dit brugernavn er typisk din e-mailadresse</key>
+    <key alias="class">Enter a class...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowAtRoot" version="7.2">Tillad på rodniveau</key>

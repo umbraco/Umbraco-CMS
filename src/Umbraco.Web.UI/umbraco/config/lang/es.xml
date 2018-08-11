@@ -300,6 +300,7 @@
     </area>
     <area alias="defaultdialogs">
         <key alias="nodeNameLinkPicker">Título del vínculo</key>
+        <key alias="classLinkPicker">Link class</key>
         <key alias="urlLinkPicker">Vínculo</key>
         <key alias="anchorInsert">Nombre</key>
         <key alias="assignDomain">Administrar dominios</key>
@@ -411,6 +412,7 @@
         <key alias="email">Introduce tu email....</key>
         <key alias="enterMessage">Introduce un mensaje...</key>
         <key alias="usernameHint">Tu nombre de usuario normalmente es tu e-mail</key>
+        <key alias="class">Enter a class...</key>
     </area>
     <area alias="editcontenttype">
         <key alias="allowAtRoot" version="7.2">Permitir en nodo raíz</key>

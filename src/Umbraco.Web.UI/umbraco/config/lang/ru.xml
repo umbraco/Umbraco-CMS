@@ -406,6 +406,7 @@
     <key alias="macroContainerSettings">Свойства макроса</key>
     <key alias="macroDoesNotHaveProperties">Этот макрос не имеет редактируемых свойств</key>
     <key alias="nodeNameLinkPicker">Заголовок ссылки</key>
+    <key alias="classLinkPicker">Link class</key>
     <key alias="noIconsFound">Ни одной пиктограммы не найдено</key>
     <key alias="paste">Вставить</key>
     <key alias="permissionsEdit">Изменить разрешения для</key>
@@ -1343,6 +1344,7 @@
     <key alias="search">Что искать...</key>
     <key alias="username">Укажите имя пользователя</key>
     <key alias="usernameHint">Имя пользователя (часто это Ваш email-адрес)</key>
+    <key alias="class">Enter a class...</key>
   </area>
   <area alias="prompt">
     <key alias="stay">Остаться</key>

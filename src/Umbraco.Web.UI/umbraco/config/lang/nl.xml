@@ -257,6 +257,7 @@
   </area>
   <area alias="defaultdialogs">
     <key alias="nodeNameLinkPicker">Link Titel</key>
+    <key alias="classLinkPicker">Link class</key>
     <key alias="urlLinkPicker">Link</key>
     <key alias="anchorInsert">Naam</key>
     <key alias="assignDomain">Beheer domeinnamen</key>
@@ -354,6 +355,7 @@
     <key alias="enterTags">Typ om tags toe te voegen (druk op enter na elke tag)...</key>
 	<key alias="email">Voer jouw email in</key>
     <key alias="usernameHint">Jouw gebruikersnaam is meestal jouw email</key>
+    <key alias="class">Enter a class...</key>
   </area>
 
   <area alias="editcontenttype">

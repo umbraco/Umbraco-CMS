@@ -686,8 +686,9 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					currentTarget = {
 						name: anchor.attr("title"),
 						url: anchor.attr("href"),
-						target: anchor.attr("target")
-					};
+                        target: anchor.attr("target"),
+						class: anchor.attr("class")
+                    };
 
 					// drop the lead char from the anchor text, if it has a value
 					var anchorVal = anchor[0].dataset.anchor;
@@ -802,7 +803,8 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 					href: href,
 					title: target.name,
 					target: target.target ? target.target : null,
-					rel: target.rel ? target.rel : null
+                    rel: target.rel ? target.rel : null,
+                    class: target.class ? target.class : null
 				};
 
 				if (hasUdi) {
