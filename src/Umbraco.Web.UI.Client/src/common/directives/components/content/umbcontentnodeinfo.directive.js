@@ -45,7 +45,8 @@
                 scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
 
                 setNodePublishStatus(scope.node);
-
+                //default setting for redirect url management
+                scope.urlTrackerDisabled = false;
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
@@ -113,14 +114,24 @@
 
             }
             function loadRedirectUrls() {
-
                 scope.loadingRedirectUrls = true;
-                redirectUrlsResource.getRedirectsForContentItem(scope.node.udi)
-                    .then(function (data) {
-                        scope.redirectUrls = data.searchResults;
-                        scope.hasRedirects = (typeof data.searchResults !== 'undefined' && data.searchResults.length > 0);
+                //check if Redirect Url Management is enabled
+                redirectUrlsResource.getEnableState().then(function (response) {
+                    scope.urlTrackerDisabled = response.enabled !== true;
+                    scope.userIsAdmin = response.userIsAdmin;
+                    if (scope.urlTrackerDisabled === false) {
+
+                        redirectUrlsResource.getRedirectsForContentItem(scope.node.udi)
+                            .then(function (data) {
+                                scope.redirectUrls = data.searchResults;
+                                scope.hasRedirects = (typeof data.searchResults !== 'undefined' && data.searchResults.length > 0);
+                                scope.loadingRedirectUrls = false;
+                            });
+                    }
+                    else {
                         scope.loadingRedirectUrls = false;
-                    });
+                    }
+                });
             }
 
             function setAuditTrailLogTypeColor(auditTrail) {
