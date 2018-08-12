@@ -34,6 +34,12 @@
     background: #f8f8f8;
 }
 
+.nested-content__item--disabled .nested-content__heading,
+.nested-content__item--disabled .nested-content__icon--disable
+{
+    opacity: 0.3;
+}
+
 .nested-content__item.ui-sortable-placeholder
 {
     background: #f8f8f8;
@@ -125,6 +131,7 @@
 
 
 .nested-content__header-bar:hover .nested-content__icons,
+.nested-content__item--disabled .nested-content__icon--disable:hover,
 .nested-content__item--active > .nested-content__header-bar .nested-content__icons
 {
     opacity: 1;

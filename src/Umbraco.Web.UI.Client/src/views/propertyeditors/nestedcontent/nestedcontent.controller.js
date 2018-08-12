@@ -12,8 +12,7 @@
                 ncAlias: "",
                 ncTabAlias: "",
                 nameTemplate: ""
-            }
-            );
+            });
         }
 
         $scope.remove = function (index) {
@@ -103,6 +102,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.singleMode = $scope.minItems == 1 && $scope.maxItems == 1;
         $scope.showIcons = $scope.model.config.showIcons || true;
         $scope.wideMode = $scope.model.config.hideLabel == "1";
+        $scope.allowDisabling = $scope.model.config.allowDisabling === "1";
 
         $scope.overlayMenu = {
             show: false,
@@ -184,6 +184,11 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     updateModel();
                 }
             }
+        };
+
+        $scope.toggleDisabled = function (idx) {
+			$scope.nodes[idx].ncDisabled = !$scope.nodes[idx].ncDisabled;
+			updateModel();
         };
 
         $scope.getName = function (idx) {
@@ -357,6 +362,11 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
             node.key = item && item.key ? item.key : UUID.generate();
             node.ncContentTypeAlias = scaffold.contentTypeAlias;
 
+            node.ncDisabled = false;
+			if(item) {
+				node.ncDisabled = item.ncDisabled;
+            }
+
             for (var t = 0; t < node.tabs.length; t++) {
                 var tab = node.tabs[t];
                 for (var p = 0; p < tab.properties.length; p++) {
@@ -394,7 +404,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                     var newValue = {
                         key: node.key,
                         name: node.name,
-                        ncContentTypeAlias: node.ncContentTypeAlias
+						ncContentTypeAlias: node.ncContentTypeAlias,
+						ncDisabled: node.ncDisabled
                     };
                     for (var t = 0; t < node.tabs.length; t++) {
                         var tab = node.tabs[t];

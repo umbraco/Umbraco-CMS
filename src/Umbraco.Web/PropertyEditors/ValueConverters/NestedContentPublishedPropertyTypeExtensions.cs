@@ -62,7 +62,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                             continue;
                         }
 
-                        var publishedContentType = PublishedContentType.Get(PublishedItemType.Content, contentTypeAlias);
+						JToken disabled;
+						if (item.TryGetValue("ncDisabled", out disabled) && disabled.Value<bool>())
+						{
+							continue;
+						}
+
+						var publishedContentType = PublishedContentType.Get(PublishedItemType.Content, contentTypeAlias);
                         if (publishedContentType == null)
                         {
                             continue;
