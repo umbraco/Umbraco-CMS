@@ -68,13 +68,13 @@
 
                 <umb-pane>
                     <umb-control-group  localize="label" label="@defaultdialogs_relateToOriginalLabel">
-                        <input type="checkbox" ng-model="$parent.$parent.relateToOriginal"/>
+                        <umb-toggle checked="$parent.$parent.relateToOriginal" on-click="$parent.$parent.toggle('relate')"></umb-toggle>
                     </umb-control-group>
                 </umb-pane>
 
                 <umb-pane>
-                    <umb-control-group localize="label" label="@defaultdialogs_includeDescendants"> 
-                        <input type="checkbox" ng-model="$parent.$parent.recursive" />
+                    <umb-control-group localize="label" label="@defaultdialogs_includeDescendants">
+                        <umb-toggle checked="$parent.$parent.recursive" on-click="$parent.$parent.toggle('recursive')"></umb-toggle>
                     </umb-control-group>
                 </umb-pane>
 

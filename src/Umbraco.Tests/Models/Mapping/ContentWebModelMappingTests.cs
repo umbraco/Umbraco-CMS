@@ -127,6 +127,23 @@ namespace Umbraco.Tests.Models.Mapping
         }
 
         [Test]
+        public void To_Display_Model_No_Tabs()
+        {
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            contentType.PropertyGroups.Clear();
+            var content = new Content("Home", -1, contentType) { Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
+
+            var result = Mapper.Map<IContent, ContentItemDisplay>(content);
+
+            AssertBasics(result, content);
+            foreach (var p in content.Properties)
+            {
+                AssertDisplayProperty(result, p, ApplicationContext);
+            }
+            Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count());
+        }
+
+        [Test]
         public void To_Display_Model_With_Non_Grouped_Properties()
         {
             var idSeed = 1;

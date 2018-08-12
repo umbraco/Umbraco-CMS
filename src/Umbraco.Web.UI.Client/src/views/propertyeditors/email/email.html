@@ -4,7 +4,7 @@
            id="{{model.alias}}"
            class="umb-editor umb-textstring textstring"
            val-email
-           ng-required="model.config.IsRequired || model.validation.mandatory"
+           ng-required="model.config.IsRequired != 0 || model.validation.mandatory"
            val-server="value" />
     
     <span class="help-inline" val-msg-for="textbox" val-toggle-msg="required"><localize key="general_required">Required</localize></span>

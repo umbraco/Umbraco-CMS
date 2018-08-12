@@ -125,7 +125,7 @@
         function link(scope, el, attr, ngModel) {
 
             // Load in ace library
-            assetsService.load(['lib/ace-builds/src-min-noconflict/ace.js', 'lib/ace-builds/src-min-noconflict/ext-language_tools.js']).then(function () {
+            assetsService.load(['lib/ace-builds/src-min-noconflict/ace.js', 'lib/ace-builds/src-min-noconflict/ext-language_tools.js'], scope).then(function () {
                 if (angular.isUndefined(window.ace)) {
                     throw new Error('ui-ace need ace to work... (o rly?)');
                 } else {
@@ -161,7 +161,7 @@
                 /**
                  * ACE editor session.
                  * @type object
-                 * @see [EditSession]{@link http://ace.c9.io/#nav=api&api=edit_session}
+                 * @see [EditSession]{@link https://ace.c9.io/#nav=api&api=edit_session}
                  */
                 var session = acee.getSession();
 

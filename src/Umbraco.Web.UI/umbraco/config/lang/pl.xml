@@ -2,7 +2,7 @@
 <language alias="pl" intName="Polish" localName="polski" lcid="21" culture="pl-PL">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Zarządzanie hostami</key>
@@ -214,7 +214,7 @@
     <key alias="childItems" version="7.0">Elementy dzieci</key>
     <key alias="target" version="7.0">Cel</key>
     <key alias="scheduledPublishServerTime">Oznacza to następującą godzinę na serwerze:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.org/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Co to oznacza?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Co to oznacza?</a>]]></key>
     <key alias="nestedContentDeleteItem">Czy na pewno chcesz usunąć ten element?</key>
     <key alias="nestedContentEditorNotSupported">Właściwość %0% używa edytora %1%, który nie jest wspierany przez Nested Content.</key>
     <key alias="addTextBox">Dodaj kolejne pole tekstowe</key>
@@ -688,7 +688,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
                 <p>Aby kontynuować, dokonaj edycji pliku "web.config" (używając Visual Studio lub dowolnego edytora tekstu), przemieść kursor na koniec pliku, dodaj parametry połączenia do Twojej bazy danych w kluczu o nazwie "umbracoDbDSN" i zapisz plik.</p> 
                 <p>
                 Kliknij <strong>ponów próbę</strong> kiedy 
-                skończysz.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+                skończysz.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
                 Tu znajdziesz więcej informacji na temat edycji pliku "web.config".</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Aby zakończyć ten etap instalacji, będziesz musiał podać parametry połączenia do Twojego serwera baz danych ("connection string").<br />
                 Skontaktuj się z Twoim dostawą usług internetowych jeśli zajdzie taka potrzeba. 
@@ -1618,7 +1618,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
 	  <key alias="httpsCheckInvalidCertificate">Błąd walidacji certyfikatu: '%0%'</key>
     <key alias="httpsCheckExpiredCertificate">Certyfikat SSL Twojej strony wygasł.</key>
     <key alias="httpsCheckExpiringCertificate">Certyfikat SSL Twojej strony wygaśnie za %0% dni.</key>
-	  <key alias="httpsCheckInvalidUrl">Błąd pingowania adresu URL %0% - '%1%'</key>
+	  <key alias="healthCheckInvalidUrl">Błąd pingowania adresu URL %0% - '%1%'</key>
 	  <key alias="httpsCheckIsCurrentSchemeHttps">Oglądasz %0% stronę używając HTTPS.</key>
 	  <key alias="httpsCheckConfigurationRectifyNotPossible">appSetting 'umbracoUseSSL' został ustawiony na 'false' w Twoim pliku web.config. Po uzyskaniu dostępu do strony, używając HTTPS, powinieneś go ustawić na 'true'.</key>
 	  <key alias="httpsCheckConfigurationCheckResult">appSetting 'umbracoUseSSL' został ustawiony na '%0%' w Twoim pliku web.config, Twoje ciasteczka są %1% ustawione jako bezpieczne.</key>
@@ -1658,10 +1658,10 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
 
     <key alias="clickJackingCheckHeaderFound"><![CDATA[Nagłówek lub meta-tag <strong>X-Frame-Options</strong> używany do kontrolowania czy strona może być IFRAME'owana przez inną został znaleziony.]]></key>
     <key alias="clickJackingCheckHeaderNotFound"><![CDATA[Nagłówek lub meta-tag <strong>X-Frame-Options</strong> używany do kontrolowania czy strona może być IFRAME'owana przez inną nie został znaleziony.]]></key>
-    <key alias="clickJackingSetHeaderInConfig">Ustaw nagłówek w Config</key>
+    <key alias="setHeaderInConfig">Ustaw nagłówek w Config</key>
     <key alias="clickJackingSetHeaderInConfigDescription">Dodaje wartość do sekcji httpProtocol/customHeaders pliku web.config, aby zapobiec IFRAME'owania strony przez inne witryny.</key>
     <key alias="clickJackingSetHeaderInConfigSuccess">Ustawienie do tworzenia nagłówka, zapobiegającego IFRAME'owania strony przez inne witryny zostało dodane do Twojego pliku web.config.</key>
-    <key alias="clickJackingSetHeaderInConfigError">Nie można zaktualizować pliku web.config. Błąd: %0%</key>
+    <key alias="setHeaderInConfigError">Nie można zaktualizować pliku web.config. Błąd: %0%</key>
 
     <!-- Następujące klucze spowodują, że tokeny zostaną przekazane:
 	    0: Lista znalezionych nagłówków, oddzielonych przecinkami

@@ -19,6 +19,7 @@ namespace Umbraco.Core.Models.Identity
                 })
                 .ConstructUsing(user => new BackOfficeIdentityUser(user.Id, user.Groups))
                 .ForMember(user => user.LastLoginDateUtc, expression => expression.MapFrom(user => user.LastLoginDate.ToUniversalTime()))
+                .ForMember(user => user.LastPasswordChangeDateUtc, expression => expression.MapFrom(user => user.LastPasswordChangeDate.ToUniversalTime()))
                 .ForMember(user => user.Email, expression => expression.MapFrom(user => user.Email))
                 .ForMember(user => user.EmailConfirmed, expression => expression.MapFrom(user => user.EmailConfirmedDate.HasValue))
                 .ForMember(user => user.Id, expression => expression.MapFrom(user => user.Id))
@@ -34,6 +35,15 @@ namespace Umbraco.Core.Models.Identity
                 .ForMember(user => user.CalculatedContentStartNodeIds, expression => expression.MapFrom(user => user.CalculateContentStartNodeIds(applicationContext.Services.EntityService)))
                 .ForMember(user => user.CalculatedMediaStartNodeIds, expression => expression.MapFrom(user => user.CalculateMediaStartNodeIds(applicationContext.Services.EntityService)))
                 .ForMember(user => user.AllowedSections, expression => expression.MapFrom(user => user.AllowedSections.ToArray()))
+
+                .ForMember(user => user.LockoutEnabled, expression => expression.Ignore())
+                .ForMember(user => user.Logins, expression => expression.Ignore())
+                .ForMember(user => user.Roles, expression => expression.Ignore())
+                .ForMember(user => user.PhoneNumber, expression => expression.Ignore())
+                .ForMember(user => user.PhoneNumberConfirmed, expression => expression.Ignore())
+                .ForMember(user => user.TwoFactorEnabled, expression => expression.Ignore())
+                .ForMember(user => user.Claims, expression => expression.Ignore())
+
                 .AfterMap((user, identityUser) =>
                 {
                     identityUser.ResetDirtyProperties(true);

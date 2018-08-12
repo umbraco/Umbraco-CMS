@@ -1,10 +1,15 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
 {
+    /// <summary>
+    /// Represents a service for handling audit.
+    /// </summary>
     public interface IAuditService : IService
     {
         void Add(AuditType type, string comment, int userId, int objectId);
@@ -54,5 +59,25 @@ namespace Umbraco.Core.Services
             Direction orderDirection = Direction.Descending,
             AuditType[] auditTypeFilter = null,
             IQuery<IAuditItem> customFilter = null);
+
+        /// <summary>
+        /// Writes an audit entry for an audited event.
+        /// </summary>
+        /// <param name="performingUserId">The identifier of the user triggering the audited event.</param>
+        /// <param name="perfomingDetails">Free-form details about the user triggering the audited event.</param>
+        /// <param name="performingIp">The IP address or the request triggering the audited event.</param>
+        /// <param name="eventDateUtc">The date and time of the audited event.</param>
+        /// <param name="affectedUserId">The identifier of the user affected by the audited event.</param>
+        /// <param name="affectedDetails">Free-form details about the entity affected by the audited event.</param>
+        /// <param name="eventType">
+        /// The type of the audited event - must contain only alphanumeric chars and hyphens with forward slashes separating categories.
+        /// <example>
+        /// The eventType will generally be formatted like: {application}/{entity-type}/{category}/{sub-category}
+        /// Example: umbraco/user/sign-in/failed
+        /// </example>
+        /// </param>
+        /// <param name="eventDetails">Free-form details about the audited event.</param>
+        IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string affectedDetails, string eventType, string eventDetails);
+        
     }
 }

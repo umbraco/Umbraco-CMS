@@ -19,6 +19,7 @@
     <header>Macro</header>
     <usercontrol>/create/xslt.ascx</usercontrol>
     <tasks>
+      <create assembly="umbraco" type="XsltTasks" />
       <delete assembly="umbraco" type="XsltTasks" />
     </tasks>
   </nodeType>
@@ -72,7 +73,7 @@
       <delete assembly="umbraco" type="stylesheetPropertyTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="initdictionary">
+  <nodeType alias="initdictionary-obsolete">
     <header>Dictionary editor egenskab</header>
     <usercontrol>/create/simple.ascx</usercontrol>
     <tasks>

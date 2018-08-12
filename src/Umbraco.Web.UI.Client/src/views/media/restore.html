@@ -1,0 +1,26 @@
+<div ng-controller="Umbraco.Editors.Media.RestoreController">
+	<div class="umb-dialog-body">
+		<umb-pane>
+
+			<p class="abstract" ng-hide="error != null || success == true">
+				<localize key="actions_restore">Restore</localize> <strong>{{currentNode.name}}</strong> <localize key="general_under">under</localize> <strong>{{target.name}}</strong>?
+            </p>
+
+            <div class="alert alert-error" ng-show="error != null">
+                <div><strong>{{error.errorMsg}}</strong></div>
+                <div>{{error.data.Message}}</div>
+            </div>
+
+			<div class="alert alert-success" ng-show="success == true">
+				<p><strong>{{currentNode.name}}</strong> <localize key="editdatatype_wasMoved">was moved underneath</localize> <strong>{{target.name}}</strong></p>
+				<button class="btn btn-primary" ng-click="nav.hideDialog()"><localize key="general_ok">OK</localize></button>
+			</div>
+
+		</umb-pane>
+	</div>
+
+	<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="success == true">
+		<a class="btn btn-link" ng-click="nav.hideDialog()"><localize key="general_cancel">Cancel</localize></a>
+		<button class="btn btn-primary" ng-click="restore()" ng-show="error == null"><localize key="actions_restore">Restore</localize></button>
+	</div>
+</div>

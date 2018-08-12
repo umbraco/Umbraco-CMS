@@ -337,7 +337,7 @@ namespace Umbraco.Core.Persistence
 			        _transaction = _sharedConnection.BeginTransaction(isolationLevel);
 			    }
 
-			    catch (Exception e)
+			    catch (Exception)
 			    {
 			        throw;
 			    }
@@ -402,7 +402,7 @@ namespace Umbraco.Core.Persistence
         }
 
         // Helper to handle named parameters from object properties
-		static Regex rxParams = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
+		static readonly Regex rxParams = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
 		public static string ProcessParams(string _sql, object[] args_src, List<object> args_dest)
 		{
 			return rxParams.Replace(_sql, m =>
@@ -545,7 +545,7 @@ namespace Umbraco.Core.Persistence
 		}
 
 		// Create a command
-		static Regex rxParamsPrefix = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
+		static readonly Regex rxParamsPrefix = new Regex(@"(?<!@)@\w+", RegexOptions.Compiled);
 		public IDbCommand CreateCommand(IDbConnection connection, string sql, params object[] args)
 		{
 			// Perform named argument replacements
@@ -666,8 +666,8 @@ namespace Umbraco.Core.Persistence
 			return ExecuteScalar<T>(sql.SQL, sql.Arguments);
 		}
 
-		Regex rxSelect = new Regex(@"\A\s*(SELECT|EXECUTE|CALL)\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
-		Regex rxFrom = new Regex(@"\A\s*FROM\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
+		static readonly Regex rxSelect = new Regex(@"\A\s*(SELECT|EXECUTE|CALL)\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
+		static readonly Regex rxFrom = new Regex(@"\A\s*FROM\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
 		string AddSelectClause<T>(string sql)
 		{
 			if (sql.StartsWith(";"))
@@ -701,9 +701,9 @@ namespace Umbraco.Core.Persistence
 			return Fetch<T>(sql.SQL, sql.Arguments);
 		}
 
-		static Regex rxColumns = new Regex(@"\A\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-		static Regex rxOrderBy = new Regex(@"\bORDER\s+BY\s+(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
-        static Regex rxDistinct = new Regex(@"\ADISTINCT\s", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+		static readonly Regex rxColumns = new Regex(@"\A\s*SELECT\s+((?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|.)*?)(?<!,\s+)\bFROM\b", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+		static readonly Regex rxOrderBy = new Regex(@"\bORDER\s+BY\s+(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?(?:\s*,\s*(?:\((?>\((?<depth>)|\)(?<-depth>)|.?)*(?(depth)(?!))\)|[\w\(\)\.])+(?:\s+(?:ASC|DESC))?)*", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
+	    static readonly Regex rxDistinct = new Regex(@"\ADISTINCT\s", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline | RegexOptions.Compiled);
 		public static bool SplitSqlForPaging(string sql, out string sqlCount, out string sqlSelectRemoved, out string sqlOrderBy)
 		{
 			sqlSelectRemoved = null;
@@ -2494,9 +2494,9 @@ namespace Umbraco.Core.Persistence
 			// Now do rhs
 			if (_rhs != null)
 				_rhs.Build(sb, args, this);
-		}
+        }
 
-		public Sql Where(string sql, params object[] args)
+        public Sql Where(string sql, params object[] args)
 		{
 			return Append(new Sql("WHERE (" + sql + ")", args));
 		}
@@ -2509,9 +2509,14 @@ namespace Umbraco.Core.Persistence
 		public Sql Select(params object[] columns)
 		{
 			return Append(new Sql("SELECT " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
-		}
+        }
 
-		public Sql From(params object[] tables)
+        public Sql AndSelect(params object[] columns)
+        {
+            return Append(new Sql(", " + String.Join(", ", (from x in columns select x.ToString()).ToArray())));
+        }
+
+        public Sql From(params object[] tables)
 		{
 			return Append(new Sql("FROM " + String.Join(", ", (from x in tables select x.ToString()).ToArray())));
 		}
@@ -2546,5 +2551,4 @@ namespace Umbraco.Core.Persistence
 			}
 		}
 	}
-
 }

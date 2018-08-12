@@ -271,7 +271,7 @@ AnotherContentFinder
         public void Resolves_Assigned_Mappers()
         {
             var foundTypes1 = _manager.ResolveAssignedMapperTypes();
-            Assert.AreEqual(29, foundTypes1.Count());
+            Assert.AreEqual(31, foundTypes1.Count());
         }
 
         [Test]
@@ -285,8 +285,7 @@ AnotherContentFinder
         public void Resolves_Attributed_Trees()
         {
             var trees = _manager.ResolveAttributedTrees();
-            // commit 6c5e35ec2cbfa31be6790d1228e0c2faf5f55bc8 brings the count down to 14
-            Assert.AreEqual(6, trees.Count());
+            Assert.AreEqual(5, trees.Count());
         }
 
         [Test]
@@ -300,7 +299,7 @@ AnotherContentFinder
         public void Resolves_Trees()
         {
             var trees = _manager.ResolveTrees();
-            Assert.AreEqual(35, trees.Count());
+            Assert.AreEqual(33, trees.Count());
         }
 
         [Test]

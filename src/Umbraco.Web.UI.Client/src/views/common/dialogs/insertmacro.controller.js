@@ -10,16 +10,22 @@
 function InsertMacroController($scope, entityResource, macroResource, umbPropEditorHelper, macroService, formHelper) {
 
     /** changes the view to edit the params of the selected macro */
-    function editParams() {
+    /** if there is pnly one macro, and it has parameters - editor can skip selecting the Macro **/
+    function editParams(insertIfNoParameters) {
+        //whether to insert the macro in the rich text editor when editParams is called and there are no parameters see U4-10537 
+        insertIfNoParameters = (typeof insertIfNoParameters !== 'undefined') ? insertIfNoParameters : true;
         //get the macro params if there are any
         macroResource.getMacroParameters($scope.selectedMacro.id)
             .then(function (data) {
 
                 //go to next page if there are params otherwise we can just exit
                 if (!angular.isArray(data) || data.length === 0) {
-                    //we can just exist!
-                    submitForm();
-
+                    //we can just exist!                  
+                    if (insertIfNoParameters) {
+                        submitForm();
+                    } else {
+                        $scope.wizardStep = 'macroSelect';
+                    }
                 } else {
                     $scope.wizardStep = "paramSelect";
                     $scope.macroParams = data;
@@ -117,7 +123,7 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
             formHelper.resetForm({ scope: $scope });
 
             if ($scope.wizardStep === "macroSelect") {
-                editParams();
+                editParams(true);
             }
             else {
                 submitForm();
@@ -155,12 +161,19 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
                 if (found) {
                     //select the macro and go to next screen
                     $scope.selectedMacro = found;
-                    editParams();
+                    editParams(true);
                     return;
                 }
             }
-            //we don't have a pre-selected macro so ensure the correct step is set
-            $scope.wizardStep = "macroSelect";
+            //if there is only one macro in the site and it has parameters, let's not make the editor choose it from a selection of one macro (unless there are no parameters - then weirdly it's a better experience to make that selection)
+            if ($scope.macros.length == 1) {
+                $scope.selectedMacro = $scope.macros[0];
+                editParams(false);
+            }
+            else {
+                //we don't have a pre-selected macro so ensure the correct step is set
+                $scope.wizardStep = 'macroSelect';
+            }
         });
 
 

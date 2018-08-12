@@ -2,7 +2,7 @@
 <language alias="ko" intName="Korean" localName="한국어" lcid="18" culture="ko-KR">
   <creator>
     <name>The Umbraco community</name>
-    <link>http://our.umbraco.org/documentation/Extending-Umbraco/Language-Files</link>
+    <link>https://our.umbraco.com/documentation/Extending-Umbraco/Language-Files</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">호스트명 관리</key>
@@ -378,7 +378,7 @@
     <key alias="databaseNotFound"><![CDATA[<p>데이터베이스를 찾을 수 없습니다. “web.config”파일의 "connection string"이 바르게 설정되었는지 확인하세요.</p>
             <p>"web.config" 파일에 맨아래에 ,키네임을 "UmbracoDbDSN"로 하여 사용하시는 데이터베이스의 connection string 정보를 입력하시고 파일을 저장하세요. </p>
             <p>
-            완료 후<strong>재시도</strong>버튼을 누르세요.<br /><a href="http://our.umbraco.org/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+            완료 후<strong>재시도</strong>버튼을 누르세요.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
 		               web.config의 더많은 정보는 여기에 있습니다.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[이과정을 위해선, 당신의 DB서버 정보에 대해서 알고 계셔야합니다.("connection string").<br />
       필요하시다면 사용하시는 ISP쪽에 문의하시기 바랍니다..

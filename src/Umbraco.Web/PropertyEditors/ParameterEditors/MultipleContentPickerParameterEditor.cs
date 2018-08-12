@@ -9,6 +9,8 @@ namespace Umbraco.Web.PropertyEditors.ParameterEditors
         public MultipleContentPickerParameterEditor()
         {
             Configuration.Add("multiPicker", "1");
+            Configuration.Add("minNumber",0 );
+            Configuration.Add("maxNumber", 0);
         }
     }
 }

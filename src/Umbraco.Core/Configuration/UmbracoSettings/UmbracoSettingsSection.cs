@@ -67,50 +67,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return (DistributedCallElement)this["distributedCall"]; }
         }
-
-        private RepositoriesElement _defaultRepositories;
-
-        [ConfigurationProperty("repositories")]
-        internal RepositoriesElement PackageRepositories
-        {
-            get
-            {
-
-                if (_defaultRepositories != null)
-                {
-                    return _defaultRepositories;
-                }
-
-                //here we need to check if this element is defined, if it is not then we'll setup the defaults
-                var prop = Properties["repositories"];
-                var repos = this[prop] as ConfigurationElement;
-                if (repos != null && repos.ElementInformation.IsPresent == false)
-                {
-                    var collection = new RepositoriesCollection
-                        {
-                            new RepositoryElement() {Name = "Umbraco package Repository", Id = new Guid("65194810-1f85-11dd-bd0b-0800200c9a66")}
-                        };
-
-                    
-                    _defaultRepositories = new RepositoriesElement()
-                        {
-                            Repositories = collection
-                        };
-
-                    return _defaultRepositories;
-                }
-
-                //now we need to ensure there is *always* our umbraco repo! its hard coded in the codebase!
-                var reposElement = (RepositoriesElement)base["repositories"];
-                if (reposElement.Repositories.All(x => x.Id != new Guid("65194810-1f85-11dd-bd0b-0800200c9a66")))
-                {
-                    reposElement.Repositories.Add(new RepositoryElement() { Name = "Umbraco package Repository", Id = new Guid("65194810-1f85-11dd-bd0b-0800200c9a66") });                    
-                }
-
-                return reposElement;
-            }
-        }
-
+        
         [ConfigurationProperty("providers")]
         internal ProvidersElement Providers
         {
@@ -183,11 +140,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IDistributedCallSection IUmbracoSettingsSection.DistributedCall
         {
             get { return DistributedCall; }
-        }
-
-        IRepositoriesSection IUmbracoSettingsSection.PackageRepositories
-        {
-            get { return PackageRepositories; }
         }
 
         IProvidersSection IUmbracoSettingsSection.Providers

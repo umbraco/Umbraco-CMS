@@ -17,7 +17,7 @@ namespace Umbraco.Core.Models.Rdbms
         }
 
         [Column("id")]
-        [PrimaryKeyColumn(IdentitySeed = 5)]
+        [PrimaryKeyColumn(IdentitySeed = 6)]
         public int Id { get; set; }
 
         [Column("userGroupAlias")]

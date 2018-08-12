@@ -8,6 +8,8 @@
             var evts = [];
             var isInfoTab = false;
             scope.publishStatus = {};
+
+            scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
             
             function onInit() {
 
@@ -39,6 +41,9 @@
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
 
+                // Declare a fallback URL for the <umb-node-preview/> directive
+                scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
+
                 setNodePublishStatus(scope.node);
                 
             }
@@ -50,8 +55,13 @@
 
             scope.openDocumentType = function (documentType) {               
                 var url = "/settings/documenttypes/edit/" + documentType.id;
-                $location.path(url);
+                $location.url(url);
             };
+
+            scope.openTemplate = function () {
+                var url = "/settings/templates/edit/" + scope.node.templateId;
+                $location.url(url);
+            }
 
             scope.updateTemplate = function (templateAlias) {
 
