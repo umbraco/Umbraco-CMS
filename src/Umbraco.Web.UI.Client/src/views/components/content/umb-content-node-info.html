@@ -22,30 +22,15 @@
         <umb-box data-element="node-info-redirects">
             <umb-box-header title-key="redirectUrls_redirectUrlManagement"></umb-box-header>
             <umb-box-content class="block-form">
-                <div style="position: relative;">
-                    <div ng-if="loadingRedirectUrls" style="background: rgba(255, 255, 255, 0.8); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
-                    <umb-load-indicator ng-if="loadingRedirectUrls"></umb-load-indicator>
-                    <!--<ul class="nav nav-stacked" style="margin-bottom: 0;" ng-show="hasRedirects">
-                        <li ng-repeat="redirectUrl in redirectUrls">
-                            <a href="{{redirectUrl.originalUrl}}"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a> <button type="button" class="umb-era-button umb-button--s -red" ng-click="removeRedirect(redirectUrl)"><localize key="redirectUrls_removeButton">Remove</localize></button>
-                        </li>
-                        </ul>-->
-                        <div class="umb-table" ng-show="hasRedirects" style="border:none">
-                            <div class="umb-table-body" style="border:none">
-                                <div class="umb-table-row -solid" ng-repeat="redirectUrl in redirectUrls"  style="border-top:none">
-                                    <div class="umb-table-cell  not-fixed flx-s1 flx-g1 flx-b4">
-                                        <a href="{{redirectUrl.originalUrl}}"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a>
-                                    </div>
-                                    <div class="umb-table-cell">
-                                  
-                                        <button type="button" class="umb-era-button umb-button--s -red" ng-click="removeRedirect(redirectUrl)"><localize key="redirectUrls_removeButton">Remove</localize></button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    <div ng-show="!hasRedirects && !loadingRedirectUrls"><localize key="redirectUrls_noRedirects"></localize></div>
-</div>                  
-</umb-box-content>
+                <div ng-if="loadingRedirectUrls" style="background: rgba(255, 255, 255, 0.8); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
+                <umb-load-indicator ng-if="loadingRedirectUrls"></umb-load-indicator>
+                <ul class="nav nav-stacked" style="margin-bottom: 0;" ng-show="hasRedirects">
+                    <li ng-repeat="redirectUrl in redirectUrls">
+                        <a href="{{redirectUrl.originalUrl}}"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a>
+                    </li>
+                </ul>
+                <div ng-show="!hasRedirects && !loadingRedirectUrls"><localize key="redirectUrls_noRedirects"></localize></div>
+            </umb-box-content>
         </umb-box>
 
         <umb-box data-element="node-info-history">
@@ -89,6 +74,7 @@
                             <div class="history-item__break">
                                 <umb-badge size="xs"
                                            color="{{item.logTypeColor}}">
+
                                     <!--{{ item.logType }}-->
                                     <localize key="auditTrails_small{{ item.logType }}">{{ item.logType }}</localize>
                                 </umb-badge>
@@ -204,13 +190,12 @@
                 </umb-control-group>
 
                 <umb-control-group data-element="node-info-document-type" label="@content_documentType">
-                    <umb-node-preview
-                        style="max-width: 100%; margin-bottom: 0;"
-                        icon="documentType.icon"
-                        name="documentType.name"
-                        allow-open="allowOpen"
-                        on-open="openDocumentType(documentType)"
-						            open-url="previewOpenUrl">
+                    <umb-node-preview style="max-width: 100%; margin-bottom: 0;"
+                                      icon="documentType.icon"
+                                      name="documentType.name"
+                                      allow-open="allowOpen"
+                                      on-open="openDocumentType(documentType)"
+                                      open-url="previewOpenUrl">
                     </umb-node-preview>
                 </umb-control-group>
 

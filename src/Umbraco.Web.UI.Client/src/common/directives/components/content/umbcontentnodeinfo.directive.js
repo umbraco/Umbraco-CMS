@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper, redirectUrlsResource, notificationsService) {
+    function ContentNodeInfoDirective($timeout, $location, logResource, eventsService, userService, localizationService, dateHelper, redirectUrlsResource) {
 
         function link(scope, element, attrs, ctrl) {
 
@@ -10,7 +10,7 @@
             scope.publishStatus = {};
 
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
-            
+
             function onInit() {
 
                 scope.allowOpen = true;
@@ -45,7 +45,7 @@
                 scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
 
                 setNodePublishStatus(scope.node);
-                
+
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
@@ -53,7 +53,7 @@
                 loadAuditTrail();
             };
 
-            scope.openDocumentType = function (documentType) {               
+            scope.openDocumentType = function (documentType) {
                 var url = "/settings/documenttypes/edit/" + documentType.id;
                 $location.url(url);
             };
@@ -85,9 +85,6 @@
             scope.clearUnpublishDate = function () {
                 clearUnpublishDate();
             };
-            scope.removeRedirect = function (redirectToDelete) {
-                removeRedirect(redirectToDelete);
-            };
 
             function loadAuditTrail() {
 
@@ -98,11 +95,11 @@
 
                         // get current backoffice user and format dates
                         userService.getCurrentUser().then(function (currentUser) {
-                            angular.forEach(data.items, function(item) {
+                            angular.forEach(data.items, function (item) {
                                 item.timestampFormatted = dateHelper.getLocalDate(item.timestamp, currentUser.locale, 'LLL');
                             });
                         });
-                    
+
                         scope.auditTrail = data.items;
                         scope.auditTrailOptions.pageNumber = data.pageNumber;
                         scope.auditTrailOptions.pageSize = data.pageSize;
@@ -110,7 +107,7 @@
                         scope.auditTrailOptions.totalPages = data.totalPages;
 
                         setAuditTrailLogTypeColor(scope.auditTrail);
-                        
+
                         scope.loadingAuditTrail = false;
                     });
 
@@ -122,28 +119,10 @@
                     .then(function (data) {
                         scope.redirectUrls = data.searchResults;
                         scope.hasRedirects = (typeof data.searchResults !== 'undefined' && data.searchResults.length > 0);
-                        scope.loadingRedirectUrls = false;                        
+                        scope.loadingRedirectUrls = false;
                     });
             }
-  
-            function removeRedirect(redirectToDelete) {
-                localizationService.localize("redirectUrls_confirmRemove", [redirectToDelete.originalUrl, scope.node.name]).then(function (value) {
-                    var toggleConfirm = confirm(value);
 
-                    if (toggleConfirm) {
-                        redirectUrlsResource.deleteRedirectUrl(redirectToDelete.redirectId).then(function () {
-
-                            var index = scope.redirectUrls.indexOf(redirectToDelete);
-                            scope.redirectUrls.splice(index, 1);
-                            notificationsService.success(localizationService.localize("redirectUrls_redirectRemoved"));
-                            loadRedirectUrls();
-                        }, function (error) {
-                            notificationsService.error(localizationService.localize("redirectUrls_redirectRemoveError"));
-                            loadRedirectUrls();
-                            });
-                    }
-                });
-            }
             function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {
                     switch (item.logType) {
@@ -161,27 +140,27 @@
             }
 
             function setNodePublishStatus(node) {
-                
+
                 // deleted node
-                if(node.trashed === true) {
+                if (node.trashed === true) {
                     scope.publishStatus.label = localizationService.localize("general_deleted");
                     scope.publishStatus.color = "danger";
                 }
 
                 // unpublished node
-                if(node.published === false && node.trashed === false) {
+                if (node.published === false && node.trashed === false) {
                     scope.publishStatus.label = localizationService.localize("content_unpublished");
                     scope.publishStatus.color = "gray";
                 }
 
                 // published node
-                if(node.hasPublishedVersion === true && node.publishDate && node.published === true) {
+                if (node.hasPublishedVersion === true && node.publishDate && node.published === true) {
                     scope.publishStatus.label = localizationService.localize("content_published");
                     scope.publishStatus.color = "success";
                 }
 
                 // published node with pending changes
-                if(node.hasPublishedVersion === true && node.publishDate && node.published === false) {
+                if (node.hasPublishedVersion === true && node.publishDate && node.published === false) {
                     scope.publishStatus.label = localizationService.localize("content_publishedPendingChanges");
                     scope.publishStatus.color = "success";
                 }
@@ -255,7 +234,7 @@
                 eventsService.emit("editors.content.changeUnpublishDate", args);
 
             }
-            
+
             function ucfirst(string) {
                 return string.charAt(0).toUpperCase() + string.slice(1);
             }
@@ -264,13 +243,13 @@
                 // get current backoffice user and format dates
                 userService.getCurrentUser().then(function (currentUser) {
                     scope.node.createDateFormatted = dateHelper.getLocalDate(scope.node.createDate, currentUser.locale, 'LLL');
-                    
+
                     scope.node.releaseDateYear = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'YYYY')) : null;
                     scope.node.releaseDateMonth = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'MMMM')) : null;
                     scope.node.releaseDateDayNumber = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'DD')) : null;
                     scope.node.releaseDateDay = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'dddd')) : null;
                     scope.node.releaseDateTime = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'HH:mm')) : null;
-                    
+
                     scope.node.removeDateYear = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'YYYY')) : null;
                     scope.node.removeDateMonth = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'MMMM')) : null;
                     scope.node.removeDateDayNumber = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'DD')) : null;
@@ -281,7 +260,7 @@
 
             // load audit trail and redirects when on the info tab
             evts.push(eventsService.on("app.tabChange", function (event, args) {
-                $timeout(function(){
+                $timeout(function () {
                     if (args.id === -1) {
                         isInfoTab = true;
                         loadAuditTrail();
@@ -293,12 +272,12 @@
             }));
 
             // watch for content updates - reload content when node is saved, published etc.
-            scope.$watch('node.updateDate', function(newValue, oldValue){
+            scope.$watch('node.updateDate', function (newValue, oldValue) {
 
-                if(!newValue) { return; }
-                if(newValue === oldValue) { return; }             
-                
-                if(isInfoTab) {
+                if (!newValue) { return; }
+                if (newValue === oldValue) { return; }
+
+                if (isInfoTab) {
                     loadAuditTrail();
                     loadRedirectUrls();
                     formatDatesToLocal();
