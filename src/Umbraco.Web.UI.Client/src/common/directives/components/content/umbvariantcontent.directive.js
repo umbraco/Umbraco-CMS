@@ -95,7 +95,7 @@
                 /** Closes the split view */
                 scope.closeSplitView = function () {
 
-                    // if we close split view, then set all set disabled to false on all active variants
+                    // if we close split view, then disabled to false on all active variants
                     for (var i = 0; i < scope.editors.length; i++) {
                         for (var c = 0; c < scope.editors[i].content.variants.length; c++) {
                             if (scope.editors[1].content.variants[c].active === true) {
