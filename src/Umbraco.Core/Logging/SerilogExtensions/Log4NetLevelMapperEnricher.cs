@@ -28,17 +28,20 @@ namespace Umbraco.Core.Logging.SerilogExtensions
                     break;
 
                 case LogEventLevel.Information:
-                    log4NetLevel = "INFO ";
+                    log4NetLevel = "INFO";
                     break;
 
                 case LogEventLevel.Verbose:
-                    log4NetLevel = "ALL  ";
+                    log4NetLevel = "ALL";
                     break;
 
                 case LogEventLevel.Warning:
-                    log4NetLevel = "WARN ";
+                    log4NetLevel = "WARN";
                     break;
             }
+
+            //Pad string so that all log levels are 5 chars long (needed to keep the txt log file lined up nicely)
+            log4NetLevel = log4NetLevel.PadRight(5);
 
             logEvent.AddPropertyIfAbsent(propertyFactory.CreateProperty("Log4NetLevel", log4NetLevel));
         }
