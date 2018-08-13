@@ -118,7 +118,6 @@
                 //check if Redirect Url Management is enabled
                 redirectUrlsResource.getEnableState().then(function (response) {
                     scope.urlTrackerDisabled = response.enabled !== true;
-                    scope.userIsAdmin = response.userIsAdmin;
                     if (scope.urlTrackerDisabled === false) {
 
                         redirectUrlsResource.getRedirectsForContentItem(scope.node.udi)
