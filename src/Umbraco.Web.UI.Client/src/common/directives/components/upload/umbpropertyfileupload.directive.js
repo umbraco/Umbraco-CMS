@@ -146,15 +146,6 @@
             return existingClientFiles;
         }
 
-        ///** Method required by the valPropertyValidator directive (returns true if the property editor has at least one file selected) */
-        //function validateMandatory() {
-        //    return {
-        //        isValid: !vm.validation.mandatory || (((vm.persistedFiles != null && vm.persistedFiles.length > 0) || (vm.files != null && vm.files.length > 0)) && !vm.clearFiles),
-        //        errorMsg: "Value cannot be empty",
-        //        errorKey: "required"
-        //    };
-        //}
-        
         /**
          * Watch for model changes
          * @param {any} changes
@@ -180,16 +171,7 @@
                         });
                     }
                 }
-
-                //// here we need to check if the value change needs to trigger an update in the UI.
-                //// if the value is only changed in the controller and not in the server values, we do not
-                //// want to trigger an update yet.
-                //// we can however no longer rely on checking values in the controller vs. values from the server
-                //// to determine whether to update or not, since you could potentially be uploading a file with
-                //// the exact same name - in that case we need to reinitialize to show the newly uploaded file.
-                //if (changes.value.currentValue.clearFiles !== true && !changes.value.currentValue.selectedFiles) {
-                //    initialize(vm.rebuildInput.index + 1);
-                //}
+                
             }
         }
 
