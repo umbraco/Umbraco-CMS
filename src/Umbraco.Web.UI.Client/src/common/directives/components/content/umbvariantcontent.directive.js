@@ -43,9 +43,12 @@
                     });
 
                     var editor = {
-                        content: scope.initVariant({ variant: variant})
+                        content: scope.initVariant({ variant: variant })
                     };
+
                     scope.editors.push(editor);
+
+                    disableActiveVariant();
 
                     //TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
                     editor.collapsed = true;
@@ -56,6 +59,7 @@
                     }, 100);
                 };
 
+               
                 /**
                  * Changes the currently selected variant
                  * @param {any} variantDropDownItem
@@ -71,8 +75,7 @@
                     if (editorIndex === 0) {
                         //if we've made it this far, then update the query string
                         $location.search("cculture", variantDropDownItem.language.culture);
-                    }
-                    else {
+                    } else {
                         //set all variant drop down items as inactive for this editor and then set the selected on as active
                         for (var i = 0; i < scope.editor.content.variants.length; i++) {
                             scope.editor.content.variants[i].active = false;
@@ -85,20 +88,63 @@
                         });
                         scope.editor.content = scope.initVariant({ variant: variant });
                     }
+
+                    disableActiveVariant();
                 };
 
                 /** Closes the split view */
                 scope.closeSplitView = function () {
+
+                    // if we close split view, then set all set disabled to false on all active variants
+                    for (var i = 0; i < scope.editors.length; i++) {
+                        for (var c = 0; c < scope.editors[i].content.variants.length; c++) {
+                            if (scope.editors[1].content.variants[c].active === true) {
+
+                                if (scope.editors[i].content.variants[c].hide) {
+                                    scope.editors[i].content.variants[c].hide = false;
+                                }
+                            }
+                        }
+                    }
+
+
                     //TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
                     scope.editor.loading = true;
                     scope.editor.collapsed = true;
                     $timeout(function () {
-                        var index = _.findIndex(scope.editors, function(e) {
+                        var index = _.findIndex(scope.editors, function (e) {
                             return e === scope.editor;
                         });
                         scope.editors.splice(index, 1);
                     }, 400);
                 };
+
+                /*
+                 * Disables the active variant in the opposite editor language dropdown
+                 * to prevent same variant to be opened twice
+                 */
+                function disableActiveVariant() {
+                    for (var j = 0; j < scope.editors[0].content.variants.length; j++) {
+
+                        if (scope.editors[1].content.variants[j].disabled) {
+                            scope.editors[1].content.variants[j].disabled = false;
+                        }
+
+                        if (scope.editors[0].content.variants[j].active === true) {
+                            scope.editors[1].content.variants[j].disabled = true;
+                        }
+                    }
+
+                    for (var c = 0; c < scope.editors[1].content.variants.length; c++) {
+                        if (scope.editors[0].content.variants[c].disabled) {
+                            scope.editors[0].content.variants[c].disabled = false;
+                        }
+
+                        if (scope.editors[1].content.variants[c].active === true) {
+                            scope.editors[0].content.variants[c].disabled = true;
+                        }
+                    }
+                }
 
                 //set the content to dirty if the header changes
                 scope.$watch("contentHeaderForm.$dirty",

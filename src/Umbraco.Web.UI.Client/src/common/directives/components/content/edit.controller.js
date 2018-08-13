@@ -107,7 +107,7 @@
                         $scope.editors[s].content = initVariant(variant);
                     }
                 }
-                
+
             }
         }
 
@@ -128,15 +128,16 @@
                 //if the variant list that defines the header drop down isn't assigned to the variant then assign it now
                 if (!variant.variants) {
                     variant.variants = _.map($scope.content.variants,
-                        function(v) {
+                        function (v) {
                             return _.pick(v, "active", "language", "state");
                         });
                 }
                 else {
                     //merge the scope variants on top of the header variants collection (handy when needing to refresh)
+                    var orgVar = variant;
                     angular.extend(variant.variants,
                         _.map($scope.content.variants,
-                            function(v) {
+                            function (v) {
                                 return _.pick(v, "active", "language", "state");
                             }));
                 }
@@ -149,6 +150,25 @@
                     else {
                         variant.variants[i].active = false;
                     }
+                }
+
+                // disables the active variant in the opposite editor language dropdown
+                // to prevent same variant to be opened twice
+                if ($scope.editors.length > 1) {
+                    for (var y = 0; y < $scope.editors.length; y++) {
+                        for (var $ = 0; $ < $scope.editors[y].content.variants.length; $++) {
+
+                            var editorIndex = y === 0 ? 1 : 0;
+
+                            if ($scope.editors[y].content.variants[$].active === true) {
+                                $scope.editors[editorIndex].content.variants[$].disabled = true;
+
+                            } else {
+                                $scope.editors[editorIndex].content.variants[$].disabled = false;
+                            }
+                        }
+                    }
+
                 }
             }
 
@@ -312,7 +332,7 @@
                 $scope.page.buttonGroupState = "success";
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });
-                
+
                 return $q.when(data);
             },
                 function (err) {
@@ -322,7 +342,7 @@
                     }
 
                     $scope.page.buttonGroupState = "error";
-                    
+
                     return $q.reject(err);
                 });
         }
@@ -581,7 +601,7 @@
                 $scope.saveAndCloseButtonState = "success";
             }).catch(angular.noop);;
         };
-        
+
         function moveNode(node, target) {
 
             contentResource.move({ "parentId": target.id, "id": node.id })
