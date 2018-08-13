@@ -1,7 +1,7 @@
-<div ng-controller="Umbraco.Overlays.PublishController as vm">
+<div ng-controller="Umbraco.Overlays.SaveContentController as vm">
 
     <div style="margin-bottom: 15px;">
-        <p><localize key="content_languagesToPublish"></localize></p>
+        <p><localize key="content_languagesToSave"></localize></p>
     </div>
 
     <div ng-if="vm.loading" style="min-height: 50px; position: relative;">
@@ -44,7 +44,7 @@
 
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading && vm.hasPristineVariants">
         <div style="margin-bottom: 15px; font-weight: bold;">
-            <p><localize key="content_publishedLanguages"></localize></p>
+            <p><localize key="content_unmodifiedLanguages"></localize></p>
         </div>
 
         <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.pristineVariantFilter">

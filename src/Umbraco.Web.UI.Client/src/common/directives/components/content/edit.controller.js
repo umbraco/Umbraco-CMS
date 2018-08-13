@@ -481,7 +481,63 @@
         };
 
         $scope.save = function () {
-            return performSave({ saveMethod: $scope.saveMethod(), action: "save" }).catch(angular.noop);
+
+            // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
+            if ($scope.content.variants.length > 1) {
+                //before we launch the dialog we want to execute all client side validations first
+                if (formHelper.submitForm({ scope: $scope, action: "save" })) {
+
+                    var dialog = {
+                        view: "views/content/overlays/save.html",
+                        variants: $scope.content.variants, //set a model property for the dialog
+                        skipFormValidation: true, //when submitting the overlay form, skip any client side validation
+                        submitButtonLabel: "Save",
+                        submit: function (model) {
+                            model.submitButtonState = "busy";
+
+                            //we need to return this promise so that the dialog can handle the result and wire up the validation response
+                            return performSave({
+                                saveMethod: $scope.saveMethod(),
+                                action: "save"
+                            }).then(function (data) {
+                                overlayService.close();
+                                return $q.when(data);
+                            },
+                                function (err) {
+                                    model.submitButtonState = "error";
+                                    //re-map the dialog model since we've re-bound the properties
+                                    dialog.variants = $scope.content.variants;
+
+                                    //check the error list for specific variant errors, if none exist that means that only server side validation
+                                    //for the current variant's properties failed, in this case we want to close the publish dialog since the user
+                                    //will need to fix validation errors on the properties
+                                    if (err.data && err.data.ModelState) {
+                                        var keys = _.keys(err.data.ModelState);
+                                        var foundVariantError = _.find(keys,
+                                            function (k) {
+                                                return k.startsWith("publish_variant_");
+                                            });
+                                        if (!foundVariantError) {
+                                            //no variant errors, close the dialog
+                                            overlayService.close();
+                                        }
+                                    }
+
+                                    return $q.reject(err);
+                                });
+                        },
+                        close: function (oldModel) {
+                            overlayService.close();
+                        }
+                    };
+
+                    overlayService.open(dialog);
+                }
+            }
+            else {
+                return performSave({ saveMethod: $scope.saveMethod(), action: "save" }).catch(angular.noop);
+            }
+
         };
 
         $scope.preview = function (content) {
