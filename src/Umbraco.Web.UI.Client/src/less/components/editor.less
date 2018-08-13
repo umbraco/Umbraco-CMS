@@ -168,12 +168,17 @@ a.umb-variant-switcher__toggle {
 	border-left: 2px solid @turquoise;
 }
 
+.umb-variant-switcher_item--disabled .umb-variant-switcher__name-wrapper-disabled {
+    background-color: @gray-9;
+    border-left: 2px solid @red;
+}
+
 .umb-variant-switcher__item:hover,
 .umb-variant-switcher__item:focus,
 .umb-variant-switcher__name-wrapper:hover,
 .umb-variant-switcher__name-wrapper:focus {
-	background-color: @gray-10;
-	outline: none;
+    background-color: @gray-10;
+    outline: none;
 }
 
 .umb-variant-switcher__item:hover .umb-variant-switcher__split-view {
@@ -190,9 +195,18 @@ a.umb-variant-switcher__toggle {
 	border-left: 2px solid transparent;
 }
 
+.umb-variant-switcher__name-wrapper-disabled {
+    font-size: 14px;
+    flex: 1;
+    cursor: not-allowed;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    border-left: 2px solid transparent;
+}
+
 .umb-variant-switcher__name {
-	display: block;
-	font-weight: bold;
+    display: block;
+    font-weight: bold;
 }
 
 .umb-variant-switcher__state {

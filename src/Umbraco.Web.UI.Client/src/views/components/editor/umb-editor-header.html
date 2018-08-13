@@ -61,7 +61,7 @@
                     </span>
 
                     <umb-dropdown ng-if="vm.dropdownOpen" style="width: 100%; max-height: 250px; overflow-y: scroll; margin-top: 5px;" on-close="vm.dropdownOpen = false" umb-keyboard-list>
-                        <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.active}" ng-repeat="variant in variants">
+                        <umb-dropdown-item class="umb-variant-switcher__item" ng-class="{'umb-variant-switcher_item--current': variant.active, 'umb-variant-switcher_item--disabled': variant.disabled}" ng-repeat="variant in variants">
 
                             <!--Dropdown in nonsplit view-->
                             <a ng-if="splitViewOpen !== true" href="" class="umb-variant-switcher__name-wrapper" ng-click="selectVariant($event, variant)" prevent-default>
@@ -84,7 +84,7 @@
                                     <span class="umb-variant-switcher__state" ng-switch-when="Published"><localize key="content_published"></localize></span>
                                 </span>
                             </a>
-                            <a ng-if="splitViewOpen === true && variant.disabled === true" style="background-color: rosybrown" href="" class="umb-variant-switcher__name-wrapper" prevent-default>
+                            <a ng-if="splitViewOpen === true && variant.disabled === true" href="" class="umb-variant-switcher__name-wrapper-disabled" prevent-default>
                                 <span class="umb-variant-switcher__name">{{variant.language.name}}</span>
                                 <span ng-switch="variant.state">
                                     <span class="umb-variant-switcher__state" ng-switch-when="NotCreated"><localize key="content_notCreated"></localize></span>
