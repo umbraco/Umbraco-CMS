@@ -148,7 +148,7 @@
 
         /** Sets the width/height/left/top dimentions based on the image size and the "center" value */
         function setDimensions() {
-            if (htmlImage) {
+            if (htmlImage && vm.center) {
                 vm.dimensions.width = htmlImage.width();
                 vm.dimensions.height = htmlImage.height();
                 vm.dimensions.left = vm.center.left * vm.dimensions.width - 10;

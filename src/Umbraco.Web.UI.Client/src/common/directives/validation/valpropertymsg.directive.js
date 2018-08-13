@@ -176,35 +176,31 @@ function valPropertyMsg(serverValidationManager) {
             // the correct field validation in their property editors.
 
             if (scope.currentProperty) { //this can be null if no property was assigned
-                serverValidationManager.subscribe(scope.currentProperty.alias, currentCulture, "", function (isValid, propertyErrors, allErrors) {
-                    hasError = !isValid;
-                    if (hasError) {
-                        //set the error message to the server message
-                        scope.errorMsg = propertyErrors[0].errorMsg;
-                        //flag that the current validator is invalid
-                        formCtrl.$setValidity('valPropertyMsg', false);
-                        startWatch();
-                    }
-                    else {
-                        scope.errorMsg = "";
-                        //flag that the current validator is valid
-                        formCtrl.$setValidity('valPropertyMsg', true);
-                        stopWatch();
-                    }
-                });
-
-                //when the element is disposed we need to unsubscribe!
-                // NOTE: this is very important otherwise when this controller re-binds the previous subscriptsion will remain
-                // but they are a different callback instance than the above.
-                element.bind('$destroy', function () {
-                    stopWatch();
-                    serverValidationManager.unsubscribe(scope.currentProperty.alias, currentCulture, "");
-                });
+                unsubscribe.push(serverValidationManager.subscribe(scope.currentProperty.alias,
+                    currentCulture,
+                    "",
+                    function(isValid, propertyErrors, allErrors) {
+                        hasError = !isValid;
+                        if (hasError) {
+                            //set the error message to the server message
+                            scope.errorMsg = propertyErrors[0].errorMsg;
+                            //flag that the current validator is invalid
+                            formCtrl.$setValidity('valPropertyMsg', false);
+                            startWatch();
+                        }
+                        else {
+                            scope.errorMsg = "";
+                            //flag that the current validator is valid
+                            formCtrl.$setValidity('valPropertyMsg', true);
+                            stopWatch();
+                        }
+                    }));
 
             }
 
             //when the scope is disposed we need to unsubscribe
             scope.$on('$destroy', function () {
+                stopWatch();
                 for (var u in unsubscribe) {
                     unsubscribe[u]();
                 }

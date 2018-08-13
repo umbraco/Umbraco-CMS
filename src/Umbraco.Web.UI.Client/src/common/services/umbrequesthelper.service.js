@@ -248,7 +248,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
 
                     formHelper.showNotifications(response.data);
 
-                    //TODO: We need to pass the result through umbDataFormatter.formatContentGetData!
+                    //TODO: Do we need to pass the result through umbDataFormatter.formatContentGetData? Right now things work so not sure but we should check
 
                     //the data returned is the up-to-date data so the UI will refresh
                     return $q.resolve(response.data);
