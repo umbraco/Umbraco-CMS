@@ -354,7 +354,10 @@ namespace Umbraco.Web
             var end = false;
             var response = context.Response;
 
-            logger.Debug<UmbracoModule>(() => $"Response status: Redirect={(pcr.IsRedirect ? (pcr.IsRedirectPermanent ? "permanent" : "redirect") : "none")}, Is404={(pcr.Is404 ? "true" : "false")}, StatusCode={pcr.ResponseStatusCode}");
+            logger.Debug<UmbracoModule>("Response status: Redirect={Redirect}, Is404={Is404}, StatusCode={ResponseStatusCode}",
+                pcr.IsRedirect ? (pcr.IsRedirectPermanent ? "permanent" : "redirect") : "none",
+                pcr.Is404 ? "true" : "false",
+                pcr.ResponseStatusCode);
 
             if(pcr.Cacheability != default)
                 response.Cache.SetCacheability(pcr.Cacheability);
@@ -551,7 +554,7 @@ namespace Umbraco.Web
             app.BeginRequest += (sender, e) =>
             {
                 var httpContext = ((HttpApplication) sender).Context;
-                Logger.Debug<UmbracoModule>(() => $"Begin request: {httpContext.Request.Url}.");
+                Logger.Debug<UmbracoModule>("Begin request: {RequestUrl}", httpContext.Request.Url);
                 BeginRequest(new HttpContextWrapper(httpContext));
             };
 
@@ -594,7 +597,7 @@ namespace Umbraco.Web
 
                 if (UmbracoContext.Current != null && UmbracoContext.Current.IsFrontEndUmbracoRequest)
                 {
-                    Logger.Debug<UmbracoModule>(() => $"End Request. ({DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds}ms)");
+                    Logger.Debug<UmbracoModule>("End Request: {RequestUrl} ({RequestTotalMilliseconds}ms)", httpContext.Request.Url, DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
                 }
 
                 OnEndRequest(new UmbracoRequestEventArgs(UmbracoContext.Current, new HttpContextWrapper(httpContext)));

@@ -46,13 +46,13 @@ namespace Umbraco.Web.Routing
         {
             if (docreq == null) throw new System.ArgumentNullException(nameof(docreq));
 
-            Logger.Debug<ContentFinderByUrl>(() => $"Test route \"{route}\"");
+            Logger.Debug<ContentFinderByUrl>("Test route '{Route}'", route);
 
             var node = docreq.UmbracoContext.ContentCache.GetByRoute(route, culture: docreq.Culture?.Name);
             if (node != null)
             {
                 docreq.PublishedContent = node;
-                Logger.Debug<ContentFinderByUrl>(() => $"Got content, id={node.Id}");
+                Logger.Debug<ContentFinderByUrl>("Got content, id={NodeId}", node.Id);
             }
             else
             {

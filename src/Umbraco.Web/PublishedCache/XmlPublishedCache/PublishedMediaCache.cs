@@ -330,8 +330,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             var miss = Interlocked.CompareExchange(ref _examineIndexMiss, 0, 0); // volatile read
             if (miss < ExamineIndexMissMax && Interlocked.Increment(ref _examineIndexMiss) == ExamineIndexMissMax)
-                Current.Logger.Warn<PublishedMediaCache>(() => $"Failed ({ExamineIndexMissMax} times) to retrieve medias from Examine index and had to load"
-                    + " them from DB. This may indicate that the Examine index is corrupted.");
+                Current.Logger.Warn<PublishedMediaCache>("Failed ({ExamineIndexMissMax} times) to retrieve medias from Examine index and had to load"
+                    + " them from DB. This may indicate that the Examine index is corrupted.", ExamineIndexMissMax);
 
             return ConvertFromIMedia(media);
         }
@@ -348,8 +348,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     : ConvertFromXPathNavigator(media.Current);
             }
 
-            Current.Logger.Warn<PublishedMediaCache>(() =>
-                $"Could not retrieve media {id} from Examine index or from legacy library.GetMedia method");
+            Current.Logger.Warn<PublishedMediaCache>("Could not retrieve media {MediaId} from Examine index or from legacy library.GetMedia method", id);
 
             return null;
         }

@@ -62,16 +62,16 @@ namespace Umbraco.Web.HealthCheck
                 var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success);
                 if (checkIsSuccess)
                 {
-                    Logger.Info<HealthCheckResults>(() => $"    Checks for '{checkName}' all completed succesfully.");
+                    Logger.Info<HealthCheckResults>("Checks for '{HealthCheckName}' all completed succesfully.", checkName);
                 }
                 else
                 {
-                    Logger.Warn<HealthCheckResults>(() => $"    Checks for '{checkName}' completed with errors.");
+                    Logger.Warn<HealthCheckResults>("Checks for '{HealthCheckName}' completed with errors.", checkName);
                 }
 
                 foreach (var checkResult in checkResults)
                 {
-                    Logger.Info<HealthCheckResults>(() => $"        Result: {checkResult.ResultType}, Message: '{checkResult.Message}'");
+                    Logger.Info<HealthCheckResults>("Result for {HealthCheckName}: {HealthCheckResult}, Message: '{HealthCheckMessage}'", checkName, checkResult.ResultType, checkResult.Message);
                 }
             }
         }
