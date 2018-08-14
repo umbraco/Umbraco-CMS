@@ -475,7 +475,7 @@
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dictionary\ICultureDictionaryFactory.cs" />
     <Compile Include="DisposableObject.cs" />
-    <Compile Include="DisposableTimer.cs" />
+    <Compile Include="Logging\DisposableTimer.cs" />
     <Compile Include="EmailSender.cs" />
     <Compile Include="Enum.cs" />
     <Compile Include="EnumerableExtensions.cs" />

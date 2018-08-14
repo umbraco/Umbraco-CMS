@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using Umbraco.Core.Logging;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.Logging
 {
     /// <summary>
     /// Starts the timer and invokes a  callback upon disposal. Provides a simple way of timing an operation by wrapping it in a <code>using</code> (C#) statement.
