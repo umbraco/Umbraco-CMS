@@ -329,6 +329,7 @@
     <Compile Include="IO\MediaPathSchemes\OriginalMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\TwoGuidsMediaPathScheme.cs" />
     <Compile Include="KeyValuePairExtensions.cs" />
+    <Compile Include="Logging\SerilogExtensions\LoggerConfigExtensions.cs" />
     <Compile Include="Logging\SerilogExtensions\Log4NetLevelMapperEnricher.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\Upgrade\V_7_10_0\RenamePreviewFolder.cs" />
