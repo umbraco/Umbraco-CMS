@@ -192,9 +192,11 @@ namespace Umbraco.Core.Sync
                     if (count > Options.MaxProcessingInstructionCount)
                     {
                         //too many instructions, proceed to cold boot
-                        Logger.Warn<DatabaseServerMessenger>(() => $"The instruction count ({count}) exceeds the specified MaxProcessingInstructionCount ({Options.MaxProcessingInstructionCount})."
+                        Logger.Warn<DatabaseServerMessenger>(
+                            "The instruction count ({InstructionCount}) exceeds the specified MaxProcessingInstructionCount ({MaxProcessingInstructionCount})."
                             + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
-                            + " to the latest found in the database and maintain cache updates based on that Id.");
+                            + " to the latest found in the database and maintain cache updates based on that Id.",
+                            count, Options.MaxProcessingInstructionCount);
 
                         coldboot = true;
                     }

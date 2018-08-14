@@ -98,7 +98,7 @@ namespace Umbraco.Core.Migrations.Install
                 var tableNameAttribute = table.FirstAttribute<TableNameAttribute>();
                 var tableName = tableNameAttribute == null ? table.Name : tableNameAttribute.Value;
 
-                _logger.Info<DatabaseSchemaCreator>(() => $"Uninstall {tableName}");
+                _logger.Info<DatabaseSchemaCreator>("Uninstall {TableName}", tableName);
 
                 try
                 {
@@ -392,13 +392,13 @@ namespace Umbraco.Core.Migrations.Install
                 {
                     //Execute the Create Table sql
                     var created = _database.Execute(new Sql(createSql));
-                    _logger.Info<DatabaseSchemaCreator>(() => $"Create Table '{tableName}' ({created}):\n {createSql}");
+                    _logger.Info<DatabaseSchemaCreator>("Create Table '{TableName}' ({Created}): \n {Sql}", tableName, created, createSql);
 
                     //If any statements exists for the primary key execute them here
                     if (string.IsNullOrEmpty(createPrimaryKeySql) == false)
                     {
                         var createdPk = _database.Execute(new Sql(createPrimaryKeySql));
-                        _logger.Info<DatabaseSchemaCreator>(() => $"Create Primary Key ({createdPk}):\n {createPrimaryKeySql}");
+                        _logger.Info<DatabaseSchemaCreator>("Create Primary Key ({CreatedPk}):\n {Sql}", createdPk, createPrimaryKeySql);
                     }
 
                     //Turn on identity insert if db provider is not mysql
@@ -424,21 +424,21 @@ namespace Umbraco.Core.Migrations.Install
                     foreach (var sql in indexSql)
                     {
                         var createdIndex = _database.Execute(new Sql(sql));
-                        _logger.Info<DatabaseSchemaCreator>(() => $"Create Index ({createdIndex}):\n {sql}");
+                        _logger.Info<DatabaseSchemaCreator>("Create Index ({CreatedIndex}):\n {Sql}", createdIndex, sql);
                     }
 
                     //Loop through foreignkey statements and execute sql
                     foreach (var sql in foreignSql)
                     {
                         var createdFk = _database.Execute(new Sql(sql));
-                        _logger.Info<DatabaseSchemaCreator>(() => $"Create Foreign Key ({createdFk}):\n {sql}");
+                        _logger.Info<DatabaseSchemaCreator>("Create Foreign Key ({CreatedFk}):\n {Sql}", createdFk, sql);
                     }
 
                     transaction.Complete();
                 }
             }
 
-            _logger.Info<DatabaseSchemaCreator>(() => $"Created table '{tableName}'");
+            _logger.Info<DatabaseSchemaCreator>("Created table '{TableName}'", tableName);
         }
 
         public void DropTable(string tableName)

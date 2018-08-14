@@ -318,7 +318,8 @@ namespace Umbraco.Core.Scoping
             if (completed.HasValue == false || completed.Value == false)
             {
                 if (LogUncompletedScopes)
-                    _logger.Debug<Scope>(() => "Uncompleted Child Scope at\r\n" + Environment.StackTrace);
+                    _logger.Debug<Scope>("Uncompleted Child Scope at\r\n {StackTrace}", Environment.StackTrace);
+
                 _completed = false;
             }
         }

@@ -37,7 +37,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                     var keyName = c.Item3.ToLowerInvariant();
                     if (dups.Contains(keyName))
                     {
-                        Logger.Warn<RefactorXmlColumns>(() => $"Duplicate constraint {c.Item3}");
+                        Logger.Warn<RefactorXmlColumns>("Duplicate constraint '{Constraint}'", c.Item3);
                         continue;
                     }
                     dups.Add(keyName);
