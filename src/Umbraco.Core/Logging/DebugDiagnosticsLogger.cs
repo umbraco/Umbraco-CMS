@@ -15,6 +15,12 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
+        public void Error(Type reporting, string messageTemplate, Exception exception = null, params object[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Format(messageTemplate, args) + Environment.NewLine + exception, reporting.FullName);
+        }
+
+        /// <inheritdoc/>
         public void Warn(Type reporting, string format)
         {
             System.Diagnostics.Debug.WriteLine(format, reporting.FullName);
@@ -30,12 +36,6 @@ namespace Umbraco.Core.Logging
         public void Warn(Type reporting, string format, params object[] args)
         {
             System.Diagnostics.Debug.WriteLine(string.Format(format, args), reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Warn(Type reporting, string format, params Func<object>[] args)
-        {
-            System.Diagnostics.Debug.WriteLine(string.Format(format, args.Select(x => x()).ToArray()), reporting.FullName);
         }
 
         /// <inheritdoc/>
@@ -57,12 +57,6 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, string format, params Func<object>[] args)
-        {
-            System.Diagnostics.Debug.WriteLine(string.Format(format + Environment.NewLine + exception, args.Select(x => x()).ToArray()), reporting.FullName);
-        }
-
-        /// <inheritdoc/>
         public void Info(Type reporting, string message)
         {
             System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
@@ -81,12 +75,6 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Info(Type reporting, string format, params Func<object>[] args)
-        {
-            System.Diagnostics.Debug.WriteLine(string.Format(format, args.Select(x => x()).ToArray()), reporting.FullName);
-        }
-
-        /// <inheritdoc/>
         public void Debug(Type reporting, string message)
         {
             System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
@@ -102,12 +90,6 @@ namespace Umbraco.Core.Logging
         public void Debug(Type reporting, string format, params object[] args)
         {
             System.Diagnostics.Debug.WriteLine(string.Format(format, args), reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Debug(Type reporting, string format, params Func<object>[] args)
-        {
-            System.Diagnostics.Debug.WriteLine(string.Format(format, args.Select(x => x()).ToArray()), reporting.FullName);
         }
     }
 }

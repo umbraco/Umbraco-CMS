@@ -8,7 +8,13 @@ namespace Umbraco.Tests.TestHelpers
     {
         public void Error(Type reporting, string message, Exception exception)
         {
-            Console.WriteLine("INFO {0} - {1}", reporting.Name, message);
+            Console.WriteLine("ERROR {0} - {1}", reporting.Name, message);
+            Console.WriteLine(exception);
+        }
+
+        public void Error(Type reporting, string messageTemplate, Exception exception = null, params object[] propertyValues)
+        {
+            Console.WriteLine("ERROR {0} - {1}", reporting.Name, string.Format(messageTemplate, propertyValues));
             Console.WriteLine(exception);
         }
 
@@ -25,11 +31,6 @@ namespace Umbraco.Tests.TestHelpers
         public void Warn(Type reporting, string format, params object[] args)
         {
             Console.WriteLine("WARN {0} - {1}", reporting.Name, string.Format(format, args));
-        }
-
-        public void Warn(Type reporting, string format, params Func<object>[] args)
-        {
-            Console.WriteLine("WARN {0} - {1}", reporting.Name, string.Format(format, args.Select(x => x()).ToArray()));
         }
 
         public void Warn(Type reporting, Exception exception, string message)
@@ -50,18 +51,6 @@ namespace Umbraco.Tests.TestHelpers
             Console.WriteLine(exception);
         }
 
-        public void Warn(Type reporting, Exception exception, string format, params Func<object>[] args)
-        {
-            Console.WriteLine("WARN {0} - {1}", reporting.Name, string.Format(format, args.Select(x => x()).ToArray()));
-            Console.WriteLine(exception);
-        }
-
-        public void WarnWithException(Type reporting, string format, Exception e, params Func<object>[] args)
-        {
-            Console.WriteLine("WARN {0} - {1}", reporting.Name, string.Format(format, args.Select(x => x()).ToArray()));
-            Console.WriteLine(e);
-        }
-
         public void Info(Type reporting, Func<string> generateMessage)
         {
             Console.WriteLine("INFO {0} - {1}", reporting.Name, generateMessage());
@@ -70,11 +59,6 @@ namespace Umbraco.Tests.TestHelpers
         public void Info(Type reporting, string format, params object[] args)
         {
             Console.WriteLine("INFO {0} - {1}", reporting.Name, string.Format(format, args));
-        }
-
-        public void Info(Type reporting, string format, params Func<object>[] args)
-        {
-            Console.WriteLine("INFO {0} - {1}", reporting.Name, string.Format(format, args.Select(x => x()).ToArray()));
         }
 
         public void Info(Type reporting, string message)
@@ -95,11 +79,6 @@ namespace Umbraco.Tests.TestHelpers
         public void Debug(Type reporting, string format, params object[] args)
         {
             Console.WriteLine("DEBUG {0} - {1}", reporting.Name, string.Format(format, args));
-        }
-
-        public void Debug(Type reporting, string format, params Func<object>[] args)
-        {
-            Console.WriteLine("DEBUG {0} - {1}", reporting.Name, string.Format(format, args.Select(x => x()).ToArray()));
         }
     }
 }
