@@ -25,8 +25,17 @@ namespace Umbraco.Core.Logging
                 .CreateLogger();
         }
 
-        // private for CreateWithDefaultConfiguration
-        private Logger()
+        public Logger(LoggerConfiguration logConfig)
+        {
+            //Configure Serilog static global logger with config passed in
+            Log.Logger = logConfig.CreateLogger();
+        }
+
+        /// <summary>
+        /// Creates a logger with some pre-definied configuration and remainder from config file
+        /// </summary>
+        /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
+        public static Logger CreateWithDefaultConfiguration()
         {
             var loggerConfig = new LoggerConfiguration();
             loggerConfig
@@ -36,16 +45,7 @@ namespace Umbraco.Core.Logging
                 .ReadFromConfigFile()
                 .ReadFromUserConfigFile();
 
-            Log.Logger = loggerConfig.CreateLogger();
-        }
-
-        /// <summary>
-        /// Creates a logger with some pre-definied configuration and remainder from config file
-        /// </summary>
-        /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
-        public static Logger CreateWithDefaultConfiguration()
-        {
-            return new Logger();
+            return new Logger(loggerConfig);
         }
 
         /// <inheritdoc/>
