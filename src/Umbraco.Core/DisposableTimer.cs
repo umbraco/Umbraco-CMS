@@ -18,6 +18,7 @@ namespace Umbraco.Core
         private string _failMessage;
         private Exception _failException;
         private bool _failed;
+        private Guid _timingId;
 
         internal enum LogType
         {
@@ -38,16 +39,17 @@ namespace Umbraco.Core
             _endMessage = endMessage;
             _failMessage = failMessage;
             _thresholdMilliseconds = thresholdMilliseconds < 0 ? 0 : thresholdMilliseconds;
+            _timingId = Guid.NewGuid();
 
             if (thresholdMilliseconds == 0)
             {
                 switch (logType)
                 {
                     case LogType.Debug:
-                        logger.Debug(loggerType, startMessage);
+                        logger.Debug(loggerType, "[Timing {TimingId}] {StartMessage}", _timingId, startMessage);
                         break;
                     case LogType.Info:
-                        logger.Info(loggerType, startMessage);
+                        logger.Info(loggerType, "[Timing {TimingId}] {StartMessage}", _timingId, startMessage);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(logType));
@@ -91,15 +93,15 @@ namespace Umbraco.Core
             {
                 if (_failed)
                 {
-                    _logger.Error(_loggerType, $"{_failMessage} ({Stopwatch.ElapsedMilliseconds}ms)", _failException);
+                    _logger.Error(_loggerType, "[Timing {TimingId}] {FailMessage} ({TimingDuration}ms)", _failException, _timingId, _failMessage, Stopwatch.ElapsedMilliseconds);
                 }
                 else switch (_logType)
                 {
                     case LogType.Debug:
-                        _logger.Debug(_loggerType, () => $"{_endMessage} ({Stopwatch.ElapsedMilliseconds}ms)");
+                        _logger.Debug(_loggerType, "[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)", _timingId, _endMessage, Stopwatch.ElapsedMilliseconds);
                         break;
                     case LogType.Info:
-                        _logger.Info(_loggerType, () => $"{_endMessage} ({Stopwatch.ElapsedMilliseconds}ms)");
+                        _logger.Info(_loggerType, "[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)", _timingId, _endMessage, Stopwatch.ElapsedMilliseconds);
                         break;
                     // filtered in the ctor
                     //default:
