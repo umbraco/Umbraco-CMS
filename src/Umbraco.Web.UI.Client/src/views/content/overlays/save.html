@@ -16,7 +16,7 @@
                     <input id="{{variant.htmlId}}"
                            name="saveVariantSelector"
                            type="checkbox"
-                           ng-model="variant.selected"
+                           ng-model="variant.save"
                            ng-change="vm.changeSelection(variant)"
                            ng-disabled="variant.active === true"
                            style="margin-right: 8px;"
@@ -24,6 +24,7 @@
                     <div>
                         <label for="{{variant.htmlId}}">
                             <span style="margin-bottom: 2px;">{{ variant.language.name }}</span>
+                            <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
                         </label>
 
                         <div ng-if="!saveVariantSelectorForm.saveVariantSelector.$invalid">
@@ -49,7 +50,10 @@
 
         <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.pristineVariantFilter">
             <div>
-                <div style="margin-bottom: 2px;">{{ variant.language.name }}</div>
+                <div style="margin-bottom: 2px;">
+                    <span>{{ variant.language.name }}</span>
+                    <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
+                </div>
                 <umb-variant-state variant="variant"></umb-variant-state>
             </div>
         </div>

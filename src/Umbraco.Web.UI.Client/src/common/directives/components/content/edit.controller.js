@@ -53,7 +53,7 @@
             bindEvents();
 
             // set first app to active
-            // TODO: We need to track active
+            // We need to track active
             $scope.content.apps[0].active = true;
 
             setActiveCulture();
@@ -76,28 +76,9 @@
             return count;
         }
 
-        /** Returns true if the save dialog should be shown when pressing save */
-        function showSaveDialog() {
-
-            //show the dialog if split view is open
-            if ($scope.editors.length > 1) {
-                return true;
-            }
-
-            //if there are more than one dirty variants
-            if (countDirtyVariants() > 1) {
-                return true;
-            }
-
-            //if there is a dirty variant that is not the currently selected variant
-            for (var i = 0; i < $scope.content.variants.length; i++) {
-                var v = $scope.content.variants[i];
-                if (v.isDirty && v.language.culture !== $scope.editors[0].content.language.culture) {
-                    return true;
-                }
-            }
-
-            return false;
+        /** Returns true if the save/publish dialog should be shown when pressing the button */
+        function showSaveOrPublishDialog() {
+            return $scope.content.variants.length > 1;
         }
 
         /**
@@ -317,15 +298,6 @@
         // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
         function performSave(args) {
 
-            //update the 'save' boolean of each variant if they are flagged as being dirty
-            //TODO: This is also where we'd set this flag when we have the save dialog
-            for (var i = 0; i < $scope.content.variants.length; i++) {
-                var v = $scope.content.variants[i];
-                if (v.isDirty) {
-                    v.save = true;
-                }
-            }
-
             $scope.page.buttonGroupState = "busy";
 
             eventsService.emit("content.saving", { content: $scope.content, action: args.action });
@@ -369,7 +341,7 @@
                 $rootScope.lastListViewPageViewed = null;
             }
         }
-
+        
         if ($scope.page.isNew) {
 
             $scope.page.loading = true;
@@ -454,7 +426,7 @@
         $scope.saveAndPublish = function () {
 
             // TODO: Add "..." to publish button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
-            if ($scope.content.variants.length > 1) {
+            if (showSaveOrPublishDialog()) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
 
@@ -513,7 +485,7 @@
         $scope.save = function () {
 
             // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
-            if (showSaveDialog()) {
+            if (showSaveOrPublishDialog()) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "save" })) {
 

@@ -358,13 +358,6 @@ namespace Umbraco.Web.Editors
             //remove the listview app if it exists
             mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "childItems").ToList();
             
-            //if (contentType.VariesByCulture())
-            //{
-            //    //Remove all variants except for the default since currently the default must be saved before other variants can be edited
-            //    //TODO: Allow for editing all variants at once ... this will be a future task
-            //    mapped.Variants = new[] { mapped.Variants.FirstOrDefault(x => x.IsCurrent) };
-            //}
-
             return mapped;
         }
 
@@ -508,47 +501,6 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns permissions for all nodes passed in for the current user
-        /// TODO: This should be moved to the CurrentUserController?
-        /// </summary>
-        /// <param name="nodeIds"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
-        {
-            var permissions = Services.UserService
-                    .GetPermissions(Security.CurrentUser, nodeIds);
-
-            var permissionsDictionary = new Dictionary<int, string[]>();
-            foreach (var nodeId in nodeIds)
-            {
-                var aggregatePerms = permissions.GetAllPermissions(nodeId).ToArray();
-                permissionsDictionary.Add(nodeId, aggregatePerms);
-            }
-
-            return permissionsDictionary;
-        }
-
-        /// <summary>
-        /// Checks a nodes permission for the current user
-        /// TODO: This should be moved to the CurrentUserController?
-        /// </summary>
-        /// <param name="permissionToCheck"></param>
-        /// <param name="nodeId"></param>
-        /// <returns></returns>
-        [HttpGet]
-        public bool HasPermission(string permissionToCheck, int nodeId)
-        {
-            var p = Services.UserService.GetPermissions(Security.CurrentUser, nodeId).GetAllPermissions();
-            if (p.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// Creates a blueprint from a content item
         /// </summary>
         /// <param name="contentId">The content id to copy</param>
@@ -631,7 +583,19 @@ namespace Umbraco.Web.Editors
             // * any file attachments have been saved to their temporary location for us to use
             // * we have a reference to the DTO object and the persisted object
             // * Permissions are valid
-            MapPropertyValues(contentItem);
+            MapValuesForPersistence(contentItem);
+
+            //this a custom check for any variants not being flagged for Saving since we'll need to manually
+            //remove the ModelState validation for the Name
+            var variantIndex = 0;
+            foreach (var variant in contentItem.Variants)
+            {
+                if (!variant.Save)
+                {
+                    ModelState.Remove($"Variants[{variantIndex}].Name");
+                }
+                variantIndex++;
+            }
 
             //We need to manually check the validation results here because:
             // * We still need to save the entity even if there are validation value errors
@@ -641,14 +605,20 @@ namespace Umbraco.Web.Editors
             //      a message indicating this
             if (ModelState.IsValid == false)
             {
-                if (!RequiredForPersistenceAttribute.HasRequiredValuesForPersistence(contentItem) && IsCreatingAction(contentItem.Action))
+                if (IsCreatingAction(contentItem.Action))
                 {
-                    //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
-                    // add the modelstate to the outgoing object and throw a validation message
-                    var forDisplay = MapToDisplay(contentItem.PersistedContent);
-                    forDisplay.Errors = ModelState.ToErrorDictionary();
-                    throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
-
+                    if (!RequiredForPersistenceAttribute.HasRequiredValuesForPersistence(contentItem)
+                        || contentItem.Variants
+                            .Where(x => x.Save)
+                            .Select(RequiredForPersistenceAttribute.HasRequiredValuesForPersistence)
+                            .Any(x => x == false))
+                    {
+                        //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
+                        // add the modelstate to the outgoing object and throw a validation message
+                        var forDisplay = MapToDisplay(contentItem.PersistedContent);
+                        forDisplay.Errors = ModelState.ToErrorDictionary();
+                        throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
+                    }
                 }
 
                 //if the model state is not valid we cannot publish so change it to save
@@ -774,15 +744,15 @@ namespace Umbraco.Web.Editors
                 {
                     //Check if a mandatory language is missing from being published
                     //fixme: This logic is wrong, we need to also check if this language doesn't already have a published version
-                    if (cultureVariants.Any(x => x.Culture == lang.IsoCode && !x.Publish))
-                    {
-                        //cannot continue publishing since a required language that is not currently being published isn't published
-                        if (!contentItem.PersistedContent.IsCulturePublished(lang.IsoCode))
-                        {
-                            AddCultureValidationError(lang.IsoCode, allLangs, "speechBubbles/contentReqCulturePublishError");
-                            canPublish = false;
-                        }
-                    }
+                    //if (cultureVariants.Any(x => x.Culture == lang.IsoCode && x.Publish == false))
+                    //{
+                    //    //cannot continue publishing since a required language that is not currently being published isn't published
+                    //    if (!contentItem.PersistedContent.IsCulturePublished(lang.IsoCode))
+                    //    {
+                    //        AddCultureValidationError(lang.IsoCode, allLangs, "speechBubbles/contentReqCulturePublishError");
+                    //        canPublish = false;
+                    //    }
+                    //}
                 }
                 
                 if (canPublish)
@@ -1038,7 +1008,7 @@ namespace Umbraco.Web.Editors
         /// Unpublishes a node with a given Id and returns the unpublished entity
         /// </summary>
         /// <param name="id">The content id to unpublish</param>
-        /// <param name="id">The culture variant for the content id to unpublish, if none specified will unpublish all variants of the content</param>
+        /// <param name="culture">The culture variant for the content id to unpublish, if none specified will unpublish all variants of the content</param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("id", 'U')]
         [OutgoingEditorModelEvent]
@@ -1243,10 +1213,10 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Maps the dto property values to the persisted model
+        /// Maps the dto property values and names to the persisted model
         /// </summary>
         /// <param name="contentSave"></param>
-        private void MapPropertyValues(ContentItemSave contentSave)
+        private void MapValuesForPersistence(ContentItemSave contentSave)
         {
             //inline method to determine if a property type varies
             bool Varies(Property property) => property.PropertyType.VariesByCulture();
@@ -1410,7 +1380,7 @@ namespace Umbraco.Web.Editors
                 case PublishResultType.FailedIsTrashed:
                     display.AddWarningNotification(
                         Services.TextService.Localize("publish"),
-                        "publish/contentPublishedFailedIsTrashed"); // fixme properly localize!
+                        "publish/contentPublishedFailedIsTrashed"); // fixme properly localize, these keys are missing from lang files!
                     break;
                 case PublishResultType.FailedContentInvalid:
                     display.AddWarningNotification(
@@ -1425,7 +1395,7 @@ namespace Umbraco.Web.Editors
                 case PublishResultType.FailedByCulture:
                     display.AddWarningNotification(
                         Services.TextService.Localize("publish"),
-                        "publish/contentPublishedFailedByCulture"); // fixme properly localize!
+                        "publish/contentPublishedFailedByCulture"); // fixme properly localize, these keys are missing from lang files!
                     break;
                 default:
                     throw new IndexOutOfRangeException($"PublishedResultType \"{status.Result}\" was not expected.");

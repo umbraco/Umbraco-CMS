@@ -1,6 +1,6 @@
 (function () {
     "use strict";
-    
+
     function PublishController($scope, localizationService) {
 
         var vm = this;
@@ -22,18 +22,41 @@
                             return v.language.id === oldVal[i].language.id;
                         });
                         if (found) {
-                            found.selected = oldVal[i].selected;
+                            found.publish = oldVal[i].publish;
                         }
+
                     }
                 }
                 onInit();
             });
 
+        /** Returns true if publishing is possible based on if there are un-published mandatory languages */
+        function canPublish() {
+            var selected = [];
+            for (var i = 0; i < vm.variants.length; i++) {
+                var variant = vm.variants[i];
+
+                //if this variant will show up in the publish-able list
+                var publishable = dirtyVariantFilter(variant);
+
+                if ((variant.language.isMandatory && (variant.state === "NotCreated" || variant.state === "Draft"))
+                    && (!publishable || !variant.publish)) {
+                    //if a mandatory variant isn't published and it's not publishable or not selected to be published
+                    //then we cannot publish anything
+
+                    //TODO: Show a message when this occurs
+                    return false;
+                }
+
+                if (variant.publish) {
+                    selected.push(variant.publish);
+                }
+            }
+            return selected.length > 0;
+        }
+
         function changeSelection(variant) {
-            var firstSelected = _.find(vm.variants, function (v) {
-                return v.selected;
-            });
-            $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
+            $scope.model.disableSubmitButton = !canPublish();
         }
 
         function dirtyVariantFilter(variant) {
@@ -52,8 +75,8 @@
 
         function onInit() {
 
-            if(!$scope.model.title) {
-                localizationService.localize("content_readyToPublish").then(function(value){
+            if (!$scope.model.title) {
+                localizationService.localize("content_readyToPublish").then(function (value) {
                     $scope.model.title = value;
                 });
             }
@@ -83,18 +106,28 @@
 
                 if (active) {
                     //ensure that the current one is selected
-                    active.selected = true;
+                    active.publish = true;
                 }
 
+                $scope.model.disableSubmitButton = !canPublish();
+
             } else {
-                //disable Publish button if we have nothing to publish
+                //disable Publish button if we have nothing to publish, should not happen
                 $scope.model.disableSubmitButton = true;
             }
 
             vm.loading = false;
+            
         }
+
+        //when this dialog is closed, reset all 'publish' flags
+        $scope.$on('$destroy', function () {
+            for (var i = 0; i < vm.variants.length; i++) {
+                vm.variants[i].publish = false;
+            }
+        });
     }
 
     angular.module("umbraco").controller("Umbraco.Overlays.PublishController", PublishController);
-    
+
 })();

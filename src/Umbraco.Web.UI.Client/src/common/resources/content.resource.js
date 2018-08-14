@@ -599,38 +599,6 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 'Failed to retrieve children for content item ' + parentId);
         },
 
-        /**
-          * @ngdoc method
-          * @name umbraco.resources.contentResource#hasPermission
-          * @methodOf umbraco.resources.contentResource
-          *
-          * @description
-          * Returns true/false given a permission char to check against a nodeID
-          * for the current user
-          *
-          * ##usage
-          * <pre>
-          * contentResource.hasPermission('p',1234)
-          *    .then(function() {
-          *        alert('You are allowed to publish this item');
-          *    });
-          * </pre> 
-          *
-          * @param {String} permission char representing the permission to check
-          * @param {Int} id id of content item to delete        
-          * @returns {Promise} resourcePromise object.
-          *
-          */
-        checkPermission: function (permission, id) {
-            return umbRequestHelper.resourcePromise(
-                $http.get(
-                    umbRequestHelper.getApiUrl(
-                        "contentApiBaseUrl",
-                        "HasPermission",
-                        [{ permissionToCheck: permission }, { nodeId: id }])),
-                'Failed to check permission for item ' + id);
-        },
-
         getDetailedPermissions: function (contentId) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
@@ -638,16 +606,6 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         "contentApiBaseUrl",
                         "GetDetailedPermissions", { contentId: contentId })),
                 'Failed to retrieve permissions for content item ' + contentId);
-        },
-
-        getPermissions: function (nodeIds) {
-            return umbRequestHelper.resourcePromise(
-                $http.post(
-                    umbRequestHelper.getApiUrl(
-                        "contentApiBaseUrl",
-                        "GetPermissions"),
-                    nodeIds),
-                'Failed to get permissions');
         },
 
         /**

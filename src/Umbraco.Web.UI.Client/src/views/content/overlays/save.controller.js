@@ -22,7 +22,7 @@
                             return v.language.id === oldVal[i].language.id;
                         });
                         if (found) {
-                            found.selected = oldVal[i].selected;
+                            found.save = oldVal[i].save;
                         }
                     }
                 }
@@ -31,7 +31,7 @@
 
         function changeSelection(variant) {
             var firstSelected = _.find(vm.variants, function (v) {
-                return v.selected;
+                return v.save;
             });
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
         }
@@ -81,7 +81,7 @@
 
                 if (active) {
                     //ensure that the current one is selected
-                    active.selected = true;
+                    active.save = true;
                 }
 
             } else {
@@ -91,6 +91,14 @@
 
             vm.loading = false;
         }
+
+        //when this dialog is closed, reset all 'save' flags
+        $scope.$on('$destroy', function () {
+            for (var i = 0; i < vm.variants.length; i++) {
+                vm.variants[i].save = false;
+            }
+        });
+
     }
 
     angular.module("umbraco").controller("Umbraco.Overlays.SaveContentController", SaveContentController);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
@@ -48,8 +49,9 @@ namespace Umbraco.Web.Editors.Filters
             {
                 //now do each validation step
                 if (contentItemValidator.ValidateExistingContent(model, actionContext) == false) return;
-                //validate for each variant
-                foreach (var variant in model.Variants)
+
+                //validate for each variant that is being updated
+                foreach (var variant in model.Variants.Where(x => x.Save))
                 {
                     if (contentItemValidator.ValidateProperties(model, variant, actionContext))
                         contentItemValidator.ValidatePropertyData(model, variant, variant.PropertyCollectionDto, actionContext.ModelState);
