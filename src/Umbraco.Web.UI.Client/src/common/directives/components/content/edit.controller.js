@@ -27,11 +27,6 @@
 
         // add all editors to an editors array to support split view 
         $scope.editors = [];
-        $scope.splitView = {
-            "leftIsOpen": true,
-            "rightIsOpen": false
-        };
-
         $scope.initVariant = initVariant;
         $scope.splitViewChanged = splitViewChanged;
 
@@ -68,6 +63,41 @@
         function splitViewChanged() {
             //send an event downwards
             $scope.$broadcast("editors.content.splitViewChanged", { editors: $scope.editors });
+        }
+
+        function countDirtyVariants() {
+            var count = 0;
+            for (var i = 0; i < $scope.content.variants.length; i++) {
+                var v = $scope.content.variants[i];
+                if (v.isDirty) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        /** Returns true if the save dialog should be shown when pressing save */
+        function showSaveDialog() {
+
+            //show the dialog if split view is open
+            if ($scope.editors.length > 1) {
+                return true;
+            }
+
+            //if there are more than one dirty variants
+            if (countDirtyVariants() > 1) {
+                return true;
+            }
+
+            //if there is a dirty variant that is not the currently selected variant
+            for (var i = 0; i < $scope.content.variants.length; i++) {
+                var v = $scope.content.variants[i];
+                if (v.isDirty && v.language.culture !== $scope.editors[0].content.language.culture) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /**
@@ -429,7 +459,7 @@
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
 
                     var dialog = {
-                        view: "publish",
+                        view: "views/content/overlays/publish.html",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabel: "Publish",
@@ -456,7 +486,7 @@
                                         var keys = _.keys(err.data.ModelState);
                                         var foundVariantError = _.find(keys,
                                             function (k) {
-                                                return k.startsWith("publish_variant_");
+                                                return k.startsWith("_content_variant_");
                                             });
                                         if (!foundVariantError) {
                                             //no variant errors, close the dialog
@@ -483,7 +513,7 @@
         $scope.save = function () {
 
             // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
-            if ($scope.content.variants.length > 1) {
+            if (showSaveDialog()) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "save" })) {
 
@@ -515,7 +545,7 @@
                                         var keys = _.keys(err.data.ModelState);
                                         var foundVariantError = _.find(keys,
                                             function (k) {
-                                                return k.startsWith("publish_variant_");
+                                                return k.startsWith("_content_variant_");
                                             });
                                         if (!foundVariantError) {
                                             //no variant errors, close the dialog

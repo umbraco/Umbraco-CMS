@@ -22,7 +22,7 @@
                             return v.language.id === oldVal[i].language.id;
                         });
                         if (found) {
-                            found.publish = oldVal[i].publish;
+                            found.selected = oldVal[i].selected;
                         }
                     }
                 }
@@ -31,19 +31,17 @@
 
         function changeSelection(variant) {
             var firstSelected = _.find(vm.variants, function (v) {
-                return v.publish;
+                return v.selected;
             });
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
         }
 
         function dirtyVariantFilter(variant) {
-            //determine a variant is 'dirty' (meaning it will show up as publish-able) if it's
+            //determine a variant is 'dirty' (meaning it will show up as save-able) if it's
             // * the active one
             // * it's editor is in a $dirty state
-            // * it has pending saves
-            // * it is unpublished
             // * it is in NotCreated state
-            return (variant.active || variant.isDirty || variant.state === "Draft" || variant.state === "PublishedPendingChanges" || variant.state === "NotCreated");
+            return (variant.active || variant.isDirty || variant.state === "NotCreated");
         }
 
         function pristineVariantFilter(variant) {
@@ -63,8 +61,7 @@
             _.each(vm.variants,
                 function (variant) {
                     variant.compositeId = variant.language.culture + "_" + (variant.segment ? variant.segment : "");
-                    //TODO: Change this prefix on both this and the publish dialog
-                    variant.htmlId = "publish_variant_" + variant.compositeId;
+                    variant.htmlId = "_content_variant_" + variant.compositeId;
 
                     //check for pristine variants
                     if (!vm.hasPristineVariants) {
@@ -84,11 +81,11 @@
 
                 if (active) {
                     //ensure that the current one is selected
-                    active.publish = true;
+                    active.selected = true;
                 }
 
             } else {
-                //disable Publish button if we have nothing to publish
+                //disable save button if we have nothing to save
                 $scope.model.disableSubmitButton = true;
             }
 

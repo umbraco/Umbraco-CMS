@@ -779,8 +779,7 @@ namespace Umbraco.Web.Editors
                         //cannot continue publishing since a required language that is not currently being published isn't published
                         if (!contentItem.PersistedContent.IsCulturePublished(lang.IsoCode))
                         {
-                            var errMsg = Services.TextService.Localize("speechBubbles/contentReqCulturePublishError", new[] { allLangs[lang.IsoCode].CultureName });
-                            ModelState.AddModelError("publish_variant_" + lang.IsoCode + "_", errMsg);
+                            AddCultureValidationError(lang.IsoCode, allLangs, "speechBubbles/contentReqCulturePublishError");
                             canPublish = false;
                         }
                     }
@@ -823,7 +822,7 @@ namespace Umbraco.Web.Editors
                 var valid = persistentContent.PublishCulture(variant.Culture);
                 if (!valid)
                 {
-                    AddCultureValidationError(variant.Culture, allLangs);
+                    AddCultureValidationError(variant.Culture, allLangs, "speechBubbles/contentCultureValidationError");
                     return false;
                 }
             }
@@ -836,11 +835,12 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="culture"></param>
         /// <param name="allLangs"></param>
-        private void AddCultureValidationError(string culture, IDictionary<string, ILanguage> allLangs)
+        /// <param name="localizationKey"></param>
+        private void AddCultureValidationError(string culture, IDictionary<string, ILanguage> allLangs, string localizationKey)
         {
-            var key = "publish_variant_" + culture + "_";
+            var key = "_content_variant_" + culture + "_";
             if (ModelState.ContainsKey(key)) return;
-            var errMsg = Services.TextService.Localize("speechBubbles/contentCultureValidationError", new[] { allLangs[culture].CultureName });
+            var errMsg = Services.TextService.Localize(localizationKey, new[] { allLangs[culture].CultureName });
             ModelState.AddModelError(key, errMsg);
         }
 
@@ -1235,7 +1235,7 @@ namespace Umbraco.Web.Editors
 
                 foreach (var cultureError in cultureErrors)
                 {
-                    AddCultureValidationError(cultureError, allLangs);
+                    AddCultureValidationError(cultureError, allLangs, "speechBubbles/contentCultureValidationError");
                 }
             }
                 

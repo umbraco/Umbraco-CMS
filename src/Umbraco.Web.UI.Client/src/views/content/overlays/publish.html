@@ -16,14 +16,14 @@
                     <input id="{{variant.htmlId}}"
                            name="publishVariantSelector"
                            type="checkbox"
-                           ng-model="variant.publish"
+                           ng-model="variant.selected"
                            ng-change="vm.changeSelection(variant)"
                            ng-disabled="variant.active === true"
                            style="margin-right: 8px;"
                            val-server-field="{{variant.htmlId}}" />
                     <div>
                         <label for="{{variant.htmlId}}">
-                            <span ng-class="{'bold': variant.published}" style="margin-bottom: 2px;">{{ variant.language.name }}</span>
+                            <span style="margin-bottom: 2px;">{{ variant.language.name }}</span>
                         </label>
 
                         <div ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid">
@@ -49,8 +49,8 @@
 
         <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.pristineVariantFilter">
             <div>
-                <div ng-class="{'bold': variant.published}" style="margin-bottom: 2px;">{{ variant.language.name }}</div>
-                <div class="umb-permission__description">{{ variant.state }}</div>
+                <div style="margin-bottom: 2px;">{{ variant.language.name }}</div>
+                <umb-variant-state variant="variant"></umb-variant-state>
             </div>
         </div>
     </div>

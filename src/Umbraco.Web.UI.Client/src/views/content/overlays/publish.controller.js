@@ -22,7 +22,7 @@
                             return v.language.id === oldVal[i].language.id;
                         });
                         if (found) {
-                            found.publish = oldVal[i].publish;
+                            found.selected = oldVal[i].selected;
                         }
                     }
                 }
@@ -31,7 +31,7 @@
 
         function changeSelection(variant) {
             var firstSelected = _.find(vm.variants, function (v) {
-                return v.publish;
+                return v.selected;
             });
             $scope.model.disableSubmitButton = !firstSelected; //disable submit button if there is none selected
         }
@@ -63,7 +63,7 @@
             _.each(vm.variants,
                 function (variant) {
                     variant.compositeId = variant.language.culture + "_" + (variant.segment ? variant.segment : "");
-                    variant.htmlId = "publish_variant_" + variant.compositeId;
+                    variant.htmlId = "_content_variant_" + variant.compositeId;
 
                     //check for pristine variants
                     if (!vm.hasPristineVariants) {
@@ -83,7 +83,7 @@
 
                 if (active) {
                     //ensure that the current one is selected
-                    active.publish = true;
+                    active.selected = true;
                 }
 
             } else {
