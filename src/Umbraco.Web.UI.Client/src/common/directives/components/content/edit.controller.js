@@ -306,7 +306,8 @@
                 saveMethod: args.saveMethod,
                 scope: $scope,
                 content: $scope.content,
-                action: args.action
+                action: args.action,
+                showNotifications: args.showNotifications
             }).then(function (data) {
                 //success            
                 init($scope.content);
@@ -441,7 +442,8 @@
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
                             return performSave({
                                 saveMethod: contentResource.publish,
-                                action: "publish"
+                                action: "publish",
+                                showNotifications: false
                             }).then(function (data) {
                                 overlayService.close();
                                 return $q.when(data);
@@ -450,21 +452,6 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-
-                                    //check the error list for specific variant errors, if none exist that means that only server side validation
-                                    //for the current variant's properties failed, in this case we want to close the publish dialog since the user
-                                    //will need to fix validation errors on the properties
-                                    if (err.data && err.data.ModelState) {
-                                        var keys = _.keys(err.data.ModelState);
-                                        var foundVariantError = _.find(keys,
-                                            function (k) {
-                                                return k.startsWith("_content_variant_");
-                                            });
-                                        if (!foundVariantError) {
-                                            //no variant errors, close the dialog
-                                            overlayService.close();
-                                        }
-                                    }
 
                                     return $q.reject(err);
                                 });
@@ -500,7 +487,8 @@
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
                             return performSave({
                                 saveMethod: $scope.saveMethod(),
-                                action: "save"
+                                action: "save",
+                                showNotifications: false
                             }).then(function (data) {
                                 overlayService.close();
                                 return $q.when(data);
@@ -509,22 +497,7 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-
-                                    //check the error list for specific variant errors, if none exist that means that only server side validation
-                                    //for the current variant's properties failed, in this case we want to close the publish dialog since the user
-                                    //will need to fix validation errors on the properties
-                                    if (err.data && err.data.ModelState) {
-                                        var keys = _.keys(err.data.ModelState);
-                                        var foundVariantError = _.find(keys,
-                                            function (k) {
-                                                return k.startsWith("_content_variant_");
-                                            });
-                                        if (!foundVariantError) {
-                                            //no variant errors, close the dialog
-                                            overlayService.close();
-                                        }
-                                    }
-
+                                    
                                     return $q.reject(err);
                                 });
                         },

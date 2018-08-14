@@ -4,32 +4,13 @@
     function PublishController($scope, localizationService) {
 
         var vm = this;
-        vm.variants = $scope.model.variants;
-        vm.changeSelection = changeSelection;
         vm.loading = true;
-        vm.dirtyVariantFilter = dirtyVariantFilter;
-        vm.pristineVariantFilter = pristineVariantFilter;
         vm.hasPristineVariants = false;
 
-        //watch this model, if it's reset, then re init
-        $scope.$watch("model.variants",
-            function (newVal, oldVal) {
-                vm.variants = newVal;
-                if (oldVal && oldVal.length) {
-                    //re-bind the selections
-                    for (var i = 0; i < oldVal.length; i++) {
-                        var found = _.find(vm.variants, function (v) {
-                            return v.language.id === oldVal[i].language.id;
-                        });
-                        if (found) {
-                            found.publish = oldVal[i].publish;
-                        }
-
-                    }
-                }
-                onInit();
-            });
-
+        vm.changeSelection = changeSelection;
+        vm.dirtyVariantFilter = dirtyVariantFilter;
+        vm.pristineVariantFilter = pristineVariantFilter;
+        
         /** Returns true if publishing is possible based on if there are un-published mandatory languages */
         function canPublish() {
             var selected = [];
@@ -57,6 +38,8 @@
 
         function changeSelection(variant) {
             $scope.model.disableSubmitButton = !canPublish();
+            //need to set the Save state to true if publish is true
+            variant.save = variant.publish;
         }
 
         function dirtyVariantFilter(variant) {
@@ -74,6 +57,8 @@
         }
 
         function onInit() {
+
+            vm.variants = $scope.model.variants;
 
             if (!$scope.model.title) {
                 localizationService.localize("content_readyToPublish").then(function (value) {
@@ -107,6 +92,7 @@
                 if (active) {
                     //ensure that the current one is selected
                     active.publish = true;
+                    active.save = true;
                 }
 
                 $scope.model.disableSubmitButton = !canPublish();
@@ -120,10 +106,13 @@
             
         }
 
+        onInit();
+
         //when this dialog is closed, reset all 'publish' flags
         $scope.$on('$destroy', function () {
             for (var i = 0; i < vm.variants.length; i++) {
                 vm.variants[i].publish = false;
+                vm.variants[i].save = false;
             }
         });
     }

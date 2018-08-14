@@ -4,31 +4,13 @@
     function SaveContentController($scope, localizationService) {
 
         var vm = this;
-        vm.variants = $scope.model.variants;
-        vm.changeSelection = changeSelection;
         vm.loading = true;
-        vm.dirtyVariantFilter = dirtyVariantFilter;
-        vm.pristineVariantFilter = pristineVariantFilter;
         vm.hasPristineVariants = false;
 
-        //watch this model, if it's reset, then re init
-        $scope.$watch("model.variants",
-            function (newVal, oldVal) {
-                vm.variants = newVal;
-                if (oldVal && oldVal.length) {
-                    //re-bind the selections
-                    for (var i = 0; i < oldVal.length; i++) {
-                        var found = _.find(vm.variants, function (v) {
-                            return v.language.id === oldVal[i].language.id;
-                        });
-                        if (found) {
-                            found.save = oldVal[i].save;
-                        }
-                    }
-                }
-                onInit();
-            });
-
+        vm.changeSelection = changeSelection;
+        vm.dirtyVariantFilter = dirtyVariantFilter;
+        vm.pristineVariantFilter = pristineVariantFilter;
+        
         function changeSelection(variant) {
             var firstSelected = _.find(vm.variants, function (v) {
                 return v.save;
@@ -49,6 +31,8 @@
         }
 
         function onInit() {
+
+            vm.variants = $scope.model.variants;
 
             if(!$scope.model.title) {
                 localizationService.localize("content_readyToSave").then(function(value){
@@ -91,6 +75,8 @@
 
             vm.loading = false;
         }
+
+        onInit();
 
         //when this dialog is closed, reset all 'save' flags
         $scope.$on('$destroy', function () {
