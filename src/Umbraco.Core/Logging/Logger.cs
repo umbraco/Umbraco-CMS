@@ -49,6 +49,7 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
+        [Obsolete("Use the message template version")]
         public void Error(Type reporting, string message, Exception exception = null)
         {
             var logger = Log.Logger;
@@ -84,6 +85,42 @@ namespace Umbraco.Core.Logging
 
             logger.Error(message, exception);
         }
+
+        public void Error(Type reporting, string messageTemplate, Exception exception = null, params object[] propertyValues)
+        {
+            var dump = false;
+
+            if (IsTimeoutThreadAbortException(exception))
+            {
+                messageTemplate += "\r\nThe thread has been aborted, because the request has timed out.";
+
+                // dump if configured, or if stacktrace contains Monitor.ReliableEnter
+                dump = UmbracoConfig.For.CoreDebug().DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
+
+                // dump if it is ok to dump (might have a cap on number of dump...)
+                dump &= MiniDump.OkToDump();
+            }
+
+            if (dump)
+            {
+                try
+                {
+                    var dumped = MiniDump.Dump(withException: true);
+                    messageTemplate += dumped
+                        ? "\r\nA minidump was created in App_Data/MiniDump"
+                        : "\r\nFailed to create a minidump";
+                }
+                catch (Exception e)
+                {
+                    //Log a new entry (as opposed to appending to same log entry)
+                    Error(e.GetType(), "Failed to create a minidump at App_Data/MiniDump ({ExType}: {ExMessage}", e, e.GetType().FullName, e.Message);
+                }
+            }
+
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Error(exception, messageTemplate, propertyValues);
+        }
+
 
         private static bool IsMonitorEnterThreadAbortException(Exception exception)
         {
@@ -125,20 +162,11 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        //public void Warn(Type reporting, string format, params object[] args)
-        //{
-        //    var logger = Log.Logger;
-        //    if (logger == null) return;
-        //    logger.WarnFormat(format, args);
-        //}
-
-        ///// <inheritdoc/>
-        //public void Warn(Type reporting, string format, params Func<object>[] args)
-        //{
-        //    var logger = LogManager.GetLogger(reporting);
-        //    if (logger == null || logger.IsWarnEnabled == false) return;
-        //    logger.WarnFormat(format, args.Select(x => x.Invoke()).ToArray());
-        //}
+        public void Warn(Type reporting, string messageTemplate, params object[] propertyValues)
+        {
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Warning(messageTemplate, propertyValues);
+        }
 
         /// <inheritdoc/>
         public void Warn(Type reporting, Exception exception, string message)
@@ -152,6 +180,13 @@ namespace Umbraco.Core.Logging
         {
             var logger = Log.Logger;
             logger?.ForContext(reporting).Warning(messageBuilder(), exception);
+        }
+
+        /// <inheritdoc/>
+        public void Warn(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+        {
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Warning(exception, messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
@@ -169,6 +204,13 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
+        public void Info(Type reporting, string messageTemplate, params object[] propertyValues)
+        {
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Information(messageTemplate, propertyValues);
+        }
+
+        /// <inheritdoc/>
         public void Debug(Type reporting, string message)
         {
             var logger = Log.Logger;
@@ -180,6 +222,13 @@ namespace Umbraco.Core.Logging
         {
             var logger = Log.Logger;
             logger?.ForContext(reporting).Debug(messageBuilder());
+        }
+
+        /// <inheritdoc/>
+        public void Debug(Type reporting, string messageTemplate, params object[] propertyValues)
+        {
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Debug(messageTemplate, propertyValues);
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 
 namespace Umbraco.Core.Logging
 {
@@ -16,7 +15,15 @@ namespace Umbraco.Core.Logging
         /// <param name="exception">An exception.</param>
         void Error(Type reporting, string message, Exception exception = null);
 
-        // note: should we have more overloads for Error too?
+        /// <summary>
+        /// Logs an error message - using a structured log message
+        /// </summary>
+        /// <param name="reporting">The reporting type.</param>
+        /// <param name="messageTemplate">The message template that includes property values</param>
+        /// <param name="exception">An exception.</param>
+        /// <param name="propertyValues">Property values to log & update in message template</param>
+        void Error(Type reporting, string messageTemplate, Exception exception = null, params object[] propertyValues);
+
 
         /// <summary>
         /// Logs a warning message.
@@ -31,6 +38,14 @@ namespace Umbraco.Core.Logging
         /// <param name="reporting">The reporting type.</param>
         /// <param name="messageBuilder">A message builder.</param>
         void Warn(Type reporting, Func<string> messageBuilder);
+
+        /// <summary>
+        /// Logs a warning message - using a structured log message
+        /// </summary>
+        /// <param name="reporting">The reporting type.</param>
+        /// <param name="messageTemplate">The message template that includes property values</param>
+        /// <param name="propertyValues">Property values to log & update in message template</param>
+        void Warn(Type reporting, string messageTemplate, params object[] propertyValues);
 
         /// <summary>
         /// Logs a warning message with an exception.
@@ -49,6 +64,15 @@ namespace Umbraco.Core.Logging
         void Warn(Type reporting, Exception exception, Func<string> messageBuilder);
 
         /// <summary>
+        /// Logs a warning message with an exception - using a structured log message
+        /// </summary>
+        /// <param name="reporting">The reporting type.</param>
+        /// <param name="exception">An exception.</param>
+        /// <param name="messageTemplate">The message template that includes property values</param>
+        /// <param name="propertyValues">Property values to log & update in message template</param>
+        void Warn(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
+
+        /// <summary>
         /// Logs an information message.
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
@@ -63,6 +87,14 @@ namespace Umbraco.Core.Logging
         void Info(Type reporting, Func<string> messageBuilder);
 
         /// <summary>
+        /// Logs a info message - using a structured log message
+        /// </summary>
+        /// <param name="reporting">The reporting type.</param>
+        /// <param name="messageTemplate">The message template that includes property values</param>
+        /// <param name="propertyValues">Property values to log & update in message template</param>
+        void Info(Type reporting, string messageTemplate, params object[] propertyValues);
+
+        /// <summary>
         /// Logs a debugging message.
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
@@ -75,5 +107,13 @@ namespace Umbraco.Core.Logging
         /// <param name="reporting">The reporting type.</param>
         /// <param name="messageBuilder">A message builder.</param>
         void Debug(Type reporting, Func<string> messageBuilder);
+
+        /// <summary>
+        /// Logs a debug message - using a structured log message
+        /// </summary>
+        /// <param name="reporting">The reporting type.</param>
+        /// <param name="messageTemplate">The message template that includes property values</param>
+        /// <param name="propertyValues">Property values to log & update in message template</param>
+        void Debug(Type reporting, string messageTemplate, params object[] propertyValues);
     }
 }
