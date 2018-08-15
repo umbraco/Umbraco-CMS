@@ -12,20 +12,15 @@ namespace Umbraco.Tests.TestHelpers
             Console.WriteLine(exception);
         }
 
-        public void Error(Type reporting, string messageTemplate, Exception exception = null, params object[] propertyValues)
+        public void Error(Type reporting, string format, Exception exception = null, params object[] args)
         {
-            Console.WriteLine("ERROR {0} - {1}", reporting.Name, string.Format(messageTemplate, propertyValues));
+            Console.WriteLine("ERROR {0} - {1}", reporting.Name, string.Format(format, args));
             Console.WriteLine(exception);
         }
 
         public void Warn(Type reporting, string message)
         {
             Console.WriteLine("WARN {0} - {1}", reporting.Name, message);
-        }
-
-        public void Warn(Type reporting, Func<string> messageBuilder)
-        {
-            Console.WriteLine("WARN {0} - {1}", reporting.Name, messageBuilder());
         }
 
         public void Warn(Type reporting, string format, params object[] args)
@@ -38,22 +33,11 @@ namespace Umbraco.Tests.TestHelpers
             Console.WriteLine("WARN {0} - {1}", reporting.Name, message);
             Console.WriteLine(exception);
         }
-
-        public void Warn(Type reporting, Exception exception, Func<string> messageBuilder)
-        {
-            Console.WriteLine("WARN {0} - {1}", reporting.Name, messageBuilder());
-            Console.WriteLine(exception);
-        }
-
+        
         public void Warn(Type reporting, Exception exception, string format, params object[] args)
         {
             Console.WriteLine("WARN {0} - {1}", reporting.Name, string.Format(format, args));
             Console.WriteLine(exception);
-        }
-
-        public void Info(Type reporting, Func<string> generateMessage)
-        {
-            Console.WriteLine("INFO {0} - {1}", reporting.Name, generateMessage());
         }
 
         public void Info(Type reporting, string format, params object[] args)
@@ -71,14 +55,19 @@ namespace Umbraco.Tests.TestHelpers
             Console.WriteLine("DEBUG {0} - {1}", reporting.Name, message);
         }
 
-        public void Debug(Type reporting, Func<string> messageBuilder)
-        {
-            Console.WriteLine("DEBUG {0} - {1}", reporting.Name, messageBuilder());
-        }
-
         public void Debug(Type reporting, string format, params object[] args)
         {
             Console.WriteLine("DEBUG {0} - {1}", reporting.Name, string.Format(format, args));
+        }
+
+        public void Verbose(Type reporting, string message)
+        {
+            Console.WriteLine("VERBOSE {0} - {1}", reporting.Name, message);
+        }
+
+        public void Verbose(Type reporting, string format, params object[] args)
+        {
+            Console.WriteLine("VERBOSE {0} - {1}", reporting.Name, string.Format(format, args));
         }
     }
 }
