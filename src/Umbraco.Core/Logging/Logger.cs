@@ -5,6 +5,7 @@ using System.Threading;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Diagnostics;
 using Serilog;
+using Serilog.Events;
 using Umbraco.Core.Logging.SerilogExtensions;
 
 namespace Umbraco.Core.Logging
@@ -40,7 +41,7 @@ namespace Umbraco.Core.Logging
             var loggerConfig = new LoggerConfiguration();
             loggerConfig
                 .MinimalConfiguration()
-                .OutputDefaultTextFile()
+                .OutputDefaultTextFile(LogEventLevel.Debug)
                 .OutputDefaultJsonFile()
                 .ReadFromConfigFile()
                 .ReadFromUserConfigFile();
