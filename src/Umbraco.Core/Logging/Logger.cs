@@ -83,7 +83,7 @@ namespace Umbraco.Core.Logging
                 }
             }
 
-            logger.Error(message, exception);
+            logger.ForContext(reporting).Error(exception, message);
         }
 
         public void Error(Type reporting, string messageTemplate, Exception exception = null, params object[] propertyValues)
