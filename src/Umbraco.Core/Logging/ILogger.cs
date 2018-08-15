@@ -85,5 +85,9 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">The message template that includes property values</param>
         /// <param name="propertyValues">Property values to log & update in message template</param>
         void Debug(Type reporting, string messageTemplate, params object[] propertyValues);
+
+        void Verbose(Type reporting, string message);
+
+        void Verbose(Type reporting, string messageTemplate, params object[] propertyValues);
     }
 }

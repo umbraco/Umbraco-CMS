@@ -126,6 +126,29 @@ namespace Umbraco.Core.Logging
         {
             logger.Debug(typeof(T), messageTemplate, propertyValues);
         }
-        
+
+        /// <summary>
+        /// Logs a verbose message.
+        /// </summary>
+        /// <typeparam name="T">The reporting type.</typeparam>
+        /// <param name="logger">The logger.</param>
+        /// <param name="message">A message.</param>
+        public static void Verbose<T>(this ILogger logger, string message)
+        {
+            logger.Verbose(typeof(T), message);
+        }
+
+        /// <summary>
+        /// Logs a Verbose message.
+        /// </summary>
+        /// <typeparam name="T">The reporting type</typeparam>
+        /// <param name="logger">The logger.</param>
+        /// <param name="messageTemplate">A structured message template</param>
+        /// <param name="propertyValues">Message property values</param>
+        public static void Verbose<T>(this ILogger logger, string messageTemplate, params object[] propertyValues)
+        {
+            logger.Verbose(typeof(T), messageTemplate, propertyValues);
+        }
+
     }
 }

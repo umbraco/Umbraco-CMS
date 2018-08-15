@@ -153,14 +153,7 @@ namespace Umbraco.Core.Logging
             var logger = Log.Logger;
             logger?.Warning(format);
         }
-
-        /// <inheritdoc/>
-        public void Warn(Type reporting, Func<string> messageBuilder)
-        {
-            var logger = Log.Logger;
-            logger?.Warning(messageBuilder());
-        }
-
+        
         /// <inheritdoc/>
         public void Warn(Type reporting, string messageTemplate, params object[] propertyValues)
         {
@@ -174,14 +167,7 @@ namespace Umbraco.Core.Logging
             var logger = Log.Logger;
             logger?.ForContext(reporting).Warning(message, exception);
         }
-
-        /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, Func<string> messageBuilder)
-        {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Warning(messageBuilder(), exception);
-        }
-
+        
         /// <inheritdoc/>
         public void Warn(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
@@ -197,13 +183,6 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Info(Type reporting, Func<string> generateMessage)
-        {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Information(generateMessage());
-        }
-
-        /// <inheritdoc/>
         public void Info(Type reporting, string messageTemplate, params object[] propertyValues)
         {
             var logger = Log.Logger;
@@ -216,19 +195,26 @@ namespace Umbraco.Core.Logging
             var logger = Log.Logger;
             logger?.ForContext(reporting).Debug(message);
         }
-
-        /// <inheritdoc/>
-        public void Debug(Type reporting, Func<string> messageBuilder)
-        {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Debug(messageBuilder());
-        }
-
+        
         /// <inheritdoc/>
         public void Debug(Type reporting, string messageTemplate, params object[] propertyValues)
         {
             var logger = Log.Logger;
             logger?.ForContext(reporting).Debug(messageTemplate, propertyValues);
+        }
+
+        /// <inheritdoc/>
+        public void Verbose(Type reporting, string message)
+        {
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Verbose(message);
+        }
+
+        /// <inheritdoc/>
+        public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues)
+        {
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Verbose(messageTemplate, propertyValues);
         }
     }
 }
