@@ -20,16 +20,16 @@
     position: relative;
     text-align: left;
     border-top: solid 1px transparent;
-    background: white;
+    background: @white;
 }
 
 .umb-nested-content__item--active:not(.umb-nested-content__item--single) {
-    background: #f8f8f8;
+    background: @gray-10;
 }
 
 .umb-nested-content__item.ui-sortable-placeholder {
-    background: #f8f8f8;
-    border: 1px dashed #d9d9d9;
+    background: @gray-10;
+    border: 1px dashed @gray-8;
     visibility: visible !important;
     height: 55px;
     margin-top: -1px;
@@ -45,10 +45,10 @@
 
 .umb-nested-content__header-bar {
     padding: 15px 20px;
-    border-bottom: 1px dashed #e0e0e0;
+    border-bottom: 1px dashed @gray-8;
     text-align: right;
     cursor: pointer;
-    background-color: white;
+    background-color: @white;
 
     -moz-user-select: none;
     -khtml-user-select: none;
@@ -65,7 +65,7 @@
     }
 
     i {
-        color: #999; /* same icon color as the icons in the item type picker */
+        color: @gray-2;
         position: absolute;
         left: 0;
     }
@@ -86,7 +86,7 @@
     position: absolute;
     right: 0px;
     top: 2px;
-    background-color: white;
+    background-color: @white;
     padding: 5px;
 
     &:before {
@@ -113,8 +113,8 @@
     padding: 4px 6px;
     margin: 2px;
     cursor: pointer;
-    background: #fff;
-    border: 1px solid #b6b6b6;
+    background: @white;
+    border: 1px solid @gray-7;
     border-radius: 200px;
     text-decoration: none !important;
 }
@@ -122,9 +122,9 @@
 .umb-nested-content__icon:hover,
 .umb-nested-content__icon--active
 {
-    color: white;
-    background: #2e8aea;
-    border-color: #2e8aea;
+    color: @white;
+    background: @turquoise-d1;
+    border-color: @turquoise-d1;
     text-decoration: none;
 }
 
@@ -132,12 +132,12 @@
 .umb-nested-content__icon.umb-nested-content__icon--disabled:hover .icon {
     display: block;
     font-size: 16px !important;
-    color: #5f5f5f;
+    color: @gray-3;
 }
 
 .umb-nested-content__icon:hover .icon,
 .umb-nested-content__icon--active .icon {
-    color: white;
+    color: @white;
 }
 
 .umb-nested-content__icon--disabled {
@@ -151,7 +151,7 @@
 }
 
 .umb-nested-content__content {
-    border-bottom: 1px dashed #e0e0e0;
+    border-bottom: 1px dashed @gray-8;
 }
 
 .umb-nested-content__content .umb-control-group {
@@ -167,8 +167,8 @@
     padding: 10px 20px 10px 20px;
     clear: both;
     font-size: 14px;
-    color: #555;
-    background: #f8f8f8;
+    color: @gray-3;
+    background: @gray-10;
     border-radius: 15px;
 }
 
@@ -181,12 +181,12 @@
 .umb-nested-content__doctypepicker table td.icon-navigation, 
 .umb-nested-content__doctypepicker i.umb-nested-content__help-icon {
     vertical-align: middle;
-    color: #CCC;
+    color: @gray-7;
 }
 
 .umb-nested-content__doctypepicker table td.icon-navigation:hover, 
 .umb-nested-content__doctypepicker i.umb-nested-content__help-icon:hover {
-    color: #343434;
+    color: @gray-2;
 }
 
 .umb-nested-content__doctypepicker i.umb-nested-content__help-icon {
