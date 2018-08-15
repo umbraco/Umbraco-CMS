@@ -45,17 +45,14 @@ namespace Umbraco.Web.Editors.Filters
             var model = (ContentItemSave)actionContext.ActionArguments["contentItem"];
             var contentItemValidator = new ContentItemValidationHelper<IContent, ContentItemSave>(_logger, _umbracoContextAccessor);
 
-            if (ValidateUserAccess(model, actionContext))
+            if (!contentItemValidator.ValidateExistingContent(model, actionContext)) return;
+            if (!ValidateUserAccess(model, actionContext)) return;
+            
+            //validate for each variant that is being updated
+            foreach (var variant in model.Variants.Where(x => x.Save))
             {
-                //now do each validation step
-                if (contentItemValidator.ValidateExistingContent(model, actionContext) == false) return;
-
-                //validate for each variant that is being updated
-                foreach (var variant in model.Variants.Where(x => x.Save))
-                {
-                    if (contentItemValidator.ValidateProperties(model, variant, actionContext))
-                        contentItemValidator.ValidatePropertyData(model, variant, variant.PropertyCollectionDto, actionContext.ModelState);
-                }
+                if (contentItemValidator.ValidateProperties(model, variant, actionContext))
+                    contentItemValidator.ValidatePropertyData(model, variant, variant.PropertyCollectionDto, actionContext.ModelState);
             }
         }
 
