@@ -77,23 +77,6 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "publishDate")]
         public DateTime? PublishDate { get; set; }
-
-        /// <summary>
-        /// Determines if the content variant for this culture has been created
-        /// </summary>
-        [DataMember(Name = "exists")]
-        public bool Exists { get; set; }
-
-        ///// <summary>
-        ///// Determines if this is the variant currently being edited
-        ///// </summary>
-        //[DataMember(Name = "current")]
-        //public bool IsCurrent { get; set; }
-
-        ///// <summary>
-        ///// If the variant is a required variant for validation purposes
-        ///// </summary>
-        //[DataMember(Name = "mandatory")]
-        //public bool Mandatory { get; set; }
+        
     }
 }

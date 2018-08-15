@@ -68,7 +68,6 @@ namespace Umbraco.Web.Models.Mapping
             CreateMap<IContent, ContentVariantDisplay>()
                 .ForMember(dest => dest.PublishDate, opt => opt.MapFrom(src => src.PublishDate))
                 .ForMember(dest => dest.Properties, opt => opt.Ignore())
-                .ForMember(dest => dest.Exists, opt => opt.Ignore())
                 .ForMember(dest => dest.Segment, opt => opt.Ignore())
                 .ForMember(dest => dest.Language, opt => opt.Ignore())
                 .ForMember(dest => dest.State, opt => opt.Ignore())
