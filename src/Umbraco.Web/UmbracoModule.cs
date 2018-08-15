@@ -551,10 +551,17 @@ namespace Umbraco.Web
             // get our dependencies injected manually, through properties.
             Core.Composing.Current.Container.InjectProperties(this);
 
+            //Create a GUID to use as some form of request ID
+            var requestId = Guid.Empty;
+
             app.BeginRequest += (sender, e) =>
             {
                 var httpContext = ((HttpApplication) sender).Context;
-                Logger.Debug<UmbracoModule>("Begin request: {RequestUrl}", httpContext.Request.Url);
+
+                //Create a new Request ID/GUID
+                requestId = Guid.NewGuid();
+
+                Logger.Verbose<UmbracoModule>("Begin request [{RequestId}]: {RequestUrl}", requestId, httpContext.Request.Url);
                 BeginRequest(new HttpContextWrapper(httpContext));
             };
 
@@ -595,9 +602,13 @@ namespace Umbraco.Web
             {
                 var httpContext = ((HttpApplication) sender).Context;
 
-                if (UmbracoContext.Current != null && UmbracoContext.Current.IsFrontEndUmbracoRequest)
+                if (UmbracoContext.Current != null)
                 {
-                    Logger.Debug<UmbracoModule>("End Request: {RequestUrl} ({RequestTotalMilliseconds}ms)", httpContext.Request.Url, DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
+                    Logger.Verbose<UmbracoModule>(
+                        "End Request [{RequestId}]: {RequestUrl} ({RequestTotalMilliseconds}ms)",
+                        requestId,
+                        httpContext.Request.Url,
+                        DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
                 }
 
                 OnEndRequest(new UmbracoRequestEventArgs(UmbracoContext.Current, new HttpContextWrapper(httpContext)));
