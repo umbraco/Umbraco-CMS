@@ -8,6 +8,12 @@ namespace Umbraco.Core.Logging.SerilogExtensions
 {
     public static class LoggerConfigExtensions
     {
+        /// <summary>
+        /// This configures Serilog with some defaults
+        /// Such as adding ProcessID, Thread, AppDomain etc
+        /// It is highly recommended that you keep/use this default in your own logging config customizations
+        /// </summary>
+        /// <param name="logConfig">A Serilog LoggerConfiguration</param>
         public static LoggerConfiguration MinimalConfiguration(this LoggerConfiguration logConfig)
         {
             Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
@@ -27,31 +33,48 @@ namespace Umbraco.Core.Logging.SerilogExtensions
             return logConfig;
         }
 
-        public static LoggerConfiguration OutputDefaultTextFile(this LoggerConfiguration logConfig)
+        /// <summary>
+        /// Outputs a .txt format log at /App_Data/Logs/
+        /// </summary>
+        /// <param name="logConfig">A Serilog LoggerConfiguration</param>
+        /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
+        /// <param name="retainedFileCount">The number of days to keep log files. Default is set to null which means all logs are kept</param>
+        public static LoggerConfiguration OutputDefaultTextFile(this LoggerConfiguration logConfig, LogEventLevel minimumLevel = LogEventLevel.Verbose, int? retainedFileCount = null)
         {
             //Main .txt logfile - in similar format to older Log4Net output
             //Ends with ..txt as Date is inserted before file extension substring
             logConfig.WriteTo.File($@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog.{Environment.MachineName}..txt",
                     rollingInterval: RollingInterval.Day,
-                    restrictedToMinimumLevel: LogEventLevel.Verbose,
+                    restrictedToMinimumLevel: minimumLevel,
                     retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss,fff} [P{ProcessId}/D{AppDomainId}/T{ThreadId}] {Log4NetLevel}  {SourceContext} - {Message:lj}{NewLine}{Exception}");
 
             return logConfig;
         }
 
-        public static LoggerConfiguration OutputDefaultJsonFile(this LoggerConfiguration logConfig)
+        /// <summary>
+        /// Outputs a CLEF format JSON log at /App_Data/Logs/
+        /// </summary>
+        /// <param name="logConfig">A Serilog LoggerConfiguration</param>
+        /// <param name="minimumLevel">The log level you wish the JSON file to collect - default is Verbose (highest)</param>
+        /// <param name="retainedFileCount">The number of days to keep log files. Default is set to null which means all logs are kept</param>
+        public static LoggerConfiguration OutputDefaultJsonFile(this LoggerConfiguration logConfig, LogEventLevel minimumLevel = LogEventLevel.Verbose, int? retainedFileCount = null)
         {
             //.clef format (Compact log event format, that can be imported into local SEQ & will make searching/filtering logs easier)
             //Ends with ..txt as Date is inserted before file extension substring
             logConfig.WriteTo.File(new CompactJsonFormatter(), $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog.{Environment.MachineName}..json",
                 rollingInterval: RollingInterval.Day, //Create a new JSON file every day
-                retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
-                restrictedToMinimumLevel: LogEventLevel.Verbose);
+                retainedFileCountLimit: retainedFileCount, //Setting to null means we keep all files - default is 31 days
+                restrictedToMinimumLevel: minimumLevel);
 
             return logConfig;
         }
 
+        /// <summary>
+        /// Reads settings from /config/serilog.config
+        /// That allows the main logging pipeline to be configured
+        /// </summary>
+        /// <param name="logConfig">A Serilog LoggerConfiguration</param>
         public static LoggerConfiguration ReadFromConfigFile(this LoggerConfiguration logConfig)
         {
             //Read from main serilog.config file
@@ -60,6 +83,11 @@ namespace Umbraco.Core.Logging.SerilogExtensions
             return logConfig;
         }
 
+        /// <summary>
+        /// Reads settings from /config/serilog.user.config
+        /// That allows a seperate logging pipeline to be configured that wil not affect the main Umbraco log
+        /// </summary>
+        /// <param name="logConfig">A Serilog LoggerConfiguration</param>
         public static LoggerConfiguration ReadFromUserConfigFile(this LoggerConfiguration logConfig)
         {
             //A nested logger - where any user configured sinks via config can not effect the main 'umbraco' logger above
