@@ -743,16 +743,17 @@ namespace Umbraco.Web.Editors
                 foreach (var lang in mandatoryLangs)
                 {
                     //Check if a mandatory language is missing from being published
-                    //fixme: This logic is wrong, we need to also check if this language doesn't already have a published version
-                    //if (cultureVariants.Any(x => x.Culture == lang.IsoCode && x.Publish == false))
-                    //{
-                    //    //cannot continue publishing since a required language that is not currently being published isn't published
-                    //    if (!contentItem.PersistedContent.IsCulturePublished(lang.IsoCode))
-                    //    {
-                    //        AddCultureValidationError(lang.IsoCode, allLangs, "speechBubbles/contentReqCulturePublishError");
-                    //        canPublish = false;
-                    //    }
-                    //}
+
+                    var variant = cultureVariants.First(x => x.Culture == lang.IsoCode);
+                    var isPublished = contentItem.PersistedContent.IsCultureAvailable(lang.IsoCode) && contentItem.PersistedContent.IsCulturePublished(lang.IsoCode);
+                    var isPublishing = variant.Publish;
+
+                    if (!isPublished && !isPublishing)
+                    {
+                        //cannot continue publishing since a required language that is not currently being published isn't published
+                        AddCultureValidationError(lang.IsoCode, allLangs, "speechBubbles/contentReqCulturePublishError");
+                        canPublish = false;
+                    }
                 }
                 
                 if (canPublish)
