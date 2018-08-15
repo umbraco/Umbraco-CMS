@@ -23,21 +23,13 @@ namespace Umbraco.Core.Logging
         /// <param name="exception">An exception.</param>
         /// <param name="propertyValues">Property values to log & update in message template</param>
         void Error(Type reporting, string messageTemplate, Exception exception = null, params object[] propertyValues);
-
-
+        
         /// <summary>
         /// Logs a warning message.
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
         /// <param name="message">A message.</param>
         void Warn(Type reporting, string message);
-
-        /// <summary>
-        /// Logs a warning message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="messageBuilder">A message builder.</param>
-        void Warn(Type reporting, Func<string> messageBuilder);
 
         /// <summary>
         /// Logs a warning message - using a structured log message
@@ -56,14 +48,6 @@ namespace Umbraco.Core.Logging
         void Warn(Type reporting, Exception exception, string message);
 
         /// <summary>
-        /// Logs a warning message with an exception.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="messageBuilder">A message builder.</param>
-        void Warn(Type reporting, Exception exception, Func<string> messageBuilder);
-
-        /// <summary>
         /// Logs a warning message with an exception - using a structured log message
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
@@ -80,13 +64,6 @@ namespace Umbraco.Core.Logging
         void Info(Type reporting, string message);
 
         /// <summary>
-        /// Logs an information message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="messageBuilder">A message builder.</param>
-        void Info(Type reporting, Func<string> messageBuilder);
-
-        /// <summary>
         /// Logs a info message - using a structured log message
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
@@ -100,14 +77,7 @@ namespace Umbraco.Core.Logging
         /// <param name="reporting">The reporting type.</param>
         /// <param name="message">A message.</param>
         void Debug(Type reporting, string message);
-
-        /// <summary>
-        /// Logs a debugging message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="messageBuilder">A message builder.</param>
-        void Debug(Type reporting, Func<string> messageBuilder);
-
+        
         /// <summary>
         /// Logs a debug message - using a structured log message
         /// </summary>
