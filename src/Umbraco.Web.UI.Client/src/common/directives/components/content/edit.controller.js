@@ -223,7 +223,7 @@
         }
 
         /**
-         *  This does the content loading and initializes everything, called on load and changing variants
+         *  This does the content loading and initializes everything, called on first load
          */
         function loadContent() {
 
@@ -242,7 +242,7 @@
                     init($scope.content);
 
                     if (!infiniteMode) {
-                        syncTreeNode($scope.content, data.path, true);
+                        syncTreeNode($scope.content, true);
                     }
 
                     resetLastListPageNumber($scope.content);
@@ -292,7 +292,9 @@
         }
 
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
-        function syncTreeNode(content, path, initialLoad) {
+        function syncTreeNode(content, initialLoad) {
+
+            var path = content.path;
 
             if (!$scope.content.isChildOfListView) {
                 navigationService.syncTree({ tree: $scope.treeAlias, path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
@@ -332,7 +334,7 @@
                 init($scope.content);
 
                 if (!infiniteMode) {
-                    syncTreeNode($scope.content, data.path);
+                    syncTreeNode($scope.content);
                 }
 
                 $scope.page.buttonGroupState = "success";
@@ -344,6 +346,7 @@
                 function (err) {
 
                     setActiveCulture();
+                    syncTreeNode($scope.content);
 
                     //error
                     if (err) {
@@ -428,7 +431,7 @@
                         init($scope.content);
 
                         if (!infiniteMode) {
-                            syncTreeNode($scope.content, data.path);
+                            syncTreeNode($scope.content);
                         }
 
                         $scope.page.buttonGroupState = "success";
