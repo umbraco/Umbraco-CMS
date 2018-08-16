@@ -8,9 +8,15 @@
 function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, navigationService, localizationService, serverValidationManager, dialogService, formHelper, appState) {
 
     function isValidIdentifier(id) {
+
         //empty id <= 0
-        if (angular.isNumber(id) && id > 0) {
-            return true;
+        if (angular.isNumber(id)) {
+            if (id === 0) {
+                return false;
+            }
+            if (id > 0) {
+                return true;
+            }
         }
 
         //empty guid
@@ -502,7 +508,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
                 //special case for content, don't sync this variant if it wasn't tagged
                 //for saving in the first place
-                if (!savedVariant.save) {
+                if (!origVariant.save) {
                     continue;
                 }
 
