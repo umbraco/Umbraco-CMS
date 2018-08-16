@@ -58,7 +58,7 @@
 
             setActiveCulture();
 
-            resetSaveAndPublishFlags();
+            resetVariantFlags();            
         }
 
         /** This is called when the split view changes based on the umb-variant-content */
@@ -66,19 +66,27 @@
             //send an event downwards
             $scope.$broadcast("editors.content.splitViewChanged", { editors: $scope.editors });
         }
-
-        /** When working with multiple variants, this will set the save/publish flags of each one to false.
-         *  When working with a single variant, this will set the publish flag to false and the save flag to true.
+        
+        /**
+         * This will reset isDirty flags if save is true.
+         * When working with multiple variants, this will set the save/publish flags of each one to false.
+         * When working with a single variant, this will set the publish flag to false and the save flag to true.
          */
-        function resetSaveAndPublishFlags() {
+        function resetVariantFlags() {
             if ($scope.content.variants.length > 1) {
                 for (var i = 0; i < $scope.content.variants.length; i++) {
                     var v = $scope.content.variants[i];
+                    if (v.save) {
+                        v.isDirty = false;
+                    }
                     v.save = false;
                     v.publish = false;
                 }
             }
             else {
+                if ($scope.content.variants[0].save) {
+                    $scope.content.variants[0].isDirty = false;
+                }
                 $scope.content.variants[0].save = true;
                 $scope.content.variants[0].publish = false;
             }
