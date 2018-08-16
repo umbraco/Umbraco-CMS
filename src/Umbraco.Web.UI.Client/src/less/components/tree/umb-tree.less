@@ -5,35 +5,20 @@
     min-width: 100%;
     width: auto;
     padding: 0 0 20px;
-
+    list-style-type: none;
+    
     * {
         white-space: nowrap;
-    }
-
-    div {
-        padding: 0;
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        flex-wrap: nowrap;
-        align-items: center;
-
-        &:hover {
-            background: @gray-10;
-
-            > .umb-options {
-                visibility: visible;
-            }
-        }
     }
 
     a, a:hover {
         outline: none;
         text-decoration: none;
 
-        &.noSpr {
-            background-position: 0
-        }
+        // TODO => confirm not in use
+//        &.noSpr {
+//            background-position: 0
+//        }
     }
 
     ins {
@@ -67,37 +52,8 @@
         &.collapsed {
             display: none;
         }
-    } //    .umb-tree-item {
-    //        display: block;
-    //        min-width: 100%;
-    //        width: auto;
-    //    }
-    //
-    //    li.current > div,
-    //    div.selected {
-    //        background: @turquoise-d1;
-    //    }
-    //
-    //    li.current > div a.umb-options i,
-    //    div.selected i {
-    //        background: @white;
-    //        border-color: @turquoise-d1;
-    //        transition: opacity 120ms ease;
-    //    }
-    //
-    //    li.current > div a.umb-options:hover i,
-    //    div.selected i {
-    //        opacity: .7;
-    //    }
-    //
-    //    li.current > div a,
-    //    li.current > div i.icon,
-    //    li.current > div ins {
-    //        color: @white !important;
-    //        background-color: @turquoise-d1;
-    //        border-color: @turquoise-d1;
-    //    }
-    //
+    }
+    
     //loader defaults
     .umb-loader {
         height: 10px;
@@ -118,7 +74,7 @@ body.touch .umb-tree {
         padding: 7px;
     }
 
-    .umb-tree-item > div {
+    .umb-tree-item > .umb-tree-item__inner {
         padding-top: 8px;
         padding-bottom: 8px;
         font-size: 110%;
@@ -127,6 +83,23 @@ body.touch .umb-tree {
     // change height of this if touch devices should have a different height of preloader.
     .umb-tree-item .l div {
         padding: 0;
+    }
+}
+
+.umb-tree-root, .umb-tree-item__inner {
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+
+    &:hover {
+        background: @gray-10;
+
+        > .umb-options {
+            visibility: visible;
+        }
     }
 }
 
@@ -215,67 +188,7 @@ body.touch .umb-tree {
     }
 }
 
-// todo -> confirm not in use. not referenced in any other code
-// 
-//.hide-header h5 {
-//    display: none !important
-//}
-//.umb-icon-item {
-//    padding: 2px;
-//    padding-left: 55px;
-//    display: block;
-//    position: relative;
-//
-//    &:hover {
-//        background: @gray-10;
-//
-//        .umb-options {
-//            visibility: visible
-//        }
-//    }
-//
-//    a {
-//        color: @gray-3;
-//        padding-top: 3px;
-//        height: 15px;
-//        font-size: 12px;
-//        text-decoration: none;
-//
-//        &:hover div {
-//            text-decoration: underline;
-//        }
-//    }
-//
-//    small {
-//        color: @gray-6;
-//        font-size: 10px;
-//        display: block;
-//    }
-//
-//    .icon {
-//        position: absolute;
-//        top: 8px;
-//        left: 19px;
-//    }
-//
-//    .umb-spr {
-//        float: left
-//    }
-//}
 
-// item-list
-// todo -> verify not in use. not mentioned elsewhere in codebase...
-// -------------------------
-//.umb-item-list {
-//    margin: 0;
-//    width: auto;
-//    display: block;
-//
-//    li {
-//        display: block;
-//        width: auto;
-//    }
-//}
 // Tree item states
 // -------------------------
 .not-published {
@@ -306,36 +219,29 @@ body.touch .umb-tree {
     }
 }
 
-.protected {
-    &::before {
-        content: "\e256";
-        color: @red;
-    }
+.protected::before {
+    content: "\e256";
+    color: @red;
 }
 
-.has-unpublished-version {
-    &::before {
-        content: "\e25a";
-        color: @green;
-    }
+.has-unpublished-version::before {
+    content: "\e25a";
+    color: @green;
 }
 
-.is-container {
-    &::before {
-        content: "\e04e";
-        color: @turquoise;
-        font-size: 8px;
-        padding-left: 13px;
-        padding-top: 8px;
-        pointer-events: none;
-    }
+.is-container::before {
+    content: "\e04e";
+    color: @turquoise;
+    font-size: 8px;
+    padding-left: 13px;
+    padding-top: 8px;
+    pointer-events: none;
 }
 
-.locked {
-    &::before {
-        content: "\e0a7";
-        color: @red;
-    }
+
+.locked::before {
+    content: "\e0a7";
+    color: @red;
 }
 
 .no-access {

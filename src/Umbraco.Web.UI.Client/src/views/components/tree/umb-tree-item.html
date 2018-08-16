@@ -1,5 +1,5 @@
 <li class="umb-tree-item" data-element="tree-item-{{::node.dataElement}}" ng-class="{'current': (node == currentNode), 'has-children': node.hasChildren, 'umb-tree-item--deleted': node.deleteAnimations}" on-right-click="altSelect(node, $event)">
-    <div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)" >
+    <div class="umb-tree-item__inner" ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)" >
         <ins data-element="tree-item-expand" 
             ng-class="{'icon-navigation-right': !node.expanded || node.metaData.isContainer, 'icon-navigation-down': node.expanded && !node.metaData.isContainer}" 
             ng-style="{'visibility': (node.hasChildren || node.metaData.isContainer && scope.enablelistviewexpand === 'true') ? 'visible' : 'hidden'}"
