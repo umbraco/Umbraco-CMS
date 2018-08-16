@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven;
 using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZero
