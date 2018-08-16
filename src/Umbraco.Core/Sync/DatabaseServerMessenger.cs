@@ -352,7 +352,11 @@ namespace Umbraco.Core.Sync
                 }
                 catch (JsonException ex)
                 {
-                    Logger.Error<DatabaseServerMessenger>($"Failed to deserialize instructions ({dto.Id}: \"{dto.Instructions}\").", ex);
+                    Logger.Error<DatabaseServerMessenger>("Failed to deserialize instructions ({DtoId}: '{DtoInstructions}').",
+                        ex,
+                        dto.Id,
+                        dto.Instructions);
+
                     lastId = dto.Id; // skip
                     continue;
                 }
@@ -408,7 +412,10 @@ namespace Umbraco.Core.Sync
             catch (Exception ex)
             {
                     Logger.Error<DatabaseServerMessenger>(
-                        $"DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions ({dto.Id}: \"{dto.Instructions}\"). Instruction is being skipped/ignored", ex);
+                        "DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions ({DtoId}: '{DtoInstructions}'). Instruction is being skipped/ignored",
+                        ex,
+                        dto.Id,
+                        dto.Instructions);
 
                 //we cannot throw here because this invalid instruction will just keep getting processed over and over and errors
                 // will be thrown over and over. The only thing we can do is ignore and move on.

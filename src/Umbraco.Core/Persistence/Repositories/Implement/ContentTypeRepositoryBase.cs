@@ -521,9 +521,12 @@ AND umbracoNode.id <> @id",
         {
             if (string.IsNullOrWhiteSpace(pt.Alias))
             {
-                var m = $"Property Type '{pt.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.";
-                var e = new InvalidOperationException(m);
-                Logger.Error<ContentTypeRepositoryBase<TEntity>>(m, e);
+                var e = new InvalidOperationException($"Property Type '{pt.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
+
+                Logger.Error<ContentTypeRepositoryBase<TEntity>>(
+                    "Property Type '{PropertyTypeName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                    e, pt.Name);
+
                 throw e;
             }
         }
@@ -532,10 +535,14 @@ AND umbracoNode.id <> @id",
         {
             if (string.IsNullOrWhiteSpace(entity.Alias))
             {
-                var m = $"{typeof(TEntity).Name} '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.";
-                var e = new InvalidOperationException(m);
-                Logger.Error<ContentTypeRepositoryBase<TEntity>>(m, e);
-                throw e;
+                var ex = new InvalidOperationException($"{typeof(TEntity).Name} '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
+
+                Logger.Error<ContentTypeRepositoryBase<TEntity>>("{EntityTypeName} '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                    ex,
+                    typeof(TEntity).Name,
+                    entity.Name);
+
+                throw ex;
             }
         }
 

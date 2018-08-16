@@ -491,7 +491,7 @@ namespace Umbraco.Core.Services.Implement
                         var tryCreateFolder = _contentTypeService.CreateContainer(-1, rootFolder);
                         if (tryCreateFolder == false)
                         {
-                            _logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
+                            _logger.Error<PackagingService>("Could not create folder: {FolderName}", tryCreateFolder.Exception, rootFolder);
                             throw tryCreateFolder.Exception;
                         }
                         var rootFolderId = tryCreateFolder.Result.Entity.Id;
@@ -525,7 +525,7 @@ namespace Umbraco.Core.Services.Implement
             var tryCreateFolder = _contentTypeService.CreateContainer(current.Id, folderName);
             if (tryCreateFolder == false)
             {
-                _logger.Error<PackagingService>("Could not create folder: " + folderName, tryCreateFolder.Exception);
+                _logger.Error<PackagingService>("Could not create folder: {FolderName}", tryCreateFolder.Exception, folderName);
                 throw tryCreateFolder.Exception;
             }
             return _contentTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -949,7 +949,7 @@ namespace Umbraco.Core.Services.Implement
                         var tryCreateFolder = _dataTypeService.CreateContainer(-1, rootFolder);
                         if (tryCreateFolder == false)
                         {
-                            _logger.Error<PackagingService>("Could not create folder: " + rootFolder, tryCreateFolder.Exception);
+                            _logger.Error<PackagingService>("Could not create folder: {FolderName}", tryCreateFolder.Exception, rootFolder);
                             throw tryCreateFolder.Exception;
                         }
                         current = _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -982,7 +982,7 @@ namespace Umbraco.Core.Services.Implement
             var tryCreateFolder = _dataTypeService.CreateContainer(current.Id, folderName);
             if (tryCreateFolder == false)
             {
-                _logger.Error<PackagingService>("Could not create folder: " + folderName, tryCreateFolder.Exception);
+                _logger.Error<PackagingService>("Could not create folder: {FolderName}", tryCreateFolder.Exception, folderName);
                 throw tryCreateFolder.Exception;
             }
             return _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -1529,7 +1529,10 @@ namespace Umbraco.Core.Services.Implement
                 else if (string.IsNullOrEmpty((string)elementCopy.Element("Master")) == false &&
                     templateElements.Any(x => (string)x.Element("Alias") == (string)elementCopy.Element("Master")) == false)
                 {
-                    _logger.Info<PackagingService>(string.Format("Template '{0}' has an invalid Master '{1}', so the reference has been ignored.", (string)elementCopy.Element("Alias"), (string)elementCopy.Element("Master")));
+                    _logger.Info<PackagingService>(
+                        "Template '{TemplateAlias}' has an invalid Master '{TemplateMaster}', so the reference has been ignored.",
+                        (string) elementCopy.Element("Alias"),
+                        (string) elementCopy.Element("Master"));
                 }
 
                 graph.AddItem(TopoGraph.CreateNode((string) elementCopy.Element("Alias"), elementCopy, dependencies));

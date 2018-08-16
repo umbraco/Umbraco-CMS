@@ -73,11 +73,11 @@ namespace Umbraco.Core.IO
             }
             catch (UnauthorizedAccessException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>("Not authorized to get directories", ex);
+                Current.Logger.Error<PhysicalFileSystem>("Not authorized to get directories for '{Path}'", ex, fullPath);
             }
             catch (DirectoryNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>("Directory not found", ex);
+                Current.Logger.Error<PhysicalFileSystem>("Directory not found for '{Path}'", ex, fullPath);
             }
 
             return Enumerable.Empty<string>();
@@ -109,7 +109,7 @@ namespace Umbraco.Core.IO
             }
             catch (DirectoryNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>("Directory not found", ex);
+                Current.Logger.Error<PhysicalFileSystem>("Directory not found for '{Path}'", ex, fullPath);
             }
         }
 
@@ -189,11 +189,11 @@ namespace Umbraco.Core.IO
             }
             catch (UnauthorizedAccessException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>("Not authorized to get directories", ex);
+                Current.Logger.Error<PhysicalFileSystem>("Not authorized to get directories for '{Path}'", ex, fullPath);
             }
             catch (DirectoryNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>("Directory not found", ex);
+                Current.Logger.Error<PhysicalFileSystem>("Directory not found for '{FullPath}'", ex, fullPath);
             }
 
             return Enumerable.Empty<string>();

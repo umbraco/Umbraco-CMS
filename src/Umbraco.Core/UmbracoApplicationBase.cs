@@ -185,14 +185,15 @@ namespace Umbraco.Core
                     BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField,
                     null, runtime, null);
 
-                var shutdownMsg = $"Application shutdown. Details: {HostingEnvironment.ShutdownReason}\r\n\r\n_shutDownMessage={shutDownMessage}\r\n\r\n_shutDownStack={shutDownStack}";
-
-                logger.Info<UmbracoApplicationBase>(shutdownMsg);
+                logger.Info<UmbracoApplicationBase>("Application shutdown. Details: {ShutdownReason}\r\n\r\n_shutDownMessage={ShutdownMessage}\r\n\r\n_shutDownStack={ShutdownStack}",
+                    HostingEnvironment.ShutdownReason,
+                    shutDownMessage,
+                    shutDownStack);
             }
             catch (Exception)
             {
                 //if for some reason that fails, then log the normal output
-                logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
+                logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: {ShutdownReason}", HostingEnvironment.ShutdownReason);
             }
         }
 
@@ -224,7 +225,7 @@ namespace Umbraco.Core
             // ignore HTTP errors
             if (exception.GetType() == typeof(HttpException)) return;
 
-            Current.Logger.Error<UmbracoApplicationBase>("An unhandled exception occurred.", exception);
+            Current.Logger.Error<UmbracoApplicationBase>("An unhandled exception occurred", exception);
         }
 
         // called by ASP.NET (auto event wireup) at any phase in the application life cycle
@@ -247,7 +248,7 @@ namespace Umbraco.Core
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<UmbracoApplicationBase>($"Error in {name} handler.", ex);
+                Current.Logger.Error<UmbracoApplicationBase>("Error in {Name} handler.", ex, name);
                 throw;
             }
         }

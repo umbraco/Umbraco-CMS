@@ -14,7 +14,6 @@ namespace Umbraco.Core.Logging
         /// <param name="logger">The logger.</param>
         /// <param name="message">A message.</param>
         /// <param name="exception">An exception.</param>
-        //[Obsolete("Use the Error<T> with message template", true)]
         public static void Error<T>(this ILogger logger, string message, Exception exception = null)
         {
             logger.Error(typeof(T), message, exception);

@@ -227,9 +227,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             if (string.IsNullOrWhiteSpace(entity.Alias))
             {
-                var m = $"ContentType '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.";
-                var e = new Exception(m);
-                Logger.Error<ContentTypeRepository>(m, e);
+                var e = new Exception($"ContentType '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
+                Logger.Error<ContentTypeRepository>("ContentType '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.", e, entity.Name);
                 throw e;
             }
 
