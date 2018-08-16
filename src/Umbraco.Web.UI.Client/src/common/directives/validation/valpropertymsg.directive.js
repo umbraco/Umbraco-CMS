@@ -12,7 +12,7 @@
 function valPropertyMsg(serverValidationManager) {
 
     return {
-        require: ['^^form', '^^valFormManager', '^^umbProperty', '?^^tabbedContent'],
+        require: ['^^form', '^^valFormManager', '^^umbProperty'],
         replace: true,
         restrict: "E",
         template: "<div ng-show=\"errorMsg != ''\" class='alert alert-error property-error' >{{errorMsg}}</div>",
@@ -25,11 +25,9 @@ function valPropertyMsg(serverValidationManager) {
             var valFormManager = ctrl[1];
             //the property controller api
             var umbPropCtrl = ctrl[2];
-            //the tabbed content controller api
-            var tabbedContent = ctrl.length > 3 ? ctrl[3] : null;
-
+            
             scope.currentProperty = umbPropCtrl.property;
-            var currentCulture = tabbedContent && tabbedContent.content && tabbedContent.content.language ? tabbedContent.content.language.culture : null;
+            var currentCulture = scope.currentProperty.culture;
 
             var watcher = null;
 
@@ -178,35 +176,31 @@ function valPropertyMsg(serverValidationManager) {
             // the correct field validation in their property editors.
 
             if (scope.currentProperty) { //this can be null if no property was assigned
-                serverValidationManager.subscribe(scope.currentProperty.alias, currentCulture, "", function (isValid, propertyErrors, allErrors) {
-                    hasError = !isValid;
-                    if (hasError) {
-                        //set the error message to the server message
-                        scope.errorMsg = propertyErrors[0].errorMsg;
-                        //flag that the current validator is invalid
-                        formCtrl.$setValidity('valPropertyMsg', false);
-                        startWatch();
-                    }
-                    else {
-                        scope.errorMsg = "";
-                        //flag that the current validator is valid
-                        formCtrl.$setValidity('valPropertyMsg', true);
-                        stopWatch();
-                    }
-                });
-
-                //when the element is disposed we need to unsubscribe!
-                // NOTE: this is very important otherwise when this controller re-binds the previous subscriptsion will remain
-                // but they are a different callback instance than the above.
-                element.bind('$destroy', function () {
-                    stopWatch();
-                    serverValidationManager.unsubscribe(scope.currentProperty.alias, currentCulture, "");
-                });
+                unsubscribe.push(serverValidationManager.subscribe(scope.currentProperty.alias,
+                    currentCulture,
+                    "",
+                    function(isValid, propertyErrors, allErrors) {
+                        hasError = !isValid;
+                        if (hasError) {
+                            //set the error message to the server message
+                            scope.errorMsg = propertyErrors[0].errorMsg;
+                            //flag that the current validator is invalid
+                            formCtrl.$setValidity('valPropertyMsg', false);
+                            startWatch();
+                        }
+                        else {
+                            scope.errorMsg = "";
+                            //flag that the current validator is valid
+                            formCtrl.$setValidity('valPropertyMsg', true);
+                            stopWatch();
+                        }
+                    }));
 
             }
 
             //when the scope is disposed we need to unsubscribe
             scope.$on('$destroy', function () {
+                stopWatch();
                 for (var u in unsubscribe) {
                     unsubscribe[u]();
                 }

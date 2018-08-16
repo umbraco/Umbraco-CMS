@@ -228,7 +228,8 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     for (var f in args.files) {
                         //each item has a property alias and the file object, we'll ensure that the alias is suffixed to the key
                         // so we know which property it belongs to on the server side
-                        var fileKey = "file_" + args.files[f].alias + "_" + args.files[f].culture;
+                        var fileKey = "file_" + args.files[f].alias + "_" + (args.files[f].culture ? args.files[f].culture : "");
+
                         if (angular.isArray(args.files[f].metaData) && args.files[f].metaData.length > 0) {
                             fileKey += ("_" + args.files[f].metaData.join("_"));
                         }
@@ -246,6 +247,8 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     }
 
                     formHelper.showNotifications(response.data);
+
+                    //TODO: Do we need to pass the result through umbDataFormatter.formatContentGetData? Right now things work so not sure but we should check
 
                     //the data returned is the up-to-date data so the UI will refresh
                     return $q.resolve(response.data);

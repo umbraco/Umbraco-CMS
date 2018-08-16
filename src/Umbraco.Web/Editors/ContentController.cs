@@ -1251,6 +1251,8 @@ namespace Umbraco.Web.Editors
             //inline method to determine if a property type varies
             bool Varies(Property property) => property.PropertyType.VariesByCulture();
 
+            var variantIndex = 0;
+
             //loop through each variant, set the correct name and property values
             foreach (var variant in contentSave.Variants)
             {
@@ -1272,12 +1274,24 @@ namespace Umbraco.Web.Editors
                     }
                 }
 
+                //This is important! We only want to process invariant properties with the first variant, for any other variant
+                // we need to exclude invariant properties from being processed, otherwise they will be double processed for the
+                // same value which can cause some problems with things such as file uploads.
+                var propertyCollection = variantIndex == 0
+                    ? variant.PropertyCollectionDto
+                    : new ContentPropertyCollectionDto
+                    {
+                        Properties = variant.PropertyCollectionDto.Properties.Where(x => !x.Culture.IsNullOrWhiteSpace())
+                    };
+
                 //for each variant, map the property values
                 MapPropertyValuesForPersistence<IContent, ContentItemSave>(
                     contentSave,
-                    variant.PropertyCollectionDto,
+                    propertyCollection,
                     (save, property) => Varies(property) ? property.GetValue(variant.Culture) : property.GetValue(),         //get prop val
                     (save, property, v) => { if (Varies(property)) property.SetValue(v, variant.Culture); else property.SetValue(v); });  //set prop val
+
+                variantIndex++;
             }
 
             //TODO: We need to support 'send to publish'

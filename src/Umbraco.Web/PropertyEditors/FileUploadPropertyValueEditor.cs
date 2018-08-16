@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
@@ -42,34 +43,14 @@ namespace Umbraco.Web.PropertyEditors
         /// </remarks>
         public override object FromEditor(ContentPropertyData editorValue, object currentValue)
         {
-            currentValue = currentValue ?? string.Empty;
+            var currentPath = currentValue as string;
+            if (!currentPath.IsNullOrWhiteSpace())
+                currentPath = _mediaFileSystem.GetRelativePath(currentPath);
 
-            // at that point,
-            // currentValue is either empty or "/media/path/to/img.jpg"
-            // editorValue.Value is { "clearFiles": true } or { "selectedFiles": "img1.jpg,img2.jpg" }
-            // comparing them makes little sense
-
-            // check the editorValue value to see whether we need to clear files
-            var editorJsonValue = editorValue.Value as JObject;
-            var clears = editorJsonValue != null && editorJsonValue["clearFiles"] != null && editorJsonValue["clearFiles"].Value<bool>();
-            var uploads = editorValue.Files != null && editorValue.Files.Length > 0;
-
-            // nothing = no changes, return what we have already (leave existing files intact)
-            if (clears == false && uploads == false)
-                return currentValue;
-
-            // get the current file paths
-            var currentPaths = currentValue.ToString()
-                .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => _mediaFileSystem.GetRelativePath(x)) // get the fs-relative path
-                .ToArray();
-
-            // if clearing, remove these files and return
-            if (clears)
+            string editorFile = null;
+            if (editorValue.Value != null)
             {
-                foreach (var pathToRemove in currentPaths)
-                    _mediaFileSystem.DeleteFile(pathToRemove);
-                return string.Empty; // no more files
+                editorFile = editorValue.Value as string;
             }
 
             // ensure we have the required guids
@@ -78,56 +59,58 @@ namespace Umbraco.Web.PropertyEditors
             var puid = editorValue.PropertyTypeKey;
             if (puid == Guid.Empty) throw new Exception("Invalid property type key.");
 
-            // process the files
-            var files = editorValue.Files;
-            if (files == null) throw new Exception("Invalid files.");
+            var uploads = editorValue.Files;
+            if (uploads == null) throw new Exception("Invalid files.");
+            var file = uploads.Length > 0 ? uploads[0] : null;
 
-            var newPaths = new List<string>();
-            const int maxLength = 1; // we only process ONE file
-            for (var i = 0; i < maxLength /*files.Length*/; i++)
+            if (file == null) // not uploading a file
             {
-                var file = files[i];
-
-                // skip invalid files
-                if (UploadFileTypeValidator.ValidateFileExtension(file.FileName) == false)
-                    continue;
-
-                // get the filepath
-                // in case we are using the old path scheme, try to re-use numbers (bah...)
-                var reuse = i < currentPaths.Length ? currentPaths[i] : null; // this would be WRONG with many files
-                var filepath = _mediaFileSystem.GetMediaPath(file.FileName, reuse, cuid, puid); // fs-relative path
-
-                using (var filestream = File.OpenRead(file.TempFilePath))
+                // if editorFile is empty then either there was nothing to begin with,
+                // or it has been cleared and we need to remove the file - else the
+                // value is unchanged.
+                if (string.IsNullOrWhiteSpace(editorFile) && string.IsNullOrWhiteSpace(currentPath) == false)
                 {
-                    _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
-
-                    // fixme - remove this code
-                    //var ext = _mediaFileSystem.GetExtension(filepath);
-                    //if (_mediaFileSystem.IsImageFile(ext))
-                    //{
-                    //    var preValues = editorValue.PreValues.FormatAsDictionary();
-                    //    var sizes = preValues.Any() ? preValues.First().Value.Value : string.Empty;
-                    //    using (var image = Image.FromStream(filestream))
-                    //        _mediaFileSystem.GenerateThumbnails(image, filepath, sizes);
-                    //}
-
-                    // all related properties (auto-fill) are managed by FileUploadPropertyEditor
-                    // when the content is saved (through event handlers)
-
-                    newPaths.Add(filepath);
+                    _mediaFileSystem.DeleteFile(currentPath);
+                    return null; // clear
                 }
+
+                return currentValue; // unchanged
             }
 
+            // process the file
+            var filepath = editorFile == null ? null : ProcessFile(editorValue, file, currentPath, cuid, puid);
+
             // remove all temp files
-            foreach (var file in files)
-                File.Delete(file.TempFilePath);
+            foreach (var f in uploads)
+                File.Delete(f.TempFilePath);
 
-            // remove files that are not there anymore
-            foreach (var pathToRemove in currentPaths.Except(newPaths))
-                _mediaFileSystem.DeleteFile(pathToRemove);
+            // remove current file if replaced
+            if (currentPath != filepath && string.IsNullOrWhiteSpace(currentPath) == false)
+                _mediaFileSystem.DeleteFile(currentPath);
 
+            // update json and return
+            if (editorFile == null) return null;
+            return filepath == null ? string.Empty : _mediaFileSystem.GetUrl(filepath);
+            
+        }
 
-            return string.Join(",", newPaths.Select(x => _mediaFileSystem.GetUrl(x)));
+        private string ProcessFile(ContentPropertyData editorValue, ContentPropertyFile file, string currentPath, Guid cuid, Guid puid)
+        {
+            // process the file
+            // no file, invalid file, reject change
+            if (UploadFileTypeValidator.ValidateFileExtension(file.FileName) == false)
+                return null;
+
+            // get the filepath
+            // in case we are using the old path scheme, try to re-use numbers (bah...)
+            var filepath = _mediaFileSystem.GetMediaPath(file.FileName, currentPath, cuid, puid); // fs-relative path
+
+            using (var filestream = File.OpenRead(file.TempFilePath))
+            {
+                _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
+            }
+
+            return filepath;
         }
     }
 }

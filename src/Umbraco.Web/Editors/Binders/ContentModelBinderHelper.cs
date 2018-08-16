@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Controllers;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Web.Models.ContentEditing;
@@ -41,9 +42,14 @@ namespace Umbraco.Web.Editors.Binders
                 if (parts.Length > 2)
                 {
                     culture = parts[2];
+                    //normalize to null if empty
+                    if (culture.IsNullOrWhiteSpace())
+                    {
+                        culture = null;
+                    }
                 }
 
-                //anything after 3 parts
+                //TODO: anything after 3 parts we can put in metadata
 
                 var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
 

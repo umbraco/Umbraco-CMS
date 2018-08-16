@@ -32,6 +32,9 @@
             "rightIsOpen": false
         };
 
+        $scope.initVariant = initVariant;
+        $scope.splitViewChanged = splitViewChanged;
+
         function init(content) {
 
             if (infiniteMode) {
@@ -59,6 +62,12 @@
             $scope.content.apps[0].active = true;
 
             setActiveCulture();
+        }
+
+        /** This is called when the split view changes based on the umb-variant-content */
+        function splitViewChanged() {
+            //send an event downwards
+            $scope.$broadcast("editors.content.splitViewChanged", { editors: $scope.editors });
         }
 
         /**
@@ -201,11 +210,6 @@
                     }
 
                     init($scope.content);
-
-                    //in one particular special case, after we've created a new item we redirect back to the edit
-                    // route but there might be server validation errors in the collection which we need to display
-                    // after the redirect, so we will bind all subscriptions which will show the server validation errors.
-                    serverValidationManager.notify();
 
                     if (!infiniteMode) {
                         syncTreeNode($scope.content, data.path, true);
@@ -556,8 +560,6 @@
             });
         };
 
-        $scope.initVariant = initVariant;
-
         /* publish method used in infinite editing */
         $scope.publishAndClose = function (content) {
             $scope.publishAndCloseButtonState = "busy";
@@ -630,7 +632,9 @@
             }
             //since we are not notifying and clearing server validation messages when they are received due to how the variant
             //switching works, we need to ensure they are cleared when this editor is destroyed
-            serverValidationManager.clear();
+            if (!$scope.page.isNew) {
+                serverValidationManager.clear();
+            }
         });
 
     }

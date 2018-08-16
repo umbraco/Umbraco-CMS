@@ -151,7 +151,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "imagesApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImagesController>(
-                                controller => controller.GetBigThumbnail(0))
+                                controller => controller.GetBigThumbnail(""))
                         },
                         {
                             "sectionApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<SectionController>(

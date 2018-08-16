@@ -1,3 +1,7 @@
-﻿<div>
-    <umb-file-upload-editor model="model"></umb-file-upload-editor>
+﻿<div ng-controller="Umbraco.PropertyEditors.FileUploadController">
+    <umb-property-file-upload culture="{{model.culture}}"
+                              property-alias="{{model.alias}}"
+                              value="model.value"
+                              on-files-selected="fileChanged(value)">
+    </umb-property-file-upload>
 </div>
