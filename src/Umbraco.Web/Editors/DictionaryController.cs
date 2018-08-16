@@ -92,7 +92,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception exception)
             {
-                Logger.Error(GetType(), "Error creating dictionary", exception);
+                Logger.Error(GetType(), "Error creating dictionary with {Name} under {ParentId}", exception, key, parentId);
                 return Request.CreateNotificationValidationErrorResponse("Error creating dictionary item");
             }
         }
@@ -177,7 +177,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception e)
             {
-                Logger.Error(GetType(), "Error saving dictionary", e);
+                Logger.Error(GetType(), "Error saving dictionary with {Name} under {ParentId}", e, dictionary.Name, dictionary.ParentId);
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse("Something went wrong saving dictionary"));
             }
         }

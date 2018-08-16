@@ -487,7 +487,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Current.Logger.Error(typeof(ContentTypeController), "Error cleaning up temporary udt file in App_Data: " + ex.Message, ex);
+                Current.Logger.Error<ContentTypeController>("Error cleaning up temporary udt file in App_Data: {File}", ex, filePath);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
