@@ -23,7 +23,7 @@
             // * the active one
             // * it's editor is in a $dirty state
             // * it is in NotCreated state
-            return (variant.active || variant.isDirty || variant.state === "NotCreated");
+            return (variant.active || variant.isDirty);
         }
 
         function pristineVariantFilter(variant) {

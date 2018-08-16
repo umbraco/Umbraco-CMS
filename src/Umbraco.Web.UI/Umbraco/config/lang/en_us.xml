@@ -244,7 +244,7 @@
         <key alias="altTextOptional">Alternative text (optional)</key>
         <key alias="type">Type</key>
         <key alias="unPublish">Unpublish</key>
-        <key alias="unpublished">Not published</key>
+        <key alias="unpublished">Draft</key>
         <key alias="notCreated">Not created</key>
         <key alias="updateDate">Last edited</key>
         <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>

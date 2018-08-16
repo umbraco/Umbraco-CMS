@@ -342,6 +342,9 @@
                 return $q.when(data);
             },
                 function (err) {
+
+                    setActiveCulture();
+
                     //error
                     if (err) {
                         editorState.set($scope.content);
