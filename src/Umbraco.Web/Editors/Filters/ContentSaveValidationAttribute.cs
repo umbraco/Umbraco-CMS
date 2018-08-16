@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
@@ -45,6 +47,7 @@ namespace Umbraco.Web.Editors.Filters
             var model = (ContentItemSave)actionContext.ActionArguments["contentItem"];
             var contentItemValidator = new ContentItemValidationHelper<IContent, ContentItemSave>(_logger, _umbracoContextAccessor);
 
+            if (!ValidateAtLeastOneVariantIsBeingSaved(model, actionContext)) return;
             if (!contentItemValidator.ValidateExistingContent(model, actionContext)) return;
             if (!ValidateUserAccess(model, actionContext)) return;
             
@@ -54,6 +57,23 @@ namespace Umbraco.Web.Editors.Filters
                 if (contentItemValidator.ValidateProperties(model, variant, actionContext))
                     contentItemValidator.ValidatePropertyData(model, variant, variant.PropertyCollectionDto, actionContext.ModelState);
             }
+        }
+
+        /// <summary>
+        /// If there are no variants tagged for Saving, then this is an invalid request
+        /// </summary>
+        /// <param name="contentItem"></param>
+        /// <param name="actionContext"></param>
+        /// <returns></returns>
+        private bool ValidateAtLeastOneVariantIsBeingSaved(ContentItemSave contentItem, HttpActionContext actionContext)
+        {
+            if (!contentItem.Variants.Any(x => x.Save))
+            {
+                actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, "No variants flagged for saving");
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>

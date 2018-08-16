@@ -57,12 +57,31 @@
             $scope.content.apps[0].active = true;
 
             setActiveCulture();
+
+            resetSaveAndPublishFlags();
         }
 
         /** This is called when the split view changes based on the umb-variant-content */
         function splitViewChanged() {
             //send an event downwards
             $scope.$broadcast("editors.content.splitViewChanged", { editors: $scope.editors });
+        }
+
+        /** When working with multiple variants, this will set the save/publish flags of each one to false.
+         *  When working with a single variant, this will set the publish flag to false and the save flag to true.
+         */
+        function resetSaveAndPublishFlags() {
+            if ($scope.content.variants.length > 1) {
+                for (var i = 0; i < $scope.content.variants.length; i++) {
+                    var v = $scope.content.variants[i];
+                    v.save = false;
+                    v.publish = false;
+                }
+            }
+            else {
+                $scope.content.variants[0].save = true;
+                $scope.content.variants[0].publish = false;
+            }
         }
 
         function countDirtyVariants() {
@@ -127,7 +146,7 @@
                         $scope.editors[s].content = initVariant(variant);
                     }
                 }
-                
+
             }
         }
 
@@ -148,7 +167,7 @@
                 //if the variant list that defines the header drop down isn't assigned to the variant then assign it now
                 if (!variant.variants) {
                     variant.variants = _.map($scope.content.variants,
-                        function(v) {
+                        function (v) {
                             return _.pick(v, "active", "language", "state");
                         });
                 }
@@ -156,7 +175,7 @@
                     //merge the scope variants on top of the header variants collection (handy when needing to refresh)
                     angular.extend(variant.variants,
                         _.map($scope.content.variants,
-                            function(v) {
+                            function (v) {
                                 return _.pick(v, "active", "language", "state");
                             }));
                 }
@@ -319,7 +338,7 @@
                 $scope.page.buttonGroupState = "success";
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });
-                
+
                 return $q.when(data);
             },
                 function (err) {
@@ -329,7 +348,7 @@
                     }
 
                     $scope.page.buttonGroupState = "error";
-                    
+
                     return $q.reject(err);
                 });
         }
@@ -342,7 +361,7 @@
                 $rootScope.lastListViewPageViewed = null;
             }
         }
-        
+
         if ($scope.page.isNew) {
 
             $scope.page.loading = true;
@@ -465,7 +484,9 @@
                 }
             }
             else {
-                return performSave({ saveMethod: contentResource.publish, action: "publish" }).catch(angular.noop);;
+                //ensure the publish flag is set
+                $scope.content.variants[0].publish = true;
+                return performSave({ saveMethod: contentResource.publish, action: "publish" });
             }
         };
 
@@ -497,7 +518,7 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-                                    
+
                                     return $q.reject(err);
                                 });
                         },
@@ -510,7 +531,7 @@
                 }
             }
             else {
-                return performSave({ saveMethod: $scope.saveMethod(), action: "save" }).catch(angular.noop);
+                return performSave({ saveMethod: $scope.saveMethod(), action: "save" });
             }
 
         };
@@ -536,7 +557,7 @@
                 else {
                     $scope.save().then(function (data) {
                         previewWindow.location.href = redirect;
-                    }).catch(angular.noop);
+                    });
                 }
             }
         };
@@ -600,7 +621,7 @@
                     $scope.infiniteModel.submit($scope.infiniteModel);
                 }
                 $scope.publishAndCloseButtonState = "success";
-            }).catch(angular.noop);;
+            });
         };
 
         /* save method used in infinite editing */
@@ -612,9 +633,9 @@
                     $scope.infiniteModel.submit($scope.infiniteModel);
                 }
                 $scope.saveAndCloseButtonState = "success";
-            }).catch(angular.noop);;
+            });
         };
-        
+
         function moveNode(node, target) {
 
             contentResource.move({ "parentId": target.id, "id": node.id })

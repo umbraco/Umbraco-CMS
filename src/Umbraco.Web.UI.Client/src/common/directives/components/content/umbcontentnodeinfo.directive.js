@@ -174,6 +174,8 @@
 
             function setNodePublishStatus(node) {
 
+                scope.publishStatus = [];
+
                 // deleted node
                 if (node.trashed === true) {
                     scope.publishStatus.push({
@@ -320,7 +322,7 @@
                 });
             }));
 
-            // watch for content updates - reload content when node is saved, published etc.
+            // watch for content state updates
             scope.$watch('node.updateDate', function(newValue, oldValue){
 
                 if(!newValue) { return; }

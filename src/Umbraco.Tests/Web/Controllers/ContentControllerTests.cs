@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Web.Http;
 using Moq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
@@ -162,9 +163,39 @@ namespace Umbraco.Tests.Web.Controllers
                 assertOkResponse: false);
 
             Assert.AreEqual(HttpStatusCode.NotFound, response.Item1.StatusCode);
+            Assert.AreEqual(")]}',\n{\"Message\":\"content was not found\"}", response.Item1.Content.ReadAsStringAsync().Result);
 
             //var obj = JsonConvert.DeserializeObject<PagedResult<UserDisplay>>(response.Item2);
             //Assert.AreEqual(0, obj.TotalItems);
+        }
+
+        [Test]
+        public async Task PostSave_Validate_At_Least_One_Variant_Flagged_For_Saving()
+        {
+            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
+            {
+                var contentServiceMock = Mock.Get(Current.Services.ContentService);
+                contentServiceMock.Setup(x => x.GetById(123)).Returns(() => null);
+
+                var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
+                var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
+                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                Container.InjectProperties(usersController);
+                return usersController;
+            }
+
+            var json = JsonConvert.DeserializeObject<JObject>(PublishJson1);
+            //remove all save flaggs
+            ((JArray)json["variants"])[2]["save"] = false;
+
+            var runner = new TestRunner(Factory);
+            var response = await runner.Execute("Content", "PostSave", HttpMethod.Post,
+                content: GetMultiPartRequestContent(JsonConvert.SerializeObject(json)),
+                mediaTypeHeader: new MediaTypeWithQualityHeaderValue("multipart/form-data"),
+                assertOkResponse: false);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, response.Item1.StatusCode);
+            Assert.AreEqual(")]}',\n{\"Message\":\"No variants flagged for saving\"}", response.Item1.Content.ReadAsStringAsync().Result);
         }
 
         /// <summary>

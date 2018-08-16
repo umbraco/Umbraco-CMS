@@ -35,7 +35,8 @@ namespace Umbraco.Web.Models.Mapping
             var childOfListViewResolver = new ContentChildOfListViewResolver(contentService, contentTypeService);
             var contentTypeBasicResolver = new ContentTypeBasicResolver<IContent, ContentItemDisplay>();
             var defaultTemplateResolver = new DefaultTemplateResolver();
-            var variantResolver = new ContentVariantResolver(localizationService, textService);
+            var variantResolver = new ContentVariantResolver(localizationService);
+            var contentSavedStateResolver = new ContentSavedStateResolver();
             
             //FROM IContent TO ContentItemDisplay
             CreateMap<IContent, ContentItemDisplay>()
@@ -67,10 +68,9 @@ namespace Umbraco.Web.Models.Mapping
 
             CreateMap<IContent, ContentVariantDisplay>()
                 .ForMember(dest => dest.PublishDate, opt => opt.MapFrom(src => src.PublishDate))
-                .ForMember(dest => dest.Properties, opt => opt.Ignore())
                 .ForMember(dest => dest.Segment, opt => opt.Ignore())
                 .ForMember(dest => dest.Language, opt => opt.Ignore())
-                .ForMember(dest => dest.State, opt => opt.Ignore())
+                .ForMember(dest => dest.State, opt => opt.ResolveUsing(contentSavedStateResolver))
                 .ForMember(dest => dest.Tabs, opt => opt.ResolveUsing(tabsAndPropertiesResolver));
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
