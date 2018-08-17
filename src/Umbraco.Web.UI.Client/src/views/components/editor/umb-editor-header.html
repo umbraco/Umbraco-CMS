@@ -12,7 +12,7 @@
 
             <ng-form data-element="editor-icon" name="iconForm">
                 <div class="umb-panel-header-icon" ng-if="!hideIcon" ng-click="openIconPicker()" ng-class="{'-placeholder': $parent.icon==='' || $parent.icon===null}"
-                    title="{{$parent.icon}}">
+                     title="{{$parent.icon}}">
                     <i class="icon {{$parent.icon}}" ng-if="$parent.icon!=='' && $parent.icon!==null"></i>
                     <div class="umb-panel-header-icon-text" ng-if="$parent.icon==='' || $parent.icon===null">
                         <localize key="settings_addIcon"></localize>
@@ -20,8 +20,7 @@
                 </div>
             </ng-form>
 
-            <div style="flex: 1 1 auto;">
-
+            <div id="nameField" style="flex: 1 1 auto;">
                 <div class="umb-editor-header__name-wrapper">
                     <ng-form name="headerNameForm">
                         <input
@@ -104,7 +103,9 @@
         <div ng-if="navigation && splitViewOpen !== true" style="margin-left: 20px;">
             <umb-editor-navigation
                 data-element="editor-sub-views"
-                navigation="navigation">
+                navigation="navigation"
+                something="something"
+                navigationOverflow ="navigationOverflow">
             </umb-editor-navigation>
         </div>
 

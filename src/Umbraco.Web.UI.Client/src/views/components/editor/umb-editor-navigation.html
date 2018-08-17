@@ -1,14 +1,51 @@
 <ul class="umb-sub-views-nav" ng-show="showNavigation">
-    <li ng-repeat="item in navigation">
-        <a data-element="sub-view-{{item.alias}}"
-        tabindex="-1"
-        class="umb-sub-views-nav-item"
-        href=""
-        ng-click="clickNavigationItem(item)"
-        hotkey="{{$index+1}}"
-        ng-class="{'is-active': item.active, '-has-error': item.hasError}">
-          <i class="icon {{ item.icon }}"></i>
-          <span class="umb-sub-views-nav-item-text">{{ item.name }}</span>
-        </a>
+    <li ng-repeat="item in navigation | limitTo: currentApps ">
+        <div ng-show="item.alias !== 'more'">
+            <a data-element="sub-view-{{item.alias}}"
+               tabindex="-1"
+               class="umb-sub-views-nav-item"
+               href=""
+               ng-click="clickNavigationItem(item)"
+               hotkey="{{$index+1}}"
+               ng-class="{'is-active': item.active, '-has-error': item.hasError}">
+                <i class="icon {{ item.icon }}"></i>
+                <span class="umb-sub-views-nav-item-text">{{ item.name }}</span>
+            </a>
+        </div>
+    </li>
+
+    <li ng-repeat="item in overflow">
+        <div ng-show="item.alias === 'more'  && showMore === true">
+            <div>
+                <a data-element="sub-view-{{item.alias}}"
+                   tabindex="-1"
+                   class="umb-sub-views-nav-item"
+                   href=""
+                   ng-click="clickNavigationItem(item)"
+                   hotkey="{{$index+1}}"
+                   ng-class="{'is-active': item.active, '-has-error': item.hasError}">
+                    <i class="icon {{ item.icon }}"></i>
+                    <span class="umb-sub-views-nav-item-text">{{ item.name }}</span>
+                </a>
+                <div ng-if="showTray === true" style="position: fixed; right: 131px;">
+                    <div style="right: 5px; margin-left: 50px; width: 0; height: 0; border: solid 10px; border-color: transparent transparent white transparent;"></div>
+                    <ul ng-if="item.alias === 'more'" class="shadow-depth-2" style="border-top: none; background-color: white; list-style: none" on-outside-click="trayClick()">
+                        <li ng-repeat="item in overflow">
+                            <a data-element="sub-view-{{item.alias}}"
+                               tabindex="-1"
+                               class="umb-sub-views-nav-item"
+                               href=""
+                               ng-click="clickNavigationItem(item)"
+                               hotkey="{{$index+1}}"
+                               ng-class="{'is-active': item.active, '-has-error': item.hasError}">
+                                <i class="icon {{ item.icon }}"></i>
+                                <span class="umb-sub-views-nav-item-text">{{ item.name }}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
     </li>
 </ul>
