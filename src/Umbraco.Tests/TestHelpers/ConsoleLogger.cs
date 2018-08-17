@@ -69,5 +69,17 @@ namespace Umbraco.Tests.TestHelpers
         {
             Console.WriteLine("VERBOSE {0} - {1}", reporting.Name, string.Format(format, args));
         }
+
+        public void Fatal(Type reporting, Exception exception, string message)
+        {
+            Console.WriteLine("FATAL {0} - {1}", reporting.Name, message);
+            Console.WriteLine(exception);
+        }
+
+        public void Fatal(Type reporting, Exception exception, string format, params object[] args)
+        {
+            Console.WriteLine("FATAL {0} - {1}", reporting.Name, string.Format(format, args));
+            Console.WriteLine(exception);
+        }
     }
 }

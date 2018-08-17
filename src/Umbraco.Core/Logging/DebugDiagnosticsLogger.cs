@@ -78,5 +78,15 @@ namespace Umbraco.Core.Logging
         {
             System.Diagnostics.Debug.WriteLine(string.Format(format, args), reporting.FullName);
         }
+
+        public void Fatal(Type reporting, Exception exception, string message)
+        {
+            System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
+        }
+
+        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Format(messageTemplate, args) + Environment.NewLine + exception, reporting.FullName);
+        }
     }
 }

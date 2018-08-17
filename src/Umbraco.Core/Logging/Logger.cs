@@ -217,5 +217,19 @@ namespace Umbraco.Core.Logging
             var logger = Log.Logger;
             logger?.ForContext(reporting).Verbose(messageTemplate, propertyValues);
         }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, Exception exception, string message)
+        {
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Fatal(exception, message);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+        {
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Fatal(exception, messageTemplate, propertyValues);
+        }
     }
 }
