@@ -491,7 +491,7 @@ namespace Umbraco.Core.Services.Implement
                         var tryCreateFolder = _contentTypeService.CreateContainer(-1, rootFolder);
                         if (tryCreateFolder == false)
                         {
-                            _logger.Error<PackagingService>("Could not create folder: {FolderName}", tryCreateFolder.Exception, rootFolder);
+                            _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
                             throw tryCreateFolder.Exception;
                         }
                         var rootFolderId = tryCreateFolder.Result.Entity.Id;
@@ -525,7 +525,7 @@ namespace Umbraco.Core.Services.Implement
             var tryCreateFolder = _contentTypeService.CreateContainer(current.Id, folderName);
             if (tryCreateFolder == false)
             {
-                _logger.Error<PackagingService>("Could not create folder: {FolderName}", tryCreateFolder.Exception, folderName);
+                _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
                 throw tryCreateFolder.Exception;
             }
             return _contentTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -949,7 +949,7 @@ namespace Umbraco.Core.Services.Implement
                         var tryCreateFolder = _dataTypeService.CreateContainer(-1, rootFolder);
                         if (tryCreateFolder == false)
                         {
-                            _logger.Error<PackagingService>("Could not create folder: {FolderName}", tryCreateFolder.Exception, rootFolder);
+                            _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", rootFolder);
                             throw tryCreateFolder.Exception;
                         }
                         current = _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
@@ -982,7 +982,7 @@ namespace Umbraco.Core.Services.Implement
             var tryCreateFolder = _dataTypeService.CreateContainer(current.Id, folderName);
             if (tryCreateFolder == false)
             {
-                _logger.Error<PackagingService>("Could not create folder: {FolderName}", tryCreateFolder.Exception, folderName);
+                _logger.Error<PackagingService>(tryCreateFolder.Exception, "Could not create folder: {FolderName}", folderName);
                 throw tryCreateFolder.Exception;
             }
             return _dataTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);

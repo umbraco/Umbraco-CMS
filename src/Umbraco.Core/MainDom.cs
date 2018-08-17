@@ -134,7 +134,7 @@ namespace Umbraco.Core
                     }
                     catch (Exception e)
                     {
-                        _logger.Error<MainDom>("Error while running callback, remaining callbacks will not run.", e);
+                        _logger.Error<MainDom>(e, "Error while running callback, remaining callbacks will not run.");
                         throw;
                     }
 

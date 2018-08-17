@@ -995,7 +995,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Logger.Error<ContentController>("Could not update content sort order", ex);
+                Logger.Error<ContentController>(ex, "Could not update content sort order");
                 throw;
             }
         }

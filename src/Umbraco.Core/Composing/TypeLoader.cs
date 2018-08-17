@@ -695,7 +695,7 @@ namespace Umbraco.Core.Composing
                         catch (Exception ex)
                         {
                             // in case of any exception, we have to exit, and revert to scanning
-                            _logger.Logger.Error<TypeLoader>("Getting {TypeName}: failed to load cache file type {CacheType}, reverting to scanning assemblies.", ex, GetName(baseType, attributeType), type);
+                            _logger.Logger.Error<TypeLoader>(ex, "Getting {TypeName}: failed to load cache file type {CacheType}, reverting to scanning assemblies.", GetName(baseType, attributeType), type);
                             scan = true;
                             break;
                         }

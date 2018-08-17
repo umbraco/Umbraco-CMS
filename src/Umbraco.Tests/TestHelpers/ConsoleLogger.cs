@@ -6,18 +6,18 @@ namespace Umbraco.Tests.TestHelpers
 {
     public class ConsoleLogger : ILogger
     {
-        public void Error(Type reporting, string message, Exception exception)
+        public void Error(Type reporting, Exception exception, string message)
         {
             Console.WriteLine("ERROR {0} - {1}", reporting.Name, message);
             Console.WriteLine(exception);
         }
 
-        public void Error(Type reporting, string format, Exception exception = null, params object[] args)
+        public void Error(Type reporting, Exception exception, string format, params object[] args)
         {
             Console.WriteLine("ERROR {0} - {1}", reporting.Name, string.Format(format, args));
             Console.WriteLine(exception);
         }
-
+        
         public void Warn(Type reporting, string message)
         {
             Console.WriteLine("WARN {0} - {1}", reporting.Name, message);

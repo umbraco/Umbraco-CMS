@@ -133,9 +133,9 @@ namespace Umbraco.Web.Search
                     // rebuilds any empty indexes
                     RebuildIndexes(true, _examineManager, logger);
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    logger.Error<ExamineComponent>("Failed to rebuild empty indexes.", e);
+                    logger.Error<ExamineComponent>(ex, "Failed to rebuild empty indexes.");
                 }
             });
             bg.Start();
@@ -219,9 +219,9 @@ namespace Umbraco.Web.Search
                         i.DocumentWriting += grid.DocumentWriting;
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                logger.Error<ExamineComponent>("Failed to bind grid property editor.", e);
+                logger.Error<ExamineComponent>(ex, "Failed to bind grid property editor.");
             }
         }
 

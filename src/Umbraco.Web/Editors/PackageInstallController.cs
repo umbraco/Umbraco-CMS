@@ -72,9 +72,9 @@ namespace Umbraco.Web.Editors
                     installed.Delete(Security.GetUserId().ResultOr(0));
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Logger.Error<PackageInstallController>("Failed to uninstall.", e);
+                Logger.Error<PackageInstallController>(ex, "Failed to uninstall.");
                 throw;
             }
 
@@ -199,13 +199,13 @@ namespace Umbraco.Web.Editors
                         }
                         catch (Exception ex)
                         {
-                            Logger.Error<PackageInstallController>("An error occurred running undo actions", ex);
+                            Logger.Error<PackageInstallController>(ex, "An error occurred running undo actions");
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error<PackageInstallController>("An error occurred running undo actions", ex);
+                    Logger.Error<PackageInstallController>(ex, "An error occurred running undo actions");
                 }
             }
 

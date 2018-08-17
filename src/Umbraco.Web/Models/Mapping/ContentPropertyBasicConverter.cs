@@ -40,8 +40,9 @@ namespace Umbraco.Web.Models.Mapping
             if (editor == null)
             {
                 _logger.Error<ContentPropertyBasicConverter<TDestination>>(
-                    "No property editor found, converting to a Label",
-                    new NullReferenceException("The property editor with alias " + property.PropertyType.PropertyEditorAlias + " does not exist"));
+                    new NullReferenceException("The property editor with alias " + property.PropertyType.PropertyEditorAlias + " does not exist"),
+                    "No property editor '{PropertyEditorAlias}' found, converting to a Label",
+                    property.PropertyType.PropertyEditorAlias);
 
                 editor = _propertyEditors[Constants.PropertyEditors.Aliases.NoEdit];
             }

@@ -69,9 +69,9 @@ namespace Umbraco.Web.HealthCheck
                 //Core.Logging.LogHelper.Debug<HealthCheckController>("Running health check: " + check.Name);
                 return check.GetStatus();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.Error<HealthCheckController>("Exception in health check: " + check.Name, e);
+                _logger.Error<HealthCheckController>(ex, "Exception in health check: {HealthCheckName}" + check.Name);
                 throw;
             }
         }

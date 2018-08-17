@@ -187,9 +187,9 @@ namespace umbraco.cms.businesslogic.packager
                             tempDir = UnPack(fi.FullName, deleteFile);
                             LoadConfig(tempDir);
                         }
-                        catch (Exception exception)
+                        catch (Exception ex)
                         {
-                            Current.Logger.Error<Installer>(string.Format("Error importing file {0}", fi.FullName), exception);
+                            Current.Logger.Error<Installer>(ex, "Error importing file {FileName}", fi.FullName);
                             throw;
                         }
                     }
@@ -317,9 +317,9 @@ namespace umbraco.cms.businesslogic.packager
                             File.Delete(sourceFile);
                     }
                 }
-                catch (Exception exception)
+                catch (Exception ex)
                 {
-                    Current.Logger.Error<Installer>("Package install error", exception);
+                    Current.Logger.Error<Installer>(ex, "Package install error");
                     throw;
                 }
 
@@ -522,9 +522,9 @@ namespace umbraco.cms.businesslogic.packager
 
                     insPack.Save();
                 }
-                catch (Exception exception)
+                catch (Exception ex)
                 {
-                    Current.Logger.Error<Installer>("Error installing businesslogic", exception);
+                    Current.Logger.Error<Installer>(ex, "Error installing businesslogic");
                     throw;
                 }
 

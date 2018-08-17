@@ -46,16 +46,16 @@ namespace Umbraco.Core.Publishing
                     _logger.Debug<ContentService>("Result of publish attempt: {PublishResult}", result.Result);
                     if (result.Success == false)
                     {
-                        _logger.Error<ScheduledPublisher>("Error publishing node {NodeId}", null, d.Id);
+                        _logger.Error<ScheduledPublisher>(null, "Error publishing node {NodeId}", d.Id);
                     }
                     else
                     {
                         counter++;
                     }
                 }
-                catch (Exception ee)
+                catch (Exception ex)
                 {
-                    _logger.Error<ScheduledPublisher>("Error publishing node {NodeId}", ee, d.Id);
+                    _logger.Error<ScheduledPublisher>(ex, "Error publishing node {NodeId}", d.Id);
                     throw;
                 }
             }
@@ -74,9 +74,9 @@ namespace Umbraco.Core.Publishing
                         counter++;
                     }
                 }
-                catch (Exception ee)
+                catch (Exception ex)
                 {
-                    _logger.Error<ScheduledPublisher>("Error unpublishing node {NodeId}", ee, d.Id);
+                    _logger.Error<ScheduledPublisher>(ex, "Error unpublishing node {NodeId}", d.Id);
                     throw;
                 }
             }

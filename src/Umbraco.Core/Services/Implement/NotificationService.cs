@@ -633,7 +633,7 @@ namespace Umbraco.Core.Services.Implement
                             }
                             catch (Exception ex)
                             {
-                                _logger.Error<NotificationService>("An error occurred sending notification", ex);
+                                _logger.Error<NotificationService>(ex, "An error occurred sending notification");
                                 s.Dispose();
                                 s = new SmtpClient();
                             }

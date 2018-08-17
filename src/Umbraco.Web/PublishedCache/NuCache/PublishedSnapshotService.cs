@@ -186,9 +186,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                     LockAndLoadDomains();
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    _logger.Error<PublishedSnapshotService>("Panic, exception while loading cache data.", e);
+                    _logger.Fatal<PublishedSnapshotService>(ex, "Panic, exception while loading cache data.");
                 }
 
                 // finaly, cache is ready!

@@ -192,7 +192,7 @@ namespace Umbraco.Core.Persistence
 
         protected override void OnException(Exception ex)
         {
-            _logger.Error<UmbracoDatabase>("Exception ({InstanceId}).", ex, InstanceId);
+            _logger.Error<UmbracoDatabase>(ex, "Exception ({InstanceId}).", InstanceId);
             _logger.Debug<UmbracoDatabase>("At:\r\n{StackTrace}", Environment.StackTrace);
             if (EnableSqlTrace == false)
                 _logger.Debug<UmbracoDatabase>("Sql:\r\n{Sql}", CommandToString(LastSQL, LastArgs));

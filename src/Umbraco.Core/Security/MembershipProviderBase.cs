@@ -281,7 +281,7 @@ namespace Umbraco.Core.Security
             if ((PasswordFormat == MembershipPasswordFormat.Hashed) && EnablePasswordRetrieval)
             {
                 var ex = new ProviderException("Provider can not retrieve a hashed password");
-                Current.Logger.Error<MembershipProviderBase>("Cannot specify a Hashed password format with the enabledPasswordRetrieval option set to true", ex);
+                Current.Logger.Error<MembershipProviderBase>(ex, "Cannot specify a Hashed password format with the enabledPasswordRetrieval option set to true");
                 throw ex;
             }
 

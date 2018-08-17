@@ -8,13 +8,13 @@ namespace Umbraco.Core.Logging
     public class DebugDiagnosticsLogger : ILogger
     {
         /// <inheritdoc/>
-        public void Error(Type reporting, string message, Exception exception = null)
+        public void Error(Type reporting, Exception exception, string message)
         {
             System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
         }
 
         /// <inheritdoc/>
-        public void Error(Type reporting, string messageTemplate, Exception exception = null, params object[] args)
+        public void Error(Type reporting, Exception exception, string messageTemplate, params object[] args)
         {
             System.Diagnostics.Debug.WriteLine(string.Format(messageTemplate, args) + Environment.NewLine + exception, reporting.FullName);
         }

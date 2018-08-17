@@ -112,7 +112,7 @@ namespace Umbraco.Core.Components
             {
                 // in case of an error, force-dump everything to log
                 _logger.Info<BootLoader>("Component Report:\r\n{ComponentReport}", GetComponentsReport(requirements));
-                _logger.Error<BootLoader>("Failed to sort compontents.", e);
+                _logger.Error<BootLoader>(e, "Failed to sort compontents.");
                 throw;
             }
 

@@ -26,10 +26,10 @@ namespace Umbraco.Core.Logging
             switch (eventType)
             {
                 case TraceEventType.Critical:
-                    _logger.Error(_type.Value, "[{EventType}] Event Id: {EventId}, State: {State}", exception ?? new Exception("Critical error"), eventType, eventId, state);
+                    _logger.Fatal(_type.Value, exception ?? new Exception("Critical error"), "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Error:
-                    _logger.Error(_type.Value, "[{EventType}] Event Id: {EventId}, State: {State}", exception ?? new Exception("Error"), eventType, eventId, state);
+                    _logger.Error(_type.Value, exception ?? new Exception("Error"), "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);
                     return true;
                 case TraceEventType.Warning:
                     _logger.Warn(_type.Value, "[{EventType}] Event Id: {EventId}, State: {State}", eventType, eventId, state);

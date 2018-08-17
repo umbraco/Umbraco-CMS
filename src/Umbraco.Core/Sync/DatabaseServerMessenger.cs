@@ -352,8 +352,7 @@ namespace Umbraco.Core.Sync
                 }
                 catch (JsonException ex)
                 {
-                    Logger.Error<DatabaseServerMessenger>("Failed to deserialize instructions ({DtoId}: '{DtoInstructions}').",
-                        ex,
+                    Logger.Error<DatabaseServerMessenger>(ex, "Failed to deserialize instructions ({DtoId}: '{DtoInstructions}').",
                         dto.Id,
                         dto.Instructions);
 
@@ -412,8 +411,8 @@ namespace Umbraco.Core.Sync
             catch (Exception ex)
             {
                     Logger.Error<DatabaseServerMessenger>(
-                        "DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions ({DtoId}: '{DtoInstructions}'). Instruction is being skipped/ignored",
                         ex,
+                        "DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions ({DtoId}: '{DtoInstructions}'). Instruction is being skipped/ignored",
                         dto.Id,
                         dto.Instructions);
 

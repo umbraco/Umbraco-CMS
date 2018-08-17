@@ -387,9 +387,9 @@ namespace Umbraco.Web.Scheduling
                 {
                     await RunAsync(bgTask, _cancelTokenSource.Token).ConfigureAwait(false);
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    _logger.Error<BackgroundTaskRunner>("{LogPrefix} Task runner exception", e, _logPrefix);
+                    _logger.Error<BackgroundTaskRunner>(ex, "{LogPrefix} Task runner exception", _logPrefix);
                 }
 
                 // done
@@ -537,7 +537,7 @@ namespace Umbraco.Web.Scheduling
             catch (Exception ex)
             {
 
-                _logger.Error<BackgroundTaskRunner>("{LogPrefix} Task has failed", ex, _logPrefix);
+                _logger.Error<BackgroundTaskRunner>(ex, "{LogPrefix} Task has failed", _logPrefix);
             }
         }
 
@@ -580,7 +580,7 @@ namespace Umbraco.Web.Scheduling
             }
             catch (Exception ex)
             {
-                _logger.Error<BackgroundTaskRunner>(_logPrefix + name + " exception occurred", ex);
+                _logger.Error<BackgroundTaskRunner>(ex, "{LogPrefix} {Name} exception occurred", _logPrefix, name);
             }
         }
 

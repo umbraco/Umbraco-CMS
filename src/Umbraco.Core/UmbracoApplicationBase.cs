@@ -92,7 +92,7 @@ namespace Umbraco.Core
                 var msg = "Unhandled exception in AppDomain";
                 if (isTerminating) msg += " (terminating)";
                 msg += ".";
-                logger.Error<UmbracoApplicationBase>(msg, exception);
+                logger.Error<UmbracoApplicationBase>(exception, msg);
             };
         }
 
@@ -225,7 +225,7 @@ namespace Umbraco.Core
             // ignore HTTP errors
             if (exception.GetType() == typeof(HttpException)) return;
 
-            Current.Logger.Error<UmbracoApplicationBase>("An unhandled exception occurred", exception);
+            Current.Logger.Error<UmbracoApplicationBase>(exception, "An unhandled exception occurred");
         }
 
         // called by ASP.NET (auto event wireup) at any phase in the application life cycle
@@ -248,7 +248,7 @@ namespace Umbraco.Core
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<UmbracoApplicationBase>("Error in {Name} handler.", ex, name);
+                Current.Logger.Error<UmbracoApplicationBase>(ex, "Error in {Name} handler.", name);
                 throw;
             }
         }

@@ -63,9 +63,9 @@ namespace Umbraco.Web.Scheduling
                         var result = await wc.SendAsync(request, token);
                     }
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    _logger.Error<KeepAlive>(string.Format("Failed (at \"{0}\").", umbracoAppUrl), e);
+                    _logger.Error<KeepAlive>(ex, "Failed (at '{UmbracoAppUrl}').", umbracoAppUrl);
                 }
             }
 

@@ -1240,11 +1240,11 @@ namespace Umbraco.Core.Services.Implement
                         d.PublishCulture(); // fixme variants?
                         result = SaveAndPublish(d, userId: d.WriterId);
                         if (result.Success == false)
-                            Logger.Error<ContentService>("Failed to publish document id={DocumentId}, reason={Reason}.", null, d.Id, result.Result);
+                            Logger.Error<ContentService>(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
                     }
                     catch (Exception e)
                     {
-                        Logger.Error<ContentService>("Failed to publish document id={DocumentId}, an exception was thrown.", e, d.Id);
+                        Logger.Error<ContentService>(e, "Failed to publish document id={DocumentId}, an exception was thrown.", d.Id);
                         throw;
                     }
                     yield return result;
@@ -1256,11 +1256,11 @@ namespace Umbraco.Core.Services.Implement
                         d.ExpireDate = null;
                         var result = Unpublish(d, userId: d.WriterId);
                         if (result.Success == false)
-                            Logger.Error<ContentService>("Failed to unpublish document id={DocumentId}, reason={Reason}.", null, d.Id, result.Result);
+                            Logger.Error<ContentService>(null, "Failed to unpublish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
                     }
                     catch (Exception e)
                     {
-                        Logger.Error<ContentService>("Failed to unpublish document id={DocumentId}, an exception was thrown.", e, d.Id);
+                        Logger.Error<ContentService>(e, "Failed to unpublish document id={DocumentId}, an exception was thrown.", d.Id);
                         throw;
                     }
                 }
@@ -1439,7 +1439,7 @@ namespace Umbraco.Core.Services.Implement
 
                 // fixme not going to work, do it differently
                 _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
-                    (file, e) => Logger.Error<ContentService>("An error occurred while deleting file attached to nodes: {File}", e, file));
+                    (file, e) => Logger.Error<ContentService>(e, "An error occurred while deleting file attached to nodes: {File}", file));
             }
         }
 

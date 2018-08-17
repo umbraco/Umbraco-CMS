@@ -331,11 +331,11 @@ namespace Umbraco.Examine
         /// <summary>
         /// overridden for logging
         /// </summary>
-        /// <param name="e"></param>
-        protected override void OnIndexingError(IndexingErrorEventArgs e)
+        /// <param name="ex"></param>
+        protected override void OnIndexingError(IndexingErrorEventArgs ex)
         {
-            ProfilingLogger.Logger.Error(GetType(), e.Message, e.InnerException);
-            base.OnIndexingError(e);
+            ProfilingLogger.Logger.Error(GetType(), ex.InnerException, ex.Message);
+            base.OnIndexingError(ex);
         }
 
         /// <summary>

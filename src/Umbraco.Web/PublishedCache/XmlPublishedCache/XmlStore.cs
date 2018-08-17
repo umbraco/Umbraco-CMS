@@ -409,9 +409,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 }
                 dtd.Append(dtdInner);
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                Current.Logger.Error<ContentTypeService>("Failed to build a DTD for the Xml cache.", exception);
+                Current.Logger.Error<ContentTypeService>(ex, "Failed to build a DTD for the Xml cache.");
             }
 
             dtd.AppendLine("]>");
@@ -696,12 +696,12 @@ AND (umbracoNode.id=@id)";
 
                 Current.Logger.Info<XmlStore>("Saved Xml to file.");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 // if something goes wrong remove the file
                 DeleteXmlFile();
 
-                Current.Logger.Error<XmlStore>("Failed to save Xml to file.", e);
+                Current.Logger.Error<XmlStore>(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
             }
         }
 
@@ -736,12 +736,12 @@ AND (umbracoNode.id=@id)";
 
                 Current.Logger.Info<XmlStore>("Saved Xml to file.");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 // if something goes wrong remove the file
                 DeleteXmlFile();
 
-                Current.Logger.Error<XmlStore>("Failed to save Xml to file.", e);
+                Current.Logger.Error<XmlStore>(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
             }
         }
 
@@ -796,9 +796,9 @@ AND (umbracoNode.id=@id)";
                 Current.Logger.Warn<XmlStore>("Failed to load Xml, file does not exist.");
                 return null;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Current.Logger.Error<XmlStore>("Failed to load Xml from file.", e);
+                Current.Logger.Error<XmlStore>(ex, "Failed to load Xml from file '{FileName}'.", _xmlFileName);
                 try
                 {
                     DeleteXmlFile();

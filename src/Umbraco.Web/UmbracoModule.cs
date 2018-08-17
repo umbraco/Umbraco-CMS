@@ -492,7 +492,7 @@ namespace Umbraco.Web
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error<UmbracoModule>("Could not dispose item with key " + k, ex);
+                    Logger.Error<UmbracoModule>(ex, "Could not dispose item with key {Key}", k);
                 }
                 try
                 {
@@ -500,7 +500,7 @@ namespace Umbraco.Web
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error<UmbracoModule>("Could not dispose item key " + k, ex);
+                    Logger.Error<UmbracoModule>(ex, "Could not dispose item key {Key}", k);
                 }
             }
         }
@@ -665,7 +665,7 @@ namespace Umbraco.Web
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error<UmbracoModule>("Could not add reserved path route", ex);
+                    Logger.Error<UmbracoModule>(ex, "Could not add reserved path route");
                 }
             }
 

@@ -14,9 +14,9 @@ namespace Umbraco.Core.Logging
         /// <param name="logger">The logger.</param>
         /// <param name="message">A message.</param>
         /// <param name="exception">An exception.</param>
-        public static void Error<T>(this ILogger logger, string message, Exception exception = null)
+        public static void Error<T>(this ILogger logger, Exception exception, string message)
         {
-            logger.Error(typeof(T), message, exception);
+            logger.Error(typeof(T), exception, message);
         }
 
         /// <summary>
@@ -27,9 +27,9 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">A structured message template</param>
         /// <param name="exception">An exception</param>
         /// <param name="propertyValues">Message property values</param>
-        public static void Error<T>(this ILogger logger, string messageTemplate, Exception exception = null, params object[] propertyValues)
+        public static void Error<T>(this ILogger logger, Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            logger.Error(typeof(T), messageTemplate, exception, propertyValues);
+            logger.Error(typeof(T), exception, messageTemplate, propertyValues);
         }
 
         /// <summary>

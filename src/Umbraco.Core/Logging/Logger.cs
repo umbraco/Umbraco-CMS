@@ -51,7 +51,7 @@ namespace Umbraco.Core.Logging
 
         /// <inheritdoc/>
         [Obsolete("Use the message template version")]
-        public void Error(Type reporting, string message, Exception exception = null)
+        public void Error(Type reporting, Exception exception, string message)
         {
             var logger = Log.Logger;
             if (logger == null) return;
@@ -87,7 +87,7 @@ namespace Umbraco.Core.Logging
             logger.ForContext(reporting).Error(exception, message);
         }
 
-        public void Error(Type reporting, string messageTemplate, Exception exception = null, params object[] propertyValues)
+        public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
             var dump = false;
 
@@ -111,10 +111,10 @@ namespace Umbraco.Core.Logging
                         ? "\r\nA minidump was created in App_Data/MiniDump"
                         : "\r\nFailed to create a minidump";
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
                     //Log a new entry (as opposed to appending to same log entry)
-                    Error(e.GetType(), "Failed to create a minidump at App_Data/MiniDump ({ExType}: {ExMessage}", e, e.GetType().FullName, e.Message);
+                    Error(ex.GetType(), ex, "Failed to create a minidump at App_Data/MiniDump ({ExType}: {ExMessage}", ex.GetType().FullName, ex.Message);
                 }
             }
 

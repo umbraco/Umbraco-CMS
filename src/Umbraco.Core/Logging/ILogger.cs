@@ -11,18 +11,18 @@ namespace Umbraco.Core.Logging
         /// Logs an error message.
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
-        /// <param name="message">A message.</param>
         /// <param name="exception">An exception.</param>
-        void Error(Type reporting, string message, Exception exception = null);
+        /// <param name="message">A message.</param>
+        void Error(Type reporting, Exception exception, string message);
 
         /// <summary>
         /// Logs an error message - using a structured log message
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
-        /// <param name="messageTemplate">The message template that includes property values</param>
         /// <param name="exception">An exception.</param>
+        /// <param name="messageTemplate">The message template that includes property values</param>
         /// <param name="propertyValues">Property values to log & update in message template</param>
-        void Error(Type reporting, string messageTemplate, Exception exception = null, params object[] propertyValues);
+        void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
         
         /// <summary>
         /// Logs a warning message.
