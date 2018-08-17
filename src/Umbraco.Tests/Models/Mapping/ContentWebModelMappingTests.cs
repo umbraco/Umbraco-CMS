@@ -215,7 +215,7 @@ namespace Umbraco.Tests.Models.Mapping
 
         #region Assertions
 
-        private void AssertDisplayProperty<T>(ITabbedContent<T> result, Property p)
+        private void AssertDisplayProperty<T>(IContentProperties<T> result, Property p)
             where T : ContentPropertyBasic
         {
             var pDto = result.Properties.SingleOrDefault(x => x.Alias == p.Alias);
@@ -250,7 +250,8 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(content.UpdateDate, invariantContent.UpdateDate);
             Assert.AreEqual(content.CreateDate, invariantContent.CreateDate);
             Assert.AreEqual(content.Name, invariantContent.Name);
-            Assert.AreEqual(content.Properties.Count(), invariantContent.Properties.Count(x => x.Alias.StartsWith("_umb_") == false));
+            Assert.AreEqual(content.Properties.Count(),
+                ((IContentProperties<ContentPropertyDisplay>)invariantContent).Properties.Count(x => x.Alias.StartsWith("_umb_") == false));
         }
 
         private void AssertBasics<T, TPersisted>(ContentItemBasic<T> result, TPersisted content)

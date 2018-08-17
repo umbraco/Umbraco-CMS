@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -148,7 +149,16 @@ namespace Umbraco.Web.Editors.Filters
                 // validate
                 var valueEditor = editor.GetValueEditor(p.DataType.Configuration);
                 foreach (var r in valueEditor.Validate(postedValue, p.IsRequired, p.ValidationRegExp))
+                {
+                    //this could be a thing, but it does make the errors seem very verbose
+                    ////update the error message to include the property name and culture if available
+                    //r.ErrorMessage = p.Culture.IsNullOrWhiteSpace()
+                    //    ? $"'{p.Label}' - {r.ErrorMessage}"
+                    //    : $"'{p.Label}' ({p.Culture}) - {r.ErrorMessage}";
+
                     modelState.AddPropertyError(r, p.Alias, p.Culture);
+                }
+                    
             }
 
             return modelState.IsValid;

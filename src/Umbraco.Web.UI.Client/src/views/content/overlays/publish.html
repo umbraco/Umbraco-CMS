@@ -23,26 +23,24 @@
                            val-server-field="{{variant.htmlId}}" />
                     <div>
                         <label for="{{variant.htmlId}}">
-                            <span ng-class="{'bold': variant.published}" style="margin-bottom: 2px;">{{ variant.language.name }}</span>
+                            <span style="margin-bottom: 2px;">{{ variant.language.name }}</span>
+                            <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
                         </label>
 
-                        <div ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid" ng-switch="variant.state">
-                            <div class="umb-permission__description" ng-switch-when="NotCreated"><localize key="content_notCreated"></localize></div>
-                            <div class="umb-permission__description" ng-switch-when="Draft"><localize key="content_unpublished"></localize></div>
-                            <div class="umb-permission__description" ng-switch-when="PublishedPendingChanges"><localize key="content_publishedPendingChanges"></localize></div>
-                            <div class="umb-permission__description" ng-switch-when="Published"><localize key="content_published"></localize></div>
+                        <div ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid">
+                            <umb-variant-state variant="variant"></umb-variant-state>
                         </div>
 
                         <div ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
                             <div class="umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</div>
                         </div>
-                        
+
                     </div>
                 </div>
-                
+
             </ng-form>
         </div>
-        <br/>
+        <br />
     </div>
 
     <div class="umb-list umb-list--condensed" ng-if="!vm.loading && vm.hasPristineVariants">
@@ -52,8 +50,11 @@
 
         <div class="umb-list-item" ng-repeat="variant in vm.variants | filter:vm.pristineVariantFilter">
             <div>
-                <div ng-class="{'bold': variant.published}" style="margin-bottom: 2px;">{{ variant.language.name }}</div>
-                <div class="umb-permission__description">{{ variant.state }}</div>
+                <div style="margin-bottom: 2px;">
+                    <span>{{ variant.language.name }}</span>
+                    <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
+                </div>
+                <umb-variant-state variant="variant"></umb-variant-state>
             </div>
         </div>
     </div>

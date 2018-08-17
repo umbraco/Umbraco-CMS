@@ -27,11 +27,6 @@
 
         // add all editors to an editors array to support split view 
         $scope.editors = [];
-        $scope.splitView = {
-            "leftIsOpen": true,
-            "rightIsOpen": false
-        };
-
         $scope.initVariant = initVariant;
         $scope.splitViewChanged = splitViewChanged;
 
@@ -58,16 +53,59 @@
             bindEvents();
 
             // set first app to active
-            // TODO: We need to track active
+            // We need to track active
             $scope.content.apps[0].active = true;
 
             setActiveCulture();
+
+            resetVariantFlags();            
         }
 
         /** This is called when the split view changes based on the umb-variant-content */
         function splitViewChanged() {
             //send an event downwards
             $scope.$broadcast("editors.content.splitViewChanged", { editors: $scope.editors });
+        }
+        
+        /**
+         * This will reset isDirty flags if save is true.
+         * When working with multiple variants, this will set the save/publish flags of each one to false.
+         * When working with a single variant, this will set the publish flag to false and the save flag to true.
+         */
+        function resetVariantFlags() {
+            if ($scope.content.variants.length > 1) {
+                for (var i = 0; i < $scope.content.variants.length; i++) {
+                    var v = $scope.content.variants[i];
+                    if (v.save) {
+                        v.isDirty = false;
+                    }
+                    v.save = false;
+                    v.publish = false;
+                }
+            }
+            else {
+                if ($scope.content.variants[0].save) {
+                    $scope.content.variants[0].isDirty = false;
+                }
+                $scope.content.variants[0].save = true;
+                $scope.content.variants[0].publish = false;
+            }
+        }
+
+        function countDirtyVariants() {
+            var count = 0;
+            for (var i = 0; i < $scope.content.variants.length; i++) {
+                var v = $scope.content.variants[i];
+                if (v.isDirty) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        /** Returns true if the save/publish dialog should be shown when pressing the button */
+        function showSaveOrPublishDialog() {
+            return $scope.content.variants.length > 1;
         }
 
         /**
@@ -116,7 +154,7 @@
                         $scope.editors[s].content = initVariant(variant);
                     }
                 }
-                
+
             }
         }
 
@@ -137,7 +175,7 @@
                 //if the variant list that defines the header drop down isn't assigned to the variant then assign it now
                 if (!variant.variants) {
                     variant.variants = _.map($scope.content.variants,
-                        function(v) {
+                        function (v) {
                             return _.pick(v, "active", "language", "state");
                         });
                 }
@@ -145,7 +183,7 @@
                     //merge the scope variants on top of the header variants collection (handy when needing to refresh)
                     angular.extend(variant.variants,
                         _.map($scope.content.variants,
-                            function(v) {
+                            function (v) {
                                 return _.pick(v, "active", "language", "state");
                             }));
                 }
@@ -193,7 +231,7 @@
         }
 
         /**
-         *  This does the content loading and initializes everything, called on load and changing variants
+         *  This does the content loading and initializes everything, called on first load
          */
         function loadContent() {
 
@@ -212,7 +250,7 @@
                     init($scope.content);
 
                     if (!infiniteMode) {
-                        syncTreeNode($scope.content, data.path, true);
+                        syncTreeNode($scope.content, true);
                     }
 
                     resetLastListPageNumber($scope.content);
@@ -262,7 +300,9 @@
         }
 
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
-        function syncTreeNode(content, path, initialLoad) {
+        function syncTreeNode(content, initialLoad) {
+
+            var path = content.path;
 
             if (!$scope.content.isChildOfListView) {
                 navigationService.syncTree({ tree: $scope.treeAlias, path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
@@ -287,15 +327,6 @@
         // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish
         function performSave(args) {
 
-            //update the 'save' boolean of each variant if they are flagged as being dirty
-            //TODO: This is also where we'd set this flag when we have the save dialog
-            for (var i = 0; i < $scope.content.variants.length; i++) {
-                var v = $scope.content.variants[i];
-                if (v.isDirty) {
-                    v.save = true;
-                }
-            }
-
             $scope.page.buttonGroupState = "busy";
 
             eventsService.emit("content.saving", { content: $scope.content, action: args.action });
@@ -304,29 +335,34 @@
                 saveMethod: args.saveMethod,
                 scope: $scope,
                 content: $scope.content,
-                action: args.action
+                action: args.action,
+                showNotifications: args.showNotifications
             }).then(function (data) {
                 //success            
                 init($scope.content);
 
                 if (!infiniteMode) {
-                    syncTreeNode($scope.content, data.path);
+                    syncTreeNode($scope.content);
                 }
 
                 $scope.page.buttonGroupState = "success";
 
                 eventsService.emit("content.saved", { content: $scope.content, action: args.action });
-                
+
                 return $q.when(data);
             },
                 function (err) {
+
+                    setActiveCulture();
+                    syncTreeNode($scope.content);
+
                     //error
                     if (err) {
                         editorState.set($scope.content);
                     }
 
                     $scope.page.buttonGroupState = "error";
-                    
+
                     return $q.reject(err);
                 });
         }
@@ -403,7 +439,7 @@
                         init($scope.content);
 
                         if (!infiniteMode) {
-                            syncTreeNode($scope.content, data.path);
+                            syncTreeNode($scope.content);
                         }
 
                         $scope.page.buttonGroupState = "success";
@@ -424,12 +460,12 @@
         $scope.saveAndPublish = function () {
 
             // TODO: Add "..." to publish button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
-            if ($scope.content.variants.length > 1) {
+            if (showSaveOrPublishDialog()) {
                 //before we launch the dialog we want to execute all client side validations first
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
 
                     var dialog = {
-                        view: "publish",
+                        view: "views/content/overlays/publish.html",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
                         submitButtonLabel: "Publish",
@@ -439,7 +475,8 @@
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
                             return performSave({
                                 saveMethod: contentResource.publish,
-                                action: "publish"
+                                action: "publish",
+                                showNotifications: false
                             }).then(function (data) {
                                 overlayService.close();
                                 return $q.when(data);
@@ -448,21 +485,6 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-
-                                    //check the error list for specific variant errors, if none exist that means that only server side validation
-                                    //for the current variant's properties failed, in this case we want to close the publish dialog since the user
-                                    //will need to fix validation errors on the properties
-                                    if (err.data && err.data.ModelState) {
-                                        var keys = _.keys(err.data.ModelState);
-                                        var foundVariantError = _.find(keys,
-                                            function (k) {
-                                                return k.startsWith("publish_variant_");
-                                            });
-                                        if (!foundVariantError) {
-                                            //no variant errors, close the dialog
-                                            overlayService.close();
-                                        }
-                                    }
 
                                     return $q.reject(err);
                                 });
@@ -476,12 +498,56 @@
                 }
             }
             else {
-                return performSave({ saveMethod: contentResource.publish, action: "publish" }).catch(angular.noop);;
+                //ensure the publish flag is set
+                $scope.content.variants[0].publish = true;
+                return performSave({ saveMethod: contentResource.publish, action: "publish" });
             }
         };
 
         $scope.save = function () {
-            return performSave({ saveMethod: $scope.saveMethod(), action: "save" }).catch(angular.noop);
+
+            // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
+            if (showSaveOrPublishDialog()) {
+                //before we launch the dialog we want to execute all client side validations first
+                if (formHelper.submitForm({ scope: $scope, action: "save" })) {
+
+                    var dialog = {
+                        view: "views/content/overlays/save.html",
+                        variants: $scope.content.variants, //set a model property for the dialog
+                        skipFormValidation: true, //when submitting the overlay form, skip any client side validation
+                        submitButtonLabel: "Save",
+                        submit: function (model) {
+                            model.submitButtonState = "busy";
+
+                            //we need to return this promise so that the dialog can handle the result and wire up the validation response
+                            return performSave({
+                                saveMethod: $scope.saveMethod(),
+                                action: "save",
+                                showNotifications: false
+                            }).then(function (data) {
+                                overlayService.close();
+                                return $q.when(data);
+                            },
+                                function (err) {
+                                    model.submitButtonState = "error";
+                                    //re-map the dialog model since we've re-bound the properties
+                                    dialog.variants = $scope.content.variants;
+
+                                    return $q.reject(err);
+                                });
+                        },
+                        close: function (oldModel) {
+                            overlayService.close();
+                        }
+                    };
+
+                    overlayService.open(dialog);
+                }
+            }
+            else {
+                return performSave({ saveMethod: $scope.saveMethod(), action: "save" });
+            }
+
         };
 
         $scope.preview = function (content) {
@@ -505,7 +571,7 @@
                 else {
                     $scope.save().then(function (data) {
                         previewWindow.location.href = redirect;
-                    }).catch(angular.noop);
+                    });
                 }
             }
         };
@@ -569,7 +635,7 @@
                     $scope.infiniteModel.submit($scope.infiniteModel);
                 }
                 $scope.publishAndCloseButtonState = "success";
-            }).catch(angular.noop);;
+            });
         };
 
         /* save method used in infinite editing */
@@ -581,9 +647,9 @@
                     $scope.infiniteModel.submit($scope.infiniteModel);
                 }
                 $scope.saveAndCloseButtonState = "success";
-            }).catch(angular.noop);;
+            });
         };
-        
+
         function moveNode(node, target) {
 
             contentResource.move({ "parentId": target.id, "id": node.id })

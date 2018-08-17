@@ -22,8 +22,16 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             _controllerFactory = controllerFactory;
         }
 
-        public async Task<Tuple<HttpResponseMessage, string>> Execute(string controllerName, string actionName, HttpMethod method, HttpContent content = null)
+        public async Task<Tuple<HttpResponseMessage, string>> Execute(string controllerName, string actionName, HttpMethod method,
+            HttpContent content = null,
+            MediaTypeWithQualityHeaderValue mediaTypeHeader = null,
+            bool assertOkResponse = true)
         {
+            if (mediaTypeHeader == null)
+            {
+                mediaTypeHeader = new MediaTypeWithQualityHeaderValue("application/json");
+            }
+
             var startup = new TestStartup(
                 configuration =>
                 {
@@ -44,7 +52,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 if (content != null)
                     request.Content = content;
 
-                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                request.Headers.Accept.Add(mediaTypeHeader);
 
                 Console.WriteLine(request);
                 var response = await server.HttpClient.SendAsync(request);
@@ -62,7 +70,11 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                     Console.Write(JsonConvert.SerializeObject(deserialized, Formatting.Indented));
                 }
 
-                Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                if (assertOkResponse)
+                {
+                    Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                }
+                
                 return Tuple.Create(response, json);
             }
         }

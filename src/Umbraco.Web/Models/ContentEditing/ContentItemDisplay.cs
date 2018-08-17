@@ -108,8 +108,14 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }
 
-        //[DataMember(Name = "publishDate")]
-        //public DateTime? PublishDate { get; set; }
+        /// <summary>
+        /// This is the last updated date for the entire content object regardless of variants
+        /// </summary>
+        /// <remarks>
+        /// Each variant has it's own update date assigned as well
+        /// </remarks>
+        [DataMember(Name = "updateDate")]
+        public DateTime UpdateDate { get; set; }
 
         //TODO: These will need to be moved once we have scheduled publishing in per culture
         [DataMember(Name = "releaseDate")]
@@ -121,14 +127,8 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "template")]
         public string TemplateAlias { get; set; }
 
-
-
-
         [DataMember(Name = "templateId")]
         public int TemplateId { get; set; }
-
-
-
 
         [DataMember(Name = "allowedTemplates")]
         public IDictionary<string, string> AllowedTemplates { get; set; }

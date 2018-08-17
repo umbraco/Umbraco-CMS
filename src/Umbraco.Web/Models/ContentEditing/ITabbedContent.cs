@@ -3,9 +3,9 @@
 namespace Umbraco.Web.Models.ContentEditing
 {
 
-    public interface ITabbedContent<T> : IContentProperties<T>
+    public interface ITabbedContent<T>
         where T : ContentPropertyBasic
     {
-        IEnumerable<Tab<T>> Tabs { get; set; }
+        IEnumerable<Tab<T>> Tabs { get; }
     }
 }

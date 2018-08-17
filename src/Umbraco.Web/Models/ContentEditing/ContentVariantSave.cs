@@ -36,10 +36,11 @@ namespace Umbraco.Web.Models.ContentEditing
         public bool Save { get; set; }
 
         /// <summary>
-        /// Indicates if the variant should be published or unpublished
+        /// Indicates if the variant should be published
         /// </summary>
         /// <remarks>
-        /// This option will have no affect if <see cref="Save"/> is false
+        /// This option will have no affect if <see cref="Save"/> is false.
+        /// This is not used to unpublish.
         /// </remarks>
         [DataMember(Name = "publish")]
         public bool Publish { get; set; }
