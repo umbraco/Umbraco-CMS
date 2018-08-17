@@ -283,22 +283,35 @@ namespace Umbraco.Web.Trees
         /// This is required in case a user has custom start nodes that are children of a list view since in that case we'll need to render the tree node. In normal cases we don't render
         /// children of a list view.
         /// </remarks>
-        protected bool ShouldRenderChildrenOfContainer(IUmbracoEntity e)
+        protected int ShouldRenderChildrenOfContainer(IUmbracoEntity e)
         {
             var isContainer = e.IsContainer();
+            var renderChildren = 0;
 
-            var renderChildren = e.HasChildren() && (isContainer == false);
+            // If a node has children, the outcome will be 1.
+            if(e.HasChildren() == true)
+                renderChildren = 1;
+
+            if (isContainer == true || renderChildren == 0)
+            {
+                if (renderChildren == 1)
+                    renderChildren = 0;
+                else if (isContainer == false)
+                    renderChildren = -1;
+                else
+                    renderChildren = -2;
+            }
 
             //Here we need to figure out if the node is a container and if so check if the user has a custom start node, then check if that start node is a child
             // of this container node. If that is true, the HasChildren must be true so that the tree node still renders even though this current node is a container/list view.
             if (isContainer && UserStartNodes.Length > 0 && UserStartNodes.Contains(Constants.System.Root) == false)
-            {                    
+            {
                 var startNodes = Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes);
                 //if any of these start nodes' parent is current, then we need to render children normally so we need to switch some logic and tell
                 // the UI that this node does have children and that it isn't a container
                 if (startNodes.Any(x => x.ParentId == e.Id))
                 {
-                    renderChildren = true;
+                    renderChildren = 1;
                 }
             }
 
@@ -320,10 +333,10 @@ namespace Umbraco.Web.Trees
 
             //before we get the children we need to see if this is a container node
 
-            //test if the parent is a listview / container
-            if (current != null && ShouldRenderChildrenOfContainer(current) == false)
+            //test if the parent is a listview / container -> the result should be an even number
+            if (current != null && (ShouldRenderChildrenOfContainer(current) % 2) == 0)
             {
-                //no children!
+                //no children rendered!
                 return new TreeNodeCollection();
             }
 
