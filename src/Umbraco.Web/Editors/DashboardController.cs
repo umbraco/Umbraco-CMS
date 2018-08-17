@@ -92,8 +92,6 @@ namespace Umbraco.Web.Editors
                 //content is null, go get it
                 try
                 {
-                    //                    using (var web = new HttpClient())
-                    //                    {
                     //fetch remote css
                     content = await HttpClient.GetStringAsync(url);
 
@@ -102,7 +100,6 @@ namespace Umbraco.Web.Editors
 
                     //save server content for 30 mins
                     ApplicationContext.ApplicationCache.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 30, 0));
-                    //                    }
                 }
                 catch (HttpRequestException ex)
                 {
