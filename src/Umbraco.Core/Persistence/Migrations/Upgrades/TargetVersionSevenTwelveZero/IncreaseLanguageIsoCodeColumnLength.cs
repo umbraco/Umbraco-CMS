@@ -15,21 +15,30 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZ
 
         public override void Up()
         {
-            // Some people seem to have a constraint in their DB instead of an index, we'd need to drop that one
-            // See: https://our.umbraco.com/forum/using-umbraco-and-getting-started/93282-upgrade-from-711-to-712-fails
-            var constraints = SqlSyntax.GetConstraintsPerTable(Context.Database).Distinct().ToArray();
-            if (constraints.Any(x => x.Item2.InvariantEquals("IX_umbracoLanguage_languageISOCode")))
+            Execute.Code(database =>
             {
-                Delete.UniqueConstraint("IX_umbracoLanguage_languageISOCode").FromTable("umbracoLanguage");
-            }
+                var localContext = new LocalMigrationContext(Context.CurrentDatabaseProvider, database, SqlSyntax, Logger);
+                var hasSql = false;
+                // Some people seem to have a constraint in their DB instead of an index, we'd need to drop that one
+                // See: https://our.umbraco.com/forum/using-umbraco-and-getting-started/93282-upgrade-from-711-to-712-fails
+                var constraints = SqlSyntax.GetConstraintsPerTable(database).Distinct().ToArray();
+                if (constraints.Any(x => x.Item2.InvariantEquals("IX_umbracoLanguage_languageISOCode")))
+                {
+                    localContext.Delete.UniqueConstraint("IX_umbracoLanguage_languageISOCode").FromTable("umbracoLanguage");
+                    hasSql = true;
+                }
 
-            //Now check for indexes of that name and drop that if it exists
-            var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)
-                .Select(x => new DbIndexDefinition(x)).ToArray();
-            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoLanguage_languageISOCode")))
-            {
-                Delete.Index("IX_umbracoLanguage_languageISOCode").OnTable("umbracoLanguage");
-            }
+                //Now check for indexes of that name and drop that if it exists
+                var dbIndexes = SqlSyntax.GetDefinedIndexes(database)
+                    .Select(x => new DbIndexDefinition(x)).ToArray();
+                if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoLanguage_languageISOCode")))
+                {
+                    localContext.Delete.Index("IX_umbracoLanguage_languageISOCode").OnTable("umbracoLanguage");
+                    hasSql = true;
+                }
+
+                return hasSql ? localContext.GetSql() : null;
+            });
 
             Alter.Table("umbracoLanguage")
                 .AlterColumn("languageISOCode")
