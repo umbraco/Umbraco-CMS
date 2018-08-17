@@ -159,13 +159,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
             //get the db index defs
             result.DbIndexDefinitions = _sqlSyntaxProvider.GetDefinedIndexes(_database)
-                .Select(x => new DbIndexDefinition()
-                {
-                    TableName = x.Item1,
-                    IndexName = x.Item2,
-                    ColumnName = x.Item3,
-                    IsUnique = x.Item4
-                }).ToArray();
+                .Select(x => new DbIndexDefinition(x)).ToArray();
 
             foreach (var item in OrderedTables.OrderBy(x => x.Key))
             {
