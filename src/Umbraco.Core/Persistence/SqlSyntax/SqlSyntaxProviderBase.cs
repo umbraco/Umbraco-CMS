@@ -537,6 +537,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public virtual string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})"; } }
         public virtual string DeleteConstraint { get { return "ALTER TABLE {0} DROP CONSTRAINT {1}"; } }
+        
         public virtual string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}"; } }
 
         public virtual string ConvertIntegerToOrderableString { get { return "REPLACE(STR({0}, 8), SPACE(1), '0')"; } }

@@ -17,11 +17,13 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
     {
         private readonly DatabaseContext _databaseContext;
         private readonly ILocalizedTextService _textService;
+        private readonly ILogger _logger;
 
         public DatabaseSchemaValidationHealthCheck(HealthCheckContext healthCheckContext) : base(healthCheckContext)
         {
             _databaseContext = HealthCheckContext.ApplicationContext.DatabaseContext;
             _textService = healthCheckContext.ApplicationContext.Services.TextService;
+            _logger = healthCheckContext.ApplicationContext.ProfilingLogger.Logger;
         }
 
         public override HealthCheckStatus ExecuteAction(HealthCheckAction action)
@@ -39,10 +41,10 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
         {
             var results = _databaseContext.ValidateDatabaseSchema();
 
-            LogHelper.Warn(typeof(DatabaseSchemaValidationHealthCheck), _textService.Localize("databaseSchemaValidationCheckDatabaseLogMessage"));
+            _logger.Warn(typeof(DatabaseSchemaValidationHealthCheck), _textService.Localize("databaseSchemaValidationCheckDatabaseLogMessage"));
             foreach(var error in results.Errors)
             {
-                LogHelper.Warn(typeof(DatabaseSchemaValidationHealthCheck), error.Item1 + ": " + error.Item2);
+                _logger.Warn(typeof(DatabaseSchemaValidationHealthCheck), error.Item1 + ": " + error.Item2);
             }
 
             if(results.Errors.Count > 0)

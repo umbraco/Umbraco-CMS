@@ -15,21 +15,35 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZ
 
         public override void Up()
         {
-            var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)
-                .Select(x => new DbIndexDefinition()
-                {
-                    TableName = x.Item1,
-                    IndexName = x.Item2,
-                    ColumnName = x.Item3,
-                    IsUnique = x.Item4
-                }).ToArray();
-
-            //Ensure the index exists before dropping it
-            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoLanguage_languageISOCode")))
+            Execute.Code(database =>
             {
-                Delete.Index("IX_umbracoLanguage_languageISOCode").OnTable("umbracoLanguage");
-            }
-            
+                var localContext = new LocalMigrationContext(Context.CurrentDatabaseProvider, database, SqlSyntax, Logger);
+                // Some people seem to have a constraint in their DB instead of an index, we'd need to drop that one
+                // See: https://our.umbraco.com/forum/using-umbraco-and-getting-started/93282-upgrade-from-711-to-712-fails
+                var constraints = SqlSyntax.GetConstraintsPerTable(database).Distinct().ToArray();
+                if (constraints.Any(x => x.Item2.InvariantEquals("IX_umbracoLanguage_languageISOCode")))
+                {
+                    localContext.Delete.UniqueConstraint("IX_umbracoLanguage_languageISOCode").FromTable("umbracoLanguage");
+                    return localContext.GetSql();
+                }
+                return null;
+            });
+
+            Execute.Code(database =>
+            {
+                var localContext = new LocalMigrationContext(Context.CurrentDatabaseProvider, database, SqlSyntax, Logger);
+
+                //Now check for indexes of that name and drop that if it exists
+                var dbIndexes = SqlSyntax.GetDefinedIndexes(database)
+                    .Select(x => new DbIndexDefinition(x)).ToArray();
+                if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoLanguage_languageISOCode")))
+                {
+                    localContext.Delete.Index("IX_umbracoLanguage_languageISOCode").OnTable("umbracoLanguage");
+                    return localContext.GetSql();
+                }
+                return null;
+            });
+
             Alter.Table("umbracoLanguage")
                 .AlterColumn("languageISOCode")
                 .AsString(14)
@@ -38,6 +52,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenTwelveZ
             Create.Index("IX_umbracoLanguage_languageISOCode")
                 .OnTable("umbracoLanguage")
                 .OnColumn("languageISOCode")
+                .Ascending()
+                .WithOptions()
                 .Unique();
         }
 
