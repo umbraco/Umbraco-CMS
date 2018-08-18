@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Logging;
+﻿using System.Net.Http;
+using Umbraco.Core.Logging;
 using Umbraco.Web;
 
 namespace dashboardUtilities
@@ -14,6 +15,8 @@ namespace dashboardUtilities
 
     public partial class FeedProxy : UmbracoEnsuredPage
     {
+        private static WebClient _webClient;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             try
@@ -31,9 +34,10 @@ namespace dashboardUtilities
                                 && feedProxyXml.SelectSingleNode(string.Concat("//allow[@host = '", requestUri.Host, "']")) != null
                                 && requestUri.Port == 80)
                             {
-                                using (var client = new WebClient())
-                                {
-                                    var response = client.DownloadString(requestUri);
+                                if (_webClient == null)
+                                    _webClient = new WebClient();
+                               
+                                    var response = _webClient.DownloadString(requestUri);
 
                                     if (string.IsNullOrEmpty(response) == false)
                                     {
@@ -41,7 +45,7 @@ namespace dashboardUtilities
                                         Response.ContentType = Request.CleanForXss("type") ?? MediaTypeNames.Text.Xml;
                                         Response.Write(response);
                                     }
-                                }
+
                             }
                             else
                             {

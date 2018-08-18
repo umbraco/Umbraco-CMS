@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
+using System.Net;
 using System.Web;
 using System.Web.Security;
 using Umbraco.Core;
@@ -80,7 +81,7 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 try
                 {
-                    var client = new System.Net.WebClient();
+                    var client = new WebClient();
                     var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email} };
                     client.UploadValues("https://shop.umbraco.com/base/Ecom/SubmitEmail/installer.aspx", values);
                 }

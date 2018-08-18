@@ -14,6 +14,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic;
 using System.Diagnostics;
 using System.IO.Compression;
+using System.Net;
 using umbraco.cms.businesslogic.template;
 using umbraco.interfaces;
 using Umbraco.Core.Events;
@@ -685,7 +686,7 @@ namespace umbraco.cms.businesslogic.packager
             if (Directory.Exists(IOHelper.MapPath(SystemDirectories.Packages)) == false)
                 Directory.CreateDirectory(IOHelper.MapPath(SystemDirectories.Packages));
 
-            var wc = new System.Net.WebClient();
+            var wc = new WebClient();
 
             wc.DownloadFile(
                 "http://" + PackageServer + "/fetch?package=" + Package.ToString(),
