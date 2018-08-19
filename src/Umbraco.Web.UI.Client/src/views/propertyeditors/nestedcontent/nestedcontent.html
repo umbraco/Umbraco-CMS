@@ -45,9 +45,9 @@
         <div class="usky-grid umb-nested-content__node-type-picker" ng-if="overlayMenu.show">
             <div class="cell-tools-menu" ng-style="overlayMenu.style" style="margin: 0;" delayed-mouseleave="closeNodeTypePicker()" on-delayed-mouseleave="closeNodeTypePicker()">
                 <h5>
+                    <a class="nested-content_links-header" ng-class="{'show': hasGroupFilter==true}" ng-click="openNodeTypePicker($event)" href><<</a>
                     <localize key="grid_insertControl" />
                 </h5>
-
                 <div class="form-search" ng-hide="overlayMenu.showFilter === false" style="margin-bottom: 15px;">
                     <i class="icon-search"></i>
                     <input type="text"
@@ -58,11 +58,14 @@
                            umb-auto-focus
                            no-dirty-check />
                 </div>
-
                 <ul class="elements">
                     <li ng-repeat="scaffold in overlayMenu.scaffolds | filter:searchTerm">
-                        <a ng-click="addNode(scaffold.alias)" href>
+                        <a ng-if="!isGroup(scaffold)" ng-click="addNode(scaffold.alias)" href>
                             <i class="icon {{scaffold.icon}}"></i>
+                            {{scaffold.name}}
+                        </a>
+                        <a ng-if="isGroup(scaffold)" ng-click="openNodeTypePicker($event,scaffold.group)" href>
+                            <i class="icon icon-folder"></i>
                             {{scaffold.name}}
                         </a>
                     </li>

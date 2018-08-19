@@ -315,6 +315,28 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                 "Failed to rename the folder with id " + id
             );
 
+        },
+
+        getPathById: function (id) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentTypeApiBaseUrl",
+                        "GetFolderPathById",
+                        [{ id: id }])),
+                'Failed to retrieve content type path');
+        },
+
+        getPathByAlias: function (alias) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentTypeApiBaseUrl",
+                        "GetFolderPathByAlias",
+                        [{ alias: alias }])),
+                'Failed to retrieve content type path');
         }
 
     };

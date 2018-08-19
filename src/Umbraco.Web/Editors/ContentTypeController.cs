@@ -439,5 +439,47 @@ namespace Umbraco.Web.Editors
                 getContentType: i => Services.ContentTypeService.GetContentType(i),
                 doCopy: (type, i) => Services.ContentTypeService.CopyContentType(type, i));
         }
+
+        /// <summary> 
+        /// Get the folder path of a document type with a given ID 
+        /// </summary> 
+        /// <param name="id"></param> 
+        /// <returns></returns> 
+        [HttpGet]
+        public IEnumerable<string> GetFolderPathById(int id)
+        {
+            var contentType = Services.ContentTypeService.GetContentType(id);
+            if (contentType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return GetFolderPathByContentType(contentType);
+        }
+
+        /// <summary> 
+        /// Get the folder path of a document type with a given name 
+        /// </summary> 
+        /// <param name="alias"></param> 
+        /// <returns></returns> 
+        [HttpGet]
+        public IEnumerable<string> GetFolderPathByAlias(string alias)
+        {
+            var contentType = Services.ContentTypeService.GetContentType(alias);
+            if (contentType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return GetFolderPathByContentType(contentType);
+        }
+
+        private IEnumerable<string> GetFolderPathByContentType(IContentType contentType)
+        {
+            return contentType.Path.Split(',')
+                .Select(idString => int.TryParse(idString, out int pathId) ? pathId : 0)
+                .Where(pathId => pathId > 0)
+                .Select(pathId => Services.EntityService.Get(pathId))
+                .Where(entity => Services.ContentTypeService.GetContentType(entity.Id) == null)
+                .Select(entity => entity.Name);
+        }
     }
 }
