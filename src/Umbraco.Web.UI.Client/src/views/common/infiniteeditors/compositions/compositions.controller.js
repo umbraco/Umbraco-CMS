@@ -1,10 +1,12 @@
  (function() {
 	"use strict";
 
-	function CompositionsOverlay($scope,$location) {
+	function CompositionsController($scope,$location) {
 
         var vm = this;
         var oldModel = null;
+
+        vm.showConfirmSubmit = false;
 
         vm.isSelected = isSelected;
         vm.openContentType = openContentType;
@@ -12,8 +14,15 @@
         vm.close = close;
 
         function onInit() {
-            console.log("on init");
+
+            /* make a copy of the init model so it is possible to roll 
+            back the changes on cancel */
             oldModel = angular.copy($scope.model);
+
+            if(!$scope.model.title) {
+                $scope.model.title = "Compositions";
+            }
+
         }
 
         function isSelected(alias) {
@@ -29,7 +38,21 @@
 
         function submit() {
             if ($scope.model && $scope.model.submit) {
-                $scope.model.submit($scope.model, oldModel);
+                
+                // check if any compositions has been removed
+                vm.compositionRemoved = false;
+                for(var i = 0; oldModel.compositeContentTypes.length > i; i++) {
+                    var oldComposition = oldModel.compositeContentTypes[i];
+                    if(_.contains($scope.model.compositeContentTypes, oldComposition) === false) {
+                        vm.compositionRemoved = true;
+                    }
+                }
+
+                /* submit the form if there havne't been removed any composition
+                or the confirm checkbox has been checked */
+                if(!vm.compositionRemoved || vm.allowSubmit) {
+                    $scope.model.submit($scope.model);
+                }
             }
         }
 
@@ -42,6 +65,6 @@
         onInit();
 	}
 
-	angular.module("umbraco").controller("Umbraco.Overlays.CompositionsOverlay", CompositionsOverlay);
+	angular.module("umbraco").controller("Umbraco.Editors.CompositionsController", CompositionsController);
 
 })();

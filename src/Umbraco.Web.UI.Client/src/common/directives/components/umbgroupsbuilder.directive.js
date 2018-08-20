@@ -245,49 +245,19 @@
       scope.openCompositionsDialog = function() {
 
         scope.compositionsDialogModel = {
-            title: "Compositions",
             contentType: scope.model,
             compositeContentTypes: scope.model.compositeContentTypes,
-            confirmSubmit: {
-                title: "Warning",
-                description: "Removing a composition will delete all the associated property data. Once you save the document type there's no way back, are you sure?",
-                checkboxLabel: "I know what I'm doing",
-                enable: true
-            },
-            submit: function(model, oldModel, confirmed) {
+            submit: function() {
+              
+              // make sure that all tabs has an init property
+              if (scope.model.groups.length !== 0) {
+                angular.forEach(scope.model.groups, function(group) {
+                  addInitProperty(group);
+                });
+              }
 
-                var compositionRemoved = false;
-
-                // check if any compositions has been removed
-                for(var i = 0; oldModel.compositeContentTypes.length > i; i++) {
-
-                    var oldComposition = oldModel.compositeContentTypes[i];
-
-                    if(_.contains(model.compositeContentTypes, oldComposition) === false) {
-                        compositionRemoved = true;
-                    }
-
-                }
-
-                // show overlay confirm box if compositions has been removed.
-                if(compositionRemoved && confirmed === false) {
-
-                    scope.compositionsDialogModel.confirmSubmit.show = true;
-
-                // submit overlay if no compositions has been removed
-                // or the action has been confirmed
-                } else {
-
-                    // make sure that all tabs has an init property
-                    if (scope.model.groups.length !== 0) {
-                      angular.forEach(scope.model.groups, function(group) {
-                        addInitProperty(group);
-                      });
-                    }
-
-                    // remove overlay
-                    editorService.close();
-                }
+              // remove overlay
+              editorService.close();
 
             },
             close: function(oldModel) {
