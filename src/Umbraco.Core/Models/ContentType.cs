@@ -48,8 +48,18 @@ namespace Umbraco.Core.Models
             _allowedTemplates = new List<ITemplate>();
         }
 
-        private static readonly PropertyInfo DefaultTemplateSelector = ExpressionHelper.GetPropertyInfo<ContentType, int>(x => x.DefaultTemplateId);
-        private static readonly PropertyInfo AllowedTemplatesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<ITemplate>>(x => x.AllowedTemplates);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo DefaultTemplateSelector = ExpressionHelper.GetPropertyInfo<ContentType, int>(x => x.DefaultTemplateId);
+            public readonly PropertyInfo AllowedTemplatesSelector = ExpressionHelper.GetPropertyInfo<ContentType, IEnumerable<ITemplate>>(x => x.AllowedTemplates);
+
+            //Custom comparer for enumerable
+            public readonly DelegateEqualityComparer<IEnumerable<ITemplate>> TemplateComparer = new DelegateEqualityComparer<IEnumerable<ITemplate>>(
+                (templates, enumerable) => templates.UnsortedSequenceEqual(enumerable),
+                templates => templates.GetHashCode());
+        }
 
         /// <summary>
         /// Gets or sets the alias of the default Template.
@@ -70,14 +80,7 @@ namespace Umbraco.Core.Models
         internal int DefaultTemplateId
         {
             get { return _defaultTemplate; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _defaultTemplate = value;
-                    return _defaultTemplate;
-                }, _defaultTemplate, DefaultTemplateSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _defaultTemplate, Ps.Value.DefaultTemplateSelector); }
         }
 
         /// <summary>
@@ -92,15 +95,10 @@ namespace Umbraco.Core.Models
             get { return _allowedTemplates; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _allowedTemplates = value;
-                    return _allowedTemplates;
-                }, _allowedTemplates, AllowedTemplatesSelector,
-                    //Custom comparer for enumerable
-                    new DelegateEqualityComparer<IEnumerable<ITemplate>>(
-                        (templates, enumerable) => templates.UnsortedSequenceEqual(enumerable),
-                        templates => templates.GetHashCode()));
+                SetPropertyValueAndDetectChanges(value, ref _allowedTemplates, Ps.Value.AllowedTemplatesSelector, Ps.Value.TemplateComparer);
+
+                if (_allowedTemplates.Any(x => x.Id == _defaultTemplate) == false)
+                    DefaultTemplateId = 0;
             }
         }
 

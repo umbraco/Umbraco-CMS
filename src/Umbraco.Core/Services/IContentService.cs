@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Xml;
+using System.Xml.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.Services
@@ -16,7 +19,7 @@ namespace Umbraco.Core.Services
     {
         //TODO: Remove this class in v8
 
-        //TODO: There's probably more that needs to be added like the EmptyRecycleBin, etc...
+        //TODO: There's probably more that needs to be added like the EmptyRecycleBin, etc...        
 
         /// <summary>
         /// Saves a single <see cref="IContent"/> object
@@ -91,8 +94,36 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Defines the ContentService, which is an easy access to operations involving <see cref="IContent"/>
     /// </summary>
-    public interface IContentService : IService
+    public interface IContentService : IContentServiceBase
     {
+        IEnumerable<IContent> GetBlueprintsForContentTypes(params int[] documentTypeIds);
+        IContent GetBlueprintById(int id);
+        IContent GetBlueprintById(Guid id);
+        void SaveBlueprint(IContent content, int userId = 0);
+        void DeleteBlueprint(IContent content, int userId = 0);
+        IContent CreateContentFromBlueprint(IContent blueprint, string name, int userId = 0);
+        void DeleteBlueprintsOfType(int contentTypeId, int userId = 0);
+        void DeleteBlueprintsOfTypes(IEnumerable<int> contentTypeIds, int userId = 0);
+
+        /// <summary>
+        /// Gets all XML entries found in the cmsContentXml table based on the given path
+        /// </summary>
+        /// <param name="path">Path starts with</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records the query would return without paging</param>
+        /// <returns>A paged enumerable of XML entries of content items</returns>
+        /// <remarks>
+        /// If -1 is passed, then this will return all content xml entries, otherwise will return all descendents from the path
+        /// </remarks>
+        IEnumerable<XElement> GetPagedXmlEntries(string path, long pageIndex, int pageSize, out long totalRecords);
+
+        /// <summary>
+        /// This builds the Xml document used for the XML cache
+        /// </summary>
+        /// <returns></returns>
+        XmlDocument BuildXmlCache();
+
         /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all documents
         /// </summary>
@@ -109,29 +140,46 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Used to bulk update the permissions set for a content item. This will replace all permissions
-        /// assigned to an entity with a list of user id & permission pairs.
+        /// assigned to an entity with a list of user group id & permission pairs.
         /// </summary>
         /// <param name="permissionSet"></param>
         void ReplaceContentPermissions(EntityPermissionSet permissionSet);
 
         /// <summary>
-        /// Assigns a single permission to the current content item for the specified user ids
+        /// Assigns a single permission to the current content item for the specified user group ids
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>
-        /// <param name="userIds"></param>
-        void AssignContentPermission(IContent entity, char permission, IEnumerable<int> userIds);
+        /// <param name="groupIds"></param>
+        void AssignContentPermission(IContent entity, char permission, IEnumerable<int> groupIds);
 
         /// <summary>
-        /// Gets the list of permissions for the content item
+        /// Returns implicit/inherited permissions assigned to the content item for all user groups
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        IEnumerable<EntityPermission> GetPermissionsForEntity(IContent content);
+        EntityPermissionCollection GetPermissionsForEntity(IContent content);
 
         bool SendToPublication(IContent content, int userId = 0);
 
         IEnumerable<IContent> GetByIds(IEnumerable<int> ids);
+        IEnumerable<IContent> GetByIds(IEnumerable<Guid> ids);
+
+        /// <summary>
+        /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
+        /// that this Content should based on.
+        /// </summary>
+        /// <remarks>
+        /// Note that using this method will simply return a new IContent without any identity
+        /// as it has not yet been persisted. It is intended as a shortcut to creating new content objects
+        /// that does not invoke a save operation against the database.
+        /// </remarks>
+        /// <param name="name">Name of the Content object</param>
+        /// <param name="parentId">Id of Parent for the new Content</param>
+        /// <param name="contentTypeAlias">Alias of the <see cref="IContentType"/></param>
+        /// <param name="userId">Optional id of the user creating the content</param>
+        /// <returns><see cref="IContent"/></returns>
+        IContent CreateContent(string name, Guid parentId, string contentTypeAlias, int userId = 0);
 
         /// <summary>
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
@@ -237,7 +285,7 @@ namespace Umbraco.Core.Services
         [Obsolete("Use the overload with 'long' parameter types instead")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         IEnumerable<IContent> GetPagedDescendants(int id, int pageIndex, int pageSize, out int totalRecords,
-            string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by Parent Id
@@ -251,7 +299,7 @@ namespace Umbraco.Core.Services
         /// <param name="filter">Search text filter</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
-            string orderBy = "Path", Direction orderDirection = Direction.Ascending, string filter = "");
+            string orderBy = "path", Direction orderDirection = Direction.Ascending, string filter = "");
 
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by Parent Id
@@ -269,11 +317,34 @@ namespace Umbraco.Core.Services
             string orderBy, Direction orderDirection, bool orderBySystemField, string filter);
 
         /// <summary>
+        /// Gets a collection of <see cref="IContent"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Descendants from</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter"></param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalRecords,
+            string orderBy, Direction orderDirection, bool orderBySystemField, IQuery<IContent> filter);
+
+        /// <summary>
         /// Gets a collection of an <see cref="IContent"/> objects versions by its Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetVersions(int id);
+
+        /// <summary>
+        /// Gets a list of all version Ids for the given content item ordered so latest is first
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="maxRows">The maximum number of rows to return</param>
+        /// <returns></returns>
+        IEnumerable<Guid> GetVersionIds(int id, int maxRows);
 
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects, which reside at the first level / root
@@ -322,6 +393,14 @@ namespace Umbraco.Core.Services
         /// <param name="contentTypeId">Id of the <see cref="IContentType"/></param>
         /// <param name="userId">Optional Id of the user issueing the delete operation</param>
         void DeleteContentOfType(int contentTypeId, int userId = 0);
+
+        /// <summary>
+        /// Deletes all content of the specified types. All Descendants of deleted content that is not of these types is moved to Recycle Bin.
+        /// </summary>
+        /// <remarks>This needs extra care and attention as its potentially a dangerous and extensive operation</remarks>
+        /// <param name="contentTypeIds">Ids of the <see cref="IContentType"/>s</param>
+        /// <param name="userId">Optional Id of the user issueing the delete operation</param>
+        void DeleteContentOfTypes(IEnumerable<int> contentTypeIds, int userId = 0);
 
         /// <summary>
         /// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.
@@ -566,6 +645,20 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents"></param>
         /// <returns>True if sorting succeeded, otherwise False</returns>
         bool Sort(IEnumerable<IContent> items, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Sorts a collection of <see cref="IContent"/> objects by updating the SortOrder according
+        /// to the ordering of node Ids passed in.
+        /// </summary>
+        /// <remarks>
+        /// Using this method will ensure that the Published-state is maintained upon sorting
+        /// so the cache is updated accordingly - as needed.
+        /// </remarks>
+        /// <param name="ids"></param>
+        /// <param name="userId"></param>
+        /// <param name="raiseEvents"></param>
+        /// <returns>True if sorting succeeded, otherwise False</returns>
+        bool Sort(int[] ids, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Gets the parent of the current content as an <see cref="IContent"/> item.

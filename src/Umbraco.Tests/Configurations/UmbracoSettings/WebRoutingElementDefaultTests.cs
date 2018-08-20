@@ -28,5 +28,11 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.IsTrue(SettingsSection.WebRouting.DisableFindContentByIdPath == false);
         }
+
+        [Test]
+        public void DisableRedirectUrlTracking()
+        {
+            Assert.IsTrue(SettingsSection.WebRouting.DisableRedirectUrlTracking == false);
+        }
     }
 }

@@ -41,6 +41,10 @@ namespace umbraco.cms.businesslogic.propertytype
 
         #endregion
 
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -50,28 +54,31 @@ namespace umbraco.cms.businesslogic.propertytype
 
         public PropertyType(int id)
         {
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                "Select mandatory, DataTypeId, propertyTypeGroupId, ContentTypeId, sortOrder, alias, name, validationRegExp, description from cmsPropertyType where id=@id",
-                SqlHelper.CreateParameter("@id", id)))
+            var found = ApplicationContext.Current.DatabaseContext.Database
+                .SingleOrDefault<dynamic>(
+                    "Select mandatory as mandatory, dataTypeId as dataTypeId, propertyTypeGroupId as propertyTypeGroupId, contentTypeId as contentTypeId, sortOrder as sortOrder, alias as alias, name as name, validationRegExp as validationRegExp, description as description from cmsPropertyType where id=@id",
+                    new {id = id});
+
+            if (found == null)
+                throw new ArgumentException("Propertytype with id: " + id + " doesnt exist!");
+
+            _mandatory = found.mandatory;
+            _id = id;
+
+            if (found.propertyTypeGroupId != null)
             {
-                if (!dr.Read())
-                    throw new ArgumentException("Propertytype with id: " + id + " doesnt exist!");
-                _mandatory = dr.GetBoolean("mandatory");
-                _id = id;
-                if (!dr.IsNull("propertyTypeGroupId"))
-                {
-                    _propertyTypeGroup = dr.GetInt("propertyTypeGroupId");
-                    //TODO: Remove after refactoring!
-                    _tabId = _propertyTypeGroup;
-                }
-                _sortOrder = dr.GetInt("sortOrder");
-                _alias = dr.GetString("alias");
-                _name = dr.GetString("Name");
-                _validationRegExp = dr.GetString("validationRegExp");
-                _DataTypeId = dr.GetInt("DataTypeId");
-                _contenttypeid = dr.GetInt("contentTypeId");
-                _description = dr.GetString("description");
+                _propertyTypeGroup = found.propertyTypeGroupId;
+                //TODO: Remove after refactoring!
+                _tabId = _propertyTypeGroup;
             }
+
+            _sortOrder = found.sortOrder;
+            _alias = found.alias;
+            _name = found.name;
+            _validationRegExp = found.validationRegExp;
+            _DataTypeId = found.dataTypeId;
+            _contenttypeid = found.contentTypeId;
+            _description = found.description;
         }
 
         #endregion
@@ -84,9 +91,9 @@ namespace umbraco.cms.businesslogic.propertytype
             set
             {
                 _DataTypeId = value.Id;
-                InvalidateCache();
-                SqlHelper.ExecuteNonQuery(
-                    "Update cmsPropertyType set DataTypeId = " + value.Id + " where id=" + Id);
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery(
+                        "Update cmsPropertyType set DataTypeId = " + value.Id + " where id=" + Id);
             }
         }
 
@@ -110,7 +117,6 @@ namespace umbraco.cms.businesslogic.propertytype
             {
                 _tabId = value;
                 PropertyTypeGroup = value;
-                InvalidateCache();
             }
         }
 
@@ -125,9 +131,11 @@ namespace umbraco.cms.businesslogic.propertytype
                 {
                     dbPropertyTypeGroup = DBNull.Value;
                 }
-                SqlHelper.ExecuteNonQuery("Update cmsPropertyType set propertyTypeGroupId = @propertyTypeGroupId where id = @id",
-                              SqlHelper.CreateParameter("@propertyTypeGroupId", dbPropertyTypeGroup),
-                              SqlHelper.CreateParameter("@id", Id));
+
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("Update cmsPropertyType set propertyTypeGroupId = @propertyTypeGroupId where id = @id",
+                              sqlHelper.CreateParameter("@propertyTypeGroupId", dbPropertyTypeGroup),
+                              sqlHelper.CreateParameter("@id", Id));
             }
         }
 
@@ -137,11 +145,10 @@ namespace umbraco.cms.businesslogic.propertytype
             set
             {
                 _mandatory = value;
-                InvalidateCache();
-                SqlHelper.ExecuteNonQuery(
-                    "Update cmsPropertyType set mandatory = @mandatory where id = @id",
-                    SqlHelper.CreateParameter("@mandatory", value),
-                    SqlHelper.CreateParameter("@id", Id));
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("Update cmsPropertyType set mandatory = @mandatory where id = @id",
+                        sqlHelper.CreateParameter("@mandatory", value),
+                        sqlHelper.CreateParameter("@id", Id));
             }
         }
 
@@ -151,10 +158,9 @@ namespace umbraco.cms.businesslogic.propertytype
             set
             {
                 _validationRegExp = value;
-                InvalidateCache();
-                SqlHelper.ExecuteNonQuery(
-                    "Update cmsPropertyType set validationRegExp = @validationRegExp where id = @id",
-                    SqlHelper.CreateParameter("@validationRegExp", value), SqlHelper.CreateParameter("@id", Id));
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("Update cmsPropertyType set validationRegExp = @validationRegExp where id = @id",
+                        sqlHelper.CreateParameter("@validationRegExp", value), sqlHelper.CreateParameter("@id", Id));
             }
         }
 
@@ -188,11 +194,10 @@ namespace umbraco.cms.businesslogic.propertytype
             set
             {
                 _description = value;
-                InvalidateCache();
-                SqlHelper.ExecuteNonQuery(
-                    "Update cmsPropertyType set description = @description where id = @id",
-                    SqlHelper.CreateParameter("@description", value),
-                    SqlHelper.CreateParameter("@id", Id));
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("Update cmsPropertyType set description = @description where id = @id",
+                        sqlHelper.CreateParameter("@description", value),
+                        sqlHelper.CreateParameter("@id", Id));
             }
         }
 
@@ -202,11 +207,10 @@ namespace umbraco.cms.businesslogic.propertytype
             set
             {
                 _sortOrder = value;
-                InvalidateCache();
-                SqlHelper.ExecuteNonQuery(
-                    "Update cmsPropertyType set sortOrder = @sortOrder where id = @id",
-                    SqlHelper.CreateParameter("@sortOrder", value),
-                    SqlHelper.CreateParameter("@id", Id));
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("Update cmsPropertyType set sortOrder = @sortOrder where id = @id",
+                        sqlHelper.CreateParameter("@sortOrder", value),
+                        sqlHelper.CreateParameter("@id", Id));
             }
         }
 
@@ -216,10 +220,10 @@ namespace umbraco.cms.businesslogic.propertytype
             set
             {
                 _alias = value;
-                InvalidateCache();
-                SqlHelper.ExecuteNonQuery("Update cmsPropertyType set alias = @alias where id= @id",
-                                          SqlHelper.CreateParameter("@alias", Casing.SafeAliasWithForcingCheck(_alias)),
-                                          SqlHelper.CreateParameter("@id", Id));
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery("Update cmsPropertyType set alias = @alias where id= @id",
+                        sqlHelper.CreateParameter("@alias", Casing.SafeAliasWithForcingCheck(_alias)),
+                        sqlHelper.CreateParameter("@id", Id));
             }
         }
 
@@ -252,11 +256,11 @@ namespace umbraco.cms.businesslogic.propertytype
             set
             {
                 _name = value;
-                InvalidateCache();
-                SqlHelper.ExecuteNonQuery(
-                    "UPDATE cmsPropertyType SET name=@name WHERE id=@id",
-                    SqlHelper.CreateParameter("@name", _name),
-                    SqlHelper.CreateParameter("@id", Id));
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery(
+                        "UPDATE cmsPropertyType SET name=@name WHERE id=@id",
+                        sqlHelper.CreateParameter("@name", _name),
+                        sqlHelper.CreateParameter("@id", Id));
             }
         }
 
@@ -289,17 +293,18 @@ namespace umbraco.cms.businesslogic.propertytype
             try
             {
                 // The method is synchronized, but we'll still look it up with an additional parameter (alias)
-                SqlHelper.ExecuteNonQuery(
-                    "INSERT INTO cmsPropertyType (DataTypeId, ContentTypeId, alias, name) VALUES (@DataTypeId, @ContentTypeId, @alias, @name)",
-                    SqlHelper.CreateParameter("@DataTypeId", dt.Id),
-                    SqlHelper.CreateParameter("@ContentTypeId", ct.Id),
-                    SqlHelper.CreateParameter("@alias", alias),
-                    SqlHelper.CreateParameter("@name", name));
-                pt =
-                    new PropertyType(
-                        SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsPropertyType WHERE alias=@alias",
-                                                     SqlHelper.CreateParameter("@alias", alias)));
-            }
+                using (var sqlHelper = Application.SqlHelper)
+                    sqlHelper.ExecuteNonQuery(
+                        "INSERT INTO cmsPropertyType (DataTypeId, ContentTypeId, alias, name) VALUES (@DataTypeId, @ContentTypeId, @alias, @name)",
+                        sqlHelper.CreateParameter("@DataTypeId", dt.Id),
+                        sqlHelper.CreateParameter("@ContentTypeId", ct.Id),
+                        sqlHelper.CreateParameter("@alias", alias),
+                        sqlHelper.CreateParameter("@name", name));
+
+                using (var sqlHelper = Application.SqlHelper)
+                    pt = new PropertyType(sqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsPropertyType WHERE alias=@alias",
+                            sqlHelper.CreateParameter("@alias", alias)));
+                }
             finally
             {
                 // Clear cached items
@@ -317,16 +322,17 @@ namespace umbraco.cms.businesslogic.propertytype
         public static IEnumerable<PropertyType> GetPropertyTypes()
         {
             var result = new List<PropertyType>();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader("select id from cmsPropertyType order by Name"))
+
+            var propertyTypeIds = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                "select id from cmsPropertyType order by Name");
+
+            foreach (var propertyTypeId in propertyTypeIds)
             {
-                while (dr.Read())
-                {
-                    PropertyType pt = GetPropertyType(dr.GetInt("id"));
-                    if (pt != null)
-                        result.Add(pt);
-                }
+                PropertyType pt = GetPropertyType(propertyTypeId);
+                if (pt != null)
+                    result.Add(pt);
             }
+            
             return result;
         }
 
@@ -338,17 +344,17 @@ namespace umbraco.cms.businesslogic.propertytype
 		public static IEnumerable<PropertyType> GetPropertyTypesByGroup(int groupId)
         {
             var result = new List<PropertyType>();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader("SELECT id FROM cmsPropertyType WHERE propertyTypeGroupId = @groupId order by SortOrder",
-                    SqlHelper.CreateParameter("@groupId", groupId)))
+
+            var propertyTypeIds = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                "SELECT id FROM cmsPropertyType WHERE propertyTypeGroupId = @groupId order by SortOrder", new {groupId = groupId});
+
+            foreach (var propertyTypeId in propertyTypeIds)
             {
-                while (dr.Read())
-                {
-                    PropertyType pt = GetPropertyType(dr.GetInt("id"));
-                    if (pt != null)
-                        result.Add(pt);
-                }
+                PropertyType pt = GetPropertyType(propertyTypeId);
+                if (pt != null)
+                    result.Add(pt);
             }
+            
             return result;
         }
 
@@ -360,19 +366,18 @@ namespace umbraco.cms.businesslogic.propertytype
         public static IEnumerable<PropertyType> GetByDataTypeDefinition(int dataTypeDefId)
         {
             var result = new List<PropertyType>();
-            using (IRecordsReader dr =
-                SqlHelper.ExecuteReader(
-                    "select id, Name from cmsPropertyType where dataTypeId=@dataTypeId order by Name",
-                    SqlHelper.CreateParameter("@dataTypeId", dataTypeDefId)))
+
+            var propertyTypeIds = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                "select id from cmsPropertyType where dataTypeId=@dataTypeId order by Name", new {dataTypeId = dataTypeDefId});
+
+            foreach (var propertyTypeId in propertyTypeIds)
             {
-                while (dr.Read())
-                {
-                    PropertyType pt = GetPropertyType(dr.GetInt("id"));
-                    if (pt != null)
-                        result.Add(pt);
-                }
+                PropertyType pt = GetPropertyType(propertyTypeId);
+                if (pt != null)
+                    result.Add(pt);
             }
-            return result.ToList();
+            
+            return result;
         }
 
         public void delete()
@@ -384,15 +389,16 @@ namespace umbraco.cms.businesslogic.propertytype
             CleanPropertiesOnDeletion(_contenttypeid);
 
             //delete tag refs
-            SqlHelper.ExecuteNonQuery("Delete from cmsTagRelationship where propertyTypeId = " + Id);
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("Delete from cmsTagRelationship where propertyTypeId = " + Id);
 
             // Delete PropertyType ..
-            SqlHelper.ExecuteNonQuery("Delete from cmsPropertyType where id = " + Id);
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("Delete from cmsPropertyType where id = " + Id);
 
 
             // delete cache from either master (via tabid) or current contentype
             FlushCacheBasedOnTab();
-            InvalidateCache();
         }
 
         public void FlushCacheBasedOnTab()
@@ -416,17 +422,19 @@ namespace umbraco.cms.businesslogic.propertytype
 
             //Initially Content.getContentOfContentType() was called, but because this doesn't include members we resort to sql lookups and deletes
             var tmp = new List<int>();
-            IRecordsReader dr = SqlHelper.ExecuteReader("SELECT nodeId FROM cmsContent INNER JOIN umbracoNode ON cmsContent.nodeId = umbracoNode.id WHERE ContentType = " + contentTypeId + " ORDER BY umbracoNode.text ");
-            while (dr.Read()) tmp.Add(dr.GetInt("nodeId"));
-            dr.Close();
-
-            foreach (var contentId in tmp)
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader dr = sqlHelper.ExecuteReader("SELECT nodeId FROM cmsContent INNER JOIN umbracoNode ON cmsContent.nodeId = umbracoNode.id WHERE ContentType = @contentTypeId ORDER BY umbracoNode.text", sqlHelper.CreateParameter("contentTypeId", contentTypeId)))
             {
-                SqlHelper.ExecuteNonQuery("DELETE FROM cmsPropertyData WHERE PropertyTypeId =" + this.Id + " AND contentNodeId = " + contentId);
-            }
+                while (dr.Read()) tmp.Add(dr.GetInt("nodeId"));
 
-            // invalidate content type cache
-            ContentType.FlushFromCache(contentTypeId);
+                foreach (var contentId in tmp)
+                {
+                    sqlHelper.ExecuteNonQuery("DELETE FROM cmsPropertyData WHERE PropertyTypeId =" + this.Id + " AND contentNodeId = " + contentId);
+                }
+
+                // invalidate content type cache
+                ContentType.FlushFromCache(contentTypeId);
+            }
         }
 
         public IDataType GetEditControl(object value, bool isPostBack)
@@ -457,8 +465,6 @@ namespace umbraco.cms.businesslogic.propertytype
 
         protected virtual void FlushCache()
         {
-            // clear local cache
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(GetCacheKey(Id));
 
             // clear cache in contentype
             ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.ContentTypePropertiesCacheKey + _contenttypeid);
@@ -475,31 +481,9 @@ namespace umbraco.cms.businesslogic.propertytype
 
         public static PropertyType GetPropertyType(int id)
         {
-            return ApplicationContext.Current.ApplicationCache.RuntimeCache.GetCacheItem<PropertyType>(
-                GetCacheKey(id),
-                timeout:        TimeSpan.FromMinutes(30),
-                getCacheItem: () =>
-                {
-                    try
-                    {
-                        return new PropertyType(id);
-                    }
-                    catch
-                    {
-                        return null;
-                    }
-                });
+            return new PropertyType(id);
         }
-
-        private void InvalidateCache()
-        {
-            ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(GetCacheKey(Id));
-        }
-
-        private static string GetCacheKey(int id)
-        {
-            return CacheKeys.PropertyTypeCacheKey + id;
-        }
+        
 
         #endregion
     }

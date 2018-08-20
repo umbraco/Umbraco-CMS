@@ -51,12 +51,41 @@ namespace UmbracoExamine
         /// </summary>
         public override string Name
         {
-            get
-            {
-                return _name;
-            }
+            get { return _name; }
+        }
+        
+        /// <summary>
+        /// Constructor to allow for creating an indexer at runtime
+        /// </summary>
+        /// <param name="indexPath"></param>
+        /// <param name="analyzer"></param>
+
+        public UmbracoExamineSearcher(DirectoryInfo indexPath, Analyzer analyzer)
+            : base(indexPath, analyzer)
+        {
         }
 
+        /// <summary>
+        /// Constructor to allow for creating an indexer at runtime
+        /// </summary>
+        /// <param name="luceneDirectory"></param>
+        /// <param name="analyzer"></param>
+        public UmbracoExamineSearcher(Lucene.Net.Store.Directory luceneDirectory, Analyzer analyzer)
+            : base(luceneDirectory, analyzer)
+        {
+        }
+
+        /// <summary>
+        /// Creates an NRT searcher
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <param name="analyzer"></param>
+        public UmbracoExamineSearcher(IndexWriter writer, Analyzer analyzer) 
+            : base(writer, analyzer)
+        {
+        }
+
+        #endregion
 
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
@@ -73,7 +102,12 @@ namespace UmbracoExamine
 
             base.Initialize(name, config);
 
-            if (config != null && config["useTempStorage"] != null)
+            //NOTES: useTempStorage is obsolete, tempStorageDirectory is obsolete, both have been superceded by Examine Core's IDirectoryFactory
+            //       tempStorageDirectory never actually got finished in Umbraco Core but accidentally got shipped (it's only enabled on the searcher
+            //       and not the indexer). So this whole block is just legacy
+
+            //detect if a dir factory has been specified, if so then useTempStorage will not be used (deprecated)
+            if (config != null && config["directoryFactory"] == null && config["useTempStorage"] != null)
             {
                 //Use the temp storage directory which will store the index in the local/codegen folder, this is useful
                 // for websites that are running from a remove file server and file IO latency becomes an issue
@@ -109,30 +143,6 @@ namespace UmbracoExamine
                 }
             }
         }
-
-        /// <summary>
-        /// Constructor to allow for creating an indexer at runtime
-        /// </summary>
-        /// <param name="indexPath"></param>
-        /// <param name="analyzer"></param>
-
-        public UmbracoExamineSearcher(DirectoryInfo indexPath, Analyzer analyzer)
-            : base(indexPath, analyzer)
-        {
-        }
-
-        /// <summary>
-        /// Constructor to allow for creating an indexer at runtime
-        /// </summary>
-        /// <param name="luceneDirectory"></param>
-        /// <param name="analyzer"></param>
-
-        public UmbracoExamineSearcher(Lucene.Net.Store.Directory luceneDirectory, Analyzer analyzer)
-            : base(luceneDirectory, analyzer)
-        {
-        }
-
-        #endregion
 
         /// <summary>
         /// Used for unit tests

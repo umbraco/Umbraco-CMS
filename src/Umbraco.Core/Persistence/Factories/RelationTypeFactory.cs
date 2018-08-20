@@ -9,16 +9,26 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IRelationType BuildEntity(RelationTypeDto dto)
         {
-            var entity = new RelationType(dto.ChildObjectType, dto.ParentObjectType, dto.Alias)
+            var entity = new RelationType(dto.ChildObjectType, dto.ParentObjectType, dto.Alias);
+
+            try
             {
-                Id = dto.Id,
-                IsBidirectional = dto.Dual,
-                Name = dto.Name
-            };
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            entity.ResetDirtyProperties(false);
-            return entity;
+                entity.DisableChangeTracking();
+
+                entity.Id = dto.Id;
+                entity.Key = dto.UniqueId;
+                entity.IsBidirectional = dto.Dual;
+                entity.Name = dto.Name;
+
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                entity.ResetDirtyProperties(false);
+                return entity;
+            }
+            finally
+            {
+                entity.EnableChangeTracking();
+            }
         }
 
         public RelationTypeDto BuildDto(IRelationType entity)
@@ -29,10 +39,13 @@ namespace Umbraco.Core.Persistence.Factories
                 ChildObjectType = entity.ChildObjectType,
                 Dual = entity.IsBidirectional,
                 Name = entity.Name,
-                ParentObjectType = entity.ParentObjectType
+                ParentObjectType = entity.ParentObjectType,
+                UniqueId = entity.Key
             };
             if (entity.HasIdentity)
+            {
                 dto.Id = entity.Id;
+            }
 
             return dto;
         }

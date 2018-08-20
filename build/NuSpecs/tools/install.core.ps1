@@ -53,7 +53,6 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\umbraco.providers.dll) { Remove-Item $umbracoBinFolder\umbraco.providers.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Umbraco.Web.UI.dll) { Remove-Item $umbracoBinFolder\Umbraco.Web.UI.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\UmbracoExamine.dll) { Remove-Item $umbracoBinFolder\UmbracoExamine.dll -Force -Confirm:$false }
-		if(Test-Path $umbracoBinFolder\UrlRewritingNet.UrlRewriter.dll) { Remove-Item $umbracoBinFolder\UrlRewritingNet.UrlRewriter.dll -Force -Confirm:$false }
 		
 		# Delete files Umbraco depends upon
 		$amd64Folder = Join-Path $umbracoBinFolder "amd64"
@@ -71,6 +70,7 @@ if ($project) {
 		if(Test-Path $umbracoBinFolder\ImageProcessor.dll) { Remove-Item $umbracoBinFolder\ImageProcessor.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\ImageProcessor.Web.dll) { Remove-Item $umbracoBinFolder\ImageProcessor.Web.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Lucene.Net.dll) { Remove-Item $umbracoBinFolder\Lucene.Net.dll -Force -Confirm:$false }
+		if(Test-Path $umbracoBinFolder\Microsoft.IO.RecyclableMemoryStream.dll) { Remove-Item $umbracoBinFolder\Microsoft.IO.RecyclableMemoryStream.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.AspNet.Identity.Core.dll) { Remove-Item $umbracoBinFolder\Microsoft.AspNet.Identity.Core.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.AspNet.Identity.Owin.dll) { Remove-Item $umbracoBinFolder\Microsoft.AspNet.Identity.Owin.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.CodeAnalysis.CSharp.dll) { Remove-Item $umbracoBinFolder\Microsoft.CodeAnalysis.CSharp.dll -Force -Confirm:$false }

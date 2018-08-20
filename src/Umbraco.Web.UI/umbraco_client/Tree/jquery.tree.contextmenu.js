@@ -48,7 +48,7 @@
                     if (opts.items[i].separator_before === true) str += "<li class='separator'><span>&nbsp;</span></li>";
                     str += '<li><a href="#" rel="' + i + '" class="' + i + ' ' + (r == 0 ? 'disabled' : '') + '">';
 
-                    // updated from patch by Matt Brailsford (http://our.umbraco.org/forum/using/ui-questions/6225-Custom-icon-in-Context-menu#comment39514)
+                    // updated from patch by Matt Brailsford (https://our.umbraco.com/forum/using/ui-questions/6225-Custom-icon-in-Context-menu#comment39514)
                     str += "<ins> </ins>"; str += "<span>";
                     if (opts.items[i].icon && opts.items[i].icon.indexOf("/") >= 0) {
                         str += "<div class=\"menuSpr\" style=\"background:transparent url('" + opts.items[i].icon + "') center center no-repeat;\"></div><div class='menuLabel'>" + opts.items[i].label + "</div>";
@@ -122,6 +122,7 @@
     $(function () {
         $.tree.plugins.contextmenu.object.hide().appendTo("body");
         $("a", $.tree.plugins.contextmenu.object[0])
+            //has to be .live, do not change to .on, it doesn't work
 			.live("click", function (event) {
 			    if (!$(this).hasClass("disabled")) {
 			        $.tree.plugins.contextmenu.exec.apply(null, [$(this).attr("rel")]);

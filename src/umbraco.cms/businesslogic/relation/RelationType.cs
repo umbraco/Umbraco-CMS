@@ -23,12 +23,7 @@ namespace umbraco.cms.businesslogic.relation
 	    internal IRelationType RelationTypeEntity;
 
 		#endregion
-
-        private static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
+        
 		#region Constructors
 
 	    /// <summary>

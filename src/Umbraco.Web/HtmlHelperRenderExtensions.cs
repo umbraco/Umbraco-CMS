@@ -883,10 +883,6 @@ namespace Umbraco.Web
 		{
 			var item = html.Wrap(tag, innerText, anonymousAttributes, children);
 			item.Visible = visible;
-			foreach (var child in children)
-			{
-				item.AddChild(child);
-			}
 			return item;
 		}
 

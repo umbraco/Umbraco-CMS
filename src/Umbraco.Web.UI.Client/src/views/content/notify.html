@@ -1,0 +1,44 @@
+<div ng-controller="Umbraco.Editors.Content.CreateNotifyController as vm">
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+    <div class="umb-pane" ng-show="!vm.loading">
+        <form name="notifyForm"
+              novalidate
+              val-form-manager>
+            <div ng-show="vm.saveError" ng-cloak>
+                <div class="alert alert-error">
+                    <div><strong>{{vm.saveError.errorMsg}}</strong></div>
+                    <div>{{vm.saveError.data.message}}</div>
+                </div>
+            </div>
+            <div ng-show="vm.saveSuccces" ng-cloak>
+                <div class="alert alert-success">
+                    <localize key="notify_notificationsSavedFor"></localize><strong> {{currentNode.name}}</strong>
+                </div>
+            </div>
+            <div ng-cloak>
+                <div class="block-form" ng-show="!vm.loading">
+                    <h5><localize key="notify_notifySet">Set your notification for</localize> {{ currentNode.name }}</h5>
+                    <umb-control-group>
+                        <umb-permission ng-repeat="option in vm.notifyOptions"
+                                        name="option.name"
+                                        description="option.description"
+                                        selected="option.checked">
+                        </umb-permission>
+                    </umb-control-group>
+                </div>
+            </div>
+            <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+                <umb-button label-key="general_cancel"
+                            action="vm.cancel()"
+                            type="button"
+                            button-style="link">
+                </umb-button>
+                <umb-button label-key="buttons_save"
+                            type="button"
+                            action="vm.save(vm.notifyOptions)"
+                            button-style="success">
+                </umb-button>
+            </div>
+        </form>
+    </div>
+</div>

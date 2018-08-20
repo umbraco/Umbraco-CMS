@@ -109,10 +109,39 @@ namespace Umbraco.Core.Models
             IsApproved = true;
         }
 
-        private static readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Username);
-        private static readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Email);
-        private static readonly PropertyInfo PasswordSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.RawPasswordValue);
-        private static readonly PropertyInfo ProviderUserKeySelector = ExpressionHelper.GetPropertyInfo<Member, object>(x => x.ProviderUserKey);
+        /// <summary>
+        /// Constructor for creating a Member object
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="email"></param>
+        /// <param name="username"></param>
+        /// <param name="rawPasswordValue">
+        /// The password value passed in to this parameter should be the encoded/encrypted/hashed format of the member's password
+        /// </param>
+        /// <param name="contentType"></param>
+        /// <param name="isApproved"></param>
+        public Member(string name, string email, string username, string rawPasswordValue, IMemberType contentType, bool isApproved)
+            : base(name, -1, contentType, new PropertyCollection())
+        {
+            Mandate.ParameterNotNull(contentType, "contentType");
+
+            _contentTypeAlias = contentType.Alias;
+            _contentType = contentType;
+            _email = email;
+            _username = username;
+            _rawPasswordValue = rawPasswordValue;
+            IsApproved = isApproved;
+        }
+
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Username);
+            public readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Email);
+            public readonly PropertyInfo PasswordSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.RawPasswordValue);
+            public readonly PropertyInfo ProviderUserKeySelector = ExpressionHelper.GetPropertyInfo<Member, object>(x => x.ProviderUserKey);
+        }
 
         /// <summary>
         /// Gets or sets the Username
@@ -121,14 +150,7 @@ namespace Umbraco.Core.Models
         public string Username
         {
             get { return _username; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _username = value;
-                    return _username;
-                }, _username, UsernameSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _username, Ps.Value.UsernameSelector); }
         }
 
         /// <summary>
@@ -138,14 +160,7 @@ namespace Umbraco.Core.Models
         public string Email
         {
             get { return _email; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _email = value;
-                    return _email;
-                }, _email, EmailSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _email, Ps.Value.EmailSelector); }
         }
 
         /// <summary>
@@ -157,11 +172,16 @@ namespace Umbraco.Core.Models
             get { return _rawPasswordValue; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
+                if (value == null)
                 {
-                    _rawPasswordValue = value;
-                    return _rawPasswordValue;
-                }, _rawPasswordValue, PasswordSelector);
+                    //special case, this is used to ensure that the password is not updated when persisting, in this case
+                    //we don't want to track changes either
+                    _rawPasswordValue = null;
+                }
+                else
+                {
+                    SetPropertyValueAndDetectChanges(value, ref _rawPasswordValue, Ps.Value.PasswordSelector);
+                }
             }
         }
 
@@ -490,14 +510,7 @@ namespace Umbraco.Core.Models
             {
                 return _providerUserKey;
             }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _providerUserKey = value;
-                    return _providerUserKey;
-                }, _providerUserKey, ProviderUserKeySelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _providerUserKey, Ps.Value.ProviderUserKeySelector); }
         }
 
       

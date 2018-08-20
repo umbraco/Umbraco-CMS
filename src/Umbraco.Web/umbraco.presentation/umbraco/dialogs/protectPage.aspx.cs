@@ -133,19 +133,21 @@ namespace umbraco.presentation.umbraco.dialogs
             _memberGroups.ID = "Membergroups";
             _memberGroups.Width = 175;
             var selectedGroups = "";
-            var roles = Roles.GetAllRoles().OrderBy(x => x);
 
-            if (roles.Any())
+            // get roles from the membership provider
+            var roles = Roles.GetAllRoles().OrderBy(x => x).ToArray();
+
+            if (roles.Length > 0)
             {
-                foreach (string role in roles)
+                foreach (var role in roles)
                 {
-                    ListItem li = new ListItem(role, role);
-                    if (IsPostBack == false)
-                    {
-                        if (Access.IsProtectedByMembershipRole(int.Parse(helper.Request("nodeid")), role))
-                            selectedGroups += role + ",";
-                    }
-                    _memberGroups.Items.Add(li);
+                    var listItem = new ListItem(role, role);
+                    _memberGroups.Items.Add(listItem);
+                    if (IsPostBack) continue;
+
+                    // first time, initialize selected roles
+                    if (Access.IsProtectedByMembershipRole(documentId, role))
+                        selectedGroups += role + ",";
                 }
             }
             else
@@ -153,6 +155,7 @@ namespace umbraco.presentation.umbraco.dialogs
                 p_noGroupsFound.Visible = true;
                 rb_advanced.Enabled = false;
             }
+
             _memberGroups.Value = selectedGroups;
             groupsSelector.Controls.Add(_memberGroups);
 
@@ -183,7 +186,7 @@ namespace umbraco.presentation.umbraco.dialogs
             SimpleLoginNameValidator.IsValid = true;
 
             var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-            
+
             int pageId = int.Parse(helper.Request("nodeId"));
 
             if (e.CommandName == "simple")

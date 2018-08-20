@@ -1,20 +1,26 @@
 using System;
 using System.Linq;
+using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
+using Lucene.Net.Index;
 using Lucene.Net.Store;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.UmbracoExamine;
 using umbraco.MacroEngines;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Tests.PublishedContent
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     public class LegacyExamineBackedMediaTests : ExamineBaseTest
     {
-        public override void TestSetup()
+        public override void Initialize()
         {
-            base.TestSetup();
+            base.Initialize();
 
             var settings = SettingsForTests.GenerateMockSettings();
             var contentMock = Mock.Get(settings.Content);
@@ -22,22 +28,20 @@ namespace Umbraco.Tests.PublishedContent
             contentMock.Setup(x => x.UmbracoLibraryCacheDuration).Returns(1800);
             SettingsForTests.ConfigureSettings(settings);
         }
-
-        public override void TestTearDown()
-        {
-            SettingsForTests.Reset();
-            base.TestTearDown();
-        }
-
+        
+   
         [Test]
         public void Ensure_Children_Are_Sorted()
         {
-            using (var luceneDir = new RAMDirectory())
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                //var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
                 indexer.RebuildIndex();
 
-                var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
+                //var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var result = searcher.Search(searcher.CreateSearchCriteria().Id(1111).Compile());
                 Assert.IsNotNull(result);
                 Assert.AreEqual(1, result.TotalItemCount);
@@ -47,7 +51,9 @@ namespace Umbraco.Tests.PublishedContent
                 var children = backedMedia.ChildrenAsList.Value;
 
                 var currSort = 0;
-                for (var i = 0; i < children.Count(); i++)
+                Assert.Greater(children.Count, 0);
+
+                for (var i = 0; i < children.Count; i++)
                 {
                     Assert.GreaterOrEqual(children[i].SortOrder, currSort);
                     currSort = children[i].SortOrder;
@@ -59,12 +65,15 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Ensure_Result_Has_All_Values()
         {
-            using (var luceneDir = new RAMDirectory())
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var writer = new IndexWriter(luceneDir, new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29), IndexWriter.MaxFieldLength.LIMITED))
+            using (var indexer = IndexInitializer.GetUmbracoIndexer(writer))
+            using (var searcher = IndexInitializer.GetUmbracoSearcher(writer))
             {
-                var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
+                //var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir);
                 indexer.RebuildIndex();
 
-                var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
+                //var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
                 var result = searcher.Search(searcher.CreateSearchCriteria().Id(1111).Compile());
                 Assert.IsNotNull(result);
                 Assert.AreEqual(1, result.TotalItemCount);

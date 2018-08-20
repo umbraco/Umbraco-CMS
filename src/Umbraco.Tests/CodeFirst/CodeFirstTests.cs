@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -60,7 +61,7 @@ namespace Umbraco.Tests.CodeFirst
 
             var result = SerializationService.ToStream(contentType.Value);
             var json = result.ResultStream.ToJsonString();
-            Console.WriteLine(json);
+            Debug.Print(json);
         }
 
         [Test]
@@ -91,7 +92,7 @@ namespace Umbraco.Tests.CodeFirst
 
             var result = SerializationService.ToStream(contentType.Value);
             var json = result.ResultStream.ToJsonString();
-            Console.WriteLine(json);
+            Debug.Print(json);
         }
 
         [Test]

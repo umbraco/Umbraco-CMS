@@ -432,20 +432,21 @@ namespace umbraco.cms.businesslogic.web
         public static void RegeneratePreviews()
         {
             XmlDocument xd = new XmlDocument();
-            IRecordsReader dr = SqlHelper.ExecuteReader("select nodeId from cmsDocument");
 
-            while (dr.Read())
+            var nodeIds = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                "select nodeId from cmsDocument");
+
+            foreach (var nodeId in nodeIds)
             {
                 try
                 {
-                    new Document(dr.GetInt("nodeId")).SaveXmlPreview(xd);
+                    new Document(nodeId).SaveXmlPreview(xd);
                 }
                 catch (Exception ee)
                 {
-					LogHelper.Error<Document>("Error generating preview xml", ee);
+                    LogHelper.Error<Document>("Error generating preview xml", ee);
                 }
-            }
-            dr.Close();
+            }            
         }
 
         /// <summary>
@@ -873,18 +874,15 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Don't use! Only used internally to support the legacy events", false)]
         internal IEnumerable<Attempt<PublishStatus>> PublishWithSubs(int userId, bool includeUnpublished)
         {
-            PublishEventArgs e = new PublishEventArgs();
+            var e = new PublishEventArgs();
             FireBeforePublish(e);
 
-            IEnumerable<Attempt<PublishStatus>> publishedResults = Enumerable.Empty<Attempt<PublishStatus>>();
+            if (e.Cancel) return Enumerable.Empty<Attempt<PublishStatus>>();
 
-            if (!e.Cancel)
-            {
-                publishedResults = ApplicationContext.Current.Services.ContentService
-                    .PublishWithChildrenWithStatus(ContentEntity, userId, includeUnpublished);
+            var publishedResults = ApplicationContext.Current.Services.ContentService
+                .PublishWithChildrenWithStatus(ContentEntity, userId, includeUnpublished);
 
-                FireAfterPublish(e);
-            }
+            FireAfterPublish(e);
 
             return publishedResults;
         }
@@ -892,7 +890,6 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Don't use! Only used internally to support the legacy events", false)]
         internal Attempt<PublishStatus> SaveAndPublish(int userId)
         {
-            var result = Attempt.Fail(new PublishStatus(ContentEntity, PublishStatusType.FailedCancelledByEvent, new EventMessages()));
             foreach (var property in GenericProperties)
             {
                 ContentEntity.SetValue(property.PropertyType.Alias, property.Value);
@@ -900,32 +897,28 @@ namespace umbraco.cms.businesslogic.web
 
             var saveArgs = new SaveEventArgs();
             FireBeforeSave(saveArgs);
+            if (saveArgs.Cancel) return Attempt.Fail(new PublishStatus(ContentEntity, PublishStatusType.FailedCancelledByEvent, new EventMessages()));
 
-            if (!saveArgs.Cancel)
-            {
-                var publishArgs = new PublishEventArgs();
-                FireBeforePublish(publishArgs);
+            var publishArgs = new PublishEventArgs();
+            FireBeforePublish(publishArgs);
+            if (publishArgs.Cancel) return Attempt.Fail(new PublishStatus(ContentEntity, PublishStatusType.FailedCancelledByEvent, new EventMessages()));
 
-                if (!publishArgs.Cancel)
-                {
-                    //NOTE: The 'false' parameter will cause the PublishingStrategy events to fire which will ensure that the cache is refreshed.
-                    result = ApplicationContext.Current.Services.ContentService
-                        .SaveAndPublishWithStatus(ContentEntity, userId);
-                    base.VersionDate = ContentEntity.UpdateDate;
-                    this.UpdateDate = ContentEntity.UpdateDate;
+            //NOTE: The 'false' parameter will cause the PublishingStrategy events to fire which will ensure that the cache is refreshed.
+            var result = ApplicationContext.Current.Services.ContentService
+                .SaveAndPublishWithStatus(ContentEntity, userId);
+            VersionDate = ContentEntity.UpdateDate;
+            UpdateDate = ContentEntity.UpdateDate;
 
-                    //NOTE: This is just going to call the CMSNode Save which will launch into the CMSNode.BeforeSave and CMSNode.AfterSave evenths
-                    // which actually do dick all and there's no point in even having them there but just in case for some insane reason someone
-                    // has bound to those events, I suppose we'll need to keep this here.
-                    base.Save();
+            //NOTE: This is just going to call the CMSNode Save which will launch into the CMSNode.BeforeSave and CMSNode.AfterSave evenths
+            // which actually do dick all and there's no point in even having them there but just in case for some insane reason someone
+            // has bound to those events, I suppose we'll need to keep this here.
+            base.Save();
 
-                    //Launch the After Save event since we're doing 2 things in one operation: Saving and publishing.
-                    FireAfterSave(saveArgs);
+            //Launch the After Save event since we're doing 2 things in one operation: Saving and publishing.
+            FireAfterSave(saveArgs);
 
-                    //Now we need to fire the After publish event
-                    FireAfterPublish(publishArgs);
-                }
-            }
+            //Now we need to fire the After publish event
+            FireAfterPublish(publishArgs);
 
             return result;
         }
@@ -1368,12 +1361,14 @@ namespace umbraco.cms.businesslogic.web
 
             string pathExp = childrenOnly ? Path + ",%" : Path;
 
-            IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(SqlOptimizedForPreview, pathExp));
-            while (dr.Read())
-                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("versionId"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml"), !dr.GetBoolean("published")));
-            dr.Close();
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader dr = sqlHelper.ExecuteReader(String.Format(SqlOptimizedForPreview, pathExp)))
+            {
+                while (dr.Read())
+                    nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("versionId"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml"), !dr.GetBoolean("published")));
 
-            return nodes;
+                return nodes;
+            }
         }
 
         public override XmlNode ToPreviewXml(XmlDocument xd)
@@ -1539,21 +1534,30 @@ namespace umbraco.cms.businesslogic.web
         [MethodImpl(MethodImplOptions.Synchronized)]
         private void saveXml(XmlNode x)
         {
-            bool exists = (SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId=@nodeId",
-                                            SqlHelper.CreateParameter("@nodeId", Id)) != 0);
-            string sql = exists ? "UPDATE cmsContentXml SET xml = @xml WHERE nodeId=@nodeId"
-                                : "INSERT INTO cmsContentXml(nodeId, xml) VALUES (@nodeId, @xml)";
-            SqlHelper.ExecuteNonQuery(sql,
-                                      SqlHelper.CreateParameter("@nodeId", Id),
-                                      SqlHelper.CreateParameter("@xml", x.OuterXml));
+            using (var sqlHelper = Application.SqlHelper)
+            {
+                bool exists = (sqlHelper.ExecuteScalar<int>(
+                                   "SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId=@nodeId",
+                                   sqlHelper.CreateParameter("@nodeId", Id)) != 0);
+                string sql = exists ? "UPDATE cmsContentXml SET xml = @xml WHERE nodeId=@nodeId"
+                                    : "INSERT INTO cmsContentXml(nodeId, xml) VALUES (@nodeId, @xml)";
+           
+                sqlHelper.ExecuteNonQuery(sql,
+                    sqlHelper.CreateParameter("@nodeId", Id),
+                    sqlHelper.CreateParameter("@xml", x.OuterXml));
+            }
         }
 
         private XmlNode importXml()
         {
             XmlDocument xmlDoc = new XmlDocument();
-            XmlReader xmlRdr = SqlHelper.ExecuteXmlReader(string.Format(
-                                                       "select xml from cmsContentXml where nodeID = {0}", Id));
-            xmlDoc.Load(xmlRdr);
+
+            var xmlStr = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
+                "select xml from cmsContentXml where nodeID = @nodeId", new {nodeId = Id});
+
+            if (xmlStr.IsNullOrWhiteSpace()) return null;
+
+            xmlDoc.LoadXml(xmlStr);
 
             return xmlDoc.FirstChild;
         }

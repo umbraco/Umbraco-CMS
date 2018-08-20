@@ -10,6 +10,7 @@ using System;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Xml;
 using umbraco.DataLayer.Utility;
 using Umbraco.Core.Logging;
@@ -343,5 +344,120 @@ namespace umbraco.DataLayer
         { }
 
         #endregion
+
+        #region Evil Reflection
+
+        internal CurrentConnectionUsing UseCurrentConnection
+        {
+            get { return new CurrentConnectionUsing(); }
+        }
+
+        #endregion
     }
+
+    #region Evil Reflection
+
+    internal class CurrentConnectionUsing : IDisposable
+    {
+        private static MethodInfo OpenMethod { get; set; }
+        //private static MethodInfo CloseMethod { get; set; }
+
+        private static readonly object ScopeProvider;
+        private static readonly MethodInfo ScopeProviderAmbientOrNoScopeMethod;
+        private static readonly PropertyInfo ScopeDatabaseProperty;
+        private static readonly PropertyInfo ConnectionProperty;
+        private static readonly FieldInfo TransactionField;
+        private static readonly PropertyInfo InnerConnectionProperty;
+        private static readonly PropertyInfo InnerTransactionProperty;
+        private static readonly object[] NoArgs = new object[0];
+
+        private readonly object _database;
+
+        static CurrentConnectionUsing()
+        {
+            var coreAssembly = Assembly.Load("Umbraco.Core");
+
+            var applicationContextType = coreAssembly.GetType("Umbraco.Core.ApplicationContext");
+            var databaseContextType = coreAssembly.GetType("Umbraco.Core.DatabaseContext");
+            var umbracoDatabaseType = coreAssembly.GetType("Umbraco.Core.Persistence.UmbracoDatabase");
+            var databaseType = coreAssembly.GetType("Umbraco.Core.Persistence.Database");
+            var scopeProviderType = coreAssembly.GetType("Umbraco.Core.Scoping.IScopeProviderInternal");
+            var scopeType = coreAssembly.GetType("Umbraco.Core.Scoping.IScope");
+
+            var applicationContextCurrentProperty = applicationContextType.GetProperty("Current", BindingFlags.Static | BindingFlags.Public);
+            if (applicationContextCurrentProperty == null) throw new Exception("oops: applicationContextCurrentProperty.");
+            var applicationContext = applicationContextCurrentProperty.GetValue(null, NoArgs);
+
+            var applicationContextDatabaseContextProperty = applicationContextType.GetProperty("DatabaseContext", BindingFlags.Instance | BindingFlags.Public);
+            if (applicationContextDatabaseContextProperty == null) throw new Exception("oops: applicationContextDatabaseContextProperty.");
+            var databaseContext = applicationContextDatabaseContextProperty.GetValue(applicationContext, NoArgs);
+
+            var databaseContextScopeProviderField = databaseContextType.GetField("ScopeProvider", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (databaseContextScopeProviderField == null) throw new Exception("oops: databaseContextScopeProviderField.");
+            ScopeProvider = databaseContextScopeProviderField.GetValue(databaseContext);
+
+            ScopeProviderAmbientOrNoScopeMethod = scopeProviderType.GetMethod("GetAmbientOrNoScope", BindingFlags.Instance | BindingFlags.Public);
+            if (ScopeProviderAmbientOrNoScopeMethod == null) throw new Exception("oops: ScopeProviderAmbientOrNoScopeMethod.");
+            ScopeDatabaseProperty = scopeType.GetProperty("Database", BindingFlags.Instance | BindingFlags.Public);
+            if (ScopeDatabaseProperty == null) throw new Exception("oops: ScopeDatabaseProperty.");
+
+            OpenMethod = databaseType.GetMethod("OpenSharedConnection", BindingFlags.Instance | BindingFlags.Public);
+            //CloseMethod = databaseType.GetMethod("CloseSharedConnection", BindingFlags.Instance | BindingFlags.Public);
+
+            ConnectionProperty = umbracoDatabaseType.GetProperty("Connection", BindingFlags.Instance | BindingFlags.Public);
+            TransactionField = databaseType.GetField("_transaction", BindingFlags.Instance | BindingFlags.NonPublic);
+
+            var profilerAssembly = Assembly.Load("MiniProfiler");
+            var profiledDbConnectionType = profilerAssembly.GetType("StackExchange.Profiling.Data.ProfiledDbConnection");
+            InnerConnectionProperty = profiledDbConnectionType.GetProperty("InnerConnection", BindingFlags.Instance | BindingFlags.Public);
+            var profiledDbTransactionType = profilerAssembly.GetType("StackExchange.Profiling.Data.ProfiledDbTransaction");
+            InnerTransactionProperty = profiledDbTransactionType.GetProperty("WrappedTransaction", BindingFlags.Instance | BindingFlags.Public);
+        }
+
+        public CurrentConnectionUsing()
+        {
+            var scope = ScopeProviderAmbientOrNoScopeMethod.Invoke(ScopeProvider, NoArgs);
+            _database = ScopeDatabaseProperty.GetValue(scope);
+
+            var connection = ConnectionProperty.GetValue(_database, NoArgs);
+            // we have to open to make sure that we *do* have a connection
+            if (connection == null)
+                OpenMethod.Invoke(_database, NoArgs);
+        }
+
+        public IDbConnection Connection
+        {
+            get
+            {
+                var connection = ConnectionProperty.GetValue(_database, NoArgs);
+                if (connection == null) return null;
+                var inner = InnerConnectionProperty.GetValue(connection, NoArgs);
+                return inner as IDbConnection;
+            }
+        }
+
+        public IDbTransaction Transaction
+        {
+            get
+            {
+                var transaction = TransactionField.GetValue(_database);
+                if (transaction == null) return null;
+                var inner = InnerTransactionProperty.GetValue(transaction, NoArgs);
+                return inner as IDbTransaction;
+            }
+        }
+
+        public void Dispose()
+        {
+            // this was required when we *always* opened the connection
+            // but now we open it only if it's not opened already and then,
+            // we assume that Core will dispose of it somehow - since it
+            // hasn't been opened twice.
+
+            // we have to close since we have opened
+            //CloseMethod.Invoke(_database, NoArgs);
+        }
+    }
+    
+    #endregion
 }

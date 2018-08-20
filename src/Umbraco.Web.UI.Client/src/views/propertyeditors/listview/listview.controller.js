@@ -20,8 +20,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       getListResultsCallback = contentResource.getPagedResults;
       deleteItemCallback = contentResource.deleteByKey;
       getIdCallback = function (selected) {
-         var selectedKey = getItemKey(selected.id);
-         return selectedKey;
+         return selected.key;
       };
       createEditUrlCallback = function (item) {
          return "/" + $scope.entityType + "/" + $scope.entityType + "/edit/" + item.key + "?page=" + $scope.options.pageNumber + "&listName=" + $scope.contentId;
@@ -53,29 +52,32 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    $scope.isNew = false;
    $scope.actionInProgress = false;
    $scope.selection = [];
-   $scope.folders = [];
+   $scope.folders = [];   
    $scope.listViewResultSet = {
       totalPages: 0,
       items: []
    };
 
-   $scope.currentNodePermissions = {}
+   //when this is null, we don't check permissions
+   $scope.currentNodePermissions = null;
 
-   //Just ensure we do have an editorState
-   if (editorState.current) {
-      //Fetch current node allowed actions for the current user
-      //This is the current node & not each individual child node in the list
-      var currentUserPermissions = editorState.current.allowedActions;
+   if ($scope.entityType === "content") {
+       //Just ensure we do have an editorState
+       if (editorState.current) {
+           //Fetch current node allowed actions for the current user
+           //This is the current node & not each individual child node in the list
+           var currentUserPermissions = editorState.current.allowedActions;
 
-      //Create a nicer model rather than the funky & hard to remember permissions strings
-      $scope.currentNodePermissions = {
-         "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
-         "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
-         "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
-         "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
-         "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
-         "canUnpublish": _.contains(currentUserPermissions, 'U'), //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
-      };
+           //Create a nicer model rather than the funky & hard to remember permissions strings
+           $scope.currentNodePermissions = {
+               "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
+               "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
+               "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
+               "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
+               "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
+               "canUnpublish": _.contains(currentUserPermissions, 'U') //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
+           };
+       }
    }
 
    //when this is null, we don't check permissions
@@ -151,13 +153,21 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
          layouts: $scope.model.config.layouts,
          activeLayout: listViewHelper.getLayout($routeParams.id, $scope.model.config.layouts)
       },
-        orderBySystemField: true,
       allowBulkPublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkPublish,
       allowBulkUnpublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkUnpublish,
       allowBulkCopy: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkCopy,
       allowBulkMove: $scope.model.config.bulkActionPermissions.allowBulkMove,
       allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete
    };
+
+    // Check if selected order by field is actually custom field
+    for (var j = 0; j < $scope.options.includeProperties.length; j++) {
+        var includedProperty = $scope.options.includeProperties[j];
+        if (includedProperty.alias.toLowerCase() === $scope.options.orderBy.toLowerCase()) {
+            $scope.options.orderBySystemField = includedProperty.isSystem === 1;
+            break;
+        }
+    }
 
    //update all of the system includeProperties to enable sorting
    _.each($scope.options.includeProperties, function (e, i) {
@@ -169,62 +179,60 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             e.allowSorting = true;
         }
 
-        // Another special case for lasted edited data/update date for media, again this field isn't available on the base table so we can't sort by it
-        if (e.isSystem && $scope.entityType == "media") {
-            e.allowSorting = e.alias != 'updateDate';
-        }
-
         // Another special case for members, only fields on the base table (cmsMember) can be used for sorting
         if (e.isSystem && $scope.entityType == "member") {
             e.allowSorting = e.alias == 'username' || e.alias == 'email';
         }
 
         if (e.isSystem) {
-         //localize the header
-         var key = getLocalizedKey(e.alias);
-         localizationService.localize(key).then(function (v) {
-            e.header = v;
-         });
-      }
+            //localize the header
+            var key = getLocalizedKey(e.alias);
+            localizationService.localize(key).then(function (v) {
+                e.header = v;
+            });
+        }
    });
 
    $scope.selectLayout = function (selectedLayout) {
       $scope.options.layout.activeLayout = listViewHelper.setLayout($routeParams.id, selectedLayout, $scope.model.config.layouts);
    };
 
-   function showNotificationsAndReset(err, reload, successMsg) {
+    function showNotificationsAndReset(err, reload, successMsg) {
 
-      //check if response is ysod
-      if (err.status && err.status >= 500) {
+        //check if response is ysod
+        if (err.status && err.status >= 500) {
 
-         // Open ysod overlay
-         $scope.ysodOverlay = {
-            view: "ysod",
-            error: err,
-            show: true
-         };
-      }
+            // Open ysod overlay
+            $scope.ysodOverlay = {
+                view: "ysod",
+                error: err,
+                show: true
+            };
+        }
 
-      $timeout(function () {
-         $scope.bulkStatus = "";
-         $scope.actionInProgress = false;
-      }, 500);
+        $timeout(function() {
+                $scope.bulkStatus = "";
+                $scope.actionInProgress = false;
+            },
+            500);
 
-      if (reload === true) {
-         $scope.reloadView($scope.contentId);
-      }
+        if (reload === true) {
+            $scope.reloadView($scope.contentId, true);
+        }
 
-      if (err.data && angular.isArray(err.data.notifications)) {
-         for (var i = 0; i < err.data.notifications.length; i++) {
-            notificationsService.showNotification(err.data.notifications[i]);
-         }
-      }
-      else if (successMsg) {
-         notificationsService.success("Done", successMsg);
-      }
-   }
+        if (err.data && angular.isArray(err.data.notifications)) {
+            for (var i = 0; i < err.data.notifications.length; i++) {
+                notificationsService.showNotification(err.data.notifications[i]);
+            }
+        } else if (successMsg) {
+            localizationService.localize("bulk_done")
+                .then(function(v) {
+                    notificationsService.success(v, successMsg);
+                });
+        }
+    }
 
-   $scope.next = function (pageNumber) {
+    $scope.next = function (pageNumber) {
       $scope.options.pageNumber = pageNumber;
       $scope.reloadView($scope.contentId);
    };
@@ -244,7 +252,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    /*Pagination is done by an array of objects, due angularJS's funky way of monitoring state
    with simple values */
 
-   $scope.reloadView = function (id) {
+   $scope.getContent = function() {
+       $scope.reloadView($scope.contentId, true);
+   }
+
+   $scope.reloadView = function (id, reloadFolders) {
 
       $scope.viewLoaded = false;
 
@@ -262,8 +274,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
             });
          }
 
-         if ($scope.entityType === 'media') {
-
+         if (reloadFolders && $scope.entityType === 'media') {
+            //The folders aren't loaded - we only need to do this once since we're never changing node ids
             mediaResource.getChildFolders($scope.contentId)
                     .then(function (folders) {
                        $scope.folders = folders;
@@ -310,7 +322,6 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    function makeSearch() {
       if ($scope.options.filter !== null && $scope.options.filter !== undefined) {
          $scope.options.pageNumber = 1;
-         //$scope.actionInProgress = true;
          $scope.reloadView($scope.contentId);
       }
    }
@@ -365,65 +376,87 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
       });
    }
 
-   $scope.delete = function () {
+    $scope.delete = function() {
+        var confirmDeleteText = "";
 
-       var attempt =
-           applySelected(
-               function(selected, index) { return deleteItemCallback(getIdCallback(selected[index])); },
-               function(count, total) {
-                   return "Deleted " + count + " out of " + total + " item" + (total > 1 ? "s" : "");
-               },
-               function(total) { return "Deleted " + total + " item" + (total > 1 ? "s" : ""); },
-               "Sure you want to delete?");
-       if (attempt) {
-           attempt.then(function () {
-               //executes if all is successful, let's sync the tree
-               var activeNode = appState.getTreeState("selectedNode");
-               if (activeNode) {
-                   navigationService.reloadNode(activeNode);
-               }
-           });
-       }
-   };
+        localizationService.localize("defaultdialogs_confirmdelete")
+            .then(function(value) {
+                confirmDeleteText = value;
+
+                var attempt =
+                    applySelected(
+                        function(selected, index) { return deleteItemCallback(getIdCallback(selected[index])); },
+                        function(count, total) {
+                            var key = (total === 1 ? "bulk_deletedItemOfItem" : "bulk_deletedItemOfItems");
+                            return localizationService.localize(key, [count, total]);
+                        },
+                        function(total) {
+                            var key = (total === 1 ? "bulk_deletedItem" : "bulk_deletedItems");
+                            return localizationService.localize(key, [total]);
+                        },
+                        confirmDeleteText + "?");
+                if (attempt) {
+                    attempt.then(function() {
+                        //executes if all is successful, let's sync the tree
+                        var activeNode = appState.getTreeState("selectedNode");
+                        if (activeNode) {
+                            navigationService.reloadNode(activeNode);
+                        }
+                    });
+                }
+            });
+    };
 
    $scope.publish = function () {
-      applySelected(
-             function (selected, index) { return contentResource.publishById(getIdCallback(selected[index])); },
-             function (count, total) { return "Published " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
-             function (total) { return "Published " + total + " item" + (total > 1 ? "s" : ""); });
+        applySelected(
+                function (selected, index) { return contentResource.publishById(getIdCallback(selected[index])); },
+                function (count, total) {
+                    var key = (total === 1 ? "bulk_publishedItemOfItem" : "bulk_publishedItemOfItems");
+                    return localizationService.localize(key, [count, total]);
+                },
+                function (total) {
+                    var key = (total === 1 ? "bulk_publishedItem" : "bulk_publishedItems");
+                    return localizationService.localize(key, [total]);
+                });
    };
 
-   $scope.unpublish = function () {
-      applySelected(
-             function (selected, index) { return contentResource.unPublish(getIdCallback(selected[index])); },
-             function (count, total) { return "Unpublished " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
-             function (total) { return "Unpublished " + total + " item" + (total > 1 ? "s" : ""); });
-   };
+    $scope.unpublish = function() {
+        applySelected(
+            function(selected, index) { return contentResource.unPublish(getIdCallback(selected[index])); },
+            function(count, total) {
+                var key = (total === 1 ? "bulk_unpublishedItemOfItem" : "bulk_unpublishedItemOfItems");
+                return localizationService.localize(key, [count, total]);
+            },
+            function(total) {
+                var key = (total === 1 ? "bulk_unpublishedItem" : "bulk_unpublishedItems");
+                return localizationService.localize(key, [total]);
+            });
+    };
 
-   $scope.move = function () {
-      $scope.moveDialog = {};
-      $scope.moveDialog.title = "Move";
-      $scope.moveDialog.section = $scope.entityType;
-      $scope.moveDialog.currentNode = $scope.contentId;
-      $scope.moveDialog.view = "move";
-      $scope.moveDialog.show = true;
+    $scope.move = function() {
+        $scope.moveDialog = {};
+        $scope.moveDialog.title = localizationService.localize("general_move");
+        $scope.moveDialog.section = $scope.entityType;
+        $scope.moveDialog.currentNode = $scope.contentId;
+        $scope.moveDialog.view = "move";
+        $scope.moveDialog.show = true;
 
-      $scope.moveDialog.submit = function (model) {
+        $scope.moveDialog.submit = function(model) {
 
-         if (model.target) {
-            performMove(model.target);
-         }
+            if (model.target) {
+                performMove(model.target);
+            }
 
-         $scope.moveDialog.show = false;
-         $scope.moveDialog = null;
-      };
+            $scope.moveDialog.show = false;
+            $scope.moveDialog = null;
+        };
 
-      $scope.moveDialog.close = function (oldModel) {
-         $scope.moveDialog.show = false;
-         $scope.moveDialog = null;
-      };
+        $scope.moveDialog.close = function(oldModel) {
+            $scope.moveDialog.show = false;
+            $scope.moveDialog = null;
+        };
 
-   };
+    };
 
 
    function performMove(target) {
@@ -434,33 +467,46 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
        var newPath = null;
        applySelected(
                function(selected, index) {
-                   return contentResource.move({ parentId: target.id, id: getIdCallback(selected[index]) }).then(function(path) {
-                       newPath = path;
-                       return path;
-                   });
+                   return contentResource.move({ parentId: target.id, id: getIdCallback(selected[index]) })
+                       .then(function(path) {
+                           newPath = path;
+                           return path;
+                       });
                },
-               function(count, total) {return "Moved " + count + " out of " + total + " item" + (total > 1 ? "s" : "");},
-               function(total) { return "Moved " + total + " item" + (total > 1 ? "s" : ""); })
-           .then(function() {  
+               function(count, total) {
+                   var key = (total === 1 ? "bulk_movedItemOfItem" : "bulk_movedItemOfItems");
+                   return localizationService.localize(key, [count, total]);
+               },
+               function(total) {
+                   var key = (total === 1 ? "bulk_movedItem" : "bulk_movedItems");
+                   return localizationService.localize(key, [total]);
+               })
+           .then(function() {
                //executes if all is successful, let's sync the tree
                if (newPath) {
 
                    //we need to do a double sync here: first refresh the node where the content was moved,
                    // then refresh the node where the content was moved from
-                   navigationService.syncTree({ tree: target.nodeType, path: newPath, forceReload: true, activate: false }).then(function (args) {
-                        //get the currently edited node (if any)
-                        var activeNode = appState.getTreeState("selectedNode");
-                        if (activeNode) {                                                        
-                            navigationService.reloadNode(activeNode);
-                        }
-                   });
+                   navigationService.syncTree({
+                           tree: target.nodeType ? target.nodeType : (target.metaData.treeAlias),
+                           path: newPath,
+                           forceReload: true,
+                           activate: false
+                       })
+                       .then(function(args) {
+                           //get the currently edited node (if any)
+                           var activeNode = appState.getTreeState("selectedNode");
+                           if (activeNode) {
+                               navigationService.reloadNode(activeNode);
+                           }
+                       });
                }
            });
    }
 
    $scope.copy = function () {
       $scope.copyDialog = {};
-      $scope.copyDialog.title = "Copy";
+      $scope.copyDialog.title = localizationService.localize("general_copy");
       $scope.copyDialog.section = $scope.entityType;
       $scope.copyDialog.currentNode = $scope.contentId;
       $scope.copyDialog.view = "copy";
@@ -485,8 +531,14 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
    function performCopy(target, relateToOriginal) {
       applySelected(
              function (selected, index) { return contentResource.copy({ parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal }); },
-             function (count, total) { return "Copied " + count + " out of " + total + " item" + (total > 1 ? "s" : ""); },
-             function (total) { return "Copied " + total + " item" + (total > 1 ? "s" : ""); });
+             function (count, total) {
+                 var key = (total === 1 ? "bulk_copiedItemOfItem" : "bulk_copiedItemOfItems");
+                 return localizationService.localize(key, [count, total]);
+             },
+             function (total) {
+                 var key = (total === 1 ? "bulk_copiedItem" : "bulk_copiedItems");
+                 return localizationService.localize(key, [total]);
+             });
    }
 
    function getCustomPropertyValue(alias, properties) {
@@ -571,7 +623,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, $cookie
              $scope.options.allowBulkMove ||
              $scope.options.allowBulkDelete;
 
-      $scope.reloadView($scope.contentId);
+      $scope.reloadView($scope.contentId, true);
    }
 
    function getLocalizedKey(alias) {

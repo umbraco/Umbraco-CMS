@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal class MigrationEntryRepository : PetaPocoRepositoryBase<int, IMigrationEntry>, IMigrationEntryRepository
     {
-        public MigrationEntryRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
+        public MigrationEntryRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax)
             : base(work, cache, logger, sqlSyntax)
         {
         }
@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var dto = Database.First<MigrationDto>(sql);
+            var dto = Database.Fetch<MigrationDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             if (dto == null)
                 return null;
 

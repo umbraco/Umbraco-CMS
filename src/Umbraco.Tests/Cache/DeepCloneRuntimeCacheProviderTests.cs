@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Web;
 using NUnit.Framework;
@@ -88,7 +89,7 @@ namespace Umbraco.Tests.Cache
 
         private static string GetValue(int i)
         {
-            Console.WriteLine("get" + i);
+            Debug.Print("get" + i);
             if (i < 3)
                 throw new Exception("fail");
             return "succ" + i;
@@ -101,20 +102,18 @@ namespace Umbraco.Tests.Cache
                 CloneId = Guid.NewGuid();
             }
 
-            private static readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Name);
+            private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+            private class PropertySelectors
+            {
+                public readonly PropertyInfo WriterSelector = ExpressionHelper.GetPropertyInfo<Content, string>(x => x.Name);
+            }
 
             private string _name;
             public string Name
             {
                 get { return _name; }
-                set
-                {
-                    SetPropertyValueAndDetectChanges(o =>
-                    {
-                        _name = value;
-                        return _name;
-                    }, _name, WriterSelector);
-                }
+                set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.WriterSelector); }
             }
 
             public Guid CloneId { get; set; }

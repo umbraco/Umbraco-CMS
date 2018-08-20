@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -32,6 +33,12 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "view", IsRequired = true)]
         public string View { get; set; }
+
+        /// <summary>
+        /// This allows for custom configuration to be injected into the pre-value editor
+        /// </summary>        
+        [DataMember(Name = "config")]
+        public IDictionary<string, object> Config { get; set; }
 
     }
 }

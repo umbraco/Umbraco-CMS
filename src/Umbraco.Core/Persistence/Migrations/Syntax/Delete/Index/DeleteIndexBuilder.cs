@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using System;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions;
 
 namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Index
@@ -17,12 +18,14 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Index
             return this;
         }
 
+        [Obsolete("I don't think this would ever be used when dropping an index, see DeleteIndexExpression.ToString")]
         public void OnColumn(string columnName)
         {
             var column = new IndexColumnDefinition { Name = columnName };
             Expression.Index.Columns.Add(column);
         }
 
+        [Obsolete("I don't think this would ever be used when dropping an index, see DeleteIndexExpression.ToString")]
         public void OnColumns(params string[] columnNames)
         {
             foreach (string columnName in columnNames)

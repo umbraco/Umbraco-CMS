@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Management.Instrumentation;
 using System.Net.Http;
 using System.Net.Http.Formatting;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Controllers;
@@ -16,16 +13,63 @@ using Umbraco.Core;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
+using Umbraco.Core.Services;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
-using IAuthorizationFilter = System.Web.Http.Filters.IAuthorizationFilter;
 using UrlHelper = System.Web.Http.Routing.UrlHelper;
 
 namespace Umbraco.Web.Trees
 {
     internal static class ApplicationTreeExtensions
     {
+
+        private static readonly ConcurrentDictionary<Type, TreeAttribute> TreeAttributeCache = new ConcurrentDictionary<Type, TreeAttribute>();
+
+        internal static TreeAttribute GetTreeAttribute(this Type treeControllerType)
+        {
+            return TreeAttributeCache.GetOrAdd(treeControllerType, type =>
+            {
+                //Locate the tree attribute
+                var treeAttributes = type
+                    .GetCustomAttributes<TreeAttribute>(false)
+                    .ToArray();
+
+                if (treeAttributes.Length == 0)
+                {
+                    throw new InvalidOperationException("The Tree controller is missing the " + typeof(TreeAttribute).FullName + " attribute");
+                }
+
+                //assign the properties of this object to those of the metadata attribute
+                return treeAttributes[0];
+            });
+        }
+
+        internal static TreeAttribute GetTreeAttribute(this ApplicationTree tree)
+        {
+            return tree.GetRuntimeType().GetTreeAttribute();
+        }
+
+        internal static string GetRootNodeDisplayName(this TreeAttribute attribute, ILocalizedTextService textService)
+        {
+            var label = $"[{attribute.Alias}]";
+
+            // try to look up a the localized tree header matching the tree alias
+            var localizedLabel = textService.Localize("treeHeaders/" + attribute.Alias);
+            
+            // if the localizedLabel returns [alias] then return the title attribute from the trees.config file, if it's defined
+            if (localizedLabel != null && localizedLabel.Equals(label, StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (string.IsNullOrEmpty(attribute.Title) == false)
+                    label = attribute.Title;
+            }
+            else
+            {
+                // the localizedLabel translated into something that's not just [alias], so use the translation
+                label = localizedLabel;
+            }
+
+            return label;
+        }
 
         internal static Attempt<Type> TryGetControllerTree(this ApplicationTree appTree)
         {

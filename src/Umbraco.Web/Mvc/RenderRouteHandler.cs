@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Text;
 using System.Web;
 using System.Web.Compilation;
 using System.Web.Mvc;
@@ -8,12 +7,10 @@ using System.Web.Routing;
 using System.Web.SessionState;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
-using umbraco.cms.businesslogic.template;
 using System.Collections.Generic;
+using Umbraco.Web.Features;
 
 namespace Umbraco.Web.Mvc
 {
@@ -69,12 +66,12 @@ namespace Umbraco.Web.Mvc
         {
             if (UmbracoContext == null)
             {
-                throw new NullReferenceException("There is not current UmbracoContext, it must be initialized before the RenderRouteHandler executes");
+                throw new NullReferenceException("There is no current UmbracoContext, it must be initialized before the RenderRouteHandler executes");
             }
             var docRequest = UmbracoContext.PublishedContentRequest;
             if (docRequest == null)
             {
-                throw new NullReferenceException("There is not current PublishedContentRequest, it must be initialized before the RenderRouteHandler executes");
+                throw new NullReferenceException("There is no current PublishedContentRequest, it must be initialized before the RenderRouteHandler executes");
             }
 
             SetupRouteDataForRequest(
@@ -177,9 +174,9 @@ namespace Umbraco.Web.Mvc
             if (decodedParts.All(x => x.Key != ReservedAdditionalKeys.Area))
                 return null;
 
-            foreach (var item in decodedParts.Where(x => new[] { 
-			    ReservedAdditionalKeys.Controller, 
-			    ReservedAdditionalKeys.Action, 
+            foreach (var item in decodedParts.Where(x => new[] {
+			    ReservedAdditionalKeys.Controller,
+			    ReservedAdditionalKeys.Action,
 			    ReservedAdditionalKeys.Area }.Contains(x.Key) == false))
             {
                 // Populate route with additional values which aren't reserved values so they eventually to action parameters
@@ -311,8 +308,8 @@ namespace Umbraco.Web.Mvc
             if (controllerType != null)
             {
                 //ensure the controller is of type IRenderMvcController and ControllerBase
-                if (TypeHelper.IsTypeAssignableFrom<IRenderController>(controllerType)
-                    && TypeHelper.IsTypeAssignableFrom<ControllerBase>(controllerType))
+                if (TypeHelper.IsTypeAssignableFrom<IRenderController>(controllerType) &&
+                    TypeHelper.IsTypeAssignableFrom<ControllerBase>(controllerType))
                 {
                     //set the controller and name to the custom one
                     def.ControllerType = controllerType;
@@ -337,7 +334,7 @@ namespace Umbraco.Web.Mvc
             }
 
             //store the route definition
-            requestContext.RouteData.DataTokens[Umbraco.Core.Constants.Web.UmbracoRouteDefinitionDataToken] = def;
+            requestContext.RouteData.DataTokens[Core.Constants.Web.UmbracoRouteDefinitionDataToken] = def;
 
             return def;
         }
@@ -349,20 +346,20 @@ namespace Umbraco.Web.Mvc
             // missing template, so we're in a 404 here
             // so the content, if any, is a custom 404 page of some sort
 
-            if (!pcr.HasPublishedContent)
+            if (pcr.HasPublishedContent == false)
                 // means the builder could not find a proper document to handle 404
                 return new PublishedContentNotFoundHandler();
 
-            if (!pcr.HasTemplate)
+            if (pcr.HasTemplate == false)
                 // means the engine could find a proper document, but the document has no template
                 // at that point there isn't much we can do and there is no point returning
                 // to Mvc since Mvc can't do much
                 return new PublishedContentNotFoundHandler("In addition, no template exists to render the custom 404.");
 
             // so we have a template, so we should have a rendering engine
-            if (pcr.RenderingEngine == RenderingEngine.WebForms) // back to webforms ?                
+            if (pcr.RenderingEngine == RenderingEngine.WebForms) // back to webforms ?
                 return GetWebFormsHandler();
-            
+
             if (pcr.RenderingEngine != RenderingEngine.Mvc) // else ?
                 return new PublishedContentNotFoundHandler("In addition, no rendering engine exists to render the custom 404.");
 
@@ -389,16 +386,19 @@ namespace Umbraco.Web.Mvc
             }
 
             //Now we can check if we are supposed to render WebForms when the route has not been hijacked
-            if (publishedContentRequest.RenderingEngine == RenderingEngine.WebForms 
-                && publishedContentRequest.HasTemplate 
+            if (publishedContentRequest.RenderingEngine == RenderingEngine.WebForms
+                && publishedContentRequest.HasTemplate
                 && routeDef.HasHijackedRoute == false)
             {
                 return GetWebFormsHandler();
             }
 
-            //here we need to check if there is no hijacked route and no template assigned, if this is the case
-            //we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
-            if (!publishedContentRequest.HasTemplate && !routeDef.HasHijackedRoute)
+            //Here we need to check if there is no hijacked route and no template assigned,
+            //if this is the case we want to return a blank page, but we'll leave that up to the NoTemplateHandler.
+            //We also check if templates have been disabled since if they are then we're allowed to render even though there's no template,
+            //for example for json rendering in headless.
+            if ((publishedContentRequest.HasTemplate == false && FeaturesResolver.Current.Features.Disabled.DisableTemplates == false)
+                && routeDef.HasHijackedRoute == false)
             {
                 publishedContentRequest.UpdateOnMissingTemplate(); // will go 404
 
@@ -410,7 +410,7 @@ namespace Umbraco.Web.Mvc
                 var handler = GetHandlerOnMissingTemplate(publishedContentRequest);
 
                 // if it's not null it can be either the PublishedContentNotFoundHandler (no document was
-                // found to handle 404, or document with no template was found) or the WebForms handler 
+                // found to handle 404, or document with no template was found) or the WebForms handler
                 // (a document was found and its template is WebForms)
 
                 // if it's null it means that a document was found and its template is Mvc
@@ -431,7 +431,7 @@ namespace Umbraco.Web.Mvc
             //no post values, just route to the controller/action requried (local)
 
             requestContext.RouteData.Values["controller"] = routeDef.ControllerName;
-            if (!string.IsNullOrWhiteSpace(routeDef.ActionName))
+            if (string.IsNullOrWhiteSpace(routeDef.ActionName) == false)
             {
                 requestContext.RouteData.Values["action"] = routeDef.ActionName;
             }
@@ -460,6 +460,6 @@ namespace Umbraco.Web.Mvc
             return _controllerFactory.GetControllerSessionBehavior(requestContext, controllerName);
         }
 
-        
+
     }
 }

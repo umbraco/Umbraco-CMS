@@ -154,36 +154,61 @@ namespace Umbraco.Tests.Persistence.Repositories
         [Test]
         public void Get_All()
         {
-            var content = CreateTestData(3).ToArray();
+            var content = CreateTestData(30).ToArray();
 
             var provider = new PetaPocoUnitOfWorkProvider(Logger);
             var unitOfWork = provider.GetUnitOfWork();
             using (var repo = new PublicAccessRepository(unitOfWork, CacheHelper, Logger, SqlSyntax))
-            {                
-                var entry1 = new PublicAccessEntry(content[0], content[1], content[2], new[]
+            {
+                var allEntries = new List<PublicAccessEntry>();
+                for (int i = 0; i < 10; i++)
                 {
-                    new PublicAccessRule
+                    var rules = new List<PublicAccessRule>();
+                    for (int j = 0; j < 50; j++)
                     {
-                        RuleValue = "test",
-                        RuleType = "RoleName"
-                    },
-                });
-                repo.AddOrUpdate(entry1);
+                        rules.Add(new PublicAccessRule
+                        {
+                            RuleValue = "test" + j,
+                            RuleType = "RoleName" + j
+                        });
+                    }                    
+                    var entry1 = new PublicAccessEntry(content[i], content[i+1], content[i+2], rules);
+                    repo.AddOrUpdate(entry1);                    
+                    unitOfWork.Commit();
+                    allEntries.Add(entry1);
+                }
 
-                var entry2 = new PublicAccessEntry(content[1], content[0], content[2], new[]
+                //now remove a few rules from a few of the items and then add some more, this will put things 'out of order' which 
+                //we need to verify our sort order is working for the relator
+                for (int i = 0; i < allEntries.Count; i++)
                 {
-                    new PublicAccessRule
+                    //all the even ones
+                    if (i % 2 == 0)
                     {
-                        RuleValue = "test",
-                        RuleType = "RoleName"
-                    },
-                });
-                repo.AddOrUpdate(entry2);
-                
-                unitOfWork.Commit();
+                        var rules = allEntries[i].Rules.ToArray();
+                        for (int j = 0; j < rules.Length; j++)
+                        {
+                            //all the even ones
+                            if (j % 2 == 0)
+                            {
+                                allEntries[i].RemoveRule(rules[j]);
+                            }
+                        }
+                        allEntries[i].AddRule("newrule" + i, "newrule" + i);
+                        repo.AddOrUpdate(allEntries[i]);
+                        unitOfWork.Commit();
+                    }
+                }
 
                 var found = repo.GetAll().ToArray();
-                Assert.AreEqual(2, found.Count());
+                Assert.AreEqual(10, found.Length);
+
+                foreach (var publicAccessEntry in found)
+                {
+                    var matched = allEntries.First(x => x.Key == publicAccessEntry.Key);
+
+                    Assert.AreEqual(matched.Rules.Count(), publicAccessEntry.Rules.Count());
+                }
             }
         }
 
@@ -225,7 +250,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
 
-        private ContentRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
+        private ContentRepository CreateRepository(IScopeUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, CacheHelper, Logger, SqlSyntax, Mock.Of<IFileSystem>(), Mock.Of<IFileSystem>(), Mock.Of<ITemplatesSection>());
             var tagRepository = new TagRepository(unitOfWork, CacheHelper, Logger, SqlSyntax);

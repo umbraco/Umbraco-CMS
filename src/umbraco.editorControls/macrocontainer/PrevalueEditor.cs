@@ -153,9 +153,10 @@ namespace umbraco.editorControls.macrocontainer
             {
                 if (_configuration == null)
                 {
-                return Application.SqlHelper.ExecuteScalar<string>(
+                using (var sqlHelper = Application.SqlHelper)
+                return sqlHelper.ExecuteScalar<string>(
                         "select value from cmsDataTypePreValues where datatypenodeid = @datatypenodeid",
-                        Application.SqlHelper.CreateParameter("@datatypenodeid", Datatype.DataTypeDefinitionId));
+                        sqlHelper.CreateParameter("@datatypenodeid", Datatype.DataTypeDefinitionId));
                 }
                 else
                 {
@@ -279,10 +280,12 @@ namespace umbraco.editorControls.macrocontainer
         /// </summary>
         public void Save()
         {
-       
-            Application.SqlHelper.ExecuteNonQuery(
-                "delete from cmsDataTypePreValues where datatypenodeid = @dtdefid",
-                Application.SqlHelper.CreateParameter("@dtdefid", Datatype.DataTypeDefinitionId));
+
+            using (var sqlHelper = Application.SqlHelper)
+            {
+                sqlHelper.ExecuteNonQuery("delete from cmsDataTypePreValues where datatypenodeid = @dtdefid", 
+                    sqlHelper.CreateParameter("@dtdefid", Datatype.DataTypeDefinitionId));
+            }
 
             StringBuilder config = new StringBuilder();
             config.Append(GetSelectedMacosFromCheckList());
@@ -299,12 +302,10 @@ namespace umbraco.editorControls.macrocontainer
             int.TryParse(_txtPreferedWidth.Text, out prefwidth);
             config.Append(prefwidth);
 
-            Application.SqlHelper.ExecuteNonQuery(
-                "insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",
-                Application.SqlHelper.CreateParameter("@dtdefid", Datatype.DataTypeDefinitionId), Application.SqlHelper.CreateParameter("@value", config.ToString()));
-
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",
+                    sqlHelper.CreateParameter("@dtdefid", Datatype.DataTypeDefinitionId), sqlHelper.CreateParameter("@value", config.ToString()));
         }
         #endregion
-
     }
 }

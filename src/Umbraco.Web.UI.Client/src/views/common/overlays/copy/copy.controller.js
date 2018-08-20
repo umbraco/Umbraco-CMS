@@ -1,7 +1,7 @@
  (function() {
 	"use strict";
 
-	function CopyOverlay($scope, localizationService, eventsService) {
+	function CopyOverlay($scope, localizationService, eventsService, entityHelper) {
 
       var vm = this;
 
@@ -32,54 +32,30 @@
           selectedSearchResults: []
       };
 
+      // get entity type based on the section
+      $scope.entityType = entityHelper.getEntityTypeFromSection(dialogOptions.section);
+
       function nodeSelectHandler(ev, args) {
-          args.event.preventDefault();
-          args.event.stopPropagation();
-
-          if (args.node.metaData.listViewNode) {
-              //check if list view 'search' node was selected
-
-              vm.searchInfo.showSearch = true;
-              vm.searchInfo.searchFromId = args.node.metaData.listViewNode.id;
-              vm.searchInfo.searchFromName = args.node.metaData.listViewNode.name;
-          }
-          else {
-              //eventsService.emit("editors.content.copyController.select", args);
-
-              if ($scope.model.target) {
-                  //un-select if there's a current one selected
-                  $scope.model.target.selected = false;
-              }
-
-              $scope.model.target = args.node;
-              $scope.model.target.selected = true;
+          if(args && args.event) {
+            args.event.preventDefault();
+            args.event.stopPropagation();
           }
 
+          //eventsService.emit("editors.content.copyController.select", args);
+
+          if ($scope.model.target) {
+              //un-select if there's a current one selected
+              $scope.model.target.selected = false;
+          }
+
+          $scope.model.target = args.node;
+          $scope.model.target.selected = true;
       }
 
       function nodeExpandedHandler(ev, args) {
-          if (angular.isArray(args.children)) {
-
-              //iterate children
-              _.each(args.children, function (child) {
-                  //check if any of the items are list views, if so we need to add a custom
-                  // child: A node to activate the search
-                  if (child.metaData.isContainer) {
-                      child.hasChildren = true;
-                      child.children = [
-                          {
-                              level: child.level + 1,
-                              hasChildren: false,
-                              name: searchText,
-                              metaData: {
-                                  listViewNode: child,
-                              },
-                              cssClass: "icon umb-tree-icon sprTree icon-search",
-                              cssClasses: ["not-published"]
-                          }
-                      ];
-                  }
-              });
+          // open mini list view for list views
+          if (args.node.metaData.isContainer) {
+              openMiniListView(args.node);
           }
       }
 
@@ -109,6 +85,20 @@
           $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
           $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
       });
+
+      // Mini list view
+      $scope.selectListViewNode = function (node) {
+          node.selected = node.selected === true ? false : true;
+		  nodeSelectHandler({}, { node: node });
+      };
+
+      $scope.closeMiniListView = function () {
+          $scope.miniListView = undefined;
+      };
+
+      function openMiniListView(node) {
+          $scope.miniListView = node;
+      }
 
 
 	}

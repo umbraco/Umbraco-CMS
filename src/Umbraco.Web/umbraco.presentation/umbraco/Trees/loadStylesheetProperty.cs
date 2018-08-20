@@ -58,12 +58,12 @@ namespace umbraco
             {
                 var sheetId = sheet.Path.TrimEnd(".css");
                 var xNode = XmlTreeNode.Create(this);
-                xNode.NodeID = sheetId + "_" + prop.Name;
+                xNode.NodeID = sheetId + "_" + HttpUtility.UrlEncode(prop.Name);
                 xNode.Text = prop.Name;
                 xNode.Action = "javascript:openStylesheetProperty('" +
                     //Needs to be escaped for JS
                     HttpUtility.UrlEncode(sheet.Path) + 
-                    "','" + prop.Name + "');";
+                    "','" + HttpUtility.UrlEncode(prop.Name) + "');";
                 xNode.Icon = "icon-brackets";
                 xNode.OpenIcon = "icon-brackets";
 

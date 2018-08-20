@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class DataTypePreValueDto
     {
         [Column("id")]
-        [PrimaryKeyColumn(IdentitySeed = 6)]
+        [PrimaryKeyColumn(IdentitySeed = 10)]
         public int Id { get; set; }
 
         [Column("datatypeNodeId")]

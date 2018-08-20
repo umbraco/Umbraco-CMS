@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text.RegularExpressions;
-using Umbraco.Core.IO;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Strings;
 
@@ -27,11 +24,12 @@ namespace Umbraco.Core.Models
             _addedProperties = new List<string>();
             _removedProperties = new List<string>();
         }
-        
+
         /// <summary>
         /// Creates an item with pre-filled properties
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="key"></param>
         /// <param name="useInEditor"></param>
         /// <param name="cacheDuration"></param>
         /// <param name="alias"></param>
@@ -43,10 +41,11 @@ namespace Umbraco.Core.Models
         /// <param name="cacheByMember"></param>
         /// <param name="dontRender"></param>
         /// <param name="scriptPath"></param>
-        public Macro(int id, bool useInEditor, int cacheDuration, string @alias, string name, string controlType, string controlAssembly, string xsltPath, bool cacheByPage, bool cacheByMember, bool dontRender, string scriptPath)
+        public Macro(int id, Guid key, bool useInEditor, int cacheDuration, string @alias, string name, string controlType, string controlAssembly, string xsltPath, bool cacheByPage, bool cacheByMember, bool dontRender, string scriptPath)
             : this()
         {
             Id = id;
+            Key = key;
             UseInEditor = useInEditor;
             CacheDuration = cacheDuration;
             Alias = alias.ToCleanString(CleanStringType.Alias);
@@ -114,22 +113,27 @@ namespace Umbraco.Core.Models
         private List<string> _addedProperties;
         private List<string> _removedProperties;
 
-        private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.Alias);
-        private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.Name);
-        private static readonly PropertyInfo UseInEditorSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.UseInEditor);
-        private static readonly PropertyInfo CacheDurationSelector = ExpressionHelper.GetPropertyInfo<Macro, int>(x => x.CacheDuration);
-        private static readonly PropertyInfo CacheByPageSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.CacheByPage);
-        private static readonly PropertyInfo CacheByMemberSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.CacheByMember);
-        private static readonly PropertyInfo DontRenderSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.DontRender);
-        private static readonly PropertyInfo ControlPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.ControlType);
-        private static readonly PropertyInfo ControlAssemblySelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.ControlAssembly);
-        private static readonly PropertyInfo ScriptPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.ScriptPath);
-        private static readonly PropertyInfo XsltPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.XsltPath);
-        private static readonly PropertyInfo PropertiesSelector = ExpressionHelper.GetPropertyInfo<Macro, MacroPropertyCollection>(x => x.Properties);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.Alias);
+            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.Name);
+            public readonly PropertyInfo UseInEditorSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.UseInEditor);
+            public readonly PropertyInfo CacheDurationSelector = ExpressionHelper.GetPropertyInfo<Macro, int>(x => x.CacheDuration);
+            public readonly PropertyInfo CacheByPageSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.CacheByPage);
+            public readonly PropertyInfo CacheByMemberSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.CacheByMember);
+            public readonly PropertyInfo DontRenderSelector = ExpressionHelper.GetPropertyInfo<Macro, bool>(x => x.DontRender);
+            public readonly PropertyInfo ControlPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.ControlType);
+            public readonly PropertyInfo ControlAssemblySelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.ControlAssembly);
+            public readonly PropertyInfo ScriptPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.ScriptPath);
+            public readonly PropertyInfo XsltPathSelector = ExpressionHelper.GetPropertyInfo<Macro, string>(x => x.XsltPath);
+            public readonly PropertyInfo PropertiesSelector = ExpressionHelper.GetPropertyInfo<Macro, MacroPropertyCollection>(x => x.Properties);
+        }
 
         void PropertiesChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            OnPropertyChanged(PropertiesSelector);
+            OnPropertyChanged(Ps.Value.PropertiesSelector);
 
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -167,7 +171,7 @@ namespace Umbraco.Core.Models
         /// <param name="e"></param>
         void PropertyDataChanged(object sender, PropertyChangedEventArgs e)
         {
-            OnPropertyChanged(PropertiesSelector);
+            OnPropertyChanged(Ps.Value.PropertiesSelector);
         }
         
         public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
@@ -204,14 +208,7 @@ namespace Umbraco.Core.Models
         public string Alias
         {
             get { return _alias; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _alias = value.ToCleanString(CleanStringType.Alias);
-                    return _alias;
-                }, _alias, AliasSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value.ToCleanString(CleanStringType.Alias), ref _alias, Ps.Value.AliasSelector); }
         }
 
         /// <summary>
@@ -221,14 +218,7 @@ namespace Umbraco.Core.Models
         public string Name
         {
             get { return _name; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _name = value;
-                    return _name;
-                }, _name, NameSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
@@ -238,14 +228,7 @@ namespace Umbraco.Core.Models
         public bool UseInEditor
         {
             get { return _useInEditor; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _useInEditor = value;
-                    return _useInEditor;
-                }, _useInEditor, UseInEditorSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _useInEditor, Ps.Value.UseInEditorSelector); }
         }
 
         /// <summary>
@@ -255,14 +238,7 @@ namespace Umbraco.Core.Models
         public int CacheDuration
         {
             get { return _cacheDuration; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _cacheDuration = value;
-                    return _cacheDuration;
-                }, _cacheDuration, CacheDurationSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _cacheDuration, Ps.Value.CacheDurationSelector); }
         }
 
         /// <summary>
@@ -272,14 +248,7 @@ namespace Umbraco.Core.Models
         public bool CacheByPage
         {
             get { return _cacheByPage; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _cacheByPage = value;
-                    return _cacheByPage;
-                }, _cacheByPage, CacheByPageSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _cacheByPage, Ps.Value.CacheByPageSelector); }
         }
 
         /// <summary>
@@ -289,14 +258,7 @@ namespace Umbraco.Core.Models
         public bool CacheByMember
         {
             get { return _cacheByMember; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _cacheByMember = value;
-                    return _cacheByMember;
-                }, _cacheByMember, CacheByMemberSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _cacheByMember, Ps.Value.CacheByMemberSelector); }
         }
 
         /// <summary>
@@ -306,14 +268,7 @@ namespace Umbraco.Core.Models
         public bool DontRender
         {
             get { return _dontRender; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _dontRender = value;
-                    return _dontRender;
-                }, _dontRender, DontRenderSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _dontRender, Ps.Value.DontRenderSelector); }
         }
 
         /// <summary>
@@ -323,14 +278,7 @@ namespace Umbraco.Core.Models
         public string ControlType
         {
             get { return _scriptFile; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _scriptFile = value;
-                    return _scriptFile;
-                }, _scriptFile, ControlPathSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _scriptFile, Ps.Value.ControlPathSelector); }
         }
 
         /// <summary>
@@ -341,14 +289,7 @@ namespace Umbraco.Core.Models
         public string ControlAssembly
         {
             get { return _scriptAssembly; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _scriptAssembly = value;
-                    return _scriptAssembly;
-                }, _scriptAssembly, ControlAssemblySelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _scriptAssembly, Ps.Value.ControlAssemblySelector); }
         }
 
         /// <summary>
@@ -359,14 +300,7 @@ namespace Umbraco.Core.Models
         public string ScriptPath
         {
             get { return _scriptPath; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _scriptPath = value;
-                    return _scriptPath;
-                }, _scriptPath, ScriptPathSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _scriptPath, Ps.Value.ScriptPathSelector); }
         }
 
         /// <summary>
@@ -377,14 +311,7 @@ namespace Umbraco.Core.Models
         public string XsltPath
         {
             get { return _xslt; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _xslt = value;
-                    return _xslt;
-                }, _xslt, XsltPathSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _xslt, Ps.Value.XsltPathSelector); }
         }
 
         /// <summary>

@@ -6,109 +6,124 @@
  * @description
  * The controller for the content type editor
  */
-(function() {
-   "use strict";
+(function () {
+    "use strict";
 
-   function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, $location, listViewHelper) {
+    function ListViewGridLayoutController($scope, $routeParams, mediaHelper, mediaResource, $location, listViewHelper, mediaTypeHelper) {
 
-      var vm = this;
+        var vm = this;
+        var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
 
-      vm.nodeId = $scope.contentId;
-      //we pass in a blacklist by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
-      vm.acceptedFileTypes = !mediaHelper.formatFileTypes(Umbraco.Sys.ServerVariables.umbracoSettings.disallowedUploadFiles);
-      vm.maxFileSize = Umbraco.Sys.ServerVariables.umbracoSettings.maxFileSize + "KB";
-      vm.activeDrag = false;
-      vm.mediaDetailsTooltip = {};
-      vm.itemsWithoutFolders = [];
-      vm.isRecycleBin = $scope.contentId === '-21' || $scope.contentId === '-20';
+        vm.nodeId = $scope.contentId;
+        // Use whitelist of allowed file types if provided
+        vm.acceptedFileTypes = mediaHelper.formatFileTypes(umbracoSettings.allowedUploadFiles);
+        if (vm.acceptedFileTypes === '') {
+            // If not provided, we pass in a blacklist by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
+            vm.acceptedFileTypes = !mediaHelper.formatFileTypes(umbracoSettings.disallowedUploadFiles);
+        }
 
-      vm.dragEnter = dragEnter;
-      vm.dragLeave = dragLeave;
-	  vm.onFilesQueue = onFilesQueue;
-      vm.onUploadComplete = onUploadComplete;
+        vm.maxFileSize = umbracoSettings.maxFileSize + "KB";
+        vm.activeDrag = false;
+        vm.mediaDetailsTooltip = {};
+        vm.itemsWithoutFolders = [];
+        vm.isRecycleBin = $scope.contentId === '-21' || $scope.contentId === '-20';
+        vm.acceptedMediatypes = [];
 
-      vm.hoverMediaItemDetails = hoverMediaItemDetails;
-      vm.selectContentItem = selectContentItem;
-      vm.selectItem = selectItem;
-      vm.selectFolder = selectFolder;
-      vm.goToItem = goToItem;
+        vm.dragEnter = dragEnter;
+        vm.dragLeave = dragLeave;
+        vm.onFilesQueue = onFilesQueue;
+        vm.onUploadComplete = onUploadComplete;
 
-      function activate() {
-          vm.itemsWithoutFolders = filterOutFolders($scope.items);
-      }
+        vm.hoverMediaItemDetails = hoverMediaItemDetails;
+        vm.selectContentItem = selectContentItem;
+        vm.selectItem = selectItem;
+        vm.selectFolder = selectFolder;
+        vm.goToItem = goToItem;
 
-      function filterOutFolders(items) {
+        function activate() {
+            vm.itemsWithoutFolders = filterOutFolders($scope.items);
 
-          var newArray = [];
+            //no need to make another REST/DB call if this data is not used when we are browsing the bin
+            if ($scope.entityType === 'media' && !vm.isRecycleBin) {
+                mediaTypeHelper.getAllowedImagetypes(vm.nodeId).then(function (types) {
+                    vm.acceptedMediatypes = types;
+                });
+            }
 
-          if(items && items.length ) {
+        }
 
-              for (var i = 0; items.length > i; i++) {
-                  var item = items[i];
-                  var isFolder = !mediaHelper.hasFilePropertyType(item);
+        function filterOutFolders(items) {
 
-                  if (!isFolder) {
-                      newArray.push(item);
-                  }
-              }
+            var newArray = [];
 
-          }
+            if (items && items.length) {
 
-          return newArray;
-      }
+                for (var i = 0; items.length > i; i++) {
+                    var item = items[i];
+                    var isFolder = !mediaHelper.hasFilePropertyType(item);
 
-      function dragEnter(el, event) {
-         vm.activeDrag = true;
-      }
+                    if (!isFolder) {
+                        newArray.push(item);
+                    }
+                }
 
-      function dragLeave(el, event) {
-         vm.activeDrag = false;
-      }
+            }
 
-		function onFilesQueue() {
-			vm.activeDrag = false;
-		}
+            return newArray;
+        }
 
-      function onUploadComplete() {
-         $scope.getContent($scope.contentId);
-      }
+        function dragEnter(el, event) {
+            vm.activeDrag = true;
+        }
 
-      function hoverMediaItemDetails(item, event, hover) {
+        function dragLeave(el, event) {
+            vm.activeDrag = false;
+        }
 
-         if (hover && !vm.mediaDetailsTooltip.show) {
+        function onFilesQueue() {
+            vm.activeDrag = false;
+        }
 
-            vm.mediaDetailsTooltip.event = event;
-            vm.mediaDetailsTooltip.item = item;
-            vm.mediaDetailsTooltip.show = true;
+        function onUploadComplete() {
+            $scope.getContent($scope.contentId);
+        }
 
-         } else if (!hover && vm.mediaDetailsTooltip.show) {
+        function hoverMediaItemDetails(item, event, hover) {
 
-            vm.mediaDetailsTooltip.show = false;
+            if (hover && !vm.mediaDetailsTooltip.show) {
 
-         }
+                vm.mediaDetailsTooltip.event = event;
+                vm.mediaDetailsTooltip.item = item;
+                vm.mediaDetailsTooltip.show = true;
 
-      }
+            } else if (!hover && vm.mediaDetailsTooltip.show) {
 
-      function selectContentItem(item, $event, $index) {
-          listViewHelper.selectHandler(item, $index, $scope.items, $scope.selection, $event);
-      }
+                vm.mediaDetailsTooltip.show = false;
 
-      function selectItem(item, $event, $index) {
-          listViewHelper.selectHandler(item, $index, vm.itemsWithoutFolders, $scope.selection, $event);
-      }
+            }
 
-      function selectFolder(folder, $event, $index) {
-          listViewHelper.selectHandler(folder, $index, $scope.folders, $scope.selection, $event);
-      }
+        }
 
-      function goToItem(item, $event, $index) {
-          $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + item.id);
-      }
+        function selectContentItem(item, $event, $index) {
+            listViewHelper.selectHandler(item, $index, $scope.items, $scope.selection, $event);
+        }
 
-      activate();
+        function selectItem(item, $event, $index) {
+            listViewHelper.selectHandler(item, $index, vm.itemsWithoutFolders, $scope.selection, $event);
+        }
 
-   }
+        function selectFolder(folder, $event, $index) {
+            listViewHelper.selectHandler(folder, $index, $scope.folders, $scope.selection, $event);
+        }
 
-   angular.module("umbraco").controller("Umbraco.PropertyEditors.ListView.GridLayoutController", ListViewGridLayoutController);
+        function goToItem(item, $event, $index) {
+            $location.path($scope.entityType + '/' + $scope.entityType + '/edit/' + item.id);
+        }
+
+        activate();
+
+    }
+
+    angular.module("umbraco").controller("Umbraco.PropertyEditors.ListView.GridLayoutController", ListViewGridLayoutController);
 
 })();

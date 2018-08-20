@@ -14,7 +14,7 @@ function RowConfigController($scope) {
     };
 
     $scope.scaleDown = function(section) {
-        var remove = (section.grid > 1) ? 1 : section.grid;
+        var remove = (section.grid > 1) ? 1 : 0;
         section.grid = section.grid - remove;
     };
 
@@ -58,9 +58,14 @@ function RowConfigController($scope) {
         }
     };
 
-    $scope.deleteArea = function(index) {
-        $scope.currentRow.areas.splice(index, 1);
+    $scope.deleteArea = function (cell, row) {
+    	if ($scope.currentCell === cell) {
+    		$scope.currentCell = undefined;
+    	}
+    	var index = row.areas.indexOf(cell)
+    	row.areas.splice(index, 1);
     };
+
     $scope.closeArea = function() {
         $scope.currentCell = undefined;
     };

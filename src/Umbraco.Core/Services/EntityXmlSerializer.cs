@@ -42,6 +42,7 @@ namespace Umbraco.Core.Services
             xml.Add(new XAttribute("writerID", content.WriterId));
             xml.Add(new XAttribute("template", content.Template == null ? "0" : content.Template.Id.ToString(CultureInfo.InvariantCulture)));
             xml.Add(new XAttribute("nodeTypeAlias", content.ContentType.Alias));
+            xml.Add(new XAttribute("isPublished", content.Published));
 
             if (deep)
             {

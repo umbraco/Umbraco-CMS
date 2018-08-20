@@ -30,11 +30,11 @@ namespace Umbraco.Core.Persistence.Factories
             _updateDate = updateDate;
         }
 
-        public IEnumerable<Property> BuildEntity(PropertyDataDto[] dtos)
+        public static IEnumerable<Property> BuildEntity(IReadOnlyCollection<PropertyDataDto> dtos, PropertyType[] compositionTypeProperties, DateTime createDate, DateTime updateDate)
         {
             var properties = new List<Property>();
 
-            foreach (var propertyType in _compositionTypeProperties)
+            foreach (var propertyType in compositionTypeProperties)
             {
                 var propertyDataDto = dtos.LastOrDefault(x => x.PropertyTypeId == propertyType.Id);
                 var property = propertyDataDto == null
@@ -42,15 +42,31 @@ namespace Umbraco.Core.Persistence.Factories
                                    : propertyType.CreatePropertyFromRawValue(propertyDataDto.GetValue,
                                                                              propertyDataDto.VersionId.Value,
                                                                              propertyDataDto.Id);
-                //on initial construction we don't want to have dirty properties tracked
-                property.CreateDate = _createDate;
-                property.UpdateDate = _updateDate;
-                // http://issues.umbraco.org/issue/U4-1946
-                property.ResetDirtyProperties(false);
-                properties.Add(property);
+                try
+                {
+                    //on initial construction we don't want to have dirty properties tracked
+                    property.DisableChangeTracking();
+
+                    property.CreateDate = createDate;
+                    property.UpdateDate = updateDate;
+                    // http://issues.umbraco.org/issue/U4-1946
+                    property.ResetDirtyProperties(false);
+                    properties.Add(property);
+                }
+                finally
+                {
+                    property.EnableChangeTracking();
+                }
+
             }
 
             return properties;
+        }
+
+        [Obsolete("Use the static method instead, there's no reason to allocate one of these classes everytime we want to map values")]
+        public IEnumerable<Property> BuildEntity(PropertyDataDto[] dtos)
+        {
+            return BuildEntity(dtos, _compositionTypeProperties, _createDate, _updateDate);
         }
 
         public IEnumerable<PropertyDataDto> BuildDto(IEnumerable<Property> properties)
@@ -89,7 +105,7 @@ namespace Umbraco.Core.Persistence.Factories
                     decimal val;
                     if (decimal.TryParse(property.Value.ToString(), out val))
                     {
-                        dto.Decimal = val;
+                        dto.Decimal = val; // property value should be normalized already
                     }
                 }
                 else if (property.DataTypeDatabaseType == DataTypeDatabaseType.Date && property.Value != null && string.IsNullOrWhiteSpace(property.Value.ToString()) == false)

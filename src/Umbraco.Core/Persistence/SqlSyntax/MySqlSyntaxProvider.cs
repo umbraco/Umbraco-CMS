@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// <summary>
     /// Represents an SqlSyntaxProvider for MySql
     /// </summary>
-    [SqlSyntaxProviderAttribute("MySql.Data.MySqlClient")]
+    [SqlSyntaxProvider(Constants.DatabaseProviders.MySql)]
     public class MySqlSyntaxProvider : SqlSyntaxProviderBase<MySqlSyntaxProvider>
     {
         private readonly ILogger _logger;
@@ -78,6 +78,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
+        /// <inheritdoc />
         public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db)
         {
             List<Tuple<string, string>> list;
@@ -100,6 +101,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
+        /// <inheritdoc />
         public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db)
         {
             List<Tuple<string, string, string>> list;
@@ -126,6 +128,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
+        /// <inheritdoc />
         public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db)
         {
             List<Tuple<string, string, string, bool>> list;
@@ -176,6 +179,11 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             }
 
             return result > 0;
+        }
+
+        public override Sql SelectTop(Sql sql, int top)
+        {
+            return new Sql(string.Concat(sql.SQL, " LIMIT ", top), sql.Arguments);
         }
 
         public override bool SupportsClustered()

@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     {
         public MacroProperty()
         {
-            
+            _key = Guid.NewGuid();
         }
 
         /// <summary>
@@ -30,6 +30,7 @@ namespace Umbraco.Core.Models
             _alias = alias;
             _name = name;
             _sortOrder = sortOrder;
+            _key = Guid.NewGuid();
 
             //try to get the new mapped parameter editor
             var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(editorAlias, false);
@@ -45,16 +46,18 @@ namespace Umbraco.Core.Models
         /// Ctor for creating an existing property
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="key"></param>
         /// <param name="alias"></param>
         /// <param name="name"></param>
         /// <param name="sortOrder"></param>
         /// <param name="editorAlias"></param>
-        internal MacroProperty(int id, string @alias, string name, int sortOrder, string editorAlias)
+        internal MacroProperty(int id, Guid key, string @alias, string name, int sortOrder, string editorAlias)
         {
             _id = id;
             _alias = alias;
             _name = name;
             _sortOrder = sortOrder;
+            _key = key;
 
             //try to get the new mapped parameter editor
             var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(editorAlias, false);
@@ -66,17 +69,34 @@ namespace Umbraco.Core.Models
             _editorAlias = editorAlias;
         }
 
+        private Guid _key;
         private string _alias;
         private string _name;
         private int _sortOrder;
         private int _id;
         private string _editorAlias;
 
-        private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Alias);
-        private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Name);
-        private static readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, int>(x => x.SortOrder);
-        private static readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Entity, int>(x => x.Id);
-        private static readonly PropertyInfo PropertyTypeSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.EditorAlias);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo KeySelector = ExpressionHelper.GetPropertyInfo<MacroProperty, Guid>(x => x.Key);
+            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Alias);
+            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.Name);
+            public readonly PropertyInfo SortOrderSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, int>(x => x.SortOrder);
+            public readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<Entity, int>(x => x.Id);
+            public readonly PropertyInfo PropertyTypeSelector = ExpressionHelper.GetPropertyInfo<MacroProperty, string>(x => x.EditorAlias);
+        }
+
+        /// <summary>
+        /// Gets or sets the Key of the Property
+        /// </summary>
+        [DataMember]
+        public Guid Key
+        {
+            get { return _key; }
+            set { SetPropertyValueAndDetectChanges(value, ref _key, Ps.Value.KeySelector); }
+        }
 
         /// <summary>
         /// Gets or sets the Alias of the Property
@@ -85,14 +105,7 @@ namespace Umbraco.Core.Models
         public int Id
         {
             get { return _id; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _id = value;
-                    return _alias;
-                }, _alias, IdSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _id, Ps.Value.IdSelector); }
         }
 
         /// <summary>
@@ -102,14 +115,7 @@ namespace Umbraco.Core.Models
         public string Alias
         {
             get { return _alias; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _alias = value;
-                    return _alias;
-                }, _alias, AliasSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _alias, Ps.Value.AliasSelector); }
         }
 
         /// <summary>
@@ -119,14 +125,7 @@ namespace Umbraco.Core.Models
         public string Name
         {
             get { return _name; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _name = value;
-                    return _name;
-                }, _name, NameSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector); }
         }
 
         /// <summary>
@@ -136,14 +135,7 @@ namespace Umbraco.Core.Models
         public int SortOrder
         {
             get { return _sortOrder; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _sortOrder = value;
-                    return _sortOrder;
-                }, _sortOrder, SortOrderSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _sortOrder, Ps.Value.SortOrderSelector); }
         }
 
         /// <summary>
@@ -159,21 +151,10 @@ namespace Umbraco.Core.Models
             get { return _editorAlias; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    //try to get the new mapped parameter editor
-                    var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(value, false);
-                    if (mapped.IsNullOrWhiteSpace() == false)
-                    {
-                        _editorAlias = mapped;
-                    }
-                    else
-                    {
-                        _editorAlias = value;
-                    }
-
-                    return _editorAlias;
-                }, _editorAlias, PropertyTypeSelector);
+                //try to get the new mapped parameter editor
+                var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(value, false);
+                var newVal = mapped.IsNullOrWhiteSpace() == false ? mapped : value;
+                SetPropertyValueAndDetectChanges(newVal, ref _editorAlias, Ps.Value.PropertyTypeSelector);                
             }
         }
 

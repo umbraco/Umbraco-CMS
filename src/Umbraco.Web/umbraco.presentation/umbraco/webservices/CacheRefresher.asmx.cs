@@ -11,7 +11,9 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
 using umbraco.interfaces;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
+using Umbraco.Web.Security;
 
 namespace umbraco.presentation.webservices
 {
@@ -67,7 +69,7 @@ namespace umbraco.presentation.webservices
             // to ensure that the lockout policies are applied, though because we are not authenticating
             // the user with their real password, we need to do this a bit manually.
 
-            var userMgr = Context.GetOwinContext().GetUserManager<BackOfficeUserManager>();
+            var userMgr = Context.GetOwinContext().GetBackOfficeUserManager();
             
             var user = ApplicationContext.Current.Services.UserService.GetByUsername(login);
             if (user == null) return false;

@@ -44,6 +44,13 @@ namespace Umbraco.Web.Install.Controllers
 
             if (ApplicationContext.Current.IsUpgrading)
             {
+                // Update ClientDependency version
+                var clientDependencyConfig = new ClientDependencyConfiguration(_umbracoContext.Application.ProfilingLogger.Logger);
+                var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
+                    UmbracoVersion.GetSemanticVersion(), DateTime.UtcNow, "yyyyMMdd");
+                // Delete ClientDependency temp directories to make sure we get fresh caches
+                var clientDependencyTempFilesDeleted = clientDependencyConfig.ClearTempFiles(HttpContext);
+
                 var result = _umbracoContext.Security.ValidateCurrentUser(false);
 
                 switch (result)

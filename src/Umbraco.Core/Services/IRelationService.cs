@@ -22,6 +22,13 @@ namespace Umbraco.Core.Services
         IRelationType GetRelationTypeById(int id);
 
         /// <summary>
+        /// Gets a <see cref="RelationType"/> by its Id
+        /// </summary>
+        /// <param name="id">Id of the <see cref="RelationType"/></param>
+        /// <returns>A <see cref="RelationType"/> object</returns>
+        IRelationType GetRelationTypeById(Guid id);
+
+        /// <summary>
         /// Gets a <see cref="RelationType"/> by its Alias
         /// </summary>
         /// <param name="alias">Alias of the <see cref="RelationType"/></param>
@@ -183,6 +190,15 @@ namespace Umbraco.Core.Services
             bool loadBaseType = false);
 
         /// <summary>
+        /// Relates two objects by their entity Ids.
+        /// </summary>
+        /// <param name="parentId">Id of the parent</param>
+        /// <param name="childId">Id of the child</param>
+        /// <param name="relationType">The type of relation to create</param>
+        /// <returns>The created <see cref="Relation"/></returns>
+        IRelation Relate(int parentId, int childId, IRelationType relationType);
+
+        /// <summary>
         /// Relates two objects that are based on the <see cref="IUmbracoEntity"/> interface.
         /// </summary>
         /// <param name="parent">Parent entity</param>
@@ -190,6 +206,15 @@ namespace Umbraco.Core.Services
         /// <param name="relationType">The type of relation to create</param>
         /// <returns>The created <see cref="Relation"/></returns>
         IRelation Relate(IUmbracoEntity parent, IUmbracoEntity child, IRelationType relationType);
+
+        /// <summary>
+        /// Relates two objects by their entity Ids.
+        /// </summary>
+        /// <param name="parentId">Id of the parent</param>
+        /// <param name="childId">Id of the child</param>
+        /// <param name="relationTypeAlias">Alias of the type of relation to create</param>
+        /// <returns>The created <see cref="Relation"/></returns>
+        IRelation Relate(int parentId, int childId, string relationTypeAlias);
 
         /// <summary>
         /// Relates two objects that are based on the <see cref="IUmbracoEntity"/> interface.

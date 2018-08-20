@@ -93,7 +93,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
                                 },
 	                            name: searchText,
 	                            metaData: {
-	                                listViewNode: child,
+	                                listViewNode: child
 	                            },
 	                            cssClass: "icon-search",
 	                            cssClasses: ["not-published"]
@@ -259,7 +259,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	                }
 	            });
 	        } else {
-	            var a = dialogOptions.filter.toLowerCase().split(',');
+	            var a = dialogOptions.filter.toLowerCase().replace(/\s/g, '').split(',');
 	            angular.forEach(nodes, function (value, key) {
 
 	                var found = a.indexOf(value.metaData.contentType.toLowerCase()) >= 0;

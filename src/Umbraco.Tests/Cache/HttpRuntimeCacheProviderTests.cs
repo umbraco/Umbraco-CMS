@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Web;
 using NUnit.Framework;
 using Umbraco.Core.Cache;
@@ -49,7 +50,7 @@ namespace Umbraco.Tests.Cache
 
         private static string GetValue(int i)
         {
-            Console.WriteLine("get" + i);
+            Debug.Print("get" + i);
             if (i < 3)
                 throw new Exception("fail");
             return "succ" + i;

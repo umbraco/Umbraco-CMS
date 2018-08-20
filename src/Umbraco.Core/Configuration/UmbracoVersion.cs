@@ -6,7 +6,7 @@ namespace Umbraco.Core.Configuration
 {
     public class UmbracoVersion
     {
-        private static readonly Version Version = new Version("7.5.0");
+        private static readonly Version Version = new Version("7.12.1");
 
         /// <summary>
         /// Gets the current version of Umbraco.
@@ -33,9 +33,9 @@ namespace Umbraco.Core.Configuration
         public static SemVersion GetSemanticVersion()
         {
             return new SemVersion(
-                Current.Major, 
+                Current.Major,
                 Current.Minor,
-                Current.Build, 
+                Current.Build,
                 CurrentComment.IsNullOrWhiteSpace() ? null : CurrentComment,
                 Current.Revision > 0 ? Current.Revision.ToInvariantString() : null);
         }

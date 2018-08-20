@@ -1,7 +1,7 @@
 .umb-editor-sub-header {
    padding: 15px 0;
    margin-bottom: 30px;
-   background: #ffffff;
+   background: @white;
    display: flex;
    justify-content: space-between;
    margin-top: -30px;
@@ -12,7 +12,7 @@
 .umb-editor-sub-header.-umb-sticky-bar {
    box-shadow: 0 5px 0 rgba(0, 0, 0, 0.08), 0 1px 0 rgba(0, 0, 0, 0.16);
    transition: box-shadow 1s;
-   top: 101px; /* height of header: 100px + its bottom-border: 1px */
+   top: 100px; /* height of header */
    margin-top: 0;
    margin-bottom: 0;
 }
@@ -36,7 +36,7 @@
 }
 
 .umb-editor-sub-header__section {
-   border-left: 1px solid @grayLight;
+   border-left: 1px solid @gray-8;
    display: flex;
    align-items: center;
    padding-left: 20px;
@@ -50,7 +50,7 @@
 
 .umb-editor-sub-header__content-right .umb-editor-sub-header__section {
    border-left: none;
-   border-right: 1px solid @grayLight;
+   border-right: 1px solid @gray-8;
 }
 
 .umb-editor-sub-header__content-right .umb-editor-sub-header__section:last-child {

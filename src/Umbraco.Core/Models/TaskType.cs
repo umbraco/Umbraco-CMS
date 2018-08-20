@@ -19,7 +19,12 @@ namespace Umbraco.Core.Models
             _alias = alias;
         }
 
-        private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<TaskType, string>(x => x.Alias);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<TaskType, string>(x => x.Alias);
+        }
 
         /// <summary>
         /// Gets or sets the Alias of the TaskType
@@ -28,14 +33,7 @@ namespace Umbraco.Core.Models
         public string Alias
         {
             get { return _alias; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _alias = value;
-                    return _alias;
-                }, _alias, AliasSelector);    
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _alias, Ps.Value.AliasSelector); }
         }
     }
 }

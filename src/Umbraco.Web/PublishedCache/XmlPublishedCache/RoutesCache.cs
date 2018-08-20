@@ -83,10 +83,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// </summary>
         /// <param name="nodeId">The node identified.</param>
         /// <param name="route">The route.</param>
-        public void Store(int nodeId, string route)
+        /// <param name="trust">A value indicating whether the value can be trusted for inbound routing.</param>
+        public void Store(int nodeId, string route, bool trust)
         {
             _routes.AddOrUpdate(nodeId, i => route, (i, s) => route);
-            _nodeIds.AddOrUpdate(route, i => nodeId, (i, s) => nodeId);
+            if (trust)
+                _nodeIds.AddOrUpdate(route, i => nodeId, (i, s) => nodeId);
         }
 
         /// <summary>
@@ -119,15 +121,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         /// <param name="nodeId">The node identifier.</param>
         public void ClearNode(int nodeId)
         {
-            if (!_routes.ContainsKey(nodeId)) return;
-
-            string key;
-            if (!_routes.TryGetValue(nodeId, out key)) return;
-
-            int val;
-            _nodeIds.TryRemove(key, out val);
-            string val2;
-            _routes.TryRemove(nodeId, out val2);
+            string route;
+            if (_routes.TryRemove(nodeId, out route))
+            {
+                int id;
+                _nodeIds.TryRemove(route, out id);
+            }
         }
 
         /// <summary>

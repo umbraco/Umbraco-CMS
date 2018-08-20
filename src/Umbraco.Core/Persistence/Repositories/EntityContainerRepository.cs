@@ -20,7 +20,7 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly Guid _containerObjectType;
 
-        public EntityContainerRepository(IDatabaseUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, Guid containerObjectType) 
+        public EntityContainerRepository(IScopeUnitOfWork work, CacheHelper cache, ILogger logger, ISqlSyntaxProvider sqlSyntax, Guid containerObjectType) 
             : base(work, cache, logger, sqlSyntax)
         {
             var allowedContainers = new[] {Constants.ObjectTypes.DocumentTypeContainerGuid, Constants.ObjectTypes.MediaTypeContainerGuid, Constants.ObjectTypes.DataTypeContainerGuid};
@@ -29,19 +29,18 @@ namespace Umbraco.Core.Persistence.Repositories
                 throw new InvalidOperationException("No container type exists with ID: " + _containerObjectType);
         }
 
-        /// <summary>
-        /// Do not cache anything
-        /// </summary>
-        protected override IRuntimeCacheProvider RuntimeCache
+        // never cache
+        private static readonly IRuntimeCacheProvider NullCache = new NullCacheProvider();
+        protected override IRuntimeCacheProvider GetIsolatedCache(IsolatedRuntimeCache provider)
         {
-            get { return new NullCacheProvider(); }
+            return NullCache;
         }
 
         protected override EntityContainer PerformGet(int id)
         {
             var sql = GetBaseQuery(false).Where(GetBaseWhereClause(), new { id = id, NodeObjectType = NodeObjectTypeId });
 
-            var nodeDto = Database.Fetch<NodeDto>(sql).FirstOrDefault();
+            var nodeDto = Database.Fetch<NodeDto>(SqlSyntax.SelectTop(sql, 1)).FirstOrDefault();
             return nodeDto == null ? null : CreateEntity(nodeDto);
         }
 
@@ -62,17 +61,27 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override IEnumerable<EntityContainer> PerformGetAll(params int[] ids)
         {
-            //we need to batch these in groups of 2000 so we don't exceed the max 2100 limit
-            return ids.InGroupsOf(2000).SelectMany(@group =>
+            if (ids.Any())
+            {
+                //we need to batch these in groups of 2000 so we don't exceed the max 2100 limit
+                return ids.InGroupsOf(2000).SelectMany(@group =>
+                {
+                    var sql = GetBaseQuery(false)
+                        .Where("nodeObjectType=@umbracoObjectTypeId", new {umbracoObjectTypeId = NodeObjectTypeId})
+                        .Where(string.Format("{0} IN (@ids)", SqlSyntax.GetQuotedColumnName("id")), new {ids = @group});
+
+                    sql.OrderBy<NodeDto>(x => x.Level, SqlSyntax);
+
+                    return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
+                });
+            }
+            else
             {
                 var sql = GetBaseQuery(false)
-                    .Where("nodeObjectType=@umbracoObjectTypeId", new { umbracoObjectTypeId = NodeObjectTypeId })
-                    .Where(string.Format("{0} IN (@ids)", SqlSyntax.GetQuotedColumnName("id")), new { ids = @group });
-
+                    .Where("nodeObjectType=@umbracoObjectTypeId", new {umbracoObjectTypeId = NodeObjectTypeId});
                 sql.OrderBy<NodeDto>(x => x.Level, SqlSyntax);
-
                 return Database.Fetch<NodeDto>(sql).Select(CreateEntity);
-            });
+            }
         }
 
         protected override IEnumerable<EntityContainer> PerformGetByQuery(IQuery<EntityContainer> query)
@@ -158,6 +167,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             // delete
             Database.Delete(nodeDto);
+
+            entity.DeletedDate = DateTime.Now;
         }
 
         protected override void PersistNewItem(EntityContainer entity)

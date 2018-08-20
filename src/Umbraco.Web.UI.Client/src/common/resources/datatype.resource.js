@@ -35,12 +35,12 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
             }
 
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "dataTypeApiBaseUrl",
-                       "GetPreValues",
-                       [{ editorAlias: editorAlias }, { dataTypeId: dataTypeId }])),
-               "Failed to retrieve pre values for editor alias " + editorAlias);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "GetPreValues",
+                        [{ editorAlias: editorAlias }, { dataTypeId: dataTypeId }])),
+                "Failed to retrieve pre values for editor alias " + editorAlias);
         },
 
         /**
@@ -66,12 +66,12 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getById: function (id) {
 
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "dataTypeApiBaseUrl",
-                       "GetById",
-                       [{ id: id }])),
-               "Failed to retrieve data for data type id " + id);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "GetById",
+                        [{ id: id }])),
+                "Failed to retrieve data for data type id " + id);
         },
 
         /**
@@ -97,24 +97,24 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getByName: function (name) {
 
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "dataTypeApiBaseUrl",
-                       "GetByName",
-                       [{ name: name }])),
-               "Failed to retrieve data for data type with name: " + name);
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "GetByName",
+                        [{ name: name }])),
+                "Failed to retrieve data for data type with name: " + name);
         },
 
         getAll: function () {
 
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "dataTypeApiBaseUrl",
-                       "GetAll")),
-               "Failed to retrieve data");
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "GetAll")),
+                "Failed to retrieve data");
         },
-     
+
         getGroupedDataTypes: function () {
             return umbRequestHelper.resourcePromise(
                 $http.get(
@@ -124,7 +124,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 "Failed to retrieve data");
         },
 
-        getGroupedPropertyEditors : function(){
+        getGroupedPropertyEditors: function () {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
@@ -173,11 +173,11 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
         getScaffold: function (parentId) {
 
             return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "dataTypeApiBaseUrl",
-                       "GetEmpty", { parentId: parentId })),
-               "Failed to retrieve data for empty datatype");
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "GetEmpty", { parentId: parentId })),
+                "Failed to retrieve data for empty datatype");
         },
         /**
          * @ngdoc method
@@ -199,7 +199,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @returns {Promise} resourcePromise object.
          *
          */
-        deleteById: function(id) {
+        deleteById: function (id) {
             return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
@@ -212,12 +212,12 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
         deleteContainerById: function (id) {
 
             return umbRequestHelper.resourcePromise(
-               $http.post(
-                   umbRequestHelper.getApiUrl(
-                       "dataTypeApiBaseUrl",
-                       "DeleteContainer",
-                       [{ id: id }])),
-               'Failed to delete content type contaier');
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "DeleteContainer",
+                        [{ id: id }])),
+                'Failed to delete content type contaier');
         },
 
 
@@ -242,16 +242,16 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          */
 
-         getCustomListView: function (contentTypeAlias) {
-                return umbRequestHelper.resourcePromise(
-                   $http.get(
-                       umbRequestHelper.getApiUrl(
-                           "dataTypeApiBaseUrl",
-                           "GetCustomListView",
-                           { contentTypeAlias: contentTypeAlias }
-                           )),
-                   "Failed to retrieve data for custom listview datatype");
-         },
+        getCustomListView: function (contentTypeAlias) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "GetCustomListView",
+                        { contentTypeAlias: contentTypeAlias }
+                    )),
+                "Failed to retrieve data for custom listview datatype");
+        },
 
         /**
         * @ngdoc method
@@ -271,16 +271,16 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
         * @returns {Promise} resourcePromise object containing the listview datatype.
         *
         */
-         createCustomListView: function (contentTypeAlias) {
-             return umbRequestHelper.resourcePromise(
+        createCustomListView: function (contentTypeAlias) {
+            return umbRequestHelper.resourcePromise(
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "dataTypeApiBaseUrl",
                         "PostCreateCustomListView",
                         { contentTypeAlias: contentTypeAlias }
-                        )),
+                    )),
                 "Failed to create a custom listview datatype");
-         },
+        },
 
         /**
          * @ngdoc method
@@ -301,7 +301,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
             var saveModel = umbDataFormatter.formatDataTypePostData(dataType, preValues, "save" + (isNew ? "New" : ""));
 
             return umbRequestHelper.resourcePromise(
-                 $http.post(umbRequestHelper.getApiUrl("dataTypeApiBaseUrl", "PostSave"), saveModel),
+                $http.post(umbRequestHelper.getApiUrl("dataTypeApiBaseUrl", "PostSave"), saveModel),
                 "Failed to save data for data type id " + dataType.id);
         },
 
@@ -351,12 +351,22 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
         createContainer: function (parentId, name) {
 
             return umbRequestHelper.resourcePromise(
-                 $http.post(
+                $http.post(
                     umbRequestHelper.getApiUrl(
-                       "dataTypeApiBaseUrl",
-                       "PostCreateContainer",
-                       { parentId: parentId, name: name })),
+                        "dataTypeApiBaseUrl",
+                        "PostCreateContainer",
+                        { parentId: parentId, name: encodeURIComponent(name) })),
                 'Failed to create a folder under parent id ' + parentId);
+        },
+
+        renameContainer: function (id, name) {
+            return umbRequestHelper.resourcePromise(
+                $http.post
+                    (umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "PostRenameContainer",
+                        { id: id, name: name })),
+                "Failed to rename the folder with id " + id);
         }
     };
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -19,7 +20,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class ContentTests : BaseUmbracoConfigurationTest
+    public class ContentTests : BaseUmbracoApplicationTest
     {
         [SetUp]
         public void Init()
@@ -382,7 +383,7 @@ namespace Umbraco.Tests.Models
 
             var result = ss.ToStream(content);
             var json = result.ResultStream.ToJsonString();
-            Console.WriteLine(json);
+            Debug.Print(json);
         }
 
         /*[Test]

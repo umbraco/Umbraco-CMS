@@ -307,11 +307,12 @@ namespace umbraco.cms.businesslogic.web
                 foreach (var currentContentTypeId in currentContentTypeIds)
                 {
                     //get all the content item ids of the current content type
-                    using (var dr = SqlHelper.ExecuteReader(@"SELECT DISTINCT cmsDocument.nodeId FROM cmsDocument
+                    using (var sqlHelper = Application.SqlHelper)
+                    using (var dr = sqlHelper.ExecuteReader(@"SELECT DISTINCT cmsDocument.nodeId FROM cmsDocument
                                                         INNER JOIN cmsContent ON cmsContent.nodeId = cmsDocument.nodeId
                                                         INNER JOIN cmsContentType ON cmsContent.contentType = cmsContentType.nodeId
                                                         WHERE cmsContentType.nodeId = @contentTypeId AND cmsDocument.published = 1",
-                                                            SqlHelper.CreateParameter("@contentTypeId", currentContentTypeId)))
+                                                            sqlHelper.CreateParameter("@contentTypeId", currentContentTypeId)))
                     {
                         while (dr.Read())
                         {
@@ -321,8 +322,9 @@ namespace umbraco.cms.businesslogic.web
                     }
 
                     //lookup the child content types if there are any and add the ids to the content type ids array
-                    using (var reader = SqlHelper.ExecuteReader("SELECT childContentTypeId FROM cmsContentType2ContentType WHERE parentContentTypeId=@contentTypeId",
-                                                                SqlHelper.CreateParameter("@contentTypeId", currentContentTypeId)))
+                    using (var sqlHelper = Application.SqlHelper)
+                    using (var reader = sqlHelper.ExecuteReader("SELECT childContentTypeId FROM cmsContentType2ContentType WHERE parentContentTypeId=@contentTypeId",
+                                                                sqlHelper.CreateParameter("@contentTypeId", currentContentTypeId)))
                     {
                         while (reader.Read())
                         {
@@ -396,15 +398,17 @@ namespace umbraco.cms.businesslogic.web
                 foreach (var currentContentTypeId in currentContentTypeIds)
                 {
                     //Remove all items from the cmsContentXml table that are of this current content type
-                    SqlHelper.ExecuteNonQuery(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                    using (var sqlHelper = Application.SqlHelper)
+                        sqlHelper.ExecuteNonQuery(@"DELETE FROM cmsContentXml WHERE nodeId IN
                                         (SELECT DISTINCT cmsContent.nodeId FROM cmsContent 
                                             INNER JOIN cmsContentType ON cmsContent.contentType = cmsContentType.nodeId 
                                             WHERE cmsContentType.nodeId = @contentTypeId)",
-                                              SqlHelper.CreateParameter("@contentTypeId", currentContentTypeId));
+                                              sqlHelper.CreateParameter("@contentTypeId", currentContentTypeId));
 
                     //lookup the child content types if there are any and add the ids to the content type ids array
-                    using (var reader = SqlHelper.ExecuteReader("SELECT childContentTypeId FROM cmsContentType2ContentType WHERE parentContentTypeId=@contentTypeId",
-                                                                SqlHelper.CreateParameter("@contentTypeId", currentContentTypeId)))
+                    using (var sqlHelper = Application.SqlHelper)
+                    using (var reader = sqlHelper.ExecuteReader("SELECT childContentTypeId FROM cmsContentType2ContentType WHERE parentContentTypeId=@contentTypeId",
+                                                                sqlHelper.CreateParameter("@contentTypeId", currentContentTypeId)))
                     {                        
                         while (reader.Read())
                         {

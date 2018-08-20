@@ -46,6 +46,7 @@ function MarkdownEditorController($scope, $element, assetsService, dialogService
                 // init the md editor after this digest because the DOM needs to be ready first
                 // so run the init on a timeout
                 $timeout(function () {
+                    $scope.markdownEditorInitComplete = false;
                     var converter2 = new Markdown.Converter();
                     var editor2 = new Markdown.Editor(converter2, "-" + $scope.model.alias);
                     editor2.run();
@@ -57,16 +58,23 @@ function MarkdownEditorController($scope, $element, assetsService, dialogService
                     });
 
                     editor2.hooks.set("onPreviewRefresh", function () {
-                        angularHelper.getCurrentForm($scope).$setDirty();
-                        // We must manually update the model as there is no way to hook into the markdown editor events without editing that code.
-                        $scope.model.value = $("textarea", $element).val();
+                        // We must manually update the model as there is no way to hook into the markdown editor events without exstensive edits to the library.
+                        if ($scope.model.value !== $("textarea", $element).val()) {
+                            if ($scope.markdownEditorInitComplete) {
+                                //only set dirty after init load to avoid "unsaved" dialogue when we don't want it
+                                angularHelper.getCurrentForm($scope).$setDirty();
+                            } else {
+                                $scope.markdownEditorInitComplete = true;
+                            }
+                            $scope.model.value = $("textarea", $element).val();
+                        }
                     });
 
                 }, 200);
             });
 
             //load the seperat css for the editor to avoid it blocking our js loading TEMP HACK
-            assetsService.loadCss("lib/markdown/markdown.css");
+            assetsService.loadCss("lib/markdown/markdown.css", $scope);
         })
 }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -17,14 +18,25 @@ namespace Umbraco.Core.Publishing
             _contentService = contentService;
         }
 
-        public void CheckPendingAndProcess()
+        /// <summary>
+        /// Processes scheduled operations
+        /// </summary>
+        /// <returns>
+        /// Returns the number of items successfully completed
+        /// </returns>
+        public int CheckPendingAndProcess()
         {
-            foreach (var d in _contentService.GetContentForRelease())
+            var counter = 0;
+            var contentForRelease = _contentService.GetContentForRelease().ToArray();
+            if (contentForRelease.Length > 0)
+                LogHelper.Debug<ScheduledPublisher>(string.Format("There's {0} item(s) of content to be published", contentForRelease.Length));
+            foreach (var d in contentForRelease)
             {
                 try
                 {
                     d.ReleaseDate = null;
                     var result = _contentService.SaveAndPublishWithStatus(d, (int)d.GetWriterProfile().Id);
+                    LogHelper.Debug<ContentService>(string.Format("Result of publish attempt: {0}", result.Result.StatusType));
                     if (result.Success == false)
                     {
                         if (result.Exception != null)
@@ -32,9 +44,13 @@ namespace Umbraco.Core.Publishing
                             LogHelper.Error<ScheduledPublisher>("Could not published the document (" + d.Id + ") based on it's scheduled release, status result: " + result.Result.StatusType, result.Exception);
                         }
                         else
-                        {                            
+                        {
                             LogHelper.Warn<ScheduledPublisher>("Could not published the document (" + d.Id + ") based on it's scheduled release. Status result: " + result.Result.StatusType);
                         }
+                    }
+                    else
+                    {
+                        counter++;
                     }
                 }
                 catch (Exception ee)
@@ -43,12 +59,20 @@ namespace Umbraco.Core.Publishing
                     throw;
                 }
             }
-            foreach (var d in _contentService.GetContentForExpiration())
+
+            var contentForExpiration = _contentService.GetContentForExpiration().ToArray();
+            if (contentForExpiration.Length > 0)
+                LogHelper.Debug<ScheduledPublisher>(string.Format("There's {0} item(s) of content to be unpublished", contentForExpiration.Length));
+            foreach (var d in contentForExpiration)
             {
                 try
                 {
                     d.ExpireDate = null;
-                    _contentService.UnPublish(d, (int)d.GetWriterProfile().Id);
+                    var result = _contentService.UnPublish(d, (int)d.GetWriterProfile().Id);
+                    if (result)
+                    {
+                        counter++;
+                    }
                 }
                 catch (Exception ee)
                 {
@@ -56,6 +80,8 @@ namespace Umbraco.Core.Publishing
                     throw;
                 }
             }
+
+            return counter;
         }
     }
 }

@@ -12,20 +12,28 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public Task BuildEntity(TaskDto dto)
         {
-            var entity = new Task(new TaskType(dto.TaskTypeDto.Alias) { Id = dto.TaskTypeDto.Id })
+            var entity = new Task(new TaskType(dto.TaskTypeDto.Alias) { Id = dto.TaskTypeDto.Id });
+
+            try
             {
-                Closed = dto.Closed,
-                AssigneeUserId = dto.UserId,
-                Comment = dto.Comment,
-                CreateDate = dto.DateTime,
-                EntityId = dto.NodeId,
-                Id = dto.Id,
-                OwnerUserId = dto.ParentUserId,
-            };
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            entity.ResetDirtyProperties(false);
-            return entity;
+                entity.DisableChangeTracking();
+
+                entity.Closed = dto.Closed;
+                entity.AssigneeUserId = dto.UserId;
+                entity.Comment = dto.Comment;
+                entity.CreateDate = dto.DateTime;
+                entity.EntityId = dto.NodeId;
+                entity.Id = dto.Id;
+                entity.OwnerUserId = dto.ParentUserId;
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                entity.ResetDirtyProperties(false);
+                return entity;
+            }
+            finally
+            {
+                entity.EnableChangeTracking();
+            }
         }
 
         public TaskDto BuildDto(Task entity)

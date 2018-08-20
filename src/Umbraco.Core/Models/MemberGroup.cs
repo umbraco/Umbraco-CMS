@@ -21,8 +21,13 @@ namespace Umbraco.Core.Models
         private string _name;
         private int _creatorId;
 
-        private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<MemberGroup, string>(x => x.Name);
-        private static readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<MemberGroup, int>(x => x.CreatorId);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<MemberGroup, string>(x => x.Name);
+            public readonly PropertyInfo CreatorIdSelector = ExpressionHelper.GetPropertyInfo<MemberGroup, int>(x => x.CreatorId);
+        }
 
         [DataMember]
         public string Name
@@ -30,33 +35,22 @@ namespace Umbraco.Core.Models
             get { return _name; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
+                if (_name != value)
                 {
-                    if (_name != value)
-                    {
-                        //if the name has changed, add the value to the additional data,
-                        //this is required purely for event handlers to know the previous name of the group
-                        //so we can keep the public access up to date.
-                        AdditionalData["previousName"] = _name;
-                    }
+                    //if the name has changed, add the value to the additional data,
+                    //this is required purely for event handlers to know the previous name of the group
+                    //so we can keep the public access up to date.
+                    AdditionalData["previousName"] = _name;
+                }
 
-                    _name = value;
-                    return _name;
-                }, _name, NameSelector);
+                SetPropertyValueAndDetectChanges(value, ref _name, Ps.Value.NameSelector);                
             }
         }
 
         public int CreatorId
         {
             get { return _creatorId; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _creatorId = value;
-                    return _creatorId;
-                }, _creatorId, CreatorIdSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _creatorId, Ps.Value.CreatorIdSelector); }
         }
 
         public IDictionary<string, object> AdditionalData { get; private set; }

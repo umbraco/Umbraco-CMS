@@ -23,6 +23,9 @@ namespace umbraco.cms.businesslogic
     {
         private static readonly Guid TopLevelParent = new Guid(Constants.Conventions.Localization.DictionaryItemRootId);
 
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
         [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database")]
         protected static ISqlHelper SqlHelper
         {
@@ -167,6 +170,12 @@ namespace umbraco.cms.businesslogic
                     else
                         throw new ArgumentException("New value of key already exists (is key)");
                 }
+            }
+
+            public void setKey(string value)
+            {
+                key = value;
+                Save();
             }
 
             public string Value(int languageId)

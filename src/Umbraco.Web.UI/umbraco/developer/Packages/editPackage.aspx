@@ -35,13 +35,27 @@
             <asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" EnableClientScript="false"
                 ControlToValidate="packageVersion">*</asp:RequiredFieldValidator>
         </cc2:PropertyPanel>
+        <cc2:PropertyPanel runat="server" ID="pp_icon" Text="Package Icon URL">
+            <asp:TextBox ID="iconUrl" runat="server" Width="230px" CssClass="guiInputText"></asp:TextBox>            
+        </cc2:PropertyPanel>
         <cc2:PropertyPanel runat="server" ID="pp_file" Text="Package file (.zip):">
-            <asp:Button ID="bt_submitButton" runat="server" Text="Submit to repository" Visible="false" />
             <asp:Literal ID="packageUmbFile" runat="server" />
         </cc2:PropertyPanel>
+         
     </cc2:Pane>
+    
+    <cc2:Pane ID="Pane5" runat="server">
+        <cc2:PropertyPanel runat="server" ID="pp_umbracoVersion" Text="Umbraco Target Version">
+            <asp:TextBox ID="umbracoVersion" runat="server" Width="230px" CssClass="guiInputText"></asp:TextBox>
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator7" runat="server" EnableClientScript="false"
+                ControlToValidate="umbracoVersion">*</asp:RequiredFieldValidator>
+            <asp:RegularExpressionValidator ID="VersionValidator" runat="server" EnableClientScript="false"
+                ControlToValidate="umbracoVersion" ValidationExpression="^\d+\.\d+\.\d+$">Invalid version number (eg. 7.5.0)</asp:RegularExpressionValidator>
+        </cc2:PropertyPanel>        
+    </cc2:Pane>
+
     <cc2:Pane ID="Pane1_1" runat="server">
-        <cc2:PropertyPanel runat="server" ID="pp_author" Text="Author Name">
+        <cc2:PropertyPanel runat="server" ID="pp_author" Text="Author Name" >
             <asp:TextBox ID="packageAuthorName" runat="server" Width="230px" CssClass="guiInputText"></asp:TextBox>
             <asp:RequiredFieldValidator ID="RequiredFieldValidator3" runat="server" EnableClientScript="false"
                 ControlToValidate="packageAuthorName">*</asp:RequiredFieldValidator>
@@ -52,6 +66,7 @@
                 ControlToValidate="packageAuthorUrl">*</asp:RequiredFieldValidator>
         </cc2:PropertyPanel>
     </cc2:Pane>
+
     <cc2:Pane ID="Pane1_2" runat="server">
         <cc2:PropertyPanel runat="server" ID="pp_licens" Text="License Name:">
             <asp:TextBox ID="packageLicenseName" runat="server" Width="230px" CssClass="guiInputText"></asp:TextBox>
@@ -175,6 +190,7 @@
                     <a href="#" onclick="UmbClientMgr.openModalWindow('developer/packages/directoryBrowser.aspx?target=<%= packageControlPath.ClientID %>','Choose a file or a folder', true, 500, 400); return false;"
                         style="border: none;">
                          <i class="icon icon-folder"></i>
+                      </a>
                 </td>
             </tr>
         </table>
@@ -188,7 +204,7 @@
                         during installation and uninstallation.
                         <br />
                         All actions are formed as a xml node, containing data for the action to be performed.
-                        <a href="http://our.umbraco.org/wiki/reference/packaging/package-actions
+                        <a href="https://our.umbraco.com/documentation/Reference/Packaging/
 " target="_blank">Package actions documentation</a>
                     </p>
                     <asp:CustomValidator ID="actionsVal" runat="server" OnServerValidate="validateActions"

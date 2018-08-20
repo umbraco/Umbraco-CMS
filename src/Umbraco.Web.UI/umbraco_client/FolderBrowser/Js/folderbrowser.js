@@ -287,11 +287,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             });
 
             // Listen for drag events
-            $(".umbFolderBrowser").live('dragenter dragover', function (e) {
+            $(".umbFolderBrowser").on('dragenter dragover', function (e) {
                 $(".upload-overlay").show();
             });
 
-            $(".upload-overlay").live('dragleave dragexit', function (e) {
+            $(".upload-overlay").on('dragleave dragexit', function (e) {
                 $(this).hide();
             }).click(function () {
                 $(this).hide();
@@ -389,12 +389,12 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                             processData: false,
                             success: function (data, textStatus) {
                                 if (textStatus == "error") {
-                                    alert("Oops. Could not update sort order");
+                                    alert("Could not update sort order");
                                     self._getChildNodes();
                                 }
                             },
                             error: function(data) {
-                                alert("Oops. Could not update sort order. Err: " + data.statusText);
+                                alert("Could not update sort order. Err: " + data.statusText);
                                 self._getChildNodes();
                             }
                         });

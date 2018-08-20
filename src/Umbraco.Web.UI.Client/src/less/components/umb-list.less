@@ -1,0 +1,30 @@
+.umb-list-item {
+    border-bottom: 1px solid @gray-9;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    display: flex;
+}
+
+a.umb-list-item:hover,
+a.umb-list-item:focus {
+    text-decoration: none;
+}
+
+.umb-list-item--disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.umb-list-item:hover .umb-list-checkbox,
+.umb-list-item--selected .umb-list-checkbox {
+    opacity: 1;
+}
+
+.umb-list-checkbox {
+    position: absolute;
+    opacity: 0;
+}
+
+.umb-list-checkbox--visible {
+    opacity: 1;
+}

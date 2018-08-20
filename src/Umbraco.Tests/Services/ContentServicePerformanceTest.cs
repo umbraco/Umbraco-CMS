@@ -112,7 +112,7 @@ namespace Umbraco.Tests.Services
             watch.Stop();
             var elapsed = watch.ElapsedMilliseconds;
 
-            Console.WriteLine("100 content items saved in {0} ms", elapsed);
+            Debug.Print("100 content items saved in {0} ms", elapsed);
 
             // Assert
             Assert.That(pages.Any(x => x.HasIdentity == false), Is.False);
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.Services
             watch.Stop();
             var elapsed = watch.ElapsedMilliseconds;
 
-            Console.WriteLine("100 content items saved in {0} ms", elapsed);
+            Debug.Print("100 content items saved in {0} ms", elapsed);
 
             // Assert
             Assert.That(pages.Any(x => x.HasIdentity == false), Is.False);
@@ -159,7 +159,7 @@ namespace Umbraco.Tests.Services
                 watch.Stop();
                 var elapsed = watch.ElapsedMilliseconds;
 
-                Console.WriteLine("100 content items retrieved in {0} ms without caching", elapsed);
+                Debug.Print("100 content items retrieved in {0} ms without caching", elapsed);
 
                 // Assert
                 Assert.That(contents.Any(x => x.HasIdentity == false), Is.False);
@@ -190,7 +190,7 @@ namespace Umbraco.Tests.Services
                 watch.Stop();
                 var elapsed = watch.ElapsedMilliseconds;
 
-                Console.WriteLine("1000 content items retrieved in {0} ms without caching", elapsed);
+                Debug.Print("1000 content items retrieved in {0} ms without caching", elapsed);
 
                 // Assert
                 //Assert.That(contents.Any(x => x.HasIdentity == false), Is.False);
@@ -223,7 +223,7 @@ namespace Umbraco.Tests.Services
                 watch.Stop();
                 var elapsed = watch.ElapsedMilliseconds;
 
-                Console.WriteLine("100 content items retrieved in {0} ms with caching", elapsed);
+                Debug.Print("100 content items retrieved in {0} ms with caching", elapsed);
 
                 // Assert
                 Assert.That(contentsCached.Any(x => x.HasIdentity == false), Is.False);
@@ -256,7 +256,7 @@ namespace Umbraco.Tests.Services
                 watch.Stop();
                 var elapsed = watch.ElapsedMilliseconds;
 
-                Console.WriteLine("1000 content items retrieved in {0} ms with caching", elapsed);
+                Debug.Print("1000 content items retrieved in {0} ms with caching", elapsed);
 
                 // Assert
                 //Assert.That(contentsCached.Any(x => x.HasIdentity == false), Is.False);

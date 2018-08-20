@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
@@ -27,23 +28,23 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
         public void Can_Generate_Create_Table_Statement()
         {
             var type = typeof(TagRelationshipDto);
-            var definition = DefinitionFactory.GetTableDefinition(type);
+            var definition = DefinitionFactory.GetTableDefinition(SqlSyntaxContext.SqlSyntaxProvider, type);
 
             string create = SqlSyntaxContext.SqlSyntaxProvider.Format(definition);
             string primaryKey = SqlSyntaxContext.SqlSyntaxProvider.FormatPrimaryKey(definition);
             var indexes = SqlSyntaxContext.SqlSyntaxProvider.Format(definition.Indexes);
             var keys = SqlSyntaxContext.SqlSyntaxProvider.Format(definition.ForeignKeys);
 
-            Console.WriteLine(create);
-            Console.WriteLine(primaryKey);
+            Debug.Print(create);
+            Debug.Print(primaryKey);
             foreach (var sql in keys)
             {
-                Console.WriteLine(sql);
+                Debug.Print(sql);
             }
 
             foreach (var sql in indexes)
             {
-                Console.WriteLine(sql);
+                Debug.Print(sql);
             }
         }
 

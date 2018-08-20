@@ -24,11 +24,16 @@ namespace Umbraco.Core.Models.Identity
         /// 
         /// </summary>
         public IdentityUser()
-        {
+        {            
             this.Claims = new List<TClaim>();
             this.Roles = new List<TRole>();
             this.Logins = new List<TLogin>();
         }
+
+        /// <summary>
+        /// Last login date
+        /// </summary>
+        public virtual DateTime? LastLoginDateUtc { get; set; }
 
         /// <summary>
         /// Email
@@ -77,6 +82,12 @@ namespace Umbraco.Core.Models.Identity
         /// 
         /// </summary>
         public virtual DateTime? LockoutEndDateUtc { get; set; }
+
+        /// <summary>
+        /// DateTime in UTC when the password was last changed.
+        /// 
+        /// </summary>
+        public virtual DateTime? LastPasswordChangeDateUtc { get; set; }
 
         /// <summary>
         /// Is lockout enabled for this user

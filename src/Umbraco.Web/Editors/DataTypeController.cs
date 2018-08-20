@@ -20,9 +20,11 @@ using umbraco;
 using Constants = Umbraco.Core.Constants;
 using System.Net.Http;
 using System.Text;
+using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Editors
 {
+
     /// <summary>
     /// The API controller used for editing data types
     /// </summary>
@@ -33,7 +35,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.DataTypes, Constants.Trees.DocumentTypes, Constants.Trees.MediaTypes, Constants.Trees.MemberTypes)]
     [EnableOverrideAuthorization]
-    public class DataTypeController : UmbracoAuthorizedJsonController
+    public class DataTypeController : BackOfficeNotificationsController
     {
         /// <summary>
         /// Gets data type by name
@@ -75,7 +77,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-            
+
             Services.DataTypeService.Delete(foundType, Security.CurrentUser.Id);
 
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -111,16 +113,16 @@ namespace Umbraco.Web.Editors
         public DataTypeDisplay PostCreateCustomListView(string contentTypeAlias)
         {
             var dt = Services.DataTypeService.GetDataTypeDefinitionByName(Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias);
-            
+
             //if it doesnt exist yet, we will create it.
             if (dt == null)
             {
-                dt = new DataTypeDefinition( Constants.PropertyEditors.ListViewAlias );
+                dt = new DataTypeDefinition(Constants.PropertyEditors.ListViewAlias);
                 dt.Name = Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias;
                 Services.DataTypeService.Save(dt);
             }
 
-            return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dt);    
+            return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dt);
         }
 
         /// <summary>
@@ -160,7 +162,7 @@ namespace Umbraco.Web.Editors
             }
 
             //these are new pre-values, so just return the field editors with default values
-            return Mapper.Map<PropertyEditor, IEnumerable<PreValueFieldDisplay>>(propEd);            
+            return Mapper.Map<PropertyEditor, IEnumerable<PreValueFieldDisplay>>(propEd);
         }
 
         /// <summary>
@@ -267,6 +269,15 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        public HttpResponseMessage PostRenameContainer(int id, string name)
+        {
+            var result = Services.ContentTypeService.RenameDataTypeContainer(id, name, Security.CurrentUser.Id);
+
+            return result
+                ? Request.CreateResponse(HttpStatusCode.OK, result.Result)
+                : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
+        }
+
         #region ReadOnly actions to return basic data - allow access for: content ,media, members, settings, developer
         /// <summary>
         /// Gets the content json for all data types
@@ -307,7 +318,7 @@ namespace Umbraco.Web.Editors
             foreach (var dataType in dataTypes)
             {
                 var propertyEditor = propertyEditors.SingleOrDefault(x => x.Alias == dataType.Alias);
-                if(propertyEditor != null)
+                if (propertyEditor != null)
                     dataType.HasPrevalues = propertyEditor.PreValueEditor.Fields.Any(); ;
             }
 
@@ -331,8 +342,10 @@ namespace Umbraco.Web.Editors
         public IDictionary<string, IEnumerable<DataTypeBasic>> GetGroupedPropertyEditors()
         {
             var datatypes = new List<DataTypeBasic>();
-            
-            var propertyEditors = PropertyEditorResolver.Current.PropertyEditors;
+            var showDeprecatedPropertyEditors = UmbracoConfig.For.UmbracoSettings().Content
+                .ShowDeprecatedPropertyEditors;
+
+            var propertyEditors = PropertyEditorResolver.Current.PropertyEditors.Where(x=>x.IsDeprecated == false || showDeprecatedPropertyEditors);
             foreach (var propertyEditor in propertyEditors)
             {
                 var hasPrevalues = propertyEditor.PreValueEditor.Fields.Any();

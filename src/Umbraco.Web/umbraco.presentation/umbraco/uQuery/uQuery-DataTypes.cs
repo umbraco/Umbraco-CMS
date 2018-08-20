@@ -35,7 +35,8 @@ namespace umbraco
 		{
 			var datatypes = new Dictionary<int, string>();
 
-			using (var reader = uQuery.SqlHelper.ExecuteReader("SELECT d.nodeId, n.text FROM cmsDataType d, umbracoNode n WHERE d.nodeId = n.id"))
+            using (var sqlHelper = Application.SqlHelper)
+            using (var reader = sqlHelper.ExecuteReader("SELECT d.nodeId, n.text FROM cmsDataType d, umbracoNode n WHERE d.nodeId = n.id"))
 			{
 				// Go through the values from the database and store them in the array.
 				while (reader.Read())

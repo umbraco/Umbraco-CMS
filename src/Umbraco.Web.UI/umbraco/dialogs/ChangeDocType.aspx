@@ -108,16 +108,14 @@
         </div>
     </asp:PlaceHolder>
 
-    <asp:PlaceHolder ID="SaveAndCancelPlaceholder" runat="server">
-        <br />
-        <p>
+    <div class="btn-toolbar umb-btn-toolbar">
+        <asp:PlaceHolder ID="SaveAndCancelPlaceholder" runat="server">
+            <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
             <asp:PlaceHolder ID="SavePlaceholder" runat="server">        
-                <asp:Button ID="ValidateAndSave" runat="server" OnClick="ValidateAndSave_Click" />
-                <em> <%= umbraco.ui.Text("or") %> </em>
-            </asp:PlaceHolder>        
-            <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("general", "cancel", Security.CurrentUser)%></a>  
-        </p>
-    </asp:PlaceHolder>
-  
+                <asp:Button ID="ValidateAndSave" runat="server" CssClass="btn btn-primary" Text="Create" OnClick="ValidateAndSave_Click"></asp:Button>
+            </asp:PlaceHolder>
+        </asp:Placeholder>
+    </div>
+     
 </asp:Content>
   

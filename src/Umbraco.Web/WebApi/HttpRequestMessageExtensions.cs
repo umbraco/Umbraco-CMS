@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using System.Web.Http.Results;
 using Microsoft.Owin;
 using Umbraco.Core;
 using Umbraco.Web.Models.ContentEditing;
@@ -27,9 +28,17 @@ namespace Umbraco.Web.WebApi
         internal static Attempt<IOwinContext> TryGetOwinContext(this HttpRequestMessage request)
         {
             var httpContext = request.TryGetHttpContext();
-            return httpContext 
-                ? Attempt.Succeed(httpContext.Result.GetOwinContext()) 
-                : Attempt<IOwinContext>.Fail();
+            try
+            {
+                return httpContext
+                        ? Attempt.Succeed(httpContext.Result.GetOwinContext())
+                        : Attempt<IOwinContext>.Fail();
+            }
+            catch (InvalidOperationException)
+            {
+                //this will occur if there is no OWIN environment which generally would only be in things like unit tests
+                return Attempt<IOwinContext>.Fail();
+            }
         }
 
         /// <summary>
@@ -122,6 +131,22 @@ namespace Umbraco.Web.WebApi
             };
             notificationModel.AddErrorNotification(errorMessage, string.Empty);
             return request.CreateValidationErrorResponse(notificationModel);
+        }
+
+        /// <summary>
+        /// Creates a succressful response with notifications in the result to be displayed in the UI
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="successMessage"></param>
+        /// <returns></returns>
+        public static HttpResponseMessage CreateNotificationSuccessResponse(this HttpRequestMessage request, string successMessage)
+        {
+            var notificationModel = new SimpleNotificationModel
+            {
+                Message = successMessage
+            };
+            notificationModel.AddSuccessNotification(successMessage, string.Empty);
+            return request.CreateResponse(HttpStatusCode.OK, notificationModel);
         }
 
         /// <summary>

@@ -1,20 +1,19 @@
-using System.Runtime.Remoting;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-
-using Umbraco.Tests.CodeFirst.TestModels.Composition;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
-    
+
     [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
     public class ContentTypeServiceTests : BaseServiceTest
@@ -29,6 +28,229 @@ namespace Umbraco.Tests.Services
         public override void TearDown()
         {
             base.TearDown();
+        }
+
+        [Test]
+        public void Deleting_Media_Type_With_Hierarchy_Of_Media_Items_Moves_Orphaned_Media_To_Recycle_Bin()
+        {
+            IMediaType contentType1 = MockedContentTypes.CreateSimpleMediaType("test1", "Test1");
+            ServiceContext.ContentTypeService.Save(contentType1);
+            IMediaType contentType2 = MockedContentTypes.CreateSimpleMediaType("test2", "Test2");
+            ServiceContext.ContentTypeService.Save(contentType2);
+            IMediaType contentType3 = MockedContentTypes.CreateSimpleMediaType("test3", "Test3");
+            ServiceContext.ContentTypeService.Save(contentType3);
+
+            var contentTypes = new[] { contentType1, contentType2, contentType3 };
+            var parentId = -1;
+
+            var ids = new List<int>();
+
+            for (int i = 0; i < 2; i++)
+            {
+                for (var index = 0; index < contentTypes.Length; index++)
+                {
+                    var contentType = contentTypes[index];
+                    var contentItem = MockedMedia.CreateSimpleMedia(contentType, "MyName_" + index + "_" + i, parentId);
+                    ServiceContext.MediaService.Save(contentItem);
+                    parentId = contentItem.Id;
+
+                    ids.Add(contentItem.Id);
+                }
+            }
+
+            //delete the first content type, all other content of different content types should be in the recycle bin
+            ServiceContext.ContentTypeService.Delete(contentTypes[0]);
+
+            var found = ServiceContext.MediaService.GetByIds(ids);
+
+            Assert.AreEqual(4, found.Count());
+            foreach (var content in found)
+            {
+                Assert.IsTrue(content.Trashed);
+            }
+        }
+
+        [Test]
+        public void Deleting_Content_Type_With_Hierarchy_Of_Content_Items_Moves_Orphaned_Content_To_Recycle_Bin()
+        {
+            IContentType contentType1 = MockedContentTypes.CreateSimpleContentType("test1", "Test1");
+            ServiceContext.ContentTypeService.Save(contentType1);
+            IContentType contentType2 = MockedContentTypes.CreateSimpleContentType("test2", "Test2");
+            ServiceContext.ContentTypeService.Save(contentType2);
+            IContentType contentType3 = MockedContentTypes.CreateSimpleContentType("test3", "Test3");
+            ServiceContext.ContentTypeService.Save(contentType3);
+
+            var contentTypes = new[] { contentType1, contentType2, contentType3 };
+            var parentId = -1;
+
+            var ids = new List<int>();
+
+            for (int i = 0; i < 2; i++)
+            {
+                for (var index = 0; index < contentTypes.Length; index++)
+                {
+                    var contentType = contentTypes[index];
+                    var contentItem = MockedContent.CreateSimpleContent(contentType, "MyName_" + index + "_" + i, parentId);
+                    ServiceContext.ContentService.Save(contentItem);
+                    ServiceContext.ContentService.Publish(contentItem);
+                    parentId = contentItem.Id;
+
+                    ids.Add(contentItem.Id);
+                }
+            }
+
+            //delete the first content type, all other content of different content types should be in the recycle bin
+            ServiceContext.ContentTypeService.Delete(contentTypes[0]);
+
+            var found = ServiceContext.ContentService.GetByIds(ids);
+
+            Assert.AreEqual(4, found.Count());
+            foreach (var content in found)
+            {
+                Assert.IsTrue(content.Trashed);
+            }
+        }
+
+        [Test]
+        public void Deleting_Media_Types_With_Hierarchy_Of_Media_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items()
+        {
+            MediaService.Trashed += MediaServiceOnTrashed;
+
+            try
+            {
+                IMediaType contentType1 = MockedContentTypes.CreateSimpleMediaType("test1", "Test1");
+                ServiceContext.ContentTypeService.Save(contentType1);
+                IMediaType contentType2 = MockedContentTypes.CreateSimpleMediaType("test2", "Test2");
+                ServiceContext.ContentTypeService.Save(contentType2);
+                IMediaType contentType3 = MockedContentTypes.CreateSimpleMediaType("test3", "Test3");
+                ServiceContext.ContentTypeService.Save(contentType3);
+
+                var contentTypes = new[] { contentType1, contentType2, contentType3 };
+                var parentId = -1;
+
+                var ids = new List<int>();
+
+                for (int i = 0; i < 2; i++)
+                {
+                    for (var index = 0; index < contentTypes.Length; index++)
+                    {
+                        var contentType = contentTypes[index];
+                        var contentItem = MockedMedia.CreateSimpleMedia(contentType, "MyName_" + index + "_" + i, parentId);
+                        ServiceContext.MediaService.Save(contentItem);
+                        parentId = contentItem.Id;
+
+                        ids.Add(contentItem.Id);
+                    }
+                }
+
+                foreach (var contentType in contentTypes.Reverse())
+                {
+                    ServiceContext.ContentTypeService.Delete(contentType);
+                }
+            }
+            finally
+            {
+                MediaService.Trashed -= MediaServiceOnTrashed;
+            }
+        }
+
+        private void MediaServiceOnTrashed(IMediaService sender, MoveEventArgs<IMedia> e)
+        {
+            foreach (var item in e.MoveInfoCollection)
+            {
+                //if this item doesn't exist then Fail!
+                var exists = ServiceContext.MediaService.GetById(item.Entity.Id);
+                if (exists == null)
+                    Assert.Fail("The item doesn't exist");
+            }
+        }
+
+        [Test]
+        public void Deleting_Content_Types_With_Hierarchy_Of_Content_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items_1()
+        {
+            ContentService.Trashed += ContentServiceOnTrashed;
+
+            try
+            {
+                IContentType contentType1 = MockedContentTypes.CreateSimpleContentType("test1", "Test1");
+                ServiceContext.ContentTypeService.Save(contentType1);
+                IContentType contentType2 = MockedContentTypes.CreateSimpleContentType("test2", "Test2");
+                ServiceContext.ContentTypeService.Save(contentType2);
+                IContentType contentType3 = MockedContentTypes.CreateSimpleContentType("test3", "Test3");
+                ServiceContext.ContentTypeService.Save(contentType3);
+
+                var contentTypes = new[] { contentType1, contentType2, contentType3 };
+                var parentId = -1;
+
+                for (int i = 0; i < 2; i++)
+                {
+                    for (var index = 0; index < contentTypes.Length; index++)
+                    {
+                        var contentType = contentTypes[index];
+                        var contentItem = MockedContent.CreateSimpleContent(contentType, "MyName_" + index + "_" + i, parentId);
+                        ServiceContext.ContentService.Save(contentItem);
+                        ServiceContext.ContentService.Publish(contentItem);
+                        parentId = contentItem.Id;
+                    }
+                }
+
+                foreach (var contentType in contentTypes.Reverse())
+                {
+                    ServiceContext.ContentTypeService.Delete(contentType);
+                }
+            }
+            finally
+            {
+                ContentService.Trashed -= ContentServiceOnTrashed;
+            }
+        }
+
+        [Test]
+        public void Deleting_Content_Types_With_Hierarchy_Of_Content_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items_2()
+        {
+            ContentService.Trashed += ContentServiceOnTrashed;
+
+            try
+            {
+                IContentType contentType1 = MockedContentTypes.CreateSimpleContentType("test1", "Test1");
+                ServiceContext.ContentTypeService.Save(contentType1);
+                IContentType contentType2 = MockedContentTypes.CreateSimpleContentType("test2", "Test2");
+                ServiceContext.ContentTypeService.Save(contentType2);
+                IContentType contentType3 = MockedContentTypes.CreateSimpleContentType("test3", "Test3");
+                ServiceContext.ContentTypeService.Save(contentType3);
+
+                var root = MockedContent.CreateSimpleContent(contentType1, "Root", -1);
+                ServiceContext.ContentService.Save(root);
+                ServiceContext.ContentService.Publish(root);
+
+                var level1 = MockedContent.CreateSimpleContent(contentType2, "L1", root.Id);
+                ServiceContext.ContentService.Save(level1);
+                ServiceContext.ContentService.Publish(level1);
+
+                for (int i = 0; i < 2; i++)
+                {
+                    var level3 = MockedContent.CreateSimpleContent(contentType3, "L2" + i, level1.Id);
+                    ServiceContext.ContentService.Save(level3);
+                    ServiceContext.ContentService.Publish(level3);
+                }
+
+                ServiceContext.ContentTypeService.Delete(contentType1);
+            }
+            finally
+            {
+                ContentService.Trashed -= ContentServiceOnTrashed;
+            }
+        }
+
+        private void ContentServiceOnTrashed(IContentService sender, MoveEventArgs<IContent> e)
+        {
+            foreach (var item in e.MoveInfoCollection)
+            {
+                //if this item doesn't exist then Fail!
+                var exists = ServiceContext.ContentService.GetById(item.Entity.Id);
+                if (exists == null)
+                    Assert.Fail("The item doesn't exist");
+            }
         }
 
         [Test]
@@ -118,13 +340,13 @@ namespace Umbraco.Tests.Services
         public void Get_Descendants()
         {
             // Arrange
-            var contentTypeService = ServiceContext.ContentTypeService;
+            var contentTypeService = (ContentTypeService) ServiceContext.ContentTypeService;
             var hierarchy = CreateContentTypeHierarchy();
             contentTypeService.Save(hierarchy, 0); //ensure they are saved!
             var master = hierarchy.First();
 
             //Act
-            var descendants = master.Descendants();
+            var descendants = contentTypeService.GetDescendants(master);
 
             //Assert
             Assert.AreEqual(10, descendants.Count());
@@ -134,13 +356,13 @@ namespace Umbraco.Tests.Services
         public void Get_Descendants_And_Self()
         {
             // Arrange
-            var contentTypeService = ServiceContext.ContentTypeService;
+            var contentTypeService = (ContentTypeService) ServiceContext.ContentTypeService;
             var hierarchy = CreateContentTypeHierarchy();
             contentTypeService.Save(hierarchy, 0); //ensure they are saved!
             var master = hierarchy.First();
 
             //Act
-            var descendants = master.DescendantsAndSelf();
+            var descendants = new[] {master}.Concat(contentTypeService.GetDescendants(master));
 
             //Assert
             Assert.AreEqual(11, descendants.Count());
@@ -273,6 +495,131 @@ namespace Umbraco.Tests.Services
             var success = category.AddContentType(component);
 
             Assert.That(success, Is.False);
+        }
+
+        [Test]
+        public void Can_Delete_Parent_ContentType_When_Child_Has_Content()
+        {
+            var cts = ServiceContext.ContentTypeService;
+            var contentType = MockedContentTypes.CreateSimpleContentType("page", "Page", null, true);
+            cts.Save(contentType);
+            var childContentType = MockedContentTypes.CreateSimpleContentType("childPage", "Child Page", contentType, true, "Child Content");
+            cts.Save(childContentType);
+            var cs = ServiceContext.ContentService;
+            var content = cs.CreateContent("Page 1", -1, childContentType.Alias);
+            cs.Save(content);
+
+            cts.Delete(contentType);
+
+            Assert.IsNotNull(content.Id);
+            Assert.AreNotEqual(0, content.Id);
+            Assert.IsNotNull(childContentType.Id);
+            Assert.AreNotEqual(0, childContentType.Id);
+            Assert.IsNotNull(contentType.Id);
+            Assert.AreNotEqual(0, contentType.Id);
+            var deletedContent = cs.GetById(content.Id);
+            var deletedChildContentType = cts.GetContentType(childContentType.Id);
+            var deletedContentType = cts.GetContentType(contentType.Id);
+
+            Assert.IsNull(deletedChildContentType);
+            Assert.IsNull(deletedContent);
+            Assert.IsNull(deletedContentType);
+        }
+
+        [Test]
+        public void Can_Create_Container()
+        {
+            // Arrange
+            var cts = ServiceContext.ContentTypeService;
+
+            // Act
+            var container = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid);
+            container.Name = "container1";
+            cts.SaveContentTypeContainer(container);
+
+            // Assert
+            var createdContainer = cts.GetContentTypeContainer(container.Id);
+            Assert.IsNotNull(createdContainer);
+        }
+
+        [Test]
+        public void Can_Get_All_Containers()
+        {
+            // Arrange
+            var cts = ServiceContext.ContentTypeService;
+
+            // Act
+            var container1 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid);
+            container1.Name = "container1";
+            cts.SaveContentTypeContainer(container1);
+
+            var container2 = new EntityContainer(Constants.ObjectTypes.DocumentTypeGuid);
+            container2.Name = "container2";
+            cts.SaveContentTypeContainer(container2);
+
+            // Assert
+            var containers = cts.GetContentTypeContainers(new int[0]);
+            Assert.AreEqual(2, containers.Count());
+        }
+
+        [Test]
+        public void Deleting_ContentType_Sends_Correct_Number_Of_DeletedEntities_In_Events()
+        {
+            var cts = ServiceContext.ContentTypeService;
+            var deletedEntities = 0;
+            var contentType = MockedContentTypes.CreateSimpleContentType("page", "Page");
+            cts.Save(contentType);
+
+            ContentTypeService.DeletedContentType += (sender, args) =>
+            {
+                deletedEntities += args.DeletedEntities.Count();
+            };
+
+            cts.Delete(contentType);
+
+            Assert.AreEqual(deletedEntities, 1);
+        }
+
+        [Test]
+        public void Deleting_Multiple_ContentTypes_Sends_Correct_Number_Of_DeletedEntities_In_Events()
+        {
+            var cts = ServiceContext.ContentTypeService;
+            var deletedEntities = 0;
+            var contentType = MockedContentTypes.CreateSimpleContentType("page", "Page");
+            cts.Save(contentType);
+            var contentType2 = MockedContentTypes.CreateSimpleContentType("otherPage", "Other page");
+            cts.Save(contentType2);
+
+            ContentTypeService.DeletedContentType += (sender, args) =>
+            {
+                deletedEntities += args.DeletedEntities.Count();
+            };
+
+            cts.Delete(contentType);
+            cts.Delete(contentType2);
+
+            Assert.AreEqual(2, deletedEntities);
+        }
+
+        [Test]
+        public void Deleting_ContentType_With_Child_Sends_Correct_Number_Of_DeletedEntities_In_Events()
+        {
+            var cts = ServiceContext.ContentTypeService;
+            var deletedEntities = 0;
+            var contentType = MockedContentTypes.CreateSimpleContentType("page", "Page");
+            cts.Save(contentType);
+            var contentType2 = MockedContentTypes.CreateSimpleContentType("subPage", "Sub page");
+            contentType2.ParentId = contentType.Id;
+            cts.Save(contentType2);
+
+            ContentTypeService.DeletedContentType += (sender, args) =>
+            {
+                deletedEntities += args.DeletedEntities.Count();
+            };
+
+            cts.Delete(contentType);
+
+            Assert.AreEqual(2, deletedEntities);
         }
 
         [Test]
@@ -574,7 +921,7 @@ namespace Umbraco.Tests.Services
              * -- Content Page
              * ---- Advanced Page -> Content Meta
              * Content Meta :: Composition, has 'Title'
-             * 
+             *
              * Content Meta has 'Title' PropertyType
              * Adding 'Title' to BasePage should fail
             */
@@ -605,7 +952,7 @@ namespace Umbraco.Tests.Services
             };
             var authorAdded = contentPage.AddPropertyType(authorPropertyType, "Content");
             service.Save(contentPage);
-            
+
             var compositionAdded = advancedPage.AddContentType(contentMetaComposition);
             service.Save(advancedPage);
 
@@ -626,6 +973,16 @@ namespace Umbraco.Tests.Services
 
             Assert.DoesNotThrow(() => service.GetContentType("contentPage"));
             Assert.DoesNotThrow(() => service.GetContentType("advancedPage"));
+        }
+
+        [Test]
+        public void Cannot_Save_ContentType_With_Empty_Name()
+        {
+            // Arrange
+            var contentType = MockedContentTypes.CreateSimpleContentType("contentType", string.Empty);
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => ServiceContext.ContentTypeService.Save(contentType));
         }
 
         [Test]
@@ -764,7 +1121,7 @@ namespace Umbraco.Tests.Services
             };
             var titleAdded = seoComposition.AddPropertyType(titlePropertyType, "Content");
             service.Save(seoComposition);
-            
+
             var seoCompositionAdded = advancedPage.AddContentType(seoComposition);
             var metaCompositionAdded = moreAdvancedPage.AddContentType(metaComposition);
             service.Save(advancedPage);
@@ -871,7 +1228,7 @@ namespace Umbraco.Tests.Services
             var subtitleAdded = contentPage.AddPropertyType(subtitlePropertyType, "Content");
             var authorPropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, "author")
             {
-                 Name = "Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88 
+                 Name = "Author", Description = "",  Mandatory = false, SortOrder = 1, DataTypeDefinitionId = -88
             };
             var authorAdded = advancedPage.AddPropertyType(authorPropertyType, "Content");
             service.Save(basePage);
@@ -945,7 +1302,7 @@ namespace Umbraco.Tests.Services
         public void Can_Rename_PropertyGroup_With_Inherited_PropertyGroups()
         {
             //Related the first issue in screencast from this post http://issues.umbraco.org/issue/U4-5986
-            
+
             // Arrange
             var service = ServiceContext.ContentTypeService;
 
@@ -1185,7 +1542,8 @@ namespace Umbraco.Tests.Services
                 SortOrder = 1,
                 DataTypeDefinitionId = -88
             };
-            var authorAdded = basePage.AddPropertyType(authorPropertyType, "Content");
+            Assert.IsTrue(basePage.AddPropertyType(authorPropertyType, "Content"));
+
             var titlePropertyType = new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext, "title")
             {
                 Name = "Title",
@@ -1194,20 +1552,20 @@ namespace Umbraco.Tests.Services
                 SortOrder = 1,
                 DataTypeDefinitionId = -88
             };
-            var titleAdded = basePage.AddPropertyType(authorPropertyType, "Meta");
+            Assert.IsTrue(basePage.AddPropertyType(titlePropertyType, "Meta"));
 
             service.Save(basePage);
-
             basePage = service.GetContentType(basePage.Id);
 
-            var totalPt = basePage.PropertyTypes.Count();
+            var count = basePage.PropertyTypes.Count();
+            Assert.AreEqual(2, count);
 
             basePage.RemovePropertyGroup("Content");
-            service.Save(basePage);
 
+            service.Save(basePage);
             basePage = service.GetContentType(basePage.Id);
 
-            Assert.AreEqual(totalPt, basePage.PropertyTypes.Count());
+            Assert.AreEqual(count, basePage.PropertyTypes.Count());
         }
 
         [Test]
@@ -1218,8 +1576,8 @@ namespace Umbraco.Tests.Services
              * - Content Page
              * -- Advanced Page
              * Content Meta :: Composition
-            */ 
-            
+            */
+
             // Arrange
             var service = ServiceContext.ContentTypeService;
             var basePage = MockedContentTypes.CreateBasicContentType();
@@ -1283,6 +1641,38 @@ namespace Umbraco.Tests.Services
 
             var descriptionPropertyTypeReloaded = propertyGroupReloaded.PropertyTypes["description"];
             Assert.That(descriptionPropertyTypeReloaded.PropertyGroupId.IsValueCreated, Is.False);
+        }
+
+        [Test]
+        public void Empty_Description_Is_Always_Null_After_Saving_Content_Type()
+        {
+            var service = ServiceContext.ContentTypeService;
+            var contentType = MockedContentTypes.CreateBasicContentType();
+            contentType.Description = null;
+            service.Save(contentType);
+
+            var contentType2 = MockedContentTypes.CreateBasicContentType("basePage2", "Base Page 2");
+            contentType2.Description = string.Empty;
+            service.Save(contentType2);
+
+            Assert.IsNull(contentType.Description);
+            Assert.IsNull(contentType2.Description);
+        }
+
+        [Test]
+        public void Empty_Description_Is_Always_Null_After_Saving_Media_Type()
+        {
+            var service = ServiceContext.ContentTypeService;
+            var mediaType = MockedContentTypes.CreateSimpleMediaType("mediaType", "Media Type");
+            mediaType.Description = null;
+            service.Save(mediaType);
+
+            var mediaType2 = MockedContentTypes.CreateSimpleMediaType("mediaType2", "Media Type 2");
+            mediaType2.Description = string.Empty;
+            service.Save(mediaType2);
+
+            Assert.IsNull(mediaType.Description);
+            Assert.IsNull(mediaType2.Description);
         }
 
         private ContentType CreateComponent()

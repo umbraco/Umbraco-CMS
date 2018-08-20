@@ -8,6 +8,7 @@ namespace Umbraco.Web.Search
     [DataContract(Name = "indexer", Namespace = "")]
     public class ExamineIndexerModel : ExamineSearcherModel
     {
+        
         [DataMember(Name = "indexCriteria")]
         public IIndexCriteria IndexCriteria { get; set; }
         

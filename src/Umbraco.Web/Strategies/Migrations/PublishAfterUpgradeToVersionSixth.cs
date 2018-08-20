@@ -20,7 +20,7 @@ namespace Umbraco.Web.Strategies.Migrations
     {
         protected override void AfterMigration(MigrationRunner sender, MigrationEventArgs e)
         {
-            if (e.ProductName != GlobalSettings.UmbracoMigrationName) return;
+            if (e.ProductName != Constants.System.UmbracoMigrationName) return;
 
             var target = new Version(6, 0, 0);
             if (e.ConfiguredVersion < target)

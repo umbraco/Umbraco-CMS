@@ -39,5 +39,7 @@ namespace Umbraco.Core.Persistence.Repositories
         void AssignRoles(int[] memberIds, string[] roleNames);
 
         void DissociateRoles(int[] memberIds, string[] roleNames);
+
+        int[] GetMemberIds(string[] names);
     }
 }

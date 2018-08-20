@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.IO;
 using System.Text;
@@ -29,10 +30,8 @@ using Umbraco.Core;
 
 namespace umbraco
 {
-	/// <summary>
-	/// Handles loading of the cache application into the developer application tree
-	/// </summary>
-    [Tree(Constants.Applications.Developer, "macros", "Macros", sortOrder: 2)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete("This is no longer used and will be removed from the codebase in the future")]
     public class loadMacros : BaseTree
 	{
 
@@ -44,9 +43,13 @@ namespace umbraco
             rootNode.NodeID = "init";
         }
 
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
-            get { return umbraco.BusinessLogic.Application.SqlHelper; }
+            get { return Application.SqlHelper; }
         }
 
         /// <summary>
@@ -70,9 +73,9 @@ function openMacro(id) {
         /// <param name="tree"></param>
         public override void Render(ref XmlTree tree)
         {
-            using (IRecordsReader macros = SqlHelper.ExecuteReader("select id, macroName from cmsMacro order by macroName"))
+            using (var sqlHelper = Application.SqlHelper)
+            using (IRecordsReader macros = sqlHelper.ExecuteReader("select id, macroName from cmsMacro order by macroName"))
             {
-                
                 while (macros.Read())
                 {
                     XmlTreeNode xNode = XmlTreeNode.Create(this);

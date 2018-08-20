@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Globalization;
 using System.IO;
@@ -34,12 +35,13 @@ using umbraco.BusinessLogic.Actions;
 
 namespace umbraco
 {
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [Obsolete("This is no longer used and will be removed from the codebase in the future")]
     public class loadTemplates : BaseTree
     {
         public loadTemplates(string application) : base(application) {}
 
-        private ViewHelper _viewHelper = new ViewHelper(new PhysicalFileSystem(SystemDirectories.MvcViews));
+        private ViewHelper _viewHelper = new ViewHelper(FileSystemProviderManager.Current.MvcViewsFileSystem);
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {

@@ -4,9 +4,11 @@ using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using System.Data.SqlServerCe;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 using Umbraco.Core.Logging; 
 
 namespace Umbraco.Core.Persistence
@@ -42,13 +44,13 @@ namespace Umbraco.Core.Persistence
             {
                 case DatabaseProviders.SqlServer:
                 case DatabaseProviders.SqlAzure:
-                    factory = DbProviderFactories.GetFactory("System.Data.SqlClient");
+                    factory = DbProviderFactories.GetFactory(Constants.DatabaseProviders.SqlServer);
                     break;
                 case DatabaseProviders.SqlServerCE:
                     factory = DbProviderFactories.GetFactory("System.Data.SqlServerCe.4.0");
                     break;
                 case DatabaseProviders.MySql:
-                    factory = DbProviderFactories.GetFactory("MySql.Data.MySqlClient");
+                    factory = DbProviderFactories.GetFactory(Constants.DatabaseProviders.MySql);
                     break;
                 case DatabaseProviders.PostgreSQL:
                 case DatabaseProviders.Oracle:
@@ -69,6 +71,38 @@ namespace Umbraco.Core.Persistence
             }
         }
 
+        public static string GetConnStringExSecurityInfo(this IDbConnection connection)
+        {
+            try
+            {
+                if (connection is SqlConnection)
+                {
+                    var builder = new SqlConnectionStringBuilder(connection.ConnectionString);
+                    return string.Format("DataSource: {0}, InitialCatalog: {1}", builder.DataSource, builder.InitialCatalog);
+                }
+
+                if (connection is SqlCeConnection)
+                {
+                    var builder = new SqlCeConnectionStringBuilder(connection.ConnectionString);
+                    return string.Format("DataSource: {0}", builder.DataSource);
+                }
+
+                if (connection is MySqlConnection)
+                {
+                    var builder = new MySqlConnectionStringBuilder(connection.ConnectionString);
+                    return string.Format("Server: {0}, Database: {1}", builder.Server, builder.Database);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.WarnWithException(typeof(DbConnectionExtensions),
+                    "Could not resolve connection string parameters", ex);
+                return "(Could not resolve)";
+            }
+
+            throw new ArgumentException(string.Format("The connection type {0} is not supported", connection.GetType()));
+        }
+
         public static bool IsAvailable(this IDbConnection connection)
         {
             try
@@ -79,7 +113,8 @@ namespace Umbraco.Core.Persistence
             catch (DbException exc)
             {
                 // Don't swallow this error, the exception is super handy for knowing "why" its not available
-                LogHelper.WarnWithException<IDbConnection>("Configured database is reporting as not being available!", exc);
+                LogHelper.WarnWithException(typeof(DbConnectionExtensions),
+                    "Configured database is reporting as not being available! {0}", exc, connection.GetConnStringExSecurityInfo);
                 return false;
             }
 

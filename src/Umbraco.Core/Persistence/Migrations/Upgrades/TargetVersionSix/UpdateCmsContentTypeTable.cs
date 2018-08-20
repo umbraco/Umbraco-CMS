@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 {
-    [Migration("6.0.0", 2, GlobalSettings.UmbracoMigrationName)]
+    [Migration("6.0.0", 2, Constants.System.UmbracoMigrationName)]
     public class UpdateCmsContentTypeTable : MigrationBase
     {
         public UpdateCmsContentTypeTable(ISqlSyntaxProvider sqlSyntax, ILogger logger) : base(sqlSyntax, logger)

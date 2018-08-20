@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Data;
 using System.Configuration;
 using System.Collections;
@@ -13,6 +14,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic;
 using umbraco.BusinessLogic;
 using umbraco.BasePages;
+using Umbraco.Core;
 
 namespace umbraco.presentation.dialogs
 {
@@ -70,7 +72,7 @@ namespace umbraco.presentation.dialogs
 
                 // Translators
                 foreach (var u in BusinessLogic.User.getAll())
-                    if (u.UserType.Alias.ToLower() == "translator" || UserHasTranslatePermission(u, _currentPage))
+                    if (u.GetGroups().Contains(Constants.Security.TranslatorGroupAlias, StringComparer.InvariantCultureIgnoreCase) || UserHasTranslatePermission(u, _currentPage))
                         translator.Items.Add(new ListItem(u.Name, u.Id.ToString()));
 
                 if (translator.Items.Count == 0) {

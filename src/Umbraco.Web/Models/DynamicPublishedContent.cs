@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
@@ -19,9 +20,11 @@ using Umbraco.Core.Models.PublishedContent;
 namespace Umbraco.Web.Models
 {
 
-	/// <summary>
-	/// The base dynamic model for views
-	/// </summary>
+    /// <summary>
+    /// The base dynamic model for views
+    /// </summary>
+    [Obsolete("The use of dynamics has been deprecated, use strongly typed syntax instead, dynamics will be removed in future versions")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     [DebuggerDisplay("Content Id: {Id}, Name: {Name}")]
     public class DynamicPublishedContent : DynamicObject, IPublishedContent
 	{
@@ -1101,11 +1104,9 @@ namespace Umbraco.Web.Models
         }
 
         /// <summary>
-        /// A shortcut method for AncestorOrSelf(1)
+        /// Gets the 'site' content for this content.
         /// </summary>
-        /// <returns>
-        /// The site homepage
-        /// </returns>
+        /// <returns>The 'site' content ie AncestorOrSelf(1).</returns>
 	    public DynamicPublishedContent Site()
 	    {
             return AncestorOrSelf(1);

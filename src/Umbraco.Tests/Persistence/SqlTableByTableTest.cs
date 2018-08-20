@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Persistence
             base.Initialize();           
 
             _database = new Database(@"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco",
-                                     "System.Data.SqlClient");
+                                     Constants.DatabaseProviders.SqlServer);
         }
 
         [TearDown]

@@ -26,5 +26,9 @@ namespace Umbraco.Core.Strings
         /// per content, in 1-to-1 multilingual configurations. Then there would be one
         /// url per culture.</remarks>
         string GetUrlSegment(IContentBase content, CultureInfo culture);
+
+        //TODO: For the 301 tracking, we need to add another extended interface to this so that 
+        // the RedirectTrackingEventHandler can ask the IUrlSegmentProvider if the URL is changing.
+        // Currently the way it works is very hacky, see notes in: RedirectTrackingEventHandler.ContentService_Publishing
     }
 }

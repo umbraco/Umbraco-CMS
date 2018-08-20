@@ -32,9 +32,9 @@ namespace Umbraco.Web.Models
             MemberProperties = new List<UmbracoProperty>();
             LoginOnSuccess = true;
             CreatePersistentLoginCookie = true;
-            if (doLookup && HttpContext.Current != null && ApplicationContext.Current != null)
+            if (doLookup && UmbracoContext.Current != null)
             {
-                var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
+                var helper = new MembershipHelper(UmbracoContext.Current);
                 var model = helper.CreateRegistrationModel(MemberTypeAlias);
                 MemberProperties = model.MemberProperties;
             }
@@ -47,7 +47,7 @@ namespace Umbraco.Web.Models
         }
 
         [Required]
-        [RegularExpression(@"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
+        [RegularExpression(@"[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?",
             ErrorMessage = "Please enter a valid e-mail address")]
         public string Email { get; set; }
 

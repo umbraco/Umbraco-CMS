@@ -6,6 +6,10 @@ using System.Threading;
 using System.Web.UI.WebControls;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Strings;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests
 {
@@ -155,16 +159,151 @@ namespace Umbraco.Tests
 			Assert.AreEqual("Hello world", result.Result);
 		}
 
-		        [Test]
+		[Test]
         public virtual void CanConvertObjectToSameObject()
         {
             var obj = new MyTestObject();
             var result = obj.TryConvertTo<object>();
 
-            Assert.AreEqual(obj, result.Result);            
+            Assert.AreEqual(obj, result.Result);
         }
-		
-		private CultureInfo savedCulture;
+
+        [Test]
+        public void ConvertToIntegerTest()
+        {
+            var conv = "100".TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100, conv.Result);
+
+            conv = "100.000".TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100, conv.Result);
+
+            conv = "100,000".TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100, conv.Result);
+
+            // oops
+            conv = "100.001".TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100, conv.Result);
+
+            conv = 100m.TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100, conv.Result);
+
+            conv = 100.000m.TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100, conv.Result);
+
+            // oops
+            conv = 100.001m.TryConvertTo<int>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100, conv.Result);
+        }
+
+        [Test]
+        public void ConvertToDecimalTest()
+        {
+            var conv = "100".TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = "100.000".TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = "100,000".TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = "100.001".TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100.001m, conv.Result);
+
+            conv = 100m.TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = 100.000m.TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = 100.001m.TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100.001m, conv.Result);
+
+            conv = 100.TryConvertTo<decimal>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+        }
+
+        [Test]
+        public void ConvertToNullableDecimalTest()
+        {
+            var conv = "100".TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = "100.000".TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = "100,000".TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = "100.001".TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100.001m, conv.Result);
+
+            conv = 100m.TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = 100.000m.TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+
+            conv = 100.001m.TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100.001m, conv.Result);
+
+            conv = 100.TryConvertTo<decimal?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(100m, conv.Result);
+        }
+
+        [Test]
+        public void ConvertToDateTimeTest()
+        {
+            var conv = "2016-06-07".TryConvertTo<DateTime>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(new DateTime(2016, 6, 7), conv.Result);
+        }
+
+        [Test]
+        public void ConvertToNullableDateTimeTest()
+        {
+            var conv = "2016-06-07".TryConvertTo<DateTime?>();
+            Assert.IsTrue(conv);
+            Assert.AreEqual(new DateTime(2016, 6, 7), conv.Result);
+        }
+
+        [Test]
+        public void Value_Editor_Can_Convert_Decimal_To_Decimal_Clr_Type()
+        {
+            var valueEditor = new PropertyValueEditor
+            {
+                ValueType = PropertyEditorValueTypes.Decimal
+            };
+
+            var result = valueEditor.TryConvertValueToCrlType(12.34d);
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(12.34d, result.Result);
+        }
+
+        private CultureInfo _savedCulture;
 
 	    /// <summary>
 		/// Run once before each test in derived test fixtures.
@@ -172,10 +311,13 @@ namespace Umbraco.Tests
         [SetUp]
 		public void TestSetup()
 		{
-			savedCulture = Thread.CurrentThread.CurrentCulture;
+			_savedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-GB"); // make sure the dates parse correctly
-			return;
-		}
+
+		    var settings = SettingsForTests.GetDefault();
+		    ShortStringHelperResolver.Current = new ShortStringHelperResolver(new DefaultShortStringHelper(settings).WithDefaultConfig());
+		    Resolution.Freeze();
+        }
 
 		/// <summary>
 		/// Run once after each test in derived test fixtures.
@@ -183,9 +325,9 @@ namespace Umbraco.Tests
 	    [TearDown]
 		public void TestTearDown()
 		{
-			Thread.CurrentThread.CurrentCulture = savedCulture;
-			return;
-		}
+			Thread.CurrentThread.CurrentCulture = _savedCulture;
+		    ShortStringHelperResolver.Reset();
+        }
 
         private class MyTestObject
         {

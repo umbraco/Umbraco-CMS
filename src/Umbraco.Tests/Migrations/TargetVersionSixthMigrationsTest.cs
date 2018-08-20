@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Moq;
@@ -76,7 +77,7 @@ namespace Umbraco.Tests.Migrations
 
             var migrationRunner = new MigrationRunner(
                 Mock.Of<IMigrationEntryService>(),
-                Logger, configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+                Logger, configuredVersion, targetVersion, Constants.System.UmbracoMigrationName);
 
             var migrations = migrationRunner.OrderedUpgradeMigrations(foundMigrations).ToList();
 
@@ -89,7 +90,7 @@ namespace Umbraco.Tests.Migrations
 
             foreach (var expression in context.Expressions)
             {
-                Console.WriteLine(expression.ToString());
+                Debug.Print(expression.ToString());
             }
 
             Assert.That(migrations.Count(), Is.EqualTo(12));
@@ -99,7 +100,7 @@ namespace Umbraco.Tests.Migrations
 
         public UmbracoDatabase GetConfiguredDatabase()
         {
-            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", "System.Data.SqlServerCe.4.0", Mock.Of<ILogger>());
+            return new UmbracoDatabase("Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;", Constants.DatabaseProviders.SqlCe, Mock.Of<ILogger>());
         }
 
 

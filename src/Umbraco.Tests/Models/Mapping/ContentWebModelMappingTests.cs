@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -120,10 +121,26 @@ namespace Umbraco.Tests.Models.Mapping
             {
                 AssertDisplayProperty(result, p, ApplicationContext);
             }            
-            Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count() - 1);
-            Assert.IsTrue(result.Tabs.Any(x => x.Label == ui.Text("general", "properties")));
+            Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count());
             Assert.IsTrue(result.Tabs.First().IsActive);
             Assert.IsTrue(result.Tabs.Except(new[] {result.Tabs.First()}).All(x => x.IsActive == false));
+        }
+
+        [Test]
+        public void To_Display_Model_No_Tabs()
+        {
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            contentType.PropertyGroups.Clear();
+            var content = new Content("Home", -1, contentType) { Level = 1, SortOrder = 1, CreatorId = 0, WriterId = 0 };
+
+            var result = Mapper.Map<IContent, ContentItemDisplay>(content);
+
+            AssertBasics(result, content);
+            foreach (var p in content.Properties)
+            {
+                AssertDisplayProperty(result, p, ApplicationContext);
+            }
+            Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count());
         }
 
         [Test]
@@ -212,7 +229,12 @@ namespace Umbraco.Tests.Models.Mapping
             Assert.AreEqual(p.Alias, pDto.Alias);
             Assert.AreEqual(p.Id, pDto.Id);
 
-            Assert.IsTrue(p.Value == null ? pDto.Value == string.Empty : pDto.Value == p.Value);
+            if (p.Value == null)
+                Assert.AreEqual(pDto.Value, string.Empty);
+            else if (p.Value is decimal)
+                Assert.AreEqual(pDto.Value, ((decimal) p.Value).ToString(NumberFormatInfo.InvariantInfo));
+            else
+                Assert.AreEqual(pDto.Value, p.Value.ToString());
         }
 
         private void AssertProperty<TPersisted>(ContentItemBasic<ContentPropertyDto, TPersisted> result, Property p)

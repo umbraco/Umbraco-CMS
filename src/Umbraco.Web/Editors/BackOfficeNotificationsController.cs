@@ -1,3 +1,4 @@
+using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
@@ -8,6 +9,7 @@ namespace Umbraco.Web.Editors
     /// currently in the request.
     /// </summary>
     [AppendCurrentEventMessages]
+    [PrefixlessBodyModelValidator]
     public abstract class BackOfficeNotificationsController : UmbracoAuthorizedJsonController
     {
         protected BackOfficeNotificationsController()

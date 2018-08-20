@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web.Security;
 using Umbraco.Core.Models;
 using umbraco;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.Routing
 {
@@ -30,8 +34,17 @@ namespace Umbraco.Web.Routing
                 return urls;
             }
 
+            string url;
             var urlProvider = umbracoContext.RoutingContext.UrlProvider;
-            var url = urlProvider.GetUrl(content.Id);            
+            try
+            {
+                url = urlProvider.GetUrl(content.Id);
+            }
+            catch (Exception e)
+            {
+                LogHelper.Error<UrlProvider>("GetUrl exception.", e);
+                url = "#ex";
+            }
             if (url == "#")
             {
                 // document as a published version yet it's url is "#" => a parent must be
@@ -48,34 +61,50 @@ namespace Umbraco.Web.Routing
                 else
                     urls.Add(ui.Text("content", "parentNotPublished", parent.Name, umbracoContext.Security.CurrentUser));
             }
-            else if (url.StartsWith("#err-"))
+            else if (url == "#ex")
             {
-                // route error, report
-                var id = int.Parse(url.Substring(5));
-                var o = umbracoContext.ContentCache.GetById(id);
-                string s;
-                if (o == null)
-                {
-                    s = "(unknown)";
-                }
-                else
-                {
-                    var l = new List<string>();
-                    while (o != null)
-                    {
-                        l.Add(o.Name);
-                        o = o.Parent;
-                    }
-                    l.Reverse();
-                    s = "/" + string.Join("/", l) + " (id=" + id + ")";
-
-                }
-                urls.Add(ui.Text("content", "routeError", s, umbracoContext.Security.CurrentUser));
+                urls.Add(ui.Text("content", "getUrlException", umbracoContext.Security.CurrentUser));
             }
             else
             {
-                urls.Add(url);
-                urls.AddRange(urlProvider.GetOtherUrls(content.Id));
+                // test for collisions
+                var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
+                if (uri.IsAbsoluteUri == false) uri = uri.MakeAbsolute(UmbracoContext.Current.CleanedUmbracoUrl);
+                uri = UriUtility.UriToUmbraco(uri);
+                var pcr = new PublishedContentRequest(uri, UmbracoContext.Current.RoutingContext, UmbracoConfig.For.UmbracoSettings().WebRouting, s => Roles.Provider.GetRolesForUser(s));
+                pcr.Engine.TryRouteRequest();
+
+                if (pcr.HasPublishedContent == false)
+                {
+                    urls.Add(ui.Text("content", "routeError", "(error)", umbracoContext.Security.CurrentUser));
+                }
+                else if (pcr.IgnorePublishedContentCollisions == false && pcr.PublishedContent.Id != content.Id)
+                {
+                    var o = pcr.PublishedContent;
+                    string s;
+                    if (o == null)
+                    {
+                        s = "(unknown)";
+                    }
+                    else
+                    {
+                        var l = new List<string>();
+                        while (o != null)
+                        {
+                            l.Add(o.Name);
+                            o = o.Parent;
+                        }
+                        l.Reverse();
+                        s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent.Id + ")";
+
+                    }
+                    urls.Add(ui.Text("content", "routeError", s, umbracoContext.Security.CurrentUser));
+                }
+                else
+                {
+                    urls.Add(url);
+                    urls.AddRange(urlProvider.GetOtherUrls(content.Id));
+                }
             }
             return urls;
         }

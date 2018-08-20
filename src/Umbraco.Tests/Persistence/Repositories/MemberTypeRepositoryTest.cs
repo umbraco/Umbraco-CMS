@@ -30,7 +30,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        private MemberTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        private MemberTypeRepository CreateRepository(IScopeUnitOfWork unitOfWork)
         {
             return new MemberTypeRepository(unitOfWork, CacheHelper.CreateDisabledCacheHelper(), Mock.Of<ILogger>(), SqlSyntax);            
         }

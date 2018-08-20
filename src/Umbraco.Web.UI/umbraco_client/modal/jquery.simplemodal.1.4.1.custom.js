@@ -1,7 +1,7 @@
 
 ; (function ($) {
-    var ie6 = $.browser.msie && parseInt($.browser.version) === 6 && typeof window['XMLHttpRequest'] !== 'object',
-		ie7 = $.browser.msie && parseInt($.browser.version) === 7,
+    var ie6 = $.browser && $.browser.msie && parseInt($.browser.version) === 6 && typeof window['XMLHttpRequest'] !== 'object',
+		ie7 = $.browser && $.browser.msie && parseInt($.browser.version) === 7,
 		ieQuirks = null,
 		w = [];
 
@@ -418,8 +418,8 @@
             var el = $(window);
 
             // fix a jQuery/Opera bug with determining the window height
-            var h = $.browser.opera && $.browser.version > '9.5' && $.fn.jquery < '1.3'
-						|| $.browser.opera && $.browser.version < '9.5' && $.fn.jquery > '1.2.6'
+            var h = $.browser && $.browser.opera && $.browser.version > '9.5' && $.fn.jquery < '1.3'
+						|| $.browser && $.browser.opera && $.browser.version < '9.5' && $.fn.jquery > '1.2.6'
 				? el[0].innerHeight : el.height();
 
             return [h, el.width()];

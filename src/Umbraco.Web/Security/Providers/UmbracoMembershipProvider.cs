@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Linq;
 using System.Text;
+using System.Web;
 using System.Web.Configuration;
 using System.Web.Security;
 using Umbraco.Core;
@@ -12,10 +13,11 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Web.Security.Providers
 {
-    
+
 
     /// <summary>
     /// Abstract Membership Provider that users any implementation of IMembershipMemberService{TEntity} service
@@ -26,7 +28,7 @@ namespace Umbraco.Web.Security.Providers
     {
 
         protected IMembershipMemberService<TEntity> MemberService { get; private set; }
-        
+
         protected UmbracoMembershipProvider(IMembershipMemberService<TEntity> memberService)
         {
             MemberService = memberService;
@@ -36,10 +38,10 @@ namespace Umbraco.Web.Security.Providers
 
         protected abstract MembershipUser ConvertToMembershipUser(TEntity entity);
 
-        private bool _allowManuallyChangingPassword = true;
+        private bool _allowManuallyChangingPassword = false;
 
         /// <summary>
-        /// For backwards compatibility, this provider supports this option by default it is true
+        /// For backwards compatibility, this provider supports this option by default it is false
         /// </summary>
         public override bool AllowManuallyChangingPassword
         {
@@ -58,14 +60,14 @@ namespace Umbraco.Web.Security.Providers
         /// <exception cref="T:System.ArgumentException">The name of the provider has a length of zero.</exception>       
         public override void Initialize(string name, NameValueCollection config)
         {
-            if (config == null) {throw new ArgumentNullException("config");}
+            if (config == null) { throw new ArgumentNullException("config"); }
 
             if (string.IsNullOrEmpty(name)) name = ProviderName;
 
             // Initialize base provider class
             base.Initialize(name, config);
 
-            _allowManuallyChangingPassword = config.GetValue("allowManuallyChangingPassword", true);
+            _allowManuallyChangingPassword = config.GetValue("allowManuallyChangingPassword", false);
         }
 
         /// <summary>
@@ -86,7 +88,7 @@ namespace Umbraco.Web.Security.Providers
             // in order to support updating passwords from the umbraco core, we can't validate the old password
             var m = MemberService.GetByUsername(username);
             if (m == null) return false;
-            
+
             string salt;
             var encodedPassword = EncryptOrHashNewPassword(newPassword, out salt);
 
@@ -139,7 +141,7 @@ namespace Umbraco.Web.Security.Providers
         /// <returns>
         /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
         /// </returns>
-        protected override MembershipUser PerformCreateUser(string memberTypeAlias, string username, string password, string email, string passwordQuestion, 
+        protected override MembershipUser PerformCreateUser(string memberTypeAlias, string username, string password, string email, string passwordQuestion,
                                                             string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
             // See if the user already exists
@@ -164,13 +166,13 @@ namespace Umbraco.Web.Security.Providers
 
             var member = MemberService.CreateWithIdentity(
                 username,
-                email, 
-                FormatPasswordForStorage(encodedPassword, salt), 
-                memberTypeAlias);
-            
+                email,
+                FormatPasswordForStorage(encodedPassword, salt),
+                memberTypeAlias,
+                isApproved);
+
             member.PasswordQuestion = passwordQuestion;
             member.RawPasswordAnswerValue = EncryptString(passwordAnswer);
-            member.IsApproved = isApproved;
             member.LastLoginDate = DateTime.Now;
             member.LastPasswordChangeDate = DateTime.Now;
 
@@ -212,7 +214,7 @@ namespace Umbraco.Web.Security.Providers
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
             var byEmail = MemberService.FindByEmail(emailToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
-            
+
             var collection = new MembershipUserCollection();
             foreach (var m in byEmail)
             {
@@ -257,7 +259,7 @@ namespace Umbraco.Web.Security.Providers
             var membersList = new MembershipUserCollection();
 
             var pagedMembers = MemberService.GetAll(pageIndex, pageSize, out totalRecords);
-            
+
             foreach (var m in pagedMembers)
             {
                 membersList.Add(ConvertToMembershipUser(m));
@@ -290,7 +292,7 @@ namespace Umbraco.Web.Security.Providers
         /// The password for the specified user name.
         /// </returns>
         protected override string PerformGetPassword(string username, string answer)
-        {            
+        {
             var m = MemberService.GetByUsername(username);
             if (m == null)
             {
@@ -410,10 +412,9 @@ namespace Umbraco.Web.Security.Providers
             //if (answer == null && RequiresQuestionAndAnswer)
             //{
             //    UpdateFailureCount(username, "passwordAnswer");
-
             //    throw new ProviderException("Password answer required for password reset.");
             //}
-            
+
             var m = MemberService.GetByUsername(username);
             if (m == null)
             {
@@ -437,8 +438,27 @@ namespace Umbraco.Web.Security.Providers
             m.RawPasswordValue = FormatPasswordForStorage(encodedPassword, salt);
             m.LastPasswordChangeDate = DateTime.Now;
             MemberService.Save(m);
-            
+
             return generatedPassword;
+        }
+
+        internal virtual bool PerformUnlockUser(string username, out TEntity member)
+        {
+            member = MemberService.GetByUsername(username);
+            if (member == null)
+            {
+                throw new ProviderException(string.Format("No member with the username '{0}' found", username));
+            }
+
+            // Non need to update		
+            if (member.IsLockedOut == false) return true;
+
+            member.IsLockedOut = false;
+            member.FailedPasswordAttempts = 0;
+
+            MemberService.Save(member);
+            
+            return true;
         }
 
         /// <summary>
@@ -450,22 +470,9 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override bool UnlockUser(string username)
         {
-            var member = MemberService.GetByUsername(username);
-
-            if (member == null)
-            {
-                throw new ProviderException(string.Format("No member with the username '{0}' found", username));
-            }                
-
-            // Non need to update
-            if (member.IsLockedOut == false) return true;
-
-            member.IsLockedOut = false;
-            member.FailedPasswordAttempts = 0;
-
-            MemberService.Save(member);
-
-            return true;
+            TEntity member;
+            var result = PerformUnlockUser(username, out member);
+            return result;
         }
 
         /// <summary>
@@ -491,7 +498,7 @@ namespace Umbraco.Web.Security.Providers
                 }
             }
             m.Email = user.Email;
-            
+
             m.IsApproved = user.IsApproved;
             m.IsLockedOut = user.IsLockedOut;
             if (user.IsLockedOut)
@@ -503,15 +510,9 @@ namespace Umbraco.Web.Security.Providers
             MemberService.Save(m);
         }
 
-        /// <summary>
-        /// Verifies that the specified user name and password exist in the data source.
-        /// </summary>
-        /// <param name="username">The name of the user to validate.</param>
-        /// <param name="password">The password for the specified user.</param>
-        /// <returns>
-        /// true if the specified username and password are valid; otherwise, false.
-        /// </returns>
-        public override bool ValidateUser(string username, string password)
+
+
+        internal virtual ValidateUserResult PerformValidateUser(string username, string password)
         {
             var member = MemberService.GetByUsername(username);
 
@@ -523,7 +524,10 @@ namespace Umbraco.Web.Security.Providers
                         username,
                         GetCurrentRequestIpAddress()));
 
-                return false;
+                return new ValidateUserResult
+                {
+                    Authenticated = false
+                };
             }
 
             if (member.IsApproved == false)
@@ -534,7 +538,11 @@ namespace Umbraco.Web.Security.Providers
                         username,
                         GetCurrentRequestIpAddress()));
 
-                return false;
+                return new ValidateUserResult
+                {
+                    Member = member,
+                    Authenticated = false
+                };
             }
             if (member.IsLockedOut)
             {
@@ -544,7 +552,11 @@ namespace Umbraco.Web.Security.Providers
                         username,
                         GetCurrentRequestIpAddress()));
 
-                return false;
+                return new ValidateUserResult
+                {
+                    Member = member,
+                    Authenticated = false
+                };
             }
 
             var authenticated = CheckPassword(password, member.RawPasswordValue);
@@ -566,7 +578,7 @@ namespace Umbraco.Web.Security.Providers
                         string.Format(
                             "Login attempt failed for username {0} from IP address {1}, the user is now locked out, max invalid password attempts exceeded",
                             username,
-                            GetCurrentRequestIpAddress()));
+                            GetCurrentRequestIpAddress()));                    
                 }
                 else
                 {
@@ -579,14 +591,19 @@ namespace Umbraco.Web.Security.Providers
             }
             else
             {
-                member.FailedPasswordAttempts = 0;
+                if (member.FailedPasswordAttempts > 0)
+                {
+                    //we have successfully logged in, reset the AccessFailedCount
+                    member.FailedPasswordAttempts = 0;
+                }
+
                 member.LastLoginDate = DateTime.Now;
 
                 LogHelper.Info<UmbracoMembershipProviderBase>(
                         string.Format(
                             "Login attempt succeeded for username {0} from IP address {1}",
                             username,
-                            GetCurrentRequestIpAddress()));
+                            GetCurrentRequestIpAddress()));                
             }
 
             //don't raise events for this! It just sets the member dates, if we do raise events this will
@@ -599,12 +616,31 @@ namespace Umbraco.Web.Security.Providers
             if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
                 MemberService.Save(member, false);
 
-            return authenticated;
+            return new ValidateUserResult
+            {
+                Authenticated = authenticated,
+                Member = member
+            };
         }
 
+        /// <summary>
+        /// Verifies that the specified user name and password exist in the data source.
+        /// </summary>
+        /// <param name="username">The name of the user to validate.</param>
+        /// <param name="password">The password for the specified user.</param>
+        /// <returns>
+        /// true if the specified username and password are valid; otherwise, false.
+        /// </returns>
+        public override bool ValidateUser(string username, string password)
+        {
+            var result = PerformValidateUser(username, password);
+            return result.Authenticated;
+        }
 
-
-        
-
+        internal class ValidateUserResult
+        {
+            public TEntity Member { get; set; }
+            public bool Authenticated { get; set; }
+        }
     }
 }

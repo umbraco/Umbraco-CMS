@@ -5,38 +5,31 @@ using System.Web.Caching;
 
 namespace Umbraco.Core.Cache
 {
-    internal class NullCacheProvider : IRuntimeCacheProvider
+    /// <summary>
+    /// Represents a cache provider that does not cache anything.
+    /// </summary>
+    public class NullCacheProvider : IRuntimeCacheProvider
     {
         public virtual void ClearAllCache()
-        {
-        }
+        { }
 
         public virtual void ClearCacheItem(string key)
-        {
-        }
+        { }
 
         public virtual void ClearCacheObjectTypes(string typeName)
-        {
-        }
+        { }
 
         public virtual void ClearCacheObjectTypes<T>()
-        {
-        }
+        { }
 
         public virtual void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
-        {
-        }
-
-
-
+        { }
 
         public virtual void ClearCacheByKeySearch(string keyStartsWith)
-        {
-        }
+        { }
 
         public virtual void ClearCacheByKeyExpression(string regexString)
-        {
-        }
+        { }
 
         public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
         {
@@ -64,8 +57,6 @@ namespace Umbraco.Core.Cache
         }
 
         public void InsertCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
-        {
-            
-        }
+        { }
     }
 }

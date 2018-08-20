@@ -9,6 +9,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Strategies
 {
@@ -36,6 +37,9 @@ namespace Umbraco.Web.Strategies
             //Send notifications for the update and created actions
             ContentService.Saved += (sender, args) =>
                 {
+                    var newEntities = new List<IContent>();
+                    var updatedEntities =  new List<IContent>();
+
                     //need to determine if this is updating or if it is new
                     foreach (var entity in args.SavedEntities)
                     {
@@ -43,16 +47,16 @@ namespace Umbraco.Web.Strategies
                         if (dirty.WasPropertyDirty("Id"))
                         {
                             //it's new
-                            applicationContext.Services.NotificationService.SendNotification(
-                                entity, ActionNew.Instance, applicationContext);
+                            newEntities.Add(entity);
                         }
                         else
                         {
                             //it's updating
-                            applicationContext.Services.NotificationService.SendNotification(
-                                entity, ActionUpdate.Instance, applicationContext);
+                            updatedEntities.Add(entity);
                         }
                     }
+                    applicationContext.Services.NotificationService.SendNotification(newEntities, ActionNew.Instance, applicationContext);
+                    applicationContext.Services.NotificationService.SendNotification(updatedEntities, ActionUpdate.Instance, applicationContext);
                 };
 
             //Send notifications for the delete action

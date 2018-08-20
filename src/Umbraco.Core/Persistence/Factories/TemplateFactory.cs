@@ -35,23 +35,31 @@ namespace Umbraco.Core.Persistence.Factories
 
         public Template BuildEntity(TemplateDto dto, IEnumerable<IUmbracoEntity> childDefinitions, Func<File, string> getFileContent)
         {
-            var template = new Template(dto.NodeDto.Text, dto.Alias, getFileContent)
-                               {
-                                   CreateDate = dto.NodeDto.CreateDate,
-                                   Id = dto.NodeId,
-                                   Key = dto.NodeDto.UniqueId,                                   
-                                   Path = dto.NodeDto.Path
-                               };
+            var template = new Template(dto.NodeDto.Text, dto.Alias, getFileContent);
 
-            template.IsMasterTemplate = childDefinitions.Any(x => x.ParentId == dto.NodeId);
+            try
+            {
+                template.DisableChangeTracking();
 
-            if(dto.NodeDto.ParentId > 0)
-                template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);
+                template.CreateDate = dto.NodeDto.CreateDate;
+                template.Id = dto.NodeId;
+                template.Key = dto.NodeDto.UniqueId;
+                template.Path = dto.NodeDto.Path;
 
-            //on initial construction we don't want to have dirty properties tracked
-            // http://issues.umbraco.org/issue/U4-1946
-            template.ResetDirtyProperties(false);
-            return template;
+                template.IsMasterTemplate = childDefinitions.Any(x => x.ParentId == dto.NodeId);
+
+                if (dto.NodeDto.ParentId > 0)
+                    template.MasterTemplateId = new Lazy<int>(() => dto.NodeDto.ParentId);
+
+                //on initial construction we don't want to have dirty properties tracked
+                // http://issues.umbraco.org/issue/U4-1946
+                template.ResetDirtyProperties(false);
+                return template;
+            }
+            finally
+            {
+                template.EnableChangeTracking();
+            }
         }
 
         public TemplateDto BuildDto(Template entity)

@@ -23,35 +23,26 @@ namespace Umbraco.Core.Models
         {
         }
 
-        private static readonly PropertyInfo RuleValueSelector = ExpressionHelper.GetPropertyInfo<PublicAccessRule, string>(x => x.RuleValue);
-        private static readonly PropertyInfo RuleTypeSelector = ExpressionHelper.GetPropertyInfo<PublicAccessRule, string>(x => x.RuleType);
+        private static readonly Lazy<PropertySelectors> Ps = new Lazy<PropertySelectors>();
+
+        private class PropertySelectors
+        {
+            public readonly PropertyInfo RuleValueSelector = ExpressionHelper.GetPropertyInfo<PublicAccessRule, string>(x => x.RuleValue);
+            public readonly PropertyInfo RuleTypeSelector = ExpressionHelper.GetPropertyInfo<PublicAccessRule, string>(x => x.RuleType);
+        }
        
         public Guid AccessEntryId { get; internal set; }
 
         public string RuleValue
         {
             get { return _ruleValue; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _ruleValue = value;
-                    return _ruleValue;
-                }, _ruleValue, RuleValueSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _ruleValue, Ps.Value.RuleValueSelector); }
         }
 
         public string RuleType
         {
             get { return _ruleType; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _ruleType = value;
-                    return _ruleType;
-                }, _ruleType, RuleTypeSelector);
-            }
+            set { SetPropertyValueAndDetectChanges(value, ref _ruleType, Ps.Value.RuleTypeSelector); }
         }
 
         

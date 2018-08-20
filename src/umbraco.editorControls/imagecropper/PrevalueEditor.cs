@@ -331,11 +331,13 @@ namespace umbraco.editorControls.imagecropper
 
             string data = String.Format("{0}|{1}", generalData, templateData);
 
-            SqlHelper.ExecuteNonQuery("delete from cmsDataTypePreValues where datatypenodeid = @dtdefid",
-                                      SqlHelper.CreateParameter("@dtdefid", _dataType.DataTypeDefinitionId));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("delete from cmsDataTypePreValues where datatypenodeid = @dtdefid", 
+                    sqlHelper.CreateParameter("@dtdefid", _dataType.DataTypeDefinitionId));
 
-            SqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",
-                                      SqlHelper.CreateParameter("@dtdefid", _dataType.DataTypeDefinitionId), SqlHelper.CreateParameter("@value", data));
+            using (var sqlHelper = Application.SqlHelper)
+                sqlHelper.ExecuteNonQuery("insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",
+                    sqlHelper.CreateParameter("@dtdefid", _dataType.DataTypeDefinitionId), sqlHelper.CreateParameter("@value", data));
         }
 
         protected override void Render(HtmlTextWriter writer)
@@ -409,23 +411,25 @@ namespace umbraco.editorControls.imagecropper
         {
             get
             {
-                object conf =
-                    SqlHelper.ExecuteScalar<object>("select value from cmsDataTypePreValues where datatypenodeid = @datatypenodeid",
-                                                    SqlHelper.CreateParameter("@datatypenodeid", _dataType.DataTypeDefinitionId));
+                using (var sqlHelper = Application.SqlHelper) { 
+                    object conf =
+                    sqlHelper.ExecuteScalar<object>("select value from cmsDataTypePreValues where datatypenodeid = @datatypenodeid",
+                                                    sqlHelper.CreateParameter("@datatypenodeid", _dataType.DataTypeDefinitionId));
 
-                if (conf != null)
-                    return conf.ToString();
-
+                    if (conf != null)
+                        return conf.ToString();
+                }
                 return string.Empty;
             }
         }
 
+        /// <summary>
+        /// Unused, please do not use
+        /// </summary>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         public static ISqlHelper SqlHelper
         {
-            get
-            {
-                return Application.SqlHelper;
-            }
+            get { return Application.SqlHelper; }
         }
     }
 }

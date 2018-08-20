@@ -103,7 +103,7 @@ namespace Umbraco.Web.WebServices
                 : get(svce, oldname);
 
             if (currentView == null)
-                currentView = new PartialView(filename);
+                currentView = new PartialView(PartialViewType.PartialView, filename);
             else
                 currentView.Path = filename;
             currentView.Content = contents;

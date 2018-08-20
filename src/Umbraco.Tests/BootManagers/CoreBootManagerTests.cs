@@ -14,6 +14,7 @@ using Umbraco.Tests.TestHelpers;
 using umbraco.interfaces;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.BootManagers
@@ -71,7 +72,7 @@ namespace Umbraco.Tests.BootManagers
             {
                 var appContext = base.CreateApplicationContext(dbContext, serviceContext);
 
-                var dbContextMock = new Mock<DatabaseContext>(Mock.Of<IDatabaseFactory>(), ProfilingLogger.Logger, Mock.Of<ISqlSyntaxProvider>(), "test");
+                var dbContextMock = new Mock<DatabaseContext>(Mock.Of<IScopeProviderInternal>(), ProfilingLogger.Logger, Mock.Of<ISqlSyntaxProvider>(), "test");
                 dbContextMock.Setup(x => x.CanConnect).Returns(true);
                 appContext.DatabaseContext = dbContextMock.Object;
 

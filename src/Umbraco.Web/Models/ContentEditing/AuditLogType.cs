@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-    /// <summary>
-    /// Defines audit trail log types
-    /// </summary>
+    [Obsolete("Use Umbraco.Core.Models.AuditType instead")]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public enum AuditLogType
     {
         /// <summary>

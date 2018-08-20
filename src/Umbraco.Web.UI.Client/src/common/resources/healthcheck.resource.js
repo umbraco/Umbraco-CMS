@@ -13,8 +13,8 @@
 
         /**
          * @ngdoc function
-         * @name umbraco.services.healthCheckService#getAllChecks
-         * @methodOf umbraco.services.healthCheckService
+         * @name umbraco.resources.healthCheckService#getAllChecks
+         * @methodOf umbraco.resources.healthCheckResource
          * @function
          *
          * @description
@@ -29,8 +29,8 @@
 
         /**
          * @ngdoc function
-         * @name umbraco.services.healthCheckService#getStatus
-         * @methodOf umbraco.services.healthCheckService
+         * @name umbraco.resources.healthCheckService#getStatus
+         * @methodOf umbraco.resources.healthCheckResource
          * @function
          *
          * @description
@@ -45,8 +45,8 @@
 
         /**
          * @ngdoc function
-         * @name umbraco.services.healthCheckService#executeAction
-         * @methodOf umbraco.services.healthCheckService
+         * @name umbraco.resources.healthCheckService#executeAction
+         * @methodOf umbraco.resources.healthCheckResource
          * @function
          *
          * @description

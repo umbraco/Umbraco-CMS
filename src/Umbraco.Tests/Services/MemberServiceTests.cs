@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Web.Security;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Events;
@@ -8,12 +10,15 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Web.Security.Providers;
 
 namespace Umbraco.Tests.Services
 {
@@ -25,12 +30,81 @@ namespace Umbraco.Tests.Services
         public override void Initialize()
         {
             base.Initialize();
+
+            //hack! but we have no choice until we remove the SavePassword method from IMemberService
+            var providerMock = new Mock<MembersMembershipProvider>(ServiceContext.MemberService) { CallBase = true };
+            providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
+            providerMock.Setup(@base => @base.PasswordFormat).Returns(MembershipPasswordFormat.Hashed);
+            var provider = providerMock.Object;
+
+            ((MemberService)ServiceContext.MemberService).MembershipProvider = provider;
         }
 
         [TearDown]
         public override void TearDown()
         {
             base.TearDown();
+        }
+        
+        [Test]
+        public void Can_Set_Password_On_New_Member()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            //this will construct a member without a password
+            var member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "test");
+            ServiceContext.MemberService.Save(member);
+
+            Assert.IsTrue(member.RawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix));
+
+            ServiceContext.MemberService.SavePassword(member, "hello123456$!");
+            
+            var foundMember = ServiceContext.MemberService.GetById(member.Id);
+            Assert.IsNotNull(foundMember);
+            Assert.AreNotEqual("hello123456$!", foundMember.RawPasswordValue);
+            Assert.IsFalse(member.RawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix));
+        }
+
+        [Test]
+        public void Can_Not_Set_Password_On_Existing_Member()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            //this will construct a member with a password
+            var member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "hello123456$!", "test");
+            ServiceContext.MemberService.Save(member);
+
+            Assert.IsFalse(member.RawPasswordValue.StartsWith(Constants.Security.EmptyPasswordPrefix));
+
+            Assert.Throws<NotSupportedException>(() => ServiceContext.MemberService.SavePassword(member, "HELLO123456$!"));
+        }
+
+        [Test]
+        public void Can_Create_Member()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
+            ServiceContext.MemberService.Save(member);
+
+            Assert.AreNotEqual(0, member.Id);
+            var foundMember = ServiceContext.MemberService.GetById(member.Id);
+            Assert.IsNotNull(foundMember);
+            Assert.AreEqual("test@test.com", foundMember.Email);
+        }
+
+        [Test]
+        public void Can_Create_Member_With_Long_TLD_In_Email()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.marketing", "pass", "test");
+            ServiceContext.MemberService.Save(member);
+
+            Assert.AreNotEqual(0, member.Id);
+            var foundMember = ServiceContext.MemberService.GetById(member.Id);
+            Assert.IsNotNull(foundMember);
+            Assert.AreEqual("test@test.marketing", foundMember.Email);
         }
 
         [Test]
@@ -156,6 +230,18 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(2, membersInRole.Count());
         }
 
+        [Test]
+        public void Cannot_Save_Member_With_Empty_Name()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, string.Empty, "test@test.com", "pass", "test");
+
+            // Act & Assert
+            Assert.Throws<ArgumentException>(() => ServiceContext.MemberService.Save(member));
+            
+        }
+
         [TestCase("MyTestRole1", "test1", StringPropertyMatchType.StartsWith, 1)]
         [TestCase("MyTestRole1", "test", StringPropertyMatchType.StartsWith, 3)]
         [TestCase("MyTestRole1", "test1", StringPropertyMatchType.Exact, 1)]
@@ -190,6 +276,10 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(member1);
             var member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
             ServiceContext.MemberService.Save(member2);
+
+            // temp make sure they exist
+            Assert.IsNotNull(ServiceContext.MemberService.GetById(member1.Id));
+            Assert.IsNotNull(ServiceContext.MemberService.GetById(member2.Id));
 
             ServiceContext.MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole1" });
 
@@ -452,6 +542,29 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(10, totalRecs);
             Assert.AreEqual("test0", found.First().Username);
             Assert.AreEqual("test1", found.Last().Username);
+        }
+
+        [Test]
+        public void Get_All_Paged_Members_With_Filter()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10);
+            ServiceContext.MemberService.Save(members);
+
+            long totalRecs;
+            var found = ServiceContext.MemberService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, true, null, "Member No-");
+
+            Assert.AreEqual(2, found.Count());
+            Assert.AreEqual(10, totalRecs);
+            Assert.AreEqual("test0", found.First().Username);
+            Assert.AreEqual("test1", found.Last().Username);
+            
+            found = ServiceContext.MemberService.GetAll(0, 2, out totalRecs, "username", Direction.Ascending, true, null, "Member No-5");
+
+            Assert.AreEqual(1, found.Count());
+            Assert.AreEqual(1, totalRecs);
+            Assert.AreEqual("test5", found.First().Username);
         }
 
         [Test]

@@ -52,9 +52,14 @@ namespace umbraco.DataLayer.SqlHelpers.SqlServer
             #if DEBUG && DebugDataLayer
                 // Log Query Execution
                 Trace.TraceInformation(GetType().Name + " SQL ExecuteScalar: " + commandText);
-            #endif
+#endif
 
-            return SH.ExecuteScalar(ConnectionString, CommandType.Text, commandText, parameters);
+            using (var cc = UseCurrentConnection)
+            {
+                return cc.Transaction == null 
+                    ? SH.ExecuteScalar((SqlConnection) cc.Connection, CommandType.Text, commandText, parameters) 
+                    : SH.ExecuteScalar((SqlTransaction) cc.Transaction, CommandType.Text, commandText, parameters);
+            }
         }
 
         /// <summary>
@@ -65,14 +70,19 @@ namespace umbraco.DataLayer.SqlHelpers.SqlServer
         /// <returns>
         /// The number of rows affected by the command.
         /// </returns>
-        protected override int ExecuteNonQuery(string commandText, SqlParameter[] parameters)
+        protected override int ExecuteNonQuery(string commandText, params SqlParameter[] parameters)
         {
             #if DEBUG && DebugDataLayer
                 // Log Query Execution
                 Trace.TraceInformation(GetType().Name + " SQL ExecuteNonQuery: " + commandText);
-            #endif
+#endif
 
-            return SH.ExecuteNonQuery(ConnectionString, CommandType.Text, commandText, parameters);
+            using (var cc = UseCurrentConnection)
+            {
+                return cc.Transaction == null
+                    ? SH.ExecuteNonQuery((SqlConnection) cc.Connection, CommandType.Text, commandText, parameters)
+                    : SH.ExecuteNonQuery((SqlTransaction) cc.Transaction, CommandType.Text, commandText, parameters);
+            }
         }
 
         /// <summary>
@@ -83,15 +93,19 @@ namespace umbraco.DataLayer.SqlHelpers.SqlServer
         /// <returns>
         /// A data reader containing the results of the command.
         /// </returns>
-        protected override IRecordsReader ExecuteReader(string commandText, SqlParameter[] parameters)
+        protected override IRecordsReader ExecuteReader(string commandText, params SqlParameter[] parameters)
         {
             #if DEBUG && DebugDataLayer
                 // Log Query Execution
                 Trace.TraceInformation(GetType().Name + " SQL ExecuteReader: " + commandText);
-            #endif
+#endif
 
-            return new SqlServerDataReader(SH.ExecuteReader(ConnectionString, CommandType.Text,
-                                                            commandText, parameters));
+            using (var cc = UseCurrentConnection)
+            {
+                return cc.Transaction == null
+                    ? new SqlServerDataReader(SH.ExecuteReader((SqlConnection) cc.Connection, CommandType.Text, commandText, parameters))
+                    : new SqlServerDataReader(SH.ExecuteReader((SqlTransaction) cc.Transaction, CommandType.Text, commandText, parameters));
+            }
         }
     }
 }
