@@ -162,7 +162,9 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
             tree = args.tree;
 
-            if (node && node.path) {
+            var nodeHasPath = typeof node !== "undefined" && typeof node.path !== "undefined";
+            var startNodeNotDefined = typeof dialogOptions.startNodeId === "undefined" || dialogOptions.startNodeId === "" || dialogOptions.startNodeId === "-1";
+            if (startNodeNotDefined && nodeHasPath) {
                 $scope.dialogTreeEventHandler.syncTree({ path: node.path, activate: false });
             }
 
