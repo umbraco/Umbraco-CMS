@@ -6,65 +6,56 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
-using ContentVariation = Umbraco.Web.Models.ContentEditing.ContentVariation;
 using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.Models.Mapping
 {
-    /// <summary>
-    /// Used to map the <see cref="ContentItemDisplay"/> variations collection from an <see cref="IContent"/> instance
-    /// </summary>
-    internal class ContentItemDisplayVariationResolver : IValueResolver<IContent, ContentItemDisplay, IEnumerable<ContentVariation>>
+    internal class ContentVariantResolver : IValueResolver<IContent, ContentItemDisplay, IEnumerable<ContentVariantDisplay>>
     {
         private readonly ILocalizationService _localizationService;
 
-        public ContentItemDisplayVariationResolver(ILocalizationService localizationService)
+        public ContentVariantResolver(ILocalizationService localizationService)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
         }
 
-        public IEnumerable<ContentVariation> Resolve(IContent source, ContentItemDisplay destination, IEnumerable<ContentVariation> destMember, ResolutionContext context)
+        public IEnumerable<ContentVariantDisplay> Resolve(IContent source, ContentItemDisplay destination, IEnumerable<ContentVariantDisplay> destMember, ResolutionContext context)
         {
+            var result = new List<ContentVariantDisplay>();
             if (!source.ContentType.VariesByCulture())
-                return Enumerable.Empty<ContentVariation>();
-
-            var allLanguages = _localizationService.GetAllLanguages().OrderBy(x => x.Id).ToList();
-            if (allLanguages.Count == 0) return Enumerable.Empty<ContentVariation>();
-
-            var langs = context.Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLanguages, null, context);
-            var variants = langs.Select(x => new ContentVariation
             {
-                Language = x,
-                Mandatory = x.Mandatory,
-                Name = source.GetCultureName(x.IsoCode),
-                Exists = source.IsCultureAvailable(x.IsoCode), // segments ??
-                PublishedState = (source.PublishedState == PublishedState.Unpublished //if the entire document is unpublished, then flag every variant as unpublished
-                    ? PublishedState.Unpublished
-                    : source.IsCulturePublished(x.IsoCode)
-                        ? PublishedState.Published
-                        : PublishedState.Unpublished).ToString(),
-                IsEdited = source.IsCultureEdited(x.IsoCode)
-                //Segment = ?? We'll need to populate this one day when we support segments
-            }).ToList();
-
-            var culture = context.GetCulture();
-
-            //set the current variant being edited to the one found in the context or the default if nothing matches
-            var foundCurrent = false;
-            foreach (var variant in variants)
-            {
-                if (culture.InvariantEquals(variant.Language.IsoCode))
-                {
-                    variant.IsCurrent = true;
-                    foundCurrent = true;
-                    break;
-                }
+                //this is invariant so just map the IContent instance to ContentVariationDisplay
+                result.Add(context.Mapper.Map<ContentVariantDisplay>(source));
             }
-            if (!foundCurrent)
-                variants.First(x => x.Language.IsDefaultVariantLanguage).IsCurrent = true;
+            else
+            {
+                var allLanguages = _localizationService.GetAllLanguages().OrderBy(x => x.Id).ToList();
+                if (allLanguages.Count == 0) return Enumerable.Empty<ContentVariantDisplay>(); //this should never happen
 
-            return variants;
+                var langs = context.Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLanguages, null, context).ToList();
+
+                //create a variant for each lang, then we'll populate the values
+                var variants = langs.Select(x =>
+                {
+                    //We need to set the culture in the mapping context since this is needed to ensure that the correct property values
+                    //are resolved during the mapping
+                    context.Items[ResolutionContextExtensions.CultureKey] = x.IsoCode;
+                    return context.Mapper.Map<IContent, ContentVariantDisplay>(source, null, context);
+                }).ToList();
+
+                for (int i = 0; i < langs.Count; i++)
+                {
+                    var x = langs[i];
+                    var variant = variants[i];
+
+                    variant.Language = x;
+                    variant.Name = source.GetCultureName(x.IsoCode);
+                }
+
+                return variants;
+            }
+            return result;
         }
-
     }
+    
 }

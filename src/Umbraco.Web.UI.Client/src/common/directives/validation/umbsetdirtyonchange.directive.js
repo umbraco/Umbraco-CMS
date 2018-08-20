@@ -3,21 +3,27 @@
 
     function SetDirtyOnChange() {
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope, el, attr, ctrls) {
 
-            if(attr.ngModel) {
-                scope.$watch(attr.ngModel, function(newValue, oldValue) {
-                    if (!newValue) {return;}
-                    if (newValue === oldValue) {return;}
-                    ctrl.$setDirty();
-                }, true);
-
+            var formCtrl = ctrls[0];
+            
+            if (ctrls.length > 1) {
+                //if an ngModel is supplied, assign a render function which is called when the model is changed
+                var modelCtrl = ctrls[1];
+                var oldRender = modelCtrl.$render;
+                modelCtrl.$render = function () {
+                    formCtrl.$setDirty();
+                    //call any previously set render method
+                    if (oldRender) {
+                        oldRender();
+                    }
+                };
             } else {
                 var initValue = attr.umbSetDirtyOnChange;
                 
                 attr.$observe("umbSetDirtyOnChange", function (newValue) {
                     if(newValue !== initValue) {
-                        ctrl.$setDirty();
+                        formCtrl.$setDirty();
                     }
                 });
             }
@@ -25,7 +31,7 @@
         }
 
         var directive = {
-            require: "^^form",
+            require: ["^^form", "?ngModel"],
             restrict: 'A',
             link: link
         };

@@ -34,11 +34,6 @@ namespace Umbraco.Core
                 public const string ListViewPrefix = "List View - ";
             }
 
-            public static class PropertyGroups
-            {
-                public const string ListViewGroupName = "umbContainerView";
-            }
-
             /// <summary>
             /// Constants for Umbraco Content property aliases.
             /// </summary>
@@ -330,6 +325,16 @@ namespace Umbraco.Core
                 /// ContentType alias for default relation type "Relate Parent Document On Delete".
                 /// </summary>
                 public const string RelateParentDocumentOnDeleteAlias = "relateParentDocumentOnDelete";
+
+                /// <summary>
+                /// ContentType name for default relation type "Relate Parent Media Folder On Delete".
+                /// </summary>
+                public const string RelateParentMediaFolderOnDeleteName = "Relate Parent Media Folder On Delete";
+
+                /// <summary>
+                /// ContentType alias for default relation type "Relate Parent Media Folder On Delete".
+                /// </summary>
+                public const string RelateParentMediaFolderOnDeleteAlias = "relateParentMediaFolderOnDelete";
             }
         }
     }

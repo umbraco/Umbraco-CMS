@@ -180,14 +180,6 @@
     <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.designer.cs">
       <DependentUpon>ChangeDocType.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\dialogs\Sort.aspx.cs">
-      <DependentUpon>sort.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Umbraco\dialogs\Sort.aspx.designer.cs">
-      <DependentUpon>sort.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="Umbraco\Masterpages\Default.Master.cs">
       <DependentUpon>default.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -348,31 +340,8 @@
     <Content Include="Umbraco\Dialogs\ChangeDocType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="Umbraco_Client\Application\Extensions.js" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.min.js" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.unobtrusive.min.js" />
-    <Content Include="Umbraco_Client\Dialogs\SortDialog.css" />
-    <Content Include="Umbraco_client\Dialogs\SortDialog.js" />
-    <Content Include="Umbraco_Client\Dialogs\AssignDomain2.js" />
-    <Content Include="Umbraco_Client\Dialogs\AssignDomain2.css" />
-    <Content Include="Umbraco_Client\Dialogs\UmbracoField.js" />
-    <Content Include="Umbraco_Client\PunyCode\punycode.min.js" />
-    <Content Include="Umbraco_Client\Splitbutton\InsertMacroSplitButton.js" />
-    <Content Include="Umbraco_Client\Tablesorting\img\asc.gif" />
-    <Content Include="Umbraco_Client\Tablesorting\img\desc.gif" />
-    <Content Include="Umbraco_Client\Tablesorting\jquery.tablesorter.min.js" />
-    <Content Include="Umbraco_Client\Splitbutton\jquery.splitbutton.js" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.hotkeys.js" />
-    <Content Include="Umbraco_Client\Splitbutton\Images\splitbutton_hover.png" />
-    <Content Include="Umbraco_Client\Splitbutton\Images\splitbutton_downarrow.png" />
-    <Content Include="Umbraco_Client\Splitbutton\splitbutton.css" />
-    <Content Include="Umbraco_Client\Modal\jquery.simplemodal.1.4.1.custom.js" />
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
-    <Content Include="Umbraco_Client\Ui\base2.js" />
-    <Content Include="Umbraco_Client\Ui\json2.js" />
-    <Content Include="Umbraco_Client\Ui\knockout.js" />
-    <Content Include="Umbraco_Client\Ui\knockout.mapping.js" />
     <Content Include="Umbraco\endPreview.aspx" />
     <Content Include="Umbraco\Dialogs\Preview.aspx" />
     <Content Include="Umbraco\Controls\Tree\TreeControl.ascx" />
@@ -385,32 +354,17 @@
     <Content Include="Umbraco\Config\Lang\nl.xml" />
     <Content Include="Umbraco\Config\Lang\nb.xml" />
     <Content Include="Umbraco\Config\Lang\sv.xml" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.cookie.js" />
-    <Content Include="Umbraco_Client\Tablesorting\Img\bg.gif" />
     <Content Include="Umbraco\Dialogs\empty.htm" />
     <Content Include="Umbraco\Dialogs\republish.aspx" />
     <Content Include="Umbraco\Dialogs\SendPublish.aspx" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery-fieldselection.js" />
-    <Content Include="Umbraco_Client\Application\JQuery\jquery.metadata.min.js" />
-    <Content Include="Umbraco_Client\Application\UmbracoUtils.js" />
-    <Content Include="Umbraco_Client\Application\UmbracoApplicationActions.js" />
-    <Content Include="Umbraco_Client\Application\UmbracoClientManager.js" />
-    <Content Include="Umbraco_Client\Application\NamespaceManager.js" />
     <Content Include="Umbraco\Translation\details.aspx" />
-    <Content Include="Umbraco_Client\Modal\modalBackground.gif" />
-    <Content Include="Umbraco_Client\Modal\modalGradiant.gif" />
     <Content Include="Umbraco\Developer\Packages\directoryBrowser.aspx" />
     <Content Include="Umbraco\Developer\Packages\editPackage.aspx" />
     <Content Include="Umbraco\Dialogs\create.aspx" />
-    <Content Include="Umbraco\Dialogs\exportDocumenttype.aspx" />
-    <Content Include="Umbraco\Dialogs\importDocumenttype.aspx" />
-    <Content Include="Umbraco\Dialogs\notifications.aspx" />
     <Content Include="Umbraco\Dialogs\protectPage.aspx" />
     <Content Include="Umbraco\Dialogs\rollBack.aspx" />
     <Content Include="Umbraco\Dialogs\sendToTranslation.aspx" />
     <Content Include="Umbraco\Dialogs\treePicker.aspx" />
-    <Content Include="Umbraco\Dialogs\umbracoField.aspx" />
-    <Content Include="Umbraco\Dialogs\viewAuditTrail.aspx" />
     <Content Include="Umbraco\Config\Create\UI.xml" />
     <Content Include="Umbraco\Config\Lang\en.xml">
       <SubType>Designer</SubType>
@@ -501,7 +455,6 @@
     <Content Include="Umbraco\Masterpages\umbracoPage.Master" />
     <Content Include="Umbraco\Masterpages\umbracoDialog.Master" />
     <Content Include="Umbraco\Webservices\CheckForUpgrade.asmx" />
-    <Content Include="Umbraco\Settings\DictionaryItemList.aspx" />
     <Content Include="Umbraco\Translation\default.aspx" />
     <Content Include="Umbraco\Translation\preview.aspx" />
     <Content Include="Umbraco\Translation\xml.aspx" />
@@ -513,27 +466,12 @@
     <Content Include="Umbraco\ping.aspx">
       <SubType>Form</SubType>
     </Content>
-    <Content Include="Umbraco\Settings\EditDictionaryItem.aspx" />
-    <Content Include="Umbraco\Dialogs\sort.aspx" />
     <Content Include="Umbraco\treeInit.aspx" />
     <!--<Content Include="Umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="Umbraco\Webservices\ajax.js" />
     <Content Include="Umbraco\Webservices\codeEditorSave.asmx" />
     <Content Include="Umbraco\Webservices\legacyAjaxCalls.asmx" />
     <Content Include="Umbraco\Webservices\nodeSorter.asmx" />
-    <Content Include="Umbraco_Client\Menuicon\Images\buttonbg.gif" />
-    <Content Include="Umbraco_Client\Menuicon\Images\buttonbgdown.gif" />
-    <Content Include="Umbraco_Client\Menuicon\Images\split.gif" />
-    <Content Include="Umbraco_Client\Menuicon\style.css" />
-    <Content Include="Umbraco_Client\Modal\modal.js" />
-    <Content Include="Umbraco_Client\Modal\style.css" />
-    <Content Include="Umbraco_Client\Scrollingmenu\javascript.js" />
-    <Content Include="Umbraco_Client\Scrollingmenu\style.css" />
-    <Content Include="Umbraco_Client\Tablesorting\tableDragAndDrop.js" />
-    <Content Include="Umbraco_Client\Ui\default.css" />
-    <Content Include="Umbraco_Client\Ui\default.js" />
-    <Content Include="Umbraco_Client\Ui\jquery.js" />
-    <Content Include="Umbraco_Client\Ui\jqueryui.js" />
     <Content Include="App_Browsers\w3cvalidator.browser" />
     <Content Include="App_Browsers\Form.browser" />
     <Content Include="Umbraco\Masterpages\default.Master" />

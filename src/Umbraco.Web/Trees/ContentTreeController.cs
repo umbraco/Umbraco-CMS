@@ -117,7 +117,7 @@ namespace Umbraco.Web.Trees
 
                 //these two are the standard items
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
-                menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(null, "content", "content");
+                menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias), true);
 
                 //filter the standard items
                 FilterUserAllowedMenuItems(menu, nodeActions);
@@ -178,10 +178,7 @@ namespace Umbraco.Web.Trees
             return nodeMenu;
         }
 
-        protected override UmbracoObjectTypes UmbracoObjectType
-        {
-            get { return UmbracoObjectTypes.Document; }
-        }
+        protected override UmbracoObjectTypes UmbracoObjectType => UmbracoObjectTypes.Document;
 
         /// <summary>
         /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
@@ -228,16 +225,15 @@ namespace Umbraco.Web.Trees
             AddActionNode<ActionCopy>(item, menu);
             AddActionNode<ActionChangeDocType>(item, menu, convert: true);
 
-            AddActionNode<ActionSort>(item, menu, true, true);
+            AddActionNode<ActionSort>(item, menu, true);
 
             AddActionNode<ActionRollback>(item, menu, convert: true);
-            AddActionNode<ActionAudit>(item, menu, convert: true);
             AddActionNode<ActionToPublish>(item, menu, convert: true);
-            AddActionNode<ActionAssignDomain>(item, menu, convert: true);
+            AddActionNode<ActionAssignDomain>(item, menu);
             AddActionNode<ActionRights>(item, menu, convert: true);
             AddActionNode<ActionProtect>(item, menu, true, true);
-
-            AddActionNode<ActionNotify>(item, menu, true, true);
+            
+            AddActionNode<ActionNotify>(item, menu, true);
             AddActionNode<ActionSendToTranslate>(item, menu, convert: true);
 
             AddActionNode<RefreshNode, ActionRefresh>(item, menu, true);
@@ -281,13 +277,19 @@ namespace Umbraco.Web.Trees
 
             // we are getting the tree for a given culture,
             // for those items that DO support cultures, we need to get the proper name, IF it exists
-            // otherwise, invariant is fine
+            // otherwise, invariant is fine (with brackets)
 
-            if (docEntity.Variations.VariesByCulture() &&
-                docEntity.CultureNames.TryGetValue(culture, out var name) &&
-                !string.IsNullOrWhiteSpace(name))
+            if (docEntity.Variations.VariesByCulture())
             {
-                entity.Name = name;
+                if (docEntity.CultureNames.TryGetValue(culture, out var name) &&
+                    !string.IsNullOrWhiteSpace(name))
+                {
+                    entity.Name = name;
+                }
+                else
+                {
+                    entity.Name = "(" + entity.Name + ")";
+                }
             }
 
             if (string.IsNullOrWhiteSpace(entity.Name))

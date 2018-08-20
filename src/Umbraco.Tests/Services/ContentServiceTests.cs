@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Services
         /// <summary>
         /// Used to list out all ambiguous events that will require dispatching with a name
         /// </summary>
-        [Test]
+        [Test, Explicit]
         public void List_Ambiguous_Events()
         {
             var events = ServiceContext.ContentService.GetType().GetEvents(BindingFlags.Static | BindingFlags.Public);
@@ -1847,7 +1847,7 @@ namespace Umbraco.Tests.Services
             object obj =
                 new
                 {
-                    tags = "Hello,World"
+                    tags = "[\"Hello\",\"World\"]"
                 };
             var content1 = MockedContent.CreateBasicContent(contentType);
             content1.PropertyValues(obj);
@@ -2006,13 +2006,13 @@ namespace Umbraco.Tests.Services
             contentService.Save(content);
 
             // value has been set but no tags have been created (not published)
-            Assert.AreEqual("hello,world", content.GetValue(propAlias));
+            Assert.AreEqual("[\"hello\",\"world\"]", content.GetValue(propAlias));
             var contentTags = ServiceContext.TagService.GetTagsForEntity(content.Id).ToArray();
             Assert.AreEqual(0, contentTags.Length);
 
             // reloading the content yields the same result
             content = (Content) contentService.GetById(content.Id);
-            Assert.AreEqual("hello,world", content.GetValue(propAlias));
+            Assert.AreEqual("[\"hello\",\"world\"]", content.GetValue(propAlias));
             contentTags = ServiceContext.TagService.GetTagsForEntity(content.Id).ToArray();
             Assert.AreEqual(0, contentTags.Length);
 
@@ -2020,7 +2020,7 @@ namespace Umbraco.Tests.Services
             contentService.SaveAndPublish(content);
 
             // now tags have been set (published)
-            Assert.AreEqual("hello,world", content.GetValue(propAlias));
+            Assert.AreEqual("[\"hello\",\"world\"]", content.GetValue(propAlias));
             contentTags = ServiceContext.TagService.GetTagsForEntity(content.Id).ToArray();
             Assert.AreEqual(2, contentTags.Length);
 
@@ -2028,7 +2028,7 @@ namespace Umbraco.Tests.Services
             var copy = contentService.Copy(content, content.ParentId, false);
 
             // copy is not published, so property has value, but no tags have been created
-            Assert.AreEqual("hello,world", copy.GetValue(propAlias));
+            Assert.AreEqual("[\"hello\",\"world\"]", copy.GetValue(propAlias));
             var copiedTags = ServiceContext.TagService.GetTagsForEntity(copy.Id).ToArray();
             Assert.AreEqual(0, copiedTags.Length);
 

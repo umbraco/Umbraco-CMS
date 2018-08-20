@@ -41,7 +41,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 var currentState = FormatGuidState(state.CurrentMigrationState);
                 var newState = FormatGuidState(state.FinalMigrationState);
 
-                var reportUrl = $"https://our.umbraco.org/contribute/releases/compare?from={currentVersion}&to={newVersion}&notes=1";
+                var reportUrl = $"https://our.umbraco.com/contribute/releases/compare?from={currentVersion}&to={newVersion}&notes=1";
 
                 return new { currentVersion, newVersion, currentState, newState, reportUrl };
             }

@@ -213,7 +213,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
+                    }, { responseType: 'text' }),
                 'Failed to move content');
         },
 
@@ -233,7 +233,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
+                    }, { responseType: 'text' }),
                 'Failed to copy content');
         },
 
@@ -244,7 +244,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                     umbRequestHelper.getApiUrl(
                        "mediaTypeApiBaseUrl",
                        "PostCreateContainer",
-                       { parentId: parentId, name: name })),
+                        { parentId: parentId, name: encodeURIComponent(name) })),
                 'Failed to create a folder under parent id ' + parentId);
         },
 

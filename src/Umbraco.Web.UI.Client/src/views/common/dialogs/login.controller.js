@@ -181,7 +181,7 @@
                     modalClass: "login-overlay",
                     animation: "slide",
                     show: true,
-                    callback: callback,
+                    callback: callback
 
                 });
             }

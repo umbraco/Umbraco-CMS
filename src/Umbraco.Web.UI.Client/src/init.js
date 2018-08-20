@@ -43,8 +43,7 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
         }
 
         var currentRouteParams = null;
-        var globalQueryStrings = ["mculture"];
-
+        
         /** execute code on each successful route */
         $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
 
@@ -126,28 +125,7 @@ app.run(['userService', '$q', '$log', '$rootScope', '$route', '$location', 'urlH
                 //check if the location being changed is only the mculture query string, if so, cancel the routing since this is just
                 //used as a global persistent query string that does not change routes.
 
-                var currUrlParts = currentRouteParams;
-                var nextUrlParts = next.params;
-
-                var allowRoute = true;
-
-                //the only time that we want to cancel is if any of the globalQueryStrings have changed
-                //in which case the number of parts need to be equal before comparing values
-                if (_.keys(currUrlParts).length == _.keys(nextUrlParts).length) {
-                    var partsChanged = 0;
-                    _.each(currUrlParts, function (value, key) {
-                        if (globalQueryStrings.indexOf(key) === -1) {
-                            if (value.toLowerCase() !== nextUrlParts[key].toLowerCase()) {
-                                partsChanged++;
-                            }
-                        }
-                    });
-                    if (partsChanged === 0) {
-                        allowRoute = false; //nothing except our query strings chagned, so don't continue routing
-                    }
-                }
-
-                if (allowRoute) {
+                if (navigationService.isRouteChangingNavigation(currentRouteParams, next.params)) {
                     //continue the route
                     $route.reload();
                 }

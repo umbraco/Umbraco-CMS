@@ -5,9 +5,9 @@ using Umbraco.Core.PropertyEditors;
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
-    /// Represents a boolean property and parameter editor.
+    /// Represents a checkbox property and parameter editor.
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.Boolean, EditorType.PropertyValue | EditorType.MacroParameter, "True/False", "boolean", ValueType = ValueTypes.Integer, Group = "Common", Icon="icon-checkbox")]
+    [DataEditor(Constants.PropertyEditors.Aliases.Boolean, EditorType.PropertyValue | EditorType.MacroParameter, "Checkbox", "boolean", ValueType = ValueTypes.Integer, Group = "Common", Icon="icon-checkbox")]
     public class TrueFalsePropertyEditor : DataEditor
     {
         /// <summary>

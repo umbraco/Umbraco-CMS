@@ -80,8 +80,11 @@ namespace Umbraco.Web.Routing
         public virtual IEnumerable<string> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
             var node = umbracoContext.ContentCache.GetById(id);
+            if (node == null) return Enumerable.Empty<string>();
+
             var domainHelper = umbracoContext.GetDomainHelper(_siteDomainHelper);
 
+            // look for domains, walking up the tree
             var n = node;
             var domainUris = domainHelper.DomainsForNode(n.Id, current, false);
             while (domainUris == null && n != null) // n is null at root

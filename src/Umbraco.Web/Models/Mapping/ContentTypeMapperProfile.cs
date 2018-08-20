@@ -28,6 +28,7 @@ namespace Umbraco.Web.Models.Mapping
                     dest.AllowedTemplates = source.AllowedTemplates
                         .Where(x => x != null)
                         .Select(fileService.GetTemplate)
+                        .Where(x => x != null)
                         .ToArray();
 
                     if (source.DefaultTemplate != null)

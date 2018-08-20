@@ -13,9 +13,9 @@ namespace Umbraco.Web.Models.Mapping
         public MemberDisplay Convert(MembershipUser source, MemberDisplay destination, ResolutionContext context)
         {
             //first convert to IMember
-            var member = Mapper.Map<MembershipUser, IMember>(source);
+            var member = Mapper.Map<IMember>(source);
             //then convert to MemberDisplay
-            return ContextMapper.Map<IMember, MemberDisplay>(member, context.GetUmbracoContext());
+            return Mapper.Map<MemberDisplay>(member);
         }
     }
 }

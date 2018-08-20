@@ -18,10 +18,8 @@ namespace Umbraco.Core.Models.Identity
         where TRole : IdentityUserRole<string>
         where TClaim : IdentityUserClaim<TKey>
     {
-
         /// <summary>
-        /// Constructor
-        ///
+        /// Initializes a new instance of the <see cref="IdentityUser{TKey, TLogin, TRole, TClaim}"/> class.
         /// </summary>
         public IdentityUser()
         {
@@ -74,6 +72,11 @@ namespace Umbraco.Core.Models.Identity
         /// DateTime in UTC when lockout ends, any time in the past is considered not locked out.
         /// </summary>
         public virtual DateTime? LockoutEndDateUtc { get; set; }
+
+        /// <summary>
+        /// DateTime in UTC when the password was last changed.
+        /// </summary>
+        public virtual DateTime? LastPasswordChangeDateUtc { get; set; }
 
         /// <summary>
         /// Is lockout enabled for this user

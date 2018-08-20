@@ -427,18 +427,18 @@ namespace umbraco.presentation.developer.packages
             packageActions = TabView1.NewTabPage("Package Actions");
             packageActions.Controls.Add(Pane4);
 
-            var pubs = TabView1.Menu.NewButton();
-            pubs.Text = Services.TextService.Localize("publish");
-            pubs.CommandName = "publish";
-            pubs.Command += new CommandEventHandler(saveOrPublish);
-            pubs.ID = "saveAndPublish";
+            //var pubs = TabView1.Menu.NewButton();
+            //pubs.Text = Services.TextService.Localize("publish");
+            //pubs.CommandName = "publish";
+            //pubs.Command += new CommandEventHandler(saveOrPublish);
+            //pubs.ID = "saveAndPublish";
 
-            var saves = TabView1.Menu.NewButton();
-            saves.Text = Services.TextService.Localize("save");
-            saves.CommandName = "save";
-            saves.Command += new CommandEventHandler(saveOrPublish);
-            saves.ButtonType = Umbraco.Web._Legacy.Controls.MenuButtonType.Primary;
-            saves.ID = "save";
+            //var saves = TabView1.Menu.NewButton();
+            //saves.Text = Services.TextService.Localize("save");
+            //saves.CommandName = "save";
+            //saves.Command += new CommandEventHandler(saveOrPublish);
+            //saves.ButtonType = Umbraco.Web._Legacy.Controls.MenuButtonType.Primary;
+            //saves.ID = "save";
 
 
 

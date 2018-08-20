@@ -116,25 +116,6 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
             "view": "views/media/apps/listview/listview.html"
         };
 
-        $scope.content.apps = [];
-
-        if($scope.content.contentTypeAlias === "Folder") {
-          // add list view app
-          $scope.content.apps.push(listview);
-            
-          // remove the list view tab
-          angular.forEach($scope.content.tabs, function(tab, index){
-            if(tab.alias === "Contents") {
-              tab.hide = true;
-            }
-          });
-
-        } else {
-            $scope.content.apps.push(contentApp);
-        }
-        
-        $scope.content.apps.push(infoApp);
-        
         // set first app to active
         $scope.content.apps[0].active = true;
 
@@ -220,7 +201,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
                 // route but there might be server validation errors in the collection which we need to display
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors
                 // if there are any and then clear them so the collection no longer persists them.
-                serverValidationManager.executeAndClearAllSubscriptions();
+                serverValidationManager.notifyAndClearAllSubscriptions();
 
                 if(!infiniteMode) {
                     syncTreeNode($scope.content, data.path, true); 

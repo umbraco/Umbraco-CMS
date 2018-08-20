@@ -106,16 +106,24 @@
                 </umb-editor-footer-content-left>
 
             <umb-editor-footer-content-right>
+                
+                <umb-button
+                    ng-if="model.infiniteMode"
+                    type="button"
+                    button-style="link"
+                    label-key="general_close"
+                    action="vm.close()">
+                </umb-button>
 
-               <umb-button
-                  alias="save"
-                  type="submit"
-                  button-style="success"
-                  state="vm.page.saveButtonState"
-                  shortcut="ctrl+s"
-                  label="Save"
-                  label-key="buttons_save">
-               </umb-button>
+                <umb-button
+                    alias="save"
+                    type="submit"
+                    button-style="success"
+                    state="vm.page.saveButtonState"
+                    shortcut="ctrl+s"
+                    label="Save"
+                    label-key="buttons_save">
+                </umb-button>
 
             </umb-editor-footer-content-right>
 
@@ -123,34 +131,5 @@
 
         </umb-editor-view>
     </form>
-
-    <umb-overlay
-       ng-if="vm.macroPickerOverlay.show"
-       model="vm.macroPickerOverlay"
-       view="vm.macroPickerOverlay.view"
-       position="right">
-   </umb-overlay>
-
-    <umb-overlay
-        ng-if="vm.pageFieldOverlay.show"
-        model="vm.pageFieldOverlay"
-        position="right"
-        view="vm.pageFieldOverlay.view">
-    </umb-overlay>
-
-    <umb-overlay
-       ng-if="vm.sectionsOverlay.show"
-       model="vm.sectionsOverlay"
-       view="vm.sectionsOverlay.view"
-       position="right">
-   </umb-overlay>
-   
-   <umb-overlay
-       ng-if="vm.masterTemplateOverlay.show"
-       model="vm.masterTemplateOverlay"
-       view="vm.masterTemplateOverlay.view"
-       position="right">
-   </umb-overlay>
-
 
 </div>

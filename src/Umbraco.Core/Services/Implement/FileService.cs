@@ -332,16 +332,23 @@ namespace Umbraco.Core.Services.Implement
 
             var evtMsgs = EventMessagesFactory.Get();
 
-            //NOTE: This isn't pretty but we need to maintain backwards compatibility so we cannot change
+            //fixme: This isn't pretty because we we're required to maintain backwards compatibility so we could not change
             // the event args here. The other option is to create a different event with different event
-            // args specifically for this method... which also isn't pretty. So for now, we'll use this
-            // dictionary approach to store 'additional data' in.
+            // args specifically for this method... which also isn't pretty. So fix this in v8!
             var additionalData = new Dictionary<string, object>
             {
                 { "CreateTemplateForContentType", true },
                 { "ContentTypeAlias", contentTypeAlias },
             };
 
+            // check that the template hasn't been created on disk before creating the content type
+            // if it exists, set the new template content to the existing file content
+            string content = GetViewContent(contentTypeAlias);
+            if (content != null)
+            {
+                template.Content = content;
+            }
+            
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<ITemplate>(template, true, evtMsgs, additionalData);
@@ -362,17 +369,29 @@ namespace Umbraco.Core.Services.Implement
             return OperationResult.Attempt.Succeed<OperationResultType, ITemplate>(OperationResultType.Success, evtMsgs, template);
         }
 
+        /// <summary>
+        /// Create a new template, setting the content if a view exists in the filesystem
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="content"></param>
+        /// <param name="masterTemplate"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public ITemplate CreateTemplateWithIdentity(string name, string content, ITemplate masterTemplate = null, int userId = 0)
         {
+            // file might already be on disk, if so grab the content to avoid overwriting
             var template = new Template(name, name)
             {
-                Content = content
+                Content = GetViewContent(name) ?? content
             };
+            
             if (masterTemplate != null)
             {
                 template.SetMasterTemplate(masterTemplate);
             }
+
             SaveTemplate(template, userId);
+
             return template;
         }
 
@@ -484,37 +503,6 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.GetChildren(masterTemplateId);
-            }
-        }
-
-        /// <summary>
-        /// Returns a template as a template node which can be traversed (parent, children)
-        /// </summary>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        [Obsolete("Use GetDescendants instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public TemplateNode GetTemplateNode(string alias)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _templateRepository.GetTemplateNode(alias);
-            }
-        }
-
-        /// <summary>
-        /// Given a template node in a tree, this will find the template node with the given alias if it is found in the hierarchy, otherwise null
-        /// </summary>
-        /// <param name="anyNode"></param>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        [Obsolete("Use GetDescendants instead")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public TemplateNode FindTemplateInTree(TemplateNode anyNode, string alias)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _templateRepository.FindTemplateInTree(anyNode, alias);
             }
         }
 
@@ -659,10 +647,26 @@ namespace Umbraco.Core.Services.Implement
                 return _templateRepository.GetFileSize(filepath);
             }
         }
+        
+        private string GetViewContent(string fileName)
+        {
+            if (fileName.IsNullOrWhiteSpace())
+                throw new ArgumentNullException(nameof(fileName));
 
-        #endregion
+            if (!fileName.EndsWith(".cshtml"))
+                fileName = $"{fileName}.cshtml";
 
-        #region Partial Views
+            var fs = _templateRepository.GetFileContentStream(fileName);
+            if (fs == null) return null;
+            using (var view = new StreamReader(fs))
+            {
+                return view.ReadToEnd().Trim();
+            }
+        }
+
+#endregion
+
+#region Partial Views
 
         public IEnumerable<string> GetPartialViewSnippetNames(params string[] filterNames)
         {

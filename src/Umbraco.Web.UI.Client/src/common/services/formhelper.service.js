@@ -116,7 +116,7 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
                     this.handleServerValidation(err.data.ModelState);
 
                     //execute all server validation events and subscribers
-                    serverValidationManager.executeAndClearAllSubscriptions();                    
+                    serverValidationManager.notifyAndClearAllSubscriptions();                    
                 }
                 else {
                     dialogService.ysodDialog(err);
@@ -145,15 +145,15 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
                 // that each property is a User Developer property editor.
                 // The way that Content Type Editor ModelState is created is simply based on the ASP.Net validation data-annotations 
                 // system. 
-                // So, to do this (since we need to support backwards compat), we need to hack a little bit. For Content Properties,
-                // which are user defined, we know that they will exist with a prefixed ModelState of "_Properties.", so if we detect
-                // this, then we know it's a Property.
+                // So, to do this there's some special ModelState syntax we need to know about.
+                // For Content Properties, which are user defined, we know that they will exist with a prefixed
+                // ModelState of "_Properties.", so if we detect this, then we know it's for a content Property.
 
                 //the alias in model state can be in dot notation which indicates
                 // * the first part is the content property alias
                 // * the second part is the field to which the valiation msg is associated with
-                //There will always be at least 2 parts for properties since all model errors for properties are prefixed with "Properties"
-                //If it is not prefixed with "Properties" that means the error is for a field of the object directly.
+                //There will always be at least 3 parts for content properties since all model errors for properties are prefixed with "_Properties"
+                //If it is not prefixed with "_Properties" that means the error is for a field of the object directly.
 
                 var parts = e.split(".");
 
@@ -163,14 +163,23 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
 
                     var propertyAlias = parts[1];
 
-                    //if it contains 2 '.' then we will wire it up to a property's field
+                    var culture = null;
                     if (parts.length > 2) {
+                        culture = parts[2];
+                        //special check in case the string is formatted this way
+                        if (culture === "null") {
+                            culture = null;
+                        }
+                    }
+
+                    //if it contains 3 '.' then we will wire it up to a property's html field
+                    if (parts.length > 3) {
                         //add an error with a reference to the field for which the validation belongs too
-                        serverValidationManager.addPropertyError(propertyAlias, parts[2], modelState[e][0]);
+                        serverValidationManager.addPropertyError(propertyAlias, culture, parts[3], modelState[e][0]);
                     }
                     else {
-                        //add a generic error for the property, no reference to a specific field
-                        serverValidationManager.addPropertyError(propertyAlias, "", modelState[e][0]);
+                        //add a generic error for the property, no reference to a specific html field
+                        serverValidationManager.addPropertyError(propertyAlias, culture, "", modelState[e][0]);
                     }
 
                 }
@@ -180,9 +189,6 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
                     // Groups[0].Properties[2].Alias
                     serverValidationManager.addFieldError(e, modelState[e][0]);
                 }
-
-                //add to notifications
-                notificationsService.error("Validation", modelState[e][0]);
 
             }
         }

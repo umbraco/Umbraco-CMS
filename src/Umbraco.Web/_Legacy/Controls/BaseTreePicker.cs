@@ -1,24 +1,12 @@
 ﻿using System;
-using System.Web.UI;
-using ClientDependency.Core;
-using ClientDependency.Core.Controls;
+using System.Web.UI; 
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
-using umbraco.cms.businesslogic;
-using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web._Legacy.Controls
 {
-
-    /*
-    [ClientDependency(0, ClientDependencyType.Javascript, "Application/NamespaceManager.js", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Css, "modal/style.css", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Javascript, "modal/modal.js", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Javascript, "Application/UmbracoClientManager.js", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Javascript, "Application/UmbracoUtils.js", "UmbracoClient")]*/
-
     [ValidationProperty("Value")]
     public abstract class BaseTreePicker : Control, INamingContainer
     {

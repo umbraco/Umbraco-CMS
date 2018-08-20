@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Validation;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-    /// <summary>
-    /// A model representing a member to be saved
-    /// </summary>
-    public class MemberSave : ContentBaseItemSave<IMember>
+    /// <inheritdoc />
+    public class MemberSave : ContentBaseSave<IMember>
     {
 
         [DataMember(Name = "username", IsRequired = true)]
@@ -35,6 +35,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "isApproved")]
         public bool IsApproved { get; set; }
+        
 
         //TODO: Need to add question / answer support
     }

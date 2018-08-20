@@ -10,7 +10,7 @@ namespace Umbraco.Web.PropertyEditors
     {
         [ConfigurationField("pageSize", "Page Size", "number", Description = "Number of items per page")]
         public int PageSize { get; set; }
-
+        
         [ConfigurationField("displayAtTabNumber", "Display At Tab Number", "number", Description = "Which tab position that the list of child items will be displayed")]
         public int DisplayAtTabNumber { get; set; }
 
@@ -33,7 +33,7 @@ namespace Umbraco.Web.PropertyEditors
         public BulkActionPermissionSettings BulkActionPermissions { get; set; } = new BulkActionPermissionSettings(); // fixme managing defaults?
 
         [ConfigurationField("tabName", "Tab Name", "textstring", Description = "The name of the listview tab (default if empty: 'Child Items')")]
-        public int TabName { get; set; }
+        public string TabName { get; set; }
 
         public class Property
         {
