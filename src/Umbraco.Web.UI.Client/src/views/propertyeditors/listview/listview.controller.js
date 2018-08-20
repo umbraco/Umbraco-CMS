@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, currentUserResource, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService) {
+function listViewController($scope, $routeParams, $injector, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $timeout, mediaResource, listViewHelper, navigationService, editorService) {
 
    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
    // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -498,28 +498,22 @@ function listViewController($rootScope, $scope, $routeParams, $injector, current
            });
    }
 
-   $scope.copy = function () {
-      $scope.copyDialog = {};
-      $scope.copyDialog.section = $scope.entityType;
-      $scope.copyDialog.currentNode = $scope.contentId;
-      $scope.copyDialog.view = "copy";
-      $scope.copyDialog.show = true;
-
-      $scope.copyDialog.submit = function (model) {
-         if (model.target) {
-            performCopy(model.target, model.relateToOriginal);
-         }
-
-         $scope.copyDialog.show = false;
-         $scope.copyDialog = null;
-      };
-
-      $scope.copyDialog.close = function (oldModel) {
-         $scope.copyDialog.show = false;
-         $scope.copyDialog = null;
-      };
-
-   };
+    $scope.copy = function () {
+        var copyEditor = {
+            section: $scope.entityType,
+            currentNode: $scope.contentId,
+            submit: function(model) {
+                if (model.target) {
+                    performCopy(model.target, model.relateToOriginal);
+                }
+                editorService.close();
+            },
+            close: function() {
+                editorService.close();
+            }
+        };
+        editorService.copy(copyEditor);
+    };
 
    function performCopy(target, relateToOriginal) {
       applySelected(
