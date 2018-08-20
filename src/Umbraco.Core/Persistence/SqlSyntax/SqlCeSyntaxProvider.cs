@@ -107,40 +107,27 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                                    item.IS_NULLABLE, item.DATA_TYPE)).ToList();
         }
 
+        /// <inheritdoc />
         public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(IDatabase db)
         {
             var items = db.Fetch<dynamic>("SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS");
-            var indexItems = db.Fetch<dynamic>("SELECT TABLE_NAME, INDEX_NAME FROM INFORMATION_SCHEMA.INDEXES");
-            return
-                items.Select(item => new Tuple<string, string>(item.TABLE_NAME, item.CONSTRAINT_NAME))
-                     .Union(
-                         indexItems.Select(
-                             indexItem => new Tuple<string, string>(indexItem.TABLE_NAME, indexItem.INDEX_NAME)))
-                     .ToList();
+            return items.Select(item => new Tuple<string, string>(item.TABLE_NAME, item.CONSTRAINT_NAME)).ToList();
         }
 
+        /// <inheritdoc />
         public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(IDatabase db)
         {
-            var items =
-                db.Fetch<dynamic>(
-                    "SELECT CONSTRAINT_NAME, TABLE_NAME, COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE");
-            var indexItems = db.Fetch<dynamic>("SELECT INDEX_NAME, TABLE_NAME, COLUMN_NAME FROM INFORMATION_SCHEMA.INDEXES");
-            return
-                items.Select(
-                    item => new Tuple<string, string, string>(item.TABLE_NAME, item.COLUMN_NAME, item.CONSTRAINT_NAME))
-                     .Union(
-                         indexItems.Select(
-                             indexItem =>
-                             new Tuple<string, string, string>(indexItem.TABLE_NAME, indexItem.COLUMN_NAME,
-                                                               indexItem.INDEX_NAME))).ToList();
+            var items = db.Fetch<dynamic>("SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE");
+            return items.Select(item => new Tuple<string, string, string>(item.TABLE_NAME, item.COLUMN_NAME, item.CONSTRAINT_NAME)).ToList();
         }
 
+        /// <inheritdoc />
         public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db)
         {
             var items =
                 db.Fetch<dynamic>(
                     @"SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME, [UNIQUE] FROM INFORMATION_SCHEMA.INDEXES
-WHERE INDEX_NAME NOT LIKE 'PK_%'
+WHERE PRIMARY_KEY=0
 ORDER BY TABLE_NAME, INDEX_NAME");
             return
                 items.Select(
