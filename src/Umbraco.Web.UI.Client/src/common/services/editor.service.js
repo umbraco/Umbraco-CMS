@@ -177,6 +177,23 @@
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#compositions
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the compositions editor in infinite editing, the submit callback returns selected compositions
+         * @param {Callback} editor.submit Submits the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+        function compositions(editor) {
+            editor.view = "views/common/infiniteeditors/compositions/compositions.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#mediaTypeEditor
          * @methodOf umbraco.services.editorService
          *
@@ -366,6 +383,7 @@
             mediaPicker: mediaPicker,
             iconPicker: iconPicker,
             documentTypeEditor: documentTypeEditor,
+            compositions: compositions,
             mediaTypeEditor: mediaTypeEditor,
             queryBuilder: queryBuilder,
             treePicker: treePicker,
