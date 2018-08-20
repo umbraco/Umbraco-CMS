@@ -27,14 +27,6 @@ namespace Umbraco.Web.Models.Mapping
             View = "views/content/apps/info/info.html"
         };
 
-        private readonly ContentApp _moreApp = new ContentApp
-        {
-            Alias = "more",
-            Name = "More",
-            Icon = "icon-thumbnails-small",
-            View = "views/content/apps/info/info.html"
-        };
-
         private readonly IDataTypeService _dataTypeService;
         private readonly PropertyEditorCollection _propertyEditorCollection;
 
@@ -56,7 +48,6 @@ namespace Umbraco.Web.Models.Mapping
 
             apps.Add(_contentApp);
             apps.Add(_infoApp);
-            apps.Add(_moreApp);
 
             return apps;
         }

@@ -1,5 +1,5 @@
 ﻿<div data-element="editor-header" class="umb-editor-header">
-    
+
     <div class="flex items-center" style="height: 100%;">
 
         <div ng-if="showBackButton === true && splitViewOpen !== true" style="margin-right: 15px;">
@@ -23,32 +23,30 @@
             <div id="nameField" style="flex: 1 1 auto;">
                 <div class="umb-editor-header__name-wrapper">
                     <ng-form name="headerNameForm">
-                        <input
-                            data-element="editor-name-field"
-                            title="{{key}}"
-                            type="text"
-                            class="umb-editor-header__name-input"
-                            localize="placeholder"
-                            placeholder="@placeholders_entername"
-                            name="headerName"
-                            ng-show="!nameLocked"
-                            ng-model="name"
-                            ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}"
-                            umb-auto-focus
-                            val-server-field="Name"
-                            required />
+                        <input data-element="editor-name-field"
+                               title="{{key}}"
+                               type="text"
+                               class="umb-editor-header__name-input"
+                               localize="placeholder"
+                               placeholder="@placeholders_entername"
+                               name="headerName"
+                               ng-show="!nameLocked"
+                               ng-model="name"
+                               ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}"
+                               umb-auto-focus
+                               val-server-field="Name"
+                               required />
                     </ng-form>
 
-                    <umb-generate-alias
-                        data-element="editor-alias"
-                        class="umb-panel-header-alias"
-                        ng-if="!hideAlias"
-                        alias="$parent.alias"
-                        alias-from="$parent.name"
-                        enable-lock="true"
-                        server-validation-field="Alias">
+                    <umb-generate-alias data-element="editor-alias"
+                                        class="umb-panel-header-alias"
+                                        ng-if="!hideAlias"
+                                        alias="$parent.alias"
+                                        alias-from="$parent.name"
+                                        enable-lock="true"
+                                        server-validation-field="Alias">
                     </umb-generate-alias>
-                    
+
                     <a ng-if="variants.length > 0 && hideChangeVariant !== true" class="umb-variant-switcher__toggle" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">
                         <span>{{vm.currentVariant.language.name}}</span>
                         <ins class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</ins>
@@ -69,9 +67,9 @@
                                     <span class="umb-variant-switcher__state" ng-switch-when="Published"><localize key="content_published"></localize></span>
                                 </span>
                             </a>
-                                                        
+
                             <div ng-if="splitViewOpen !== true" class="umb-variant-switcher__split-view" ng-click="openInSplitView($event, variant)">Open in split view</div>
-                            
+
                         </umb-dropdown-item>
                     </umb-dropdown>
 
@@ -79,15 +77,14 @@
 
                 <div class="umb-panel-header-name" ng-if="nameLocked" title="{{key}}">{{ name }}</div>
 
-                <input
-                    data-element="editor-description"
-                    type="text"
-                    class="umb-panel-header-description"
-                    localize="placeholder"
-                    placeholder="@placeholders_enterDescription"
-                    ng-if="!hideDescription && !descriptionLocked"
-                    ng-model="$parent.description" />
-        
+                <input data-element="editor-description"
+                       type="text"
+                       class="umb-panel-header-description"
+                       localize="placeholder"
+                       placeholder="@placeholders_enterDescription"
+                       ng-if="!hideDescription && !descriptionLocked"
+                       ng-model="$parent.description" />
+
                 <div class="umb-panel-header-locked-description" ng-if="descriptionLocked">{{ description }}</div>
 
             </div>
@@ -101,19 +98,16 @@
         </div>
 
         <div ng-if="navigation && splitViewOpen !== true" style="margin-left: 20px;">
-            <umb-editor-navigation
-                data-element="editor-sub-views"
-                navigation="navigation"
-                something="something"
-                navigationOverflow ="navigationOverflow">
+            <umb-editor-navigation data-element="editor-sub-views"
+                                   navigation="navigation"
+                                   content-apps-limit="contentAppsLimit">
             </umb-editor-navigation>
         </div>
 
         <div ng-if="menu.currentNode && splitViewOpen !== true && hideMenu !== true" style="margin-left: 20px;">
-            <umb-editor-menu
-                data-element="editor-actions"
-                current-node="menu.currentNode"
-                current-section="{{menu.currentSection}}">
+            <umb-editor-menu data-element="editor-actions"
+                             current-node="menu.currentNode"
+                             current-section="{{menu.currentSection}}">
             </umb-editor-menu>
         </div>
 

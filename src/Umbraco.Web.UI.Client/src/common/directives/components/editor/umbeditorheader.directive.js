@@ -208,23 +208,11 @@ Use this directive to construct a header inside the main editor window.
 
         function link(scope, el, attr, ctrl) {
 
-            var maxApps = 2;
+            scope.contentAppsLimit = 2;
 
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
-            scope.vm.inputWidth = "";
-            scope.maxSections = maxApps;
-            scope.overflowingApps = 0;
-            scope.navigationOverflow = [];
-
-
-            var moreButton = {
-                alias: "more",
-                name: "More",
-                icon: "icon-thumbnails-small",
-                view: "views/content/apps/info/info.html"
-            };
 
             function onInit() {
                 setCurrentVariant();
@@ -245,6 +233,7 @@ Use this directive to construct a header inside the main editor window.
             };
 
             scope.selectVariant = function (event, variant) {
+
                 if (scope.onSelectVariant) {
                     scope.vm.dropdownOpen = false;
                     scope.onSelectVariant({ "variant": variant });

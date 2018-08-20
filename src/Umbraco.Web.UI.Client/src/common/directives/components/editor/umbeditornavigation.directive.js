@@ -5,29 +5,29 @@
 
         function link(scope, el, attr, ctrl) {
 
-
-
             scope.showNavigation = true;
-            scope.showMore = false;
+            scope.showMoreButton = false;
             scope.showTray = false;
-            scope.overflow = [];
-            scope.currentApps = 0;
 
-            
+            scope.moreButton = {
+                alias: "more",
+                active: false,
+                name: "More",
+                icon: "icon-thumbnails-small",
+                view: "views/content/apps/info/info.html"
+            };
 
             scope.clickNavigationItem = function (selectedItem) {
-                console.log(scope.something);
+                runItemAction(selectedItem);
+                eventsService.emit("app.tabChange", selectedItem);
+                setItemToActive(selectedItem);
+            };
 
-                if (selectedItem.alias !== "more") {
-                    runItemAction(selectedItem);
-                    eventsService.emit("app.tabChange", selectedItem);
-                    setItemToActive(selectedItem);
+            scope.trayClick = function () {
+                if (scope.showTray === false) {
+                    scope.showTray = true;
                 } else {
-                    if (scope.showTray === false) {
-                        scope.showTray = true;
-                    } else {
-                        scope.showTray = false;
-                    }
+                    scope.showTray = false;
                 }
             };
 
@@ -43,6 +43,15 @@
 
                     for (var index = 0; index < scope.navigation.length; index++) {
                         var item = scope.navigation[index];
+
+                        // set 'more' button active if there is an active app in the app tray
+                        var selectedItemIndex = scope.navigation.indexOf(selectedItem);
+                        if (selectedItemIndex + 1 > scope.contentAppsLimit) {
+                            scope.moreButton.active = true;
+                        } else {
+                            scope.moreButton.active = false;
+                        }
+
                         item.active = false;
                     }
 
@@ -52,33 +61,34 @@
             }
 
             function activate() {
-
                 // hide navigation if there is only 1 item
                 if (scope.navigation.length <= 1) {
                     scope.showNavigation = false;
                 }
-                scope.currentApps = scope.navigation.length;
+            }
 
-                var maxApps =4;
-                var navLenght = scope.navigation.length - 1;
-
-
-                var appsToPop = navLenght - maxApps;
-
-                if (navLenght > maxApps) {
-
-                    for (var i = 0; i < appsToPop +1; i++) {
-                        var v = scope.navigation.pop();
-                        scope.overflow.push(v);
-                    }
-                    scope.showMore = true;
-
+            function showMoreButton() {
+                if (scope.showNavigation === false) {
+                    return;
                 }
 
+
+                if (scope.navigation.length > scope.contentAppsLimit) {
+                    scope.showMoreButton = true;
+
+                    calculateTrayLimit();
+                }
+            }
+
+            function calculateTrayLimit() {
+                var navLength = scope.navigation.length;
+                var maxApps = scope.contentAppsLimit;
+
+                scope.contentAppsTrayLimit = maxApps - navLength;
             }
 
             activate();
-            
+            showMoreButton();
         }
 
         var directive = {
@@ -87,7 +97,7 @@
             templateUrl: 'views/components/editor/umb-editor-navigation.html',
             scope: {
                 navigation: "=",
-                something: "="
+                contentAppsLimit: "="
             },
             link: link
         };
