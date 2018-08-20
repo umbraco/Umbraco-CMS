@@ -247,6 +247,8 @@
         scope.compositionsDialogModel = {
             contentType: scope.model,
             compositeContentTypes: scope.model.compositeContentTypes,
+            view: "views/common/infiniteeditors/compositions/compositions.html",
+            size: "small",
             submit: function() {
               
               // make sure that all tabs has an init property
@@ -347,7 +349,7 @@
             })
         ]).then(function() {
             //resolves when both other promises are done, now show it
-            editorService.compositions(scope.compositionsDialogModel);
+            editorService.open(scope.compositionsDialogModel);
         });
 
       };
