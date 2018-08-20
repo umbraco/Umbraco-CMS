@@ -1,18 +1,8 @@
 <div class="form-horizontal" ng-controller="Umbraco.Editors.Content.Apps.ContentController as vm">
 
-    <div class="umb-expansion-panel" ng-repeat="group in model.tabs | filter: { hide : '!' + true } track by group.label">
-
-        <div class="umb-expansion-panel__header" ng-click="group.open = !group.open">
-            <div>{{ group.label }}</div>
-            <ins class="umb-expansion-panel__expand" ng-class="{'icon-navigation-down': !group.open, 'icon-navigation-up': group.open}" class="icon-navigation-right">&nbsp;</ins>
-        </div>
-
-        <div class="umb-expansion-panel__content" ng-show="group.open">
-            <umb-property data-element="property-{{group.alias}}" ng-repeat="property in group.properties track by property.alias" property="property">
-                <umb-property-editor model="property"></umb-property-editor>
-            </umb-property>
-        </div>
-
-    </div>
-
+    <umb-tabbed-content
+        ng-if="!vm.loading"
+        content="vm.content">
+    </umb-tabbed-content>
+    
 </div>

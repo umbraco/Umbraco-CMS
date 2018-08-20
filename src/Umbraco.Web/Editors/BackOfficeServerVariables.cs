@@ -151,7 +151,7 @@ namespace Umbraco.Web.Editors
                         },
                         {
                             "imagesApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ImagesController>(
-                                controller => controller.GetBigThumbnail(0))
+                                controller => controller.GetBigThumbnail(""))
                         },
                         {
                             "sectionApiBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<SectionController>(
@@ -254,7 +254,7 @@ namespace Umbraco.Web.Editors
                                 controller => controller.GetTags(""))
                         },
                         {
-                            "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementApiController>(
+                            "examineMgmtBaseUrl", _urlHelper.GetUmbracoApiServiceBaseUrl<ExamineManagementController>(
                                 controller => controller.GetIndexerDetails())
                         },
                         {

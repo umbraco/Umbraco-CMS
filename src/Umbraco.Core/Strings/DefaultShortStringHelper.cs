@@ -61,57 +61,6 @@ namespace Umbraco.Core.Strings
 
         #endregion
 
-        #region JavaScript
-
-        private const string SssjsFormat = @"
-var UMBRACO_FORCE_SAFE_ALIAS = {0};
-var UMBRACO_FORCE_SAFE_ALIAS_URL = '{1}';
-var UMBRACO_FORCE_SAFE_ALIAS_TIMEOUT = 666;
-var UMBRACO_FORCE_SAFE_ALIAS_TMKEY = 'safe-alias-tmout';
-
-function getSafeAliasFromServer(value, callback) {{
-    $.getJSON(UMBRACO_FORCE_SAFE_ALIAS_URL + 'ToSafeAlias?value=' + encodeURIComponent(value), function(json) {{
-        if (json.alias) {{ callback(json.alias); }}
-    }});
-}}
-
-function getSafeAlias(input, value, immediate, callback) {{
-    if (!UMBRACO_FORCE_SAFE_ALIAS) {{
-        callback(value);
-        return;
-    }}
-    var timeout = input.data(UMBRACO_FORCE_SAFE_ALIAS_TMKEY);
-    if (timeout) clearTimeout(timeout);
-    input.data(UMBRACO_FORCE_SAFE_ALIAS_TMKEY, setTimeout(function() {{
-        input.removeData(UMBRACO_FORCE_SAFE_ALIAS_TMKEY);
-        getSafeAliasFromServer(value, function(alias) {{ callback(alias); }});
-    }}, UMBRACO_FORCE_SAFE_ALIAS_TIMEOUT));
-}}
-
-function validateSafeAlias(input, value, immediate, callback) {{
-    if (!UMBRACO_FORCE_SAFE_ALIAS) {{
-        callback(true);
-        return;
-    }}
-    var timeout = input.data(UMBRACO_FORCE_SAFE_ALIAS_TMKEY);
-    if (timeout) clearTimeout(timeout);
-    input.data(UMBRACO_FORCE_SAFE_ALIAS_TMKEY, setTimeout(function() {{
-        input.removeData(UMBRACO_FORCE_SAFE_ALIAS_TMKEY);
-        getSafeAliasFromServer(value, function(alias) {{ callback(value.toLowerCase() == alias.toLowerCase()); }});
-    }}, UMBRACO_FORCE_SAFE_ALIAS_TIMEOUT));
-}}
-";
-
-        /// <summary>
-        /// Gets the JavaScript code defining client-side short string services.
-        /// </summary>
-        public string GetShortStringServicesJavaScript(string controllerPath)
-        {
-                return string.Format(SssjsFormat, _config.ForceSafeAliases ? "true" : "false", controllerPath);
-        }
-
-        #endregion
-
         #region IShortStringHelper CleanFor...
 
         /// <summary>

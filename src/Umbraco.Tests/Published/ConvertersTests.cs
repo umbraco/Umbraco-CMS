@@ -43,10 +43,31 @@ namespace Umbraco.Tests.Published
             var element1 = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "1234" } }, false);
 
             Assert.AreEqual(1234, element1.Value("prop1"));
+
+            // 'null' would be considered a 'missing' value by the default, magic logic
+            var e = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", null } }, false);
+            Assert.IsFalse(e.HasValue("prop1"));
+
+            // '0' would not - it's a valid integer - but the converter knows better
+            e = new PublishedElement(elementType1, Guid.NewGuid(), new Dictionary<string, object> { { "prop1", "0" } }, false);
+            Assert.IsFalse(e.HasValue("prop1"));
         }
 
         private class SimpleConverter1 : IPropertyValueConverter
         {
+            public bool? IsValue(object value, PropertyValueLevel level)
+            {
+                switch (level)
+                {
+                    case PropertyValueLevel.Source:
+                        return null;
+                    case PropertyValueLevel.Inter:
+                        return value is int ivalue && ivalue != 0;
+                    default:
+                        throw new NotSupportedException($"Invalid level: {level}.");
+                }
+            }
+
             public bool IsConverter(PublishedPropertyType propertyType)
                 => propertyType.EditorAlias.InvariantEquals("Umbraco.Void");
 
@@ -116,6 +137,9 @@ namespace Umbraco.Tests.Published
                 _publishedSnapshotAccessor = publishedSnapshotAccessor;
                 _cacheLevel = cacheLevel;
             }
+
+            public bool? IsValue(object value, PropertyValueLevel level)
+                => value != null && (!(value is string) || string.IsNullOrWhiteSpace((string) value) == false);
 
             public bool IsConverter(PublishedPropertyType propertyType)
                 => propertyType.EditorAlias.InvariantEquals("Umbraco.Void");

@@ -14,16 +14,19 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class MemberMapperProfile : Profile
     {
-        public MemberMapperProfile(IUserService userService, ILocalizedTextService textService, IMemberTypeService memberTypeService, IMemberService memberService)
+        public MemberMapperProfile(
+            MemberTabsAndPropertiesResolver tabsAndPropertiesResolver,
+            MemberTreeNodeUrlResolver memberTreeNodeUrlResolver,
+            MemberBasicPropertiesResolver memberBasicPropertiesResolver,
+            IUserService userService,
+            IMemberTypeService memberTypeService,
+            IMemberService memberService)
         {
             // create, capture, cache
             var memberOwnerResolver = new OwnerResolver<IMember>(userService);
-            var tabsAndPropertiesResolver = new MemberTabsAndPropertiesResolver(textService, memberService, userService);
             var memberProfiderFieldMappingResolver = new MemberProviderFieldResolver();
             var membershipScenarioMappingResolver = new MembershipScenarioResolver(memberTypeService);
             var memberDtoPropertiesResolver = new MemberDtoPropertiesResolver();
-            var memberTreeNodeUrlResolver = new MemberTreeNodeUrlResolver();
-            var memberBasicPropertiesResolver = new MemberBasicPropertiesResolver();
 
             //FROM MembershipUser TO MediaItemDisplay - used when using a non-umbraco membership provider
             CreateMap<MembershipUser, MemberDisplay>().ConvertUsing<MembershipUserTypeConverter>();
@@ -120,14 +123,14 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.Ignore());
 
             //FROM IMember TO ContentItemDto<IMember>
-            CreateMap<IMember, ContentItemDto<IMember>>()
-                .ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
-                .ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => memberOwnerResolver.Resolve(src)))
-                .ForMember(dest => dest.Published, opt => opt.Ignore())
-                .ForMember(dest => dest.Edited, opt => opt.Ignore())
-                .ForMember(dest => dest.Updater, opt => opt.Ignore())
-                .ForMember(dest => dest.Icon, opt => opt.Ignore())
-                .ForMember(dest => dest.Alias, opt => opt.Ignore())
+            CreateMap<IMember, ContentPropertyCollectionDto>()
+                //.ForMember(dest => dest.Udi, opt => opt.MapFrom(content => Udi.Create(Constants.UdiEntityType.Member, content.Key)))
+                //.ForMember(dest => dest.Owner, opt => opt.ResolveUsing(src => memberOwnerResolver.Resolve(src)))
+                //.ForMember(dest => dest.Published, opt => opt.Ignore())
+                //.ForMember(dest => dest.Edited, opt => opt.Ignore())
+                //.ForMember(dest => dest.Updater, opt => opt.Ignore())
+                //.ForMember(dest => dest.Icon, opt => opt.Ignore())
+                //.ForMember(dest => dest.Alias, opt => opt.Ignore())
                 //do no map the custom member properties (currently anyways, they were never there in 6.x)
                 .ForMember(dest => dest.Properties, opt => opt.ResolveUsing(src => memberDtoPropertiesResolver.Resolve(src)));
 

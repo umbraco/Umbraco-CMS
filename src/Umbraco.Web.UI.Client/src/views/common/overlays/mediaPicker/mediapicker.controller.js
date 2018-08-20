@@ -49,7 +49,7 @@ angular.module("umbraco")
                 pageSize: 100,
                 totalItems: 0,
                 totalPages: 0,
-                filter: '',
+                filter: ''
             };
 
             //preload selected item

@@ -11,9 +11,16 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class MemberTreeNodeUrlResolver : IValueResolver<IMember, MemberDisplay, string>
     {
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+
+        public MemberTreeNodeUrlResolver(IUmbracoContextAccessor umbracoContextAccessor)
+        {
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
+        }
+
         public string Resolve(IMember source, MemberDisplay destination, string destMember, ResolutionContext context)
         {
-            var umbracoContext = context.GetUmbracoContext(throwIfMissing: false);
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
             if (umbracoContext == null) return null;
 
             var urlHelper = new UrlHelper(umbracoContext.HttpContext.Request.RequestContext);

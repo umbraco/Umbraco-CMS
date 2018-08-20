@@ -70,66 +70,6 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             }
         }
 
-        [Obsolete("Use the overload with the parameter index instead")]
-        public override string GetStringColumnStartsWithComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnStartsWithComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return $"{column} LIKE '{value}%'";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(columnType));
-            }
-        }
-
-        [Obsolete("Use the overload with the parameter index instead")]
-        public override string GetStringColumnEndsWithComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnEndsWithComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return $"{column} LIKE '%{value}'";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(columnType));
-            }
-        }
-
-        [Obsolete("Use the overload with the parameter index instead")]
-        public override string GetStringColumnContainsComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnContainsComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return $"{column} LIKE '%{value}%'";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(columnType));
-            }
-        }
-
-        [Obsolete("Use the overload with the parameter index instead")]
-        public override string GetStringColumnWildcardComparison(string column, string value, TextColumnType columnType)
-        {
-            switch (columnType)
-            {
-                case TextColumnType.NVarchar:
-                    return base.GetStringColumnContainsComparison(column, value, columnType);
-                case TextColumnType.NText:
-                    //MSSQL doesn't allow for upper methods with NText columns
-                    return $"{column} LIKE '{value}'";
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(columnType));
-            }
-        }
-
         /// <summary>
         /// This uses a the DbTypeMap created and custom mapping to resolve the SqlDbType
         /// </summary>

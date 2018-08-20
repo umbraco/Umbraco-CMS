@@ -62,6 +62,7 @@
     $global:node_path = $env:path
     $nodePath = $this.BuildEnv.NodePath
     $gitExe = (Get-Command git).Source
+    if (-not $gitExe) { $gitExe = (Get-Command git).Path }
     $gitPath = [System.IO.Path]::GetDirectoryName($gitExe)
     $env:path = "$nodePath;$gitPath"
 
@@ -297,7 +298,11 @@
 
     # copy libs
     Write-Host "Copy SqlCE libraries"
-    $nugetPackages = [System.Environment]::ExpandEnvironmentVariables("%userprofile%\.nuget\packages")
+    $nugetPackages = $env:NUGET_PACKAGES
+    if (-not $nugetPackages)
+    {
+      $nugetPackages = [System.Environment]::ExpandEnvironmentVariables("%userprofile%\.nuget\packages")
+    }
     $this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x86\native", "*.*", "$tmp\bin\x86")
     $this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x64\native", "*.*", "$tmp\bin\amd64")
     $this.CopyFiles("$nugetPackages\umbraco.sqlserverce\4.0.0.1\runtimes\win-x86\native", "*.*", "$tmp\WebApp\bin\x86")

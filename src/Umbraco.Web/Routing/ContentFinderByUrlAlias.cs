@@ -38,6 +38,7 @@ namespace Umbraco.Web.Routing
             {
                 node = FindContentByAlias(frequest.UmbracoContext.ContentCache,
                     frequest.HasDomain ? frequest.Domain.ContentId : 0,
+                    frequest.Culture.Name,
                     frequest.Uri.GetAbsolutePathDecoded());
 
                 if (node != null)
@@ -50,7 +51,7 @@ namespace Umbraco.Web.Routing
             return node != null;
         }
 
-        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string alias)
+        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias)
         {
             if (alias == null) throw new ArgumentNullException(nameof(alias));
 
@@ -62,7 +63,7 @@ namespace Umbraco.Web.Routing
             // can we normalize the values so that they contain no whitespaces, and no leading slashes?
             // and then the comparisons in IsMatch can be way faster - and allocate way less strings
 
-            const string propertyAlias = "umbracoUrlAlias";
+            const string propertyAlias = Constants.Conventions.Content.UrlAlias;
 
             var test1 = alias.TrimStart('/') + ",";
             var test2 = ",/" + test1; // test2 is ",/alias,"
@@ -78,11 +79,25 @@ namespace Umbraco.Web.Routing
                 // ")]"
 
                 if (!c.HasProperty(propertyAlias)) return false;
-                var v = c.Value<string>(propertyAlias);
+                var p = c.GetProperty(propertyAlias);
+                var varies = p.PropertyType.VariesByCulture();
+                string v;
+                if (varies)
+                {
+                    if (!c.HasCulture(culture)) return false;
+                    v = c.Value<string>(propertyAlias, culture);
+                }
+                else
+                {
+                    v = c.Value<string>(propertyAlias);
+                }
                 if (string.IsNullOrWhiteSpace(v)) return false;
                 v = "," + v.Replace(" ", "") + ",";
                 return v.Contains(a1) || v.Contains(a2);
             }
+
+            // fixme - even with Linq, what happens below has to be horribly slow
+            // but the only solution is to entirely refactor url providers to stop being dynamic
 
             if (rootNodeId > 0)
             {

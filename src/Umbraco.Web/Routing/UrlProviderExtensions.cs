@@ -18,10 +18,18 @@ namespace Umbraco.Web.Routing
         /// <para>Use when displaying Urls. If errors occur when generating the Urls, they will show in the list.</para>
         /// <para>Contains all the Urls that we can figure out (based upon domains, etc).</para>
         /// </remarks>
-        public static IEnumerable<UrlInfo> GetContentUrls(this IContent content, UrlProvider urlProvider, ILocalizedTextService textService, IContentService contentService, ILogger logger)
+        public static IEnumerable<UrlInfo> GetContentUrls(this IContent content, 
+            PublishedRouter publishedRouter,
+            UmbracoContext umbracoContext,
+            ILocalizationService localizationService,
+            ILocalizedTextService textService,
+            IContentService contentService,
+            ILogger logger)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
-            if (urlProvider == null) throw new ArgumentNullException(nameof(urlProvider));
+            if (publishedRouter == null) throw new ArgumentNullException(nameof(publishedRouter));
+            if (umbracoContext == null) throw new ArgumentNullException(nameof(umbracoContext));
+            if (localizationService == null) throw new ArgumentNullException(nameof(localizationService));
             if (textService == null) throw new ArgumentNullException(nameof(textService));
             if (contentService == null) throw new ArgumentNullException(nameof(contentService));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
@@ -33,12 +41,7 @@ namespace Umbraco.Web.Routing
                 urls.Add(UrlInfo.Message(textService.Localize("content/itemNotPublished")));
                 return urls;
             }
-
-            // fixme inject
-            // fixme PublishedRouter is stateless and should be a singleton!
-            var localizationService = Core.Composing.Current.Services.LocalizationService;
-            var publishedRouter = Core.Composing.Current.Container.GetInstance<PublishedRouter>();
-
+            
             // build a list of urls, for the back-office
             // which will contain
             // - the 'main' urls, which is what .Url would return, for each culture
@@ -61,7 +64,7 @@ namespace Umbraco.Web.Routing
                 string url;
                 try
                 {
-                    url = urlProvider.GetUrl(content.Id, culture);
+                    url = umbracoContext.UrlProvider.GetUrl(content.Id, culture);
                 }
                 catch (Exception e)
                 {
@@ -83,7 +86,7 @@ namespace Umbraco.Web.Routing
 
                     // got a url, deal with collisions, add url
                     default:
-                        if (!DetectCollision(content, url, urls, culture, publishedRouter, textService)) // detect collisions, etc
+                        if (!DetectCollision(content, url, urls, culture, umbracoContext, publishedRouter, textService)) // detect collisions, etc
                             urls.Add(UrlInfo.Url(url, culture));
                         break;
                 }
@@ -107,11 +110,14 @@ namespace Umbraco.Web.Routing
             foreach (var (text, infos) in dmsg)
                 ret.Add(UrlInfo.Message(text, infos.Count == cultures.Count ?  null : string.Join(", ", infos.Select(x => x.Culture))));
 
-            // fixme - need to add 'others' urls
-            // but, when?
-            //// get the 'other' urls
-            //foreach(var otherUrl in urlProvider.GetOtherUrls(content.Id))
-            //    urls.Add(otherUrl);
+            // get the 'other' urls - ie not what you'd get with GetUrl() but urls that would route to the document, nevertheless.
+            // for these 'other' urls, we don't check whether they are routable, collide, anything - we just report them.
+            // also, we are not dealing with cultures at all - that will have to wait
+            foreach(var otherUrl in umbracoContext.UrlProvider.GetOtherUrls(content.Id))
+            {
+                if (urls.Any(x => x.IsUrl && x.Text == otherUrl)) continue;
+                ret.Add(UrlInfo.Url(otherUrl));
+            }
 
             return ret;
         }
@@ -137,13 +143,13 @@ namespace Umbraco.Web.Routing
                 urls.Add(UrlInfo.Message(textService.Localize("content/parentCultureNotPublished", new[] { parent.Name }), culture));
         }
 
-        private static bool DetectCollision(IContent content, string url, List<UrlInfo> urls, string culture, PublishedRouter publishedRouter, ILocalizedTextService textService)
+        private static bool DetectCollision(IContent content, string url, List<UrlInfo> urls, string culture, UmbracoContext umbracoContext, PublishedRouter publishedRouter, ILocalizedTextService textService)
         {
             // test for collisions on the 'main' url
             var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
-            if (uri.IsAbsoluteUri == false) uri = uri.MakeAbsolute(UmbracoContext.Current.CleanedUmbracoUrl);
+            if (uri.IsAbsoluteUri == false) uri = uri.MakeAbsolute(umbracoContext.CleanedUmbracoUrl);
             uri = UriUtility.UriToUmbraco(uri);
-            var pcr = publishedRouter.CreateRequest(UmbracoContext.Current, uri);
+            var pcr = publishedRouter.CreateRequest(umbracoContext, uri);
             publishedRouter.TryRouteRequest(pcr);
 
             if (pcr.HasPublishedContent == false)
@@ -151,6 +157,9 @@ namespace Umbraco.Web.Routing
                 urls.Add(UrlInfo.Message(textService.Localize("content/routeErrorCannotRoute"), culture));
                 return true;
             }
+
+            if (pcr.IgnorePublishedContentCollisions)
+                return false;
 
             if (pcr.PublishedContent.Id != content.Id)
             {

@@ -12,9 +12,16 @@ namespace Umbraco.Web.Models.Mapping
         where TSource : IContentBase
         where TController : ContentTreeControllerBase
     {
+        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+
+        public ContentTreeNodeUrlResolver(IUmbracoContextAccessor umbracoContextAccessor)
+        {
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new System.ArgumentNullException(nameof(umbracoContextAccessor));
+        }
+
         public string Resolve(TSource source, object destination, string destMember, ResolutionContext context)
         {
-            var umbracoContext = context.GetUmbracoContext(throwIfMissing: false);
+            var umbracoContext = _umbracoContextAccessor.UmbracoContext;
             if (umbracoContext == null) return null;
 
             var urlHelper = new UrlHelper(umbracoContext.HttpContext.Request.RequestContext);

@@ -61,7 +61,6 @@ namespace Umbraco.Web.Cache
             foreach (var id in payloads.Select(x => x.Id))
             {
                 _idkMap.ClearCache(id);
-                ClearLegacyCaches(id);
             }
 
             if (payloads.Any(x => x.ItemType == typeof(IContentType).Name))
@@ -101,30 +100,6 @@ namespace Umbraco.Web.Cache
         public override void Remove(int id)
         {
             throw new NotSupportedException();
-        }
-
-        private void ClearLegacyCaches(int contentTypeId /*, string contentTypeAlias, IEnumerable<int> propertyTypeIds*/)
-        {
-            // legacy umbraco.cms.businesslogic.ContentType
-
-            // TODO - get rid of all this mess
-
-            // clears the cache for each property type associated with the content type
-            // see src/umbraco.cms/businesslogic/propertytype/propertytype.cs
-            // that cache is disabled because we could not clear it properly
-            //foreach (var pid in propertyTypeIds)
-            //    ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(CacheKeys.PropertyTypeCacheKey + pid);
-
-            // clears the cache associated with the content type itself
-            CacheHelper.RuntimeCache.ClearCacheItem(CacheKeys.ContentTypeCacheKey + contentTypeId);
-
-            // clears the cache associated with the content type properties collection
-            CacheHelper.RuntimeCache.ClearCacheItem(CacheKeys.ContentTypePropertiesCacheKey + contentTypeId);
-
-            // clears the dictionary object cache of the legacy ContentType
-            // see src/umbraco.cms/businesslogic/ContentType.cs
-            // that cache is disabled because we could not clear it properly
-            //global::umbraco.cms.businesslogic.ContentType.RemoveFromDataTypeCache(contentTypeAlias);
         }
 
         #endregion

@@ -6,7 +6,7 @@
             ng-click="load(node)">&nbsp;</ins>
 
         <i class="icon umb-tree-icon sprTree" ng-class="::node.cssClass" title="{{::node.routePath}}" ng-click="select(node, $event)" ng-style="::node.style"></i>
-        <a class="umb-tree-item__label" ng-href="#/{{::node.routePath}}" ng-click="select(node, $event)">{{::node.name}}</a>
+        <a class="umb-tree-item__label" ng-href="#/{{::node.routePath}}" ng-click="select(node, $event)">{{node.name}}</a>
     
         <!-- NOTE: These are the 'option' elipses -->
         <a data-element="tree-item-options" class="umb-options" ng-click="options(node, $event)" ng-if="::node.menuUrl"><i></i><i></i><i></i></a>
