@@ -275,38 +275,38 @@ angular.module("umbraco")
                     });
 					
                     tinyMceService.createLinkPicker(editor, $scope, function(currentTarget, anchorElement) {
-                        $scope.linkPickerOverlay = {
-                            view: "linkpicker",
+                        var linkPicker = {
                             currentTarget: currentTarget,
-							anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
-                            show: true,
+                            anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
                             submit: function(model) {
                                 tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
-                                $scope.linkPickerOverlay.show = false;
-                                $scope.linkPickerOverlay = null;
+                                editorService.close();
+                            },
+                            close: function() {
+                                editorService.close();
                             }
                         };
+                        editorService.linkPicker(linkPicker);
                     });
 
                     //Create the insert media plugin
                     tinyMceService.createMediaPicker(editor, $scope, function(currentTarget, userData){
-
-                        $scope.mediaPickerOverlay = {
+                        var mediaPicker = {
                             currentTarget: currentTarget,
                             onlyImages: true,
                             showDetails: true,
                             disableFolderSelect: true,
                             startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
                             startNodeIsVirtual: userData.startMediaIds.length !== 1,
-                            view: "mediapicker",
-                            show: true,
                             submit: function(model) {
                                 tinyMceService.insertMediaInEditor(editor, model.selectedImages[0]);
-                                $scope.mediaPickerOverlay.show = false;
-                                $scope.mediaPickerOverlay = null;
+                                editorService.close();
+                            },
+                            close: function() {
+                                editorService.close();
                             }
                         };
-
+                        editorService.mediaPicker(mediaPicker);
                     });
                     
                     //Create the embedded plugin
