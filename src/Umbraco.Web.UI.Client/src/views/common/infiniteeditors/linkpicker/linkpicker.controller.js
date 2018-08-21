@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
-    function ($scope, eventsService, entityResource, contentResource, mediaHelper, userService, localizationService, tinyMceService) {
+    function ($scope, eventsService, entityResource, contentResource, mediaHelper, userService, localizationService, tinyMceService, editorService) {
         
         var vm = this;
         var dialogOptions = $scope.model;
@@ -108,11 +108,9 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
 
         $scope.switchToMediaPicker = function () {
             userService.getCurrentUser().then(function (userData) {
-                $scope.mediaPickerOverlay = {
-                    view: "mediapicker",
+                var mediaPicker = {
                     startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
                     startNodeIsVirtual: userData.startMediaIds.length !== 1,
-                    show: true,
                     submit: function (model) {
                         var media = model.selectedImages[0];
 
@@ -122,12 +120,13 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                         $scope.model.target.name = media.name;
                         $scope.model.target.url = mediaHelper.resolveFile(media);
 
-                        debugger;
-
-                        $scope.mediaPickerOverlay.show = false;
-                        $scope.mediaPickerOverlay = null;
+                        editorService.close();
+                    },
+                    close: function() {
+                        editorService.close();
                     }
                 };
+                editorService.mediaPicker(mediaPicker);
             });
         };
 
