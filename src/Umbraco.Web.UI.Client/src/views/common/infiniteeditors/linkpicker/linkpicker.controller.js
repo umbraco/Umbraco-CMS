@@ -1,17 +1,24 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
     function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, userService, localizationService, tinyMceService) {
+        
+        var vm = this;
         var dialogOptions = $scope.model;
-
         var anchorPattern = /<a id=\\"(.*?)\\">/gi;
-
         var searchText = "Search...";
+
+        vm.submit = submit;
+        vm.close = close;
+
         localizationService.localize("general_search").then(function (value) {
             searchText = value + "...";
         });
 
         if (!$scope.model.title) {
-            $scope.model.title = localizationService.localize("defaultdialogs_selectLink");
+            localizationService.localize("defaultdialogs_selectLink")
+                .then(function(value) {
+                    $scope.model.title = value;
+                });
         }
 
         $scope.dialogTreeApi = {};
@@ -83,7 +90,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
             } else {
                 contentResource.getById(args.node.id).then(function (resp) {
                     $scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
-                    $scope.model.target.url = resp.urls[0];
+                    $scope.model.target.url = resp.urls[0].text;
                 });
             }
 
@@ -165,6 +172,18 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 
         function openMiniListView(node) {
             $scope.miniListView = node;
+        }
+
+        function close() {
+            if($scope.model && $scope.model.close) {
+                $scope.model.close();
+            }
+        }
+
+        function submit() {
+            if($scope.model && $scope.model.submit) {
+                $scope.model.submit($scope.model);
+            }
         }
 
     });
