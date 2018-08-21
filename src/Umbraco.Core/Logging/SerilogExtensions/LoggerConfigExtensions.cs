@@ -28,6 +28,7 @@ namespace Umbraco.Core.Logging.SerilogExtensions
                 .Enrich.WithThreadId()
                 .Enrich.WithProperty("AppDomainId", AppDomain.CurrentDomain.Id)
                 .Enrich.WithProperty("AppDomainAppId", HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty))
+                .Enrich.WithProperty("MachineName", Environment.MachineName)
                 .Enrich.With<Log4NetLevelMapperEnricher>();
 
             return logConfig;
