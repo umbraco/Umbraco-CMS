@@ -124,6 +124,26 @@
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#copy
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a move editor in infinite editing.
+         * @param {String} editor.section The node entity type
+         * @param {String} editor.currentNode The current node id
+         * @param {Callback} editor.submit Saves, submits, and closes the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+
+        function move(editor) {
+            editor.view = "views/common/infiniteeditors/move/move.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#mediaEditor
          * @methodOf umbraco.services.editorService
          *
@@ -384,6 +404,7 @@
             contentEditor: contentEditor,
             contentPicker: contentPicker,
             copy: copy,
+            move: move,
             mediaPicker: mediaPicker,
             iconPicker: iconPicker,
             documentTypeEditor: documentTypeEditor,

@@ -429,27 +429,20 @@ function listViewController($scope, $routeParams, $injector, currentUserResource
     };
 
     $scope.move = function() {
-        $scope.moveDialog = {};
-        $scope.moveDialog.section = $scope.entityType;
-        $scope.moveDialog.currentNode = $scope.contentId;
-        $scope.moveDialog.view = "move";
-        $scope.moveDialog.show = true;
-
-        $scope.moveDialog.submit = function(model) {
-
-            if (model.target) {
-                performMove(model.target);
+        var move = {
+            section: $scope.entityType,
+            currentNode: $scope.contentId,
+            submit: function(model) {
+                if (model.target) {
+                    performMove(model.target);
+                }
+                editorService.close();
+            },
+            close: function() {
+                editorService.close();
             }
-
-            $scope.moveDialog.show = false;
-            $scope.moveDialog = null;
-        };
-
-        $scope.moveDialog.close = function(oldModel) {
-            $scope.moveDialog.show = false;
-            $scope.moveDialog = null;
-        };
-
+        }
+        editorService.move(move);
     };
 
 
