@@ -1,105 +1,108 @@
 (function() {
    "use strict";
 
-   function EmbedOverlay($scope, $http, umbRequestHelper, localizationService) {
+   function EmbedOverlay($scope, $http, $sce, umbRequestHelper, localizationService) {
 
-      var vm = this;
-      var origWidth = 500;
-      var origHeight = 300;
+        var vm = this;
+        var origWidth = 500;
+        var origHeight = 300;
 
-      $scope.model.embed = {
-         url: "",
-         width: 360,
-         height: 240,
-         constrain: true,
-         preview: "",
-         success: false,
-         info: "",
-         supportsDimensions: ""
-      };
+        vm.trustedPreview = null;
 
-      vm.showPreview = showPreview;
-      vm.changeSize = changeSize;
+        $scope.model.embed = {
+            url: "",
+            width: 360,
+            height: 240,
+            constrain: true,
+            preview: "",
+            success: false,
+            info: "",
+            supportsDimensions: ""
+        };
 
-    function onInit() {
-        if(!$scope.model.title) {
-            localizationService.localize("general_embed").then(function(value){
-                $scope.model.title = value;
-            });
+        vm.showPreview = showPreview;
+        vm.changeSize = changeSize;
+
+        function onInit() {
+            if(!$scope.model.title) {
+                localizationService.localize("general_embed").then(function(value){
+                    $scope.model.title = value;
+                });
+            }
         }
-    }
 
-      function showPreview() {
+        function showPreview() {
 
-         if ($scope.model.embed.url) {
-            $scope.model.embed.show = true;
-            $scope.model.embed.preview = "<div class=\"umb-loader\" style=\"height: 10px; margin: 10px 0px;\"></div>";
-            $scope.model.embed.info = "";
-            $scope.model.embed.success = false;
+            if ($scope.model.embed.url) {
+                $scope.model.embed.show = true;
+                $scope.model.embed.preview = "<div class=\"umb-loader\" style=\"height: 10px; margin: 10px 0px;\"></div>";
+                $scope.model.embed.info = "";
+                $scope.model.embed.success = false;
 
-            $http({
-                  method: 'GET',
-                  url: umbRequestHelper.getApiUrl("embedApiBaseUrl", "GetEmbed"),
-                  params: {
-                     url: $scope.model.embed.url,
-                     width: $scope.model.embed.width,
-                     height: $scope.model.embed.height
-                  }
-               })
-               .success(function(data) {
 
-                  $scope.model.embed.preview = "";
+                $http({
+                    method: 'GET',
+                    url: umbRequestHelper.getApiUrl("embedApiBaseUrl", "GetEmbed"),
+                    params: {
+                        url: $scope.model.embed.url,
+                        width: $scope.model.embed.width,
+                        height: $scope.model.embed.height
+                    }
+                }).then(function(response) {
 
-                  switch (data.Status) {
-                     case 0:
+                    $scope.model.embed.preview = "";
+
+                    switch (response.data.Status) {
+                        case 0:
                         //not supported
                         $scope.model.embed.info = "Not supported";
                         break;
-                     case 1:
+                        case 1:
                         //error
                         $scope.model.embed.info = "Could not embed media - please ensure the URL is valid";
                         break;
-                     case 2:
-                        $scope.model.embed.preview = data.Markup;
-                        $scope.model.embed.supportsDimensions = data.SupportsDimensions;
+                        case 2:
+                        $scope.model.embed.preview = response.data.Markup;
+                        vm.trustedPreview = $sce.trustAsHtml(response.data.Markup);
+                        $scope.model.embed.supportsDimensions = response.data.SupportsDimensions;
                         $scope.model.embed.success = true;
                         break;
-                  }
-               })
-               .error(function() {
-                  $scope.model.embed.supportsDimensions = false;
-                  $scope.model.embed.preview = "";
-                  $scope.model.embed.info = "Could not embed media - please ensure the URL is valid";
-               });
-         } else {
-            $scope.model.embed.supportsDimensions = false;
-            $scope.model.embed.preview = "";
-            $scope.model.embed.info = "Please enter a URL";
-         }
-      }
+                    }
+                }, function() {
+                    $scope.model.embed.supportsDimensions = false;
+                    $scope.model.embed.preview = "";
+                    $scope.model.embed.info = "Could not embed media - please ensure the URL is valid";
+                });
 
-      function changeSize(type) {
-
-         var width, height;
-
-         if ($scope.model.embed.constrain) {
-            width = parseInt($scope.model.embed.width, 10);
-            height = parseInt($scope.model.embed.height, 10);
-            if (type == 'width') {
-               origHeight = Math.round((width / origWidth) * height);
-               $scope.model.embed.height = origHeight;
             } else {
-               origWidth = Math.round((height / origHeight) * width);
-               $scope.model.embed.width = origWidth;
+                $scope.model.embed.supportsDimensions = false;
+                $scope.model.embed.preview = "";
+                $scope.model.embed.info = "Please enter a URL";
             }
-         }
-         if ($scope.model.embed.url !== "") {
-            showPreview();
-         }
+        }
 
-      }
+       function changeSize(type) {
 
-      onInit();
+           var width, height;
+
+           if ($scope.model.embed.constrain) {
+               width = parseInt($scope.model.embed.width, 10);
+               height = parseInt($scope.model.embed.height, 10);
+               if (type == 'width') {
+                   origHeight = Math.round((width / origWidth) * height);
+                   $scope.model.embed.height = origHeight;
+               } else {
+                   origWidth = Math.round((height / origHeight) * width);
+                   $scope.model.embed.width = origWidth;
+               }
+           }
+           if ($scope.model.embed.url !== "") {
+               showPreview();
+           }
+
+       }
+
+        onInit();
 
    }
 
