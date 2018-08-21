@@ -1,7 +1,7 @@
 (function() {
    "use strict";
 
-   function EmbedOverlay($scope, $http, $sce, umbRequestHelper, localizationService) {
+   function EmbedController($scope, $http, $sce, umbRequestHelper, localizationService) {
 
         var vm = this;
         var origWidth = 500;
@@ -22,6 +22,8 @@
 
         vm.showPreview = showPreview;
         vm.changeSize = changeSize;
+        vm.submit = submit;
+        vm.close = close;
 
         function onInit() {
             if(!$scope.model.title) {
@@ -102,10 +104,22 @@
 
        }
 
+       function submit() {
+            if($scope.model && $scope.model.submit) {
+                $scope.model.submit($scope.model);
+            }
+        }
+
+        function close() {
+            if($scope.model && $scope.model.close) {
+                $scope.model.close();
+            }
+        }
+
         onInit();
 
    }
 
-   angular.module("umbraco").controller("Umbraco.Overlays.EmbedOverlay", EmbedOverlay);
+   angular.module("umbraco").controller("Umbraco.Editors.EmbedController", EmbedController);
 
 })();

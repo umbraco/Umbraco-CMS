@@ -311,17 +311,16 @@ angular.module("umbraco")
                     
                     //Create the embedded plugin
                     tinyMceService.createInsertEmbeddedMedia(editor, $scope, function() {
-
-                      $scope.embedOverlay = {
-                          view: "embed",
-                          show: true,
-                          submit: function(model) {
-                              tinyMceService.insertEmbeddedMediaInEditor(editor, model.embed.preview);
-                              $scope.embedOverlay.show = false;
-                              $scope.embedOverlay = null;
-                          }
-                      };
-
+                        var embed = {
+                            submit: function(model) {
+                                tinyMceService.insertEmbeddedMediaInEditor(editor, model.embed.preview);
+                                editorService.close();
+                            },
+                            close: function() {
+                                editorService.close();
+                            }
+                        };
+                        editorService.embed(embed);
                     });
 
 

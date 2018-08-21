@@ -124,7 +124,7 @@
 
         /**
          * @ngdoc method
-         * @name umbraco.services.editorService#copy
+         * @name umbraco.services.editorService#move
          * @methodOf umbraco.services.editorService
          *
          * @description
@@ -138,6 +138,24 @@
 
         function move(editor) {
             editor.view = "views/common/infiniteeditors/move/move.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#embed
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens an embed editor in infinite editing.
+         * @param {Callback} editor.submit Saves, submits, and closes the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+
+        function embed(editor) {
+            editor.view = "views/common/infiniteeditors/embed/embed.html";
             editor.size = "small";
             open(editor);
         }
@@ -405,6 +423,7 @@
             contentPicker: contentPicker,
             copy: copy,
             move: move,
+            embed: embed,
             mediaPicker: mediaPicker,
             iconPicker: iconPicker,
             documentTypeEditor: documentTypeEditor,
