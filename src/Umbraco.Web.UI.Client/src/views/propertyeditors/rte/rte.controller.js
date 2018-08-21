@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $scope, $q, $locale, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, editorState) {
+    function ($scope, $q, $locale, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, editorState, editorService) {
 
         $scope.isLoading = true;
 
@@ -327,19 +327,18 @@ angular.module("umbraco")
 
                     //Create the insert macro plugin
                     tinyMceService.createInsertMacro(editor, $scope, function(dialogData) {
-
-                        $scope.macroPickerOverlay = {
-                            view: "macropicker",
+                        var macroPicker = {
                             dialogData: dialogData,
-                            show: true,
                             submit: function(model) {
                                 var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
                                 tinyMceService.insertMacroInEditor(editor, macroObject, $scope);
-                                $scope.macroPickerOverlay.show = false;
-                                $scope.macroPickerOverlay = null;
+                                editorService.close();
+                            },
+                            close: function() {
+                                editorService.close();
                             }
                         };
-
+                        editorService.macroPicker(macroPicker);
                     });
                 };
                 
