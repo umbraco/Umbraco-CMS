@@ -162,6 +162,24 @@
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#linkPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens an embed editor in infinite editing.
+         * @param {Callback} editor.submit Saves, submits, and closes the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+
+        function linkPicker(editor) {
+            editor.view = "views/common/infiniteeditors/linkpicker/linkpicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#mediaEditor
          * @methodOf umbraco.services.editorService
          *
@@ -424,6 +442,7 @@
             copy: copy,
             move: move,
             embed: embed,
+            linkPicker: linkPicker,
             mediaPicker: mediaPicker,
             iconPicker: iconPicker,
             documentTypeEditor: documentTypeEditor,
