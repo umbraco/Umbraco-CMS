@@ -1,13 +1,20 @@
 (function () {
     'use strict';
 
-    function EditorNavigationDirective(eventsService) {
+    function EditorNavigationDirective(eventsService, $timeout) {
 
         function link(scope, el, attr, ctrl) {
+
+
+            var maxApps = 3;
+            var contentAppsWidth = [];
 
             scope.showNavigation = true;
             scope.showMoreButton = false;
             scope.showTray = false;
+
+            scope.contentAppsLimit = maxApps;
+
 
             scope.moreButton = {
                 alias: "more",
@@ -61,6 +68,15 @@
             }
 
             function activate() {
+
+                $timeout(function () {
+
+                    $("#contentApps li").each(function (index) {
+                        contentAppsWidth.push($(this).outerWidth());
+                    });
+                });
+
+
                 // hide navigation if there is only 1 item
                 if (scope.navigation.length <= 1) {
                     scope.showNavigation = false;
@@ -72,20 +88,46 @@
                     return;
                 }
 
-
-                if (scope.navigation.length > scope.contentAppsLimit) {
+                if (scope.contentAppsLimit < maxApps) {
                     scope.showMoreButton = true;
 
-                    calculateTrayLimit();
+                } else {
+                    scope.showMoreButton = false;
                 }
             }
 
-            function calculateTrayLimit() {
-                var navLength = scope.navigation.length;
-                var maxApps = scope.contentAppsLimit;
+            window.onresize = calculateWidth;
 
-                scope.contentAppsTrayLimit = maxApps - navLength;
+            function calculateWidth() {
+                $timeout(function () {
+                    //total width minus room for avatar, search and help icon
+                    var nameHeaderWidth = $(window).width() - 200;
+                    var appsWidth = 0;
+                    var totalApps = scope.navigation.length;
+
+                    // detect how many apps we can show on the screen and tray
+                    for (var i = 0; i < contentAppsWidth.length; i++) {
+                        var appItemWidth = contentAppsWidth[i];
+                        appsWidth += appItemWidth;
+
+                        // substract current content apps width to get a more accurate measurement of the name header width
+                        nameHeaderWidth -= appsWidth;
+
+                        if (appsWidth > nameHeaderWidth) {
+                            scope.contentAppsLimit = i - 1;
+                            scope.contentAppsTrayLimit = scope.contentAppsLimit - totalApps;
+                            break;
+                        } else {
+                            scope.contentAppsLimit = maxApps;
+                            scope.contentAppsTrayLimit = scope.contentAppsLimit - totalApps;
+                        }
+
+                    }
+                });
+
+                showMoreButton();
             }
+
 
             activate();
             showMoreButton();
@@ -96,8 +138,7 @@
             replace: true,
             templateUrl: 'views/components/editor/umb-editor-navigation.html',
             scope: {
-                navigation: "=",
-                contentAppsLimit: "="
+                navigation: "="
             },
             link: link
         };

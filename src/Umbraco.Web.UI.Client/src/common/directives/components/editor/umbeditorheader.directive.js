@@ -208,7 +208,6 @@ Use this directive to construct a header inside the main editor window.
 
         function link(scope, el, attr, ctrl) {
 
-            scope.contentAppsLimit = 2;
 
             scope.vm = {};
             scope.vm.dropdownOpen = false;

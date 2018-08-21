@@ -1,4 +1,4 @@
-<ul class="umb-sub-views-nav" ng-show="showNavigation">
+<ul id="contentApps" class="umb-sub-views-nav" ng-show="showNavigation">
     <li ng-repeat="item in navigation | limitTo: contentAppsLimit ">
         <div ng-show="item.alias !== 'more'">
             <a data-element="sub-view-{{item.alias}}"
