@@ -55,8 +55,7 @@ namespace Umbraco.Web.Models.Mapping
                         .ToDictionary(t => t.Alias, t => t.Name)))
                 .ForMember(display => display.Tabs, expression => expression.ResolveUsing(new TabsAndPropertiesResolver<IContent>(applicationContext.Services.TextService)))
                 .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
-                    new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService), new Lazy<IContentService>(() => applicationContext.Services.ContentService))))
-                .ForMember(display => display.Tour, expression => expression.ResolveUsing<TourResolver>())
+                    new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService), new Lazy<IContentService>(() => applicationContext.Services.ContentService))))                
                 .AfterMap((content, display) =>
                 {
                     if (content.ContentType.IsContainer)
@@ -209,50 +208,6 @@ namespace Umbraco.Web.Models.Mapping
 
                 return permissions;
             }
-        }
-
-        /// <summary>
-        /// Gets the tour alias for the current document type
-        /// </summary>
-        private class TourResolver : ValueResolver<IContent, string>
-        {
-            protected override string ResolveCore(IContent source)
-            {
-                if (UmbracoContext.Current == null)
-                {                   
-                    return string.Empty;
-                }
-
-                var tourController = new TourController();
-
-                var tourFiles = tourController.GetTours().ToList();
-
-                if (tourFiles.Count == 0)
-                {
-                    return string.Empty;
-                }
-
-                var tour = tourFiles.SelectMany(x => x.Tours)
-                    .FirstOrDefault(x =>
-                    {
-                        if (string.IsNullOrEmpty(x.ContentType))
-                        {
-                            return false;
-                        }
-
-                        var contentTypes = x.ContentType.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(ct => ct.Trim());
-
-                        return contentTypes.Contains(source.ContentType.Alias);
-
-                    });
-
-                if (tour == null)
-                {
-                    return string.Empty;
-                }
-
-                return tour.Alias;
-            }
-        }
+        }        
     }
 }

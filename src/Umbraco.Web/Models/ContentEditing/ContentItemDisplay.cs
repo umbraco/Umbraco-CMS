@@ -65,9 +65,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public IEnumerable<string> AllowedActions { get; set; }
 
         [DataMember(Name = "isBlueprint")]
-        public bool IsBlueprint { get; set; }
-
-        [DataMember(Name = "tour")]
-        public string Tour { get; set; }
+        public bool IsBlueprint { get; set; }        
     }
 }
