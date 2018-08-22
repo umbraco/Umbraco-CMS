@@ -100,16 +100,7 @@
       });
 
       $scope.defaultButton = buttons.defaultButton;
-      $scope.subButtons = buttons.subButtons;
-
-        if (content.tour !== '') {
-            tourService.getTourByAlias(content.tour).then(function(data) {
-                if (data !== null) {
-                    $scope.page.tour = data;
-                }
-            });
-        }
-
+      $scope.subButtons = buttons.subButtons;      
     }
 
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */
