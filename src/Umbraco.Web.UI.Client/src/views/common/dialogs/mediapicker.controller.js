@@ -23,10 +23,6 @@ angular.module("umbraco")
                     $scope.acceptedMediatypes = types;
                 });
 
-            $scope.upload = function(v) {
-                angular.element(".umb-file-dropzone-directive .file-select").click();
-            };
-
             $scope.dragLeave = function(el, event) {
                 $scope.activeDrag = false;
             };

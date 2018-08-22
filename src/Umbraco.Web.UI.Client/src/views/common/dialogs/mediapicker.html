@@ -79,14 +79,6 @@
                            placeholder="@placeholders_filter"
                            no-dirty-check />
                 </div>
-
-                <div class="upload-button">
-                    <button class="btn fileinput-button" ng-click="upload()" ng-class="{disabled: disabled}">
-                        <i class="icon-page-up"></i>
-                        <localize key="general_upload">Upload</localize>
-                    </button>
-                </div>
-
             </div>
 
             <div class="row">
@@ -121,7 +113,6 @@
 
             <umb-file-dropzone ng-if="acceptedMediatypes.length > 0"
                                accepted-mediatypes="acceptedMediatypes"
-                               hide-dropzone="{{!activeDrag && images.length > 0}}"
                                parent-id="{{currentFolder.id}}"
                                files-uploaded="onUploadComplete"
                                files-queued="onFilesQueue">
