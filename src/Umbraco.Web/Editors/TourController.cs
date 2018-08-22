@@ -92,6 +92,27 @@ namespace Umbraco.Web.Editors
             return result.Except(toursToBeRemoved).OrderBy(x => x.FileName, StringComparer.InvariantCultureIgnoreCase);
         }
 
+        /// <summary>
+        /// Gets a tour for a specific doctype
+        /// </summary>
+        /// <param name="doctypeAlias">The documenttype alias</param>
+        /// <returns>A <see cref="BackOfficeTour"/></returns>
+        public BackOfficeTour GetTourForDoctype(string doctypeAlias)
+        {
+            var tourFiles = this.GetTours();
+
+           return tourFiles.SelectMany(x => x.Tours)
+                .FirstOrDefault(x =>
+                {
+                    if (string.IsNullOrEmpty(x.ContentType))
+                    {
+                        return false;
+                    }
+                    var contentTypes = x.ContentType.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ct => ct.Trim());
+                    return contentTypes.Contains(doctypeAlias);
+                });          
+        }
+
         private void TryParseTourFile(string tourFile,
             ICollection<BackOfficeTourFile> result,
             List<BackOfficeTourFilter> filters,
