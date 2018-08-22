@@ -8,11 +8,22 @@
             var evts = [];
 
             function onInit() {
-                scope.allowOpenMediaType = true;
+                // By default don't show the open anchors
+                scope.allowOpenMediaType = false;
+
+                // If logged in as an admin user show the open anchors
+                userService.getCurrentUser().then(function (currentUser) {
+                    if(currentUser.userType === "admin"){
+                        scope.allowOpenMediaType = true;
+                    }
+                });
+
                 // get document type details
                 scope.mediaType = scope.node.contentType;
+
                 // get node url
                 scope.nodeUrl = scope.node.mediaLink;
+
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
             }
@@ -30,7 +41,7 @@
                 var url = "/settings/mediaTypes/edit/" + mediaType.id;
                 $location.path(url);
             };
-            
+
             // watch for content updates - reload content when node is saved, published etc.
             scope.$watch('node.updateDate', function(newValue, oldValue){
                 if(!newValue) { return; }
