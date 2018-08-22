@@ -69,14 +69,7 @@ namespace Umbraco.Web.Trees
             if (CanUserAccessNode(e, allowedUserOptions))
             { 
                 var hasChildren = e.HasChildren();
-                var shouldRenderChildren = ShouldRenderChildrenOfContainer(e);
-
-                //Special check to see if the node has no children.
-                if (shouldRenderChildren == false && !hasChildren)
-                {
-                    hasChildren = false;
-                }
-
+                
                 var node = CreateTreeNode(
                     entity,
                     Constants.ObjectTypes.DocumentGuid,
@@ -85,7 +78,6 @@ namespace Umbraco.Web.Trees
                     hasChildren);
 
                 node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
-                node.AdditionalData.Add("shouldRender", shouldRenderChildren);
 
                 if (e.IsContainer())
                 {
