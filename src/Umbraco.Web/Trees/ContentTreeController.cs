@@ -67,12 +67,12 @@ namespace Umbraco.Web.Trees
 
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(e);
             if (CanUserAccessNode(e, allowedUserOptions))
-            {
-                //The result returned from the method will indicate if there are children. 
-                var hasChildren = (ShouldRenderChildrenOfContainer(e) >= 0);
+            { 
+                var hasChildren = e.HasChildren();
+                var shouldRenderChildren = ShouldRenderChildrenOfContainer(e);
 
                 //Special check to see if the node has no children.
-                if (ShouldRenderChildrenOfContainer(e) < 0)
+                if (shouldRenderChildren == false && !hasChildren)
                 {
                     hasChildren = false;
                 }
@@ -85,6 +85,7 @@ namespace Umbraco.Web.Trees
                     hasChildren);
 
                 node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
+                node.AdditionalData.Add("shouldRender", shouldRenderChildren);
 
                 if (e.IsContainer())
                 {
