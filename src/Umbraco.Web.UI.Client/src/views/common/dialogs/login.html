@@ -149,8 +149,12 @@
 
                         <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
                             <label><localize key="general_password">Password</localize></label>
+                            <input type="password" ng-model="password" name="password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" />
                             <div class="password-toggle">
-                                <input type="password" ng-model="password" name="password" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" /><a ng-click="togglePassword()">Toggle</a>
+                                <a href="#" prevent-default ng-click="togglePassword()">
+                                    <span class="password-text show"><localize key="login_showPassword">Show password</localize></span>
+                                    <span class="password-text hide"><localize key="login_hidePassword">Hide password</localize></span>
+                                </a>
                             </div>
                         </div>
 

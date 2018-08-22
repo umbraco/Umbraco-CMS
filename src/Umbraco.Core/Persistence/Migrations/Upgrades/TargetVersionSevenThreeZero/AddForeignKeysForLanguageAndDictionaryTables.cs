@@ -62,13 +62,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenThreeZe
                 }
 
                 var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)
-                    .Select(x => new DbIndexDefinition
-                    {
-                        TableName = x.Item1,
-                        IndexName = x.Item2,
-                        ColumnName = x.Item3,
-                        IsUnique = x.Item4
-                    }).ToArray();
+                    .Select(x => new DbIndexDefinition(x)).ToArray();
 
                 //make sure it doesn't already exist
                 if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsDictionary_id")) == false)

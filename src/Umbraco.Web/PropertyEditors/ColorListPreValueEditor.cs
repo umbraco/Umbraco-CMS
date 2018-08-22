@@ -22,9 +22,9 @@ namespace Umbraco.Web.PropertyEditors
             //use a custom editor too
             field.View = "views/propertyeditors/colorpicker/colorpicker.prevalues.html";
             //change the description
-            field.Description = "Add and remove colors";
+            field.Description = "Add, remove or sort colors.";
             //change the label
-            field.Name = "Add color";
+            field.Name = "Colors";
             //need to have some custom validation happening here
             field.Validators.Add(new ColorListValidator());
 
@@ -40,28 +40,44 @@ namespace Umbraco.Web.PropertyEditors
         public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
         {
             var dictionary = persistedPreVals.FormatAsDictionary();
-            var items = dictionary
-                .Where(x => x.Key != "useLabel")
-                .ToDictionary(x => x.Value.Id, x => x.Value.Value);
+            var items = dictionary.Where(x => x.Key != "useLabel")
+                                  .OrderBy(x => x.Value.SortOrder);
 
             var items2 = new Dictionary<int, object>();
             foreach (var item in items)
             {
-                if (item.Value.DetectIsJson() == false)
+                var valueItem = new ColorPickerColor
                 {
-                    items2[item.Key] = item.Value;
-                    continue;
+                    Color = item.Value.Value,
+                    Label = item.Value.Value,
+                    SortOrder = item.Value.SortOrder
+                };
+
+                if (item.Value.Value.DetectIsJson())
+                {
+                    try
+                    {
+                        var valueObject = JsonConvert.DeserializeObject<ColorPickerColor>(item.Value.Value);
+                        valueItem = new ColorPickerColor
+                        {
+                            Color = valueObject.Color,
+                            Label = valueObject.Label,
+                            SortOrder = valueObject.SortOrder
+                        };
+                    }
+                    catch
+                    {
+                        // let's say parsing Json failed, we'll not do anything,
+                        // we'll just use the valueItem we built in the  first place
+                    }
                 }
 
-                try
+                items2[item.Value.Id] = new JObject
                 {
-                    items2[item.Key] = JsonConvert.DeserializeObject(item.Value);
-                }
-                catch
-                {
-                    // let's say parsing Json failed, so what we have is the string - build json
-                    items2[item.Key] = new JObject { { "color", item.Value }, { "label", item.Value } };
-                }
+                    { "value", valueItem.Color },
+                    { "label", valueItem.Label },
+                    { "sortOrder", valueItem.SortOrder }
+                };
             }
 
             var result = new Dictionary<string, object> { { "items", items2 } };
@@ -80,9 +96,8 @@ namespace Umbraco.Web.PropertyEditors
 
             try
             {
-                object useLabelObj;
                 var useLabel = false;
-                if (editorValue.TryGetValue("useLabel", out useLabelObj))
+                if (editorValue.TryGetValue("useLabel", out var useLabelObj))
                 {
                     useLabel = useLabelObj is string && (string) useLabelObj == "1";
                     result["useLabel"] = new PreValue(useLabel ? "1" : "0");
@@ -90,21 +105,26 @@ namespace Umbraco.Web.PropertyEditors
 
                 // get all non-empty values
                 var index = 0;
+                // items get submitted in the sorted order, so just count them up
+                var sortOrder = -1;
                 foreach (var preValue in val.OfType<JObject>()
                     .Where(x => x["value"] != null)
                     .Select(x =>
                     {
                         var idString = x["id"] == null ? "0" : x["id"].ToString();
-                        int id;
-                        if (int.TryParse(idString, out id) == false) id = 0;
+                        int.TryParse(idString, out var id);
 
                         var color = x["value"].ToString();
                         if (string.IsNullOrWhiteSpace(color)) return null;
 
                         var label = x["label"].ToString();
-                        return new PreValue(id, useLabel
-                            ? JsonConvert.SerializeObject(new { value = color, label = label })
-                            : color);
+
+                        sortOrder++;
+                        var value = useLabel
+                            ? JsonConvert.SerializeObject(new { value = color, label = label, sortOrder = sortOrder })
+                            : color;
+
+                        return new PreValue(id, value, sortOrder);
                     })
                     .WhereNotNull())
                 {
@@ -149,5 +169,15 @@ namespace Umbraco.Web.PropertyEditors
                 }
             }
         }
+    }
+
+    internal class ColorPickerColor
+    {
+        [JsonProperty("value")]
+        public string Color { get; set; }
+        [JsonProperty("label")]
+        public string Label { get; set; }
+        [JsonProperty("sortOrder")]
+        public int SortOrder { get; set; }
     }
 }

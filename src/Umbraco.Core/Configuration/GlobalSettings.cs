@@ -32,7 +32,6 @@ namespace Umbraco.Core.Configuration
 
         #region Private static fields
 
-        private static Version _version;
         private static readonly object Locker = new object();
         //make this volatile so that we can ensure thread safety with a double check lock
         private static volatile string _reservedUrlsCache;

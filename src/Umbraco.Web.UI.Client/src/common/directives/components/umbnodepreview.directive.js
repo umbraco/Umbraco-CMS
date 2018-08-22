@@ -16,6 +16,7 @@
                 ng-repeat="node in vm.nodes"
                 icon="node.icon"
                 name="node.name"
+                alias="node.alias"
                 published="node.published"
                 description="node.description"
                 sortable="vm.sortable"
@@ -77,6 +78,7 @@
 
 @param {string} icon (<code>binding</code>): The node icon.
 @param {string} name (<code>binding</code>): The node name.
+@param {string} alias (<code>binding</code>): The node document type alias will be displayed on hover if in debug mode or logged in as admin
 @param {boolean} published (<code>binding</code>): The node published state.
 @param {string} description (<code>binding</code>): A short description.
 @param {boolean} sortable (<code>binding</code>): Will add a move cursor on the node preview. Can used in combination with ui-sortable.
@@ -86,6 +88,9 @@
 @param {function} onRemove (<code>expression</code>): Callback function when the remove button is clicked.
 @param {function} onOpen (<code>expression</code>): Callback function when the open button is clicked.
 @param {function} onEdit (<code>expression</code>): Callback function when the edit button is clicked (Added in version 7.7.0).
+@param {string} openUrl (<code>binding</code>): Fallback URL for <code>onOpen</code> (Added in version 7.12.0).
+@param {string} editUrl (<code>binding</code>): Fallback URL for <code>onEdit</code> (Added in version 7.12.0).
+@param {string} removeUrl (<code>binding</code>): Fallback URL for <code>onRemove</code> (Added in version 7.12.0).
 **/
 
 (function () {
@@ -120,7 +125,10 @@
                 allowEdit: "=?",
                 onOpen: "&?",
                 onRemove: "&?",
-                onEdit: "&?"
+                onEdit: "&?",
+                openUrl: '=?',
+                editUrl: '=?',
+                removeUrl: '=?'
             },
             link: link
         };
