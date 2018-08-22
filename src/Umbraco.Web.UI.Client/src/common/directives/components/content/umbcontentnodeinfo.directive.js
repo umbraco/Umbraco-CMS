@@ -13,10 +13,10 @@
 
             function onInit() {
 
-                // By default we don't show the open anchors
+                // By default don't show the open anchors
                 scope.allowOpen = false;
 
-                // // If we're logged in as an admin user we show the open anchors
+                // If logged in as an admin user show the open anchors
                 userService.getCurrentUser().then(function (currentUser) {
                     if(currentUser.userType === "admin"){
                         scope.allowOpen = true;
