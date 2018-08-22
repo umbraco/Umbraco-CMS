@@ -432,6 +432,24 @@
             open(editor);
         }
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#macroPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a member group picker in infinite editing.
+         * 
+         * @param {Callback} editor.submit Submits the editor.
+         * @param {Callback} editor.close Closes the editor.
+         * @returns {Object} editor object
+         */
+        function memberGroupPicker(editor) {
+            editor.view = "views/common/infiniteeditors/membergrouppicker/membergrouppicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
         var service = {
             getEditors: getEditors,
             open: open,
@@ -458,7 +476,8 @@
             templateSections: templateSections,
             userPicker: userPicker,
             itemPicker: itemPicker,
-            macroPicker: macroPicker
+            macroPicker: macroPicker,
+            memberGroupPicker: memberGroupPicker
         };
 
         return service;
