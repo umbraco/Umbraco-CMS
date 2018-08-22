@@ -16,13 +16,12 @@
                 // By default we don't show the open anchors
                 scope.allowOpen = false;
 
-                // If we're logged in as an admin user we show the open anchors
+                // // If we're logged in as an admin user we show the open anchors
                 userService.getCurrentUser().then(function (currentUser) {
                     if(currentUser.userType === "admin"){
                         scope.allowOpen = true;
                     }
                 });
-
 
                 scope.datePickerConfig = {
                     pickDate: true,
@@ -50,11 +49,11 @@
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
 
-                // Declare a fallback URL for the <umb-node-preview/> directive
-                scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
-
+                // Make sure to set the node status
                 setNodePublishStatus(scope.node);
 
+                // Declare a fallback URL for the <umb-node-preview/> directive
+                scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
@@ -124,6 +123,7 @@
 
             function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {
+
                     switch (item.logType) {
                         case "Publish":
                             item.logTypeColor = "success";
@@ -140,6 +140,7 @@
 
             function setNodePublishStatus(node) {
 
+                console.log(node);
                 // deleted node
                 if(node.trashed === true) {
                     scope.publishStatus.label = localizationService.localize("general_deleted");
