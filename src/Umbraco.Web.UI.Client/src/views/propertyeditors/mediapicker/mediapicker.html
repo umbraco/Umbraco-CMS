@@ -1,7 +1,5 @@
 <div class="umb-property-editor umb-mediapicker" ng-controller="Umbraco.PropertyEditors.MediaPickerController">
 
-    <pre><code>{{model.value | json}}</code></pre>
-
     <p ng-if="(images|filter:{trashed:true}).length == 1"><localize key="mediaPicker_pickedTrashedItem"></localize></p>
     <p ng-if="(images|filter:{trashed:true}).length > 1"><localize key="mediaPicker_pickedTrashedItems"></localize></p>
     
