@@ -760,7 +760,7 @@ namespace Umbraco.Web.Editors
 
                 case UmbracoEntityTypes.User:
 
-                    int total;
+                    long total;
                     var users = Services.UserService.GetAll(0, int.MaxValue, out total, "Name", Direction.Ascending, null, null, null);
                     var filteredUsers = ExecutePostFilter(users, postFilter, postFilterParams);
                     return Mapper.Map<IEnumerable<IUser>, IEnumerable<EntityBasic>>(filteredUsers);
