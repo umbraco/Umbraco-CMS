@@ -12,7 +12,7 @@
             $scope.model.config.enableRange = false;
         }
         else {
-            $scope.model.config.enableRange = $scope.model.config.enableRange === true || ($scope.model.config.enableRange === "1" ? true : false);
+            $scope.model.config.enableRange = Object.toBoolean($scope.model.config.enableRange);
         }
 
         if (!$scope.model.config.initVal1) {
@@ -54,7 +54,7 @@
             $scope.model.config.reversed = false;
         }
         else {
-            $scope.model.config.reversed = $scope.model.config.reversed === true || ($scope.model.config.reversed === "1" ? true : false);
+            $scope.model.config.reversed = Object.toBoolean($scope.model.config.reversed);
         }
 
         if (!$scope.model.config.tooltip) {
@@ -65,7 +65,7 @@
             $scope.model.config.tooltipSplit = false;
         }
         else {
-            $scope.model.config.tooltipSplit = $scope.model.config.tooltipSplit === true || ($scope.model.config.tooltipSplit === "1" ? true : false);
+            $scope.model.config.tooltipSplit = Object.toBoolean($scope.model.config.tooltipSplit);
         }
 
         if ($scope.model.config.tooltipFormat) {
