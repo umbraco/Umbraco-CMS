@@ -1194,7 +1194,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 if (_gen < 0) return;
 #if DEBUG
-                //WB: TODO Need to inspect what Snapshot prop is returning here
                 _logger.Debug<Snapshot>("Dispose snapshot ({Snapshot})", _genRef?.GenRefRef.Count.ToString() ?? "live");
 #endif
                 _gen = -1;
