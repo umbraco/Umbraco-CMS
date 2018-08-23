@@ -7,7 +7,7 @@ namespace Umbraco.Core.Logging.SerilogExtensions
     /// This is used to create a new property in Logs called 'Log4NetLevel'
     /// So that we can map Serilog levels to Log4Net levels - so log files stay consistent
     /// </summary>
-    public class Log4NetLevelMapperEnricher : ILogEventEnricher
+    internal class Log4NetLevelMapperEnricher : ILogEventEnricher
     {
         public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
         {
