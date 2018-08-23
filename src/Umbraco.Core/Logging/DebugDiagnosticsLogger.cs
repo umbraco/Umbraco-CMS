@@ -14,6 +14,12 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
+        public void Error(Type reporting, Exception exception)
+        {
+            System.Diagnostics.Debug.WriteLine(Environment.NewLine + exception, reporting.FullName);
+        }
+
+        /// <inheritdoc/>
         public void Error(Type reporting, Exception exception, string messageTemplate, params object[] args)
         {
             System.Diagnostics.Debug.WriteLine(string.Format(messageTemplate, args) + Environment.NewLine + exception, reporting.FullName);

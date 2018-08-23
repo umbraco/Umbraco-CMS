@@ -16,6 +16,13 @@ namespace Umbraco.Core.Logging
         void Error(Type reporting, Exception exception, string message);
 
         /// <summary>
+        /// Logs an error message NOTE: This will log an empty message string
+        /// </summary>
+        /// <param name="reporting">The reporting type.</param>
+        /// <param name="exception">An exception.</param>
+        void Error(Type reporting, Exception exception);
+
+        /// <summary>
         /// Logs an error message - using a structured log message
         /// </summary>
         /// <param name="reporting">The reporting type.</param>

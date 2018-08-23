@@ -8,7 +8,7 @@ namespace Umbraco.Core.Logging
     public static class LoggerExtensions
     {
         /// <summary>
-        /// Logs an error message.
+        /// Logs an error message
         /// </summary>
         /// <typeparam name="T">The reporting type.</typeparam>
         /// <param name="logger">The logger.</param>
@@ -20,7 +20,7 @@ namespace Umbraco.Core.Logging
         }
 
         /// <summary>
-        /// Logs a warning message.
+        /// Logs an error message with a structured message template
         /// </summary>
         /// <typeparam name="T">The reporting type</typeparam>
         /// <param name="logger">The logger.</param>
@@ -30,6 +30,17 @@ namespace Umbraco.Core.Logging
         public static void Error<T>(this ILogger logger, Exception exception, string messageTemplate, params object[] propertyValues)
         {
             logger.Error(typeof(T), exception, messageTemplate, propertyValues);
+        }
+
+        /// <summary>
+        /// Logs an error message NOTE: This will log an empty message string
+        /// </summary>
+        /// <typeparam name="T">The reporting type</typeparam>
+        /// <param name="logger">The logger.</param>
+        /// <param name="exception">An exception</param>
+        public static void Error<T>(this ILogger logger, Exception exception)
+        {
+            logger.Error(typeof(T), exception);
         }
 
         /// <summary>
@@ -44,7 +55,7 @@ namespace Umbraco.Core.Logging
         }
 
         /// <summary>
-        /// Logs a warning message.
+        /// Logs a warning message with a structured message template
         /// </summary>
         /// <typeparam name="T">The reporting type</typeparam>
         /// <param name="logger">The logger.</param>
@@ -68,7 +79,7 @@ namespace Umbraco.Core.Logging
         }
 
         /// <summary>
-        /// Logs a warning message.
+        /// Logs a warning message with an exception with a structured message template
         /// </summary>
         /// <typeparam name="T">The reporting type</typeparam>
         /// <param name="logger">The logger.</param>
@@ -92,7 +103,7 @@ namespace Umbraco.Core.Logging
         }
 
         /// <summary>
-        /// Logs a information message.
+        /// Logs a information message with a structured message template
         /// </summary>
         /// <typeparam name="T">The reporting type</typeparam>
         /// <param name="logger">The logger.</param>
@@ -115,7 +126,7 @@ namespace Umbraco.Core.Logging
         }
 
         /// <summary>
-        /// Logs a debugging message.
+        /// Logs a debugging message with a structured message template
         /// </summary>
         /// <typeparam name="T">The reporting type</typeparam>
         /// <param name="logger">The logger.</param>
@@ -138,7 +149,7 @@ namespace Umbraco.Core.Logging
         }
 
         /// <summary>
-        /// Logs a Verbose message.
+        /// Logs a Verbose message with a structured message template
         /// </summary>
         /// <typeparam name="T">The reporting type</typeparam>
         /// <param name="logger">The logger.</param>
@@ -164,7 +175,7 @@ namespace Umbraco.Core.Logging
 
 
         /// <summary>
-        /// Logs a fatal message.
+        /// Logs a fatal message with a structured message template
         /// </summary>
         /// <typeparam name="T">The reporting type.</typeparam>
         /// <param name="logger">The logger.</param>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Tests.TestHelpers
@@ -9,6 +8,12 @@ namespace Umbraco.Tests.TestHelpers
         public void Error(Type reporting, Exception exception, string message)
         {
             Console.WriteLine("ERROR {0} - {1}", reporting.Name, message);
+            Console.WriteLine(exception);
+        }
+
+        public void Error(Type reporting, Exception exception)
+        {
+            Console.WriteLine("ERROR {0}", reporting.Name);
             Console.WriteLine(exception);
         }
 

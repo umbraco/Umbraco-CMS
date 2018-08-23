@@ -50,43 +50,18 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        [Obsolete("Use the message template version")]
         public void Error(Type reporting, Exception exception, string message)
         {
-            var logger = Log.Logger;
-            if (logger == null) return;
-
-            var dump = false;
-
-            if (IsTimeoutThreadAbortException(exception))
-            {
-                message += "\r\nThe thread has been aborted, because the request has timed out.";
-
-                // dump if configured, or if stacktrace contains Monitor.ReliableEnter
-                dump = UmbracoConfig.For.CoreDebug().DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
-
-                // dump if it is ok to dump (might have a cap on number of dump...)
-                dump &= MiniDump.OkToDump();
-            }
-
-            if (dump)
-            {
-                try
-                {
-                    var dumped = MiniDump.Dump(withException: true);
-                    message += dumped
-                        ? "\r\nA minidump was created in App_Data/MiniDump"
-                        : "\r\nFailed to create a minidump";
-                }
-                catch (Exception e)
-                {
-                    message += string.Format("\r\nFailed to create a minidump ({0}: {1})", e.GetType().FullName, e.Message);
-                }
-            }
-
-            logger.ForContext(reporting).Error(exception, message);
+            Error(reporting, exception, message, null);
         }
 
+        /// <inheritdoc/>
+        public void Error(Type reporting, Exception exception)
+        {
+            Error(reporting, exception, string.Empty);
+        }
+
+        /// <inheritdoc/>
         public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
             var dump = false;
