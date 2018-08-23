@@ -5,8 +5,8 @@
 
     <ng-form name="contentPickerForm">
 
-        <div ui-sortable="sortableOptions" ng-model="renderModel">
-            <umb-node-preview ng-repeat="node in renderModel"
+        <div ui-sortable="sortableOptions" ng-model="sortableModel">
+            <umb-node-preview ng-repeat="node in renderModel track by node.id"
                               icon="node.icon"
                               name="node.name"
                               published="node.published"
