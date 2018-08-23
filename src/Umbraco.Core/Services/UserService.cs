@@ -699,7 +699,7 @@ namespace Umbraco.Core.Services
             using (var uow = UowProvider.GetUnitOfWork(readOnly: true))
             {
                 var repository = RepositoryFactory.CreateUserRepository(uow);
-                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Username);
+                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Name);
             }
         }
 

@@ -20,10 +20,10 @@
 
                 // get document type details
                 scope.mediaType = scope.node.contentType;
-
                 // get node url
                 scope.nodeUrl = scope.node.mediaLink;
-
+                // set the media link initially
+                setMediaLink();
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
             }
@@ -36,6 +36,10 @@
                 });
             }
 
+            function setMediaLink(){
+                scope.nodeUrl = scope.node.mediaLink;
+            }
+
             scope.openMediaType = function (mediaType) {
                 // remove first "#" from url if it is prefixed else the path won't work
                 var url = "/settings/mediaTypes/edit/" + mediaType.id;
@@ -46,6 +50,11 @@
             scope.$watch('node.updateDate', function(newValue, oldValue){
                 if(!newValue) { return; }
                 if(newValue === oldValue) { return; }
+
+                // Update the media link
+                setMediaLink();
+
+                // Update the create and update dates
                 formatDatesToLocal();
             });
 
@@ -57,7 +66,6 @@
             });
 
             onInit();
-
         }
 
         var directive = {
