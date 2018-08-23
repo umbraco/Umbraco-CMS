@@ -139,8 +139,6 @@
             }
 
             function setNodePublishStatus(node) {
-
-                console.log(node);
                 // deleted node
                 if(node.trashed === true) {
                     scope.publishStatus.label = localizationService.localize("general_deleted");
