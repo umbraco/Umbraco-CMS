@@ -26,7 +26,7 @@
             <span class="umb-sub-views-nav-item-text">{{ moreButton.name }}</span>
         </a>
 
-        <umb-dropdown ng-show="showDropdown" on-close="hideDropdown()" style="left: auto; right: 0; display: grid; grid-template-columns: 1fr 1fr 1fr; min-width: auto; margin-top: 10px;">
+        <umb-dropdown ng-show="showDropdown" on-close="hideDropdown()" class="umb-sub-views-nav__dropdown">
             <umb-dropdown-item ng-repeat="item in navigation | limitTo: overflowingItems">
                 <a data-element="sub-view-{{item.alias}}"
                     style="display: flex; border: none;"
