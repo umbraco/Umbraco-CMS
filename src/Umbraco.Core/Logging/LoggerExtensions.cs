@@ -44,6 +44,29 @@ namespace Umbraco.Core.Logging
         }
 
         /// <summary>
+        /// Logs an error message WITHOUT EX
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="logger"></param>
+        /// <param name="message"></param>
+        public static void Error<T>(this ILogger logger, string message)
+        {
+            logger.Error(typeof(T), message);
+        }
+
+        /// <summary>
+        /// Logs an error message - using a structured log message
+        /// </summary>
+        /// <typeparam name="T">The reporting type</typeparam>
+        /// <param name="logger">The logger.</param>
+        /// <param name="messageTemplate">A structured message template</param>
+        /// <param name="propertyValues">Message property values</param>
+        public static void Error<T>(this ILogger logger, string messageTemplate, params object[] propertyValues)
+        {
+            logger.Error(typeof(T), messageTemplate, propertyValues);
+        }
+
+        /// <summary>
         /// Logs a warning message.
         /// </summary>
         /// <typeparam name="T">The reporting type.</typeparam>

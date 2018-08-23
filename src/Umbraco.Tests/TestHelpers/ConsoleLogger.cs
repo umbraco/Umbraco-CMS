@@ -17,12 +17,22 @@ namespace Umbraco.Tests.TestHelpers
             Console.WriteLine(exception);
         }
 
+        public void Error(Type reporting, string message)
+        {
+            Console.WriteLine("ERROR {0} - {1}", reporting.Name, message);
+        }
+
         public void Error(Type reporting, Exception exception, string format, params object[] args)
         {
             Console.WriteLine("ERROR {0} - {1}", reporting.Name, string.Format(format, args));
             Console.WriteLine(exception);
         }
-        
+
+        public void Error(Type reporting, string format, params object[] args)
+        {
+            Console.WriteLine("ERROR {0} - {1}", reporting.Name, string.Format(format, args));
+        }
+
         public void Warn(Type reporting, string message)
         {
             Console.WriteLine("WARN {0} - {1}", reporting.Name, message);

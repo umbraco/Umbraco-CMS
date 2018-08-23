@@ -23,6 +23,13 @@ namespace Umbraco.Core.Logging
         void Error(Type reporting, Exception exception);
 
         /// <summary>
+        /// Logs an error message WITHOUT EX
+        /// </summary>
+        /// <param name="reporting">The reporting type.</param>
+        /// <param name="message">A message.</param>
+        void Error(Type reporting, string message);
+
+        /// <summary>
         /// Logs an error message - using a structured log message
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
@@ -30,7 +37,15 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">The message template that includes property values</param>
         /// <param name="propertyValues">Property values to log & update in message template</param>
         void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
-        
+
+        /// <summary>
+        /// Logs an error message WITHOUT EX - using a structured log message
+        /// </summary>
+        /// <param name="reporting">The reporting type.</param>
+        /// <param name="messageTemplate">The message template that includes property values</param>
+        /// <param name="propertyValues">Property values to log & update in message template</param>
+        void Error(Type reporting, string messageTemplate, params object[] propertyValues);
+
         /// <summary>
         /// Logs a warning message.
         /// </summary>

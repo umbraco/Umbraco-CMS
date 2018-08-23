@@ -62,6 +62,20 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
+        public void Error(Type reporting, string message)
+        {
+            //Sometimes we need to throw an error without an ex
+            Error(reporting, null, message);
+        }
+
+        /// <inheritdoc/>
+        public void Error(Type reporting, string messageTemplate, params object[] propertyValues)
+        {
+            //Log a structured message WITHOUT an ex
+            Error(reporting, null, messageTemplate, propertyValues);
+        }
+
+        /// <inheritdoc/>
         public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
             var dump = false;
@@ -96,7 +110,6 @@ namespace Umbraco.Core.Logging
             var logger = Log.Logger;
             logger?.ForContext(reporting).Error(exception, messageTemplate, propertyValues);
         }
-
 
         private static bool IsMonitorEnterThreadAbortException(Exception exception)
         {
