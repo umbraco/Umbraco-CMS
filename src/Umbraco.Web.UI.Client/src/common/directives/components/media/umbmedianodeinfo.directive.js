@@ -8,9 +8,14 @@
             var evts = [];
 
             function onInit() {
-                scope.allowOpenMediaType = true;
+                // If logged in user has access to the settings section
+                // show the open anchors - if the user doesn't have 
+                // access, contentType is null, see MediaModelMapper
+                scope.allowOpen = scope.node.contentType !== null;
+                
                 // get document type details
                 scope.mediaType = scope.node.contentType;
+
                 // set the media link initially
                 setMediaLink();
                 // make sure dates are formatted to the user's locale
