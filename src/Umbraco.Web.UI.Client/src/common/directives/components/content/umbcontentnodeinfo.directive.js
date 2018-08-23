@@ -12,16 +12,10 @@
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
 
             function onInit() {
-
-                // By default don't show the open anchors
-                scope.allowOpen = false;
-
-                // If logged in as an admin user show the open anchors
-                userService.getCurrentUser().then(function (currentUser) {
-                    if(currentUser.userType === "admin"){
-                        scope.allowOpen = true;
-                    }
-                });
+                // If logged in user has access to the settings section
+                // show the open anchors - if the user doesn't have 
+                // access, documentType is null, see ContentModelMapper
+                scope.allowOpen = scope.node.documentType !== null;
 
                 scope.datePickerConfig = {
                     pickDate: true,
@@ -53,7 +47,9 @@
                 setNodePublishStatus(scope.node);
 
                 // Declare a fallback URL for the <umb-node-preview/> directive
-                scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
+                if (scope.documentType !== null) {
+                    scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
+                }
             }
 
             scope.auditTrailPageChange = function (pageNumber) {

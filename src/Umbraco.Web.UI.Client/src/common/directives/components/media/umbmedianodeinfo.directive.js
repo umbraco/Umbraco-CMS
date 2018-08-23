@@ -8,20 +8,14 @@
             var evts = [];
 
             function onInit() {
-                // By default don't show the open anchors
-                scope.allowOpenMediaType = false;
-
-                // If logged in as an admin user show the open anchors
-                userService.getCurrentUser().then(function (currentUser) {
-                    if(currentUser.userType === "admin"){
-                        scope.allowOpenMediaType = true;
-                    }
-                });
-
+                // If logged in user has access to the settings section
+                // show the open anchors - if the user doesn't have 
+                // access, contentType is null, see MediaModelMapper
+                scope.allowOpen = scope.node.contentType !== null;
+                
                 // get document type details
                 scope.mediaType = scope.node.contentType;
-                // get node url
-                scope.nodeUrl = scope.node.mediaLink;
+
                 // set the media link initially
                 setMediaLink();
                 // make sure dates are formatted to the user's locale
