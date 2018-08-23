@@ -50,3 +50,25 @@
   font-size: 12px;
   line-height: 1em;
 }
+
+.umb-sub-views-nav-item__more {
+  margin-bottom: 10px;
+}
+
+.umb-sub-views-nav-item__more i {
+	height: 5px;
+  width: 5px;
+  border-radius: 50%;
+  background: @gray-3;
+  display: inline-block;
+  margin: 0 5px 0 0;
+}
+
+.umb-sub-views-nav-item__more i:last-of-type {
+  margin-right: 0;
+}
+
+// make dots green the an item is active
+.umb-sub-views-nav-item.is-active .umb-sub-views-nav-item__more i {
+  background-color: @turquoise-d1;
+}

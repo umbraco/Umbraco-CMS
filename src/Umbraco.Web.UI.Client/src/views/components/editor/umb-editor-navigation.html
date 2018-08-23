@@ -1,11 +1,12 @@
-<ul id="contentApps" class="umb-sub-views-nav" ng-show="showNavigation">
-    <li ng-repeat="item in navigation | limitTo: contentAppsLimit ">
+<ul class="umb-sub-views-nav" ng-show="showNavigation">
+    
+    <li ng-repeat="item in navigation | limitTo: itemsLimit ">
         <div ng-show="item.alias !== 'more'">
             <a data-element="sub-view-{{item.alias}}"
                tabindex="-1"
-               class="umb-sub-views-nav-item"
+               class="umb-sub-views-nav-item js-umb-sub-views-nav-item"
                href=""
-               ng-click="clickNavigationItem(item)"
+               ng-click="clickNavigationItem(item, $index)"
                hotkey="{{$index+1}}"
                ng-class="{'is-active': item.active, '-has-error': item.hasError}">
                 <i class="icon {{ item.icon }}"></i>
@@ -14,38 +15,31 @@
         </div>
     </li>
 
+    <li ng-show="showMoreButton" style="position: relative;">
 
-    <li>
-        <div ng-show="showMoreButton === true">
-            <a data-element="sub-view-{{moreButton.alias}}"
-               tabindex="-1"
-               class="umb-sub-views-nav-item"
-               href=""
-               ng-click="trayClick()"
-               ng-class="{'is-active': moreButton.active}">
-                <i class="icon {{ moreButton.icon }}"></i>
-                <span class="umb-sub-views-nav-item-text">{{ moreButton.name }}</span>
-            </a>
-            <div ng-if="showTray === true" on-outside-click="trayClick()" style="position: fixed; right: 131px;">
+        <a data-element="sub-view-{{moreButton.alias}}"
+            class="umb-sub-views-nav-item"
+            href=""
+            ng-click="toggleDropdown()"
+            ng-class="{'is-active': moreButton.active}">
+            <div class="umb-sub-views-nav-item__more"><i></i><i></i><i></i></div>
+            <span class="umb-sub-views-nav-item-text">{{ moreButton.name }}</span>
+        </a>
 
-                <!--The triange above the app tray-->
-                <div style="right: 5px; margin-left: 50px; width: 0; height: 0; border: solid 10px; border-color: transparent transparent white transparent;"></div>
+        <umb-dropdown ng-show="showDropdown" on-close="hideDropdown()" style="left: auto; right: 0; display: grid; grid-template-columns: 1fr 1fr 1fr; min-width: auto; margin-top: 10px;">
+            <umb-dropdown-item ng-repeat="item in navigation | limitTo: overflowingItems">
+                <a data-element="sub-view-{{item.alias}}"
+                    style="display: flex; border: none;"
+                    class="umb-sub-views-nav-item"
+                    ng-href=""
+                    ng-click="clickNavigationItem(item, $index)"
+                    ng-class="{'is-active': item.active, '-has-error': item.hasError}">
+                    <i class="icon {{ item.icon }}"></i>
+                    <span class="umb-sub-views-nav-item-text">{{ item.name }}</span>
+                </a>
+            </umb-dropdown-item>
+        </umb-dropdown>
 
-                <ul class="shadow-depth-2" style="background-color: white; list-style: none;">
-                    <li ng-repeat="item in navigation | limitTo: contentAppsTrayLimit ">
-                        <a data-element="sub-view-{{item.alias}}"
-                           tabindex="-1"
-                           class="umb-sub-views-nav-item"
-                           href=""
-                           ng-click="clickNavigationItem(item)"
-                           ng-class="{'is-active': item.active, '-has-error': item.hasError}">
-                            <i class="icon {{ item.icon }}"></i>
-                            <span class="umb-sub-views-nav-item-text">{{ item.name }}</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-        </div>
     </li>
+
 </ul>

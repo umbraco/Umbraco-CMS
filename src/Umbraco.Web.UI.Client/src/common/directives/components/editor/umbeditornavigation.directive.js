@@ -1,42 +1,78 @@
 (function () {
     'use strict';
 
-    function EditorNavigationDirective(eventsService, $timeout) {
+    function EditorNavigationDirective($window, $timeout, eventsService, windowResizeListener) {
 
-        function link(scope, el, attr, ctrl) {
-
-
-            var maxApps = 3;
-            var contentAppsWidth = [];
+        function link(scope) {
 
             scope.showNavigation = true;
             scope.showMoreButton = false;
-            scope.showTray = false;
-
-            scope.contentAppsLimit = maxApps;
-
+            scope.showDropdown = false;
+            scope.overflowingItems = 0;
+            scope.itemsLimit = 6;
 
             scope.moreButton = {
                 alias: "more",
                 active: false,
-                name: "More",
-                icon: "icon-thumbnails-small",
-                view: "views/content/apps/info/info.html"
+                name: "More"
             };
 
             scope.clickNavigationItem = function (selectedItem) {
+                scope.showDropdown = false;
                 runItemAction(selectedItem);
                 eventsService.emit("app.tabChange", selectedItem);
                 setItemToActive(selectedItem);
             };
 
-            scope.trayClick = function () {
-                if (scope.showTray === false) {
-                    scope.showTray = true;
-                } else {
-                    scope.showTray = false;
-                }
+            scope.toggleDropdown = function () {
+                scope.showDropdown = !scope.showDropdown;
             };
+
+            scope.hideDropdown = function() {
+                scope.showDropdown = false;
+            };
+
+            function onInit() {
+
+                // hide navigation if there is only 1 item
+                if (scope.navigation.length <= 1) {
+                    scope.showNavigation = false;
+                }
+                
+                $timeout(function(){
+                    if($window && $window.innerWidth) {
+                        calculateVisibleItems($window.innerWidth);
+                    }
+                });
+
+            }
+
+            function calculateVisibleItems(windowWidth) {
+
+                // if we don't get a windowWidth stick with the default item limit
+                if(!windowWidth) {
+                    return;
+                }
+
+                scope.itemsLimit = 0;
+
+                // set visible items based on browser width
+                if (windowWidth > 1500) {
+                    scope.itemsLimit = 6;
+                } 
+                else if (windowWidth > 700) {
+                    scope.itemsLimit = 4;
+                }
+
+                // toggle more button
+                if(scope.navigation.length > scope.itemsLimit) {
+                    scope.showMoreButton = true;
+                    scope.overflowingItems = scope.itemsLimit - scope.navigation.length;
+                } else {
+                    scope.showMoreButton = false;
+                    scope.overflowingItems = 0;
+                }
+            }
 
             function runItemAction(selectedItem) {
                 if (selectedItem.action) {
@@ -45,92 +81,42 @@
             }
 
             function setItemToActive(selectedItem) {
-                // set all other views to inactive
                 if (selectedItem.view) {
-
-                    for (var index = 0; index < scope.navigation.length; index++) {
-                        var item = scope.navigation[index];
-
-                        // set 'more' button active if there is an active app in the app tray
-                        var selectedItemIndex = scope.navigation.indexOf(selectedItem);
-                        if (selectedItemIndex + 1 > scope.contentAppsLimit) {
-                            scope.moreButton.active = true;
-                        } else {
-                            scope.moreButton.active = false;
-                        }
-
+                    
+                    // deselect all items
+                    angular.forEach(scope.navigation, function(item, index){
                         item.active = false;
-                    }
-
-                    // set view to active
-                    selectedItem.active = true;
-                }
-            }
-
-            function activate() {
-
-                $timeout(function () {
-
-                    $("#contentApps li").each(function (index) {
-                        contentAppsWidth.push($(this).outerWidth());
                     });
-                });
+                    
+                    // set clicked item to active
+                    selectedItem.active = true;
 
-
-                // hide navigation if there is only 1 item
-                if (scope.navigation.length <= 1) {
-                    scope.showNavigation = false;
-                }
-            }
-
-            function showMoreButton() {
-                if (scope.showNavigation === false) {
-                    return;
-                }
-
-                if (scope.contentAppsLimit < maxApps) {
-                    scope.showMoreButton = true;
-
-                } else {
-                    scope.showMoreButton = false;
-                }
-            }
-
-            window.onresize = calculateWidth;
-
-            function calculateWidth() {
-                $timeout(function () {
-                    //total width minus room for avatar, search and help icon
-                    var nameHeaderWidth = $(window).width() - 200;
-                    var appsWidth = 0;
-                    var totalApps = scope.navigation.length;
-
-                    // detect how many apps we can show on the screen and tray
-                    for (var i = 0; i < contentAppsWidth.length; i++) {
-                        var appItemWidth = contentAppsWidth[i];
-                        appsWidth += appItemWidth;
-
-                        // substract current content apps width to get a more accurate measurement of the name header width
-                        nameHeaderWidth -= appsWidth;
-
-                        if (appsWidth > nameHeaderWidth) {
-                            scope.contentAppsLimit = i - 1;
-                            scope.contentAppsTrayLimit = scope.contentAppsLimit - totalApps;
-                            break;
-                        } else {
-                            scope.contentAppsLimit = maxApps;
-                            scope.contentAppsTrayLimit = scope.contentAppsLimit - totalApps;
-                        }
-
+                    // set more button to active if item in dropdown is clicked
+                    var selectedItemIndex = scope.navigation.indexOf(selectedItem);
+                    if (selectedItemIndex + 1 > scope.itemsLimit) {
+                        scope.moreButton.active = true;
+                    } else {
+                        scope.moreButton.active = false;
                     }
-                });
 
-                showMoreButton();
+                }
             }
 
+            var resizeCallback = function(size) {
+                if(size && size.width) {
+                    calculateVisibleItems(size.width);
+                }
+            };
 
-            activate();
-            showMoreButton();
+            windowResizeListener.register(resizeCallback);
+
+            //ensure to unregister from all events and kill jquery plugins
+            scope.$on('$destroy', function () {
+                windowResizeListener.unregister(resizeCallback);
+            });
+
+            onInit();
+
         }
 
         var directive = {
