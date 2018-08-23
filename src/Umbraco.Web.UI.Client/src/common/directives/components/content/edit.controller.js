@@ -68,6 +68,12 @@
 
           init($scope.content);
 
+            tourService.getTourForDoctype($scope.content.contentTypeAlias).then(function (data) {
+                if (data && data !== 'null') {
+                    $scope.page.tour = data;
+                }                  
+              });
+
           //in one particular special case, after we've created a new item we redirect back to the edit
           // route but there might be server validation errors in the collection which we need to display
           // after the redirect, so we will bind all subscriptions which will show the server validation errors
@@ -97,7 +103,9 @@
           save: $scope.save,
           unPublish: $scope.unPublish
         }
-      });
+        });
+
+
 
       $scope.defaultButton = buttons.defaultButton;
       $scope.subButtons = buttons.subButtons;      
