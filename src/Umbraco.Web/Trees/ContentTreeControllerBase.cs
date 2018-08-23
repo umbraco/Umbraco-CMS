@@ -320,7 +320,7 @@ namespace Umbraco.Web.Trees
 
             //before we get the children we need to see if this is a container node
 
-            //test if the parent is a listview / container -> the result should be an even number
+            //test if the parent is a listview / container
             if (current != null && ShouldRenderChildrenOfContainer(current) == false)
             {
                 //no children rendered!
