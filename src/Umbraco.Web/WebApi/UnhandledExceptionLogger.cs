@@ -24,13 +24,10 @@ namespace Umbraco.Web.WebApi
 
         public override void Log(ExceptionLoggerContext context)
         {
-            if (context != null && context.ExceptionContext != null
-                && context.ExceptionContext.ActionContext != null && context.ExceptionContext.ActionContext.ControllerContext != null
-                && context.ExceptionContext.ActionContext.ControllerContext.Controller != null
-                && context.Exception != null)
+            if (context != null && context.Exception != null)
             {
-                var requestUrl = context.ExceptionContext.ControllerContext.Request.RequestUri.AbsoluteUri;
-                var controllerType = context.ExceptionContext.ActionContext.ControllerContext.Controller.GetType();
+                var requestUrl = context.ExceptionContext?.ControllerContext?.Request?.RequestUri?.AbsoluteUri;
+                var controllerType = context.ExceptionContext?.ActionContext?.ControllerContext?.Controller?.GetType();
 
                 _logger.Error(controllerType, context.Exception, "Unhandled controller exception occurred for request '{RequestUrl}'", requestUrl);
             }
