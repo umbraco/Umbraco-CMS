@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $scope, $q, $locale, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, editorState) {
+    function ($scope, $q, $locale, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, editorState, editorService) {
 
         $scope.isLoading = true;
 
@@ -275,71 +275,69 @@ angular.module("umbraco")
                     });
 					
                     tinyMceService.createLinkPicker(editor, $scope, function(currentTarget, anchorElement) {
-                        $scope.linkPickerOverlay = {
-                            view: "linkpicker",
+                        var linkPicker = {
                             currentTarget: currentTarget,
-							anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
-                            show: true,
+                            anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
                             submit: function(model) {
                                 tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
-                                $scope.linkPickerOverlay.show = false;
-                                $scope.linkPickerOverlay = null;
+                                editorService.close();
+                            },
+                            close: function() {
+                                editorService.close();
                             }
                         };
+                        editorService.linkPicker(linkPicker);
                     });
 
                     //Create the insert media plugin
                     tinyMceService.createMediaPicker(editor, $scope, function(currentTarget, userData){
-
-                        $scope.mediaPickerOverlay = {
+                        var mediaPicker = {
                             currentTarget: currentTarget,
                             onlyImages: true,
                             showDetails: true,
                             disableFolderSelect: true,
                             startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
                             startNodeIsVirtual: userData.startMediaIds.length !== 1,
-                            view: "mediapicker",
-                            show: true,
                             submit: function(model) {
                                 tinyMceService.insertMediaInEditor(editor, model.selectedImages[0]);
-                                $scope.mediaPickerOverlay.show = false;
-                                $scope.mediaPickerOverlay = null;
+                                editorService.close();
+                            },
+                            close: function() {
+                                editorService.close();
                             }
                         };
-
+                        editorService.mediaPicker(mediaPicker);
                     });
                     
                     //Create the embedded plugin
                     tinyMceService.createInsertEmbeddedMedia(editor, $scope, function() {
-
-                      $scope.embedOverlay = {
-                          view: "embed",
-                          show: true,
-                          submit: function(model) {
-                              tinyMceService.insertEmbeddedMediaInEditor(editor, model.embed.preview);
-                              $scope.embedOverlay.show = false;
-                              $scope.embedOverlay = null;
-                          }
-                      };
-
+                        var embed = {
+                            submit: function(model) {
+                                tinyMceService.insertEmbeddedMediaInEditor(editor, model.embed.preview);
+                                editorService.close();
+                            },
+                            close: function() {
+                                editorService.close();
+                            }
+                        };
+                        editorService.embed(embed);
                     });
 
 
                     //Create the insert macro plugin
                     tinyMceService.createInsertMacro(editor, $scope, function(dialogData) {
-
-                        $scope.macroPickerOverlay = {
-                            view: "macropicker",
+                        var macroPicker = {
                             dialogData: dialogData,
-                            show: true,
                             submit: function(model) {
                                 var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
                                 tinyMceService.insertMacroInEditor(editor, macroObject, $scope);
-                                $scope.macroPickerOverlay.show = false;
-                                $scope.macroPickerOverlay = null;
+                                editorService.close();
+                            },
+                            close: function() {
+                                editorService.close();
                             }
                         };
-
+                        editorService.macroPicker(macroPicker);
                     });
                 };
                 
