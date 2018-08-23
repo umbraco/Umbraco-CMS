@@ -20,11 +20,22 @@
                         "GetTours")),
                 'Failed to get tours');
         }
-        
+
+        function getTourForDoctype(doctypeAlias) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "tourApiBaseUrl",
+                        "GetTourForDoctype",
+                        [{ doctypeAlias: doctypeAlias }])),
+                'Failed to get tours');
+        }
+
 
         var resource = {
-            getTours: getTours
-        };
+            getTours: getTours,
+            getTourForDoctype : getTourForDoctype
+    };
 
         return resource;
 
