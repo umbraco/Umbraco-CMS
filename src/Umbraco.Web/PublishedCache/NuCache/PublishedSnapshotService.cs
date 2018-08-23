@@ -551,7 +551,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             foreach (var payload in payloads)
             {
-                //WB: TODO Check ChangeTypes as its an enum (be nice to get the text & not 0, 1, 2)
                 _logger.Debug<PublishedSnapshotService>("Notified {ChangeTypes} for content {ContentId}", payload.ChangeTypes, payload.Id);
 
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
@@ -642,7 +641,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             foreach (var payload in payloads)
             {
-                //WB: TODO Check ChangeTypes as its an enum (be nice to get the text & not 0, 1, 2)
                 _logger.Debug<PublishedSnapshotService>("Notified {ChangeTypes} for media {MediaId}", payload.ChangeTypes, payload.Id);
 
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
@@ -712,7 +710,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return;
 
             foreach (var payload in payloads)
-                //WB: TODO Check ChangeTypes as its an enum (be nice to get the text & not 0, 1, 2)
                 _logger.Debug<PublishedSnapshotService>("Notified {ChangeTypes} for {ItemType} {ItemId}", payload.ChangeTypes, payload.ItemType, payload.Id);
 
             Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);

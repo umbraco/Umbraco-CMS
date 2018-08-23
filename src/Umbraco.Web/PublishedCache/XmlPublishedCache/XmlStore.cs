@@ -1038,7 +1038,6 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             {
                 foreach (var payload in payloads)
                 {
-                    //WB: TODO Check ChangeTypes as its an enum (be nice to get the text & not 0, 1, 2)
                     Current.Logger.Debug<XmlStore>("Notified {ChangeTypes} for content {ContentId}", payload.ChangeTypes, payload.Id);
 
                     if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
@@ -1225,7 +1224,6 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 .ToArray();
 
             foreach (var payload in payloads)
-                //WB: TODO Check ChangeTypes as its an enum (be nice to get the text & not 0, 1, 2)
                 Current.Logger.Debug<XmlStore>("Notified {ChangeTypes} for content type {ContentTypeId}", payload.ChangeTypes, payload.Id);
 
             if (ids.Length > 0) // must have refreshes, not only removes
