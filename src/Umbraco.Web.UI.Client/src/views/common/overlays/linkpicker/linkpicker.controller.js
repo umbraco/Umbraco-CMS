@@ -53,7 +53,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 				});
 			} else if ($scope.model.target.url.length) {
 				// a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
-				$scope.model.target.url = $scope.model.target.url.substring(0, $scope.model.target.url.search(/(#|\?)/));				
+                // only do the substring if there's a # or a ?
+                var indexOfAnchor = $scope.model.target.url.search(/(#|\?)/);
+                if (indexOfAnchor > -1) {
+                    $scope.model.target.url = $scope.model.target.url.substring(0, indexOfAnchor);
+                }
 			}
 		} else if (dialogOptions.anchors) {
 			$scope.anchorValues = dialogOptions.anchors;
