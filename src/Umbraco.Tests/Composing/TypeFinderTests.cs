@@ -378,7 +378,8 @@ namespace Umbraco.Tests.Composing
                     "ICSharpCode.",
                     "CookComputing.",
                     /* Mono */
-                    "MonoDevelop.NUnit"
+                    "MonoDevelop.NUnit",
+                    "Serilog."
                 };
 
             public static IEnumerable<Type> FindClassesOfTypeWithAttribute<T, TAttribute>()
