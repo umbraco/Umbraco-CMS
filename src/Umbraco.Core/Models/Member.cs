@@ -553,7 +553,6 @@ namespace Umbraco.Core.Models
         {
             void DoLog(string logPropertyAlias, string logPropertyName)
             {
-                //WB: TODO Check that we do not need to specify properties again if used later on again in message template
                 Current.Logger.Warn<Member>("Trying to access the '{PropertyName}' property on '{MemberType}' " +
                                             "but the {PropertyAlias} property does not exist on the member type so a default value is returned. " +
                                             "Ensure that you have a property type with alias:  {PropertyAlias} configured on your member type in order to use the '{PropertyName}' property on the model correctly.",
@@ -579,7 +578,7 @@ namespace Umbraco.Core.Models
         {
             void DoLog(string logPropertyAlias, string logPropertyName)
             {
-                Current.Logger.Warn<Member>("An attempt was made to set a value on the property '{PropertyName}' on type typeof(Member) but the " +
+                Current.Logger.Warn<Member>("An attempt was made to set a value on the property '{PropertyName}' on type '{MemberType}' but the " +
                                             "property type {PropertyAlias} does not exist on the member type, ensure that this property type exists so that setting this property works correctly.",
                                                 logPropertyName,
                                                 typeof(Member),
