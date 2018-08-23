@@ -27,7 +27,7 @@ namespace Umbraco.Core.Logging
         {
             // Using LogHelper since the ImageProcessor logger expects a parameterless constructor.
             var message = $"{callerName} {lineNumber} : {text}";
-            Current.Logger.Error<T>(new ImageProcessingException(message), string.Empty);
+            Current.Logger.Error<T>(new ImageProcessingException(message));
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Logging
         {
             // Using LogHelper since the ImageProcessor logger expects a parameterless constructor.
             var message = $"{callerName} {lineNumber} : {text}";
-            Current.Logger.Error(type, new ImageProcessingException(message), string.Empty);
+            Current.Logger.Error(type, new ImageProcessingException(message));
         }
     }
 }
