@@ -1,6 +1,4 @@
-﻿using Umbraco.Core.PropertyEditors;
-
-namespace Umbraco.Web.PropertyEditors
+﻿namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration for the slider value editor.
@@ -8,7 +6,7 @@ namespace Umbraco.Web.PropertyEditors
     public class SliderConfiguration
     {
         [ConfigurationField("enableRange", "Enable range", "boolean")]
-        public string Range { get; set; }
+        public bool EnableRange { get; set; }
 
         [ConfigurationField("orientation", "Orientation", "views/propertyeditors/slider/orientation.prevalues.html")]
         public string Orientation { get; set; }
@@ -38,7 +36,7 @@ namespace Umbraco.Web.PropertyEditors
         public string Tooltip { get; set; }
 
         [ConfigurationField("tooltipSplit", "Tooltip split", "boolean", Description = "If false show one tootip if true show two tooltips one for each handler")]
-        public string TooltipSplit { get; set; } // fixme bool?
+        public bool TooltipSplit { get; set; } // fixme bool?
 
         [ConfigurationField("tooltipFormat", "Tooltip format", "textstring", Description = "The value wanted to be displayed in the tooltip. Use {0} and {1} for current values - {1} is only for range slider and if not using tooltip split.")]
         public string TooltipFormat { get; set; }
@@ -47,7 +45,7 @@ namespace Umbraco.Web.PropertyEditors
         public string TooltipPosition { get; set; }
 
         [ConfigurationField("reversed", "Reversed", "boolean", Description = "Whether or not the slider should be reversed")]
-        public string Reversed { get; set; } // fixme bool?
+        public bool Reversed { get; set; } // fixme bool?
 
         [ConfigurationField("ticks", "Ticks", "textstring", Description = "Comma-separated values. Used to define the values of ticks. Tick marks are indicators to denote special values in the range. This option overwrites min and max options.")]
         public string Ticks { get; set; }

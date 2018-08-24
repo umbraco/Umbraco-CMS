@@ -335,7 +335,6 @@
     <Compile Include="PropertyEditors\RelatedLinksConfiguration.cs" />
     <Compile Include="PropertyEditors\RelatedLinksConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\RichTextConfiguration.cs" />
-    <Compile Include="PropertyEditors\SliderConfiguration.cs" />
     <Compile Include="PropertyEditors\SliderConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\TagConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\TextAreaConfiguration.cs" />
