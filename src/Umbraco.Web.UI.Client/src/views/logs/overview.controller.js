@@ -11,6 +11,8 @@
 
         vm.logTypeLabels = ["Info", "Debug", "Warning", "Error", "Critical"];
         vm.logTypeData = [500, 75, 10, 45, 2];
+        vm.logTypeColors = [ '#dcdcdc', '#97bbcd', '#46bfbd', '#fdb45c', '#f7464a'];
+
 
         vm.chartOptions = {
             legend: {

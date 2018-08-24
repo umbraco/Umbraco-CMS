@@ -33,36 +33,116 @@
                 <div class="umb-package-details__main-content">
             
                     <umb-box data-element="node-info-history">
-                        <umb-box-header title-key="'Logs'"></umb-box-header>
                         <umb-box-content class="block-form">
             
-                           Main logs here
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Level</th>
+                                        <th>Machine Name</th>
+                                        <th>Message</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>2018-08-24T08:27:06</td>
+                                        <td>INFO</td>
+                                        <td>DELLBOOK</td>
+                                        <td>Some info log message</td>
+                                        <td><button class="btn">View Details</button></td>
+                                    </tr>
+                                    <tr>
+                                            <td>2018-08-24T08:27:06</td>
+                                            <td>INFO</td>
+                                            <td>DELLBOOK</td>
+                                            <td>Ordered Components: <br/>
+                                                Umbraco.Core.Runtime.CoreRuntimeComponent<br/>
+                                                Umbraco.Web.Runtime.WebRuntimeComponent<br/>
+                                                Umbraco.Core.Logging.WebProfilerComponent<br/>
+                                                Umbraco.Core.Auditing.AuditEventsComponent<br/>
+                                                Umbraco.Web.PublishedCache.NuCache.NuCacheComponent<br/>
+                                                Umbraco.Core.Components.UmbracoCoreComponent
+                                            </td>
+                                            <td><button class="btn">View Details</button></td>
+                                        </tr>
+                                </tbody>
+                            </table>
             
+
                         </umb-box-content>
                     </umb-box>
                 </div>
             
                 <div class="umb-package-details__sidebar">
+
+                    <!-- No of Errors -->
                     <umb-box data-element="node-info-scheduled-publishing">
-                        <umb-box-header title-key="'Number of Errors'"></umb-box-header>
+                        <umb-box-header>Number of Errors</umb-box-header>
                         <umb-box-content class="block-form" style="font-size: 40px; font-weight:900; text-align:center; color:#fe6561;">
                             1234
                         </umb-box-content>
                     </umb-box>
 
+                    <!-- Chart of diff log types -->
                     <umb-box data-element="node-info-scheduled-publishing">
-                        <umb-box-header title-key="'Logs'"></umb-box-header>
+                        <umb-box-header>Log Types</umb-box-header>
                         <umb-box-content class="block-form">
 
                             <canvas 
                                 chart-doughnut 
                                 chart-data="vm.logTypeData" 
-                                chart-labels="vm.logTypeLabels" 
+                                chart-labels="vm.logTypeLabels"
+                                chart-colors="vm.logTypeColors" 
                                 chart-options="vm.chartOptions"></canvas>
 
                         </umb-box-content>
                     </umb-box>
 
+                    <!-- List of top 5 common log messages -->
+                    <umb-box data-element="node-info-scheduled-publishing">
+                            <umb-box-header>Common Log Messages</umb-box-header>
+                            <umb-box-content class="block-form">
+
+                                    <table class="table table-hover">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    [Timing {TimingId}] {EndMessage} ({TimingDuration}ms)
+                                                </td>          
+                                                <td>
+                                                    1234
+                                                </td>                                         
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    [Timing {TimingId}] {StartMessage}
+                                                </td>
+                                                <td>
+                                                    487
+                                                </td>                                                  
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    The tree definition: {AddElement} could not be resolved to a .Net object type
+                                                </td>
+                                                <td>
+                                                    360
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    Getting {TypeName}: found a cached type list.
+                                                </td>
+                                                <td>
+                                                    145
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                            </umb-box-content>
+                        </umb-box>
 
                 </div>
             </div>
