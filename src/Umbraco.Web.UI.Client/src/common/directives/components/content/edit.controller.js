@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource) {
+  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, userService, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource) {
 
     var evts = [];
 
@@ -103,27 +103,55 @@
 
     }
 
+      function checkSyncingToCurrentNode() {
+
+          //it's not a child of a list view, then we should sync normally
+          if (!$scope.content.isChildOfListView) {
+              return $q.when(true);
+          }
+
+          //it is a child of a list view, we need to check if the user's start node ids
+          //this is a user's start node and if so then sync normally
+          return userService.getCurrentUser().then(function(userData) {
+
+              if (userData.startContentIds.indexOf($scope.content.id) > -1) {
+                  return $q.when(true);
+              }
+              else {
+                  return $q.reject(false);
+              }
+          });
+      }
+
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */
     function syncTreeNode(content, path, initialLoad) {
+        //Check if this is a child of a list view and if the user has a start node in within this path,
+        //we will still want to sync the tree. This is a special case when the user's start node is a child
+        //of a list view.
 
-      if (!$scope.content.isChildOfListView) {
-        navigationService.syncTree({ tree: $scope.treeAlias, path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
-          $scope.page.menu.currentNode = syncArgs.node;
-        });
-      }
-      else if (initialLoad === true) {
+        checkSyncingToCurrentNode().then(function() {
+                //we need to sync to the current node, it's either a normal node OR
+                // it's a child of a list view and it's the user's start node
+                navigationService.syncTree({ tree: $scope.treeAlias, path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
+                    $scope.page.menu.currentNode = syncArgs.node;
+                });
+            },
+            function() {
+                
+                if (initialLoad === true) {
 
-        //it's a child item, just sync the ui node to the parent
-        navigationService.syncTree({ tree: $scope.treeAlias, path: path.substring(0, path.lastIndexOf(",")).split(","), forceReload: initialLoad !== true });
+                    //it's a child item, just sync the ui node to the parent
+                    navigationService.syncTree({ tree: $scope.treeAlias, path: path.substring(0, path.lastIndexOf(",")).split(","), forceReload: initialLoad !== true });
 
-        //if this is a child of a list view and it's the initial load of the editor, we need to get the tree node 
-        // from the server so that we can load in the actions menu.
-        umbRequestHelper.resourcePromise(
-          $http.get(content.treeNodeUrl),
-          'Failed to retrieve data for child node ' + content.id).then(function (node) {
-          $scope.page.menu.currentNode = node;
-        });
-      }
+                    //it's a child of a list view so we need to get the tree node 
+                    // from the server so that we can load in the actions menu.
+                    umbRequestHelper.resourcePromise(
+                        $http.get(content.treeNodeUrl),
+                        'Failed to retrieve data for child node ' + content.id).then(function (node) {
+                        $scope.page.menu.currentNode = node;
+                    });
+                }
+            });
     }
 
     // This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish

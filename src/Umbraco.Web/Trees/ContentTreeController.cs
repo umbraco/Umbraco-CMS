@@ -68,14 +68,12 @@ namespace Umbraco.Web.Trees
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(e);
             if (CanUserAccessNode(e, allowedUserOptions))
             { 
-                var hasChildren = e.HasChildren();
-                
                 var node = CreateTreeNode(
                     entity,
                     Constants.ObjectTypes.DocumentGuid,
                     parentId,
                     queryStrings,
-                    hasChildren);
+                    entity.HasChildren);
 
                 node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
 

@@ -37,9 +37,7 @@ angular.module("umbraco.directives")
 
         template: '<li data-element="tree-item-{{node.dataElement}}" ng-class="{\'current\': (node == currentNode), \'has-children\': node.hasChildren}" on-right-click="altSelect(node, $event)">' +
             '<div ng-class="getNodeCssClass(node)" ng-swipe-right="options(node, $event)" ng-dblclick="load(node)" >' +
-            //NOTE: This ins element is used to display the search icon if the node is a container/listview and the tree is currently in dialog
-            //'<ins ng-if="tree.enablelistviewsearch && node.metaData.isContainer" class="umb-tree-node-search icon-search" ng-click="searchNode(node, $event)" alt="searchAltText"></ins>' + 
-            '<ins data-element="tree-item-expand" ng-class="{\'icon-navigation-right\': (node.hasChildren && !node.metaData.isContainer && !node.expanded) || (node.hasChildren && enablelistviewexpand === \'true\' && !node.expanded), \'icon-navigation-down\': node.expanded}" ng-click="load(node)">&nbsp;</ins>' +
+            '<ins data-element="tree-item-expand" ng-class="{\'icon-navigation-right\': !node.expanded || node.metaData.isContainer, \'icon-navigation-down\': node.expanded}" ng-click="load(node)">&nbsp;</ins>' +
             '<i class="icon umb-tree-icon sprTree" ng-click="select(node, $event)"></i>' +
             '<a class="umb-tree-item__label" href="#/{{node.routePath}}" ng-click="select(node, $event)"></a>' +
             //NOTE: These are the 'option' elipses
@@ -65,6 +63,26 @@ angular.module("umbraco.directives")
                 }
             }
 
+            /**
+             * Determine if the node should allow loading children
+             * @param {any} node
+             */
+            function allowExpandingChildren(node) {
+                //We want to show the right nav arrow if:
+
+                //1. The node is not expanded
+                //2. The node has children
+                //3. Deal with containers:
+                //* The node is not a container OR
+                //    * The node is a container
+                //    * The user doesn't have access to the container (i.e. their start node is below it) OR
+                //    * The`enablelistviewexpand` option is true
+
+                return !node.expanded &&
+                    node.hasChildren &&
+                    (!node.metaData.isContainer || node.metaData.noAccess || scope.enablelistviewexpand === 'true');
+            }
+
             // updates the node's DOM/styles
             function setupNodeDom(node, tree) {
                 
@@ -76,7 +94,7 @@ angular.module("umbraco.directives")
                 //toggle visibility of last 'ins' depending on children
                 //visibility still ensure the space is "reserved", so both nodes with and without children are aligned.
                 
-                if (node.hasChildren || node.metaData.isContainer && scope.enablelistviewexpand === "true") {
+                if (node.expanded || allowExpandingChildren(node)) {
                     element.find("ins").last().css("visibility", "visible");
                 }
                 else {
@@ -226,8 +244,17 @@ angular.module("umbraco.directives")
             scope.loadChildren = function (node, forceReload) {
                 //emit treeNodeExpanding event, if a callback object is set on the tree
                 emitEvent("treeNodeExpanding", { tree: scope.tree, node: node });
-                
-                if (node.hasChildren && !node.metaData.isContainer && (forceReload || !node.children || (angular.isArray(node.children) && node.children.length === 0))) {
+
+                //some special logic required to determine if we can expand the children:
+                // 1) the node must have children
+                // 2) the node must not be a container/listview OR if it is a container and the user doesn't have access to the list view we can allow it
+                // 3) forceReload is specified OR the children haven't been loaded yet
+
+                var loadChildren = node.hasChildren && // #1
+                    (!node.metaData.isContainer || node.metaData.noAccess) && // #2
+                    (forceReload || !node.children || (angular.isArray(node.children) && node.children.length === 0)) // #3
+
+                if (loadChildren) {
                     //get the children from the tree service
                     treeService.loadNodeChildren({ node: node, section: scope.section })
                         .then(function (data) {

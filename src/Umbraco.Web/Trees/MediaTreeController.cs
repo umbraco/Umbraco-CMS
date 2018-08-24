@@ -64,19 +64,16 @@ namespace Umbraco.Web.Trees
         {
             var entity = (UmbracoEntity)e;
 
-            //Special check to see if it ia a container, if so then we'll hide children.
-            var isContainer = e.IsContainer(); // && (queryStrings.Get("isDialog") != "true");
-
             var node = CreateTreeNode(
                 entity,
                 Constants.ObjectTypes.MediaGuid,
                 parentId,
                 queryStrings,
-                entity.HasChildren && (isContainer == false));
+                entity.HasChildren);
 
             node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
 
-            if (isContainer)
+            if (e.IsContainer())
             {
                 node.SetContainerStyle();
                 node.AdditionalData.Add("isContainer", true);
