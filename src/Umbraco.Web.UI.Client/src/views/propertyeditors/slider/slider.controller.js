@@ -119,7 +119,7 @@
     function getValueForSlider(val) {
         
         if (!angular.isArray(val)) {
-            val = val.split(",");
+            val = val.toString().split(",");
         }
         var val1 = val[0];
         var val2 = val.length > 1 ? val[1] : null;
