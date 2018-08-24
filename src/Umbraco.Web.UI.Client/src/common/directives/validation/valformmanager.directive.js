@@ -12,7 +12,7 @@
 * Another thing this directive does is to ensure that any .control-group that contains form elements that are invalid will
 * be marked with the 'error' css class. This ensures that labels included in that control group are styled correctly.
 **/
-function valFormManager(serverValidationManager, $rootScope, $timeout, $location, overlayService, eventsService, $routeParams, navigationService, editorService) {
+function valFormManager(serverValidationManager, $rootScope, $timeout, $location, overlayService, eventsService, $routeParams, navigationService, editorService, localizationService) {
 
     var SHOW_VALIDATION_CLASS_NAME = "show-validation";
     var SAVING_EVENT_NAME = "formSubmitting";
@@ -43,6 +43,22 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
             });
         },
         link: function (scope, element, attr, formCtrl) {
+
+            var labels = {};
+
+            var labelKeys = [
+                "prompt_unsavedChanges",
+                "prompt_unsavedChangesWarning",
+                "prompt_discardChanges",
+                "prompt_stay"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(function (values) {
+                labels.unsavedChangesTitle = values[0];
+                labels.unsavedChangesContent = values[1];
+                labels.discardChangesButton = values[2];
+                labels.stayButton = values[3];
+            });
 
             //watch the list of validation errors to notify the application of any validation changes
             scope.$watch(function () {
@@ -129,11 +145,11 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
 
                         // Open discard changes overlay
                         var overlay = {
-                            "title": "You have unsaved changes VALFORM",
-                            "content": "Are you sure you want to navigate away from this page?",
                             "view": "default",
-                            "submitButtonLabel": "Stay",
-                            "closeButtonLabel": "Discard changes",
+                            "title": labels.unsavedChangesTitle,
+                            "content": labels.unsavedChangesContent,
+                            "submitButtonLabel": labels.stayButton,
+                            "closeButtonLabel": labels.discardChangesButton,
                             submit: function() {
                                 overlayService.close();
                             },
