@@ -12,7 +12,7 @@
 * Another thing this directive does is to ensure that any .control-group that contains form elements that are invalid will
 * be marked with the 'error' css class. This ensures that labels included in that control group are styled correctly.
 **/
-function valFormManager(serverValidationManager, $rootScope, $log, $timeout, notificationsService, eventsService, $routeParams, navigationService) {
+function valFormManager(serverValidationManager, $rootScope, $timeout, $location, overlayService, eventsService, $routeParams, navigationService, editorService) {
 
     var SHOW_VALIDATION_CLASS_NAME = "show-validation";
     var SAVING_EVENT_NAME = "formSubmitting";
@@ -104,27 +104,60 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
                 formCtrl.$setPristine();
             }));
 
+            var confirmed = false;
+
             //This handles the 'unsaved changes' dialog which is triggered when a route is attempting to be changed but
             // the form has pending changes
             var locationEvent = $rootScope.$on('$locationChangeStart', function(event, nextLocation, currentLocation) {
-                if (!formCtrl.$dirty || isSavingNewItem) {
+
+                var infiniteEditors = editorService.getEditors();
+
+                if (!formCtrl.$dirty && infiniteEditors.length === 0 || isSavingNewItem && infiniteEditors.length === 0) {
+                    confirmed = true;
                     return;
                 }
 
                 var nextPath = nextLocation.split("#")[1];
 
-                if (nextPath) {
+                if (nextPath && !confirmed) {
 
                     if (navigationService.isRouteChangingNavigation(currentLocation, nextLocation)) {
-                        if (!notificationsService.hasView()) {
 
-                            if (nextPath.indexOf("%253") || nextPath.indexOf("%252")) {
-                                nextPath = decodeURIComponent(nextPath);
-                            }
-
-                            var msg = { view: "confirmroutechange", args: { path: nextPath, listener: locationEvent } };
-                            notificationsService.add(msg);
+                        if (nextPath.indexOf("%253") || nextPath.indexOf("%252")) {
+                            nextPath = decodeURIComponent(nextPath);
                         }
+
+                        // Open discard changes overlay
+                        var overlay = {
+                            "title": "You have unsaved changes VALFORM",
+                            "content": "Are you sure you want to navigate away from this page?",
+                            "view": "default",
+                            "submitButtonLabel": "Stay",
+                            "closeButtonLabel": "Discard changes",
+                            submit: function() {
+                                overlayService.close();
+                            },
+                            close: function() {
+                                // close all editors
+                                editorService.closeAll();
+                                // allow redirection
+                                navigationService.clearSearch();
+                                //we need to break the path up into path and query
+                                var parts = nextPath.split("?");
+                                var query = {};
+                                if (parts.length > 1) {
+                                    _.each(parts[1].split("&"), function(q) {
+                                        var keyVal = q.split("=");
+                                        query[keyVal[0]] = keyVal[1];
+                                    });
+                                }
+                                $location.path(parts[0]).search(query);
+                                overlayService.close();
+                                confirmed = true;
+                            }
+                        };
+
+                        overlayService.open(overlay);
 
                         //prevent the route!
                         event.preventDefault();

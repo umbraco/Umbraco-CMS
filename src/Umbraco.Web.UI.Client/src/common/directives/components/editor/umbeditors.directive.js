@@ -206,6 +206,10 @@
                 removeEditor(args.editor);
             }));
 
+            evts.push(eventsService.on("appState.editors.closeAll", function (name, args) {
+                scope.editors = [];
+            }));
+
             //ensure to unregister from all events!
             scope.$on('$destroy', function () {
                 for (var e in evts) {
