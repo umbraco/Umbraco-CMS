@@ -49,12 +49,11 @@ namespace Umbraco.Web.Trees
                     nodes.Add(node);
             }
 
-            //this is a hack to enable file system tree to support multiple file extension look-up
-            //so the pattern both support *.* *.xml and xml,js,vb for lookups
-            var files = FileSystem.GetFiles(path).Where(x =>
+            //This will support wildcards aswell as normal extensions like xml
+            var files = Extensions.SelectMany(x =>
             {
-                var extension = Path.GetExtension(x);
-                return extension != null && Extensions.Contains(extension.Trim('.'), StringComparer.InvariantCultureIgnoreCase);
+                string filter = (x.StartsWith("*")) ? x : "*" + x;
+                return FileSystem.GetFiles(path, filter);
             });
 
             foreach (var file in files)
