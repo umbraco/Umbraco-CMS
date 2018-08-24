@@ -218,7 +218,7 @@ angular.module("umbraco")
                 // Fade in control when sorting stops
                 ui.item.context.style.opacity = "1";
 
-                ui.item.parents(".umb-cell-content").find(".mceNoEditor").each(function () {
+                ui.item.offsetParent().find(".mceNoEditor").each(function () {
                     if ($.inArray($(this).attr("id"), notIncludedRte) < 0) {
                         // add all dragged's neighbouring RTEs in the new cell
                         notIncludedRte.splice(0, 0, $(this).attr("id"));
