@@ -1,9 +1,14 @@
 //used for the member picker dialog
-angular.module("umbraco").controller("Umbraco.Overlays.MemberGroupPickerController",
-    function($scope, eventsService, entityResource, searchService, $log, localizationService) {
+angular.module("umbraco").controller("Umbraco.Editors.MemberGroupPickerController",
+    function($scope, eventsService, localizationService) {
+
+        var vm = this;
 
         $scope.dialogTreeApi = {};
         $scope.multiPicker = $scope.model.multiPicker;
+
+        vm.submit = submit;
+        vm.close = close;
 
         function activate() {
 
@@ -58,6 +63,18 @@ angular.module("umbraco").controller("Umbraco.Overlays.MemberGroupPickerControll
         $scope.onTreeInit = function () {
             $scope.dialogTreeApi.callbacks.treeNodeSelect(nodeSelectHandler);
         };
+        
+        function close() {
+            if($scope.model && $scope.model.close) {
+                $scope.model.close();
+            }
+        }
+    
+        function submit() {
+            if($scope.model && $scope.model.submit) {
+                $scope.model.submit($scope.model);
+            }
+        }
         
         activate();
 

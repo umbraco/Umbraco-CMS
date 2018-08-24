@@ -104,6 +104,82 @@
 
         /**
          * @ngdoc method
+         * @name umbraco.services.editorService#copy
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a copy editor in infinite editing, the submit callback returns an array of selected items
+         * @param {String} editor.section The node entity type
+         * @param {String} editor.currentNode The current node id
+         * @param {Callback} editor.submit Saves, submits, and closes the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+
+        function copy(editor) {
+            editor.view = "views/common/infiniteeditors/copy/copy.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#move
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a move editor in infinite editing.
+         * @param {String} editor.section The node entity type
+         * @param {String} editor.currentNode The current node id
+         * @param {Callback} editor.submit Saves, submits, and closes the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+
+        function move(editor) {
+            editor.view = "views/common/infiniteeditors/move/move.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#embed
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens an embed editor in infinite editing.
+         * @param {Callback} editor.submit Saves, submits, and closes the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+
+        function embed(editor) {
+            editor.view = "views/common/infiniteeditors/embed/embed.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#linkPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens an embed editor in infinite editing.
+         * @param {Callback} editor.submit Saves, submits, and closes the editor
+         * @param {Callback} editor.close Closes the editor
+         * @returns {Object} editor object
+         */
+
+        function linkPicker(editor) {
+            editor.view = "views/common/infiniteeditors/linkpicker/linkpicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.editorService#mediaEditor
          * @methodOf umbraco.services.editorService
          *
@@ -356,6 +432,24 @@
             open(editor);
         }
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#macroPicker
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens a member group picker in infinite editing.
+         * 
+         * @param {Callback} editor.submit Submits the editor.
+         * @param {Callback} editor.close Closes the editor.
+         * @returns {Object} editor object
+         */
+        function memberGroupPicker(editor) {
+            editor.view = "views/common/infiniteeditors/membergrouppicker/membergrouppicker.html";
+            editor.size = "small";
+            open(editor);
+        }
+
         var service = {
             getEditors: getEditors,
             open: open,
@@ -363,6 +457,10 @@
             mediaEditor: mediaEditor,
             contentEditor: contentEditor,
             contentPicker: contentPicker,
+            copy: copy,
+            move: move,
+            embed: embed,
+            linkPicker: linkPicker,
             mediaPicker: mediaPicker,
             iconPicker: iconPicker,
             documentTypeEditor: documentTypeEditor,
@@ -378,7 +476,8 @@
             templateSections: templateSections,
             userPicker: userPicker,
             itemPicker: itemPicker,
-            macroPicker: macroPicker
+            macroPicker: macroPicker,
+            memberGroupPicker: memberGroupPicker
         };
 
         return service;

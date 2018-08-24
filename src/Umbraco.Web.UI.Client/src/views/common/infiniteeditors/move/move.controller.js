@@ -1,13 +1,15 @@
  (function() {
 	"use strict";
 
-	function MoveOverlay($scope, localizationService, eventsService, entityHelper) {
+	function MoveController($scope, localizationService, entityHelper) {
 
       var vm = this;
 
       vm.hideSearch = hideSearch;
       vm.selectResult = selectResult;
       vm.onSearchResults = onSearchResults;
+      vm.submit = submit;
+      vm.close = close;
 
       var dialogOptions = $scope.model;
       var searchText = "Search...";
@@ -105,10 +107,22 @@
         $scope.miniListView = node;
       }
 
+        function submit() {
+            if ($scope.model && $scope.model.submit) {
+                $scope.model.submit($scope.model);
+            }
+        }
+
+        function close() {
+            if ($scope.model && $scope.model.close) {
+                $scope.model.close();
+            }
+        }
+
       onInit();
 
 	}
 
-	angular.module("umbraco").controller("Umbraco.Overlays.MoveOverlay", MoveOverlay);
+	angular.module("umbraco").controller("Umbraco.Editors.MoveController", MoveController);
 
 })();
