@@ -1,0 +1,75 @@
+<div data-element="editor-logs" ng-controller="Umbraco.Editors.Logs.OverviewController as vm" class="clearfix">
+
+    <umb-editor-view footer="false">
+
+        <umb-editor-header
+            name="'Logs'"
+            name-locked="true"
+            hide-icon="true"
+            hide-description="true"
+            hide-alias="true">
+        </umb-editor-header>
+
+        <umb-editor-container>
+            
+            <umb-load-indicator></umb-load-indicator>
+
+            <umb-editor-sub-header>
+
+                <umb-editor-sub-header-content-left>
+                    <umb-button
+                        button-style="success"
+                        type="button" 
+                        action="vm.addLanguage()"
+                        label-key="'Choose Day'">
+                    </umb-button>
+                </umb-editor-sub-header-content-left>
+
+            </umb-editor-sub-header>            
+            
+
+            <div class="umb-package-details">
+
+                <div class="umb-package-details__main-content">
+            
+                    <umb-box data-element="node-info-history">
+                        <umb-box-header title-key="'Logs'"></umb-box-header>
+                        <umb-box-content class="block-form">
+            
+                           Main logs here
+            
+                        </umb-box-content>
+                    </umb-box>
+                </div>
+            
+                <div class="umb-package-details__sidebar">
+                    <umb-box data-element="node-info-scheduled-publishing">
+                        <umb-box-header title-key="'Number of Errors'"></umb-box-header>
+                        <umb-box-content class="block-form" style="font-size: 40px; font-weight:900; text-align:center; color:#fe6561;">
+                            1234
+                        </umb-box-content>
+                    </umb-box>
+
+                    <umb-box data-element="node-info-scheduled-publishing">
+                        <umb-box-header title-key="'Logs'"></umb-box-header>
+                        <umb-box-content class="block-form">
+
+                            <canvas 
+                                chart-doughnut 
+                                chart-data="vm.logTypeData" 
+                                chart-labels="vm.logTypeLabels" 
+                                chart-options="vm.chartOptions"></canvas>
+
+                        </umb-box-content>
+                    </umb-box>
+
+
+                </div>
+            </div>
+            
+
+        </umb-editor-container>
+
+    </umb-editor-view>
+
+</div>
