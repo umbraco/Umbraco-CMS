@@ -73,6 +73,9 @@ namespace Umbraco.Core
         /// <returns>The <see cref="Attempt{T}"/></returns>
         public static Attempt<T> TryConvertTo<T>(this object input)
         {
+            if(input == null)
+                return Attempt<T>.Fail();
+
             var result = TryConvertTo(input, typeof(T));
 
             if (result.Success)
