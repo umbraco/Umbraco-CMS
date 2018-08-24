@@ -114,6 +114,7 @@
     <Compile Include="Editors\BackOfficeModel.cs" />
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
     <Compile Include="Models\ContentEditing\ContentSavedState.cs" />
+    <Compile Include="Trees\LogsTreeController.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="Models\ContentEditing\IContentSave.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
