@@ -206,6 +206,64 @@ namespace Umbraco.Web.Editors
                 ? Request.CreateResponse(HttpStatusCode.OK, result.Result) //return the id
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
+        
+        public DocumentTypeCollectionDisplay PostCreateCollection(int parentId, string collectionName, string collectionItemName, string collectionIcon, string collectionItemIcon)
+        {
+            var storeInContainer = false;
+            var allowUnderDocType = -1;
+            // check if it's a folder
+            if (Services.ContentTypeService.GetContentType(parentId) == null)
+            {
+                storeInContainer = true;
+            } else
+            {
+                // if it's not a container, we'll change the parentid to the root,
+                // and use the parent id as the doc type the collection should be allowed under
+                allowUnderDocType = parentId;
+                parentId = -1;
+            }
+
+            // create item doctype
+            var itemDocType = new ContentType(parentId);
+            itemDocType.Name = collectionItemName;
+            itemDocType.Alias = collectionItemName.ToSafeAlias();
+            itemDocType.Icon = collectionItemIcon;
+            Services.ContentTypeService.Save(itemDocType);
+
+            // create collection doctype
+            var collectionDocType = new ContentType(parentId);
+            collectionDocType.Name = collectionName;
+            collectionDocType.Alias = collectionName.ToSafeAlias();
+            collectionDocType.Icon = collectionIcon;
+            collectionDocType.IsContainer = true;
+            collectionDocType.AllowedContentTypes = new List<ContentTypeSort>()
+            {
+                new ContentTypeSort(itemDocType.Id, 0)
+            };
+            Services.ContentTypeService.Save(collectionDocType);
+
+            // test if the parent id exist and then allow the collection underneath
+            if (storeInContainer == false && allowUnderDocType != -1)
+            {
+                var parentCt = Services.ContentTypeService.GetContentType(allowUnderDocType);
+                if (parentCt != null)
+                {
+                    var allowedCts = parentCt.AllowedContentTypes.ToList();
+                    allowedCts.Add(new ContentTypeSort(collectionDocType.Id, allowedCts.Count()));
+                    parentCt.AllowedContentTypes = allowedCts;
+                    Services.ContentTypeService.Save(parentCt);
+                } else
+                {
+                }
+            }
+
+
+            return new DocumentTypeCollectionDisplay
+            {
+                CollectionId = collectionDocType.Id,
+                ItemId = itemDocType.Id
+            };
+        }
 
         public DocumentTypeDisplay PostSave(DocumentTypeSave contentTypeSave)
         {
@@ -230,6 +288,19 @@ namespace Umbraco.Web.Editors
                                     () => tryCreateTemplate.Result.StatusType);
                             }
                             template = tryCreateTemplate.Result.Entity;
+                        }
+
+                        // If the alias has been manually updated before the first save,
+                        // make sure to also update the first allowed template, as the
+                        // name will come back as a SafeAlias of the document type name,
+                        // not as the actual document type alias.
+                        // For more info: http://issues.umbraco.org/issue/U4-11059
+                        if (ctSave.DefaultTemplate != template.Alias)
+                        {
+                            var allowedTemplates = ctSave.AllowedTemplates.ToArray();
+                            if (allowedTemplates.Any())
+                                allowedTemplates[0] = template.Alias;
+                            ctSave.AllowedTemplates = allowedTemplates;
                         }
 
                         //make sure the template alias is set on the default and allowed template so we can map it back

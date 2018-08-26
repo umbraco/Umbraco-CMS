@@ -244,7 +244,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                     umbRequestHelper.getApiUrl(
                        "mediaTypeApiBaseUrl",
                        "PostCreateContainer",
-                       { parentId: parentId, name: name })),
+                        { parentId: parentId, name: encodeURIComponent(name) })),
                 'Failed to create a folder under parent id ' + parentId);
         },
 

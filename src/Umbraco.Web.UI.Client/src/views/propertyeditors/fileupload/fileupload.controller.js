@@ -73,7 +73,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
 
             var extension = file.file.substring(file.file.lastIndexOf(".") + 1, file.file.length);
 
-            file.thumbnail = thumbnailUrl;
+            file.thumbnail = thumbnailUrl + '&rnd=' + Math.random();
             file.extension = extension.toLowerCase();
         });
 

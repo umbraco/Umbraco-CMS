@@ -4,7 +4,7 @@
             <input overlay-submit-on-enter="false" name="newItem" focus-when="{{focusOnNew}}" ng-keydown="createNew($event)" type="text" ng-model="newItem" val-highlight="{{hasError}}" />
         </div>
         <div class="umb-prevalues-multivalues__right">
-            <button class="btn btn-info" ng-click="add($event)">Add</button>
+            <button class="btn btn-info" ng-click="add($event)"><localize key="general_add">Add</localize></button>
         </div>
     </div>
     <div ui-sortable="sortableOptions">
@@ -14,7 +14,7 @@
                 <input type="text" ng-model="item.value" val-server="item_{{$index}}" required />
             </div>
             <div class="umb-prevalues-multivalues__right">
-                <a class="umb-node-preview__action" ng-click="remove(item, $event)">Remove</a>
+                <a class="umb-node-preview__action umb-node-preview__action--red" ng-click="remove(item, $event)"><localize key="general_remove">Remove</localize></a>
             </div>
         </div>
     </div>

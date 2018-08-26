@@ -77,7 +77,10 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
 
     // sortable options
     $scope.sortableOptions = {
+        axis: "y",
+        containment: "parent",
         distance: 10,
+        opacity: 0.7,
         tolerance: "pointer",
         scroll: true,
         zIndex: 6000
@@ -109,6 +112,7 @@ function contentPickerController($scope, entityResource, editorState, iconHelper
         entityType: entityType,
         filterCssClass: "not-allowed not-published",
         startNodeId: null,
+        currentNode: editorState ? editorState.current : null,
         callback: function (data) {
             if (angular.isArray(data)) {
                 _.each(data, function (item, i) {

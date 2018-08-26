@@ -26,13 +26,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             // it is absolutely required to exist in order to have it as a foreign key reference, so we'll need to check it's existence
             // this came to light from this issue: http://issues.umbraco.org/issue/U4-4133
             var dbIndexes = SqlSyntax.GetDefinedIndexes(Context.Database)
-                .Select(x => new DbIndexDefinition()
-                {
-                    TableName = x.Item1,
-                    IndexName = x.Item2,
-                    ColumnName = x.Item3,
-                    IsUnique = x.Item4
-                }).ToArray();
+                .Select(x => new DbIndexDefinition(x)).ToArray();
             if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsContent")) == false)
             {
                 Create.Index("IX_cmsContent").OnTable("cmsContent").OnColumn("nodeId").Ascending().WithOptions().Unique();

@@ -47,7 +47,7 @@ angular.module("umbraco")
                 pageSize: 100,
                 totalItems: 0,
                 totalPages: 0,
-                filter: '',
+                filter: ''
             };
 
             //preload selected item
@@ -82,17 +82,21 @@ angular.module("umbraco")
                     //media object so we need to look it up
                     var id = $scope.target.udi ? $scope.target.udi : $scope.target.id
                     var altText = $scope.target.altText;
-                    mediaResource.getById(id)
-                        .then(function (node) {
-                            $scope.target = node;
-                            if (ensureWithinStartNode(node)) {
-                                selectImage(node);
-                                $scope.target.url = mediaHelper.resolveFile(node);
-                                $scope.target.altText = altText;
-                                $scope.openDetailsDialog();
-                            }
-                        },
-                        gotoStartNode);
+                    if (id) {
+                        mediaResource.getById(id)
+                            .then(function (node) {
+                                $scope.target = node;
+                                if (ensureWithinStartNode(node)) {
+                                    selectImage(node);
+                                    $scope.target.url = mediaHelper.resolveFile(node);
+                                    $scope.target.altText = altText;
+                                    $scope.openDetailsDialog();
+                                }
+                            },
+                                gotoStartNode);
+                    } else {
+                        gotoStartNode();
+                    }
                 }
             }
 

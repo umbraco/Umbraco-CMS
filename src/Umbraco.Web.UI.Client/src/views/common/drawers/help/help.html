@@ -8,16 +8,17 @@
     <umb-drawer-content>
 
         <!-- Tours -->
-        <div ng-if="vm.tours" data-element="help-tours" style="margin-bottom: 20px;">
+        <div class="umb-help-section" ng-if="vm.tours" data-element="help-tours">
 
-            <h5 style="margin-bottom: 10px; margin-top: 0;">Tours</h5>
+            <h5 class="umb-help-section__title">Tours</h5>
             
-            <div ng-repeat="tourGroup in vm.tours | orderBy:'groupOrder'" style="margin-bottom: 5px;">
+            <div ng-repeat="tourGroup in vm.tours | orderBy:'groupOrder'">
 
                 <div class="umb-help-list">
 
-                    <a href="" class="umb-help-list-item umb-help-list-item__content flex items-center justify-between" style="text-decoration: none;" ng-click="tourGroup.open = !tourGroup.open">
-                        <h5 class="umb-help-list-item__group-title"><i style="margin-right: 2px;text-decoration: none;" ng-class="{'icon-navigation-right': !tourGroup.open, 'icon-navigation-down': tourGroup.open}"></i>
+                    <a href="" class="umb-help-list-item umb-help-list-item__content flex items-center justify-between" ng-click="tourGroup.open = !tourGroup.open">
+                        <h5 class="umb-help-list-item__group-title">
+                            <i ng-class="{'icon-navigation-right': !tourGroup.open, 'icon-navigation-down': tourGroup.open}"></i>
                             <span ng-if="tourGroup.group !== 'undefined'">{{tourGroup.group}}</span>
                             <span ng-if="tourGroup.group === 'undefined'">Other</span>
                         </h5>
@@ -49,7 +50,7 @@
 
 
         <!-- Show in custom help dashboard -->
-        <div data-element="help-custom-dashboard" style="margin-bottom: 20px;" ng-if="vm.customDashboard.length > 0">
+        <div class="umb-help-section" data-element="help-custom-dashboard" ng-if="vm.customDashboard.length > 0">
             <div ng-repeat="tab in vm.customDashboard">
                 <div ng-repeat="property in tab.properties">
                     <div>
@@ -61,11 +62,11 @@
         </div>
 
         <!--  Help Content -->
-        <div data-element="help-articles" style="margin-bottom: 20px;" ng-if="vm.topics.length > 0">
-            <h5 style="margin-bottom: 10px; margin-top: 0;">Articles</h5>
+        <div class="umb-help-section" data-element="help-articles" ng-if="vm.topics.length > 0">
+            <h5 class="umb-help-section__title">Articles</h5>
             <ul class="umb-help-list">
                 <li class="umb-help-list-item" ng-repeat="topic in vm.topics track by $index">
-                    <a data-element="help-article-{{topic.name}}" target="_blank" ng-href="{{topic.url}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
+                    <a class="umb-help-list-item__content" data-element="help-article-{{topic.name}}" target="_blank" ng-href="{{topic.url}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
                         <span>
                             <span class="umb-help-list-item__title">
                                 <span class="bold">{{topic.name}}</span>
@@ -79,11 +80,11 @@
         </div>
 
         <!--  Umbraco tv content -->
-        <div data-element="help-videos" style="margin-bottom: 20px;">
-            <h5 style="margin-bottom: 10px; margin-top: 0;" ng-if="vm.videos.length > 0">Videos</h5>
+        <div class="umb-help-section" data-element="help-videos" ng-if="vm.hasAccessToSettings">
+            <h5 class="umb-help-section__title" ng-if="vm.videos.length > 0">Videos</h5>
             <ul class="umb-help-list">
                 <li class="umb-help-list-item" ng-repeat="video in vm.videos track by $index">
-                    <a data-element="help-article-{{video.title}}" target="_blank" ng-href="{{video.link}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
+                    <a class="umb-help-list-item__content" data-element="help-article-{{video.title}}" target="_blank" ng-href="{{video.link}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
                         <i class="umb-help-list-item__icon icon-tv-old"></i>
                         <span class="umb-help-list-item__title">{{video.title}}</span>
                         <i class="umb-help-list-item__open-icon icon-out"></i>
@@ -93,8 +94,8 @@
         </div>
 
         <!--  Links -->
-        <div data-element="help-links">
-            <a data-element="help-link-umbraco-tv" class="umb-help-badge" style="margin-bottom: 5px;" target="_blank" href="http://umbraco.tv?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
+        <div class="umb-help-section" data-element="help-links" ng-if="vm.hasAccessToSettings">
+            <a data-element="help-link-umbraco-tv" class="umb-help-badge" target="_blank" href="https://umbraco.tv?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
                 <i class="umb-help-badge__icon icon-tv-old"></i>
                 <div class="umb-help-badge__title">Visit umbraco.tv</div>
                 <small>
@@ -102,9 +103,9 @@
                 </small>
             </a>
 
-            <a data-element="help-link-our-umbraco" class="umb-help-badge" style="margin-bottom: 5px;" target="_blank" href="http://our.umbraco.org?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=our">
+            <a data-element="help-link-our-umbraco" class="umb-help-badge" target="_blank" href="https://our.umbraco.com?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=our">
                 <i class="umb-help-badge__icon icon-favorite"></i>
-                <div class="umb-help-badge__title">Visit our.umbraco.org</div>
+                <div class="umb-help-badge__title">Visit our.umbraco.com</div>
                 <small>
                     <localize key="defaultdialogs_theFriendliestCommunity">The friendliest community</localize>
                 </small>
