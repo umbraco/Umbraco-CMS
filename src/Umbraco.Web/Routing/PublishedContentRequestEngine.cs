@@ -11,6 +11,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 
 using umbraco;
@@ -651,9 +652,8 @@ namespace Umbraco.Web.Routing
 			// only if the published content is the initial once, else the alternate template
 			// does not apply
             // + optionnally, apply the alternate template on internal redirects
-            var useAltTemplate = _webRoutingSection.DisableAlternativeTemplates == false 
-                && (_pcr.IsInitialPublishedContent
-                || (_webRoutingSection.InternalRedirectPreservesTemplate && _pcr.IsInternalRedirectPublishedContent));
+            var useAltTemplate = _pcr.IsInitialPublishedContent
+                || (_webRoutingSection.InternalRedirectPreservesTemplate && _pcr.IsInternalRedirectPublishedContent);
             string altTemplate = useAltTemplate
                 ? _routingContext.UmbracoContext.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
 				: null;
@@ -675,20 +675,11 @@ namespace Umbraco.Web.Routing
 
 				var templateId = _pcr.PublishedContent.TemplateId;
 
-				if (templateId > 0)
-				{
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
-					var template = ApplicationContext.Current.Services.FileService.GetTemplate(templateId);
-					if (template == null)
-						throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render");
-					_pcr.TemplateModel = template;
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
-				}
-				else
-				{
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}No specified template.", () => tracePrefix);
-				}
-			}
+                // This code was moved to GetTemplateModel to allow the same functionality on a failed altTemplate (U4-8550)
+                // The only change is a diffent logger prefix and null will be set to _pcr.TemplateModel if the templateId is <= 0
+                // rather than no set taking place
+                _pcr.TemplateModel = GetTemplateModel(_pcr.PublishedContent.TemplateId);
+            }
 			else
 			{
 				// we have an alternate template specified. lookup the template with that alias
@@ -701,16 +692,19 @@ namespace Umbraco.Web.Routing
 					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Has a template already, but also an alternate template.", () => tracePrefix);
 				ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Look for alternate template alias=\"{1}\"", () => tracePrefix, () => altTemplate);
 
-				var template = ApplicationContext.Current.Services.FileService.GetTemplate(altTemplate);
-				if (template != null)
-				{
-					_pcr.TemplateModel = template;
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
-				}
-				else
-				{
-					ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}The template with alias=\"{1}\" does not exist, ignoring.", () => tracePrefix, () => altTemplate);
-				}
+                if (_pcr.PublishedContent.IsAllowedTemplate(altTemplate))
+                {
+                    var template = ApplicationContext.Current.Services.FileService.GetTemplate(altTemplate);
+                    if (template != null)
+                        _pcr.TemplateModel = template;
+                    else
+                        ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}The template with alias=\"{1}\" does not exist, ignoring.", () => tracePrefix, () => altTemplate);
+                }
+                else
+                {
+                    LogHelper.Warn<PublishedContentRequestEngine>("{0}Configuration settings prevent template \"{1}\" from showing for node \"{2}\"", () => tracePrefix, () => altTemplate, () => _pcr.PublishedContent.Id);
+                    _pcr.TemplateModel = GetTemplateModel(_pcr.PublishedContent.TemplateId);
+                }
 			}
 
 			if (_pcr.HasTemplate == false)
@@ -732,11 +726,31 @@ namespace Umbraco.Web.Routing
 			}
 		}
 
-		/// <summary>
-		/// Follows external redirection through <c>umbracoRedirect</c> document property.
-		/// </summary>
-		/// <remarks>As per legacy, if the redirect does not work, we just ignore it.</remarks>
-		private void FollowExternalRedirect()
+        private ITemplate GetTemplateModel(int templateId)
+        {
+            const string tracePrefix = "GetTemplateModel: ";
+
+            if (templateId > 0)
+            {
+                ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Look for template id={1}", () => tracePrefix, () => templateId);
+                var template = ApplicationContext.Current.Services.FileService.GetTemplate(templateId);
+                if (template == null)
+                    throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render");
+                ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}Got template id={1} alias=\"{2}\"", () => tracePrefix, () => template.Id, () => template.Alias);
+                return template;
+            }
+            else
+            {
+                ProfilingLogger.Logger.Debug<PublishedContentRequestEngine>("{0}No specified template.", () => tracePrefix);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Follows external redirection through <c>umbracoRedirect</c> document property.
+        /// </summary>
+        /// <remarks>As per legacy, if the redirect does not work, we just ignore it.</remarks>
+        private void FollowExternalRedirect()
 		{
 		    if (_pcr.HasPublishedContent == false) return;
 
