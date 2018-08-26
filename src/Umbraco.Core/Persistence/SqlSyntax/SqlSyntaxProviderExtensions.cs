@@ -9,13 +9,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public static IEnumerable<DbIndexDefinition> GetDefinedIndexesDefinitions(this ISqlSyntaxProvider sql, Database db)
         {
             return sql.GetDefinedIndexes(db)
-                .Select(x => new DbIndexDefinition()
-                {
-                    TableName = x.Item1,
-                    IndexName = x.Item2,
-                    ColumnName = x.Item3,
-                    IsUnique = x.Item4
-                }).ToArray();
+                .Select(x => new DbIndexDefinition(x)).ToArray();
         }
 
         /// <summary>

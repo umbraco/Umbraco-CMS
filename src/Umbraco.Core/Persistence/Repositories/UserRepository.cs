@@ -186,6 +186,8 @@ UNION
 SELECT '4CountOfLockedOut' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userNoConsole = 1
 UNION
 SELECT '5CountOfInvited' AS colName, COUNT(id) AS num FROM umbracoUser WHERE lastLoginDate IS NULL AND userDisabled = 1 AND invitedDate IS NOT NULL
+UNION
+SELECT '6CountOfDisabled' AS colName, COUNT(id) AS num FROM umbracoUser WHERE userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL 
 ORDER BY colName";
 
             var result = Database.Fetch<dynamic>(sql);
@@ -196,7 +198,8 @@ ORDER BY colName";
                 {UserState.Active, (int)result[1].num},
                 {UserState.Disabled, (int)result[2].num},
                 {UserState.LockedOut, (int)result[3].num},
-                {UserState.Invited, (int)result[4].num}
+                {UserState.Invited, (int)result[4].num},
+                {UserState.Inactive, (int) result[5].num}
             };
         }
 
@@ -763,6 +766,12 @@ ORDER BY colName";
                     if (userState.Contains(UserState.Active))
                     {
                         sb.Append("(userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NOT NULL)");
+                        appended = true;
+                    }
+                    if (userState.Contains(UserState.Inactive))
+                    {
+                        if (appended) sb.Append(" OR ");
+                        sb.Append("(userDisabled = 0 AND userNoConsole = 0 AND lastLoginDate IS NULL)");
                         appended = true;
                     }
                     if (userState.Contains(UserState.Disabled))

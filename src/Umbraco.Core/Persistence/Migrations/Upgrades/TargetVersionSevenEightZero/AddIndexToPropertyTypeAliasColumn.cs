@@ -15,7 +15,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenEightZe
         {
             Execute.Code(database =>
             {                
-                var dbIndexes = SqlSyntax.GetDefinedIndexesDefinitions(Context.Database);
+                var dbIndexes = SqlSyntax.GetDefinedIndexesDefinitions(database);
 
                 //make sure it doesn't already exist
                 if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsPropertyTypeAlias")) == false)

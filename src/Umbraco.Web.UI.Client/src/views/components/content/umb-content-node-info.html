@@ -195,15 +195,16 @@
                 <umb-control-group data-element="node-info-document-type" label="@content_documentType">
                     <umb-node-preview
                         style="max-width: 100%; margin-bottom: 0;"
-                        icon="documentType.icon"
-                        name="documentType.name"
+                        icon="node.icon"
+                        name="node.contentTypeName"
                         allow-open="allowOpen"
                         on-open="openDocumentType(documentType)"
-						            open-url="previewOpenUrl">
+						open-url="previewOpenUrl">
                     </umb-node-preview>
                 </umb-control-group>
 
                 <umb-control-group ng-if="disableTemplates == false" data-element="node-info-template" label="@template_template">
+
                     <div class="flex items-center">
                         <select class="input-block-level"
                                 ng-model="node.template"
@@ -211,7 +212,7 @@
                                 ng-change="updateTemplate(node.template)">
                             <option value=""><localize key="general_choose">Choose</localize>...</option>
                         </select>
-                        <a href="" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()" ng-if="node.template !== null">
+                        <a href="" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()" ng-if="node.template !== null && allowOpen">
                             <localize key="general_open">Open</localize>
                         </a>
                     </div>
