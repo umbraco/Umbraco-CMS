@@ -109,8 +109,10 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             else {
                 if (dialogOptions.filter.startsWith("!")) {
                     dialogOptions.filterExclude = true;
-                    //dialogOptions.filter = dialogOptions.filter.substring(1); // Can't substring the value on dialogoptions.filter as it then keeps it's modified value next time the dialog opens
                     dialogOptions.filterTypes = dialogOptions.filter.substring(1);
+                } else {
+                    dialogOptions.filterExclude = false;
+                    dialogOptions.filterTypes = dialogOptions.filter;
                 }
 
                 //used advanced filtering
