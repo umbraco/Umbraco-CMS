@@ -208,6 +208,18 @@
                 "event": "click"
             },
             {
+                "element": "[data-element~='sub-view-permissions']",
+                "title": "Check the document type permissions",
+                "content": "Click <b>Permissions</b> to view the permissions page.",
+                "event": "click"
+            },
+            {
+                "element": "[data-element~='permissions-allow-as-root']",
+                "title": "Allow this document type to work at the root of your site",
+                "content": "Toggle the switch <b>Allow as root</b> to allow new content pages based on this document type to be created at the root of your site",
+                "event": "click"
+            },
+            {
                 "element": "[data-element='button-save']",
                 "title": "Save the document type",
                 "content": "All we need now is to save the document type. Click <b>Save</b> to create and save your new document type.",
