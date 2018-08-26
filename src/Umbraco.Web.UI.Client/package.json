@@ -27,9 +27,11 @@
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-connect": "5.0.0",
-    "gulp-less": "^3.1.0",
+    "gulp-eslint": "^5.0.0",
+    "gulp-imagemin": "^4.1.0",
+    "gulp-less": "^3.5.0",
     "gulp-ngdocs": "^0.3.0",
-    "gulp-open": "^2.0.0",
+    "gulp-open": "^2.1.0",
     "gulp-postcss": "^6.2.0",
     "gulp-rename": "^1.2.2",
     "gulp-sort": "^2.0.0",
@@ -38,11 +40,11 @@
     "gulp-wrap-js": "^0.4.1",
     "jasmine-core": "2.5.2",
     "karma": "^1.7.0",
-    "karma-jasmine": "^1.1.0",
+    "karma-jasmine": "^1.1.1",
     "karma-phantomjs-launcher": "^1.0.4",
-    "less": "^2.6.1",
-    "lodash": "^4.16.3",
+    "less": "^2.7.3",
+    "lodash": "^4.17.5",
     "merge-stream": "^1.0.1",
-    "run-sequence": "^2.1.0"
+    "run-sequence": "^2.2.1"
   }
 }

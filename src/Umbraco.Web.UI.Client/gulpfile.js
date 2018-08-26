@@ -7,9 +7,13 @@ var sort = require('gulp-sort');
 var connect = require('gulp-connect');
 var open = require('gulp-open');
 var runSequence = require('run-sequence');
+const imagemin = require('gulp-imagemin');
 
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
+
+// js
+const eslint = require('gulp-eslint');
 
 //Less + css
 var postcss = require('gulp-postcss');
@@ -29,6 +33,11 @@ Helper functions
 function processJs(files, out) {
     
     return gulp.src(files)
+     // check for js errors
+     .pipe(eslint())
+     // outputs the lint results to the console
+     .pipe(eslint.format())
+     // sort files in stream by path or any custom sort comparator
      .pipe(sort())
      .pipe(concat(out))
      .pipe(wrap('(function(){\n%= body %\n})();'))
@@ -73,7 +82,6 @@ var sources = {
     js: {
         preview: { files: ["src/canvasdesigner/**/*.js"], out: "umbraco.canvasdesigner.js" },
         installer: { files: ["src/installer/**/*.js"], out: "umbraco.installer.js" },
-        
         controllers: { files: ["src/{views,controllers}/**/*.controller.js"], out: "umbraco.controllers.js" },
         directives: { files: ["src/common/directives/**/*.js"], out: "umbraco.directives.js" },
         filters: { files: ["src/common/filters/**/*.js"], out: "umbraco.filters.js" },
@@ -85,8 +93,7 @@ var sources = {
     //selectors for copying all views into the build
     //processed in the views task
     views:{
-        umbraco: {files: ["src/views/**/*html"], folder: ""},
-        preview: { files: ["src/canvasdesigner/**/*.html"], folder: "../preview"},
+        umbraco: {files: ["src/views/**/*.html"], folder: ""},
         installer: {files: ["src/installer/steps/*.html"], folder: "install"}
     },
 
@@ -208,6 +215,17 @@ gulp.task('dependencies', function () {
     //css, fonts and image files
     stream.add( 
             gulp.src(sources.globs.assets)
+				.pipe(imagemin([
+                    imagemin.gifsicle({interlaced: true}),
+                    imagemin.jpegtran({progressive: true}),
+                    imagemin.optipng({optimizationLevel: 5}),
+                    imagemin.svgo({
+                        plugins: [
+                            {removeViewBox: true},
+                            {cleanupIDs: false}
+                        ]
+                    })
+                ]))
                 .pipe(gulp.dest(root + targets.assets))
         );
 
@@ -341,7 +359,7 @@ gulp.task('docs', [], function (cb) {
         title: "Umbraco Backoffice UI API Documentation",
         dest: 'docs/api',
         styles: ['docs/umb-docs.css'],
-        image: "https://our.umbraco.org/assets/images/logo.svg"
+        image: "https://our.umbraco.com/assets/images/logo.svg"
     }
 
     return gulpDocs.sections({

@@ -13,6 +13,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using Umbraco.Core.Services;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
@@ -232,13 +233,9 @@ namespace Umbraco.Web
             return doc;
         }
 
-        private IPublishedContent TypedDocumentById(Guid id, ContextualPublishedCache cache)
+        private IPublishedContent TypedDocumentById(Guid key, ContextualPublishedCache cache)
         {
-            // todo: in v8, implement in a more efficient way
-            var legacyXml = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema;
-            var xpath = legacyXml ? "//node [@key=$guid]" : "//* [@key=$guid]";
-            var doc = cache.GetSingleByXPath(xpath, new XPathVariable("guid", id.ToString()));
-            return doc;
+            return cache.GetById(key);
         }
 
         private IPublishedContent TypedDocumentByXPath(string xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)
@@ -261,7 +258,6 @@ namespace Umbraco.Web
 
         private IEnumerable<IPublishedContent> TypedDocumentsByIds(ContextualPublishedCache cache, IEnumerable<Guid> ids)
         {
-            // todo: in v8, implement in a more efficient way
             return ids.Select(eachId => TypedDocumentById(eachId, cache)).WhereNotNull();
         }
 

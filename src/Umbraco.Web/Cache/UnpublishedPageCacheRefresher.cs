@@ -84,7 +84,6 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(int id)
         {
-            ApplicationContext.Current.Services.IdkMap.ClearCache(id);
             ClearRepositoryCacheItemById(id);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             content.Instance.UpdateSortOrder(id);
@@ -104,7 +103,6 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(IContent instance)
         {
-            ApplicationContext.Current.Services.IdkMap.ClearCache(instance.Id);
             ClearRepositoryCacheItemById(instance.Id);
             ClearAllIsolatedCacheByEntityType<PublicAccessEntry>();
             content.Instance.UpdateSortOrder(instance);

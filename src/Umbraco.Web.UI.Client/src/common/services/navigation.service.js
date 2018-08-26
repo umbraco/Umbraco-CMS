@@ -288,9 +288,12 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 throw "args.tree cannot be null";
             }
 
-            if (mainTreeEventHandler) {
-                //returns a promise
-                return mainTreeEventHandler.syncTree(args);
+            if (mainTreeEventHandler) {                
+               
+                if (mainTreeEventHandler.syncTree) {
+                    //returns a promise,
+                    return mainTreeEventHandler.syncTree(args);
+                }
             }
 
             //couldn't sync
@@ -638,7 +641,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
                     //These will show up on the dialog controller's $scope under dialogOptions
                     currentNode: args.node,
-                    currentAction: args.action,
+                    currentAction: args.action
                 });
 
             //save the currently assigned dialog so it can be removed before a new one is created

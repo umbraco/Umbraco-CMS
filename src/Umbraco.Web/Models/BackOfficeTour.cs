@@ -9,6 +9,11 @@ namespace Umbraco.Web.Models
     [DataContract(Name = "tour", Namespace = "")]
     public class BackOfficeTour
     {
+        public BackOfficeTour()
+        {
+            RequiredSections = new List<string>();            
+        }
+
         [DataMember(Name = "name")]
         public string Name { get; set; }
         [DataMember(Name = "alias")]
@@ -23,5 +28,8 @@ namespace Umbraco.Web.Models
         public List<string> RequiredSections { get; set; }
         [DataMember(Name = "steps")]
         public BackOfficeTourStep[] Steps { get; set; }
+
+        [DataMember(Name = "culture")]
+        public string Culture { get; set; }
     }
 }

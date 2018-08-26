@@ -8,10 +8,14 @@
             var evts = [];
             var isInfoTab = false;
             scope.publishStatus = {};
-            
-            function onInit() {
 
-                scope.allowOpen = true;
+            scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
+
+            function onInit() {
+                // If logged in user has access to the settings section
+                // show the open anchors - if the user doesn't have 
+                // access, documentType is null, see ContentModelMapper
+                scope.allowOpen = scope.node.documentType !== null;
 
                 scope.datePickerConfig = {
                     pickDate: true,
@@ -39,8 +43,13 @@
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
 
+                // Make sure to set the node status
                 setNodePublishStatus(scope.node);
-                
+
+                // Declare a fallback URL for the <umb-node-preview/> directive
+                if (scope.documentType !== null) {
+                    scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
+                }
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
@@ -48,10 +57,15 @@
                 loadAuditTrail();
             };
 
-            scope.openDocumentType = function (documentType) {               
+            scope.openDocumentType = function (documentType) {
                 var url = "/settings/documenttypes/edit/" + documentType.id;
                 $location.url(url);
             };
+
+            scope.openTemplate = function () {
+                var url = "/settings/templates/edit/" + scope.node.templateId;
+                $location.url(url);
+            }
 
             scope.updateTemplate = function (templateAlias) {
 
@@ -89,7 +103,7 @@
                                 item.timestampFormatted = dateHelper.getLocalDate(item.timestamp, currentUser.locale, 'LLL');
                             });
                         });
-                    
+
                         scope.auditTrail = data.items;
                         scope.auditTrailOptions.pageNumber = data.pageNumber;
                         scope.auditTrailOptions.pageSize = data.pageSize;
@@ -97,7 +111,7 @@
                         scope.auditTrailOptions.totalPages = data.totalPages;
 
                         setAuditTrailLogTypeColor(scope.auditTrail);
-                        
+
                         scope.loadingAuditTrail = false;
                     });
 
@@ -105,6 +119,7 @@
 
             function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {
+
                     switch (item.logType) {
                         case "Publish":
                             item.logTypeColor = "success";
@@ -120,7 +135,6 @@
             }
 
             function setNodePublishStatus(node) {
-                
                 // deleted node
                 if(node.trashed === true) {
                     scope.publishStatus.label = localizationService.localize("general_deleted");
@@ -214,7 +228,7 @@
                 eventsService.emit("editors.content.changeUnpublishDate", args);
 
             }
-            
+
             function ucfirst(string) {
                 return string.charAt(0).toUpperCase() + string.slice(1);
             }
@@ -223,13 +237,13 @@
                 // get current backoffice user and format dates
                 userService.getCurrentUser().then(function (currentUser) {
                     scope.node.createDateFormatted = dateHelper.getLocalDate(scope.node.createDate, currentUser.locale, 'LLL');
-                    
+
                     scope.node.releaseDateYear = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'YYYY')) : null;
                     scope.node.releaseDateMonth = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'MMMM')) : null;
                     scope.node.releaseDateDayNumber = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'DD')) : null;
                     scope.node.releaseDateDay = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'dddd')) : null;
                     scope.node.releaseDateTime = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'HH:mm')) : null;
-                    
+
                     scope.node.removeDateYear = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'YYYY')) : null;
                     scope.node.removeDateMonth = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'MMMM')) : null;
                     scope.node.removeDateDayNumber = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'DD')) : null;
@@ -254,8 +268,8 @@
             scope.$watch('node.updateDate', function(newValue, oldValue){
 
                 if(!newValue) { return; }
-                if(newValue === oldValue) { return; }             
-                
+                if(newValue === oldValue) { return; }
+
                 if(isInfoTab) {
                     loadAuditTrail();
                     formatDatesToLocal();

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
+using AutoMapper;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
@@ -20,28 +18,31 @@ namespace Umbraco.Web.Models.Mapping
         {
             _textService = textService;
         }
-
-        protected override ContentPropertyDisplay ConvertCore(Property originalProp)
+        public override ContentPropertyDisplay Convert(ResolutionContext context)
         {
-            var display = base.ConvertCore(originalProp);
+            var display = base.Convert(context);
+
+            var originalProperty = context.SourceValue as Property;
+            if (originalProperty == null)
+                throw new InvalidOperationException("Source value is not a property.");
 
             var dataTypeService = DataTypeService;
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(originalProp.PropertyType.DataTypeDefinitionId);
+            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(originalProperty.PropertyType.DataTypeDefinitionId);
 
             //configure the editor for display with the pre-values
             var valEditor = display.PropertyEditor.ValueEditor;
             valEditor.ConfigureForDisplay(preVals);
 
             //set the display properties after mapping
-            display.Alias = originalProp.Alias;
-            display.Description = originalProp.PropertyType.Description;
-            display.Label = originalProp.PropertyType.Name;
+            display.Alias = originalProperty.Alias;
+            display.Description = originalProperty.PropertyType.Description;
+            display.Label = originalProperty.PropertyType.Name;
             display.HideLabel = valEditor.HideLabel;
-            
+
             //add the validation information
-            display.Validation.Mandatory = originalProp.PropertyType.Mandatory;
-            display.Validation.Pattern = originalProp.PropertyType.ValidationRegExp;
-            
+            display.Validation.Mandatory = originalProperty.PropertyType.Mandatory;
+            display.Validation.Pattern = originalProperty.PropertyType.ValidationRegExp;
+
             if (display.PropertyEditor == null)
             {
                 //display.Config = PreValueCollection.AsDictionary(preVals);

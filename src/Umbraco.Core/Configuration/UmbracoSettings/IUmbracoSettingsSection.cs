@@ -24,9 +24,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         IScheduledTasksSection ScheduledTasks { get; }
 
         IDistributedCallSection DistributedCall { get; }
-
-        IRepositoriesSection PackageRepositories { get; }
-
+        
         IProvidersSection Providers { get; }
 
         [EditorBrowsable(EditorBrowsableState.Never)]

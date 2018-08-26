@@ -202,6 +202,9 @@
     <Reference Include="System.Threading.Tasks.Dataflow, Version=4.6.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Dataflow.4.7.0\lib\portable-net45+win8+wpa81\System.Threading.Tasks.Dataflow.dll</HintPath>
     </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -316,8 +319,11 @@
     <Compile Include="Cache\TemplateCacheRefresher.cs" />
     <Compile Include="Cache\UnpublishedPageCacheRefresher.cs" />
     <Compile Include="Cache\UserCacheRefresher.cs" />
+    <Compile Include="Editors\PreviewController.cs" />
+    <Compile Include="Editors\BackOfficeAssetsController.cs" />
     <Compile Include="Features\DisabledFeatures.cs" />
     <Compile Include="Editors\BackOfficeNotificationsController.cs" />
+    <Compile Include="Editors\DictionaryController.cs" />
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
     <Compile Include="Editors\DashboardHelper.cs" />
     <Compile Include="Editors\EditorModelEventArgs.cs" />
@@ -332,11 +338,18 @@
     <Compile Include="Editors\CodeFileController.cs" />
     <Compile Include="Editors\TourController.cs" />
     <Compile Include="Features\EnabledFeatures.cs" />
+    <Compile Include="HealthCheck\Checks\DataIntegrity\DatabaseSchemaValidationHealthCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Security\XssProtectionCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Security\HstsCheck.cs" />
     <Compile Include="Models\BackOfficeTourFilter.cs" />
+    <Compile Include="Models\ContentEditing\BackOfficePreview.cs" />
+    <Compile Include="Models\ContentEditing\DocumentTypeCollectionDisplay.cs" />
+    <Compile Include="Models\ContentEditing\NotifySetting.cs" />
     <Compile Include="Models\Mapping\AutoMapperExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTreeNodeUrlResolver.cs" />
     <Compile Include="Models\Mapping\MemberTreeNodeUrlResolver.cs" />
     <Compile Include="Models\Trees\ExportMember.cs" />
+    <Compile Include="PropertyEditors\DropdownFlexiblePropertyEditor.cs" />
     <Compile Include="TourFilterResolver.cs" />
     <Compile Include="Editors\UserEditorAuthorizationHelper.cs" />
     <Compile Include="Editors\UserGroupAuthorizationAttribute.cs" />
@@ -358,6 +371,8 @@
     <Compile Include="HealthCheck\Checks\Config\TraceCheck.cs" />
     <Compile Include="HealthCheck\Checks\Config\ValueComparisonType.cs" />
     <Compile Include="HealthCheck\Checks\Config\CompilationDebugCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Security\BaseHttpHeaderCheck.cs" />
+    <Compile Include="HealthCheck\Checks\Security\NoSniffCheck.cs" />
     <Compile Include="HealthCheck\Checks\Services\SmtpCheck.cs" />
     <Compile Include="HealthCheck\Checks\Permissions\FolderAndFilePermissionsCheck.cs" />
     <Compile Include="HealthCheck\Checks\Security\ExcessiveHeadersCheck.cs" />
@@ -388,6 +403,11 @@
     <Compile Include="Models\ContentEditing\AssignedContentPermissions.cs" />
     <Compile Include="Models\ContentEditing\AssignedUserGroupPermissions.cs" />
     <Compile Include="Models\ContentEditing\ContentRedirectUrl.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryOverviewDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DictionarySave.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryOverviewTranslationDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryTranslationSave.cs" />
     <Compile Include="Models\ContentEditing\EditorNavigation.cs" />
     <Compile Include="Models\ContentEditing\GetAvailableCompositionsFilter.cs" />
     <Compile Include="Editors\IEditorValidator.cs" />
@@ -414,6 +434,7 @@
     <Compile Include="Models\ContentEditing\SimpleNotificationModel.cs" />
     <Compile Include="Models\ContentEditing\SnippetDisplay.cs" />
     <Compile Include="Models\ContentEditing\TemplateDisplay.cs" />
+    <Compile Include="Models\ContentEditing\DictionaryTranslationDisplay.cs" />
     <Compile Include="Models\ContentEditing\UserDisplay.cs" />
     <Compile Include="Models\ContentEditing\UserBasic.cs" />
     <Compile Include="Models\ContentEditing\UserGroupBasic.cs" />
@@ -428,6 +449,7 @@
     <Compile Include="Models\Mapping\CodeFileDisplayMapper.cs" />
     <Compile Include="Models\Mapping\ContentTypeModelMapperExtensions.cs" />
     <Compile Include="Models\Mapping\ContentTypeUdiResolver.cs" />
+    <Compile Include="Models\Mapping\DictionaryModelMapper.cs" />
     <Compile Include="Models\Mapping\EntityModelMapperExtensions.cs" />
     <Compile Include="Models\Mapping\LockedCompositionsResolver.cs" />
     <Compile Include="Models\Mapping\UserGroupDefaultPermissionsResolver.cs" />
@@ -509,6 +531,7 @@
     <Compile Include="Models\Mapping\PropertyTypeGroupResolver.cs" />
     <Compile Include="Security\Identity\PreviewAuthenticationMiddleware.cs" />
     <Compile Include="SingletonHttpContextAccessor.cs" />
+    <Compile Include="Trees\DictionaryTreeController.cs" />
     <Compile Include="Trees\MacroTreeController.cs" />
     <Compile Include="Trees\UserTreeController.cs" />
     <Compile Include="Suspendable.cs" />
@@ -1528,13 +1551,6 @@
       <DependentUpon>importDocumenttype.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\notifications.aspx.cs">
-      <DependentUpon>notifications.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\notifications.aspx.designer.cs">
-      <DependentUpon>notifications.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx.cs">
       <DependentUpon>rollBack.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1603,13 +1619,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\DictionaryItemList.aspx.designer.cs">
       <DependentUpon>DictionaryItemList.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx.cs">
-      <DependentUpon>EditDictionaryItem.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx.designer.cs">
-      <DependentUpon>EditDictionaryItem.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\editLanguage.aspx.cs">
       <DependentUpon>editLanguage.aspx</DependentUpon>
@@ -1697,7 +1706,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\loadContent.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadcontentItemType.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadDataTypes.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadDictionary.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadLanguages.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMacros.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMedia.cs" />
@@ -1706,7 +1714,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMembers.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadMemberTypes.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadNodeTypes.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadPackages.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPython.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadScripts.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadStylesheetProperty.cs" />
@@ -1872,9 +1879,6 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\importDocumenttype.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\notifications.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1912,9 +1916,6 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\schemas\umbraco.xsd">
       <SubType>Designer</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\settings\EditDictionaryItem.aspx">
-      <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx" />
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
@@ -1980,10 +1981,10 @@
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
-    <WebReferenceUrl Include="http://our.umbraco.org/umbraco/webservices/api/repository.asmx">
+    <WebReferenceUrl Include="https://our.umbraco.com/umbraco/webservices/api/repository.asmx">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\org.umbraco.our\</RelPath>
-      <UpdateFromURL>http://our.umbraco.org/umbraco/webservices/api/repository.asmx</UpdateFromURL>
+      <UpdateFromURL>https://our.umbraco.com/umbraco/webservices/api/repository.asmx</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>
