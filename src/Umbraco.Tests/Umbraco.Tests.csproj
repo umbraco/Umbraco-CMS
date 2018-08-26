@@ -190,6 +190,7 @@
     <Compile Include="Models\Mapping\UserModelMapperTests.cs" />
     <Compile Include="Packaging\PackageExtractionTests.cs" />
     <Compile Include="Persistence\Repositories\SimilarNodeNameTests.cs" />
+    <Compile Include="PublishedContent\StronglyTypedModels\Home.cs" />
     <Compile Include="Services\AuditServiceTests.cs" />
     <Compile Include="Services\ConsentServiceTests.cs" />
     <Compile Include="TestHelpers\ControllerTesting\AuthenticateEverythingExtensions.cs" />
@@ -385,7 +386,6 @@
     <Compile Include="DynamicsAndReflection\QueryableExtensionTests.cs" />
     <Compile Include="DynamicsAndReflection\ExtensionMethodFinderTests.cs" />
     <Compile Include="DynamicsAndReflection\ReflectionTests.cs" />
-    <Compile Include="Integration\CreateContent.cs" />
     <Compile Include="Macros\MacroParserTests.cs" />
     <Compile Include="Migrations\Upgrades\ValidateV7UpgradeTest.cs" />
     <Compile Include="Models\ContentExtensionsTests.cs" />
@@ -437,8 +437,6 @@
     <Compile Include="Manifest\ManifestParserTests.cs" />
     <Compile Include="Templates\TemplateRepositoryTests.cs" />
     <Compile Include="Templates\ViewHelperTests.cs" />
-    <Compile Include="TestHelpers\BaseSeleniumTest.cs" />
-    <Compile Include="Integration\InstallPackage.cs" />
     <Compile Include="CoreXml\NavigableNavigatorTests.cs" />
     <Compile Include="Cache\PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="Strings\CmsHelperCasingTests.cs" />

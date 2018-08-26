@@ -73,7 +73,7 @@
       <delete assembly="umbraco" type="stylesheetPropertyTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="initdictionary">
+  <nodeType alias="initdictionary-obsolete">
     <header>Dictionary editor egenskab</header>
     <usercontrol>/create/simple.ascx</usercontrol>
     <tasks>

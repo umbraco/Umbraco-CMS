@@ -13,6 +13,12 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
             $scope.treeModel.hideHeader = userData.startMediaIds.length > 0 && userData.startMediaIds.indexOf(-1) == -1;
         });
 
+        function treeLoadedHandler(ev, args) {
+            if (node && node.path) {
+                $scope.dialogTreeEventHandler.syncTree({ path: node.path, activate: false });
+            }
+        }
+
 	    function nodeSelectHandler(ev, args) {
 
 			if(args && args.event) {
@@ -38,6 +44,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
 			}
 	    }
 
+	    $scope.dialogTreeEventHandler.bind("treeLoaded", treeLoadedHandler);
 	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
 	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
 
@@ -71,6 +78,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
 	    };
 
 	    $scope.$on('$destroy', function () {
+	        $scope.dialogTreeEventHandler.unbind("treeLoaded", treeLoadedHandler);
 	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
 			$scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
 	    });

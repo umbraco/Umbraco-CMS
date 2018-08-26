@@ -7,13 +7,10 @@ angular.module("umbraco")
         $scope.isLoading = true;
         $scope.tagToAdd = "";
 
-        assetsService.loadJs("lib/typeahead.js/typeahead.bundle.min.js", $scope).then(function () {
+		function setModelValue(val) {
 
-            $scope.isLoading = false;
-
-            //load current value
-
-            if ($scope.model.value) {
+			$scope.model.value = val || $scope.model.value;
+			if ($scope.model.value) {
                 if (!$scope.model.config.storageType || $scope.model.config.storageType !== "Json") {
                     //it is csv
                     if (!$scope.model.value) {
@@ -21,7 +18,14 @@ angular.module("umbraco")
                     }
                     else {
                        if($scope.model.value.length > 0) {
-                          $scope.model.value = $scope.model.value.split(",");
+						  // split the csv string, and remove any duplicate values
+						  var tempArray = $scope.model.value.split(',').map(function(v) {
+							 return v.trim();
+						  });
+
+                          $scope.model.value = tempArray.filter(function(v, i, self) {
+							  return self.indexOf(v) === i;
+						  });
                        }
                     }
                 }
@@ -29,6 +33,14 @@ angular.module("umbraco")
             else {
                 $scope.model.value = [];
             }
+		}
+
+        assetsService.loadJs("lib/typeahead.js/typeahead.bundle.min.js", $scope).then(function () {
+
+            $scope.isLoading = false;
+
+            //load current value
+			setModelValue();
 
             // Method required by the valPropertyValidator directive (returns true if the property editor has at least one tag selected)
             $scope.validateMandatory = function () {
@@ -52,7 +64,7 @@ angular.module("umbraco")
 
             $scope.addTagOnEnter = function (e) {
                 var code = e.keyCode || e.which;
-                if (code == 13) { //Enter keycode   
+                if (code == 13) { //Enter keycode
                     if ($element.find('.tags-' + $scope.model.alias).parent().find(".tt-dropdown-menu .tt-cursor").length === 0) {
                         //this is required, otherwise the html form will attempt to submit.
                         e.preventDefault();
@@ -67,35 +79,46 @@ angular.module("umbraco")
                 addTag($scope.tagToAdd);
                 $scope.tagToAdd = "";
                 //this clears the value stored in typeahead so it doesn't try to add the text again
-                // http://issues.umbraco.org/issue/U4-4947
+                // https://issues.umbraco.org/issue/U4-4947
                 $typeahead.typeahead('val', '');
             };
 
-
+            // Set the visible prompt to -1 to ensure it will not be visible
+            $scope.promptIsVisible = "-1";
 
             $scope.removeTag = function (tag) {
                 var i = $scope.model.value.indexOf(tag);
+
                 if (i >= 0) {
+                    // Make sure to hide the prompt so it does not stay open because another item gets a new number in the array index
+                    $scope.promptIsVisible = "-1";
+
+                    // Remove the tag from the index
                     $scope.model.value.splice(i, 1);
+
                     //this is required to re-validate
                     $scope.propertyForm.tagCount.$setViewValue($scope.model.value.length);
                 }
             };
 
+            $scope.showPrompt = function (idx, tag){
+
+                var i = $scope.model.value.indexOf(tag);
+
+                // Make the prompt visible for the clicked tag only
+                if (i === idx) {
+                    $scope.promptIsVisible = i;
+                }
+            }
+
+            $scope.hidePrompt = function(){
+                $scope.promptIsVisible = "-1";
+            }
+
             //vice versa
             $scope.model.onValueChanged = function (newVal, oldVal) {
                 //update the display val again if it has changed from the server
-                $scope.model.value = newVal;
-
-                if (!$scope.model.config.storageType || $scope.model.config.storageType !== "Json") {
-                    //it is csv
-                    if (!$scope.model.value) {
-                        $scope.model.value = [];
-                    }
-                    else {
-                        $scope.model.value = $scope.model.value.split(",");
-                    }
-                }
+				setModelValue(newVal);
             };
 
             //configure the tags data source
@@ -160,7 +183,7 @@ angular.module("umbraco")
                         tagsHound.get(query, function (suggestions) {
                             cb(removeCurrentTagsFromSuggestions(suggestions));
                         });
-                    },
+                    }
                 }).bind("typeahead:selected", function (obj, datum, name) {
                     angularHelper.safeApply($scope, function () {
                         addTag(datum["value"]);
@@ -190,4 +213,4 @@ angular.module("umbraco")
         });
 
     }
-);
+);

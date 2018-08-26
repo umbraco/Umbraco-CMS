@@ -106,7 +106,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
 
         $scope.overlayMenu = {
             show: false,
-            style: {}
+            style: {},
+            showFilter: false
         };
 
         // helper to force the current form into the dirty state
@@ -228,10 +229,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.sortableOptions = {
             axis: 'y',
             cursor: "move",
-            handle: ".nested-content__icon--move",
+            handle: ".umb-nested-content__icon--move",
             start: function (ev, ui) {
                 // Yea, yea, we shouldn't modify the dom, sue me
-                $("#nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
+                $("#umb-nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
                     tinymce.execCommand('mceRemoveEditor', false, $(this).attr('id'));
                     $(this).css("visibility", "hidden");
                 });
@@ -243,7 +244,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 $scope.setDirty();
             },
             stop: function (ev, ui) {
-                $("#nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
+                $("#umb-nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
                     tinymce.execCommand('mceAddEditor', true, $(this).attr('id'));
                     $(this).css("visibility", "visible");
                 });
@@ -343,6 +344,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 if ($scope.singleMode || ($scope.nodes.length == 1 && $scope.maxItems == 1)) {
                     $scope.currentNode = $scope.nodes[0];
                 }
+
+                $scope.overlayMenu.showFilter = $scope.scaffolds.length > 15;
 
                 inited = true;
             }

@@ -12,7 +12,7 @@ angular.module("umbraco.directives")
             restrict: 'A',
             replace: false,
             scope: {
-                node: '=umbLaunchMiniEditor',
+                node: '=umbLaunchMiniEditor'
             },
             link: function(scope, element, attrs) {
 
