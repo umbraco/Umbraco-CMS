@@ -28,8 +28,7 @@
         }
 
         function startDoctypeTour() {
-            tourService.startTour(vm.docTypeTour);
-            closeDrawer();
+            startTour(vm.docTypeTour);
         }
 
         function oninit() {
