@@ -9,7 +9,7 @@
                     size="small">
                     <localize key="content_noMediaLink"></localize>
                 </umb-empty-state>
-                
+
                 <ul ng-if="nodeUrl" class="nav nav-stacked" style="margin-bottom: 0;">
                     <li>
                         <a href="{{nodeUrl}}" target="_blank">
@@ -28,7 +28,7 @@
         <umb-box data-element="node-info-general">
             <umb-box-header title-key="general_general"></umb-box-header>
             <umb-box-content class="block-form">
-                
+
                 <umb-control-group data-element="node-info-create-date" label="@content_createDate">
                     {{node.createDateFormatted}} by {{ node.owner.name }}
                 </umb-control-group>
@@ -36,13 +36,13 @@
                 <umb-control-group data-element="node-info-update-date" label="@content_updateDate">
                     {{node.updateDateFormatted}}
                 </umb-control-group>
-            
+
                 <umb-control-group data-element="node-info-media-type" label="@content_mediatype">
                     <umb-node-preview
                         style="max-width: 100%; margin-bottom: 0px;"
-                        icon="mediaType.icon"
-                        name="mediaType.name"
-                        allow-open="allowOpenMediaType"
+                        icon="node.icon"
+                        name="node.contentTypeName"
+                        allow-open="allowOpen"
                         on-open="openMediaType(mediaType)">
                     </umb-node-preview>
                 </umb-control-group>
@@ -52,8 +52,8 @@
                     <small>{{ node.key }}</small>
                 </umb-control-group>
 
-            </umb-box-content>    
+            </umb-box-content>
         </umb-box>
     </div>
-    
+
 </div>

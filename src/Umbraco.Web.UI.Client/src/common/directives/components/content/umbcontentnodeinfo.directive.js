@@ -12,8 +12,10 @@
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
 
             function onInit() {
-
-                scope.allowOpen = true;
+                // If logged in user has access to the settings section
+                // show the open anchors - if the user doesn't have 
+                // access, documentType is null, see ContentModelMapper
+                scope.allowOpen = scope.node.documentType !== null;
 
                 scope.datePickerConfig = {
                     pickDate: true,
@@ -41,12 +43,16 @@
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
 
-                // Declare a fallback URL for the <umb-node-preview/> directive
-                scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
-
+                // Make sure to set the node status
                 setNodePublishStatus(scope.node);
+
                 //default setting for redirect url management
                 scope.urlTrackerDisabled = false;
+
+                // Declare a fallback URL for the <umb-node-preview/> directive
+                if (scope.documentType !== null) {
+                    scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
+                }
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
@@ -135,6 +141,7 @@
 
             function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {
+
                     switch (item.logType) {
                         case "Publish":
                             item.logTypeColor = "success";
@@ -150,7 +157,6 @@
             }
 
             function setNodePublishStatus(node) {
-
                 // deleted node
                 if (node.trashed === true) {
                     scope.publishStatus.label = localizationService.localize("general_deleted");
@@ -287,7 +293,7 @@
                 if (!newValue) { return; }
                 if (newValue === oldValue) { return; }
 
-                if (isInfoTab) {
+                if(isInfoTab) {
                     loadAuditTrail();
                     loadRedirectUrls();
                     formatDatesToLocal();
