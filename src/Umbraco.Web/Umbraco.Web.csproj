@@ -113,6 +113,7 @@
     <Compile Include="Editors\BackOfficeAssetsController.cs" />
     <Compile Include="Editors\BackOfficeModel.cs" />
     <Compile Include="Editors\BackOfficeServerVariables.cs" />
+    <Compile Include="Editors\LogsController.cs" />
     <Compile Include="Models\ContentEditing\ContentSavedState.cs" />
     <Compile Include="Trees\LogsTreeController.cs" />
     <Compile Include="WebApi\HttpActionContextExtensions.cs" />
