@@ -4,7 +4,7 @@
     function HelpDrawerController($scope, $routeParams, $timeout, dashboardResource, localizationService, userService, eventsService, helpService, appState, tourService, $filter) {
 
         var vm = this;
-        var evts = [];
+        var evts = [];        
 
         vm.title = localizationService.localize("general_help");
         vm.subtitle = "Umbraco version" + " " + Umbraco.Sys.ServerVariables.application.version;
@@ -18,9 +18,17 @@
         vm.startTour = startTour;
         vm.getTourGroupCompletedPercentage = getTourGroupCompletedPercentage;
         vm.showTourButton = showTourButton;
+        vm.showDocTypeTour = false;
+        vm.docTypeTour = null;
+        vm.startDoctypeTour = startDoctypeTour;
             
         function startTour(tour) {
             tourService.startTour(tour);
+            closeDrawer();
+        }
+
+        function startDoctypeTour() {
+            tourService.startTour(vm.docTypeTour);
             closeDrawer();
         }
 
@@ -49,13 +57,16 @@
 
                 vm.hasAccessToSettings = _.contains(user.allowedSections, 'settings');                
 
-                evts.push(eventsService.on("appState.treeState.changed", function (e, args) {
+                evts.push(eventsService.on("appState.treeState.changed", function (e, args) {                    
+                    setDocTypeTour();
                     handleSectionChange();
                 }));
 
                 findHelp(vm.section, vm.tree, vm.userType, vm.userLang);
 
             });
+
+            setDocTypeTour();
             
             // check if a tour is running - if it is open the matching group
             var currentTour = tourService.getCurrentTour();
@@ -64,6 +75,23 @@
                 openTourGroup(currentTour.alias);
             }
 
+        }
+
+        function setDocTypeTour() {
+            vm.showDocTypeTour = false;
+            vm.docTypeTour = null;
+            console.log(appState.getTreeState('selectedNode'));            
+            if (vm.section === 'content') {
+                var treeNode = appState.getTreeState('selectedNode');
+                if (treeNode) {
+                    tourService.getTourForDoctype(treeNode.metaData.contentType).then(function (data) {
+                        if (data && data !== 'null') {
+                            vm.docTypeTour = data;
+                            vm.showDocTypeTour = true;
+                        }
+                    });  
+                }                              
+            }                     
         }
 
         function closeDrawer() {
@@ -79,7 +107,7 @@
 
                     setSectionName();
                     findHelp(vm.section, vm.tree, vm.userType, vm.userLang);
-
+                    setDocTypeTour();
                 }
             });
         }

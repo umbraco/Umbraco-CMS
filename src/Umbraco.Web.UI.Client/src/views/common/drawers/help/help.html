@@ -7,11 +7,25 @@
 
     <umb-drawer-content>
 
+        <div class="umb-help-section" ng-if="vm.showDocTypeTour" data-element="doctype-tour">
+            <h5>Need help editing current item ?</h5>
+
+            <umb-button
+                alias="doctypTypeHelp"
+                type="button"
+                label="Start help"                
+                button-style="info"
+                icon="icon-help-alt"
+                action="vm.startDoctypeTour()"
+            >
+            </umb-button>
+        </div>
+
         <!-- Tours -->
         <div class="umb-help-section" ng-if="vm.tours" data-element="help-tours">
 
             <h5 class="umb-help-section__title">Tours</h5>
-            
+
             <div ng-repeat="tourGroup in vm.tours | orderBy:'groupOrder'">
 
                 <div class="umb-help-list">
@@ -37,7 +51,7 @@
                                     <span ng-class="{'strike': tour.completed}" class="umb-help-list-item__title">{{ tour.name }}</span>
                                 </div>
                                 <div>
-                                    <umb-button ng-if="!tour.completed && vm.showTourButton($index, tourGroup)" button-style="primary" size="xxs" type="button" label="Start" action="vm.startTour(tour)"></umb-button>       
+                                    <umb-button ng-if="!tour.completed && vm.showTourButton($index, tourGroup)" button-style="primary" size="xxs" type="button" label="Start" action="vm.startTour(tour)"></umb-button>
                                     <umb-button ng-if="tour.completed" size="xxs" type="button" label="Rerun" action="vm.startTour(tour)"></umb-button>
                                 </div>
                             </div>
