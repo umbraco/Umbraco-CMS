@@ -40,7 +40,7 @@ namespace Umbraco.Web.Editors
             var redirectUrlService = Services.RedirectUrlService;
             long resultCount;
 
-            var redirects = string.IsNullOrWhiteSpace(searchTerm) 
+            var redirects = string.IsNullOrWhiteSpace(searchTerm)
                 ? redirectUrlService.GetAllRedirectUrls(page, pageSize, out resultCount)
                 : redirectUrlService.SearchRedirectUrls(searchTerm, page, pageSize, out resultCount);
 
@@ -54,7 +54,7 @@ namespace Umbraco.Web.Editors
             searchResult.TotalCount = resultCount;
             searchResult.CurrentPage = page;
             searchResult.PageCount = ((int)resultCount + pageSize - 1) / pageSize;
-            
+
             return searchResult;
 
         }
@@ -68,17 +68,16 @@ namespace Umbraco.Web.Editors
         public RedirectUrlSearchResult RedirectUrlsForContentItem(string contentUdi)
         {
             var redirectsResult = new RedirectUrlSearchResult();
-            GuidUdi guidIdi;
-            var contentKey = GuidUdi.TryParse(contentUdi, out guidIdi) ? guidIdi.Guid : default(Guid);
-            //hmm what to do if this doesn't parse as a Guid?
-            var redirectUrlService = Services.RedirectUrlService;
-            var redirects = redirectUrlService.GetContentRedirectUrls(contentKey);
-            redirectsResult.SearchResults = Mapper.Map<IEnumerable<ContentRedirectUrl>>(redirects).ToArray();
-            //now map the Content/published - don't need to do this? - not displaying the target Url on the info tab, no need to retrieve in the same was as on the dashboard
-            //not doing paging 'yet'
-            redirectsResult.TotalCount = redirects.Count();
-            redirectsResult.CurrentPage = 1;
-            redirectsResult.PageCount = 1;
+            if (GuidUdi.TryParse(contentUdi, out var guidIdi))
+            {
+                var redirectUrlService = Services.RedirectUrlService;
+                var redirects = redirectUrlService.GetContentRedirectUrls(guidIdi.Guid);
+                redirectsResult.SearchResults = Mapper.Map<IEnumerable<ContentRedirectUrl>>(redirects).ToArray();
+                //not doing paging 'yet'
+                redirectsResult.TotalCount = redirects.Count();
+                redirectsResult.CurrentPage = 1;
+                redirectsResult.PageCount = 1;
+            }
             return redirectsResult;
         }
         [HttpPost]
