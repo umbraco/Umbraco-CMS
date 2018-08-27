@@ -266,7 +266,7 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
+                    }, { responseType: 'text' }),
                 'Failed to move content');
         },
 
@@ -286,14 +286,14 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
+                    }, { responseType: 'text' }),
                 'Failed to copy content');
         },
 
         createContainer: function (parentId, name) {
 
             return umbRequestHelper.resourcePromise(
-                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateContainer", { parentId: parentId, name: name })),
+                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateContainer", { parentId: parentId, name: encodeURIComponent(name) })),
                 'Failed to create a folder under parent id ' + parentId);
 
         },
@@ -333,6 +333,17 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                     notificationsService.error(value);
                 });
             });
+        },
+
+        import: function (file) {
+            if (!file) {
+                throw "file cannot be null";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "Import", { file: file })),
+                "Failed to import document type " + file
+            );
         }
     };
 }

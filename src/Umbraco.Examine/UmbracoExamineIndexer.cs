@@ -389,6 +389,8 @@ namespace Umbraco.Examine
             //the value of the field 'as-is'.
             foreach (var value in e.IndexItem.ValueSet.Values.ToList()) //ToList here to make a diff collection else we'll get collection modified errors
             {
+                if (value.Value == null) continue;
+
                 if (value.Value.Count > 0)
                 {
                     if (value.Value.First() is string str)

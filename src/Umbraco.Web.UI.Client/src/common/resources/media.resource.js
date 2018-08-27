@@ -112,7 +112,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                          {
                              parentId: args.parentId,
                              id: args.id
-                         }),
+                         }, {responseType: 'text'}),
                    'Failed to move media');
         },
 

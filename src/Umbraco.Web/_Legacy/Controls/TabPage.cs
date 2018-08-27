@@ -67,10 +67,6 @@ namespace Umbraco.Web._Legacy.Controls
             this.Controls.Add(_tempErr);
         }
 
-        public ScrollingMenu Menu
-        {
-            get { return parent.Menu; }
-        }
 
         public bool HasMenu
         {

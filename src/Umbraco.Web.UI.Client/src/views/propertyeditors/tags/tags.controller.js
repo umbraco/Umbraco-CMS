@@ -79,7 +79,7 @@ angular.module("umbraco")
                 addTag($scope.tagToAdd);
                 $scope.tagToAdd = "";
                 //this clears the value stored in typeahead so it doesn't try to add the text again
-                // http://issues.umbraco.org/issue/U4-4947
+                // https://issues.umbraco.org/issue/U4-4947
                 $typeahead.typeahead('val', '');
             };
 
@@ -183,7 +183,7 @@ angular.module("umbraco")
                         tagsHound.get(query, function (suggestions) {
                             cb(removeCurrentTagsFromSuggestions(suggestions));
                         });
-                    },
+                    }
                 }).bind("typeahead:selected", function (obj, datum, name) {
                     angularHelper.safeApply($scope, function () {
                         addTag(datum["value"]);

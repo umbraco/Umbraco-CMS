@@ -216,12 +216,6 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "createFolder.aspx?nodeId=" + nodeId + "&nodeType=" + nodeType + "&nodeName=" + nodeName + "&rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/create")));
-                case "UmbClientMgr.appActions().actionSort()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/sort.aspx?id=" + nodeId + "&nodeType=" + nodeType + "&app=" + currentSection + "&rnd=" + DateTime.UtcNow.Ticks,
-                            Current.Services.TextService.Localize("actions/sort")));
-
                 case "UmbClientMgr.appActions().actionProtect()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
@@ -257,27 +251,11 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "dialogs/republish.aspx?rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/republish")));
-                case "UmbClientMgr.appActions().actionAssignDomain()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/assignDomain2.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            Current.Services.TextService.Localize("actions/assignDomain")));
                 case "UmbClientMgr.appActions().actionSendToTranslate()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(
                             "dialogs/sendToTranslation.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             Current.Services.TextService.Localize("actions/sendToTranslate")));
-
-                case "UmbClientMgr.appActions().actionImport()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/importDocumentType.aspx",
-                            Current.Services.TextService.Localize("actions/importDocumentType")));
-                case "UmbClientMgr.appActions().actionAudit()":
-                    return Attempt.Succeed(
-                        new LegacyUrlAction(
-                            "dialogs/viewAuditTrail.aspx?nodeId=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
-                            Current.Services.TextService.Localize("actions/auditTrail")));
 
             }
             return Attempt<LegacyUrlAction>.Fail();

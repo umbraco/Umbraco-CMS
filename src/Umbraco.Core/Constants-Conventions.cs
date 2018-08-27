@@ -34,11 +34,6 @@ namespace Umbraco.Core
                 public const string ListViewPrefix = "List View - ";
             }
 
-            public static class PropertyGroups
-            {
-                public const string ListViewGroupName = "umbContainerView";
-            }
-
             /// <summary>
             /// Constants for Umbraco Content property aliases.
             /// </summary>

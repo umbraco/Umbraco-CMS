@@ -35,8 +35,8 @@
                 vm.showSensitiveData = user.userGroups.indexOf("sensitiveData") != -1;
             });
 
-            //make the default the same as the content type
-            if (!$scope.model.property.id) {
+            //make the default the same as the content type            
+            if (!$scope.model.property.dataTypeId) {
                 $scope.model.property.allowCultureVariant = $scope.model.contentTypeAllowCultureVariant;
             }
             

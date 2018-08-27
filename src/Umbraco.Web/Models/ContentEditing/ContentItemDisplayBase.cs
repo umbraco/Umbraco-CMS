@@ -5,9 +5,8 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
-    public abstract class ContentItemDisplayBase<T, TPersisted> : TabbedContentItem<T, TPersisted>, INotificationModel, IErrorModel
+    public abstract class ContentItemDisplayBase<T> : TabbedContentItem<T>, INotificationModel, IErrorModel
         where T : ContentPropertyBasic
-        where TPersisted : IContentBase
     {
         protected ContentItemDisplayBase()
         {

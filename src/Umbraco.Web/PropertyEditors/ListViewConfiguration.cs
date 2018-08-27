@@ -33,7 +33,7 @@ namespace Umbraco.Web.PropertyEditors
         public BulkActionPermissionSettings BulkActionPermissions { get; set; } = new BulkActionPermissionSettings(); // fixme managing defaults?
 
         [ConfigurationField("tabName", "Tab Name", "textstring", Description = "The name of the listview tab (default if empty: 'Child Items')")]
-        public int TabName { get; set; }
+        public string TabName { get; set; }
 
         public class Property
         {

@@ -497,7 +497,7 @@
             });
 
             //we need to use 'apply' to call intersection with an array of arrays,
-            //see: http://stackoverflow.com/a/16229480/694494
+            //see: https://stackoverflow.com/a/16229480/694494
             var intersectPermissions = _.intersection.apply(_, arr);
 
             return {
@@ -506,7 +506,7 @@
                 canDelete: _.contains(intersectPermissions, 'D'), //Magic Char = D
                 canMove: _.contains(intersectPermissions, 'M'), //Magic Char = M
                 canPublish: _.contains(intersectPermissions, 'U'), //Magic Char = U
-                canUnpublish: _.contains(intersectPermissions, 'U'), //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
+                canUnpublish: _.contains(intersectPermissions, 'U') //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
             };
         }
 

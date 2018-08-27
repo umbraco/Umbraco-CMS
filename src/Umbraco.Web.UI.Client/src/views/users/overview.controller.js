@@ -47,7 +47,8 @@
                           $location.search("subview", "users")
                         },
                         "view": !usersUri || usersUri === "users" ? "views/users/views/users/users.html" : null,
-                        "active": !usersUri || usersUri === "users"
+                        "active": !usersUri || usersUri === "users",
+                        "alias": "users"
                     },
                     {
                         "name": vm.page.labels.groups,
@@ -56,7 +57,8 @@
                           $location.search("subview", "groups")
                         },
                         "view": usersUri === "groups" ? "views/users/views/groups/groups.html" : null,
-                        "active": usersUri === "groups"
+                        "active": usersUri === "groups",
+                        "alias": "userGroups"
                     }
                 ];
             });

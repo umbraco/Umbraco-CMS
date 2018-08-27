@@ -180,7 +180,7 @@ app.config(function ($routeProvider) {
         .when('/:section/:tree/:method?/:id', {
             //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
             template: "<div ng-include='templateUrl'></div>",
-            //This controller will execute for this route, then we replace the template dynamnically based on the current tree.
+            //This controller will execute for this route, then we replace the template dynamically based on the current tree.
             controller: function ($scope, $route, $routeParams, treeService) {
 
                 if (!$routeParams.tree || !$routeParams.method) {

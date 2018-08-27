@@ -8,38 +8,14 @@
             
             <div class="umb-split-views">
                 <div class="umb-split-view" ng-class="{'umb-split-view--collapsed': editor.collapsed}" ng-repeat="editor in editors">
-                    
-                    <umb-load-indicator
-                        ng-if="editor.loading">
-                    </umb-load-indicator>
-
-                    <div class="umb-split-view__content" ng-if="!editor.loading">
-                        <umb-editor-header 
-                            menu="page.menu"
-                            hide-menu="page.hideActionsMenu"
-                            name="editor.content.name"
-                            hide-icon="true"
-                            hide-description="true" 
-                            hide-alias="true"
-                            navigation="editor.content.apps"
-                            variants="editor.content.variants"
-                            hide-change-variant="page.hideChangeVariant"
-                            on-back="backToListView()"
-                            show-back-button="page.listViewPath !== null"
-                            split-view-open="editors.length > 1"
-                            on-open-in-split-view="openInSplitView(variant)"
-                            on-close-split-view="closeSplitView($index, editor)">
-                        </umb-editor-header>
-
-                        <umb-editor-container>
-                            <umb-editor-sub-views 
-                                ng-if="!page.loading" 
-                                sub-views="editor.content.apps" 
-                                model="editor.content">
-                            </umb-editor-sub-views>    
-                        </umb-editor-container>
-                    </div>
-
+                    <umb-variant-content
+                        page="page"
+                        content="content"
+                        editor="editor"
+                        editors="editors"
+                        init-variant="initVariant(variant)"
+                        on-split-view-changed="splitViewChanged()">
+                    </umb-variant-content>
                 </div>
             </div>
 

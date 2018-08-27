@@ -6,7 +6,6 @@ using System.Net.Http.Formatting;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Services;
 using Umbraco.Web._Legacy.Actions;
 using Umbraco.Web.Models.ContentEditing;
@@ -74,13 +73,7 @@ namespace Umbraco.Web.Trees
 
                 // root actions
                 menu.Items.Add<ActionNew>(Services.TextService.Localize(string.Format("actions/{0}", ActionNew.Instance.Alias)));
-                menu.Items.Add<ActionImport>(Services.TextService.Localize(string.Format("actions/{0}", ActionImport.Instance.Alias)), true).ConvertLegacyMenuItem(new EntitySlim
-                {
-                    Id = int.Parse(id),
-                    Level = 1,
-                    ParentId = Constants.System.Root,
-                    Name = ""
-                }, "documenttypes", "settings");
+                menu.Items.Add<ActionImport>(Services.TextService.Localize(string.Format("actions/{0}", ActionImport.Instance.Alias)), true);
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize(string.Format("actions/{0}", ActionRefresh.Instance.Alias)), true);
                 return menu;
             }

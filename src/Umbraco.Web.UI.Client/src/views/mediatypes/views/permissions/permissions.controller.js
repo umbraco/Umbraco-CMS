@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    function PermissionsController($scope, mediaTypeResource, iconHelper, contentTypeHelper, localizationService) {
+    function PermissionsController($scope, mediaTypeResource, iconHelper, contentTypeHelper, localizationService, overlayService) {
 
         /* ----------- SCOPE VARIABLES ----------- */
 
@@ -43,20 +43,23 @@
         }
 
         function addChild($event) {
-            vm.childNodeSelectorOverlay = {
+            var childNodeSelectorOverlay = {
                 view: "itempicker",
                 title: childNodeSelectorOverlayTitle,
                 availableItems: vm.mediaTypes,
                 selectedItems: vm.selectedChildren,
+                position: "target",
                 event: $event,
-                show: true,
                 submit: function(model) {
                     vm.selectedChildren.push(model.selectedItem);
                     $scope.model.allowedContentTypes.push(model.selectedItem.id);
-                    vm.childNodeSelectorOverlay.show = false;
-                    vm.childNodeSelectorOverlay = null;
+                    overlayService.close();
+                },
+                close: function() {
+                    overlayService.close();
                 }
             };
+            overlayService.open(childNodeSelectorOverlay);
         }
 
         function removeChild(selectedChild, index) {

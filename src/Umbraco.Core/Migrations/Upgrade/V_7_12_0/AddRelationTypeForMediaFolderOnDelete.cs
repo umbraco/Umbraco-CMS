@@ -1,5 +1,4 @@
-﻿using System;
-using Umbraco.Core.Persistence.Dtos;
+﻿using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_7_12_0
 {
@@ -12,18 +11,22 @@ namespace Umbraco.Core.Migrations.Upgrade.V_7_12_0
 
         public override void Migrate()
         {
-            var exists = Context.Database.FirstOrDefault<RelationTypeDto>("WHERE alias=@alias", new { alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias });
-            if (exists == null)
+            var relationTypeCount = Context.Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoRelationType WHERE alias=@alias",
+                new { alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias });
+
+            if (relationTypeCount > 0)
+                return;
+
+            var uniqueId = (Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias + "____" + Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName).ToGuid();
+            Insert.IntoTable("umbracoRelationType").Row(new
             {
-                Insert.IntoTable(Constants.DatabaseSchema.Tables.RelationType).Row(new
-                {
-                    alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias,
-                    name = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName,
-                    childObjectType = Constants.ObjectTypes.MediaType,
-                    parentObjectType = Constants.ObjectTypes.MediaType,
-                    dual = false
+                typeUniqueId = uniqueId,
+                alias = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias,
+                name = Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteName,
+                childObjectType = Constants.ObjectTypes.MediaType,
+                parentObjectType = Constants.ObjectTypes.MediaType,
+                dual = false
                 }).Do();
-            }
         }
 
     }

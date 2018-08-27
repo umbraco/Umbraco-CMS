@@ -229,10 +229,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.sortableOptions = {
             axis: 'y',
             cursor: "move",
-            handle: ".nested-content__icon--move",
+            handle: ".umb-nested-content__icon--move",
             start: function (ev, ui) {
                 // Yea, yea, we shouldn't modify the dom, sue me
-                $("#nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
+                $("#umb-nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
                     tinymce.execCommand('mceRemoveEditor', false, $(this).attr('id'));
                     $(this).css("visibility", "hidden");
                 });
@@ -244,7 +244,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 $scope.setDirty();
             },
             stop: function (ev, ui) {
-                $("#nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
+                $("#umb-nested-content--" + $scope.model.id + " .umb-rte textarea").each(function () {
                     tinymce.execCommand('mceAddEditor', true, $(this).attr('id'));
                     $(this).css("visibility", "visible");
                 });

@@ -14,10 +14,7 @@ namespace Umbraco.Core.Events
             _msgs.Add(msg);
         }
 
-        public int Count
-        {
-            get { return _msgs.Count; }
-        }
+        public int Count => _msgs.Count;
 
         public IEnumerable<EventMessage> GetAll()
         {

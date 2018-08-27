@@ -137,14 +137,7 @@ namespace Umbraco.Core.Models
         void CopyFrom(IContent other, string culture = "*");
 
         // fixme validate published cultures?
-
-        /// <summary>
-        /// Checks if the content and property values are valid in order to be persisted.
-        /// </summary>
-        /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
-        /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
-        bool IsValid(string culture = "*");
-
+        
         /// <summary>
         /// Validates the content item's properties.
         /// </summary>
