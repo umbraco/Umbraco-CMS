@@ -10,9 +10,17 @@
 
     function overlayService(eventsService, backdropService) {
 
-        function open(overlay) {
+        var currentOverlay = null;
+
+        function open(newOverlay) {
+
+            // prevent two open overlays at the same time
+            if(currentOverlay) {
+                return;
+            }
 
             var backdropOptions = {};
+            var overlay = newOverlay;
 
             // set the default overlay position to center
             if(!overlay.position) {
@@ -26,11 +34,13 @@
 
             overlay.show = true;
             backdropService.open(backdropOptions);
+            currentOverlay = overlay;
             eventsService.emit("appState.overlay", overlay);
         }
 
         function close() {
             backdropService.close();
+            currentOverlay = null;
             eventsService.emit("appState.overlay", null);
         }
 
