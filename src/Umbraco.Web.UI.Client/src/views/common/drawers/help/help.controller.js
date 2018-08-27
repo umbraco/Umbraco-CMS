@@ -21,6 +21,7 @@
         vm.showDocTypeTour = false;
         vm.docTypeTour = null;
         vm.startDoctypeTour = startDoctypeTour;
+        vm.nodeName = '';
             
         function startTour(tour) {
             tourService.startTour(tour);
@@ -79,13 +80,15 @@
         function setDocTypeTour() {
             vm.showDocTypeTour = false;
             vm.docTypeTour = null;
-            console.log(appState.getTreeState('selectedNode'));            
-            if (vm.section === 'content') {
+            vm.nodeName = '';
+
+            if (vm.section === 'content' && vm.tree === 'content') {
                 var treeNode = appState.getTreeState('selectedNode');
                 if (treeNode) {
                     tourService.getTourForDoctype(treeNode.metaData.contentType).then(function (data) {
                         if (data && data !== 'null') {
                             vm.docTypeTour = data;
+                            vm.nodeName = treeNode.name;
                             vm.showDocTypeTour = true;
                         }
                     });  
