@@ -35,9 +35,11 @@ namespace Umbraco.Core.Composing.LightInject
         {
             var container = new ServiceContainer(new ContainerOptions { EnablePropertyInjection = false });
 
-                        // supports annotated constructor injections
+            // note: the block below is disabled, as it is too LightInject-specific
+            //
+            // supports annotated constructor injections
             // eg to specify the service name on some services
-            container.EnableAnnotatedConstructorInjection();
+            //container.EnableAnnotatedConstructorInjection();
 
             // note: the block below is disabled, we do not allow property injection at all anymore
             //       (see options in CreateServiceContainer)
@@ -56,7 +58,7 @@ namespace Umbraco.Core.Composing.LightInject
             //Container.EnableAnnotatedPropertyInjection();
 
             // ensure that we do *not* scan assemblies
-            // we explicitely RegisterFrom our own composition roots and don't want them scanned
+            // we explicitly RegisterFrom our own composition roots and don't want them scanned
             container.AssemblyScanner = new AssemblyScanner(/*container.AssemblyScanner*/);
 
             // see notes in MixedLightInjectScopeManagerProvider
