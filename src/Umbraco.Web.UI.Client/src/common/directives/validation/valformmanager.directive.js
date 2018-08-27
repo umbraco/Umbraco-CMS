@@ -148,6 +148,7 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                             "view": "default",
                             "title": labels.unsavedChangesTitle,
                             "content": labels.unsavedChangesContent,
+                            "disableBackdropClick": true,
                             "submitButtonLabel": labels.stayButton,
                             "closeButtonLabel": labels.discardChangesButton,
                             submit: function() {

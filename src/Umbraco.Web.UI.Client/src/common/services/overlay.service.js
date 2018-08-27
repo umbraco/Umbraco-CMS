@@ -11,11 +11,21 @@
     function overlayService(eventsService, backdropService) {
 
         function open(overlay) {
+
+            var backdropOptions = {};
+
+            // set the default overlay position to center
             if(!overlay.position) {
                 overlay.position = "center";
             }
+
+            // option to disable backdrop clicks
+            if(overlay.disableBackdropClick) {
+                backdropOptions.disableEventsOnClick = true;
+            }
+
             overlay.show = true;
-            backdropService.open();
+            backdropService.open(backdropOptions);
             eventsService.emit("appState.overlay", overlay);
         }
 
