@@ -319,7 +319,7 @@ namespace Umbraco.Core.Components
                         foreach (var initializer in initializers)
                         {
                             var parameters = initializer.GetParameters()
-                                .Select(x => GetParameter(componentType, x.ParameterType))
+                                .Select(x => GetParameter(componentType, x.ParameterType, x.Name))
                                 .ToArray();
                             initializer.Invoke(component, parameters);
                         }
@@ -328,21 +328,16 @@ namespace Umbraco.Core.Components
             }
         }
 
-        private object GetParameter(Type componentType, Type parameterType)
+        private object GetParameter(Type componentType, Type parameterType, string parameterName)
         {
-            object param;
-
             try
             {
-                param = _container.TryGetInstance(parameterType);
+                return _container.GetInstance(parameterType);
             }
             catch (Exception e)
             {
-                throw new BootFailedException($"Could not get parameter of type {parameterType.FullName} for component {componentType.FullName}.", e);
+                throw new BootFailedException($"Could not get parameter '{parameterName}' of type {parameterType.FullName} for component {componentType.FullName}.", e);
             }
-
-            if (param == null) throw new BootFailedException($"Could not get parameter of type {parameterType.FullName} for component {componentType.FullName}.");
-            return param;
         }
 
         public void Terminate()
