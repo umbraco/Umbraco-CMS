@@ -61,6 +61,13 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         TabsAndPropertiesResolver<IContent>.AddListView(display, "content", applicationContext.Services.DataTypeService, applicationContext.Services.TextService);
                     }
+                    //if there aren't any allowed templates for this content item, default 'AllowPreview' to be false
+                    //this can still be overriden by a developer (SendingContentModel event) if they have route hijacked
+                    //and do have a valid preview to show.
+                    if (display.AllowedTemplates == null || !display.AllowedTemplates.Any())
+                    {
+                        display.AllowPreview = false;
+                    }
                 });
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
