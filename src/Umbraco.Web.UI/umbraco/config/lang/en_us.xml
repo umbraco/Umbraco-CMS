@@ -1679,8 +1679,8 @@ To manage your website, simply open the Umbraco back office and start adding con
 
         <key alias="tabHasNoSortOrder">tab has no sort order</key>
 
-		<key alias="compositionUsageHeading">Where is this composition used?</key>
-		<key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
+        <key alias="compositionUsageHeading">Where is this composition used?</key>
+        <key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
     </area>
 
     <area alias="modelsBuilder">
@@ -2177,6 +2177,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="originalUrl">Original URL</key>
         <key alias="redirectedTo">Redirected To</key>
         <key alias="redirectUrlManagement">Redirect Url Management</key>
+        <key alias="panelInformation">The following URLs redirect to this content item:</key>
         <key alias="noRedirects">No redirects have been made</key>
         <key alias="noRedirectsDescription">When a published page gets renamed or moved a redirect will automatically be made to the new page.</key>
         <key alias="removeButton">Remove</key>

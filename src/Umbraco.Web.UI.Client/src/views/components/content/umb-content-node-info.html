@@ -25,13 +25,16 @@
                 <div style="position: relative;">
                     <div ng-if="loadingRedirectUrls" style="background: rgba(255, 255, 255, 0.8); position: absolute; top: 0; left: 0; right: 0; bottom: 0;"></div>
                     <umb-load-indicator ng-if="loadingRedirectUrls"></umb-load-indicator>
-                    <ul class="nav nav-stacked" style="margin-bottom: 0;" ng-show="hasRedirects">
-                        <li ng-repeat="redirectUrl in redirectUrls">
-                            <a href="{{redirectUrl.originalUrl}}"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a>
-                        </li>
-                    </ul>
                     <div ng-show="!hasRedirects && !loadingRedirectUrls && !urlTrackerDisabled"><localize key="redirectUrls_noRedirects"></localize></div>
                     <div ng-show="urlTrackerDisabled">Redirect Url Management is disabled</div>
+                    <div ng-show="hasRedirects">
+                        <p><localize key="redirectUrls_panelInformation" class="ng-isolate-scope ng-scope">The following URLs redirect to this content item:</localize></p>
+                        <ul class="nav nav-stacked" style="margin-bottom: 0;">
+                            <li ng-repeat="redirectUrl in redirectUrls">
+                                <a href="{{redirectUrl.originalUrl}}" target="_blank"><i ng-class="value.icon" class="icon-out"></i> {{redirectUrl.originalUrl}}</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </umb-box-content>
         </umb-box>
