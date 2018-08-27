@@ -21,12 +21,12 @@
                 'Failed to get tours');
         }
 
-        function getTourForDoctype(doctypeAlias) {
+        function getToursForDoctype(doctypeAlias) {
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "tourApiBaseUrl",
-                        "GetTourForDoctype",
+                        "GetToursForDoctype",
                         [{ doctypeAlias: doctypeAlias }])),
                 'Failed to get tours');
         }
@@ -34,7 +34,7 @@
 
         var resource = {
             getTours: getTours,
-            getTourForDoctype : getTourForDoctype
+            getToursForDoctype: getToursForDoctype
     };
 
         return resource;

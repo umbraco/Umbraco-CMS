@@ -93,16 +93,16 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets a tour for a specific doctype
+        /// Gets a tours for a specific doctype
         /// </summary>
         /// <param name="doctypeAlias">The documenttype alias</param>
         /// <returns>A <see cref="BackOfficeTour"/></returns>
-        public BackOfficeTour GetTourForDoctype(string doctypeAlias)
+        public IEnumerable<BackOfficeTour> GetToursForDoctype(string doctypeAlias)
         {
             var tourFiles = this.GetTours();
 
            return tourFiles.SelectMany(x => x.Tours)
-                .FirstOrDefault(x =>
+                .Where(x =>
                 {
                     if (string.IsNullOrEmpty(x.ContentType))
                     {
