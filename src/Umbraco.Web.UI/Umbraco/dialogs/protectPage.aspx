@@ -1,4 +1,5 @@
 <%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="True" Inherits="umbraco.presentation.umbraco.dialogs.protectPage" %>
+<%@ Register TagPrefix="cc1" Namespace="Umbraco.Web._Legacy.Controls" Assembly="Umbraco.Web" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
     <script type="text/javascript">

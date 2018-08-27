@@ -424,6 +424,7 @@
       Navnet '%0%' eksisterer allerede.
    ]]>
     </key>
+      <key alias="overviewTitle">Ordbog</key>
   </area>
   <area alias="placeholders">
     <key alias="username">Indtast dit brugernavn</key>

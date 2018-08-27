@@ -48,11 +48,14 @@
                     //exit/ignore
                     return $q.reject(rejection);
                 }
-                var filtered = _.find(requestInterceptorFilter(), function (val) {
-                    return config.url.indexOf(val) > 0;
-                });
-                if (filtered) {
-                    return $q.reject(rejection);
+
+                if (config.url) {
+                    var filtered = _.find(requestInterceptorFilter(), function (val) {
+                        return config.url.indexOf(val) > 0;
+                    });
+                    if (filtered) {
+                        return $q.reject(rejection);
+                    }
                 }
 
                 //A 401 means that the user is not logged in

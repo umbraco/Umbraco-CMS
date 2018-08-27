@@ -45,7 +45,9 @@ namespace Umbraco.Tests.Models
                 .Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns<int>(x => dataType);
 
-            var serviceContext = new ServiceContext(dataTypeService: dataTypeService);
+            var serviceContext = new ServiceContext(
+                dataTypeService: dataTypeService,
+                localizedTextService: Mock.Of<ILocalizedTextService>());
 
             Mock.Get(container)
                 .Setup(x => x.GetInstance(It.IsAny<Type>()))
@@ -53,8 +55,10 @@ namespace Umbraco.Tests.Models
                 {
                     if (x == typeof(PropertyEditorCollection)) return propertyEditors;
                     if (x == typeof(ServiceContext)) return serviceContext;
+                    if (x == typeof(ILocalizedTextService)) return serviceContext.LocalizationService;
                     throw new Exception("oops");
                 });
+            
         }
 
         [Test]

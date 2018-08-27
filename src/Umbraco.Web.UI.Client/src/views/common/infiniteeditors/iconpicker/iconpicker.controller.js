@@ -13,6 +13,28 @@ function IconPickerController($scope, iconHelper, localizationService) {
     vm.selectIcon = selectIcon;
     vm.close = close;
 
+    vm.colors = [
+        { name: "Black", value: "color-black" },
+        { name: "Blue Grey", value: "color-blue-grey" },
+        { name: "Grey", value: "color-grey" },
+        { name: "Brown", value: "color-brown" },
+        { name: "Blue", value: "color-blue" },
+        { name: "Light Blue", value: "color-light-blue" },
+        { name: "Indigo", value: "color-indigo" },
+        { name: "Purple", value: "color-purple" },
+        { name: "Deep Purple", value: "color-deep-purple" },
+        { name: "Cyan", value: "color-cyan" },
+        { name: "Green", value: "color-green" },
+        { name: "Light Green", value: "color-light-green" },
+        { name: "Lime", value: "color-lime" },
+        { name: "Yellow", value: "color-yellow" },
+        { name: "Amber", value: "color-amber" },
+        { name: "Orange", value: "color-orange" },
+        { name: "Deep Orange", value: "color-deep-orange" },
+        { name: "Red", value: "color-red" },
+        { name: "Pink", value: "color-pink" }
+    ];
+
     function onInit() {
 
         vm.loading = true;
@@ -23,6 +45,12 @@ function IconPickerController($scope, iconHelper, localizationService) {
             vm.icons = icons;
             vm.loading = false;
         });
+
+        // set a default color if nothing is passed in
+        vm.color = $scope.model.color ? $scope.model.color :  vm.colors[0].value;
+
+        // if an icon is passed in - preselect it
+        vm.icon = $scope.model.icon ? $scope.model.icon : undefined;
 
     }
 

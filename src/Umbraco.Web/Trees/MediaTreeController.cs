@@ -96,7 +96,7 @@ namespace Umbraco.Web.Trees
 
                 // root actions
                 menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
-                menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(null, "media", "media");
+                menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias), true);
                 menu.Items.Add<RefreshNode, ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
@@ -125,7 +125,7 @@ namespace Umbraco.Web.Trees
             menu.Items.Add<ActionNew>(Services.TextService.Localize("actions", ActionNew.Instance.Alias));
             menu.Items.Add<ActionMove>(Services.TextService.Localize("actions", ActionMove.Instance.Alias));
             menu.Items.Add<ActionDelete>(Services.TextService.Localize("actions", ActionDelete.Instance.Alias));
-            menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias)).ConvertLegacyMenuItem(item, "media", "media");
+            menu.Items.Add<ActionSort>(Services.TextService.Localize("actions", ActionSort.Instance.Alias));
             menu.Items.Add<ActionRefresh>(Services.TextService.Localize("actions", ActionRefresh.Instance.Alias), true);
 
             //if the media item is in the recycle bin, don't have a default menu, just show the regular menu

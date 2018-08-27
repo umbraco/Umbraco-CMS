@@ -6,7 +6,6 @@ namespace Umbraco.Web._Legacy.Controls
 {
     public class UmbracoPanel : Panel
     {
-        private ScrollingMenu _menu = new ScrollingMenu();
 
         private bool _hasMenu = false;
         private string _StatusBarText = "";
@@ -43,10 +42,6 @@ namespace Umbraco.Web._Legacy.Controls
             set { _StatusBarText = value; }
         }
 
-        public ScrollingMenu Menu
-        {
-            get { return _menu; }
-        }
 
         protected override void OnInit(EventArgs e)
         {
@@ -88,7 +83,6 @@ namespace Umbraco.Web._Legacy.Controls
 
             rightcol.TagName = "span";
             rightcol.Attributes.Add("class", "span4");
-            rightcol.Controls.Add(Menu);
             row.Controls.Add(rightcol);
 
             body.TagName = "div";

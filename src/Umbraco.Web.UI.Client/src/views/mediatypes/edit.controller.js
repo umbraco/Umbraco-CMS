@@ -76,17 +76,20 @@
             vm.page.navigation = [
                 {
                     "name": vm.labels.design,
+                    "alias": "design",
                     "icon": "icon-document-dashed-line",
                     "view": "views/mediatypes/views/design/design.html",
                     "active": true
                 },
                 {
                     "name": vm.labels.listview,
+                    "alias": "listView",
                     "icon": "icon-list",
                     "view": "views/mediatypes/views/listview/listview.html"
                 },
                 {
                     "name": vm.labels.permissions,
+                    "alias": "permissions",
                     "icon": "icon-keychain",
                     "view": "views/mediatypes/views/permissions/permissions.html"
                 }

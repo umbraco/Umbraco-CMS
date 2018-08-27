@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
@@ -22,6 +25,32 @@ namespace Umbraco.Tests.Services
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, PublishedRepositoryEvents = true)]
     public class MediaServiceTests : TestWithSomeContentBase
     {
+        /// <summary>
+        /// Used to list out all ambiguous events that will require dispatching with a name
+        /// </summary>
+        [Test, Explicit]
+        public void List_Ambiguous_Events()
+        {
+            var events = ServiceContext.MediaService.GetType().GetEvents(BindingFlags.Static | BindingFlags.Public);
+            var typedEventHandler = typeof(TypedEventHandler<,>);
+            foreach (var e in events)
+            {
+                //only continue if this is a TypedEventHandler
+                if (!e.EventHandlerType.IsGenericType) continue;
+                var typeDef = e.EventHandlerType.GetGenericTypeDefinition();
+                if (typedEventHandler != typeDef) continue;
+
+                //get the event arg type
+                var eventArgType = e.EventHandlerType.GenericTypeArguments[1];
+
+                var found = EventNameExtractor.FindEvent(typeof(MediaService), eventArgType, EventNameExtractor.MatchIngNames);
+                if (!found.Success && found.Result.Error == EventNameExtractorError.Ambiguous)
+                {
+                    Console.WriteLine($"Ambiguous event, source: {typeof(MediaService)}, args: {eventArgType}");
+                }
+            }
+        }
+
         [Test]
         public void Get_Paged_Children_With_Media_Type_Filter()
         {

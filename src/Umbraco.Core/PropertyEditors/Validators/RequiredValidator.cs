@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Core.Composing;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.PropertyEditors.Validators
 {
@@ -8,6 +10,17 @@ namespace Umbraco.Core.PropertyEditors.Validators
     /// </summary>
     internal sealed class RequiredValidator : IValueRequiredValidator, IManifestValueValidator
     {
+        private readonly ILocalizedTextService _textService;
+
+        public RequiredValidator() : this(Current.Services.TextService)
+        {
+        }
+
+        public RequiredValidator(ILocalizedTextService textService)
+        {
+            _textService = textService;
+        }
+
         /// <inheritdoc cref="IManifestValueValidator.ValidationName"/>
         public string ValidationName => "Required";
 
@@ -22,20 +35,20 @@ namespace Umbraco.Core.PropertyEditors.Validators
         {
             if (value == null)
             {
-                yield return new ValidationResult("Value cannot be null", new[] {"value"});
+                yield return new ValidationResult(_textService.Localize("validation", "invalidNull"), new[] {"value"});
                 yield break;
             }
 
             if (valueType.InvariantEquals(ValueTypes.Json))
             {
                 if (value.ToString().DetectIsEmptyJson())
-                    yield return new ValidationResult("Value cannot be empty", new[] { "value" });
+                    yield return new ValidationResult(_textService.Localize("validation", "invalidEmpty"), new[] { "value" });
                 yield break;
             }
 
             if (value.ToString().IsNullOrWhiteSpace())
             {
-                yield return new ValidationResult("Value cannot be empty", new[] { "value" });
+                yield return new ValidationResult(_textService.Localize("validation", "invalidEmpty"), new[] { "value" });
             }
         }
     }

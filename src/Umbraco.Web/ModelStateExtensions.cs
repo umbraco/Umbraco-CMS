@@ -57,24 +57,40 @@ namespace Umbraco.Web
         /// <param name="modelState"></param>
         /// <param name="result"></param>
         /// <param name="propertyAlias"></param>
-        internal static void AddPropertyError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState, ValidationResult result, string propertyAlias)
+        /// <param name="culture">The culture for the property, if the property is invariant than this is empty</param>
+        internal static void AddPropertyError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
+            ValidationResult result, string propertyAlias, string culture = "")
         {
-            modelState.AddValidationError(result, "_Properties", propertyAlias);
+            if (culture == null)
+                culture = "";
+            modelState.AddValidationError(result, "_Properties", propertyAlias, culture);
         }
 
-        internal static void AddValidationError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState, ValidationResult result, string prefix, string owner)
+        /// <summary>
+        /// Adds the error to model state correctly for a property so we can use it on the client side.
+        /// </summary>
+        /// <param name="modelState"></param>
+        /// <param name="result"></param>
+        /// <param name="parts">
+        /// Each model state validation error has a name and in most cases this name is made up of parts which are delimited by a '.'
+        /// </param>
+        internal static void AddValidationError(this System.Web.Http.ModelBinding.ModelStateDictionary modelState,
+            ValidationResult result, params string[] parts)
         {
             // if there are assigned member names, we combine the member name with the owner name
             // so that we can try to match it up to a real field. otherwise, we assume that the
             // validation message is for the overall owner.
+            // Owner = the component being validated, like a content property but could be just an html field on another editor
+
             var withNames = false;
+            var delimitedParts = string.Join(".", parts);
             foreach (var memberName in result.MemberNames)
             {
-                modelState.AddModelError($"{prefix}.{owner}.{memberName}", result.ErrorMessage);
+                modelState.AddModelError($"{delimitedParts}.{memberName}", result.ErrorMessage);
                 withNames = true;
             }
             if (!withNames)
-                modelState.AddModelError($"{prefix}.{owner}", result.ErrorMessage);
+                modelState.AddModelError($"{delimitedParts}", result.ErrorMessage);
         }
 
         public static IDictionary<string, object> ToErrorDictionary(this System.Web.Http.ModelBinding.ModelStateDictionary modelState)

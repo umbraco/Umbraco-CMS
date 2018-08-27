@@ -1,5 +1,6 @@
 ﻿using System;
 using AutoMapper;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
@@ -17,16 +18,16 @@ namespace Umbraco.Web.Models.Mapping
             : base(dataTypeService, logger, propertyEditors)
         { }
 
-        public override ContentPropertyDto Convert(Property originalProperty, ContentPropertyDto dest, ResolutionContext context)
+        public override ContentPropertyDto Convert(Property property, ContentPropertyDto dest, ResolutionContext context)
         {
-            var propertyDto = base.Convert(originalProperty, dest, context);
+            var propertyDto = base.Convert(property, dest, context);
 
-            propertyDto.IsRequired = originalProperty.PropertyType.Mandatory;
-            propertyDto.ValidationRegExp = originalProperty.PropertyType.ValidationRegExp;
-            propertyDto.Description = originalProperty.PropertyType.Description;
-            propertyDto.Label = originalProperty.PropertyType.Name;
-            propertyDto.DataType = DataTypeService.GetDataType(originalProperty.PropertyType.DataTypeId);
-
+            propertyDto.IsRequired = property.PropertyType.Mandatory;
+            propertyDto.ValidationRegExp = property.PropertyType.ValidationRegExp;
+            propertyDto.Description = property.PropertyType.Description;
+            propertyDto.Label = property.PropertyType.Name;
+            propertyDto.DataType = DataTypeService.GetDataType(property.PropertyType.DataTypeId);
+            
             return propertyDto;
         }
     }
