@@ -19,18 +19,13 @@
         vm.getTourGroupCompletedPercentage = getTourGroupCompletedPercentage;
         vm.showTourButton = showTourButton;
         vm.showDocTypeTour = false;
-        vm.docTypeTours = [];
-        vm.startDoctypeTour = startDoctypeTour;
+        vm.docTypeTours = [];        
         vm.nodeName = '';
             
         function startTour(tour) {
             tourService.startTour(tour);
             closeDrawer();
-        }
-
-        function startDoctypeTour() {
-            startTour(vm.docTypeTour);
-        }
+        }        
 
         function oninit() {
 
@@ -85,8 +80,8 @@
             if (vm.section === 'content' && vm.tree === 'content') {
                 var treeNode = appState.getTreeState('selectedNode');
                 if (treeNode) {
-                    tourService.getToursForDoctype(treeNode.metaData.contentType).then(function (data) {
-                        if (data && data !== 'null') {
+                    tourService.getToursForDoctype(treeNode.metaData.contentType).then(function (data) {                        
+                        if (data && data.length > 0) {
                             vm.docTypeTours = data;
                             vm.nodeName = treeNode.name;
                             vm.showDocTypeTour = true;

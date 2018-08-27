@@ -9,16 +9,23 @@
 
         <div class="umb-help-section" ng-if="vm.showDocTypeTour" data-element="doctype-tour">
             <h5>Need help editing current item '{{vm.nodeName}}' ?</h5>
+         
+                <div class="umb-help-list">
+                   
 
-            <umb-button
-                alias="doctypTypeHelp"
-                type="button"
-                label="Start help"                
-                button-style="info"
-                icon="icon-help-alt"
-                action="vm.startDoctypeTour()"
-            >
-            </umb-button>
+                    <div ng-repeat="tour in vm.docTypeTours | orderBy:'groupOrder'">
+                        <div data-element="tour-{{tour.alias}}" class="umb-help-list-item">
+                            <div class="umb-help-list-item__content justify-between">
+                                <div class="flex items-center">                                   
+                                    <span class="umb-help-list-item__title">{{ tour.name }}</span>
+                                </div>
+                                <div>
+                                    <umb-button  button-style="primary" size="xxs" type="button" label="Start" action="vm.startTour(tour)"></umb-button>                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>           
         </div>
 
         <!-- Tours -->
