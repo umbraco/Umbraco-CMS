@@ -2177,7 +2177,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="enableUrlTracker">Activer URL tracker</key>
     <key alias="originalUrl">URL original</key>
     <key alias="redirectedTo">Redirigé Vers</key>
-    <key alias="redirectUrlManagement">Redirect Url Management</key>
     <key alias="noRedirects">Aucune redirection n'a été créée</key>
     <key alias="noRedirectsDescription">Lorsqu'une page publiée est renommée ou déplacée, une redirection sera automatiquement créée vers la nouvelle page.</key>
     <key alias="removeButton">Supprimer</key>

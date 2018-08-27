@@ -1606,7 +1606,6 @@
     <key alias="enableUrlTracker">启用 url 跟踪程序</key>
     <key alias="originalUrl">原始网址</key>
     <key alias="redirectedTo">已重定向至</key>
-    <key alias="redirectUrlManagement">Redirect Url Management</key>
     <key alias="noRedirects">未进行重定向</key>
     <key alias="noRedirectsDescription">当已发布的页重命名或移动时, 将自动对新页进行重定向。</key>
     <key alias="removeButton">删除</key>

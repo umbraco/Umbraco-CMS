@@ -1337,7 +1337,6 @@
     <key alias="enableUrlTracker">啟動網址追蹤器</key>
     <key alias="originalUrl">原本網址</key>
     <key alias="redirectedTo">轉址成</key>
-    <key alias="redirectUrlManagement">Redirect Url Management</key>
     <key alias="noRedirects">沒有任何轉址</key>
     <key alias="noRedirectsDescription">當發佈後的頁面改名或移動時，會自動轉址至新網頁。</key>
     <key alias="removeButton">移除</key>

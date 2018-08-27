@@ -1401,7 +1401,6 @@
     <key alias="enableUrlTracker">Запустить отслеживание URL</key>
     <key alias="originalUrl">Первоначальный URL</key>
     <key alias="redirectedTo">Перенаправлен в</key>
-    <key alias="redirectUrlManagement">Redirect Url Management</key>
     <key alias="noRedirects">На данный момент нет ни одного перенаправления</key>
     <key alias="noRedirectsDescription">Если опубликованный документ переименовывается или меняет свое расположение в дереве, а следовательно, меняется адрес (URL), автоматически создается перенаправление на новое местоположение этого документа.</key>
     <key alias="removeButton">Удалить</key>

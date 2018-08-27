@@ -259,6 +259,7 @@
     <key alias="dropFilesHere">Slip filerne her...</key>
     <key alias="urls">Link til medie</key>
     <key alias="orClickHereToUpload">eller klik her for at vælge filer</key>
+    <key alias="dragFilesHereToUpload">Du kan trække filer herind for at uploade</key>
     <key alias="onlyAllowedFiles">Tilladte filtyper er kun</key>
     <key alias="disallowedFileType">Kan ikke uploade denne fil, den har ikke en godkendt filtype</key>
     <key alias="maxFileSize">Maks filstørrelse er</key>
@@ -1587,7 +1588,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="enableUrlTracker">Slå URL tracker til</key>
     <key alias="originalUrl">Original URL</key>
     <key alias="redirectedTo">Viderestillet til</key>
-    <key alias="redirectUrlManagement">Redirect Url Management</key>
     <key alias="noRedirects">Der er ikke lavet nogen viderestillinger</key>
     <key alias="noRedirectsDescription">Når en udgivet side bliver omdøbt eller flyttet, vil en viderestilling automatisk blive lavet til den nye side.</key>
     <key alias="removeButton">Fjern</key>
