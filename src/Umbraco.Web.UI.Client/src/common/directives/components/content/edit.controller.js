@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource, tourService) {
+  function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource) {
 
     var evts = [];
 
@@ -16,8 +16,7 @@
     $scope.page.menu.currentSection = appState.getSectionState("currentSection");
     $scope.page.listViewPath = null;
     $scope.page.isNew = $scope.isNew ? true : false;
-      $scope.page.buttonGroupState = "init";
-      $scope.page.tour = null;
+      $scope.page.buttonGroupState = "init";     
     $scope.allowOpen = true;
 
 
@@ -66,13 +65,7 @@
               "/content/content/edit/" + data.parentId;
           }
 
-          init($scope.content);
-
-            tourService.getTourForDoctype($scope.content.contentTypeAlias).then(function (data) {
-                if (data && data !== 'null') {
-                    $scope.page.tour = data;
-                }                  
-              });
+          init($scope.content);           
 
           //in one particular special case, after we've created a new item we redirect back to the edit
           // route but there might be server validation errors in the collection which we need to display
