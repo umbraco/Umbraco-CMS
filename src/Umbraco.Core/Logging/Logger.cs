@@ -50,6 +50,40 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
+        public void Fatal(Type reporting, Exception exception, string message)
+        {
+            Fatal(reporting, exception, message, null);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, Exception exception)
+        {
+            Fatal(reporting, exception, string.Empty);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, string message)
+        {
+            //Sometimes we need to throw an error without an ex
+            Fatal(reporting, null, message);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, string messageTemplate, params object[] propertyValues)
+        {
+            //Log a structured message WITHOUT an ex
+            Fatal(reporting, null, messageTemplate, propertyValues);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+        {
+            ErrorOrFatal(Fatal, exception, ref messageTemplate);
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Fatal(exception, messageTemplate, propertyValues);
+        }
+
+        /// <inheritdoc/>
         public void Error(Type reporting, Exception exception, string message)
         {
             Error(reporting, exception, message, null);
@@ -78,6 +112,13 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
+            ErrorOrFatal(Error, exception, ref messageTemplate);
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Error(exception, messageTemplate, propertyValues);
+        }
+
+        private static void ErrorOrFatal(Action<Type, Exception, string, object[]> logAction, Exception exception, ref string messageTemplate)
+        {
             var dump = false;
 
             if (IsTimeoutThreadAbortException(exception))
@@ -103,18 +144,15 @@ namespace Umbraco.Core.Logging
                 catch (Exception ex)
                 {
                     //Log a new entry (as opposed to appending to same log entry)
-                    Error(ex.GetType(), ex, "Failed to create a minidump at App_Data/MiniDump ({ExType}: {ExMessage}", ex.GetType().FullName, ex.Message);
+                    logAction(ex.GetType(), ex, "Failed to create a minidump at App_Data/MiniDump ({ExType}: {ExMessage}",
+                        new object[]{ ex.GetType().FullName, ex.Message });
                 }
             }
-
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Error(exception, messageTemplate, propertyValues);
         }
 
         private static bool IsMonitorEnterThreadAbortException(Exception exception)
         {
-            var abort = exception as ThreadAbortException;
-            if (abort == null) return false;
+            if (!(exception is ThreadAbortException abort)) return false;
 
             var stacktrace = abort.StackTrace;
             return stacktrace.Contains("System.Threading.Monitor.ReliableEnter");
@@ -122,8 +160,7 @@ namespace Umbraco.Core.Logging
 
         private static bool IsTimeoutThreadAbortException(Exception exception)
         {
-            var abort = exception as ThreadAbortException;
-            if (abort == null) return false;
+            if (!(exception is ThreadAbortException abort)) return false;
 
             if (abort.ExceptionState == null) return false;
 
@@ -139,22 +176,19 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Warn(Type reporting, string format)
         {
-            var logger = Log.Logger;
-            logger?.Warning(format);
+            Warn(reporting, null, format);
         }
         
         /// <inheritdoc/>
         public void Warn(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Warning(messageTemplate, propertyValues);
+            Warn(reporting, null, messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
         public void Warn(Type reporting, Exception exception, string message)
         {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Warning(message, exception);
+            Warn(reporting, exception, message, Array.Empty<object>());
         }
         
         /// <inheritdoc/>
@@ -167,8 +201,7 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Info(Type reporting, string message)
         {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Information(message);
+            Info(reporting, message, Array.Empty<object>());
         }
 
         /// <inheritdoc/>
@@ -181,8 +214,7 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Debug(Type reporting, string message)
         {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Debug(message);
+            Debug(reporting, message, Array.Empty<object>());
         }
         
         /// <inheritdoc/>
@@ -195,8 +227,7 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Verbose(Type reporting, string message)
         {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Verbose(message);
+            Verbose(reporting, message, Array.Empty<object>());
         }
 
         /// <inheritdoc/>
@@ -206,18 +237,6 @@ namespace Umbraco.Core.Logging
             logger?.ForContext(reporting).Verbose(messageTemplate, propertyValues);
         }
 
-        /// <inheritdoc/>
-        public void Fatal(Type reporting, Exception exception, string message)
-        {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Fatal(exception, message);
-        }
-
-        /// <inheritdoc/>
-        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
-        {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Fatal(exception, messageTemplate, propertyValues);
-        }
+        
     }
 }

@@ -8,6 +8,45 @@ namespace Umbraco.Core.Logging
     public interface ILogger
     {
         /// <summary>
+        /// Logs a fatal message.
+        /// </summary>
+        /// <param name="reporting">The reporting type.</param>
+        /// <param name="exception">An exception.</param>
+        /// <param name="message">A message.</param>
+        void Fatal(Type reporting, Exception exception, string message);
+
+        /// <summary>
+        /// Logs a fatal message NOTE: This will log an empty message string
+        /// </summary>
+        /// <param name="reporting">The reporting type.</param>
+        /// <param name="exception">An exception.</param>
+        void Fatal(Type reporting, Exception exception);
+
+        /// <summary>
+        /// Logs a fatal message WITHOUT EX
+        /// </summary>
+        /// <param name="reporting">The reporting type.</param>
+        /// <param name="message">A message.</param>
+        void Fatal(Type reporting, string message);
+
+        /// <summary>
+        /// Logs a fatal message - using a structured log message
+        /// </summary>
+        /// <param name="reporting">The reporting type.</param>
+        /// <param name="exception">An exception.</param>
+        /// <param name="messageTemplate">The message template that includes property values</param>
+        /// <param name="propertyValues">Property values to log & update in message template</param>
+        void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
+
+        /// <summary>
+        /// Logs a fatal message WITHOUT EX - using a structured log message
+        /// </summary>
+        /// <param name="reporting">The reporting type.</param>
+        /// <param name="messageTemplate">The message template that includes property values</param>
+        /// <param name="propertyValues">Property values to log & update in message template</param>
+        void Fatal(Type reporting, string messageTemplate, params object[] propertyValues);
+
+        /// <summary>
         /// Logs an error message.
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
@@ -122,22 +161,6 @@ namespace Umbraco.Core.Logging
         /// <param name="messageTemplate">The message template that includes property values</param>
         /// <param name="propertyValues">Property values to log & update in message template</param>
         void Verbose(Type reporting, string messageTemplate, params object[] propertyValues);
-
-        /// <summary>
-        /// Logs a fatal message.
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name="exception">An exception.</param>
-        /// <param name="message">A message.</param>
-        void Fatal(Type reporting, Exception exception, string message);
-
-        /// <summary>
-        /// Logs a fatal message - using a structured log message
-        /// </summary>
-        /// <param name="reporting">The reporting type.</param>
-        /// <param name = "exception" > An exception.</param>
-        /// <param name="messageTemplate">The message template that includes property values</param>
-        /// <param name="propertyValues">Property values to log & update in message template</param>
-        void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues);
+        
     }
 }
