@@ -226,7 +226,7 @@ namespace Umbraco.Web.Editors
             // create item doctype
             var itemDocType = new ContentType(parentId);
             itemDocType.Name = collectionItemName;
-            itemDocType.Alias = collectionItemName.ToSafeAlias();
+            itemDocType.Alias = collectionItemName.ToSafeAlias(true);
             itemDocType.Icon = collectionItemIcon;
             
             // create item doctype template
@@ -255,7 +255,7 @@ namespace Umbraco.Web.Editors
             // create collection doctype
             var collectionDocType = new ContentType(parentId);
             collectionDocType.Name = collectionName;
-            collectionDocType.Alias = collectionName.ToSafeAlias();
+            collectionDocType.Alias = collectionName.ToSafeAlias(true);
             collectionDocType.Icon = collectionIcon;
             collectionDocType.IsContainer = true;
             collectionDocType.AllowedContentTypes = new List<ContentTypeSort>()
