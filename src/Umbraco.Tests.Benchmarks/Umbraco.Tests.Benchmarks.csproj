@@ -61,7 +61,7 @@
     <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.10.13" />
     <PackageReference Include="BenchmarkDotNet.Toolchains.Roslyn" Version="0.10.13" />
     <PackageReference Include="Castle.Core" Version="4.2.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.9.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="2.8.0" />
     <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="2.0.11" />
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
