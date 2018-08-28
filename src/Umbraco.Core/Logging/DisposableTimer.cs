@@ -17,7 +17,7 @@ namespace Umbraco.Core.Logging
         private string _failMessage;
         private Exception _failException;
         private bool _failed;
-        private Guid _timingId;
+        private readonly string _timingId;
 
         internal enum LogType
         {
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Logging
             _endMessage = endMessage;
             _failMessage = failMessage;
             _thresholdMilliseconds = thresholdMilliseconds < 0 ? 0 : thresholdMilliseconds;
-            _timingId = Guid.NewGuid();
+            _timingId = Guid.NewGuid().ToString("N");
 
             if (thresholdMilliseconds == 0)
             {
