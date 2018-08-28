@@ -176,22 +176,19 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Warn(Type reporting, string format)
         {
-            var logger = Log.Logger;
-            logger?.Warning(format);
+            Warn(reporting, null, format);
         }
         
         /// <inheritdoc/>
         public void Warn(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Warning(messageTemplate, propertyValues);
+            Warn(reporting, null, messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
         public void Warn(Type reporting, Exception exception, string message)
         {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Warning(message, exception);
+            Warn(reporting, exception, message, Array.Empty<object>());
         }
         
         /// <inheritdoc/>
@@ -204,8 +201,7 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Info(Type reporting, string message)
         {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Information(message);
+            Info(reporting, message, Array.Empty<object>());
         }
 
         /// <inheritdoc/>
@@ -218,8 +214,7 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Debug(Type reporting, string message)
         {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Debug(message);
+            Debug(reporting, message, Array.Empty<object>());
         }
         
         /// <inheritdoc/>
@@ -232,8 +227,7 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Verbose(Type reporting, string message)
         {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Verbose(message);
+            Verbose(reporting, message, Array.Empty<object>());
         }
 
         /// <inheritdoc/>
