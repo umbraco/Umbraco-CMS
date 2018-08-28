@@ -64,7 +64,7 @@ function serverValidationManager($timeout) {
             }
         }
     }
-
+    
     return {
         
         /**
@@ -116,7 +116,7 @@ function serverValidationManager($timeout) {
          * @name subscribe
          * @methodOf umbraco.services.serverValidationManager
          * @function
-         *
+         * @returns {} a method to unsubscribe this callback
          * @description
          *  Adds a callback method that is executed whenever validation changes for the field name + property specified.
          *  This is generally used for server side validation in order to match up a server side validation error with 
@@ -129,31 +129,49 @@ function serverValidationManager($timeout) {
             if (!callback) {
                 return;
             }
-            
+
+            var id = String.CreateGuid();
+
             if (propertyAlias === null) {
-                //don't add it if it already exists
-                var exists1 = _.find(callbacks, function (item) {
-                    return item.propertyAlias === null && item.fieldName === fieldName;
+                callbacks.push({
+                    propertyAlias: null,
+                    culture: null,
+                    fieldName: fieldName,
+                    callback: callback,
+                    id: id
                 });
-                if (!exists1) {
-                    callbacks.push({ propertyAlias: null, culture: null, fieldName: fieldName, callback: callback });
-                }
             }
             else if (propertyAlias !== undefined) {
                 //normalize culture to null
                 if (!culture) {
                     culture = null;
                 }
-                //don't add it if it already exists
-                var exists2 = _.find(callbacks, function (item) {
-                    return item.propertyAlias === propertyAlias && item.culture === culture && item.fieldName === fieldName;
+                callbacks.push({
+                    propertyAlias: propertyAlias,
+                    culture: culture, fieldName: fieldName,
+                    callback: callback,
+                    id: id
                 });
-                if (!exists2) {
-                    callbacks.push({ propertyAlias: propertyAlias, culture: culture, fieldName: fieldName, callback: callback });
-                }
             }
+
+            function unsubscribeId() {
+                //remove all callbacks for the content field
+                callbacks = _.reject(callbacks, function (item) {
+                    return item.id === id;
+                });
+            }
+
+            //return a function to unsubscribe this subscription by uniqueId
+            return unsubscribeId;
         },
-        
+
+        /**
+         * Removes all callbacks registered for the propertyALias, culture and fieldName combination
+         * @param {} propertyAlias 
+         * @param {} culture 
+         * @param {} fieldName 
+         * @returns {} 
+         */
         unsubscribe: function (propertyAlias, culture, fieldName) {
             
             if (propertyAlias === null) {

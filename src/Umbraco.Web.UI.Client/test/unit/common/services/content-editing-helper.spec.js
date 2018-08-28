@@ -193,13 +193,13 @@ describe('contentEditingHelper tests', function () {
             expect(result).toBe(true);
         });
         
-        it('does not redirect when creating content with an invalid name', function () {
+        it('does not redirect when creating content with an invalid id', function () {
             
             //arrange
             $routeParams.create = true;
 
             //act
-            var result = contentEditingHelper.redirectToCreatedContent(1234, {Name: ["Required"]});
+            var result = contentEditingHelper.redirectToCreatedContent(0, {Name: ["Required"]});
 
             //assert
             expect(result).toBe(false);
@@ -214,6 +214,7 @@ describe('contentEditingHelper tests', function () {
 
             //arrange
             var origContent = mocksUtils.getMockContent(1234);
+            origContent.save = true;
             origContent.tabs[0].properties[0].value = { complex1: "origValue1a", complex2: "origValue1b" };
             origContent.tabs[1].properties[0].value = "origValue2";
             origContent.tabs[1].properties[1].value = "origValue3";

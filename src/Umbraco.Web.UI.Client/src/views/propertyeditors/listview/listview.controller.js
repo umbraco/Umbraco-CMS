@@ -1,4 +1,4 @@
-function listViewController($rootScope, $scope, $routeParams, $injector, notificationsService, iconHelper, dialogService, editorState, localizationService, $location, appState, $timeout, $q, mediaResource, listViewHelper, userService, navigationService, treeService) {
+function listViewController($scope, $routeParams, $injector, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $timeout, mediaResource, listViewHelper, navigationService, editorService) {
 
    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
    // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -124,7 +124,7 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
             });
 
             if (missingLookup.length > 0) {
-               contentResource.getPermissions(missingLookup).then(function (p) {
+                currentUserResource.getPermissions(missingLookup).then(function (p) {
                   $scope.buttonPermissions = listViewHelper.getButtonPermissions(p, idsWithPermissions);
                });
             }
@@ -429,27 +429,20 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
     };
 
     $scope.move = function() {
-        $scope.moveDialog = {};
-        $scope.moveDialog.section = $scope.entityType;
-        $scope.moveDialog.currentNode = $scope.contentId;
-        $scope.moveDialog.view = "move";
-        $scope.moveDialog.show = true;
-
-        $scope.moveDialog.submit = function(model) {
-
-            if (model.target) {
-                performMove(model.target);
+        var move = {
+            section: $scope.entityType,
+            currentNode: $scope.contentId,
+            submit: function(model) {
+                if (model.target) {
+                    performMove(model.target);
+                }
+                editorService.close();
+            },
+            close: function() {
+                editorService.close();
             }
-
-            $scope.moveDialog.show = false;
-            $scope.moveDialog = null;
-        };
-
-        $scope.moveDialog.close = function(oldModel) {
-            $scope.moveDialog.show = false;
-            $scope.moveDialog = null;
-        };
-
+        }
+        editorService.move(move);
     };
 
 
@@ -498,28 +491,22 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
            });
    }
 
-   $scope.copy = function () {
-      $scope.copyDialog = {};
-      $scope.copyDialog.section = $scope.entityType;
-      $scope.copyDialog.currentNode = $scope.contentId;
-      $scope.copyDialog.view = "copy";
-      $scope.copyDialog.show = true;
-
-      $scope.copyDialog.submit = function (model) {
-         if (model.target) {
-            performCopy(model.target, model.relateToOriginal);
-         }
-
-         $scope.copyDialog.show = false;
-         $scope.copyDialog = null;
-      };
-
-      $scope.copyDialog.close = function (oldModel) {
-         $scope.copyDialog.show = false;
-         $scope.copyDialog = null;
-      };
-
-   };
+    $scope.copy = function () {
+        var copyEditor = {
+            section: $scope.entityType,
+            currentNode: $scope.contentId,
+            submit: function(model) {
+                if (model.target) {
+                    performCopy(model.target, model.relateToOriginal);
+                }
+                editorService.close();
+            },
+            close: function() {
+                editorService.close();
+            }
+        };
+        editorService.copy(copyEditor);
+    };
 
    function performCopy(target, relateToOriginal) {
       applySelected(

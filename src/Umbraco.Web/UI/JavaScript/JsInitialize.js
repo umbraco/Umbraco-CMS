@@ -1,14 +1,14 @@
 ﻿[
     'lib/jquery/jquery.min.js',
+    'lib/jquery-ui/jquery-ui.min.js',
+    'lib/jquery-ui-touch-punch/jquery.ui.touch-punch.js',
+
     'lib/angular/angular.js',
     'lib/underscore/underscore-min.js',
 
     'lib/moment/moment.min.js',
 
     'lib/animejs/anime.min.js',
-
-    'lib/jquery-ui/jquery-ui.min.js',
-    'lib/jquery-ui-touch-punch/jquery.ui.touch-punch.js',
 
     'lib/angular-route/angular-route.js',
     'lib/angular-cookies/angular-cookies.js',

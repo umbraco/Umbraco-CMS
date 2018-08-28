@@ -190,9 +190,6 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
                     serverValidationManager.addFieldError(e, modelState[e][0]);
                 }
 
-                //add to notifications
-                notificationsService.error("Validation", modelState[e][0]);
-
             }
         }
     };

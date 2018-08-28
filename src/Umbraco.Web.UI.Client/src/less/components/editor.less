@@ -64,11 +64,9 @@
 
 .umb-editor-header {
 	background: @white;
-	// flex: 1 1 60px;
 	position: absolute;
 	padding: 0 20px;
-	z-index: 1;
-	// box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.16);
+	z-index: @zIndexEditor;
 	border-bottom: 1px solid @gray-9;
 	width: 100%;
 	box-sizing: border-box;
@@ -265,4 +263,15 @@ a.umb-variant-switcher__toggle {
 .umb-editor-footer-content__left-side {
 	margin-right: auto;
 	padding-right: 10px;
+}
+
+/* Confirm */
+.umb-editor-confirm {
+	background-color: @white;
+	padding: 20px;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	z-index: 10;
+	box-shadow: 0 -3px 12px 0px rgba(0,0,0,0.16);
 }

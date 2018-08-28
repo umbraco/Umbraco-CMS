@@ -53,6 +53,7 @@
                     $timeout(function () {
                         editor.collapsed = false;
                         editor.loading = false;
+                        scope.onSplitViewChanged();
                     }, 100);
                 };
 
@@ -97,6 +98,7 @@
                             return e === scope.editor;
                         });
                         scope.editors.splice(index, 1);
+                        scope.onSplitViewChanged();
                     }, 400);
                 };
 
@@ -110,13 +112,16 @@
 
             },
             scope: {
+                //TODO: This should be turned into a proper component
+
                 page: "=",
                 content: "=",
                 editor: "=",
                 editors: "=",
                 //TODO: I don't like having this callback defined and would like to make this directive a bit less
                 // coupled but right now don't have time
-                initVariant: "&"
+                initVariant: "&",
+                onSplitViewChanged: "&"
             }
         };
 

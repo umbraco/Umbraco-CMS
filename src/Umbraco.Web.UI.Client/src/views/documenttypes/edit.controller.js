@@ -290,8 +290,7 @@
         /* ---------- SAVE ---------- */
 
         function save() {
-            //return the saveInternal method but catch rejections since this is the upper most caller
-            return saveInternal().catch(angular.noop); 
+            saveInternal();
         }
 
         /** This internal save method performs the actual saving and returns a promise, not to be bound to any buttons but used by other bound methods */

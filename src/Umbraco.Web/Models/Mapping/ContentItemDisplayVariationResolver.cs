@@ -10,16 +10,13 @@ using Language = Umbraco.Web.Models.ContentEditing.Language;
 
 namespace Umbraco.Web.Models.Mapping
 {
-
     internal class ContentVariantResolver : IValueResolver<IContent, ContentItemDisplay, IEnumerable<ContentVariantDisplay>>
     {
         private readonly ILocalizationService _localizationService;
-        private readonly ILocalizedTextService _textService;
 
-        public ContentVariantResolver(ILocalizationService localizationService, ILocalizedTextService textService)
+        public ContentVariantResolver(ILocalizationService localizationService)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
-            _textService = textService ?? throw new ArgumentNullException(nameof(textService));
         }
 
         public IEnumerable<ContentVariantDisplay> Resolve(IContent source, ContentItemDisplay destination, IEnumerable<ContentVariantDisplay> destMember, ResolutionContext context)
@@ -53,24 +50,6 @@ namespace Umbraco.Web.Models.Mapping
 
                     variant.Language = x;
                     variant.Name = source.GetCultureName(x.IsoCode);
-                    variant.Exists = source.IsCultureAvailable(x.IsoCode); // segments ??
-
-                    var publishedState = source.PublishedState == PublishedState.Unpublished //if the entire document is unpublished, then flag every variant as unpublished
-                        ? PublishedState.Unpublished
-                        : source.IsCulturePublished(x.IsoCode)
-                            ? PublishedState.Published
-                            : PublishedState.Unpublished;
-                    var isEdited = source.Id > 0 && source.IsCultureEdited(x.IsoCode);
-
-                    //now we can calculate the content state
-                    if (!isEdited && publishedState == PublishedState.Unpublished)
-                        variant.State = ContentSavedState.NotCreated;
-                    else if (isEdited && publishedState == PublishedState.Unpublished)
-                        variant.State = ContentSavedState.Draft;
-                    else if (!isEdited && publishedState == PublishedState.Published)
-                        variant.State = ContentSavedState.Published;
-                    else
-                        variant.State = ContentSavedState.PublishedPendingChanges;
                 }
 
                 return variants;

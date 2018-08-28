@@ -43,7 +43,7 @@
     "clipboard": "~2.0.0",
     "font-awesome": "~4.2",
     "animejs": "^2.2.0",
-    "angular-ui-sortable": "0.14.3",
+    "angular-ui-sortable": "0.14.4",
     "angular-messages": "^1.7.2",
     "angular-chart.js": "^1.1.1"
   },

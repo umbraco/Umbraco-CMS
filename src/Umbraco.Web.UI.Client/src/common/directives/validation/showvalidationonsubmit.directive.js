@@ -27,6 +27,7 @@
                     element.hide();
                 }));
 
+                //no isolate scope to listen to element destroy
                 element.bind('$destroy', function () {
                     for (var u in unsubscribe) {
                         unsubscribe[u]();

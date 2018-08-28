@@ -1,7 +1,7 @@
 (function() {
     "use strict";
 
-    function GridRichTextEditorController($scope, tinyMceService, macroService, editorState) {
+    function GridRichTextEditorController($scope, tinyMceService, macroService, editorState, editorService) {
 
         var vm = this;
 
@@ -11,63 +11,64 @@
         vm.openEmbed = openEmbed;
 
         function openLinkPicker(editor, currentTarget, anchorElement) {
-						
-            vm.linkPickerOverlay = {
-                view: "linkpicker",
+            var linkPicker = {
                 currentTarget: currentTarget,
 				anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
-                show: true,
                 submit: function(model) {
                     tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
-                    vm.linkPickerOverlay.show = false;
-                    vm.linkPickerOverlay = null;
+                    editorService.close();
+                },
+                close: function() {
+                    editorService.close();
                 }
             };
+            editorService.linkPicker(linkPicker);
         }
 
         function openMediaPicker(editor, currentTarget, userData) {
-            vm.mediaPickerOverlay = {
+            var mediaPicker = {
                 currentTarget: currentTarget,
                 onlyImages: true,
                 showDetails: true,
                 startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
-                view: "mediapicker",
-                show: true,
                 submit: function(model) {
                     tinyMceService.insertMediaInEditor(editor, model.selectedImages[0]);
-                    vm.mediaPickerOverlay.show = false;
-                    vm.mediaPickerOverlay = null;
+                    editorService.close();
+                },
+                close: function() {
+                    editorService.close();
                 }
             };
+            editorService.mediaPicker(mediaPicker);
         }
 
         function openEmbed(editor) {
-            vm.embedOverlay = {
-                view: "embed",
-                show: true,
+            var embed = {
                 submit: function(model) {
                     tinyMceService.insertEmbeddedMediaInEditor(editor, model.embed.preview);
-                    vm.embedOverlay.show = false;
-                    vm.embedOverlay = null;
+                    editorService.close();
+                },
+                close: function() {
+                    editorService.close();
                 }
             };
+            editorService.embed(embed);
         }
 
         function openMacroPicker(editor, dialogData) {
-            vm.macroPickerOverlay = {
-                view: "macropicker",
+            var macroPicker = {
                 dialogData: dialogData,
-                show: true,
                 submit: function(model) {
                     var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
                     tinyMceService.insertMacroInEditor(editor, macroObject, $scope);
-                    vm.macroPickerOverlay.show = false;
-                    vm.macroPickerOverlay = null;
+                    editorService.close();
+                },
+                close: function() {
+                    editorService.close();
                 }
             };
+            editorService.macroPicker(macroPicker);
         }
-
-
 
     }
 

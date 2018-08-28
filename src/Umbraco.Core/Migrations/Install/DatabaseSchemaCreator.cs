@@ -141,13 +141,7 @@ namespace Umbraco.Core.Migrations.Install
 
             //get the db index defs
             result.DbIndexDefinitions = SqlSyntax.GetDefinedIndexes(_database)
-                .Select(x => new DbIndexDefinition
-                {
-                    TableName = x.Item1,
-                    IndexName = x.Item2,
-                    ColumnName = x.Item3,
-                    IsUnique = x.Item4
-                }).ToArray();
+                .Select(x => new DbIndexDefinition(x)).ToArray();
 
             result.TableDefinitions.AddRange(OrderedTables
                 .Select(x => DefinitionFactory.GetTableDefinition(x, SqlSyntax)));
@@ -160,6 +154,14 @@ namespace Umbraco.Core.Migrations.Install
             return result;
         }
 
+        /// <summary>
+        /// This validates the Primary/Foreign keys in the database
+        /// </summary>
+        /// <param name="result"></param>
+        /// <remarks>
+        /// This does not validate any database constraints that are not PKs or FKs because Umbraco does not create a database with non PK/FK contraints.
+        /// Any unique "constraints" in the database are done with unique indexes.
+        /// </remarks>
         private void ValidateDbConstraints(DatabaseSchemaResult result)
         {
             //MySql doesn't conform to the "normal" naming of constraints, so there is currently no point in doing these checks.
@@ -172,8 +174,7 @@ namespace Umbraco.Core.Migrations.Install
             var constraintsInDatabase = SqlSyntax.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
             var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("FK_")).Select(x => x.Item3).ToList();
             var primaryKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("PK_")).Select(x => x.Item3).ToList();
-            var indexesInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("IX_")).Select(x => x.Item3).ToList();
-            var indexesInSchema = result.TableDefinitions.SelectMany(x => x.Indexes.Select(y => y.Name)).ToList();
+
             var unknownConstraintsInDatabase =
                 constraintsInDatabase.Where(
                     x =>
@@ -188,7 +189,7 @@ namespace Umbraco.Core.Migrations.Install
             // In theory you could have: FK_ or fk_ ...or really any standard that your development department (or developer) chooses to use.
             foreach (var unknown in unknownConstraintsInDatabase)
             {
-                if (foreignKeysInSchema.InvariantContains(unknown) || primaryKeysInSchema.InvariantContains(unknown) || indexesInSchema.InvariantContains(unknown))
+                if (foreignKeysInSchema.InvariantContains(unknown) || primaryKeysInSchema.InvariantContains(unknown))
                 {
                     result.ValidConstraints.Add(unknown);
                 }
@@ -230,23 +231,6 @@ namespace Umbraco.Core.Migrations.Install
                 result.Errors.Add(new Tuple<string, string>("Constraint", primaryKey));
             }
 
-            //Constaints:
-
-            //NOTE: SD: The colIndex checks above should really take care of this but I need to keep this here because it was here before
-            // and some schema validation checks might rely on this data remaining here!
-            //Add valid and invalid index differences to the result object
-            var validIndexDifferences = indexesInDatabase.Intersect(indexesInSchema, StringComparer.InvariantCultureIgnoreCase);
-            foreach (var index in validIndexDifferences)
-            {
-                result.ValidConstraints.Add(index);
-            }
-            var invalidIndexDifferences =
-                indexesInDatabase.Except(indexesInSchema, StringComparer.InvariantCultureIgnoreCase)
-                                .Union(indexesInSchema.Except(indexesInDatabase, StringComparer.InvariantCultureIgnoreCase));
-            foreach (var index in invalidIndexDifferences)
-            {
-                result.Errors.Add(new Tuple<string, string>("Constraint", index));
-            }
         }
 
         private void ValidateDbColumns(DatabaseSchemaResult result)

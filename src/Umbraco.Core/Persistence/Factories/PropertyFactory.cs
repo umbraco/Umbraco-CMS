@@ -27,7 +27,11 @@ namespace Umbraco.Core.Persistence.Factories
                     if (xdtos.TryGetValue(propertyType.Id, out var propDtos))
                     {
                         foreach (var propDto in propDtos)
+                        {
+                            property.Id = propDto.Id;
                             property.FactorySetValue(languageRepository.GetIsoCodeById(propDto.LanguageId), propDto.Segment, propDto.VersionId == publishedVersionId, propDto.Value);
+                        }
+                            
                     }
 
                     property.ResetDirtyProperties(false);

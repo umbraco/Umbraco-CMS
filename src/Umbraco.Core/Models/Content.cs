@@ -213,17 +213,23 @@ namespace Umbraco.Core.Models
         [IgnoreDataMember]
         public IEnumerable<string> PublishedCultures => _publishInfos?.Keys ?? Enumerable.Empty<string>();
 
+        //fixme should this return false if ID == 0?
+        //fixme should this return false if IsCultureAvailable(culture) is false?
         /// <inheritdoc />
         public bool IsCulturePublished(string culture)
-            =>  _publishInfos != null && _publishInfos.ContainsKey(culture); //fixme should this return false if ID == 0?
+            =>  _publishInfos != null && _publishInfos.ContainsKey(culture); 
 
+        //fixme should this return false if ID == 0?
+        //fixme should this return false if IsCultureAvailable(culture) is false?
         /// <inheritdoc />
         public bool WasCulturePublished(string culture)
-            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture); //fixme should this return false if ID == 0? 
+            => _publishInfosOrig != null && _publishInfosOrig.ContainsKey(culture); 
 
+        //fixme should this return false if ID == 0?
+        //fixme should this return false if IsCultureAvailable(culture) is false?
         /// <inheritdoc />
         public bool IsCultureEdited(string culture)
-            => !IsCulturePublished(culture) || (_editedCultures != null && _editedCultures.Contains(culture)); //fixme should this return false if ID == 0?
+            => !IsCulturePublished(culture) || (_editedCultures != null && _editedCultures.Contains(culture)); 
 
         /// <inheritdoc/>
         [IgnoreDataMember]

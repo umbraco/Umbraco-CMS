@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $scope, $q, $locale, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, editorState) {
+    function ($scope, $q, $locale, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource, macroService, editorState, editorService) {
 
         $scope.isLoading = true;
 
@@ -14,9 +14,14 @@ angular.module("umbraco")
         var alreadyDirty = false;
         function syncContent(editor){
             editor.save();
+
+            //stop watching before we update the value
+            stopWatch();
             angularHelper.safeApply($scope, function () {
                 $scope.model.value = editor.getContent();
             });
+            //re-watch the value
+            startWatch(editor);
 
             if (!alreadyDirty) {
                 //make the form dirty manually so that the track changes works, setting our model doesn't trigger
@@ -24,6 +29,33 @@ angular.module("umbraco")
                 var currForm = angularHelper.getCurrentForm($scope);
                 currForm.$setDirty();
                 alreadyDirty = true;
+            }
+        }
+
+        var unwatch = null;
+
+        /**
+         * Starts a watch on the model value so that we can update TinyMCE if the model changes behind the scenes or from the server
+         * @param {any} editor
+         */
+        function startWatch(editor) {
+            unwatch = $scope.$watch("model.value", function (newVal, oldVal) {
+                if (newVal !== oldVal) {
+                    //update the display val again if it has changed from the server;
+                    //uses an empty string in the editor when the value is null
+                    editor.setContent(newVal || "", { format: 'raw' });
+
+                    //we need to manually fire this event since it is only ever fired based on loading from the DOM, this
+                    // is required for our plugins listening to this event to execute
+                    editor.fire('LoadContent', null);
+                }
+            });
+        }
+
+        /** Stops the watch on model.value which is done anytime we are manually updating the model.value */
+        function stopWatch() {
+            if (unwatch) {
+                unwatch();
             }
         }
 
@@ -275,72 +307,72 @@ angular.module("umbraco")
                     });
 					
                     tinyMceService.createLinkPicker(editor, $scope, function(currentTarget, anchorElement) {
-                        $scope.linkPickerOverlay = {
-                            view: "linkpicker",
+                        var linkPicker = {
                             currentTarget: currentTarget,
-							anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
-                            show: true,
+                            anchors: tinyMceService.getAnchorNames(JSON.stringify(editorState.current.properties)),
                             submit: function(model) {
                                 tinyMceService.insertLinkInEditor(editor, model.target, anchorElement);
-                                $scope.linkPickerOverlay.show = false;
-                                $scope.linkPickerOverlay = null;
+                                editorService.close();
+                            },
+                            close: function() {
+                                editorService.close();
                             }
                         };
+                        editorService.linkPicker(linkPicker);
                     });
 
                     //Create the insert media plugin
                     tinyMceService.createMediaPicker(editor, $scope, function(currentTarget, userData){
-
-                        $scope.mediaPickerOverlay = {
+                        var mediaPicker = {
                             currentTarget: currentTarget,
                             onlyImages: true,
                             showDetails: true,
                             disableFolderSelect: true,
                             startNodeId: userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0],
                             startNodeIsVirtual: userData.startMediaIds.length !== 1,
-                            view: "mediapicker",
-                            show: true,
                             submit: function(model) {
                                 tinyMceService.insertMediaInEditor(editor, model.selectedImages[0]);
-                                $scope.mediaPickerOverlay.show = false;
-                                $scope.mediaPickerOverlay = null;
+                                editorService.close();
+                            },
+                            close: function() {
+                                editorService.close();
                             }
                         };
-
+                        editorService.mediaPicker(mediaPicker);
                     });
                     
                     //Create the embedded plugin
                     tinyMceService.createInsertEmbeddedMedia(editor, $scope, function() {
-
-                      $scope.embedOverlay = {
-                          view: "embed",
-                          show: true,
-                          submit: function(model) {
-                              tinyMceService.insertEmbeddedMediaInEditor(editor, model.embed.preview);
-                              $scope.embedOverlay.show = false;
-                              $scope.embedOverlay = null;
-                          }
-                      };
-
+                        var embed = {
+                            submit: function(model) {
+                                tinyMceService.insertEmbeddedMediaInEditor(editor, model.embed.preview);
+                                editorService.close();
+                            },
+                            close: function() {
+                                editorService.close();
+                            }
+                        };
+                        editorService.embed(embed);
                     });
 
 
                     //Create the insert macro plugin
                     tinyMceService.createInsertMacro(editor, $scope, function(dialogData) {
-
-                        $scope.macroPickerOverlay = {
-                            view: "macropicker",
+                        var macroPicker = {
                             dialogData: dialogData,
-                            show: true,
                             submit: function(model) {
                                 var macroObject = macroService.collectValueData(model.selectedMacro, model.macroParams, dialogData.renderingEngine);
                                 tinyMceService.insertMacroInEditor(editor, macroObject, $scope);
-                                $scope.macroPickerOverlay.show = false;
-                                $scope.macroPickerOverlay = null;
+                                editorService.close();
+                            },
+                            close: function() {
+                                editorService.close();
                             }
                         };
-
+                        editorService.macroPicker(macroPicker);
                     });
+
+                    startWatch(editor);
                 };
                 
                 /** Loads in the editor */
@@ -354,25 +386,11 @@ angular.module("umbraco")
 
                         $scope.isLoading = false;
 
-                    }, 200, false);
+                    }, 200);
                 }
 
-
-
-
                 loadTinyMce();
-
-                //here we declare a special method which will be called whenever the value has changed from the server
-                //this is instead of doing a watch on the model.value = faster
-                $scope.model.onValueChanged = function (newVal, oldVal) {
-                    //update the display val again if it has changed from the server;
-                    //uses an empty string in the editor when the value is null
-                    tinyMceEditor.setContent(newVal || "", { format: 'raw' });
-                    //we need to manually fire this event since it is only ever fired based on loading from the DOM, this
-                    // is required for our plugins listening to this event to execute
-                    tinyMceEditor.fire('LoadContent', null);
-                };
-
+                
                 //listen for formSubmitting event (the result is callback used to remove the event subscription)
                 var unsubscribe = $scope.$on("formSubmitting", function () {
                     //TODO: Here we should parse out the macro rendered content so we can save on a lot of bytes in data xfer
@@ -389,6 +407,7 @@ angular.module("umbraco")
 						tinyMceEditor.destroy()
 					}
                 });
+                
             });
         });
 
