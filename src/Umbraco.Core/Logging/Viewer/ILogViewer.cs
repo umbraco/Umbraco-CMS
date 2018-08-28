@@ -11,28 +11,28 @@ namespace Umbraco.Core.Logging.Viewer
         /// <summary>
         /// Get all logs from your chosen datasource back as Serilog LogEvents
         /// </summary>
-        IEnumerable<LogEvent> GetAllLogs(DateTime startDate, DateTime endDate);
+        IEnumerable<LogEvent> GetAllLogs(DateTimeOffset startDate, DateTimeOffset endDate);
 
         /// <summary>
         /// A count of number of errors
         /// By counting Warnings with Exceptions, Errors & Fatal messages
         /// </summary>
-        int GetNumberOfErrors(DateTime startDate, DateTime endDate);
+        int GetNumberOfErrors(DateTimeOffset startDate, DateTimeOffset endDate);
 
         /// <summary>
         /// Returns a number of the different log level entries
         /// </summary>
-        LogLevelCounts GetLogLevelCounts(DateTime startDate, DateTime endDate);
+        LogLevelCounts GetLogLevelCounts(DateTimeOffset startDate, DateTimeOffset endDate);
 
         /// <summary>
         /// Returns the top 10 common log message templates and their counts
         /// </summary>
-        IEnumerable<CommonLogMessage> GetCommonLogMessages(DateTime startDate, DateTime endDate, int numberOfResults = 10);
+        IEnumerable<CommonLogMessage> GetCommonLogMessages(DateTimeOffset startDate, DateTimeOffset endDate, int numberOfResults = 10);
 
         /// <summary>
         /// Returns the collection of logs
         /// </summary>
-        PagedResult<LogMessage> GetLogs(DateTime startDate, DateTime endDate,
+        PagedResult<LogMessage> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate,
             int pageNumber = 1, int pageSize = 100, Direction orderDirection = Direction.Descending);
 
     }

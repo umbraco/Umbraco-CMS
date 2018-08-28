@@ -12,36 +12,55 @@ namespace Umbraco.Core.Logging.Viewer
     public class JsonLogViewer : ILogViewer
     {
         
-        public IEnumerable<LogEvent> GetAllLogs(DateTime startDate, DateTime endDate)
+        public IEnumerable<LogEvent> GetAllLogs(DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var logs = new List<LogEvent>();
-            var filePath = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog.DELLBOOK.20180828.json";
 
-            //Open log file
-            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            //Open the JSON log file for the range of dates (and exclude machinename) Could be several for LB
+            var dateRange = endDate - startDate;
+
+            //Log Directory
+            var logDirectory = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\";
+
+            //foreach full day in the range - see if we can find one or more filenames that end with
+            //yyyyMMdd.json - Ends with due to MachineName in filenames - could be 1 or more due to load balancing
+            for (var day = startDate.Date; day.Date <= endDate.Date; day = day.AddDays(1))
             {
-                using (var stream = new StreamReader(fs))
-                {
+                //Filename ending to search for (As could be multiple)
+                var filesToFind = $"*{day.ToString("yyyyMMdd")}.json";
 
-                    var reader = new LogEventReader(stream);
-                    LogEvent evt;
-                    while (reader.TryRead(out evt))
+                var filesForCurrentDay = Directory.GetFiles(logDirectory, filesToFind);
+
+                //Foreach file we find - open it
+                foreach(var filePath in filesForCurrentDay)
+                {
+                    //Open log file & add contents to the log collection
+                    //Which we then use LINQ to page over
+                    using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     {
-                        logs.Add(evt);
+                        using (var stream = new StreamReader(fs))
+                        {
+                            var reader = new LogEventReader(stream);
+                            LogEvent evt;
+                            while (reader.TryRead(out evt))
+                            {
+                                logs.Add(evt);
+                            }
+                        }
                     }
                 }
             }
-
+            
             return logs;
         }
 
-        public int GetNumberOfErrors(DateTime startDate, DateTime endDate)
+        public int GetNumberOfErrors(DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var logs = GetAllLogs(startDate, endDate);
             return logs.Count(x => x.Level == LogEventLevel.Fatal && x.Level == LogEventLevel.Error && x.Exception != null);
         }
 
-        public LogLevelCounts GetLogLevelCounts(DateTime startDate, DateTime endDate)
+        public LogLevelCounts GetLogLevelCounts(DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var logs = GetAllLogs(startDate, endDate);
             return new LogLevelCounts
@@ -54,7 +73,7 @@ namespace Umbraco.Core.Logging.Viewer
             };
         }
 
-        public IEnumerable<CommonLogMessage> GetCommonLogMessages(DateTime startDate, DateTime endDate, int numberOfResults)
+        public IEnumerable<CommonLogMessage> GetCommonLogMessages(DateTimeOffset startDate, DateTimeOffset endDate, int numberOfResults)
         {
             var logs = GetAllLogs(startDate, endDate);
             var templates = logs.GroupBy(x => x.MessageTemplate.Text)
@@ -65,7 +84,7 @@ namespace Umbraco.Core.Logging.Viewer
             return templates;
         }
 
-        public PagedResult<LogMessage> GetLogs(DateTime startDate, DateTime endDate, int pageNumber = 1, int pageSize = 100, Direction orderDirection = Direction.Descending)
+        public PagedResult<LogMessage> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, int pageNumber = 1, int pageSize = 100, Direction orderDirection = Direction.Descending)
         {            
             //Get all logs into memory (Not sure this good or not)
             var logs = GetAllLogs(startDate, endDate);
