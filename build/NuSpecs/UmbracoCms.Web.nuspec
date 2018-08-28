@@ -52,13 +52,11 @@
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.xml" target="lib\Umbraco.Examine.xml" />
 
         <!-- TOOD: Do we need this? -->
-        <file src="tools\install.core.ps1" target="tools\install.ps1" />
+        <!--<file src="tools\install.core.ps1" target="tools\install.ps1" />-->
 
         <!-- symbols -->
         <file src="$BuildTmp$\bin\Umbraco.Web.pdb" target="lib" />
         <file src="$BuildTmp$\..\src\Umbraco.Web\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Web" />
-        <file src="$BuildTmp$\bin\Umbraco.Web.UI.pdb" target="lib" />
-        <file src="$BuildTmp$\..\src\Umbraco.Web.UI\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Web.UI" />
         <file src="$BuildTmp$\bin\Umbraco.Examine.pdb" target="lib" />
         <file src="$BuildTmp$\..\src\Umbraco.Examine\**\*.cs" exclude="$BuildTmp$\..\src\**\TemporaryGeneratedFile*.cs" target="src\Umbraco.Examine" />
     </files>
