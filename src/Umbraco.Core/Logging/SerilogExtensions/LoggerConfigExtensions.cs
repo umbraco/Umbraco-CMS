@@ -45,6 +45,7 @@ namespace Umbraco.Core.Logging.SerilogExtensions
             //Main .txt logfile - in similar format to older Log4Net output
             //Ends with ..txt as Date is inserted before file extension substring
             logConfig.WriteTo.File($@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog.{Environment.MachineName}..txt",
+                    shared: true,
                     rollingInterval: RollingInterval.Day,
                     restrictedToMinimumLevel: minimumLevel,
                     retainedFileCountLimit: null, //Setting to null means we keep all files - default is 31 days
@@ -64,6 +65,7 @@ namespace Umbraco.Core.Logging.SerilogExtensions
             //.clef format (Compact log event format, that can be imported into local SEQ & will make searching/filtering logs easier)
             //Ends with ..txt as Date is inserted before file extension substring
             logConfig.WriteTo.File(new CompactJsonFormatter(), $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog.{Environment.MachineName}..json",
+                shared: true,
                 rollingInterval: RollingInterval.Day, //Create a new JSON file every day
                 retainedFileCountLimit: retainedFileCount, //Setting to null means we keep all files - default is 31 days
                 restrictedToMinimumLevel: minimumLevel);
