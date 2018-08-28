@@ -25,12 +25,14 @@
     "angular-i18n": "~1.7.2",
     "signalr": "^2.2.1",
     "typeahead.js": "~0.10.5",
-    "underscore": "~1.7.0",
+    "underscore": "~1.9.1",
     "rgrove-lazyload": "*",
     "bootstrap-social": "~4.8.0",
     "jquery": "2.2.4",
     "jquery-ui": "~1.12.0",
     "jquery-migrate": "1.4.0",
+    "jquery-validate": "~1.17.0",
+    "jquery-validation-unobtrusive": "3.2.10",
     "angular-dynamic-locale": "~0.1.36",
     "ng-file-upload": "~12.2.13",
     "tinymce": "~4.7.1",
@@ -41,7 +43,7 @@
     "clipboard": "~2.0.0",
     "font-awesome": "~4.2",
     "animejs": "^2.2.0",
-    "angular-ui-sortable": "0.14.3",
+    "angular-ui-sortable": "0.14.4",
     "angular-messages": "^1.7.2"
   },
   "install": {
@@ -53,39 +55,41 @@
       "ace-builds"
     ],
     "sources": {
-      "moment": [
-        "bower_components/moment/min/moment.min.js",
-        "bower_components/moment/min/moment-with-locales.js",
-        "bower_components/moment/min/moment-with-locales.min.js",
-        "bower_components/moment/locale/*.js"
-      ],
-      "underscore": [
-        "bower_components/underscore/underscore-min.js",
-        "bower_components/underscore/underscore-min.map"
-      ],
-      "jquery": [
-        "bower_components/jquery/dist/jquery.min.js",
-        "bower_components/jquery/dist/jquery.min.map"
-      ],
-      "angular-dynamic-locale": [
-        "bower_components/angular-dynamic-locale/tmhDynamicLocale.min.js",
-        "bower_components/angular-dynamic-locale/tmhDynamicLocale.min.js.map"
-      ],
-      "angular-local-storage": [
-        "bower_components/angular-local-storage/dist/angular-local-storage.min.js",
-        "bower_components/angular-local-storage/dist/angular-local-storage.min.js.map"
-      ],
-      "tinymce": [
-        "bower_components/tinymce/tinymce.min.js"
-      ],
-      "angular-i18n": "bower_components/angular-i18n/angular-locale_*.js",
-      "typeahead.js": "bower_components/typeahead.js/dist/typeahead.bundle.min.js",
-      "rgrove-lazyload": "bower_components/rgrove-lazyload/lazyload.js",
-      "ng-file-upload": "bower_components/ng-file-upload/ng-file-upload.min.js",
-      "jquery-ui": "bower_components/jquery-ui/jquery-ui.min.js",
-      "jquery-migrate": "bower_components/jquery-migrate/jquery-migrate.min.js",
-      "clipboard": "bower_components/clipboard/dist/clipboard.min.js",
-      "animejs": "bower_components/animejs/anime.min.js"
+        "moment": [
+            "bower_components/moment/min/moment.min.js",
+            "bower_components/moment/min/moment-with-locales.js",
+            "bower_components/moment/min/moment-with-locales.min.js",
+            "bower_components/moment/locale/*.js"
+        ],
+        "underscore": [
+            "bower_components/underscore/underscore-min.js",
+            "bower_components/underscore/underscore-min.map"
+        ],
+        "jquery": [
+            "bower_components/jquery/dist/jquery.min.js",
+            "bower_components/jquery/dist/jquery.min.map"
+        ],
+        "angular-dynamic-locale": [
+            "bower_components/angular-dynamic-locale/tmhDynamicLocale.min.js",
+            "bower_components/angular-dynamic-locale/tmhDynamicLocale.min.js.map"
+        ],
+        "angular-local-storage": [
+            "bower_components/angular-local-storage/dist/angular-local-storage.min.js",
+            "bower_components/angular-local-storage/dist/angular-local-storage.min.js.map"
+        ],
+        "tinymce": [
+            "bower_components/tinymce/tinymce.min.js"
+        ],
+        "angular-i18n": "bower_components/angular-i18n/angular-locale_*.js",
+        "typeahead.js": "bower_components/typeahead.js/dist/typeahead.bundle.min.js",
+        "rgrove-lazyload": "bower_components/rgrove-lazyload/lazyload.js",
+        "ng-file-upload": "bower_components/ng-file-upload/ng-file-upload.min.js",
+        "jquery-ui": "bower_components/jquery-ui/jquery-ui.min.js",
+        "jquery-migrate": "bower_components/jquery-migrate/jquery-migrate.min.js",
+        "clipboard": "bower_components/clipboard/dist/clipboard.min.js",
+        "animejs": "bower_components/animejs/anime.min.js",
+        "jquery-validate": "bower_components/jquery-validate/dist/jquery.validate.min.js",
+        "jquery-validation-unobtrusive": "bower_components/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"
     }
   },
   "devDependencies": {

@@ -67,9 +67,6 @@ namespace Umbraco.Tests.Configurations
             Assert.IsTrue(globalSettings.IsReservedPathOrUrl(url));
         }
 
-        [TestCase("/umbraco_client/Tree/treeIcons.css")]
-        [TestCase("/umbraco_client/Tree/Themes/umbraco/style.css")]
-        [TestCase("/umbraco_client/scrollingmenu/style.css")]
         [TestCase("/base/somebasehandler")]
         [TestCase("/")]
         [TestCase("/home.aspx")]

@@ -33,7 +33,6 @@ if ($project) {
 		robocopy $umbracoBinFolder $umbracoBinBackupPath /e /LOG:$copyLogsPath\UmbracoBinBackup.log
 		
 		# Delete files Umbraco ships with
-		if(Test-Path $umbracoBinFolder\log4net.dll) { Remove-Item $umbracoBinFolder\log4net.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\Microsoft.ApplicationBlocks.Data.dll) { Remove-Item $umbracoBinFolder\Microsoft.ApplicationBlocks.Data.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Data.SqlServerCe.dll) { Remove-Item $umbracoBinFolder\System.Data.SqlServerCe.dll -Force -Confirm:$false }
 		if(Test-Path $umbracoBinFolder\System.Data.SqlServerCe.Entity.dll) { Remove-Item $umbracoBinFolder\System.Data.SqlServerCe.Entity.dll -Force -Confirm:$false }

@@ -82,7 +82,7 @@ namespace Umbraco.Web.Scheduling
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<ScheduledTasks>("An error occurred calling web task for url: " + url, ex);
+                    _logger.Error<ScheduledTasks>(ex, "An error occurred calling web task for url: {Url}", url);
                 }
                 return false;
             }
@@ -113,9 +113,9 @@ namespace Umbraco.Web.Scheduling
                 {
                     await ProcessTasksAsync(token);
                 }
-                catch (Exception ee)
+                catch (Exception ex)
                 {
-                    _logger.Error<ScheduledTasks>("Error executing scheduled task", ee);
+                    _logger.Error<ScheduledTasks>(ex, "Error executing scheduled task");
                 }
             }
 

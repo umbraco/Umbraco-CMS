@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models.Mapping
                 if (configuration.TryGetValue(field.Key, out var value))
                     field.Value = value;
                 else // weird - just leave the field without a value - but warn
-                    Current.Logger.Warn<DataTypeConfigurationFieldDisplayResolver>(() => $"Could not find a value for configuration field \"{field.Key}\".");
+                    Current.Logger.Warn<DataTypeConfigurationFieldDisplayResolver>("Could not find a value for configuration field '{ConfigField}'", field.Key);
             }
         }
 

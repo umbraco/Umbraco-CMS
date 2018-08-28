@@ -38,6 +38,7 @@ function ContentDeleteController($scope, $timeout, contentResource, treeService,
                     //ensure the recycle bin has child nodes now            
                     var recycleBin = treeService.getDescendantNode(rootNode, -20);
                     if (recycleBin) {
+                        //TODO: This seems to return a rejection and we end up with "Possibly unhanded rejection"
                         treeService.syncTree({ node: recycleBin, path: treeService.getPath(recycleBin), forceReload: true });
                     }
                 }, 500);

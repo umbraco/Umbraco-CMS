@@ -73,11 +73,11 @@ namespace Umbraco.Core.IO
             }
             catch (UnauthorizedAccessException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>("Not authorized to get directories", ex);
+                Current.Logger.Error<PhysicalFileSystem>(ex, "Not authorized to get directories for '{Path}'", fullPath);
             }
             catch (DirectoryNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>("Directory not found", ex);
+                Current.Logger.Error<PhysicalFileSystem>(ex, "Directory not found for '{Path}'", fullPath);
             }
 
             return Enumerable.Empty<string>();
@@ -109,7 +109,7 @@ namespace Umbraco.Core.IO
             }
             catch (DirectoryNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>("Directory not found", ex);
+                Current.Logger.Error<PhysicalFileSystem>(ex, "Directory not found for '{Path}'", fullPath);
             }
         }
 
@@ -189,11 +189,11 @@ namespace Umbraco.Core.IO
             }
             catch (UnauthorizedAccessException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>("Not authorized to get directories", ex);
+                Current.Logger.Error<PhysicalFileSystem>(ex, "Not authorized to get directories for '{Path}'", fullPath);
             }
             catch (DirectoryNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>("Directory not found", ex);
+                Current.Logger.Error<PhysicalFileSystem>(ex, "Directory not found for '{FullPath}'", fullPath);
             }
 
             return Enumerable.Empty<string>();
@@ -226,7 +226,7 @@ namespace Umbraco.Core.IO
             }
             catch (FileNotFoundException ex)
             {
-                Current.Logger.Info<PhysicalFileSystem>(() => $"DeleteFile failed with FileNotFoundException: {ex.InnerException}");
+                Current.Logger.Error<PhysicalFileSystem>(ex.InnerException, "DeleteFile failed with FileNotFoundException for '{Path}'", fullPath);
             }
         }
 

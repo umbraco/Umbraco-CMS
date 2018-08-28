@@ -36,7 +36,7 @@ namespace Umbraco.Web._Legacy.Actions
         {
             get
             {
-                return string.Format("{0}.actionSort()", ClientTools.Scripts.GetAppActions);
+                return null;
             }
         }
 

@@ -350,6 +350,9 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                     if (args.cacheKey) {
                         $scope.cachekey = args.cacheKey;
                     }
+                    if (args.customTreeParams) {
+                        $scope.customtreeparams = args.customTreeParams;
+                    }
                 }
 
                 //load the tree

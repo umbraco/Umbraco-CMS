@@ -18,7 +18,7 @@ using Umbraco.Web.WebApi.Filters;
 namespace Umbraco.Web.Editors
 {
     /// <summary>
-    /// An abstract base controller used for media/content (and probably members) to try to reduce code replication.
+    /// An abstract base controller used for media/content/members to try to reduce code replication.
     /// </summary>
     [OutgoingDateTimeFormat]
     public abstract class ContentControllerBase : BackOfficeNotificationsController
@@ -42,17 +42,19 @@ namespace Umbraco.Web.Editors
         /// <typeparam name="TPersisted"></typeparam>
         /// <typeparam name="TSaved"></typeparam>
         /// <param name="contentItem"></param>
+        /// <param name="dto"></param>
         /// <param name="getPropertyValue"></param>
         /// <param name="savePropertyValue"></param>
-        protected void MapPropertyValues<TPersisted, TSaved>(
+        internal void MapPropertyValuesForPersistence<TPersisted, TSaved>(
             TSaved contentItem,
+            ContentPropertyCollectionDto dto,
             Func<TSaved, Property, object> getPropertyValue,
             Action<TSaved, Property, object> savePropertyValue)
             where TPersisted : IContentBase
-            where TSaved : ContentBaseItemSave<TPersisted>
+            where TSaved : IContentSave<TPersisted>
         {
             // map the property values
-            foreach (var propertyDto in contentItem.ContentDto.Properties)
+            foreach (var propertyDto in dto.Properties)
             {
                 // get the property editor
                 if (propertyDto.PropertyEditor == null)
@@ -68,9 +70,12 @@ namespace Umbraco.Web.Editors
 
                 // get the property
                 var property = contentItem.PersistedContent.Properties[propertyDto.Alias];
+                
+                // prepare files, if any matching property and culture
+                var files = contentItem.UploadedFiles
+                    .Where(x => x.PropertyAlias == propertyDto.Alias && x.Culture == propertyDto.Culture)
+                    .ToArray();
 
-                // prepare files, if any
-                var files = contentItem.UploadedFiles.Where(x => x.PropertyAlias == propertyDto.Alias).ToArray();
                 foreach (var file in files)
                     file.FileName = file.FileName.ToSafeFileName();
 
@@ -99,9 +104,7 @@ namespace Umbraco.Web.Editors
             }
         }
 
-        protected void HandleInvalidModelState<T, TPersisted>(ContentItemDisplayBase<T, TPersisted> display)
-            where TPersisted : IContentBase
-            where T : ContentPropertyBasic
+        protected virtual void HandleInvalidModelState(IErrorModel display)
         {
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             if (!ModelState.IsValid)

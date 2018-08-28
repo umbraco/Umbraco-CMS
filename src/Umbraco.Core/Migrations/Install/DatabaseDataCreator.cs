@@ -29,7 +29,7 @@ namespace Umbraco.Core.Migrations.Install
         /// <param name="tableName">Name of the table to create base data for</param>
         public void InitializeBaseData(string tableName)
         {
-            _logger.Info<DatabaseDataCreator>(() => $"Creating data in table {tableName}");
+            _logger.Info<DatabaseDataCreator>("Creating data in {TableName}", tableName);
 
             if (tableName.Equals(Constants.DatabaseSchema.Tables.Node))
                 CreateNodeData();
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Migrations.Install
             if (tableName.Equals(Constants.DatabaseSchema.Tables.KeyValue))
                 CreateKeyValueData();
 
-            _logger.Info<DatabaseDataCreator>(() => $"Done creating table {tableName} data.");
+            _logger.Info<DatabaseDataCreator>("Done creating table {TableName} data.", tableName);
         }
 
         private void CreateNodeData()
@@ -205,7 +205,6 @@ namespace Umbraco.Core.Migrations.Install
         {
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 3, ContentTypeNodeId = 1032, Text = "Image", SortOrder = 1, UniqueId = new Guid(Constants.PropertyTypeGroups.Image) });
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 4, ContentTypeNodeId = 1033, Text = "File", SortOrder = 1, UniqueId = new Guid(Constants.PropertyTypeGroups.File) });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 5, ContentTypeNodeId = 1031, Text = "Contents", SortOrder = 1, UniqueId = new Guid(Constants.PropertyTypeGroups.Contents) });
             //membership property group
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 11, ContentTypeNodeId = 1044, Text = "Membership", SortOrder = 1, UniqueId = new Guid(Constants.PropertyTypeGroups.Membership) });
         }
@@ -220,7 +219,6 @@ namespace Umbraco.Core.Migrations.Install
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 24, UniqueId = 24.ToGuid(), DataTypeId = -90, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Constants.Conventions.Media.File, Name = "Upload file", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 25, UniqueId = 25.ToGuid(), DataTypeId = -92, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Constants.Conventions.Media.Extension, Name = "Type", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 26, UniqueId = 26.ToGuid(), DataTypeId = Constants.DataTypes.LabelBigint, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Constants.Conventions.Media.Bytes, Name = "Size", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
-            _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 27, UniqueId = 27.ToGuid(), DataTypeId = Constants.DataTypes.DefaultMediaListView, ContentTypeId = 1031, PropertyTypeGroupId = 5, Alias = "contents", Name = "Contents:", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
             //membership property types
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 28, UniqueId = 28.ToGuid(), DataTypeId = -89, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.Comments, Name = Constants.Conventions.Member.CommentsLabel, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 29, UniqueId = 29.ToGuid(), DataTypeId = Constants.DataTypes.LabelInt, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Constants.Conventions.Member.FailedPasswordAttempts, Name = Constants.Conventions.Member.FailedPasswordAttemptsLabel, SortOrder = 1, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
@@ -234,7 +232,7 @@ namespace Umbraco.Core.Migrations.Install
 
         private void CreateLanguageData()
         {
-            _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", false, new LanguageDto { Id = 1, IsoCode = "en-US", CultureName = "en-US" });
+            _database.Insert(Constants.DatabaseSchema.Tables.Language, "id", false, new LanguageDto { Id = 1, IsoCode = "en-US", CultureName = "English (United States)" });
         }
 
         private void CreateContentChildTypeData()

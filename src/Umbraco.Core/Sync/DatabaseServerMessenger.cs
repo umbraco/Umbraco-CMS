@@ -192,9 +192,11 @@ namespace Umbraco.Core.Sync
                     if (count > Options.MaxProcessingInstructionCount)
                     {
                         //too many instructions, proceed to cold boot
-                        Logger.Warn<DatabaseServerMessenger>(() => $"The instruction count ({count}) exceeds the specified MaxProcessingInstructionCount ({Options.MaxProcessingInstructionCount})."
+                        Logger.Warn<DatabaseServerMessenger>(
+                            "The instruction count ({InstructionCount}) exceeds the specified MaxProcessingInstructionCount ({MaxProcessingInstructionCount})."
                             + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
-                            + " to the latest found in the database and maintain cache updates based on that Id.");
+                            + " to the latest found in the database and maintain cache updates based on that Id.",
+                            count, Options.MaxProcessingInstructionCount);
 
                         coldboot = true;
                     }
@@ -350,7 +352,10 @@ namespace Umbraco.Core.Sync
                 }
                 catch (JsonException ex)
                 {
-                    Logger.Error<DatabaseServerMessenger>($"Failed to deserialize instructions ({dto.Id}: \"{dto.Instructions}\").", ex);
+                    Logger.Error<DatabaseServerMessenger>(ex, "Failed to deserialize instructions ({DtoId}: '{DtoInstructions}').",
+                        dto.Id,
+                        dto.Instructions);
+
                     lastId = dto.Id; // skip
                     continue;
                 }
@@ -406,7 +411,10 @@ namespace Umbraco.Core.Sync
             catch (Exception ex)
             {
                     Logger.Error<DatabaseServerMessenger>(
-                        $"DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions ({dto.Id}: \"{dto.Instructions}\"). Instruction is being skipped/ignored", ex);
+                        ex,
+                        "DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions ({DtoId}: '{DtoInstructions}'). Instruction is being skipped/ignored",
+                        dto.Id,
+                        dto.Instructions);
 
                 //we cannot throw here because this invalid instruction will just keep getting processed over and over and errors
                 // will be thrown over and over. The only thing we can do is ignore and move on.

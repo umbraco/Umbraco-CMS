@@ -12,7 +12,7 @@
 * Another thing this directive does is to ensure that any .control-group that contains form elements that are invalid will
 * be marked with the 'error' css class. This ensures that labels included in that control group are styled correctly.
 **/
-function valFormManager(serverValidationManager, $rootScope, $log, $timeout, notificationsService, eventsService, $routeParams) {
+function valFormManager(serverValidationManager, $rootScope, $timeout, $location, overlayService, eventsService, $routeParams, navigationService, editorService, localizationService) {
 
     var SHOW_VALIDATION_CLASS_NAME = "show-validation";
     var SAVING_EVENT_NAME = "formSubmitting";
@@ -43,6 +43,22 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
             });
         },
         link: function (scope, element, attr, formCtrl) {
+
+            var labels = {};
+
+            var labelKeys = [
+                "prompt_unsavedChanges",
+                "prompt_unsavedChangesWarning",
+                "prompt_discardChanges",
+                "prompt_stay"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(function (values) {
+                labels.unsavedChangesTitle = values[0];
+                labels.unsavedChangesContent = values[1];
+                labels.discardChangesButton = values[2];
+                labels.stayButton = values[3];
+            });
 
             //watch the list of validation errors to notify the application of any validation changes
             scope.$watch(function () {
@@ -104,29 +120,68 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
                 formCtrl.$setPristine();
             }));
 
+            var confirmed = false;
+
             //This handles the 'unsaved changes' dialog which is triggered when a route is attempting to be changed but
             // the form has pending changes
             var locationEvent = $rootScope.$on('$locationChangeStart', function(event, nextLocation, currentLocation) {
-                if (!formCtrl.$dirty || isSavingNewItem) {
+
+                var infiniteEditors = editorService.getEditors();
+
+                if (!formCtrl.$dirty && infiniteEditors.length === 0 || isSavingNewItem && infiniteEditors.length === 0) {
+                    confirmed = true;
                     return;
                 }
 
-                var path = nextLocation.split("#")[1];
-                if (path) {
-                    if (path.indexOf("%253") || path.indexOf("%252")) {
-                        path = decodeURIComponent(path);
+                var nextPath = nextLocation.split("#")[1];
+
+                if (nextPath && !confirmed) {
+
+                    if (navigationService.isRouteChangingNavigation(currentLocation, nextLocation)) {
+
+                        if (nextPath.indexOf("%253") || nextPath.indexOf("%252")) {
+                            nextPath = decodeURIComponent(nextPath);
+                        }
+
+                        // Open discard changes overlay
+                        var overlay = {
+                            "view": "default",
+                            "title": labels.unsavedChangesTitle,
+                            "content": labels.unsavedChangesContent,
+                            "disableBackdropClick": true,
+                            "submitButtonLabel": labels.stayButton,
+                            "closeButtonLabel": labels.discardChangesButton,
+                            submit: function() {
+                                overlayService.close();
+                            },
+                            close: function() {
+                                // close all editors
+                                editorService.closeAll();
+                                // allow redirection
+                                navigationService.clearSearch();
+                                //we need to break the path up into path and query
+                                var parts = nextPath.split("?");
+                                var query = {};
+                                if (parts.length > 1) {
+                                    _.each(parts[1].split("&"), function(q) {
+                                        var keyVal = q.split("=");
+                                        query[keyVal[0]] = keyVal[1];
+                                    });
+                                }
+                                $location.path(parts[0]).search(query);
+                                overlayService.close();
+                                confirmed = true;
+                            }
+                        };
+
+                        overlayService.open(overlay);
+
+                        //prevent the route!
+                        event.preventDefault();
+
+                        //raise an event
+                        eventsService.emit("valFormManager.pendingChanges", true);
                     }
-
-                    if (!notificationsService.hasView()) {
-                        var msg = { view: "confirmroutechange", args: { path: path, listener: locationEvent } };
-                        notificationsService.add(msg);
-                    }
-
-                    //prevent the route!
-                    event.preventDefault();
-
-                    //raise an event
-                    eventsService.emit("valFormManager.pendingChanges", true);
                 }
 
             });

@@ -186,9 +186,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                     LockAndLoadDomains();
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    _logger.Error<PublishedSnapshotService>("Panic, exception while loading cache data.", e);
+                    _logger.Fatal<PublishedSnapshotService>(ex, "Panic, exception while loading cache data.");
                 }
 
                 // finaly, cache is ready!
@@ -298,12 +298,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _localContentDb?.Clear();
 
-            _logger.Debug<PublishedSnapshotService>(() => "Loading content from database...");
+            _logger.Debug<PublishedSnapshotService>("Loading content from database...");
             var sw = Stopwatch.StartNew();
             var kits = _dataSource.GetAllContentSources(scope);
             _contentStore.SetAll(kits);
             sw.Stop();
-            _logger.Debug<PublishedSnapshotService>(() => "Loaded content from database (" + sw.ElapsedMilliseconds + "ms).");
+            _logger.Debug<PublishedSnapshotService>("Loaded content from database ({ElapsedMilliseconds}ms)", sw.ElapsedMilliseconds);
         }
 
         private void LoadContentFromLocalDbLocked(IScope scope)
@@ -312,12 +312,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 .Select(x => _publishedContentTypeFactory.CreateContentType(x));
             _contentStore.UpdateContentTypes(null, contentTypes, null);
 
-            _logger.Debug<PublishedSnapshotService>(() => "Loading content from local db...");
+            _logger.Debug<PublishedSnapshotService>("Loading content from local db...");
             var sw = Stopwatch.StartNew();
             var kits = _localContentDb.Select(x => x.Value).OrderBy(x => x.Node.Level);
             _contentStore.SetAll(kits);
             sw.Stop();
-            _logger.Debug<PublishedSnapshotService>(() => "Loaded content from local db (" + sw.ElapsedMilliseconds + "ms).");
+            _logger.Debug<PublishedSnapshotService>("Loaded content from local db ({ElapsedMilliseconds}ms)", sw.ElapsedMilliseconds);
         }
 
         // keep these around - might be useful
@@ -365,12 +365,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             _localMediaDb?.Clear();
 
-            _logger.Debug<PublishedSnapshotService>(() => "Loading media from database...");
+            _logger.Debug<PublishedSnapshotService>("Loading media from database...");
             var sw = Stopwatch.StartNew();
             var kits = _dataSource.GetAllMediaSources(scope);
             _mediaStore.SetAll(kits);
             sw.Stop();
-            _logger.Debug<PublishedSnapshotService>(() => "Loaded media from database (" + sw.ElapsedMilliseconds + "ms).");
+            _logger.Debug<PublishedSnapshotService>("Loaded media from database ({ElapsedMilliseconds}ms)", sw.ElapsedMilliseconds);
         }
 
         private void LoadMediaFromLocalDbLocked(IScope scope)
@@ -379,12 +379,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 .Select(x => _publishedContentTypeFactory.CreateContentType(x));
             _mediaStore.UpdateContentTypes(null, mediaTypes, null);
 
-            _logger.Debug<PublishedSnapshotService>(() => "Loading media from local db...");
+            _logger.Debug<PublishedSnapshotService>("Loading media from local db...");
             var sw = Stopwatch.StartNew();
             var kits = _localMediaDb.Select(x => x.Value);
             _mediaStore.SetAll(kits);
             sw.Stop();
-            _logger.Debug<PublishedSnapshotService>(() => "Loaded media from local db (" + sw.ElapsedMilliseconds + "ms).");
+            _logger.Debug<PublishedSnapshotService>("Loaded media from local db ({ElapsedMilliseconds}ms)", sw.ElapsedMilliseconds);
         }
 
         // keep these around - might be useful
@@ -551,7 +551,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             foreach (var payload in payloads)
             {
-                _logger.Debug<PublishedSnapshotService>(() => $"Notified {payload.ChangeTypes} for content {payload.Id}");
+                _logger.Debug<PublishedSnapshotService>("Notified {ChangeTypes} for content {ContentId}", payload.ChangeTypes, payload.Id);
 
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
                 {
@@ -641,7 +641,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             foreach (var payload in payloads)
             {
-                _logger.Debug<PublishedSnapshotService>(() => $"Notified {payload.ChangeTypes} for media {payload.Id}");
+                _logger.Debug<PublishedSnapshotService>("Notified {ChangeTypes} for media {MediaId}", payload.ChangeTypes, payload.Id);
 
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
                 {
@@ -710,7 +710,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return;
 
             foreach (var payload in payloads)
-                _logger.Debug<PublishedSnapshotService>(() => $"Notified {payload.ChangeTypes} for {payload.ItemType} {payload.Id}");
+                _logger.Debug<PublishedSnapshotService>("Notified {ChangeTypes} for {ItemType} {ItemId}", payload.ChangeTypes, payload.ItemType, payload.Id);
 
             Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);
             Notify<IMediaType>(_mediaStore, payloads, RefreshMediaTypesLocked);
@@ -760,7 +760,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var idsA = payloads.Select(x => x.Id).ToArray();
 
             foreach (var payload in payloads)
-                _logger.Debug<PublishedSnapshotService>(() => $"Notified {(payload.Removed ? "Removed" : "Refreshed")} for data type {payload.Id}");
+                _logger.Debug<PublishedSnapshotService>("Notified {RemovedStatus} for data type {DataTypeId}",
+                    payload.Removed ? "Removed" : "Refreshed",
+                    payload.Id);
 
             using (_contentStore.GetWriter(_scopeProvider))
             using (_mediaStore.GetWriter(_scopeProvider))

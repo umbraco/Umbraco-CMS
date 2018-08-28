@@ -446,7 +446,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 throw new ArgumentException("Kit content cannot have children.", nameof(kit));
             // ReSharper restore LocalizableElement
 
-            _logger.Debug<ContentStore>(() => "Set content ID:" + kit.Node.Id);
+            _logger.Debug<ContentStore>("Set content ID: {KitNodeId}", kit.Node.Id);
 
             var lockInfo = new WriteLockInfo();
             try
@@ -571,7 +571,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 if (link?.Value == null) return false;
 
                 var content = link.Value;
-                _logger.Debug<ContentStore>(() => "Clear content ID:" + content.Id);
+                _logger.Debug<ContentStore>("Clear content ID: {ContentId}", content.Id);
 
                 // clear the entire branch
                 ClearBranchLocked(content);
@@ -921,7 +921,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             // see notes in CreateSnapshot
 #if DEBUG
-            _logger.Debug<ContentStore>(() => "Collect.");
+            _logger.Debug<ContentStore>("Collect.");
 #endif
             while (_genRefRefs.TryPeek(out GenRefRef genRefRef) && (genRefRef.Count == 0 || genRefRef.WGenRef.IsAlive == false))
             {
@@ -1098,7 +1098,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
 #if DEBUG
                 _logger = logger;
-                _logger.Debug<Snapshot>(() => "Creating snapshot.");
+                _logger.Debug<Snapshot>("Creating snapshot.");
 #endif
             }
 
@@ -1113,7 +1113,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
 #if DEBUG
                 _logger = logger;
-                _logger.Debug<Snapshot>(() => "Creating live.");
+                _logger.Debug<Snapshot>("Creating live.");
 #endif
             }
 
@@ -1194,7 +1194,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 if (_gen < 0) return;
 #if DEBUG
-                _logger.Debug<Snapshot>(() => "Dispose snapshot (" + (_genRef?.GenRefRef.Count.ToString() ?? "live") + ").");
+                _logger.Debug<Snapshot>("Dispose snapshot ({Snapshot})", _genRef?.GenRefRef.Count.ToString() ?? "live");
 #endif
                 _gen = -1;
                 if (_genRef != null)

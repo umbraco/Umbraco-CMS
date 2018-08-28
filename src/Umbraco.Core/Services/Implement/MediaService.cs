@@ -892,7 +892,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(Deleted, this, args);
 
                 _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
-                    (file, e) => Logger.Error<MediaService>("An error occurred while deleting file attached to nodes: " + file, e));
+                    (file, e) => Logger.Error<MediaService>(e, "An error occurred while deleting file attached to nodes: {File}", file));
             }
         }
 
@@ -1010,7 +1010,7 @@ namespace Umbraco.Core.Services.Implement
 
                 var originalPath = media.Path;
 
-                if (scope.Events.DispatchCancelable(Trashing, this, new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia))))
+                if (scope.Events.DispatchCancelable(Trashing, this, new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(media, originalPath, Constants.System.RecycleBinMedia)), nameof(Trashing)))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
@@ -1022,7 +1022,7 @@ namespace Umbraco.Core.Services.Implement
                 var moveInfo = moves.Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId))
                     .ToArray();
 
-                scope.Events.Dispatch(Trashed, this, new MoveEventArgs<IMedia>(false, evtMsgs, moveInfo));
+                scope.Events.Dispatch(Trashed, this, new MoveEventArgs<IMedia>(false, evtMsgs, moveInfo), nameof(Trashed));
                 Audit(AuditType.Move, "Move Media to Recycle Bin performed by user", userId, media.Id);
 
                 scope.Complete();
@@ -1058,7 +1058,7 @@ namespace Umbraco.Core.Services.Implement
 
                 var moveEventInfo = new MoveEventInfo<IMedia>(media, media.Path, parentId);
                 var moveEventArgs = new MoveEventArgs<IMedia>(moveEventInfo);
-                if (scope.Events.DispatchCancelable(Moving, this, moveEventArgs))
+                if (scope.Events.DispatchCancelable(Moving, this, moveEventArgs, nameof(Moving)))
                 {
                     scope.Complete();
                     return;
@@ -1082,7 +1082,7 @@ namespace Umbraco.Core.Services.Implement
                     .ToArray();
                 moveEventArgs.MoveInfoCollection = moveInfo;
                 moveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Moved, this, moveEventArgs);
+                scope.Events.Dispatch(Moved, this, moveEventArgs, nameof(Moved));
                 Audit(AuditType.Move, "Move Media performed by user", userId, media.Id);
                 scope.Complete();
             }
@@ -1382,7 +1382,7 @@ namespace Umbraco.Core.Services.Implement
         /// <para>Deletes media items of the specified type, and only that type. Does *not* handle content types
         /// inheritance and compositions, which need to be managed outside of this method.</para>
         /// </remarks>
-        /// <param name="mediaTypeId">Id of the <see cref="IMediaType"/></param>
+        /// <param name="mediaTypeIds">Id of the <see cref="IMediaType"/></param>
         /// <param name="userId">Optional id of the user deleting the media</param>
         public void DeleteMediaOfTypes(IEnumerable<int> mediaTypeIds, int userId = 0)
         {
@@ -1434,7 +1434,7 @@ namespace Umbraco.Core.Services.Implement
                 var moveInfos = moves.Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId))
                     .ToArray();
                 if (moveInfos.Length > 0)
-                    scope.Events.Dispatch(Trashed, this, new MoveEventArgs<IMedia>(false, moveInfos), "Trashed");
+                    scope.Events.Dispatch(Trashed, this, new MoveEventArgs<IMedia>(false, moveInfos), nameof(Trashed));
                 scope.Events.Dispatch(TreeChanged, this, changes.ToEventArgs());
 
                 Audit(AuditType.Delete, $"Delete Media of types {string.Join(",", mediaTypeIdsA)} performed by user", userId, Constants.System.Root);

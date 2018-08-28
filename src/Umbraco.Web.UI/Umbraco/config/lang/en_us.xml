@@ -128,7 +128,7 @@
         <key alias="save">Save</key>
         
         <key alias="saveAndClose">Save and close</key>
-        <key alias="saveAndPublish">Save and publish</key>
+        <key alias="saveAndPublish">Publish</key>
         <key alias="saveAndPublishMany">Publish…</key>
         <key alias="saveAndSchedule">Save and schedule</key>
         <key alias="saveToPublish">Save and send for approval</key>
@@ -231,8 +231,7 @@
         <key alias="routeErrorCannotRoute">This document is published but its url cannot be routed</key>
         <key alias="publish">Publish</key>
         <key alias="published">Published</key>
-        <key alias="publishedPendingChanges">Published (pending changes)</key>
-        <key alias="unpublishedPendingChanges">Unpublished (pending changes)</key>
+        <key alias="publishedPendingChanges">Published (pending changes)</key>>
         <key alias="publishStatus">Publication Status</key>
         <key alias="releaseDate">Publish at</key>
         <key alias="unpublishDate">Unpublish at</key>
@@ -245,7 +244,8 @@
         <key alias="altTextOptional">Alternative text (optional)</key>
         <key alias="type">Type</key>
         <key alias="unPublish">Unpublish</key>
-        <key alias="unpublished">Unpublished</key>
+        <key alias="unpublished">Draft</key>
+        <key alias="notCreated">Not created</key>
         <key alias="updateDate">Last edited</key>
         <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
         <key alias="uploadClear">Remove file(s)</key>
@@ -264,8 +264,11 @@
         <key alias="isSensitiveValue">This value is hidden. If you need access to view this value please contact your website administrator.</key>
         <key alias="isSensitiveValue_short">This value is hidden.</key>
         <key alias="languagesToPublish">What languages would you like to publish?</key>
-        <key alias="publishedLanguages">Published Languages.</key>
+        <key alias="languagesToSave">What languages would you like to save?</key>
+        <key alias="publishedLanguages">Published Languages</key>
+        <key alias="unmodifiedLanguages">Unmodified Languages</key>
         <key alias="readyToPublish">Ready to Publish?</key>
+        <key alias="readyToSave">Ready to Save?</key>
     </area>
     <area alias="blueprints">
         <key alias="createBlueprintFrom">Create a new Content Template from '%0%'</key>
@@ -1368,6 +1371,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="sortDone">Sorting complete.</key>
         <key alias="sortHelp">Drag the different items up or down below to set how they should be arranged. Or click the column headers to sort the entire collection of items</key>
         <key alias="sortPleaseWait"><![CDATA[Please wait. Items are being sorted, this can take a while.]]></key>
+        <key alias="sortEmptyState">This node has no child nodes to sort</key>
     </area>
     <area alias="speechBubbles">
         <key alias="validationFailedHeader">Validation</key>
@@ -1459,7 +1463,6 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="resendInviteSuccess">Invitation has been re-sent to %0%</key>
         <key alias="contentReqCulturePublishError">Cannot publish the document since the required '%0%' is not published</key>
         <key alias="contentCultureValidationError">Validation failed for language '%0%'</key>
-        <key alias="contentCultureUnexpectedValidationError">Unexpected validation failed for language '%0%'</key>
         <key alias="documentTypeExportedSuccess">Document type was exported to file</key>
         <key alias="documentTypeExportedError">An error occurred while exporting the document type</key>
     </area>
@@ -2051,9 +2054,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     </area>
     <area alias="validation">
         <key alias="validation">Validation</key>
-        <key alias="validateAsEmail">Validate as email</key>
+        <key alias="validateAsEmail">Validate as an email address</key>
         <key alias="validateAsNumber">Validate as a number</key>
-        <key alias="validateAsUrl">Validate as a Url</key>
+        <key alias="validateAsUrl">Validate as a URL</key>
         <key alias="enterCustomValidation">...or enter a custom validation</key>
         <key alias="fieldIsMandatory">Field is mandatory</key>
         <key alias="validationRegExp">Enter a regular expression</key>
@@ -2064,6 +2067,9 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="invalidDate">Invalid date</key>
         <key alias="invalidNumber">Not a number</key>
         <key alias="invalidEmail">Invalid email</key>
+        <key alias="invalidNull">Value cannot be null</key>
+        <key alias="invalidEmpty">Value cannot be empty</key>
+        <key alias="invalidPattern">Value is invalid, it does not match the correct pattern</key>
     </area>
     <area alias="healthcheck">
         <!-- The following keys get these tokens passed in:
@@ -2220,5 +2226,9 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="itemCannotBeRestored">Cannot automatically restore this item</key>
         <key alias="noRestoreRelation">There is no 'restore' relation found for this node. Use the Move menu item to move it manually.</key>
         <key alias="restoreUnderRecycled">The item you want to restore it under ('%0%') is in the recycle bin. Use the Move menu item to move the item manually.</key>
+    </area>
+    <area alias="notify">
+        <key alias="notifySet">Select your notifications for</key>
+        <key alias="notificationsSavedFor">Notification settings saved for </key>
     </area>
 </language>

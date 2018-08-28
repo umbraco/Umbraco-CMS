@@ -169,9 +169,12 @@
             <umb-box-content class="block-form">
 
                 <umb-control-group data-element="node-info-status" label="@general_status">
-                    <umb-badge size="xs" color="{{publishStatus.color}}">
-                        {{publishStatus.label}}
-                    </umb-badge>
+                    <div ng-repeat="status in publishStatus" style="margin-bottom: 5px;">
+                        <span ng-if="status.culture"><em>{{status.culture}}: </em></span>
+                        <umb-badge size="xs" color="{{status.color}}">
+                            {{status.label}}
+                        </umb-badge>
+                    </div>
                 </umb-control-group>
 
                 <umb-control-group data-element="node-info-create-date" label="@template_createdDate">
@@ -180,12 +183,12 @@
 
                 <umb-control-group data-element="node-info-document-type" label="@content_documentType">
                     <umb-node-preview
-                                      icon="node.icon"
-                                      name="node.contentTypeName"
-                                      alias="documentType.alias"
-                                      allow-open="allowChangeDocumentType"
-                                      on-open="openDocumentType(documentType)"
-                                      open-url="previewOpenUrl">
+                        style="min-width: 100%; margin-bottom: 0;"
+                        icon="node.icon"
+                        name="node.contentTypeName"
+                        alias="documentType.alias"
+                        allow-open="allowChangeDocumentType"
+                        on-open="openDocumentType(documentType)">
                     </umb-node-preview>
                 </umb-control-group>
 
@@ -197,7 +200,7 @@
                                 ng-change="updateTemplate(node.template)">
                             <option value=""><localize key="general_choose">Choose</localize>...</option>
                         </select>
-                        <a href="" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()" ng-if="node.template !== null">
+                        <a href="" ng-if="allowChangeTemplate" class="umb-node-preview__action" style="margin-left:15px;" ng-click="openTemplate()" ng-if="node.template !== null">
                             <localize key="general_open">Open</localize>
                         </a>
                     </div>

@@ -102,7 +102,7 @@ namespace Umbraco.Web.UI.Pages
                 if (!Security.ValidateUserApp(CurrentApp))
                 {
                     var ex = new SecurityException(String.Format("The current user doesn't have access to the section/app '{0}'", CurrentApp));
-                    Current.Logger.Error<UmbracoEnsuredPage>(String.Format("Tried to access '{0}'", CurrentApp), ex);
+                    Current.Logger.Error<UmbracoEnsuredPage>(ex, "Tried to access '{CurrentApp}'", CurrentApp);
                     throw ex;
                 }
 

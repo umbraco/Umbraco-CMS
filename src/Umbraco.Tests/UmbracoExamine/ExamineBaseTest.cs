@@ -19,7 +19,7 @@ namespace Umbraco.Tests.UmbracoExamine
         [OneTimeSetUp]
         public void InitializeFixture()
         {
-            var logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config")));
+            var logger = new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test.config")));
             _profilingLogger = new ProfilingLogger(logger, new LogProfiler(logger));
         }
 

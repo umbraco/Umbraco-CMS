@@ -213,7 +213,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
+                    }, { responseType: 'text' }),
                 'Failed to move content');
         },
 
@@ -233,7 +233,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
                     {
                         parentId: args.parentId,
                         id: args.id
-                    }),
+                    }, { responseType: 'text' }),
                 'Failed to copy content');
         },
 

@@ -182,7 +182,7 @@ namespace umbraco.presentation.dialogs
                         }
                         catch (Exception ex)
                         {
-                            Current.Logger.Error<sendToTranslation>("Error sending translation e-mail", ex);
+                            Current.Logger.Error<sendToTranslation>(ex, "Error sending translation e-mail");
                         }
                     }
 
