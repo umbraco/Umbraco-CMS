@@ -1073,7 +1073,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     NodeId = content.Id,
                     LanguageId = LanguageRepository.GetIdByIsoCode(culture) ?? throw new InvalidOperationException("Not a valid culture."),
                     Culture = culture,
-                    Edited = !content.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture)) // if not published, always edited
+
+                    // if not published, always edited
+                    // no need to check for availability: it *is* available since it is in content.CultureNames
+                    Edited = !content.IsCulturePublished(culture) || (editedCultures != null && editedCultures.Contains(culture))
                 };
         }
 
