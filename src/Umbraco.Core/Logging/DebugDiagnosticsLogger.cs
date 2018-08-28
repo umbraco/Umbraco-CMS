@@ -8,6 +8,36 @@ namespace Umbraco.Core.Logging
     public class DebugDiagnosticsLogger : ILogger
     {
         /// <inheritdoc/>
+        public void Fatal(Type reporting, Exception exception, string message)
+        {
+            System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, Exception exception)
+        {
+            System.Diagnostics.Debug.WriteLine(Environment.NewLine + exception, reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, string message)
+        {
+            System.Diagnostics.Debug.WriteLine(message);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Format(messageTemplate, args) + Environment.NewLine + exception, reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, string messageTemplate, params object[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(messageTemplate, args);
+        }
+
+        /// <inheritdoc/>
         public void Error(Type reporting, Exception exception, string message)
         {
             System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
@@ -96,15 +126,6 @@ namespace Umbraco.Core.Logging
         {
             System.Diagnostics.Debug.WriteLine(string.Format(format, args), reporting.FullName);
         }
-
-        public void Fatal(Type reporting, Exception exception, string message)
-        {
-            System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
-        }
-
-        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] args)
-        {
-            System.Diagnostics.Debug.WriteLine(string.Format(messageTemplate, args) + Environment.NewLine + exception, reporting.FullName);
-        }
+        
     }
 }

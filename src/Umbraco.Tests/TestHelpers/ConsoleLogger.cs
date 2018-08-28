@@ -5,6 +5,34 @@ namespace Umbraco.Tests.TestHelpers
 {
     public class ConsoleLogger : ILogger
     {
+        public void Fatal(Type reporting, Exception exception, string message)
+        {
+            Console.WriteLine("FATAL {0} - {1}", reporting.Name, message);
+            Console.WriteLine(exception);
+        }
+
+        public void Fatal(Type reporting, Exception exception)
+        {
+            Console.WriteLine("FATAL {0}", reporting.Name);
+            Console.WriteLine(exception);
+        }
+
+        public void Fatal(Type reporting, string message)
+        {
+            Console.WriteLine("FATAL {0} - {1}", reporting.Name, message);
+        }
+
+        public void Fatal(Type reporting, Exception exception, string format, params object[] args)
+        {
+            Console.WriteLine("FATAL {0} - {1}", reporting.Name, string.Format(format, args));
+            Console.WriteLine(exception);
+        }
+
+        public void Fatal(Type reporting, string format, params object[] args)
+        {
+            Console.WriteLine("FATAL {0} - {1}", reporting.Name, string.Format(format, args));
+        }
+
         public void Error(Type reporting, Exception exception, string message)
         {
             Console.WriteLine("ERROR {0} - {1}", reporting.Name, message);
@@ -83,18 +111,6 @@ namespace Umbraco.Tests.TestHelpers
         public void Verbose(Type reporting, string format, params object[] args)
         {
             Console.WriteLine("VERBOSE {0} - {1}", reporting.Name, string.Format(format, args));
-        }
-
-        public void Fatal(Type reporting, Exception exception, string message)
-        {
-            Console.WriteLine("FATAL {0} - {1}", reporting.Name, message);
-            Console.WriteLine(exception);
-        }
-
-        public void Fatal(Type reporting, Exception exception, string format, params object[] args)
-        {
-            Console.WriteLine("FATAL {0} - {1}", reporting.Name, string.Format(format, args));
-            Console.WriteLine(exception);
         }
     }
 }
