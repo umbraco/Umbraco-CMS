@@ -2,7 +2,9 @@
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
+using Umbraco.Web.Media;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Constants = Umbraco.Core.Constants;
@@ -16,10 +18,12 @@ namespace Umbraco.Web.Editors
     public class ImagesController : UmbracoAuthorizedApiController
     {
         private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IContentSection _contentSection;
 
-        public ImagesController(MediaFileSystem mediaFileSystem)
+        public ImagesController(MediaFileSystem mediaFileSystem, IContentSection contentSection)
         {
             _mediaFileSystem = mediaFileSystem;
+            _contentSection = contentSection;
         }
 
         /// <summary>
@@ -51,7 +55,7 @@ namespace Umbraco.Web.Editors
             var ext = Path.GetExtension(imagePath);
 
             // we need to check if it is an image by extension
-            if (_mediaFileSystem.IsImageFile(ext) == false)
+            if (_contentSection.IsImageFile(ext) == false)
                 return Request.CreateResponse(HttpStatusCode.NotFound);
 
             //redirect to ImageProcessor thumbnail with rnd generated from last modified time of original media file

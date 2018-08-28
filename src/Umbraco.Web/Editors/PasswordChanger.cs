@@ -11,6 +11,7 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
+using Umbraco.Web.Security;
 using IUser = Umbraco.Core.Models.Membership.IUser;
 
 namespace Umbraco.Web.Editors

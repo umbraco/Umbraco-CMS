@@ -26,12 +26,13 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.Security.Identity;
+
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
+using Umbraco.Web.Security;
 using Action = Umbraco.Web._Legacy.Actions.Action;
 using Constants = Umbraco.Core.Constants;
 using JArray = Newtonsoft.Json.Linq.JArray;
