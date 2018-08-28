@@ -81,9 +81,9 @@ namespace Umbraco.Web._Legacy.Actions
                         _actionJsList += string.Format(",\n\tmenuItem(\"{0}\", \"{1}\", \"{2}\", \"{3}\")",
                             action.Letter, icon, Current.Services.TextService.Localize("actions/"+ action.Alias, new[] { language }), action.JsFunctionName);
                     }
-                    catch (Exception ee)
+                    catch (Exception ex)
                     {
-                        Current.Logger.Error<Action>("Error registrering action to javascript", ee);
+                        Current.Logger.Error<Action>(ex, "Error registrering action to javascript");
                     }
                 }
 

@@ -62,7 +62,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             if (touched == false) return;
 
-            _logger.Debug<XmlStoreFilePersister>(() => $"Created, save in {WaitMilliseconds}ms.");
+            _logger.Debug<XmlStoreFilePersister>("Created, save in {WaitMilliseconds}ms.", WaitMilliseconds);
             _initialTouch = DateTime.Now;
             _timer = new Timer(_ => TimerRelease());
             _timer.Change(WaitMilliseconds, 0);
@@ -107,7 +107,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
                 else if (_timer == null) // we don't have a timer yet
                 {
-                    _logger.Debug<XmlStoreFilePersister>(() => $"Touched, was idle, start and save in {WaitMilliseconds}ms.");
+                    _logger.Debug<XmlStoreFilePersister>("Touched, was idle, start and save in {WaitMilliseconds}ms.", WaitMilliseconds);
                     _initialTouch = DateTime.Now;
                     _timer = new Timer(_ => TimerRelease());
                     _timer.Change(WaitMilliseconds, 0);
@@ -120,7 +120,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
                     if (DateTime.Now - _initialTouch < TimeSpan.FromMilliseconds(MaxWaitMilliseconds))
                     {
-                        _logger.Debug<XmlStoreFilePersister>(() => $"Touched, was waiting, can delay, save in {WaitMilliseconds}ms.");
+                        _logger.Debug<XmlStoreFilePersister>("Touched, was waiting, can delay, save in {WaitMilliseconds}ms.", WaitMilliseconds);
                         _timer.Change(WaitMilliseconds, 0);
                     }
                     else

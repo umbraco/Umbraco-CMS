@@ -192,7 +192,7 @@ namespace Umbraco.Core.Packaging
                                           assemblyName.Name,
                                           "' see error log for full details."));
                         assembliesWithErrors.Add(a);
-                        Current.Logger.Error<PackageBinaryInspector>("An error occurred scanning package assemblies", ex);
+                        Current.Logger.Error<PackageBinaryInspector>(ex, "An error occurred scanning package assembly '{AssemblyName}'", assemblyName.FullName);
                     }
                 }
             }
@@ -236,7 +236,7 @@ namespace Umbraco.Core.Packaging
                                           a.GetName().Name,
                                           "' see error log for full details."));
                         assembliesWithErrors.Add(a);
-                        Current.Logger.Error<PackageBinaryInspector>("An error occurred scanning package assemblies", ex);
+                        Current.Logger.Error<PackageBinaryInspector>(ex, "An error occurred scanning package assembly '{AssemblyName}'", a.GetName().FullName);
                     }
                 }
 

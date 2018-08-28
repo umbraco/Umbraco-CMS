@@ -3,10 +3,11 @@ using System.Reflection;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
-using log4net;
 using LightInject;
+using Serilog;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
+using ILogger = Umbraco.Core.Logging.ILogger;
 
 namespace Umbraco.Core
 {
@@ -27,7 +28,7 @@ namespace Umbraco.Core
         /// </summary>
         protected virtual ILogger GetLogger()
         {
-            return Logger.CreateWithDefaultLog4NetConfiguration();
+            return Logger.CreateWithDefaultConfiguration();
         }
 
         // events - in the order they trigger
@@ -91,7 +92,7 @@ namespace Umbraco.Core
                 var msg = "Unhandled exception in AppDomain";
                 if (isTerminating) msg += " (terminating)";
                 msg += ".";
-                logger.Error<UmbracoApplicationBase>(msg, exception);
+                logger.Error<UmbracoApplicationBase>(exception, msg);
             };
         }
 
@@ -184,14 +185,15 @@ namespace Umbraco.Core
                     BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField,
                     null, runtime, null);
 
-                var shutdownMsg = $"Application shutdown. Details: {HostingEnvironment.ShutdownReason}\r\n\r\n_shutDownMessage={shutDownMessage}\r\n\r\n_shutDownStack={shutDownStack}";
-
-                logger.Info<UmbracoApplicationBase>(shutdownMsg);
+                logger.Info<UmbracoApplicationBase>("Application shutdown. Details: {ShutdownReason}\r\n\r\n_shutDownMessage={ShutdownMessage}\r\n\r\n_shutDownStack={ShutdownStack}",
+                    HostingEnvironment.ShutdownReason,
+                    shutDownMessage,
+                    shutDownStack);
             }
             catch (Exception)
             {
                 //if for some reason that fails, then log the normal output
-                logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: " + HostingEnvironment.ShutdownReason);
+                logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: {ShutdownReason}", HostingEnvironment.ShutdownReason);
             }
         }
 
@@ -201,7 +203,10 @@ namespace Umbraco.Core
         {
             HandleApplicationEnd();
             OnApplicationEnd(sender, evargs);
-            LogManager.Shutdown();
+
+            //Not sure if we need to do this - as my POC approach I never had to deal with this
+            //As the LightInject container when tearing down will dispose of Serilog AFAIK
+            Log.CloseAndFlush();
         }
 
         #endregion
@@ -220,7 +225,7 @@ namespace Umbraco.Core
             // ignore HTTP errors
             if (exception.GetType() == typeof(HttpException)) return;
 
-            Current.Logger.Error<UmbracoApplicationBase>("An unhandled exception occurred.", exception);
+            Current.Logger.Error<UmbracoApplicationBase>(exception, "An unhandled exception occurred");
         }
 
         // called by ASP.NET (auto event wireup) at any phase in the application life cycle
@@ -243,7 +248,7 @@ namespace Umbraco.Core
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<UmbracoApplicationBase>($"Error in {name} handler.", ex);
+                Current.Logger.Error<UmbracoApplicationBase>(ex, "Error in {Name} handler.", name);
                 throw;
             }
         }

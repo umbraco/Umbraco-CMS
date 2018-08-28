@@ -171,7 +171,7 @@ namespace Umbraco.Web.Editors
                 {
                     //ensure it's not listening
                     indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;
-                    Logger.Error<ExamineManagementController>("An error occurred rebuilding index", ex);
+                    Logger.Error<ExamineManagementController>(ex, "An error occurred rebuilding index");
                     var response = Request.CreateResponse(HttpStatusCode.Conflict);
                     response.Content =
                         new

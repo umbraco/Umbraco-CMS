@@ -79,13 +79,13 @@ namespace Umbraco.Core.Configuration
                     versionAttribute.SetValue(newVersion);
                     clientDependencyConfigXml.Save(_fileName, SaveOptions.DisableFormatting);
 
-                    _logger.Info<ClientDependencyConfiguration>(() => $"Updated version number from {oldVersion} to {newVersion}");
+                    _logger.Info<ClientDependencyConfiguration>("Updated version number from {OldVersion} to {NewVersion}", oldVersion, newVersion);
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                _logger.Error<ClientDependencyConfiguration>("Couldn't update ClientDependency version number", ex);
+                _logger.Error<ClientDependencyConfiguration>(ex, "Couldn't update ClientDependency version number");
             }
 
             return false;
@@ -113,13 +113,13 @@ namespace Umbraco.Core.Configuration
                     versionAttribute.SetValue(newVersion);
                     clientDependencyConfigXml.Save(_fileName, SaveOptions.DisableFormatting);
 
-                    _logger.Info<ClientDependencyConfiguration>(() => $"Updated version number from {oldVersion} to {newVersion}");
+                    _logger.Info<ClientDependencyConfiguration>("Updated version number from {OldVersion} to {NewVersion}", oldVersion, newVersion);
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                _logger.Error<ClientDependencyConfiguration>("Couldn't update ClientDependency version number", ex);
+                _logger.Error<ClientDependencyConfiguration>(ex, "Couldn't update ClientDependency version number");
             }
 
             return false;
@@ -150,7 +150,7 @@ namespace Umbraco.Core.Configuration
             catch (Exception ex)
             {
                 //invalid path format or something... try/catch to be safe
-                _logger.Error<ClientDependencyConfiguration>("Could not get path from ClientDependency.config", ex);
+                _logger.Error<ClientDependencyConfiguration>(ex, "Could not get path from ClientDependency.config");
             }
 
             var success = true;
@@ -167,7 +167,7 @@ namespace Umbraco.Core.Configuration
                 catch (Exception ex)
                 {
                     // Something could be locking the directory or the was another error, making sure we don't break the upgrade installer
-                    _logger.Error<ClientDependencyConfiguration>("Could not clear temp files", ex);
+                    _logger.Error<ClientDependencyConfiguration>(ex, "Could not clear temp files");
                     success = false;
                 }
             }

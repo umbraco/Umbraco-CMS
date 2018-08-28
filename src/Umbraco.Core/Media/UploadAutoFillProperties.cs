@@ -153,7 +153,7 @@ namespace Umbraco.Core.Media
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(typeof(UploadAutoFillProperties), $"Could not populate upload auto-fill properties for file \"{filepath}\".", ex);
+                    _logger.Error(typeof(UploadAutoFillProperties), ex, "Could not populate upload auto-fill properties for file '{File}'.", filepath);
                     ResetProperties(content, autoFillConfig, culture, segment);
                 }
             }

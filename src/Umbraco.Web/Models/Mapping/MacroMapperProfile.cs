@@ -41,7 +41,7 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         //we'll just map this to a text box
                         paramEditor = Current.ParameterEditors[Constants.PropertyEditors.Aliases.TextBox];
-                        Current.Logger.Warn<MacroMapperProfile>(() => $"Could not resolve a parameter editor with alias {property.EditorAlias}, a textbox will be rendered in it's place");
+                        Current.Logger.Warn<MacroMapperProfile>("Could not resolve a parameter editor with alias {PropertyEditorAlias}, a textbox will be rendered in it's place", property.EditorAlias);
                     }
 
                     parameter.View = paramEditor.GetValueEditor().View;

@@ -39,7 +39,7 @@ namespace Umbraco.Web
             {
                 _suspended = false;
 
-                Current.ProfilingLogger.Logger.Info(typeof (PageCacheRefresher), $"Resume document cache (reload:{(_tried ? "true" : "false")}).");
+                Current.ProfilingLogger.Logger.Info(typeof (PageCacheRefresher), "Resume document cache (reload:{Tried}).", _tried);
 
                 if (_tried == false) return;
                 _tried = false;
@@ -73,7 +73,7 @@ namespace Umbraco.Web
             {
                 _suspended = false;
 
-                Current.ProfilingLogger.Logger.Info(typeof (ExamineEvents), $"Resume indexers (rebuild:{(_tried ? "true" : "false")}).");
+                Current.ProfilingLogger.Logger.Info(typeof (ExamineEvents), "Resume indexers (rebuild:{Tried}).", _tried);
 
                 if (_tried == false) return;
                 _tried = false;

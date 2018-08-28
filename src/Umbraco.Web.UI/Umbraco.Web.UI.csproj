@@ -90,8 +90,6 @@
     <PackageReference Include="Examine" Version="1.0.0-beta025" />
     <PackageReference Include="ImageProcessor.Web" Version="4.9.2.19" />
     <PackageReference Include="ImageProcessor.Web.Config" Version="2.4.1.19" />
-    <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="Log4Net.Async" Version="2.0.4" />
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.1" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.6" />
@@ -260,9 +258,6 @@
     <Content Include="Config\imageprocessor\cache.config">
       <SubType>Designer</SubType>
     </Content>
-    <None Include="Config\log4net.Release.config">
-      <DependentUpon>log4net.config</DependentUpon>
-    </None>
     <None Include="Config\FileSystemProviders.Release.config">
       <DependentUpon>FileSystemProviders.config</DependentUpon>
     </None>
@@ -276,6 +271,12 @@
       <DependentUpon>HealthChecks.config</DependentUpon>
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Config\serilog.user.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Config\serilog.config">
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="Config\umbracoSettings.Release.config">
       <DependentUpon>umbracoSettings.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -489,7 +490,6 @@
     <Content Include="Config\umbracoSettings.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\log4net.config" />
     <Content Include="Config\FileSystemProviders.config" />
     <Content Include="Config\EmbeddedMedia.config" />
     <Content Include="Config\BackOfficeTours\getting-started.json" />

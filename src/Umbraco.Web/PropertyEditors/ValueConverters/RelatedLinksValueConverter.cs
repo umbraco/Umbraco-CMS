@@ -95,7 +95,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 }
                 else
                 {
-                    _logger.Warn<RelatedLinksValueConverter>(() => $"Related Links value converter skipped a link as the node has been unpublished/deleted (Internal Link NodeId: {relatedLink.Link}, Link Caption: \"{relatedLink.Caption}\")");
+                    _logger.Warn<RelatedLinksValueConverter>("Related Links value converter skipped a link as the node has been unpublished/deleted (Internal Link NodeId: {RelatedLinkNodeId}, Link Caption: '{RelatedLinkCaption}')", relatedLink.Link, relatedLink.Caption);
                 }
             }
 
@@ -158,7 +158,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<RelatedLinksValueConverter>("Could not parse the string " + sourceString + " to a json object", ex);
+                    _logger.Error<RelatedLinksValueConverter>(ex, "Could not parse the string {Json} to a json object", sourceString);
                 }
             }
 
