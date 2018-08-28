@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web.Mvc;
 using Umbraco.Core.Logging.Viewer;
+using Umbraco.Core.Models;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Editors
@@ -21,25 +23,25 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public int GetNumberOfErrors()
         {
-            return _logViewer.GetNumberOfErrors();
+            return _logViewer.GetNumberOfErrors(startDate: DateTime.Now, endDate: DateTime.Now);
         }
         
         [HttpGet]
         public LogLevelCounts GetLogLevelCounts()
         {
-            return _logViewer.GetLogLevelCounts();
+            return _logViewer.GetLogLevelCounts(startDate: DateTime.Now, endDate: DateTime.Now);
         }
 
         [HttpGet]
         public IEnumerable<CommonLogMessage> GetCommonLogMessages()
         {
-            return _logViewer.GetCommonLogMessages();
+            return _logViewer.GetCommonLogMessages(startDate: DateTime.Now, endDate: DateTime.Now);
         }
 
         [HttpGet]
-        public IEnumerable<LogMessage> GetLogs()
+        public PagedResult<LogMessage> GetLogs()
         {
-            return _logViewer.GetLogs();
+            return _logViewer.GetLogs(startDate: DateTime.Now, endDate: DateTime.Now);
         }
 
     }
