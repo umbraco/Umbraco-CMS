@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Serilog.Events;
 
 namespace Umbraco.Core.Logging.Viewer
 {
@@ -17,14 +16,14 @@ namespace Umbraco.Core.Logging.Viewer
         LogLevelCounts GetLogLevelCounts();
 
         /// <summary>
-        /// Returns the top 5 common log message templates and their counts
+        /// Returns the top  common log message templates and their counts
         /// </summary>
-        IEnumerable<CommonLogMessage> GetCommonLogMessages();
+        IEnumerable<CommonLogMessage> GetCommonLogMessages(int numberOfResults = 10);
 
         /// <summary>
         /// Returns the collection of logs
         /// </summary>
-        IEnumerable<LogEvent> GetLogs();
+        IEnumerable<LogMessage> GetLogs();
 
     }
 }

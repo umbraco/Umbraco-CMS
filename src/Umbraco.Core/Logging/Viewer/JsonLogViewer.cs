@@ -7,13 +7,13 @@ using Serilog.Formatting.Compact.Reader;
 
 namespace Umbraco.Core.Logging.Viewer
 {
-    public class LogViewer : ILogViewer
+    public class JsonLogViewer : ILogViewer
     {
-        private List<LogEvent> _logs;
+        private List<LogEvent> _logs = new List<LogEvent>();
 
-        public LogViewer()
+        public JsonLogViewer()
         {
-            var filePath = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog.DELLBOOK.20180824.json";
+            var filePath = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog.DELLBOOK.20180828.json";
 
             //Open log file
             using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
@@ -48,16 +48,37 @@ namespace Umbraco.Core.Logging.Viewer
             };
         }
 
-        public IEnumerable<CommonLogMessage> GetCommonLogMessages()
+        public IEnumerable<CommonLogMessage> GetCommonLogMessages(int numberOfResults)
         {
-            var messages = new List<CommonLogMessage>();
-            return messages;
+            var templates = _logs.GroupBy(x => x.MessageTemplate.Text)
+                .Select(g => new CommonLogMessage { MessageTemplate = g.Key, Count = g.Count() })
+                .OrderByDescending(x => x.Count)
+                .Take(numberOfResults);
 
+            return templates;
         }
 
-        public IEnumerable<LogEvent> GetLogs()
+        public IEnumerable<LogMessage> GetLogs()
         {
-            throw new NotImplementedException();
+            var messages = new List<LogMessage>();
+            var logs = _logs.Take(20);
+
+            foreach(var log in logs)
+            {
+                var logItem = new LogMessage
+                {
+                    Level = log.Level,
+                    Properties = log.Properties,
+                    Timestamp = log.Timestamp,
+                    MessageTemplateText = log.MessageTemplate.Text, //Not necesarily worried about token position just the message text itself
+                    RenderedMessage = log.RenderMessage(), //Not returning LogEvent itself from Serilog (as we don't get the rendered txt log back)
+                    Exception = log.Exception
+                };
+
+                messages.Add(logItem);
+            }
+
+            return messages;
         }
     }
 }
