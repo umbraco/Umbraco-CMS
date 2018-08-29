@@ -11,11 +11,11 @@ namespace Umbraco.Web.Editors
     /// Backoffice controller supporting the dashboard for viewing logs with some simple graphs & filtering
     /// </summary>
     [PluginController("UmbracoApi")]
-    public class LogsController : UmbracoAuthorizedJsonController
+    public class LogViewerController : UmbracoAuthorizedJsonController
     {
         private ILogViewer _logViewer;
 
-        public LogsController(ILogViewer logViewer)
+        public LogViewerController(ILogViewer logViewer)
         {
             _logViewer = logViewer;
         }
