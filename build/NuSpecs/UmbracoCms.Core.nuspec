@@ -33,8 +33,6 @@
       <dependency id="LightInject.Annotation" version="[1.1.0,1.999999)" />
       <dependency id="LightInject.Mvc" version="[2.0.0,2.999999)" />
       <dependency id="LightInject.WebApi" version="[2.0.0,2.999999)" />
-      <dependency id="log4net" version="[2.0.8,2.999999)" />
-      <dependency id="Log4Net.Async" version="[2.0.4,2.999999)" />
       <dependency id="Lucene.Net.Contrib" version="[3.0.3,3.999999)" />
       <dependency id="Markdown" version="[2.2.1,2.999999)" />
       <dependency id="Microsoft.AspNet.Identity.Owin" version="[2.2.1,2.999999)" />
@@ -53,6 +51,13 @@
       <dependency id="Newtonsoft.Json" version="[11.0.2,11.999999)" />
       <dependency id="NPoco" version="[3.9.3,3.999999)" />
       <dependency id="Semver" version="[2.0.4,2.999999)" />
+      <dependency id="Serilog" version="[2.7.1,2.999999)" />
+      <dependency id="Serilog.Enrichers.Process" version="[2.0.1,2.999999)" />
+      <dependency id="Serilog.Enrichers.Thread" version="[3.0.0,3.999999)" />
+      <dependency id="Serilog.Filters.Expressions" version="[2.0.0,2.999999)" />
+      <dependency id="Serilog.Formatting.Compact" version="[1.0.0,1.999999)" />
+      <dependency id="Serilog.Settings.AppSettings" version="[2.1.2,2.999999)" />
+      <dependency id="Serilog.Sinks.File" version="[4.0.0,4.999999)" />
       <dependency id="System.Reflection.Primitives" version="[4.3.0,4.999999)" />
       <dependency id="System.Runtime.Handles" version="[4.3.0,4.999999)" />
       <dependency id="System.Security.Cryptography.X509Certificates" version="[4.3.2,4.999999)" />

@@ -148,7 +148,7 @@ namespace Umbraco.Core.Composing
                     catch (FileNotFoundException ex)
                     {
                         //this will occur if it cannot load the assembly
-                        Current.Logger.Error(typeof(TypeFinder), "Could not load assembly App_Code", ex);
+                        Current.Logger.Error(typeof(TypeFinder), ex, "Could not load assembly App_Code");
                     }
                 }
             }
@@ -224,7 +224,6 @@ namespace Umbraco.Core.Composing
                     "Dynamic,",
                     "HtmlDiff,",
                     "Iesi.Collections,",
-                    "log4net,",
                     "Microsoft.",
                     "Newtonsoft.",
                     "NHibernate.",
@@ -440,7 +439,7 @@ namespace Umbraco.Core.Composing
                     }
                     catch (TypeLoadException ex)
                     {
-                        Current.Logger.Error(typeof(TypeFinder), $"Could not query types on {assembly} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", ex);
+                        Current.Logger.Error(typeof(TypeFinder), ex, "Could not query types on {Assembly} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", assembly);
                         continue;
                     }
 
@@ -506,7 +505,7 @@ namespace Umbraco.Core.Composing
                     }
                     catch (TypeLoadException ex)
                     {
-                        Current.Logger.Error(typeof(TypeFinder), $"Could not query types on {assembly} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", ex);
+                        Current.Logger.Error(typeof(TypeFinder), ex, "Could not query types on {Assembly} assembly, this is most likely due to this assembly not being compatible with the current Umbraco version", assembly);
                         continue;
                     }
 
@@ -573,7 +572,7 @@ namespace Umbraco.Core.Composing
                     if (NotifiedLoadExceptionAssemblies.Contains(a.FullName) == false)
                     {
                         NotifiedLoadExceptionAssemblies.Add(a.FullName);
-                        Current.Logger.Warn(typeof (TypeFinder), ex, $"Could not load all types from {a.GetName().Name}.");
+                        Current.Logger.Warn(typeof (TypeFinder), ex, "Could not load all types from {TypeName}.", a.GetName().Name);
                     }
                 }
                 return rex.Types.WhereNotNull().ToArray();

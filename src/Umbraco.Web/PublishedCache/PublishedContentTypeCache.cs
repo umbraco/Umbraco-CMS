@@ -48,7 +48,7 @@ namespace Umbraco.Web.PublishedCache
         /// </summary>
         public void ClearAll()
         {
-            _logger.Debug<PublishedContentTypeCache>(() => "Clear all.");
+            _logger.Debug<PublishedContentTypeCache>("Clear all.");
 
             try
             {
@@ -70,7 +70,7 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="id">An identifier.</param>
         public void ClearContentType(int id)
         {
-            _logger.Debug<PublishedContentTypeCache>(() => $"Clear content type w/id {id}.");
+            _logger.Debug<PublishedContentTypeCache>("Clear content type w/id {ContentTypeId}", id);
 
             try
             {
@@ -105,7 +105,7 @@ namespace Umbraco.Web.PublishedCache
         /// <param name="id">A data type identifier.</param>
         public void ClearDataType(int id)
         {
-            _logger.Debug<PublishedContentTypeCache>(() => $"Clear data type w/id {id}.");
+            _logger.Debug<PublishedContentTypeCache>("Clear data type w/id {DataTypeId}.", id);
 
             // there is no recursion to handle here because a PublishedContentType contains *all* its
             // properties ie both its own properties and those that were inherited (it's based upon an

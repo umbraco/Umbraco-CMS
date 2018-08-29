@@ -237,7 +237,7 @@ namespace Umbraco.Web.Components
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<DatabaseServerRegistrarAndMessengerComponent>("Failed to update server record in database.", ex);
+                    _logger.Error<DatabaseServerRegistrarAndMessengerComponent>(ex, "Failed to update server record in database.");
                     return false; // probably stop if we have an error
                 }
             }

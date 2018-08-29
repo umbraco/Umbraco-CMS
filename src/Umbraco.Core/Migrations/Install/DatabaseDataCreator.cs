@@ -29,7 +29,7 @@ namespace Umbraco.Core.Migrations.Install
         /// <param name="tableName">Name of the table to create base data for</param>
         public void InitializeBaseData(string tableName)
         {
-            _logger.Info<DatabaseDataCreator>(() => $"Creating data in table {tableName}");
+            _logger.Info<DatabaseDataCreator>("Creating data in {TableName}", tableName);
 
             if (tableName.Equals(Constants.DatabaseSchema.Tables.Node))
                 CreateNodeData();
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Migrations.Install
             if (tableName.Equals(Constants.DatabaseSchema.Tables.KeyValue))
                 CreateKeyValueData();
 
-            _logger.Info<DatabaseDataCreator>(() => $"Done creating table {tableName} data.");
+            _logger.Info<DatabaseDataCreator>("Done creating table {TableName} data.", tableName);
         }
 
         private void CreateNodeData()

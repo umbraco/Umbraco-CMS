@@ -38,9 +38,8 @@ namespace Umbraco.Web.Trees
             var attempt = tree.TryLoadFromLegacyTree(id, queryStrings, Url, tree.ApplicationAlias);
             if (attempt.Success == false)
             {
-                var msg = "Could not render tree " + queryStrings.GetRequiredString("treeType") + " for node id " + id;
-                Logger.Error<LegacyTreeController>(msg, attempt.Exception);
-                throw new ApplicationException(msg);
+                Logger.Error<LegacyTreeController>(attempt.Exception, "Could not render tree {TreeType} for node id {NodeId}", queryStrings.GetRequiredString("treeType"), id);
+                throw new ApplicationException("Could not render tree " + queryStrings.GetRequiredString("treeType") + " for node id " + id);
             }
 
             return attempt.Result;
@@ -65,9 +64,8 @@ namespace Umbraco.Web.Trees
                 var attempt = tree.TryGetMenuFromLegacyTreeRootNode(queryStrings, Url);
                 if (attempt.Success == false)
                 {
-                    var msg = "Could not render menu for root node for treeType " + queryStrings.GetRequiredString("treeType");
-                    Logger.Error<LegacyTreeController>(msg, attempt.Exception);
-                    throw new ApplicationException(msg);
+                    Logger.Error<LegacyTreeController>(attempt.Exception, "Could not render menu for root node for treeType {TreeType}", queryStrings.GetRequiredString("treeType"));
+                    throw new ApplicationException("Could not render menu for root node for treeType " + queryStrings.GetRequiredString("treeType"));
                 }
 
                 foreach (var menuItem in attempt.Result.Items)
@@ -81,9 +79,8 @@ namespace Umbraco.Web.Trees
                 var attempt = tree.TryGetMenuFromLegacyTreeNode(parentId, id, queryStrings, Url);
                 if (attempt.Success == false)
                 {
-                    var msg = "Could not render menu for treeType " + queryStrings.GetRequiredString("treeType") + " for node id " + parentId;
-                    Logger.Error<LegacyTreeController>(msg, attempt.Exception);
-                    throw new ApplicationException(msg);
+                    Logger.Error<LegacyTreeController>(attempt.Exception, "Could not render menu for treeType {TreeType} for node id {ParentNodeId}", queryStrings.GetRequiredString("treeType"), parentId);
+                    throw new ApplicationException("Could not render menu for treeType " + queryStrings.GetRequiredString("treeType") + " for node id " + parentId);
                 }
                 foreach (var menuItem in attempt.Result.Items)
                 {

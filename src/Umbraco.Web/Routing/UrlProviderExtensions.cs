@@ -65,9 +65,9 @@ namespace Umbraco.Web.Routing
                 {
                     url = umbracoContext.UrlProvider.GetUrl(content.Id, culture);
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    logger.Error<UrlProvider>("GetUrl exception.", e);
+                    logger.Error<UrlProvider>(ex, "GetUrl exception.");
                     url = "#ex";
                 }
 

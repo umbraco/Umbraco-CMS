@@ -111,15 +111,15 @@ namespace Umbraco.Core.Components
             catch (Exception e)
             {
                 // in case of an error, force-dump everything to log
-                _logger.Info<BootLoader>(() => GetComponentsReport(requirements));
-                _logger.Error<BootLoader>("Failed to sort components.", e);
+                _logger.Info<BootLoader>("Component Report:\r\n{ComponentReport}", GetComponentsReport(requirements));
+                _logger.Error<BootLoader>(e, "Failed to sort compontents.");
                 throw;
             }
 
             // bit verbose but should help for troubleshooting
             var text = "Ordered Components: " + Environment.NewLine + string.Join(Environment.NewLine, sortedComponentTypes) + Environment.NewLine;
             Console.WriteLine(text);
-            _logger.Debug<BootLoader>(text);
+            _logger.Debug<BootLoader>("Ordered Components: {SortedComponentTypes}", sortedComponentTypes);
 
             return sortedComponentTypes;
         }

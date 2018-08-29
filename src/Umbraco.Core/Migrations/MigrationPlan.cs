@@ -269,14 +269,11 @@ namespace Umbraco.Core.Migrations
             if (_migrationBuilder == null || _logger == null)
                 throw new InvalidOperationException("Cannot execute a non-executing plan.");
 
-            _logger.Info<MigrationPlan>(() => $"Starting \"{Name}\"...");
+            _logger.Info<MigrationPlan>("Starting '{MigrationName}'...", Name);
+
             var origState = fromState ?? string.Empty;
 
-            _logger.Info<MigrationPlan>(() =>
-            {
-                var info = "At " + (string.IsNullOrWhiteSpace(origState) ? "origin" : ("\"" + origState + "\"")) + ".";
-                return info.Replace("{", "{{").Replace("}", "}}"); // stupid log4net
-            });
+            _logger.Info<MigrationPlan>("At {OrigState}", string.IsNullOrWhiteSpace(origState) ? "origin": origState);
 
             if (!_transitions.TryGetValue(origState, out var transition))
                 throw new Exception($"Unknown state \"{origState}\".");
@@ -291,7 +288,7 @@ namespace Umbraco.Core.Migrations
                 var nextState = transition.TargetState;
                 origState = nextState;
 
-                _logger.Info<MigrationPlan>(() => $"At \"{origState}\".");
+                _logger.Info<MigrationPlan>("At {OrigState}", origState);
 
                 if (!_transitions.TryGetValue(origState, out transition))
                     throw new Exception($"Unknown state \"{origState}\".");

@@ -225,7 +225,7 @@ namespace Umbraco.Core.Models
                     }
                     catch (Exception ex)
                     {
-                        Current.Logger.Warn(typeof(PropertyTagsExtensions), ex, "Could not automatically convert stored json value to an enumerable string");
+                        Current.Logger.Warn(typeof(PropertyTagsExtensions), ex, "Could not automatically convert stored json value to an enumerable string '{Json}'", value.ToString());
                     }
                     break;
 

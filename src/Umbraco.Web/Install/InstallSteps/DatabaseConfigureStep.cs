@@ -85,7 +85,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<DatabaseConfigureStep>("An error occurred, reconfiguring...", ex);
+                    _logger.Error<DatabaseConfigureStep>(ex, "An error occurred, reconfiguring...");
                     //something went wrong, could not connect so probably need to reconfigure
                     return true;
                 }

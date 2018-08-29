@@ -552,9 +552,14 @@ namespace Umbraco.Core.Models
         private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)
         {
             void DoLog(string logPropertyAlias, string logPropertyName)
-                => Current.Logger.Warn<Member>($"Trying to access the '{logPropertyName}' property on " + typeof(Member)
-                + $" but the {logPropertyAlias} property does not exist on the member type so a default value is returned. Ensure that you have a property type with alias: "
-                + logPropertyAlias + $" configured on your member type in order to use the '{logPropertyName}' property on the model correctly.");
+            {
+                Current.Logger.Warn<Member>("Trying to access the '{PropertyName}' property on '{MemberType}' " +
+                                            "but the {PropertyAlias} property does not exist on the member type so a default value is returned. " +
+                                            "Ensure that you have a property type with alias:  {PropertyAlias} configured on your member type in order to use the '{PropertyName}' property on the model correctly.",
+                                                logPropertyName,
+                                                typeof(Member),
+                                                logPropertyAlias);
+            }
 
             // if the property doesn't exist,
             if (Properties.Contains(propertyAlias) == false)
@@ -572,8 +577,13 @@ namespace Umbraco.Core.Models
         private bool WarnIfPropertyTypeNotFoundOnSet(string propertyAlias, string propertyName)
         {
             void DoLog(string logPropertyAlias, string logPropertyName)
-                => Current.Logger.Warn<Member>($"An attempt was made to set a value on the property '{logPropertyName}' on type " + typeof(Member)
-                + $" but the property type {logPropertyAlias} does not exist on the member type, ensure that this property type exists so that setting this property works correctly.");
+            {
+                Current.Logger.Warn<Member>("An attempt was made to set a value on the property '{PropertyName}' on type '{MemberType}' but the " +
+                                            "property type {PropertyAlias} does not exist on the member type, ensure that this property type exists so that setting this property works correctly.",
+                                                logPropertyName,
+                                                typeof(Member),
+                                                logPropertyAlias);
+            }
 
             // if the property doesn't exist,
             if (Properties.Contains(propertyAlias) == false)

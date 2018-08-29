@@ -487,10 +487,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 if (result.ContainsKey(temp.VersionId))
                 {
-                    var msg = $"The query returned multiple property sets for content {temp.Id}, {temp.ContentType.Name}";
                     if (ContentRepositoryBase.ThrowOnWarning)
-                        throw new InvalidOperationException(msg);
-                    Logger.Warn<ContentRepositoryBase<TId, TEntity, TRepository>>(msg);
+                        throw new InvalidOperationException($"The query returned multiple property sets for content {temp.Id}, {temp.ContentType.Name}");
+                    Logger.Warn<ContentRepositoryBase<TId, TEntity, TRepository>>("The query returned multiple property sets for content {ContentId}, {ContentTypeName}", temp.Id, temp.ContentType.Name);
                 }
 
                 result[temp.VersionId] = new PropertyCollection(properties);

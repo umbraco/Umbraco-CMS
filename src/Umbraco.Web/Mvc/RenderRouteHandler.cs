@@ -318,8 +318,11 @@ namespace Umbraco.Web.Mvc
                 }
                 else
                 {
-                    Current.Logger.Warn<RenderRouteHandler>(() =>
-                        $"The current Document Type {request.PublishedContent.ContentType.Alias} matches a locally declared controller of type {controllerType.FullName}. Custom Controllers for Umbraco routing must implement '{typeof(IRenderController).FullName}' and inherit from '{typeof(ControllerBase).FullName}'.");
+                    Current.Logger.Warn<RenderRouteHandler>("The current Document Type {ContentTypeAlias} matches a locally declared controller of type {ControllerName}. Custom Controllers for Umbraco routing must implement '{UmbracoRenderController}' and inherit from '{UmbracoControllerBase}'.",
+                        request.PublishedContent.ContentType.Alias,
+                        controllerType.FullName,
+                        typeof(IRenderController).FullName,
+                        typeof(ControllerBase).FullName);
 
                     //we cannot route to this custom controller since it is not of the correct type so we'll continue with the defaults
                     // that have already been set above.

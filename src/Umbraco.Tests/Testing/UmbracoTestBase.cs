@@ -162,9 +162,9 @@ namespace Umbraco.Tests.Testing
                 Container.RegisterSingleton(f => Mock.Of<ILogger>());
                 Container.RegisterSingleton(f => Mock.Of<IProfiler>());
             }
-            else if (option == UmbracoTestOptions.Logger.Log4Net)
+            else if (option == UmbracoTestOptions.Logger.Serilog)
             {
-                Container.RegisterSingleton<ILogger>(f => new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test-log4net.config"))));
+                Container.RegisterSingleton<ILogger>(f => new Logger(new FileInfo(TestHelper.MapPathForTest("~/unit-test.config"))));
                 Container.RegisterSingleton<IProfiler>(f => new LogProfiler(f.GetInstance<ILogger>()));
             }
 

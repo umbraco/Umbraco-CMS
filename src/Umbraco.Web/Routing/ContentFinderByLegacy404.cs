@@ -70,7 +70,7 @@ namespace Umbraco.Web.Routing
 
             if (error404.HasValue)
             {
-                _logger.Debug<ContentFinderByLegacy404>(() => $"Got id={error404.Value}.");
+                _logger.Debug<ContentFinderByLegacy404>("Got id={ErrorNodeId}.", error404.Value);
 
                 content = frequest.UmbracoContext.ContentCache.GetById(error404.Value);
 

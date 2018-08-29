@@ -62,9 +62,9 @@ namespace Umbraco.Web.Scheduling
                 var publisher = new ScheduledPublisher(_contentService, _logger, _userService);
                 var count = publisher.CheckPendingAndProcess();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.Error<ScheduledPublishing>("Failed.", e);
+                _logger.Error<ScheduledPublishing>(ex, "Failed.");
             }
 
             return true; // repeat
