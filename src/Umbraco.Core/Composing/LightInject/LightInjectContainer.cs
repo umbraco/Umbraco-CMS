@@ -110,6 +110,10 @@ namespace Umbraco.Core.Composing.LightInject
             => Container.GetInstance(type, name);
 
         /// <inheritdoc />
+        public object TryGetInstance(Type type)
+            => Container.TryGetInstance(type);
+
+        /// <inheritdoc />
         public IEnumerable<T> GetAllInstances<T>()
             => Container.GetAllInstances<T>();
 

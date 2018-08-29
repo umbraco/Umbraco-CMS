@@ -78,27 +78,20 @@ namespace Umbraco.Core.Composing
         // registered we setup a default one. We should really refactor our tests so that it does
         // not happen. Will do when we get rid of IShortStringHelper.
 
-        private static T TryGetInstance<T>(IContainer container)
-            where T : class
-        {
-            var registration = container?.GetRegistered<T>();
-            return registration == null ? null : container.GetInstance<T>();
-        }
-
         public static IShortStringHelper ShortStringHelper
-            => _shortStringHelper ?? (_shortStringHelper = TryGetInstance<IShortStringHelper>(_container)
+            => _shortStringHelper ?? (_shortStringHelper = _container?.TryGetInstance<IShortStringHelper>()
                 ?? new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(UmbracoConfig.For.UmbracoSettings())));
 
         public static ILogger Logger
-            => _logger ?? (_logger = TryGetInstance<ILogger>(_container)
+            => _logger ?? (_logger = _container?.TryGetInstance<ILogger>()
                 ?? new DebugDiagnosticsLogger());
 
         public static IProfiler Profiler
-            => _profiler ?? (_profiler = TryGetInstance<IProfiler>(_container)
+            => _profiler ?? (_profiler = _container?.TryGetInstance<IProfiler>()
                 ?? new LogProfiler(Logger));
 
         public static ProfilingLogger ProfilingLogger
-            => _profilingLogger ?? (_profilingLogger = TryGetInstance<ProfilingLogger>(_container))
+            => _profilingLogger ?? (_profilingLogger = _container?.TryGetInstance<ProfilingLogger>())
                ?? new ProfilingLogger(Logger, Profiler);
 
         public static IRuntimeState RuntimeState

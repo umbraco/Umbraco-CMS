@@ -20,6 +20,17 @@ namespace Umbraco.Core.Composing
             => (T) container.GetInstance(typeof(T));
 
         /// <summary>
+        /// Tries to get an instance.
+        /// </summary>
+        /// <typeparam name="T">The type of the instance.</typeparam>
+        /// <returns>An instance of the specified type, or null.</returns>
+        /// <remarks>Returns null if the container does not know how to get an instance
+        /// of the specified type. Throws an exception if the container does know how
+        /// to get an instance of the specified type, but failed to do so.</remarks>
+        public static T TryGetInstance<T>(this IContainer container)
+            => (T) container.TryGetInstance(typeof(T));
+
+        /// <summary>
         /// Gets registration for a service.
         /// </summary>
         /// <typeparam name="TService">The type of the service.</typeparam>

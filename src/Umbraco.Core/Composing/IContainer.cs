@@ -38,6 +38,16 @@ namespace Umbraco.Core.Composing
         object GetInstance(Type type, string name);
 
         /// <summary>
+        /// Tries to get an instance.
+        /// </summary>
+        /// <param name="type">The type of the instance.</param>
+        /// <returns>An instance of the specified type, or null.</returns>
+        /// <remarks>Returns null if the container does not know how to get an instance
+        /// of the specified type. Throws an exception if the container does know how
+        /// to get an instance of the specified type, but failed to do so.</remarks>
+        object TryGetInstance(Type type);
+
+        /// <summary>
         /// Gets all instances of a service.
         /// </summary>
         /// <param name="serviceType">The type of the service.</param>
