@@ -271,9 +271,7 @@
 
                     init($scope.content);
 
-                    if (!infiniteMode) {
-                        syncTreeNode($scope.content, true);
-                    }
+                    syncTreeNode($scope.content, $scope.content.path, true);
 
                     resetLastListPageNumber($scope.content);
 
@@ -322,10 +320,12 @@
         }
 
         /** Syncs the content item to it's tree node - this occurs on first load and after saving */
-        function syncTreeNode(content, initialLoad) {
+        function syncTreeNode(content, path, initialLoad) {
 
-            var path = content.path;
-
+            if (infiniteMode || !path) {
+                return;
+            }
+            
             if (!$scope.content.isChildOfListView) {
                 navigationService.syncTree({ tree: $scope.treeAlias, path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
                     $scope.page.menu.currentNode = syncArgs.node;
@@ -363,9 +363,7 @@
                 //success            
                 init($scope.content);
 
-                if (!infiniteMode) {
-                    syncTreeNode($scope.content);
-                }
+                syncTreeNode($scope.content, data.path);
 
                 $scope.page.buttonGroupState = "success";
 
@@ -376,7 +374,7 @@
                 function (err) {
 
                     setActiveCulture();
-                    syncTreeNode($scope.content);
+                    syncTreeNode($scope.content, $scope.content.path);
 
                     //error
                     if (err) {
@@ -460,9 +458,7 @@
 
                         init($scope.content);
 
-                        if (!infiniteMode) {
-                            syncTreeNode($scope.content);
-                        }
+                        syncTreeNode($scope.content, data.path);
 
                         $scope.page.buttonGroupState = "success";
 

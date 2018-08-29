@@ -652,14 +652,14 @@ Opens an overlay to show a custom YSOD. </br>
                          $q.when(scope.model.submit(model, modelCopy, scope.directive.enableConfirmButton)).then(
                              function() {
                                  formHelper.resetForm({ scope: scope });
-                             }, angular.noop);
+                             });
                      } else {
                          unregisterOverlay();
                          //wrap in a when since we don't know if this is a promise or not
                          $q.when(scope.model.submit(model, modelCopy, scope.directive.enableConfirmButton)).then(
                              function() {
                                  formHelper.resetForm({ scope: scope });
-                             }, angular.noop);
+                             });
                      }
 
                  }
