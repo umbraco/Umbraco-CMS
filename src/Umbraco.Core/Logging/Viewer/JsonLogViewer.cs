@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Serilog.Events;
+using Serilog.Filters.Expressions;
 using Serilog.Formatting.Compact.Reader;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -84,17 +85,31 @@ namespace Umbraco.Core.Logging.Viewer
             return templates;
         }
 
-        public PagedResult<LogMessage> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, int pageNumber = 1, int pageSize = 100, Direction orderDirection = Direction.Descending)
+        public PagedResult<LogMessage> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate,
+            int pageNumber = 1, int pageSize = 100,
+            Direction orderDirection = Direction.Descending,
+            string filterExpression = null)
         {            
             //Get all logs into memory (Not sure this good or not)
             var logs = GetAllLogs(startDate, endDate);
+            
+            //If we have a filter expression, apply it
+            if(string.IsNullOrEmpty(filterExpression) == false)
+            {
+                Func<LogEvent, bool> filter = null;
+                var eval = FilterLanguage.CreateFilter(filterExpression);
+                filter = evt => true.Equals(eval(evt));
+                
+                logs = logs.Where(filter);
+            }
+
             long totalRecords = logs.Count();
             long pageIndex = pageNumber - 1;
             
-            //Skip, Take & Select
-            var logItems = logs
+            //Order By, Skip, Take & Select
+            IEnumerable<LogMessage> logMessages = logs
                 .OrderBy(l => l.Timestamp, orderDirection)
-                .Skip(pageSize * pageNumber)
+                .Skip(pageSize * (pageNumber -1))
                 .Take(pageSize)
                 .Select(x => new LogMessage {
                     Timestamp = x.Timestamp,
@@ -107,7 +122,7 @@ namespace Umbraco.Core.Logging.Viewer
 
             return new PagedResult<LogMessage>(totalRecords, pageNumber, pageSize)
             {
-                Items = logItems
+                Items = logMessages
             };            
         }
     }
