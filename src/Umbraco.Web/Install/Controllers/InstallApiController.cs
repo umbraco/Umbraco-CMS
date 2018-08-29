@@ -225,7 +225,7 @@ namespace Umbraco.Web.Install.Controllers
         // executes the step
         internal InstallSetupResult ExecuteStep(InstallSetupStep step, JToken instruction)
         {
-            using (_proflog.TraceDuration<InstallApiController>("Executing installation step: '{Step}' Step completed", step.Name))
+            using (_proflog.TraceDuration<InstallApiController>("Executing installation step: '{step.Name}'.", "Step completed"))
             {
                 var model = instruction?.ToObject(step.StepType);
                 var genericStepType = typeof(InstallSetupStep<>);
