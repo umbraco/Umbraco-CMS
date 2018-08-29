@@ -49,7 +49,7 @@ namespace Umbraco.Core.Services
         private Dictionary<string, IContentType> _importedContentTypes;
         private IPackageInstallation _packageInstallation;
         private readonly IUserService _userService;
-        private static readonly HttpClient HttpClient = new HttpClient();
+        private static HttpClient _httpClient;
 
         public PackagingService(
             ILogger logger,
@@ -96,7 +96,11 @@ namespace Umbraco.Core.Services
                 byte[] bytes;
                 try
                 {
-                    bytes = HttpClient.GetByteArrayAsync(url).GetAwaiter().GetResult();
+                    if (_httpClient == null)
+                    {
+                        _httpClient = new HttpClient();
+                    }
+                    bytes = _httpClient.GetByteArrayAsync(url).GetAwaiter().GetResult();
                 }
                 catch (HttpRequestException ex)
                 {

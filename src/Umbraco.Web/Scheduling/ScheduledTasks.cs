@@ -17,7 +17,7 @@ namespace Umbraco.Web.Scheduling
 
     internal class ScheduledTasks : RecurringTaskBase
     {
-        private static readonly HttpClient HttpClient = new HttpClient();
+        private static HttpClient _httpClient;
         private readonly ApplicationContext _appContext;
         private readonly IUmbracoSettingsSection _settings;
         private static readonly Hashtable ScheduledTaskTimes = new Hashtable();
@@ -62,9 +62,13 @@ namespace Umbraco.Web.Scheduling
 
         private async Task<bool> GetTaskByHttpAync(string url, CancellationToken token)
         {
+            if (_httpClient == null)
+            {
+                _httpClient = new HttpClient();
+            }
             if (Uri.TryCreate(_appContext.UmbracoApplicationUrl, UriKind.Absolute, out var baseUri))
             {
-                HttpClient.BaseAddress = baseUri;
+                _httpClient.BaseAddress = baseUri;
             }
             var request = new HttpRequestMessage(HttpMethod.Get, url);
 
@@ -73,7 +77,7 @@ namespace Umbraco.Web.Scheduling
 
             try
             {
-                var result = await HttpClient.SendAsync(request, token).ConfigureAwait(false); // ConfigureAwait(false) is recommended? http://blog.stephencleary.com/2012/07/dont-block-on-async-code.html
+                var result = await _httpClient.SendAsync(request, token).ConfigureAwait(false); // ConfigureAwait(false) is recommended? http://blog.stephencleary.com/2012/07/dont-block-on-async-code.html
                 return result.StatusCode == HttpStatusCode.OK;
             }
             catch (Exception ex)
