@@ -54,7 +54,7 @@ namespace Umbraco.Core.IO
             }
 
             _logger = logger;
-            _logger.Debug<ShadowFileSystems>(() => "Shadow " + id + ".");
+            _logger.Debug<ShadowFileSystems>("Shadow '{ShadowId}'", id);
             _id = id;
 
             _wrappers = wrappers;
@@ -112,7 +112,7 @@ namespace Umbraco.Core.IO
         {
             lock (Locker)
             {
-                _logger.Debug<ShadowFileSystems>(() => "UnShadow " + _id + " (" + (_completed ? "complete" : "abort") + ").");
+                _logger.Debug<ShadowFileSystems>("UnShadow '{ShadowId}' {Status}", _id, _completed ? "complete" : "abort");
 
                 var exceptions = new List<Exception>();
                 foreach (var wrapper in _wrappers)

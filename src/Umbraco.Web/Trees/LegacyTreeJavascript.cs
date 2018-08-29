@@ -34,7 +34,7 @@ namespace Umbraco.Web.Trees
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error(typeof(LegacyTreeJavascript), "Could not load the JS from the legacy tree " + bTree.TreeAlias, ex);
+                    Current.Logger.Error(typeof(LegacyTreeJavascript), ex, "Could not load the JS from the legacy tree {TreeAlias}", bTree.TreeAlias);
                 }
             }
 
@@ -64,9 +64,9 @@ namespace Umbraco.Web.Trees
                         }
                     }
                 }
-                catch (Exception ee)
+                catch (Exception ex)
                 {
-                    Current.Logger.Error(typeof(LegacyTreeJavascript), "Error initializing tree action", ee);
+                    Current.Logger.Error(typeof(LegacyTreeJavascript), ex, "Error initializing tree action");
                 }
             }
 

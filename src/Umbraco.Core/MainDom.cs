@@ -117,7 +117,7 @@ namespace Umbraco.Core
 
             lock (_locko)
             {
-                _logger.Debug<MainDom>(() => "Signaled" + (_signaled ? " (again)" : "") + " (" + source + ").");
+                _logger.Debug<MainDom>("Signaled {Signaled} ({SignalSource})", _signaled ? "(again)" : string.Empty, source);
                 if (_signaled) return;
                 if (_isMainDom == false) return; // probably not needed
                 _signaled = true;
@@ -125,7 +125,7 @@ namespace Umbraco.Core
 
             try
             {
-                _logger.Info<MainDom>("Stopping.");
+                _logger.Info<MainDom>("Stopping ({SignalSource})", source);
                 foreach (var callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
                 {
                     try
@@ -134,19 +134,19 @@ namespace Umbraco.Core
                     }
                     catch (Exception e)
                     {
-                        _logger.Error<MainDom>("Error while running callback, remaining callbacks will not run.", e);
+                        _logger.Error<MainDom>(e, "Error while running callback, remaining callbacks will not run.");
                         throw;
                     }
 
                 }
-                _logger.Debug<MainDom>("Stopped.");
+                _logger.Debug<MainDom>("Stopped ({SignalSource})", source);
             }
             finally
             {
                 // in any case...
                 _isMainDom = false;
                 _asyncLocker.Dispose();
-                _logger.Info<MainDom>("Released.");
+                _logger.Info<MainDom>("Released ({SignalSource})", source);
             }
         }
 

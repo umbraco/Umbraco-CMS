@@ -892,7 +892,7 @@ namespace Umbraco.Core.Services.Implement
                 scope.Events.Dispatch(Deleted, this, args);
 
                 _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
-                    (file, e) => Logger.Error<MediaService>("An error occurred while deleting file attached to nodes: " + file, e));
+                    (file, e) => Logger.Error<MediaService>(e, "An error occurred while deleting file attached to nodes: {File}", file));
             }
         }
 

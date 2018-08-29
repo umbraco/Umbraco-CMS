@@ -1,61 +1,129 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
-using log4net;
-using log4net.Config;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Diagnostics;
-using log4net.Util;
+using Serilog;
+using Serilog.Events;
+using Umbraco.Core.Logging.SerilogExtensions;
 
 namespace Umbraco.Core.Logging
 {
     ///<summary>
-    /// Implements <see cref="ILogger"/> on top of log4net.
+    /// Implements <see cref="ILogger"/> on top of Serilog.
     ///</summary>
     public class Logger : ILogger
     {
         /// <summary>
-        /// Initialize a new instance of the <see cref="Logger"/> class with a log4net configuration file.
+        /// Initialize a new instance of the <see cref="Logger"/> class with a configuration file.
         /// </summary>
-        /// <param name="log4NetConfigFile"></param>
-        public Logger(FileInfo log4NetConfigFile)
-            : this()
+        /// <param name="logConfigFile"></param>
+        public Logger(FileInfo logConfigFile)
         {
-            XmlConfigurator.Configure(log4NetConfigFile);
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + logConfigFile)
+                .CreateLogger();
         }
 
-        // private for CreateWithDefaultLog4NetConfiguration
-        private Logger()
+        public Logger(LoggerConfiguration logConfig)
         {
-            // add custom global properties to the log4net context that we can use in our logging output
-            GlobalContext.Properties["processId"] = Process.GetCurrentProcess().Id;
-            GlobalContext.Properties["appDomainId"] = AppDomain.CurrentDomain.Id;
+            //Configure Serilog static global logger with config passed in
+            Log.Logger = logConfig.CreateLogger();
         }
 
         /// <summary>
-        /// Creates a logger with the default log4net configuration discovered (i.e. from the web.config).
+        /// Creates a logger with some pre-definied configuration and remainder from config file
         /// </summary>
         /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
-        public static Logger CreateWithDefaultLog4NetConfiguration()
+        public static Logger CreateWithDefaultConfiguration()
         {
-            return new Logger();
+            var loggerConfig = new LoggerConfiguration();
+            loggerConfig
+                .MinimalConfiguration()
+                .OutputDefaultTextFile(LogEventLevel.Debug)
+                .OutputDefaultJsonFile()
+                .ReadFromConfigFile()
+                .ReadFromUserConfigFile();
+
+            return new Logger(loggerConfig);
         }
 
         /// <inheritdoc/>
-        public void Error(Type reporting, string message, Exception exception = null)
+        public void Fatal(Type reporting, Exception exception, string message)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null) return;
+            Fatal(reporting, exception, message, null);
+        }
 
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, Exception exception)
+        {
+            Fatal(reporting, exception, string.Empty);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, string message)
+        {
+            //Sometimes we need to throw an error without an ex
+            Fatal(reporting, null, message);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, string messageTemplate, params object[] propertyValues)
+        {
+            //Log a structured message WITHOUT an ex
+            Fatal(reporting, null, messageTemplate, propertyValues);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+        {
+            ErrorOrFatal(Fatal, exception, ref messageTemplate);
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Fatal(exception, messageTemplate, propertyValues);
+        }
+
+        /// <inheritdoc/>
+        public void Error(Type reporting, Exception exception, string message)
+        {
+            Error(reporting, exception, message, null);
+        }
+
+        /// <inheritdoc/>
+        public void Error(Type reporting, Exception exception)
+        {
+            Error(reporting, exception, string.Empty);
+        }
+
+        /// <inheritdoc/>
+        public void Error(Type reporting, string message)
+        {
+            //Sometimes we need to throw an error without an ex
+            Error(reporting, null, message);
+        }
+
+        /// <inheritdoc/>
+        public void Error(Type reporting, string messageTemplate, params object[] propertyValues)
+        {
+            //Log a structured message WITHOUT an ex
+            Error(reporting, null, messageTemplate, propertyValues);
+        }
+
+        /// <inheritdoc/>
+        public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
+        {
+            ErrorOrFatal(Error, exception, ref messageTemplate);
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Error(exception, messageTemplate, propertyValues);
+        }
+
+        private static void ErrorOrFatal(Action<Type, Exception, string, object[]> logAction, Exception exception, ref string messageTemplate)
+        {
             var dump = false;
 
             if (IsTimeoutThreadAbortException(exception))
             {
-                message += "\r\nThe thread has been aborted, because the request has timed out.";
+                messageTemplate += "\r\nThe thread has been aborted, because the request has timed out.";
 
                 // dump if configured, or if stacktrace contains Monitor.ReliableEnter
                 dump = UmbracoConfig.For.CoreDebug().DumpOnTimeoutThreadAbort || IsMonitorEnterThreadAbortException(exception);
@@ -69,23 +137,22 @@ namespace Umbraco.Core.Logging
                 try
                 {
                     var dumped = MiniDump.Dump(withException: true);
-                    message += dumped
+                    messageTemplate += dumped
                         ? "\r\nA minidump was created in App_Data/MiniDump"
                         : "\r\nFailed to create a minidump";
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    message += string.Format("\r\nFailed to create a minidump ({0}: {1})", e.GetType().FullName, e.Message);
+                    //Log a new entry (as opposed to appending to same log entry)
+                    logAction(ex.GetType(), ex, "Failed to create a minidump at App_Data/MiniDump ({ExType}: {ExMessage}",
+                        new object[]{ ex.GetType().FullName, ex.Message });
                 }
             }
-
-            logger.Error(message, exception);
         }
 
         private static bool IsMonitorEnterThreadAbortException(Exception exception)
         {
-            var abort = exception as ThreadAbortException;
-            if (abort == null) return false;
+            if (!(exception is ThreadAbortException abort)) return false;
 
             var stacktrace = abort.StackTrace;
             return stacktrace.Contains("System.Threading.Monitor.ReliableEnter");
@@ -93,8 +160,7 @@ namespace Umbraco.Core.Logging
 
         private static bool IsTimeoutThreadAbortException(Exception exception)
         {
-            var abort = exception as ThreadAbortException;
-            if (abort == null) return false;
+            if (!(exception is ThreadAbortException abort)) return false;
 
             if (abort.ExceptionState == null) return false;
 
@@ -110,135 +176,67 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Warn(Type reporting, string format)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            logger.Warn(format);
+            Warn(reporting, null, format);
         }
-
+        
         /// <inheritdoc/>
-        public void Warn(Type reporting, Func<string> messageBuilder)
+        public void Warn(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            logger.Warn(messageBuilder());
-        }
-
-        /// <inheritdoc/>
-        public void Warn(Type reporting, string format, params object[] args)
-        {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            logger.WarnFormat(format, args);
-        }
-
-        /// <inheritdoc/>
-        public void Warn(Type reporting, string format, params Func<object>[] args)
-        {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            logger.WarnFormat(format, args.Select(x => x.Invoke()).ToArray());
+            Warn(reporting, null, messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
         public void Warn(Type reporting, Exception exception, string message)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            logger.Warn(message, exception);
+            Warn(reporting, exception, message, Array.Empty<object>());
         }
-
+        
         /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, Func<string> messageBuilder)
+        public void Warn(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            logger.Warn(messageBuilder(), exception);
-        }
-
-        /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, string format, params object[] args)
-        {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            // there is no WarnFormat overload that accepts an exception
-            // format the message the way log4net would do it (see source code LogImpl.cs)
-            var message = new SystemStringFormat(CultureInfo.InvariantCulture, format, args);
-            logger.Warn(message, exception);
-        }
-
-        /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, string format, params Func<object>[] args)
-        {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsWarnEnabled == false) return;
-            // there is no WarnFormat overload that accepts an exception
-            // format the message the way log4net would do it (see source code LogImpl.cs)
-            var message = new SystemStringFormat(CultureInfo.InvariantCulture, format, args.Select(x => x.Invoke()).ToArray());
-            logger.Warn(message, exception);
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Warning(exception, messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
         public void Info(Type reporting, string message)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsInfoEnabled == false) return;
-            logger.Info(message);
+            Info(reporting, message, Array.Empty<object>());
         }
 
         /// <inheritdoc/>
-        public void Info(Type reporting, Func<string> generateMessage)
+        public void Info(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsInfoEnabled == false) return;
-            logger.Info(generateMessage());
-        }
-
-        /// <inheritdoc/>
-        public void Info(Type reporting, string format, params object[] args)
-        {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsInfoEnabled == false) return;
-            logger.InfoFormat(format, args);
-        }
-
-        /// <inheritdoc/>
-        public void Info(Type reporting, string format, params Func<object>[] args)
-        {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsInfoEnabled == false) return;
-            logger.InfoFormat(format, args.Select(x => x.Invoke()).ToArray());
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Information(messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
         public void Debug(Type reporting, string message)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsDebugEnabled == false) return;
-            logger.Debug(message);
+            Debug(reporting, message, Array.Empty<object>());
+        }
+        
+        /// <inheritdoc/>
+        public void Debug(Type reporting, string messageTemplate, params object[] propertyValues)
+        {
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Debug(messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
-        public void Debug(Type reporting, Func<string> messageBuilder)
+        public void Verbose(Type reporting, string message)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsDebugEnabled == false) return;
-            logger.Debug(messageBuilder());
+            Verbose(reporting, message, Array.Empty<object>());
         }
 
         /// <inheritdoc/>
-        public void Debug(Type reporting, string format, params object[] args)
+        public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsDebugEnabled == false) return;
-            logger.DebugFormat(format, args);
+            var logger = Log.Logger;
+            logger?.ForContext(reporting).Verbose(messageTemplate, propertyValues);
         }
 
-        /// <inheritdoc/>
-        public void Debug(Type reporting, string format, params Func<object>[] args)
-        {
-            var logger = LogManager.GetLogger(reporting);
-            if (logger == null || logger.IsDebugEnabled == false) return;
-            logger.DebugFormat(format, args.Select(x => x.Invoke()).ToArray());
-        }
+        
     }
 }

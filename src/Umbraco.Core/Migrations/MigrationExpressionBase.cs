@@ -55,7 +55,7 @@ namespace Umbraco.Core.Migrations
 
             if (string.IsNullOrWhiteSpace(sql))
             {
-                Logger.Info(GetType(), $"SQL [{Context.Index}]: <empty>");
+                Logger.Info(GetType(), "SQL [{ContextIndex}: <empty>", Context.Index);
             }
             else
             {
@@ -90,7 +90,7 @@ namespace Umbraco.Core.Migrations
         private void ExecuteStatement(StringBuilder stmtBuilder)
         {
             var stmt = stmtBuilder.ToString();
-            Logger.Info(GetType(), $"SQL [{Context.Index}]: {stmt}");
+            Logger.Info(GetType(), "SQL [{ContextIndex}]: {Sql}", Context.Index, stmt);
             Database.Execute(stmt);
             stmtBuilder.Clear();
         }

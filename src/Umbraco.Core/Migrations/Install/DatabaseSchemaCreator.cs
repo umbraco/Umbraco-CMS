@@ -98,7 +98,7 @@ namespace Umbraco.Core.Migrations.Install
                 var tableNameAttribute = table.FirstAttribute<TableNameAttribute>();
                 var tableName = tableNameAttribute == null ? table.Name : tableNameAttribute.Value;
 
-                _logger.Info<DatabaseSchemaCreator>(() => $"Uninstall {tableName}");
+                _logger.Info<DatabaseSchemaCreator>("Uninstall {TableName}", tableName);
 
                 try
                 {
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Migrations.Install
                 {
                     //swallow this for now, not sure how best to handle this with diff databases... though this is internal
                     // and only used for unit tests. If this fails its because the table doesn't exist... generally!
-                    _logger.Error<DatabaseSchemaCreator>("Could not drop table " + tableName, ex);
+                    _logger.Error<DatabaseSchemaCreator>(ex, "Could not drop table {TableName}", tableName);
                 }
             }
         }
@@ -141,13 +141,7 @@ namespace Umbraco.Core.Migrations.Install
 
             //get the db index defs
             result.DbIndexDefinitions = SqlSyntax.GetDefinedIndexes(_database)
-                .Select(x => new DbIndexDefinition
-                {
-                    TableName = x.Item1,
-                    IndexName = x.Item2,
-                    ColumnName = x.Item3,
-                    IsUnique = x.Item4
-                }).ToArray();
+                .Select(x => new DbIndexDefinition(x)).ToArray();
 
             result.TableDefinitions.AddRange(OrderedTables
                 .Select(x => DefinitionFactory.GetTableDefinition(x, SqlSyntax)));
@@ -160,6 +154,14 @@ namespace Umbraco.Core.Migrations.Install
             return result;
         }
 
+        /// <summary>
+        /// This validates the Primary/Foreign keys in the database
+        /// </summary>
+        /// <param name="result"></param>
+        /// <remarks>
+        /// This does not validate any database constraints that are not PKs or FKs because Umbraco does not create a database with non PK/FK contraints.
+        /// Any unique "constraints" in the database are done with unique indexes.
+        /// </remarks>
         private void ValidateDbConstraints(DatabaseSchemaResult result)
         {
             //MySql doesn't conform to the "normal" naming of constraints, so there is currently no point in doing these checks.
@@ -172,8 +174,7 @@ namespace Umbraco.Core.Migrations.Install
             var constraintsInDatabase = SqlSyntax.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
             var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("FK_")).Select(x => x.Item3).ToList();
             var primaryKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("PK_")).Select(x => x.Item3).ToList();
-            var indexesInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("IX_")).Select(x => x.Item3).ToList();
-            var indexesInSchema = result.TableDefinitions.SelectMany(x => x.Indexes.Select(y => y.Name)).ToList();
+
             var unknownConstraintsInDatabase =
                 constraintsInDatabase.Where(
                     x =>
@@ -188,7 +189,7 @@ namespace Umbraco.Core.Migrations.Install
             // In theory you could have: FK_ or fk_ ...or really any standard that your development department (or developer) chooses to use.
             foreach (var unknown in unknownConstraintsInDatabase)
             {
-                if (foreignKeysInSchema.InvariantContains(unknown) || primaryKeysInSchema.InvariantContains(unknown) || indexesInSchema.InvariantContains(unknown))
+                if (foreignKeysInSchema.InvariantContains(unknown) || primaryKeysInSchema.InvariantContains(unknown))
                 {
                     result.ValidConstraints.Add(unknown);
                 }
@@ -230,23 +231,6 @@ namespace Umbraco.Core.Migrations.Install
                 result.Errors.Add(new Tuple<string, string>("Constraint", primaryKey));
             }
 
-            //Constaints:
-
-            //NOTE: SD: The colIndex checks above should really take care of this but I need to keep this here because it was here before
-            // and some schema validation checks might rely on this data remaining here!
-            //Add valid and invalid index differences to the result object
-            var validIndexDifferences = indexesInDatabase.Intersect(indexesInSchema, StringComparer.InvariantCultureIgnoreCase);
-            foreach (var index in validIndexDifferences)
-            {
-                result.ValidConstraints.Add(index);
-            }
-            var invalidIndexDifferences =
-                indexesInDatabase.Except(indexesInSchema, StringComparer.InvariantCultureIgnoreCase)
-                                .Union(indexesInSchema.Except(indexesInDatabase, StringComparer.InvariantCultureIgnoreCase));
-            foreach (var index in invalidIndexDifferences)
-            {
-                result.Errors.Add(new Tuple<string, string>("Constraint", index));
-            }
         }
 
         private void ValidateDbColumns(DatabaseSchemaResult result)
@@ -392,13 +376,13 @@ namespace Umbraco.Core.Migrations.Install
                 {
                     //Execute the Create Table sql
                     var created = _database.Execute(new Sql(createSql));
-                    _logger.Info<DatabaseSchemaCreator>(() => $"Create Table '{tableName}' ({created}):\n {createSql}");
+                    _logger.Info<DatabaseSchemaCreator>("Create Table '{TableName}' ({Created}): \n {Sql}", tableName, created, createSql);
 
                     //If any statements exists for the primary key execute them here
                     if (string.IsNullOrEmpty(createPrimaryKeySql) == false)
                     {
                         var createdPk = _database.Execute(new Sql(createPrimaryKeySql));
-                        _logger.Info<DatabaseSchemaCreator>(() => $"Create Primary Key ({createdPk}):\n {createPrimaryKeySql}");
+                        _logger.Info<DatabaseSchemaCreator>("Create Primary Key ({CreatedPk}):\n {Sql}", createdPk, createPrimaryKeySql);
                     }
 
                     //Turn on identity insert if db provider is not mysql
@@ -424,21 +408,21 @@ namespace Umbraco.Core.Migrations.Install
                     foreach (var sql in indexSql)
                     {
                         var createdIndex = _database.Execute(new Sql(sql));
-                        _logger.Info<DatabaseSchemaCreator>(() => $"Create Index ({createdIndex}):\n {sql}");
+                        _logger.Info<DatabaseSchemaCreator>("Create Index ({CreatedIndex}):\n {Sql}", createdIndex, sql);
                     }
 
                     //Loop through foreignkey statements and execute sql
                     foreach (var sql in foreignSql)
                     {
                         var createdFk = _database.Execute(new Sql(sql));
-                        _logger.Info<DatabaseSchemaCreator>(() => $"Create Foreign Key ({createdFk}):\n {sql}");
+                        _logger.Info<DatabaseSchemaCreator>("Create Foreign Key ({CreatedFk}):\n {Sql}", createdFk, sql);
                     }
 
                     transaction.Complete();
                 }
             }
 
-            _logger.Info<DatabaseSchemaCreator>(() => $"Created table '{tableName}'");
+            _logger.Info<DatabaseSchemaCreator>("Created table '{TableName}'", tableName);
         }
 
         public void DropTable(string tableName)

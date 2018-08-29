@@ -44,6 +44,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string TruncateTable { get; }
         string CreateConstraint { get; }
         string DeleteConstraint { get; }
+
+        [Obsolete("This is never used, use the Format(ForeignKeyDefinition) instead")]
         string CreateForeignKeyConstraint { get; }
         string DeleteDefaultConstraint { get; }
         string FormatDateTime(DateTime date, bool includeTime = true);
@@ -80,8 +82,32 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         IEnumerable<string> GetTablesInSchema(IDatabase db);
         IEnumerable<ColumnInfo> GetColumnsInSchema(IDatabase db);
+
+        /// <summary>
+        /// Returns all constraints defined in the database (Primary keys, foreign keys, unique constraints...) (does not include indexes)
+        /// </summary>
+        /// <param name="db"></param>
+        /// <returns>
+        /// A Tuple containing: TableName, ConstraintName
+        /// </returns>
         IEnumerable<Tuple<string, string>> GetConstraintsPerTable(IDatabase db);
+
+        /// <summary>
+        /// Returns all constraints defined in the database (Primary keys, foreign keys, unique constraints...) (does not include indexes)
+        /// </summary>
+        /// <param name="db"></param>
+        /// <returns>
+        /// A Tuple containing: TableName, ColumnName, ConstraintName
+        /// </returns>
         IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(IDatabase db);
+
+        /// <summary>
+        /// Returns all defined Indexes in the database excluding primary keys
+        /// </summary>
+        /// <param name="db"></param>
+        /// <returns>
+        /// A Tuple containing: TableName, IndexName, ColumnName, IsUnique
+        /// </returns>
         IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db);
     }
 }

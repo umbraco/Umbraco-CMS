@@ -208,6 +208,7 @@ Use this directive to construct a header inside the main editor window.
 
         function link(scope, el, attr, ctrl) {
 
+
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
@@ -231,6 +232,7 @@ Use this directive to construct a header inside the main editor window.
             };
 
             scope.selectVariant = function (event, variant) {
+
                 if (scope.onSelectVariant) {
                     scope.vm.dropdownOpen = false;
                     scope.onSelectVariant({ "variant": variant });
@@ -292,6 +294,7 @@ Use this directive to construct a header inside the main editor window.
                 });
             }
         }
+
 
         var directive = {
             transclude: true,

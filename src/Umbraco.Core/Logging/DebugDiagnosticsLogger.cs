@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace Umbraco.Core.Logging
 {
@@ -9,9 +8,63 @@ namespace Umbraco.Core.Logging
     public class DebugDiagnosticsLogger : ILogger
     {
         /// <inheritdoc/>
-        public void Error(Type reporting, string message, Exception exception = null)
+        public void Fatal(Type reporting, Exception exception, string message)
         {
             System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, Exception exception)
+        {
+            System.Diagnostics.Debug.WriteLine(Environment.NewLine + exception, reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, string message)
+        {
+            System.Diagnostics.Debug.WriteLine(message);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Format(messageTemplate, args) + Environment.NewLine + exception, reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal(Type reporting, string messageTemplate, params object[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(messageTemplate, args);
+        }
+
+        /// <inheritdoc/>
+        public void Error(Type reporting, Exception exception, string message)
+        {
+            System.Diagnostics.Debug.WriteLine(message + Environment.NewLine + exception, reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Error(Type reporting, Exception exception)
+        {
+            System.Diagnostics.Debug.WriteLine(Environment.NewLine + exception, reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Error(Type reporting, string message)
+        {
+            System.Diagnostics.Debug.WriteLine(message);
+        }
+
+        /// <inheritdoc/>
+        public void Error(Type reporting, Exception exception, string messageTemplate, params object[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Format(messageTemplate, args) + Environment.NewLine + exception, reporting.FullName);
+        }
+
+        /// <inheritdoc/>
+        public void Error(Type reporting, string messageTemplate, params object[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(messageTemplate, args);
         }
 
         /// <inheritdoc/>
@@ -19,23 +72,11 @@ namespace Umbraco.Core.Logging
         {
             System.Diagnostics.Debug.WriteLine(format, reporting.FullName);
         }
-
-        /// <inheritdoc/>
-        public void Warn(Type reporting, Func<string> messageBuilder)
-        {
-            System.Diagnostics.Debug.WriteLine(messageBuilder(), reporting.FullName);
-        }
-
+        
         /// <inheritdoc/>
         public void Warn(Type reporting, string format, params object[] args)
         {
             System.Diagnostics.Debug.WriteLine(string.Format(format, args), reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Warn(Type reporting, string format, params Func<object>[] args)
-        {
-            System.Diagnostics.Debug.WriteLine(string.Format(format, args.Select(x => x()).ToArray()), reporting.FullName);
         }
 
         /// <inheritdoc/>
@@ -45,21 +86,9 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, Func<string> messageBuilder)
-        {
-            System.Diagnostics.Debug.WriteLine(messageBuilder() + Environment.NewLine + exception, reporting.FullName);
-        }
-
-        /// <inheritdoc/>
         public void Warn(Type reporting, Exception exception, string format, params object[] args)
         {
             System.Diagnostics.Debug.WriteLine(string.Format(format + Environment.NewLine + exception, args), reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, string format, params Func<object>[] args)
-        {
-            System.Diagnostics.Debug.WriteLine(string.Format(format + Environment.NewLine + exception, args.Select(x => x()).ToArray()), reporting.FullName);
         }
 
         /// <inheritdoc/>
@@ -69,21 +98,9 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Info(Type reporting, Func<string> messageBuilder)
-        {
-            System.Diagnostics.Debug.WriteLine(messageBuilder(), reporting.FullName);
-        }
-
-        /// <inheritdoc/>
         public void Info(Type reporting, string format, params object[] args)
         {
             System.Diagnostics.Debug.WriteLine(string.Format(format, args), reporting.FullName);
-        }
-
-        /// <inheritdoc/>
-        public void Info(Type reporting, string format, params Func<object>[] args)
-        {
-            System.Diagnostics.Debug.WriteLine(string.Format(format, args.Select(x => x()).ToArray()), reporting.FullName);
         }
 
         /// <inheritdoc/>
@@ -93,21 +110,22 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Debug(Type reporting, Func<string> messageBuilder)
-        {
-            System.Diagnostics.Debug.WriteLine(messageBuilder(), reporting.FullName);
-        }
-
-        /// <inheritdoc/>
         public void Debug(Type reporting, string format, params object[] args)
         {
             System.Diagnostics.Debug.WriteLine(string.Format(format, args), reporting.FullName);
         }
 
         /// <inheritdoc/>
-        public void Debug(Type reporting, string format, params Func<object>[] args)
+        public void Verbose(Type reporting, string message)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(format, args.Select(x => x()).ToArray()), reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
         }
+
+        /// <inheritdoc/>
+        public void Verbose(Type reporting, string format, params object[] args)
+        {
+            System.Diagnostics.Debug.WriteLine(string.Format(format, args), reporting.FullName);
+        }
+        
     }
 }

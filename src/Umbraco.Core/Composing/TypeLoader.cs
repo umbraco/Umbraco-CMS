@@ -494,7 +494,7 @@ namespace Umbraco.Core.Composing
                     if (--attempts == 0)
                         throw;
 
-                    _logger.Logger.Debug<TypeLoader>(() => $"Attempted to get filestream for file {path} failed, {attempts} attempts left, pausing for {pauseMilliseconds} milliseconds");
+                    _logger.Logger.Debug<TypeLoader>("Attempted to get filestream for file {Path} failed, {NumberOfAttempts} attempts left, pausing for {PauseMilliseconds} milliseconds", path, attempts, pauseMilliseconds);
                     Thread.Sleep(pauseMilliseconds);
                 }
             }
@@ -645,7 +645,7 @@ namespace Umbraco.Core.Composing
             if (typeList != null)
             {
                 // need to put some logging here to try to figure out why this is happening: http://issues.umbraco.org/issue/U4-3505
-                _logger.Logger.Debug<TypeLoader>(() => $"Getting {GetName(baseType, attributeType)}: found a cached type list.");
+                _logger.Logger.Debug<TypeLoader>("Getting {TypeName}: found a cached type list.", GetName(baseType, attributeType));
                 return typeList.Types;
             }
 
@@ -676,7 +676,7 @@ namespace Umbraco.Core.Composing
                 // so in this instance there will never be a result.
                 if (cacheResult.Exception is CachedTypeNotFoundInFileException || cacheResult.Success == false)
                 {
-                    _logger.Logger.Debug<TypeLoader>(() => $"Getting {GetName(baseType, attributeType)}: failed to load from cache file, must scan assemblies.");
+                    _logger.Logger.Debug<TypeLoader>("Getting {TypeName}: failed to load from cache file, must scan assemblies.", GetName(baseType, attributeType));
                     scan = true;
                 }
                 else
@@ -695,7 +695,7 @@ namespace Umbraco.Core.Composing
                         catch (Exception ex)
                         {
                             // in case of any exception, we have to exit, and revert to scanning
-                            _logger.Logger.Error<TypeLoader>("Getting " + GetName(baseType, attributeType) + ": failed to load cache file type " + type + ", reverting to scanning assemblies.", ex);
+                            _logger.Logger.Error<TypeLoader>(ex, "Getting {TypeName}: failed to load cache file type {CacheType}, reverting to scanning assemblies.", GetName(baseType, attributeType), type);
                             scan = true;
                             break;
                         }
@@ -703,7 +703,7 @@ namespace Umbraco.Core.Composing
 
                     if (scan == false)
                     {
-                        _logger.Logger.Debug<TypeLoader>(() => $"Getting {GetName(baseType, attributeType)}: loaded types from cache file.");
+                        _logger.Logger.Debug<TypeLoader>("Getting {TypeName}: loaded types from cache file.", GetName(baseType, attributeType));
                     }
                 }
             }
@@ -711,7 +711,7 @@ namespace Umbraco.Core.Composing
             if (scan)
             {
                 // either we had to scan, or we could not get the types from the cache file - scan now
-                _logger.Logger.Debug<TypeLoader>(() => $"Getting {GetName(baseType, attributeType)}: scanning assemblies.");
+                _logger.Logger.Debug<TypeLoader>("Getting {TypeName}: scanning assemblies.", GetName(baseType, attributeType));
 
                 foreach (var t in finder())
                     typeList.Add(t);
@@ -729,11 +729,11 @@ namespace Umbraco.Core.Composing
                         UpdateCache();
                 }
 
-                _logger.Logger.Debug<TypeLoader>(() => $"Got {GetName(baseType, attributeType)}, caching ({added.ToString().ToLowerInvariant()}).");
+                _logger.Logger.Debug<TypeLoader>("Got {TypeName}, caching ({CacheType}).", GetName(baseType, attributeType), added.ToString().ToLowerInvariant());
             }
             else
             {
-                _logger.Logger.Debug<TypeLoader>(() => $"Got {GetName(baseType, attributeType)}.");
+                _logger.Logger.Debug<TypeLoader>("Got {TypeName}.", GetName(baseType, attributeType));
             }
 
             return typeList.Types;

@@ -43,7 +43,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             catch (Exception ex)
             {
                 // cannot deserialize, assume it may be a raw image url
-                Current.Logger.Error<ImageCropperValueConverter>($"Could not deserialize string \"{sourceString}\" into an image cropper value.", ex);
+                Current.Logger.Error<ImageCropperValueConverter>(ex, "Could not deserialize string '{JsonString}' into an image cropper value.", sourceString);
                 value = new ImageCropperValue { Src = sourceString };
             }
 

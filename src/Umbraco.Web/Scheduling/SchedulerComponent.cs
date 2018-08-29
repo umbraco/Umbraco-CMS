@@ -87,7 +87,7 @@ namespace Umbraco.Web.Scheduling
         {
             LazyInitializer.EnsureInitialized(ref _tasks, ref _started, ref _locker, () =>
             {
-                _logger.Debug<SchedulerComponent>(() => "Initializing the scheduler");
+                _logger.Debug<SchedulerComponent>("Initializing the scheduler");
                 var settings = UmbracoConfig.For.UmbracoSettings();
 
                 var tasks = new List<IBackgroundTask>();

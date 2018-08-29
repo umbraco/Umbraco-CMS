@@ -22,7 +22,7 @@
         not want this to happen as the alpha of the next major is, really, the next major already.
       -->
       <dependency id="Microsoft.AspNet.SignalR.Core" version="[2.2.3, 2.999999)" />
-      <dependency id="Umbraco.ModelsBuilder.Ui" version="[8.0.0-alpha.20]" />
+      <dependency id="Umbraco.ModelsBuilder.Ui" version="[8.0.0-alpha.22]" />
     </dependencies>
   </metadata>
   <files>
@@ -35,7 +35,6 @@
     <file src="$BuildTmp$\WebApp\config\splashes\**" target="UmbracoFiles\Config\splashes" />
     <file src="$BuildTmp$\WebApp\config\BackOfficeTours\**" target="Content\Config\BackOfficeTours" />
     <file src="$BuildTmp$\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
-    <file src="$BuildTmp$\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
     <file src="$BuildTmp$\WebApp\Media\Web.config" target="Content\Media\Web.config" />
 
     <file src="$BuildTmp$\WebApp\App_Plugins\ModelsBuilder\modelsbuilder.htm" target="Content\App_Plugins\ModelsBuilder\modelsbuilder.htm" />

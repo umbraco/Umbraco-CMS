@@ -78,14 +78,14 @@
                     hide-dropzone="{{!activeDrag && images.length > 0 || searchOptions.filter }}"
                     compact="{{ images.length > 0 }}">
                 </umb-file-dropzone>
-    
+                
                 <umb-media-grid 
                     ng-if="!loading" 
                     items="images" 
                     on-click="clickHandler"
                     on-click-name="clickItemName"
                     on-click-edit="editMediaItem(item)"
-                    allow-on-click-edit="true"
+                    allow-on-click-edit="{{allowMediaEdit}}"
                     item-max-width="150"
                     item-max-height="150" 
                     item-min-width="100" 

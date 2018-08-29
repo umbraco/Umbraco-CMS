@@ -39,14 +39,14 @@ namespace Umbraco.Core.Sync
             if (string.IsNullOrWhiteSpace(umbracoApplicationUrl) == false)
             {
                 umbracoApplicationUrl = umbracoApplicationUrl.TrimEnd('/');
-                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: " + umbracoApplicationUrl + " (provider)");
+                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (provider)", umbracoApplicationUrl);
                 return umbracoApplicationUrl;
             }
 
             if (request == null) return null;
 
             umbracoApplicationUrl = GetApplicationUrlFromCurrentRequest(request, globalSettings);
-            logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: " + umbracoApplicationUrl + " (UmbracoModule request)");
+            logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (UmbracoModule request)", umbracoApplicationUrl);
             return umbracoApplicationUrl;
         }
 
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Sync
             if (url.IsNullOrWhiteSpace() == false)
             {
                 var umbracoApplicationUrl = url.TrimEnd('/');
-                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: " + umbracoApplicationUrl + " (using web.routing/@umbracoApplicationUrl)");
+                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (using web.routing/@umbracoApplicationUrl)", umbracoApplicationUrl);
                 return umbracoApplicationUrl;
             }
 
@@ -78,7 +78,7 @@ namespace Umbraco.Core.Sync
                 var ssl = globalSettings.UseHttps ? "s" : "";
                 url = "http" + ssl + "://" + url;
                 var umbracoApplicationUrl = url.TrimEnd('/');
-                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: " + umbracoApplicationUrl + " (using scheduledTasks/@baseUrl)");
+                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (using scheduledTasks/@baseUrl)", umbracoApplicationUrl);
                 return umbracoApplicationUrl;
             }
 
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Sync
             if (url.IsNullOrWhiteSpace() == false)
             {
                 var umbracoApplicationUrl = url.TrimEnd('/');
-                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: " + umbracoApplicationUrl + " (IServerRegistrar)");
+                logger.Info(TypeOfApplicationUrlHelper, "ApplicationUrl: {UmbracoAppUrl} (IServerRegistrar)", umbracoApplicationUrl);
                 return umbracoApplicationUrl;
             }
 

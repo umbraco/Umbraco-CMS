@@ -316,10 +316,10 @@
                             // by looking at the key
                             switch (foundAlias[0]) {
                                 case "umbracoMemberLockedOut":
-                                    saveModel.isLockedOut = prop.value ? (prop.value.toString() === "1" ? true : false) : false;
+                                    saveModel.isLockedOut = Object.toBoolean(prop.value);
                                     break;
                                 case "umbracoMemberApproved":
-                                    saveModel.isApproved = prop.value ? (prop.value.toString() === "1" ? true : false) : true;
+                                    saveModel.isApproved = Object.toBoolean(prop.value);
                                     break;
                                 case "umbracoMemberComments":
                                     saveModel.comments = prop.value;

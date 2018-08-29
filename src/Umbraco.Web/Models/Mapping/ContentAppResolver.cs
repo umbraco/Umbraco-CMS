@@ -48,7 +48,7 @@ namespace Umbraco.Web.Models.Mapping
 
             apps.Add(_contentApp);
             apps.Add(_infoApp);
-            
+
             return apps;
         }
 }
