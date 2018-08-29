@@ -30,6 +30,7 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
 
     //A list of query strings defined that when changed will not cause a reload of the route
     var nonRoutingQueryStrings = ["mculture", "cculture"];
+    var retainedQueryStrings = ['mculture'];
 
     //used to track the current dialog object
     var currentDialog = null;
@@ -192,8 +193,8 @@ function navigationService($rootScope, $route, $routeParams, $log, $location, $q
          * @description
          * utility to clear the querystring/search params while maintaining a known list of parameters that should be maintained throughout the app
          */
-        clearSearch: function () {
-            var toRetain = ["mculture"];
+        clearSearch: function (toRetain) {
+            var toRetain = _.union(retainedQueryStrings, toRetain);
             var currentSearch = $location.search();
             $location.search('');
             _.each(toRetain, function (k) {
