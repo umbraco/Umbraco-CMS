@@ -33,7 +33,10 @@ namespace Umbraco.Core.Logging.Viewer
         /// Returns the collection of logs
         /// </summary>
         PagedResult<LogMessage> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate,
-            int pageNumber = 1, int pageSize = 100, Direction orderDirection = Direction.Descending);
+            int pageNumber = 1,
+            int pageSize = 100,
+            Direction orderDirection = Direction.Descending,
+            string filterExpression = null);
 
     }
 }

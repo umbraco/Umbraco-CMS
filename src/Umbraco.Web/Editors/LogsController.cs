@@ -39,9 +39,9 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpGet]
-        public PagedResult<LogMessage> GetLogs()
+        public PagedResult<LogMessage> GetLogs(int pageNumber = 1, string filterExpression = null)
         {
-            return _logViewer.GetLogs(startDate: DateTime.Now, endDate: DateTime.Now);
+            return _logViewer.GetLogs(startDate: DateTime.Now, endDate: DateTime.Now, filterExpression: filterExpression, pageNumber: pageNumber);
         }
 
     }
