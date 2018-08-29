@@ -18,7 +18,7 @@ This NuGet package includes build targets that extend the creation of a deploy p
 Publishing from Visual Studio. The targets will only work once Publishing is configured, so if you don't use
 Publish this won't affect you.
 The following items will now be automatically included when creating a deploy package or publishing to the file 
-system: umbraco, umbraco_client, config\splashes and global.asax.
+system: umbraco, config\splashes and global.asax.
 
 Please read the release notes on our.umbraco.com:
 http://our.umbraco.com/contribute/releases

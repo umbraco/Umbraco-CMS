@@ -44,14 +44,6 @@ if ($project) {
 	robocopy $umbracoFolder $umbracoBackupPath /e /LOG:$copyLogsPath\UmbracoBackup.log
 	robocopy $umbracoFolderSource $umbracoFolder /is /it /e /xf UI.xml /LOG:$copyLogsPath\UmbracoCopy.log
 
-	$umbracoClientFolder = Join-Path $projectPath "Umbraco_Client"	
-	New-Item -ItemType Directory -Force -Path $umbracoClientFolder
-	$umbracoClientFolderSource = Join-Path $installPath "UmbracoFiles\Umbraco_Client"		
-	$umbracoClientBackupPath = Join-Path $backupPath "Umbraco_Client"
-	New-Item -ItemType Directory -Force -Path $umbracoClientBackupPath		
-	robocopy $umbracoClientFolder $umbracoClientBackupPath /e /LOG:$copyLogsPath\UmbracoClientBackup.log
-	robocopy $umbracoClientFolderSource $umbracoClientFolder /is /it /e /LOG:$copyLogsPath\UmbracoClientCopy.log		
-
 	$copyWebconfig = $true
 	$destinationWebConfig = Join-Path $projectPath "Web.config"
 

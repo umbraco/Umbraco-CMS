@@ -40,8 +40,7 @@
     <title ng-bind="$root.locationTitle">Umbraco</title>
 
     @Html.RenderCssHere(
-        new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
-        new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
+        new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)))
 </head>
 <body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
 
