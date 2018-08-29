@@ -77,15 +77,7 @@ if ($project) {
 		$splashesDestination = Join-Path $projectPath "Config\splashes\"
 		New-Item $splashesDestination -Type directory
 		Copy-Item $splashesSource $splashesDestination -Force
-
-		$sqlCe64Source = Join-Path $installPath "UmbracoFiles\bin\amd64\*"
-		$sqlCe64Destination = Join-Path $projectPath "bin\amd64\"
-		Copy-Item $sqlCe64Source $sqlCe64Destination -Force
-		
-		$sqlCex86Source = Join-Path $installPath "UmbracoFiles\bin\x86\*"
-		$sqlCex86Destination = Join-Path $projectPath "bin\x86\"
-		Copy-Item $sqlCex86source $sqlCex86Destination -Force
-
+        
 		$umbracoUIXMLSource = Join-Path $installPath "UmbracoFiles\Umbraco\Config\Create\UI.xml"
 		$umbracoUIXMLDestination = Join-Path $projectPath "Umbraco\Config\Create\UI.xml"
 		Copy-Item $umbracoUIXMLSource $umbracoUIXMLDestination -Force
