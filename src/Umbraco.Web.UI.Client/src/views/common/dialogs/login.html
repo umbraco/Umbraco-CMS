@@ -181,7 +181,7 @@
                     <form method="POST" name="requestPasswordResetForm" ng-submit="requestPasswordResetSubmit(email)">
                         <div class="control-group" ng-class="{error: requestPasswordResetForm.email.$invalid}">
                             <label><localize key="general_email">Email</localize></label>
-                            <input type="email" ng-model="email" name="email" class="-full-width-input" localize="placeholder" placeholder="@placeholders_email" />
+                            <input type="email" val-email ng-model="email" name="email" class="-full-width-input" localize="placeholder" placeholder="@placeholders_email" />
                         </div>
 
                         <div class="control-group" ng-show="requestPasswordResetForm.$invalid">
