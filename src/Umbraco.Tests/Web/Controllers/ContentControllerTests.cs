@@ -152,7 +152,6 @@ namespace Umbraco.Tests.Web.Controllers
                 var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
-                Container.InjectProperties(usersController);
                 return usersController;
             }
 
@@ -180,7 +179,6 @@ namespace Umbraco.Tests.Web.Controllers
                 var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
-                Container.InjectProperties(usersController);
                 return usersController;
             }
 
@@ -220,7 +218,6 @@ namespace Umbraco.Tests.Web.Controllers
                 var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
                 var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
-                Container.InjectProperties(usersController);
                 return usersController;
             }
 

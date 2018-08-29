@@ -483,7 +483,7 @@ namespace Umbraco.Web
             app.BeginRequest += (sender, e) =>
             {
                 var httpContext = ((HttpApplication) sender).Context;
-                _logger.Debug<UmbracoModule>(() => $"Begin request: {httpContext.Request.Url}.");
+                _logger.Verbose<UmbracoModule>("Begin request {RequestUrl}", httpContext.Request.Url);
                 BeginRequest(new HttpContextWrapper(httpContext));
             };
 
@@ -526,7 +526,7 @@ namespace Umbraco.Web
 
                 if (UmbracoContext.Current != null && UmbracoContext.Current.IsFrontEndUmbracoRequest)
                 {
-                    _logger.Debug<UmbracoModule>(() => $"End Request. ({DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds}ms)");
+                    _logger.Verbose<UmbracoModule>("End Request {RequestUrl} ({RequestDuration}ms)", httpContext.Request.Url, DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
                 }
 
                 UmbracoModule.OnEndRequest(this, new UmbracoRequestEventArgs(UmbracoContext.Current, new HttpContextWrapper(httpContext)));

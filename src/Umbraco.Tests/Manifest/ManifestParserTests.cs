@@ -2,7 +2,6 @@
 using System.Linq;
 using Moq;
 using System.Text;
-using LightInject;
 using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -19,14 +18,13 @@ namespace Umbraco.Tests.Manifest
     [TestFixture]
     public class ManifestParserTests
     {
-
         private ManifestParser _parser;
 
         [SetUp]
         public void Setup()
         {
             Current.Reset();
-            var container = Mock.Of<IServiceContainer>();
+            var container = Mock.Of<IContainer>();
             Current.Container = container;
 
             var serviceContext = new ServiceContext(
