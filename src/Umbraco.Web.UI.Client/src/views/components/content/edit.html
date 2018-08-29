@@ -7,7 +7,10 @@
         <umb-editor-view ng-if="!page.loading">
             
             <div class="umb-split-views">
-                <div class="umb-split-view" ng-class="{'umb-split-view--collapsed': editor.collapsed}" ng-repeat="editor in editors">
+                <div class="umb-split-view"
+                     ng-class="{'umb-split-view--collapsed': editor.collapsed}"
+                     ng-repeat="editor in editors track by editor.culture">
+
                     <umb-variant-content
                         page="page"
                         content="content"
@@ -16,6 +19,7 @@
                         init-variant="initVariant(variant)"
                         on-split-view-changed="splitViewChanged()">
                     </umb-variant-content>
+
                 </div>
             </div>
 

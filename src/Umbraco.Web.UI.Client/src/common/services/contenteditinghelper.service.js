@@ -599,8 +599,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
                     //add model state errors to notifications
                     if (args.showNotifications) {
-                        for (var e in modelState) {
-                            notificationsService.error("Validation", modelState[e][0]);
+                        for (var e in args.err.data.ModelState) {
+                            notificationsService.error("Validation", args.err.data.ModelState[e][0]);
                         }
                     }
 

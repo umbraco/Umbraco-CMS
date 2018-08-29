@@ -132,17 +132,39 @@
 
             initVariant(activeVariant);
 
+            var variantCulture = activeVariant.language ? activeVariant.language.culture : "invariant";
+
             //If there are no editors yet then create one with the current content.
             //if there's already a main editor then update it with the current content.
             if ($scope.editors.length === 0) {
                 var editor = {
-                    content: activeVariant
+                    content: activeVariant,
+                    //used for "track-by" ng-repeat
+                    culture: variantCulture
                 };
                 $scope.editors.push(editor);
             }
             else {
-                //this will mean there is only one
-                $scope.editors[0].content = activeVariant;
+
+                //check if the current editor is the same culture
+                var currentIndex = _.findIndex($scope.editors, function (e) {
+                    return e.culture === variantCulture;
+                });
+
+                if (currentIndex < 0) {
+                    //not the current culture which means we need to modify the array,
+                    //if we just replace the content object at the zero index, the rg-repeat will not update
+                    //which means directives do not refresh which cause problems
+                    $scope.editors.splice(0, 1, {
+                        content: activeVariant,
+                        //used for "track-by" ng-repeat
+                        culture: variantCulture
+                    });
+                }
+                else {
+                    //replace the content for the same culture
+                    $scope.editors[0].content = activeVariant;
+                }
 
                 if ($scope.editors.length > 1) {
                     //now re-sync any other editor content (i.e. if split view is open)
