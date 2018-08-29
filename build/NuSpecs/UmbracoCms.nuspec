@@ -39,10 +39,11 @@
         <file src="$BuildTmp$\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
         <file src="$BuildTmp$\WebApp\Media\Web.config" target="Content\Media\Web.config" />
 
-        <file src="$BuildTmp$\WebApp\App_Plugins\ModelsBuilder\modelsbuilder.htm" target="Content\App_Plugins\ModelsBuilder\modelsbuilder.htm" />
+        <!--TODO: These are included by the MB package so not sure why this was here -->
+        <!--<file src="$BuildTmp$\WebApp\App_Plugins\ModelsBuilder\modelsbuilder.htm" target="Content\App_Plugins\ModelsBuilder\modelsbuilder.htm" />
         <file src="$BuildTmp$\WebApp\App_Plugins\ModelsBuilder\modelsbuilder.controller.js" target="Content\App_Plugins\ModelsBuilder\modelsbuilder.controller.js" />
         <file src="$BuildTmp$\WebApp\App_Plugins\ModelsBuilder\modelsbuilder.resource.js" target="Content\App_Plugins\ModelsBuilder\modelsbuilder.resource.js" />
-        <file src="$BuildTmp$\WebApp\App_Plugins\ModelsBuilder\package.manifest" target="Content\App_Plugins\ModelsBuilder\package.manifest" />
+        <file src="$BuildTmp$\WebApp\App_Plugins\ModelsBuilder\package.manifest" target="Content\App_Plugins\ModelsBuilder\package.manifest" />-->
 
         <file src="tools\install.ps1" target="tools\install.ps1" />
 
