@@ -38,7 +38,7 @@
             unsubscribe.push($scope.$watch("contentHeaderForm.$dirty",
                 function(newValue, oldValue) {
                     if (newValue === true) {
-                        scope.editor.content.isDirty = true;
+                        vm.editor.content.isDirty = true;
                     }
                 }));
         }
