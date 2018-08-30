@@ -6,11 +6,11 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
-    [UmbracoTreeAuthorize(Constants.Trees.Logs)]
-    [Tree(Constants.Applications.Developer, Constants.Trees.Logs, null, sortOrder: 7)]
+    [UmbracoTreeAuthorize(Constants.Trees.LogViewer)]
+    [Tree(Constants.Applications.Developer, Constants.Trees.LogViewer, null, sortOrder: 7)]
     [PluginController("UmbracoTrees")]
     [CoreTree]
-    public class LogsTreeController : TreeController
+    public class LogViewerTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
@@ -33,7 +33,7 @@ namespace Umbraco.Web.Trees
             var root = base.CreateRootNode(queryStrings);
 
             //this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = string.Format("{0}/{1}/{2}", Constants.Applications.Developer, Constants.Trees.Logs, "overview");
+            root.RoutePath = string.Format("{0}/{1}/{2}", Constants.Applications.Developer, Constants.Trees.LogViewer, "overview");
             root.Icon = "icon-bug";
             root.HasChildren = false;
             root.MenuUrl = null;

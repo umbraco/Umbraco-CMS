@@ -145,7 +145,7 @@
 
             public const string PartialViewMacros = "partialViewMacros";
 
-            public const string Logs = "logs";
+            public const string LogViewer = "logViewer";
 
             //TODO: Fill in the rest!
         }

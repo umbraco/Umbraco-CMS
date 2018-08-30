@@ -1,26 +1,21 @@
 (function () {
     "use strict";
 
-    function LogsOverviewController($scope, $location, localizationService) {
+    function LogViewerOverviewController($scope, $location, localizationService) {
 
         var vm = this;
 
         vm.page = {};
         vm.labels = {};
 
-
+        // ChartJS Options - for count/overview of log distribution
         vm.logTypeLabels = ["Info", "Debug", "Warning", "Error", "Critical"];
-        vm.logTypeData = [500, 75, 10, 45, 2];
+        vm.logTypeData = [0, 0, 0, 0, 0];
         vm.logTypeColors = [ '#dcdcdc', '#97bbcd', '#46bfbd', '#fdb45c', '#f7464a'];
-
-
         vm.chartOptions = {
             legend: {
                 display: true,
-                position: 'left',
-                labels: {
-                    /*fontColor: 'rgb(255, 99, 132)'*/
-                }
+                position: 'left'
             }
         };
 
@@ -56,6 +51,6 @@
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Editors.Logs.OverviewController", LogsOverviewController);
+    angular.module("umbraco").controller("Umbraco.Editors.LogViewer.OverviewController", LogViewerOverviewController);
 
 })();
