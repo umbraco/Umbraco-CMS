@@ -26,7 +26,7 @@
         <umb-editor-container>
             <div class="umb-editor-sub-views">
                 <div ng-repeat="app in vm.editor.content.apps track by app.alias">
-                    <umb-editor-sub-view model="app" content="content" />
+                    <umb-editor-sub-view model="app" content="vm.content" />
                 </div>
             </div>
         </umb-editor-container>
