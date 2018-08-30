@@ -25,11 +25,6 @@
         $scope.page.hideChangeVariant = infiniteMode ? true : false;
         $scope.allowOpen = true;
 
-        // add all editors to an editors array to support split view 
-        $scope.editors = [];
-        $scope.initVariant = initVariant;
-        $scope.splitViewChanged = splitViewChanged;
-
         function init(content) {
 
             if (infiniteMode) {
@@ -55,17 +50,10 @@
             // set first app to active
             // We need to track active
             $scope.content.apps[0].active = true;
-
-            setActiveCulture();
-
+            
             resetVariantFlags();            
         }
 
-        /** This is called when the split view changes based on the umb-variant-content */
-        function splitViewChanged() {
-            //send an event downwards
-            $scope.$broadcast("editors.content.splitViewChanged", { editors: $scope.editors });
-        }
         
         /**
          * This will reset isDirty flags if save is true.
@@ -106,128 +94,6 @@
         /** Returns true if the save/publish dialog should be shown when pressing the button */
         function showSaveOrPublishDialog() {
             return $scope.content.variants.length > 1;
-        }
-
-        /**
-         * The content item(s) are loaded into an array and this will set the active content item based on the current culture (query string).
-         * If the content item is invariant, then only one item exists in the array.
-         */
-        function setActiveCulture() {
-            // set the active variant
-            var activeVariant = null;
-            _.each($scope.content.variants, function (v) {
-                if (v.language && v.language.culture === $scope.culture) {
-                    v.active = true;
-                    activeVariant = v;
-                }
-                else {
-                    v.active = false;
-                }
-            });
-            if (!activeVariant) {
-                // set the first variant to active
-                $scope.content.variants[0].active = true;
-                activeVariant = $scope.content.variants[0];
-            }
-
-            initVariant(activeVariant);
-
-            var variantCulture = activeVariant.language ? activeVariant.language.culture : "invariant";
-
-            //If there are no editors yet then create one with the current content.
-            //if there's already a main editor then update it with the current content.
-            if ($scope.editors.length === 0) {
-                var editor = {
-                    content: activeVariant,
-                    //used for "track-by" ng-repeat
-                    culture: variantCulture
-                };
-                $scope.editors.push(editor);
-            }
-            else {
-
-                //check if the current editor is the same culture
-                var currentIndex = _.findIndex($scope.editors, function (e) {
-                    return e.culture === variantCulture;
-                });
-
-                if (currentIndex < 0) {
-                    //not the current culture which means we need to modify the array,
-                    //if we just replace the content object at the zero index, the rg-repeat will not update
-                    //which means directives do not refresh which cause problems
-                    $scope.editors.splice(0, 1, {
-                        content: activeVariant,
-                        //used for "track-by" ng-repeat
-                        culture: variantCulture
-                    });
-                }
-                else {
-                    //replace the content for the same culture
-                    $scope.editors[0].content = activeVariant;
-                }
-
-                if ($scope.editors.length > 1) {
-                    //now re-sync any other editor content (i.e. if split view is open)
-                    for (var s = 1; s < $scope.editors.length; s++) {
-                        //get the variant from the scope model
-                        var variant = _.find($scope.content.variants, function (v) {
-                            return v.language.culture === $scope.editors[s].content.language.culture;
-                        });
-                        $scope.editors[s].content = initVariant(variant);
-                    }
-                }
-
-            }
-        }
-
-        function initVariant(variant) {
-            //The model that is assigned to the editor contains the current content variant along
-            //with a copy of the contentApps. This is required because each editor renders it's own
-            //header and content apps section and the content apps contains the view for editing content itself
-            //and we need to assign a view model to the subView so that it is scoped to the current
-            //editor so that split views work. 
-
-            //copy the apps from the main model if not assigned yet to the variant
-            if (!variant.apps) {
-                variant.apps = angular.copy($scope.content.apps);
-            }
-
-            //if this is a variant has a culture/language than we need to assign the language drop down info 
-            if (variant.language) {
-                //if the variant list that defines the header drop down isn't assigned to the variant then assign it now
-                if (!variant.variants) {
-                    variant.variants = _.map($scope.content.variants,
-                        function (v) {
-                            return _.pick(v, "active", "language", "state");
-                        });
-                }
-                else {
-                    //merge the scope variants on top of the header variants collection (handy when needing to refresh)
-                    angular.extend(variant.variants,
-                        _.map($scope.content.variants,
-                            function (v) {
-                                return _.pick(v, "active", "language", "state");
-                            }));
-                }
-
-                //ensure the current culture is set as the active one
-                for (var i = 0; i < variant.variants.length; i++) {
-                    if (variant.variants[i].language.culture === variant.language.culture) {
-                        variant.variants[i].active = true;
-                    }
-                    else {
-                        variant.variants[i].active = false;
-                    }
-                }
-            }
-
-            //then assign the variant to a view model to the content app
-            var contentApp = _.find(variant.apps, function (a) {
-                return a.alias === "content";
-            });
-            contentApp.viewModel = variant;
-
-            return variant;
         }
 
         function bindEvents() {
@@ -594,10 +460,6 @@
             }
         };
 
-        $scope.backToListView = function () {
-            $location.path($scope.page.listViewPath);
-        };
-
         $scope.restore = function (content) {
 
             $scope.page.buttonRestore = "busy";
@@ -702,12 +564,6 @@
                 $scope.infiniteModel.close($scope.infiniteModel);
             }
         };
-
-        $scope.$watch('culture', function (newVal, oldVal) {
-            if (newVal !== oldVal) {
-                setActiveCulture();
-            }
-        });
 
         //ensure to unregister from all events!
         $scope.$on('$destroy', function () {

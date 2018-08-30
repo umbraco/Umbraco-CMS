@@ -1,31 +1,31 @@
 ﻿<div>
-    <umb-load-indicator ng-if="editor.loading">
+    <umb-load-indicator ng-if="vm.editor.loading">
     </umb-load-indicator>
 
-    <div class="umb-split-view__content" ng-show="!editor.loading">
+    <div class="umb-split-view__content" ng-show="!vm.editor.loading">
 
         <ng-form name="contentHeaderForm">
-            <umb-editor-header menu="page.menu"
-                               hide-menu="page.hideActionsMenu"
-                               name="editor.content.name"
+            <umb-editor-header menu="vm.page.menu"
+                               hide-menu="vm.page.hideActionsMenu"
+                               name="vm.editor.content.name"
                                hide-icon="true"
                                hide-description="true"
                                hide-alias="true"
-                               navigation="editor.content.apps"
-                               variants="editor.content.variants"
-                               hide-change-variant="page.hideChangeVariant"
-                               on-back="backToListView()"
-                               show-back-button="page.listViewPath !== null"
-                               split-view-open="editors.length > 1"
-                               on-open-in-split-view="openInSplitView(variant)"
-                               on-close-split-view="closeSplitView()"
-                               on-select-variant="selectVariant(variant)">
+                               navigation="vm.editor.content.apps"
+                               variants="vm.editor.content.variants"
+                               hide-change-variant="vm.page.hideChangeVariant"
+                               on-back="vm.backToListView()"
+                               show-back-button="vm.page.listViewPath !== null"
+                               split-view-open="vm.editorCount > 1"
+                               on-open-in-split-view="vm.openSplitView(variant)"
+                               on-close-split-view="vm.onCloseSplitView()"
+                               on-select-variant="vm.selectVariant(variant)">
             </umb-editor-header>
         </ng-form>
 
         <umb-editor-container>
             <div class="umb-editor-sub-views">
-                <div ng-repeat="app in editor.content.apps track by app.alias">
+                <div ng-repeat="app in vm.editor.content.apps track by app.alias">
                     <umb-editor-sub-view model="app" content="content" />
                 </div>
             </div>
