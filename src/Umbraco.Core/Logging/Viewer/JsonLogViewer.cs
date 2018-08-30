@@ -58,7 +58,7 @@ namespace Umbraco.Core.Logging.Viewer
         public int GetNumberOfErrors(DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var logs = GetAllLogs(startDate, endDate);
-            return logs.Count(x => x.Level == LogEventLevel.Fatal && x.Level == LogEventLevel.Error && x.Exception != null);
+            return logs.Count(x => x.Level == LogEventLevel.Fatal || x.Level == LogEventLevel.Error || x.Exception != null);
         }
 
         public LogLevelCounts GetLogLevelCounts(DateTimeOffset startDate, DateTimeOffset endDate)
@@ -115,7 +115,7 @@ namespace Umbraco.Core.Logging.Viewer
                     Timestamp = x.Timestamp,
                     Level = x.Level,
                     MessageTemplateText = x.MessageTemplate.Text,
-                    Exception = x.Exception,
+                    Exception = x.Exception?.ToString(),
                     Properties = x.Properties,
                     RenderedMessage = x.RenderMessage()
                 });           

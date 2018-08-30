@@ -37,6 +37,6 @@ namespace Umbraco.Core.Logging.Viewer
         /// <summary>
         /// An exception associated with the logevent, or null.
         /// </summary>
-        public Exception Exception { get; set; }
+        public string Exception { get; set; }
     }
 }
