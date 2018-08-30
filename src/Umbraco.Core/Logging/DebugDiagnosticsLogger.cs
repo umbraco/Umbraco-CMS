@@ -28,7 +28,7 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] args)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(messageTemplate, args) + Environment.NewLine + exception, reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(messageTemplate, args) + Environment.NewLine + exception, reporting.FullName);
         }
 
         /// <inheritdoc/>
@@ -58,7 +58,7 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Error(Type reporting, Exception exception, string messageTemplate, params object[] args)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(messageTemplate, args) + Environment.NewLine + exception, reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(messageTemplate, args) + Environment.NewLine + exception, reporting.FullName);
         }
 
         /// <inheritdoc/>
@@ -76,7 +76,7 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Warn(Type reporting, string format, params object[] args)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(format, args), reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(format, args), reporting.FullName);
         }
 
         /// <inheritdoc/>
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Warn(Type reporting, Exception exception, string format, params object[] args)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(format + Environment.NewLine + exception, args), reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(format + Environment.NewLine + exception, args), reporting.FullName);
         }
 
         /// <inheritdoc/>
@@ -100,7 +100,7 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Info(Type reporting, string format, params object[] args)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(format, args), reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(format, args), reporting.FullName);
         }
 
         /// <inheritdoc/>
@@ -112,7 +112,7 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Debug(Type reporting, string format, params object[] args)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(format, args), reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(format, args), reporting.FullName);
         }
 
         /// <inheritdoc/>
@@ -124,8 +124,7 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public void Verbose(Type reporting, string format, params object[] args)
         {
-            System.Diagnostics.Debug.WriteLine(string.Format(format, args), reporting.FullName);
-        }
-        
+            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(format, args), reporting.FullName);
+        }        
     }
 }

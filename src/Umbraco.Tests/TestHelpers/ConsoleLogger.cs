@@ -24,13 +24,13 @@ namespace Umbraco.Tests.TestHelpers
 
         public void Fatal(Type reporting, Exception exception, string format, params object[] args)
         {
-            Console.WriteLine("FATAL {0} - {1}", reporting.Name, string.Format(format, args));
+            Console.WriteLine("FATAL {0} - {1}", reporting.Name, MessageTemplates.Render(format, args));
             Console.WriteLine(exception);
         }
 
         public void Fatal(Type reporting, string format, params object[] args)
         {
-            Console.WriteLine("FATAL {0} - {1}", reporting.Name, string.Format(format, args));
+            Console.WriteLine("FATAL {0} - {1}", reporting.Name, MessageTemplates.Render(format, args));
         }
 
         public void Error(Type reporting, Exception exception, string message)
@@ -52,13 +52,13 @@ namespace Umbraco.Tests.TestHelpers
 
         public void Error(Type reporting, Exception exception, string format, params object[] args)
         {
-            Console.WriteLine("ERROR {0} - {1}", reporting.Name, string.Format(format, args));
+            Console.WriteLine("ERROR {0} - {1}", reporting.Name, MessageTemplates.Render(format, args));
             Console.WriteLine(exception);
         }
 
         public void Error(Type reporting, string format, params object[] args)
         {
-            Console.WriteLine("ERROR {0} - {1}", reporting.Name, string.Format(format, args));
+            Console.WriteLine("ERROR {0} - {1}", reporting.Name, MessageTemplates.Render(format, args));
         }
 
         public void Warn(Type reporting, string message)
@@ -68,7 +68,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public void Warn(Type reporting, string format, params object[] args)
         {
-            Console.WriteLine("WARN {0} - {1}", reporting.Name, string.Format(format, args));
+            Console.WriteLine("WARN {0} - {1}", reporting.Name, MessageTemplates.Render(format, args));
         }
 
         public void Warn(Type reporting, Exception exception, string message)
@@ -76,16 +76,16 @@ namespace Umbraco.Tests.TestHelpers
             Console.WriteLine("WARN {0} - {1}", reporting.Name, message);
             Console.WriteLine(exception);
         }
-        
+
         public void Warn(Type reporting, Exception exception, string format, params object[] args)
         {
-            Console.WriteLine("WARN {0} - {1}", reporting.Name, string.Format(format, args));
+            Console.WriteLine("WARN {0} - {1}", reporting.Name, MessageTemplates.Render(format, args));
             Console.WriteLine(exception);
         }
 
         public void Info(Type reporting, string format, params object[] args)
         {
-            Console.WriteLine("INFO {0} - {1}", reporting.Name, string.Format(format, args));
+            Console.WriteLine("INFO {0} - {1}", reporting.Name, MessageTemplates.Render(format, args));
         }
 
         public void Info(Type reporting, string message)
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public void Debug(Type reporting, string format, params object[] args)
         {
-            Console.WriteLine("DEBUG {0} - {1}", reporting.Name, string.Format(format, args));
+            Console.WriteLine("DEBUG {0} - {1}", reporting.Name, MessageTemplates.Render(format, args));
         }
 
         public void Verbose(Type reporting, string message)
@@ -110,7 +110,7 @@ namespace Umbraco.Tests.TestHelpers
 
         public void Verbose(Type reporting, string format, params object[] args)
         {
-            Console.WriteLine("VERBOSE {0} - {1}", reporting.Name, string.Format(format, args));
+            Console.WriteLine("VERBOSE {0} - {1}", reporting.Name, MessageTemplates.Render(format, args));
         }
     }
 }
