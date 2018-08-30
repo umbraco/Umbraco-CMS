@@ -31,6 +31,24 @@
 
                 </umb-editor-sub-header-content-left>
 
+                <umb-editor-sub-header-content-right>
+
+                    <span>From</span>
+                    <umb-date-time-picker
+                        options="vm.fromDatePickerConfig"
+                        on-change="vm.datePickerChange(event)"
+                        on-error="vm.datePickerError(event)">
+                    </umb-date-time-picker>
+
+                    <span>To</span>
+                    <umb-date-time-picker
+                        options="vm.toDatePickerConfig"
+                        on-change="vm.datePickerChange(event)"
+                        on-error="vm.datePickerError(event)">
+                    </umb-date-time-picker>
+
+                </umb-editor-sub-header-content-right>
+
             </umb-editor-sub-header>            
             
 
@@ -60,17 +78,16 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat-start="log in vm.logItems.items" ng-click="log.open = !log.open">
-                                        <td>{{ log.Timestamp }}</td>
-                                        <td>{{ log.Level }}</td>
+                                        <td>{{ log.Timestamp | date:'medium' }}</td>
+                                        <td><umb-badge size="s" color="{{ log.logTypeColor }}">{{ log.Level }}</umb-badge></td>
                                         <td>{{ log.Properties.MachineName.Value }}</td>
                                         <td>{{ log.RenderedMessage }}</td>
                                     </tr>
                                     <tr ng-repeat-end ng-if="log.open">
                                         <td colspan="4">
-                                            <div ng-if="log.Exception">
+                                            <div ng-if="log.Exception" style="background-color:#fe6561; color:#94100b; padding:10px;">
                                                 <h3>Exception</h3>
-                                                <strong>TODO: Make this a red box or something?!</strong>
-                                                {{ log.Exception }}
+                                                <p style="white-space: pre-wrap;">{{ log.Exception }}</p>
                                             </div>
                                                                                         
                                             <h3>Properties</h3>

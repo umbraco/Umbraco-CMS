@@ -26,6 +26,33 @@
             }
         };
 
+        vm.fromDatePickerConfig = {
+            pickDate: true,
+            pickTime: true,
+            useSeconds: false,
+            useCurrent: false,
+            format: "YYYY-MM-DD HH:mm",
+            icons: {
+                time: "icon-time",
+                date: "icon-calendar",
+                up: "icon-chevron-up",
+                down: "icon-chevron-down"
+            }
+        };
+
+        vm.toDatePickerConfig = {
+            pickDate: true,
+            pickTime: true,
+            useSeconds: false,
+            format: "YYYY-MM-DD HH:mm",
+            icons: {
+                time: "icon-time",
+                date: "icon-calendar",
+                up: "icon-chevron-up",
+                down: "icon-chevron-down"
+            }
+        };
+
         //Functions
         vm.getLogs = getLogs;
         vm.changePageNumber = changePageNumber;
@@ -91,6 +118,30 @@
         function getLogs(){
             logViewerResource.getLogs(vm.logOptions).then(function (data) {
                 vm.logItems = data;
+
+                setLogTypeColor( vm.logItems.items);
+            });
+        }
+
+        function setLogTypeColor(logItems) {
+            angular.forEach(logItems, function (log) {
+                switch (log.Level) {
+                    case "Information":
+                        log.logTypeColor = "primary";
+                        break;
+                    case "Debug":
+                        log.logTypeColor = "secondary";
+                        break;
+                    case "Warning":
+                        log.logTypeColor = "warning";
+                        break;
+                    case "Fatal":
+                    case "Error":
+                        log.logTypeColor = "danger";
+                        break;
+                    default:
+                        log.logTypeColor = "gray";
+                }
             });
         }
 
