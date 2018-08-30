@@ -412,7 +412,7 @@ Opens an overlay to show a custom YSOD. </br>
 (function() {
    'use strict';
 
-   function OverlayDirective($timeout, formHelper, overlayHelper, localizationService, $q) {
+    function OverlayDirective($timeout, formHelper, overlayHelper, localizationService, $q, $templateCache, $http, $compile) {
 
       function link(scope, el, attr, ctrl) {
 
@@ -424,7 +424,8 @@ Opens an overlay to show a custom YSOD. </br>
          var numberOfOverlays = 0;
          var isRegistered = false;
 
-         var modelCopy = {};
+          var modelCopy = {};
+          var unsubscribe = [];
 
          function activate() {
 
@@ -459,6 +460,21 @@ Opens an overlay to show a custom YSOD. </br>
                   scope.view = "views/common/overlays/" + viewAlias + "/" + viewAlias + ".html";
                }
 
+                //if a custom parent scope is defined then we need to manually compile the view
+                if (scope.parentScope) {
+                    var element = el.find(".scoped-view");
+                    $http.get(scope.view, { cache: $templateCache })
+                        .then(function (response) {
+                            var templateScope = scope.parentScope.$new();
+                            unsubscribe.push(function() {
+                                templateScope.$destroy();
+                            });
+                            templateScope.model = scope.model;
+                            element.html(response.data);
+                            element.show();
+                            $compile(element.contents())(templateScope);
+                        });
+                }
             }
 
          }
@@ -553,7 +569,7 @@ Opens an overlay to show a custom YSOD. </br>
             var newObject = {};
 
             for (var key in object) {
-               if (key !== "event") {
+               if (key !== "event" && key !== "parentScope") {
                   newObject[key] = angular.copy(object[key]);
                }
             }
@@ -684,8 +700,11 @@ Opens an overlay to show a custom YSOD. </br>
 
          };
 
-        scope.$on('$destroy', function(){
-            unregisterOverlay();
+        unsubscribe.push(unregisterOverlay);
+        scope.$on('$destroy', function () {
+           for (var i = 0; i < unsubscribe.length; i++) {
+              unsubscribe[i]();
+           }
         });
 
         activate();
@@ -701,7 +720,8 @@ Opens an overlay to show a custom YSOD. </br>
             ngShow: "=",
             model: "=",
             view: "=",
-            position: "@"
+            position: "@",
+            parentScope: "=?"
          },
          link: link
       };

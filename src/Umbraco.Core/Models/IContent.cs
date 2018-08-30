@@ -172,10 +172,9 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns>A value indicating whether the culture can be published.</returns>
         /// <remarks>
-        /// <para>Fails if values cannot be published, e.g. if some values are not valid.</para>
+        /// <para>Fails if properties don't pass variant validtion rules.</para>
         /// <para>Publishing must be finalized via the content service SavePublishing method.</para>
         /// </remarks>
-        // fixme - should return an attempt with error results
         bool PublishCulture(string culture = "*");
 
         /// <summary>

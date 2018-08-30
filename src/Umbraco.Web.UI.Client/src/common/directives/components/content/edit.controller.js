@@ -239,7 +239,6 @@
             },
                 function (err) {
 
-                    setActiveCulture();
                     syncTreeNode($scope.content, $scope.content.path);
 
                     //error
@@ -349,6 +348,7 @@
                 if (formHelper.submitForm({ scope: $scope, action: "publish" })) {
 
                     var dialog = {
+                        parentScope: $scope,
                         view: "views/content/overlays/publish.html",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
@@ -370,7 +370,8 @@
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
 
-                                    return $q.reject(err);
+                                    //don't reject, we've handled the error
+                                    return $q.when(err);
                                 });
                         },
                         close: function (oldModel) {
@@ -417,7 +418,8 @@
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
 
-                                    return $q.reject(err);
+                                    //don't reject, we've handled the error
+                                    return $q.when(err);
                                 });
                         },
                         close: function (oldModel) {

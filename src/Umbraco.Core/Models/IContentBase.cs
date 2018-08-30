@@ -139,7 +139,7 @@ namespace Umbraco.Core.Models
         // fixme validate published cultures?
         
         /// <summary>
-        /// Validates the content item's properties.
+        /// Validates the content item's properties pass variant rules
         /// </summary>
         /// <para>If the content type is variant, then culture can be either '*' or an actual culture, but neither 'null' nor
         /// 'empty'. If the content type is invariant, then culture can be either '*' or null or empty.</para>
