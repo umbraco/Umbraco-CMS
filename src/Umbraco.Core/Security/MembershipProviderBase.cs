@@ -720,7 +720,7 @@ namespace Umbraco.Core.Security
                     }
                     else
                     {
-                        //if the salt bytes is too long for the required key length for the algorithm, extend it
+                        //if the salt bytes is too short for the required key length for the algorithm, extend it
                         var numArray2 = new byte[keyedHashAlgorithm.Key.Length];
                         var dstOffset = 0;
                         while (dstOffset < numArray2.Length)
