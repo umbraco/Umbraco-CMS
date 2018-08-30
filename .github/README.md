@@ -44,6 +44,6 @@ Umbraco is contribution focused and community driven. If you want to contribute 
 
 ## Found a bug?
 
-Another way you can contribute to Umbraco is by providing issue reports. For information on how to submit an issue report refer to our [online guide for reporting issues](https://github.com/umbraco/Umbraco-CMS/blob/dev-v7/docs/CONTRIBUTING.md).
+Another way you can contribute to Umbraco is by providing issue reports. For information on how to submit an issue report refer to our [online guide for reporting issues](https://github.com/umbraco/Umbraco-CMS/blob/dev-v7/.github/CONTRIBUTING.md).
 
 To view existing issues, please visit [http://issues.umbraco.org](http://issues.umbraco.org).
