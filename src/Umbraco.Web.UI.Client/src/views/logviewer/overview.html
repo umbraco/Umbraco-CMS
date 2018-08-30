@@ -25,6 +25,10 @@
                         label-key="general_search">
                     </umb-button>
 
+                    <strong>Sort by timestamp</strong>
+                    Ascending <input type="radio" value="Ascending" ng-model="vm.logOptions.orderDirection" ng-change="vm.updateSort()" />
+                    Descending <input type="radio" value="Descending" ng-model="vm.logOptions.orderDirection" ng-change="vm.updateSort()"/>
+
                 </umb-editor-sub-header-content-left>
 
             </umb-editor-sub-header>            
@@ -52,16 +56,28 @@
                                         <th>Level</th>
                                         <th>Machine Name</th>
                                         <th>Message</th>
-                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="log in vm.logItems.items">
+                                    <tr ng-repeat-start="log in vm.logItems.items" ng-click="log.open = !log.open">
                                         <td>{{ log.Timestamp }}</td>
                                         <td>{{ log.Level }}</td>
                                         <td>{{ log.Properties.MachineName.Value }}</td>
                                         <td>{{ log.RenderedMessage }}</td>
-                                        <td><button class="btn">View Details</button></td>
+                                    </tr>
+                                    <tr ng-repeat-end ng-if="log.open">
+                                        <td colspan="4">
+                                            <div ng-if="log.Exception">
+                                                <h3>Exception</h3>
+                                                <strong>TODO: Make this a red box or something?!</strong>
+                                                {{ log.Exception }}
+                                            </div>
+                                                                                        
+                                            <h3>Properties</h3>
+                                            <div ng-repeat="(key, val) in log.Properties">
+                                                <strong>{{ key }}</strong> {{ val.Value }}
+                                            </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>

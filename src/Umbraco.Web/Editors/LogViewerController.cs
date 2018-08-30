@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web.Mvc;
 using Umbraco.Core.Logging.Viewer;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Editors
@@ -39,9 +40,10 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpGet]
-        public PagedResult<LogMessage> GetLogs(int pageNumber = 1, string filterExpression = null)
+        public PagedResult<LogMessage> GetLogs(string orderDirection = "Descending", int pageNumber = 1, string filterExpression = null)
         {
-            return _logViewer.GetLogs(startDate: DateTime.Now, endDate: DateTime.Now, filterExpression: filterExpression, pageNumber: pageNumber);
+            var direction = orderDirection == "Descending" ? Direction.Descending : Direction.Ascending;
+            return _logViewer.GetLogs(startDate: DateTime.Now, endDate: DateTime.Now, filterExpression: filterExpression, pageNumber: pageNumber, orderDirection: direction);
         }
 
     }

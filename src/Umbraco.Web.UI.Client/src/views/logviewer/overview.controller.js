@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LogViewerOverviewController($scope, $location, localizationService, logViewerResource) {
+    function LogViewerOverviewController($scope, localizationService, logViewerResource) {
 
         var vm = this;
 
@@ -13,6 +13,7 @@
         vm.numberOfErrors = 0;
         vm.commonLogMessages = [];
         vm.logOptions = {};
+        vm.logOptions.orderDirection = 'Descending';
 
         // ChartJS Options - for count/overview of log distribution
         vm.logTypeLabels = ["Info", "Debug", "Warning", "Error", "Critical"];
@@ -29,6 +30,7 @@
         vm.getLogs = getLogs;
         vm.changePageNumber = changePageNumber;
         vm.search = search;
+        vm.updateSort = updateSort;
 
 
         function init() {
@@ -78,6 +80,11 @@
 
         function changePageNumber(pageNumber) {
             vm.logOptions.pageNumber = pageNumber;
+            getLogs();
+        }
+
+        function updateSort() {
+            //vm.logOptions.orderDirection
             getLogs();
         }
 
