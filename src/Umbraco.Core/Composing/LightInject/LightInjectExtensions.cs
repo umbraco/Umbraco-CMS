@@ -2,7 +2,7 @@
 using System.Linq;
 using LightInject;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Core.Composing.LightInject
 {
     /// <summary>
     /// Provides extensions to LightInject.
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
-        /// Registers a servuice with an implementation as a singleton.
+        /// Registers a service with an implementation as a singleton.
         /// </summary>
         public static void RegisterSingleton<TService, TImplementation>(this IServiceRegistry container)
             where TImplementation : TService
@@ -37,7 +37,7 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
-        /// Registers a servuice with an implementation as a singleton.
+        /// Registers a service with an implementation as a singleton.
         /// </summary>
         public static void RegisterSingleton(this IServiceRegistry container, Type serviceType, Type implementingType)
         {
@@ -56,7 +56,7 @@ namespace Umbraco.Core.Composing
         }
 
         /// <summary>
-        /// Registers a servuice with a named implementation as a singleton.
+        /// Registers a service with a named implementation as a singleton.
         /// </summary>
         public static void RegisterSingleton(this IServiceRegistry container, Type serviceType, Type implementingType, string name)
         {
