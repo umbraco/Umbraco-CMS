@@ -7,6 +7,9 @@ namespace Umbraco.Core.Logging
     /// </summary>
     public class DebugDiagnosticsLogger : ILogger
     {
+        public bool IsEnabled(Type reporting, LogLevel level)
+            => true;
+
         /// <inheritdoc/>
         public void Fatal(Type reporting, Exception exception, string message)
         {
@@ -26,15 +29,15 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] args)
+        public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(messageTemplate, args) + Environment.NewLine + exception, reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(messageTemplate, propertyValues) + Environment.NewLine + exception, reporting.FullName);
         }
 
         /// <inheritdoc/>
-        public void Fatal(Type reporting, string messageTemplate, params object[] args)
+        public void Fatal(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(messageTemplate, args);
+            System.Diagnostics.Debug.WriteLine(messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
@@ -56,27 +59,27 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Error(Type reporting, Exception exception, string messageTemplate, params object[] args)
+        public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(messageTemplate, args) + Environment.NewLine + exception, reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(messageTemplate, propertyValues) + Environment.NewLine + exception, reporting.FullName);
         }
 
         /// <inheritdoc/>
-        public void Error(Type reporting, string messageTemplate, params object[] args)
+        public void Error(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(messageTemplate, args);
+            System.Diagnostics.Debug.WriteLine(messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
-        public void Warn(Type reporting, string format)
+        public void Warn(Type reporting, string message)
         {
-            System.Diagnostics.Debug.WriteLine(format, reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(message, reporting.FullName);
         }
-        
+
         /// <inheritdoc/>
-        public void Warn(Type reporting, string format, params object[] args)
+        public void Warn(Type reporting, string message, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(format, args), reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(message, propertyValues), reporting.FullName);
         }
 
         /// <inheritdoc/>
@@ -86,9 +89,9 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Warn(Type reporting, Exception exception, string format, params object[] args)
+        public void Warn(Type reporting, Exception exception, string message, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(format + Environment.NewLine + exception, args), reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(message + Environment.NewLine + exception, propertyValues), reporting.FullName);
         }
 
         /// <inheritdoc/>
@@ -98,9 +101,9 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Info(Type reporting, string format, params object[] args)
+        public void Info(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(format, args), reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(messageTemplate, propertyValues), reporting.FullName);
         }
 
         /// <inheritdoc/>
@@ -110,9 +113,9 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Debug(Type reporting, string format, params object[] args)
+        public void Debug(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(format, args), reporting.FullName);
+            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(messageTemplate, propertyValues), reporting.FullName);
         }
 
         /// <inheritdoc/>
@@ -122,9 +125,9 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Verbose(Type reporting, string format, params object[] args)
+        public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(format, args), reporting.FullName);
-        }        
+            System.Diagnostics.Debug.WriteLine(MessageTemplates.Render(messageTemplate, propertyValues), reporting.FullName);
+        }
     }
 }

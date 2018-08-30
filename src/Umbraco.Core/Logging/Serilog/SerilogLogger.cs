@@ -2,41 +2,40 @@
 using System.IO;
 using System.Reflection;
 using System.Threading;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Diagnostics;
 using Serilog;
 using Serilog.Events;
-using Umbraco.Core.Logging.SerilogExtensions;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Diagnostics;
 
-namespace Umbraco.Core.Logging
+namespace Umbraco.Core.Logging.Serilog
 {
     ///<summary>
     /// Implements <see cref="ILogger"/> on top of Serilog.
     ///</summary>
-    public class Logger : ILogger
+    public class SerilogLogger : ILogger
     {
         /// <summary>
-        /// Initialize a new instance of the <see cref="Logger"/> class with a configuration file.
+        /// Initialize a new instance of the <see cref="SerilogLogger"/> class with a configuration file.
         /// </summary>
         /// <param name="logConfigFile"></param>
-        public Logger(FileInfo logConfigFile)
+        public SerilogLogger(FileInfo logConfigFile)
         {
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + logConfigFile)
                 .CreateLogger();
         }
 
-        public Logger(LoggerConfiguration logConfig)
+        public SerilogLogger(LoggerConfiguration logConfig)
         {
             //Configure Serilog static global logger with config passed in
             Log.Logger = logConfig.CreateLogger();
         }
 
         /// <summary>
-        /// Creates a logger with some pre-definied configuration and remainder from config file
+        /// Creates a logger with some pre-defined configuration and remainder from config file
         /// </summary>
         /// <remarks>Used by UmbracoApplicationBase to get its logger.</remarks>
-        public static Logger CreateWithDefaultConfiguration()
+        public static SerilogLogger CreateWithDefaultConfiguration()
         {
             var loggerConfig = new LoggerConfiguration();
             loggerConfig
@@ -46,78 +45,118 @@ namespace Umbraco.Core.Logging
                 .ReadFromConfigFile()
                 .ReadFromUserConfigFile();
 
-            return new Logger(loggerConfig);
+            return new SerilogLogger(loggerConfig);
         }
+
+        /// <summary>
+        /// Gets a contextualized logger.
+        /// </summary>
+        private global::Serilog.ILogger LoggerFor(Type reporting)
+            => Log.Logger.ForContext(reporting);
+
+        /// <summary>
+        /// Maps Umbraco's log level to Serilog's.
+        /// </summary>
+        private LogEventLevel MapLevel(LogLevel level)
+        {
+            switch (level)
+            {
+                case LogLevel.Debug:
+                    return LogEventLevel.Debug;
+                case LogLevel.Error:
+                    return LogEventLevel.Error;
+                case LogLevel.Fatal:
+                    return LogEventLevel.Fatal;
+                case LogLevel.Information:
+                    return LogEventLevel.Information;
+                case LogLevel.Verbose:
+                    return LogEventLevel.Verbose;
+                case LogLevel.Warning:
+                    return LogEventLevel.Warning;
+            }
+
+            throw new NotSupportedException($"LogLevel \"{level}\" is not supported.");
+        }
+
+        /// <inheritdoc/>
+        public bool IsEnabled(Type reporting, LogLevel level)
+            => LoggerFor(reporting).IsEnabled(MapLevel(level));
 
         /// <inheritdoc/>
         public void Fatal(Type reporting, Exception exception, string message)
         {
-            Fatal(reporting, exception, message, null);
+            var logger = LoggerFor(reporting);
+            DumpThreadAborts(logger, LogEventLevel.Fatal, exception, ref message);
+            logger.Fatal(exception, message);
         }
 
         /// <inheritdoc/>
         public void Fatal(Type reporting, Exception exception)
         {
-            Fatal(reporting, exception, string.Empty);
+            var logger = LoggerFor(reporting);
+            var message = "Exception.";
+            DumpThreadAborts(logger, LogEventLevel.Fatal, exception, ref message);
+            logger.Fatal(exception, message);
         }
 
         /// <inheritdoc/>
         public void Fatal(Type reporting, string message)
         {
-            //Sometimes we need to throw an error without an ex
-            Fatal(reporting, null, message);
+            LoggerFor(reporting).Fatal(message);
         }
 
         /// <inheritdoc/>
         public void Fatal(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            //Log a structured message WITHOUT an ex
-            Fatal(reporting, null, messageTemplate, propertyValues);
+            LoggerFor(reporting).Fatal(messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
         public void Fatal(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            ErrorOrFatal(Fatal, exception, ref messageTemplate);
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Fatal(exception, messageTemplate, propertyValues);
+            var logger = LoggerFor(reporting);
+            DumpThreadAborts(logger, LogEventLevel.Fatal, exception, ref messageTemplate);
+            logger.Fatal(exception, messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
         public void Error(Type reporting, Exception exception, string message)
         {
-            Error(reporting, exception, message, null);
+            var logger = LoggerFor(reporting);
+            DumpThreadAborts(logger, LogEventLevel.Error, exception, ref message);
+            logger.Error(exception, message);
         }
 
         /// <inheritdoc/>
         public void Error(Type reporting, Exception exception)
         {
-            Error(reporting, exception, string.Empty);
+            var logger = LoggerFor(reporting);
+            var message = "Exception";
+            DumpThreadAborts(logger, LogEventLevel.Error, exception, ref message);
+            logger.Error(exception, message);
         }
 
         /// <inheritdoc/>
         public void Error(Type reporting, string message)
         {
-            //Sometimes we need to throw an error without an ex
-            Error(reporting, null, message);
+            LoggerFor(reporting).Error(message);
         }
 
         /// <inheritdoc/>
         public void Error(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            //Log a structured message WITHOUT an ex
-            Error(reporting, null, messageTemplate, propertyValues);
+            LoggerFor(reporting).Error(messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
         public void Error(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            ErrorOrFatal(Error, exception, ref messageTemplate);
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Error(exception, messageTemplate, propertyValues);
+            var logger = LoggerFor(reporting);
+            DumpThreadAborts(logger, LogEventLevel.Error, exception, ref messageTemplate);
+            logger.Error(exception, messageTemplate, propertyValues);
         }
 
-        private static void ErrorOrFatal(Action<Type, Exception, string, object[]> logAction, Exception exception, ref string messageTemplate)
+        private static void DumpThreadAborts(global::Serilog.ILogger logger, LogEventLevel level, Exception exception, ref string messageTemplate)
         {
             var dump = false;
 
@@ -143,8 +182,10 @@ namespace Umbraco.Core.Logging
                 }
                 catch (Exception ex)
                 {
+                    messageTemplate += "\r\nFailed to create a minidump";
+
                     //Log a new entry (as opposed to appending to same log entry)
-                    logAction(ex.GetType(), ex, "Failed to create a minidump at App_Data/MiniDump ({ExType}: {ExMessage}",
+                    logger.Write(level, ex, "Failed to create a minidump ({ExType}: {ExMessage})",
                         new object[]{ ex.GetType().FullName, ex.Message });
                 }
             }
@@ -174,69 +215,63 @@ namespace Umbraco.Core.Logging
         }
 
         /// <inheritdoc/>
-        public void Warn(Type reporting, string format)
+        public void Warn(Type reporting, string message)
         {
-            Warn(reporting, null, format);
+            LoggerFor(reporting).Warning(message);            
         }
         
         /// <inheritdoc/>
-        public void Warn(Type reporting, string messageTemplate, params object[] propertyValues)
+        public void Warn(Type reporting, string message, params object[] propertyValues)
         {
-            Warn(reporting, null, messageTemplate, propertyValues);
+            LoggerFor(reporting).Warning(message, propertyValues);
         }
 
         /// <inheritdoc/>
         public void Warn(Type reporting, Exception exception, string message)
         {
-            Warn(reporting, exception, message, Array.Empty<object>());
+            LoggerFor(reporting).Warning(exception, message);
         }
         
         /// <inheritdoc/>
         public void Warn(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Warning(exception, messageTemplate, propertyValues);
+            LoggerFor(reporting).Warning(exception, messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
         public void Info(Type reporting, string message)
         {
-            Info(reporting, message, Array.Empty<object>());
+            LoggerFor(reporting).Information(message);
         }
 
         /// <inheritdoc/>
         public void Info(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Information(messageTemplate, propertyValues);
+            LoggerFor(reporting).Information(messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
         public void Debug(Type reporting, string message)
         {
-            Debug(reporting, message, Array.Empty<object>());
+            LoggerFor(reporting).Debug(message);
         }
         
         /// <inheritdoc/>
         public void Debug(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Debug(messageTemplate, propertyValues);
+            LoggerFor(reporting).Debug(messageTemplate, propertyValues);
         }
 
         /// <inheritdoc/>
         public void Verbose(Type reporting, string message)
         {
-            Verbose(reporting, message, Array.Empty<object>());
+            LoggerFor(reporting).Verbose(message);
         }
 
         /// <inheritdoc/>
         public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues)
         {
-            var logger = Log.Logger;
-            logger?.ForContext(reporting).Verbose(messageTemplate, propertyValues);
+            LoggerFor(reporting).Verbose(messageTemplate, propertyValues);
         }
-
-        
     }
 }
