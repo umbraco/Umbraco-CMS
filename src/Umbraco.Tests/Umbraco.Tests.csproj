@@ -80,7 +80,6 @@
     <PackageReference Include="Examine" Version="1.0.0-beta025" />
     <PackageReference Include="LightInject" Version="5.1.2" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
-    <PackageReference Include="Log4Net.Async" Version="2.0.4" />
     <PackageReference Include="Lucene.Net" Version="3.0.3" />
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.1" />
@@ -107,7 +106,6 @@
     <PackageReference Include="SharpZipLib" Version="0.86.0" />
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.4.0" />
-    <PackageReference Include="log4net" Version="2.0.8" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache\CacheRefresherComponentTests.cs" />
@@ -521,7 +519,7 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="UmbracoExamine\TestFiles\umbraco.config" />
-    <None Include="unit-test-log4net.config">
+    <None Include="unit-test-logger.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

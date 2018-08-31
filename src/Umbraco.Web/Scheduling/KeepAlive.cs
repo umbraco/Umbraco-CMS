@@ -64,9 +64,9 @@ namespace Umbraco.Web.Scheduling
                     var request = new HttpRequestMessage(HttpMethod.Get, url);
                     var result = await _httpClient.SendAsync(request, token);
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    _logger.Error<KeepAlive>(string.Format("Failed (at \"{0}\").", umbracoAppUrl), e);
+                    _logger.Error<KeepAlive>(ex, "Failed (at '{UmbracoAppUrl}').", umbracoAppUrl);
                 }
             }
 

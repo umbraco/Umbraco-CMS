@@ -930,7 +930,7 @@ namespace Umbraco.Core.Services.Implement
             // fixme - this is MOOT because the event will not trigger immediately
             // it's been refactored already (think it's the dispatcher that deals with it?)
             _mediaFileSystem.DeleteFiles(args.MediaFilesToDelete, // remove flagged files
-                (file, e) => Logger.Error<MemberService>("An error occurred while deleting file attached to nodes: " + file, e));
+                (file, e) => Logger.Error<MemberService>(e, "An error occurred while deleting file attached to nodes: {File}", file));
         }
 
         #endregion

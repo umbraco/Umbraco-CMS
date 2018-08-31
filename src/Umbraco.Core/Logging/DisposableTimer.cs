@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using Umbraco.Core.Logging;
 
-namespace Umbraco.Core
+namespace Umbraco.Core.Logging
 {
     /// <summary>
     /// Starts the timer and invokes a  callback upon disposal. Provides a simple way of timing an operation by wrapping it in a <code>using</code> (C#) statement.
@@ -10,7 +9,7 @@ namespace Umbraco.Core
 	public class DisposableTimer : DisposableObjectSlim
     {
         private readonly ILogger _logger;
-        private readonly LogType? _logType;
+        private readonly LogLevel _level;
         private readonly Type _loggerType;
         private readonly int _thresholdMilliseconds;
         private readonly IDisposable _profilerStep;
@@ -18,39 +17,33 @@ namespace Umbraco.Core
         private string _failMessage;
         private Exception _failException;
         private bool _failed;
-
-        internal enum LogType
-        {
-            Debug, Info
-        }
+        private readonly string _timingId;
 
         // internal - created by profiling logger
-        internal DisposableTimer(ILogger logger, LogType logType, IProfiler profiler, Type loggerType,
+        internal DisposableTimer(ILogger logger, LogLevel level, IProfiler profiler, Type loggerType,
             string startMessage, string endMessage, string failMessage = null,
             int thresholdMilliseconds = 0)
         {
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
-            if (loggerType == null) throw new ArgumentNullException(nameof(loggerType));
-
-            _logger = logger;
-            _logType = logType;
-            _loggerType = loggerType;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _level = level;
+            _loggerType = loggerType ?? throw new ArgumentNullException(nameof(loggerType));
             _endMessage = endMessage;
             _failMessage = failMessage;
             _thresholdMilliseconds = thresholdMilliseconds < 0 ? 0 : thresholdMilliseconds;
+            _timingId = Guid.NewGuid().ToString("N");
 
             if (thresholdMilliseconds == 0)
             {
-                switch (logType)
+                switch (_level)
                 {
-                    case LogType.Debug:
-                        logger.Debug(loggerType, startMessage);
+                    case LogLevel.Debug:
+                        logger.Debug(loggerType, "[Timing {TimingId}] {StartMessage}", _timingId, startMessage);
                         break;
-                    case LogType.Info:
-                        logger.Info(loggerType, startMessage);
+                    case LogLevel.Information:
+                        logger.Info(loggerType, "[Timing {TimingId}] {StartMessage}", _timingId, startMessage);
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(logType));
+                        throw new ArgumentOutOfRangeException(nameof(level));
                 }
             }
 
@@ -86,20 +79,20 @@ namespace Umbraco.Core
             _profilerStep?.Dispose();
 
             if ((Stopwatch.ElapsedMilliseconds >= _thresholdMilliseconds || _failed)
-                && _logType.HasValue && _loggerType != null && _logger != null
+                && _loggerType != null && _logger != null
                 && (_endMessage.IsNullOrWhiteSpace() == false || _failed))
             {
                 if (_failed)
                 {
-                    _logger.Error(_loggerType, $"{_failMessage} ({Stopwatch.ElapsedMilliseconds}ms)", _failException);
+                    _logger.Error(_loggerType, _failException, "[Timing {TimingId}] {FailMessage} ({TimingDuration}ms)", _timingId, _failMessage, Stopwatch.ElapsedMilliseconds);
                 }
-                else switch (_logType)
+                else switch (_level)
                 {
-                    case LogType.Debug:
-                        _logger.Debug(_loggerType, () => $"{_endMessage} ({Stopwatch.ElapsedMilliseconds}ms)");
+                    case LogLevel.Debug:
+                        _logger.Debug(_loggerType, "[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)", _timingId, _endMessage, Stopwatch.ElapsedMilliseconds);
                         break;
-                    case LogType.Info:
-                        _logger.Info(_loggerType, () => $"{_endMessage} ({Stopwatch.ElapsedMilliseconds}ms)");
+                    case LogLevel.Information:
+                        _logger.Info(_loggerType, "[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)", _timingId, _endMessage, Stopwatch.ElapsedMilliseconds);
                         break;
                     // filtered in the ctor
                     //default:

@@ -388,7 +388,7 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             }
             catch (Exception ex)
             {
-                _logger.Error<MySqlSyntaxProvider>("Error querying for lower_case support", ex);
+                _logger.Error<MySqlSyntaxProvider>(ex, "Error querying for lower_case support");
             }
             finally
             {

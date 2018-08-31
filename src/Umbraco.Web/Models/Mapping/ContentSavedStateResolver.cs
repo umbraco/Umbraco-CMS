@@ -28,8 +28,7 @@ namespace Umbraco.Web.Models.Mapping
                         ? PublishedState.Published
                         : PublishedState.Unpublished;
 
-                //it can only be 'edited' if the content item is persisted and if the variant has a name and it's flagged as edited
-                isEdited = source.Id > 0 && source.IsCultureAvailable(culture) && source.IsCultureEdited(culture);
+                isEdited = source.IsCultureEdited(culture);
             }
             else
             {
@@ -37,17 +36,16 @@ namespace Umbraco.Web.Models.Mapping
                     ? PublishedState.Unpublished
                     : PublishedState.Published;
 
-                isEdited = source.Id > 0 && source.Edited;
+                isEdited = source.Edited;
             }
 
-            //now we can calculate the content state
-            if (!isEdited && publishedState == PublishedState.Unpublished)
-                return ContentSavedState.NotCreated;
-            if (isEdited && publishedState == PublishedState.Unpublished)
-                return ContentSavedState.Draft;
-            if (!isEdited && publishedState == PublishedState.Published)
-                return ContentSavedState.Published;
-            return ContentSavedState.PublishedPendingChanges;
+            if (publishedState == PublishedState.Unpublished)
+                return isEdited && source.Id > 0 ? ContentSavedState.Draft : ContentSavedState.NotCreated;
+
+            if (publishedState == PublishedState.Published)
+                return isEdited ? ContentSavedState.PublishedPendingChanges : ContentSavedState.Published;
+
+            throw new NotSupportedException($"PublishedState {publishedState} is not supported.");
         }
     }
 }

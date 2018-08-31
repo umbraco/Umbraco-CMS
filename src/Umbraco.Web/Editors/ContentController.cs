@@ -745,7 +745,7 @@ namespace Umbraco.Web.Editors
                     //Check if a mandatory language is missing from being published
 
                     var variant = cultureVariants.First(x => x.Culture == lang.IsoCode);
-                    var isPublished = contentItem.PersistedContent.IsCultureAvailable(lang.IsoCode) && contentItem.PersistedContent.IsCulturePublished(lang.IsoCode);
+                    var isPublished = contentItem.PersistedContent.IsCulturePublished(lang.IsoCode);
                     var isPublishing = variant.Publish;
 
                     if (!isPublished && !isPublishing)
@@ -966,7 +966,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Logger.Error<ContentController>("Could not update content sort order", ex);
+                Logger.Error<ContentController>(ex, "Could not update content sort order");
                 throw;
             }
         }

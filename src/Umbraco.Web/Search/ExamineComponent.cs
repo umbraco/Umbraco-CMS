@@ -91,7 +91,7 @@ namespace Umbraco.Web.Search
 
             var registeredIndexers = examineManager.IndexProviders.Values.OfType<UmbracoExamineIndexer>().Count(x => x.EnableDefaultEventHandler);
 
-            profilingLogger.Logger.Info<ExamineComponent>(() => $"Adding examine event handlers for {registeredIndexers} index providers.");
+            profilingLogger.Logger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
 
             // don't bind event handlers if we're not suppose to listen
             if (registeredIndexers == 0)
@@ -133,9 +133,9 @@ namespace Umbraco.Web.Search
                     // rebuilds any empty indexes
                     RebuildIndexes(true, _examineManager, logger);
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    logger.Error<ExamineComponent>("Failed to rebuild empty indexes.", e);
+                    logger.Error<ExamineComponent>(ex, "Failed to rebuild empty indexes.");
                 }
             });
             bg.Start();
@@ -200,7 +200,7 @@ namespace Umbraco.Web.Search
                     var dir = luceneIndexer.GetLuceneDirectory();
                     if (IndexWriter.IsLocked(dir))
                     {
-                        logger.Info<ExamineComponent>(() => $"Forcing index {luceneIndexer.Name} to be unlocked since it was left in a locked state");
+                        logger.Info<ExamineComponent>("Forcing index {IndexerName} to be unlocked since it was left in a locked state", luceneIndexer.Name);
                         IndexWriter.Unlock(dir);
                     }
                 }
@@ -219,9 +219,9 @@ namespace Umbraco.Web.Search
                         i.DocumentWriting += grid.DocumentWriting;
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                logger.Error<ExamineComponent>("Failed to bind grid property editor.", e);
+                logger.Error<ExamineComponent>(ex, "Failed to bind grid property editor.");
             }
         }
 

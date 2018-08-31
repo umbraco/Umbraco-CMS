@@ -309,7 +309,7 @@ namespace Umbraco.Core.Migrations.Install
             {
                 var source = connectionStrings.Attribute("configSource").Value;
                 var configFile = IOHelper.MapPath($"{SystemDirectories.Root}/{source}");
-                logger.Info<DatabaseBuilder>(() => $"Storing ConnectionString in {configFile}");
+                logger.Info<DatabaseBuilder>("Storing ConnectionString in {ConfigFile}", configFile);
                 if (File.Exists(configFile))
                 {
                     xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
@@ -335,7 +335,7 @@ namespace Umbraco.Core.Migrations.Install
             }
 
             xml.Save(fileName, SaveOptions.DisableFormatting);
-            logger.Info<DatabaseBuilder>(() => $"Configured a new ConnectionString using the '{providerName}' provider.");
+            logger.Info<DatabaseBuilder>("Configured a new ConnectionString using the '{ProviderName}' provider.", providerName);
         }
 
         internal bool IsConnectionStringConfigured(ConnectionStringSettings databaseSettings)
@@ -500,7 +500,7 @@ namespace Umbraco.Core.Migrations.Install
                     message = message + "<p>Installation completed!</p>";
 
                     //now that everything is done, we need to determine the version of SQL server that is executing
-                    _logger.Info<DatabaseBuilder>(() => $"Database configuration status: {message}");
+                    _logger.Info<DatabaseBuilder>("Database configuration status: {DbConfigStatus}", message);
                     return new Result { Message = message, Success = true, Percentage = "100" };
                 }
 
@@ -589,7 +589,7 @@ namespace Umbraco.Core.Migrations.Install
 
                 //now that everything is done, we need to determine the version of SQL server that is executing
 
-                _logger.Info<DatabaseBuilder>(() => $"Database configuration status: {message}");
+                _logger.Info<DatabaseBuilder>("Database configuration status: {DbConfigStatus}", message);
 
                 return new Result { Message = message, Success = true, Percentage = "100" };
             }
@@ -658,11 +658,11 @@ namespace Umbraco.Core.Migrations.Install
 
         private Result HandleInstallException(Exception ex)
         {
-            _logger.Error<DatabaseBuilder>("Database configuration failed", ex);
+            _logger.Error<DatabaseBuilder>(ex, "Database configuration failed");
 
             if (_databaseSchemaValidationResult != null)
             {
-                _logger.Info<DatabaseBuilder>(() => $"The database schema validation produced the following summary: {Environment.NewLine}{_databaseSchemaValidationResult.GetSummary()}");
+                _logger.Info<DatabaseBuilder>("The database schema validation produced the following summary: {DbSchemaSummary}", _databaseSchemaValidationResult.GetSummary());
             }
 
             return new Result

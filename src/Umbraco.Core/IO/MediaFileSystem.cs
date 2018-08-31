@@ -111,7 +111,7 @@ namespace Umbraco.Core.IO
                 }
                 catch (Exception e)
                 {
-                    Logger.Error<MediaFileSystem>("Failed to delete attached file \"" + file + "\".", e);
+                    Logger.Error<MediaFileSystem>(e, "Failed to delete attached file '{File}'", file);
                 }
             });
         }

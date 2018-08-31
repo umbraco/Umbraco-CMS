@@ -562,7 +562,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Logger.Error<MediaController>("Could not update media sort order", ex);
+                Logger.Error<MediaController>(ex, "Could not update media sort order");
                 throw;
             }
         }

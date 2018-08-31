@@ -45,7 +45,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(language, Is.Not.Null);
                 Assert.That(language.HasIdentity, Is.True);
-                Assert.That(language.CultureName, Is.EqualTo("en-US"));
+                Assert.That(language.CultureName, Is.EqualTo("English (United States)"));
                 Assert.That(language.IsoCode, Is.EqualTo("en-US"));
                 Assert.That(language.FallbackLanguageId, Is.Null);
             }
@@ -251,7 +251,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var scope = provider.CreateScope())
             {
                 var repository = CreateRepository(provider);
-                                
+
                 var languageBR = (ILanguage)new Language("pt-BR") { CultureName = "pt-BR", IsDefault = true, IsMandatory = true };
                 repository.Save(languageBR);
                 var languageEN = new Language("en-AU") { CultureName = "en-AU" };

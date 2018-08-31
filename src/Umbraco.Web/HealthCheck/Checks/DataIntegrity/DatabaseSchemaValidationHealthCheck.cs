@@ -42,11 +42,11 @@ namespace Umbraco.Web.HealthCheck.Checks.DataIntegrity
         {
             var results = _databaseBuilder.ValidateDatabaseSchema();
 
-            _logger.Warn(typeof(DatabaseSchemaValidationHealthCheck), _textService.Localize("databaseSchemaValidationCheckDatabaseLogMessage"));
+            _logger.Warn<DatabaseSchemaValidationHealthCheck>(_textService.Localize("databaseSchemaValidationCheckDatabaseLogMessage"));
 
             foreach(var error in results.Errors)
             {
-                _logger.Warn(typeof(DatabaseSchemaValidationHealthCheck), error.Item1 + ": " + error.Item2);
+                _logger.Warn<DatabaseSchemaValidationHealthCheck>("{Error} : {ErrorDetail}", error.Item1, error.Item2);
             }
 
             if(results.Errors.Count > 0)

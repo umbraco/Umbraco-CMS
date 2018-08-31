@@ -59,7 +59,7 @@ namespace Umbraco.Web.WebApi.Filters
             }
             catch (Exception ex)
             {
-                Current.Logger.Error(typeof(AngularAntiForgeryHelper), "Could not validate XSRF token", ex);
+                Current.Logger.Error(typeof(AngularAntiForgeryHelper), ex, "Could not validate XSRF token");
                 return false;
             }
             return true;

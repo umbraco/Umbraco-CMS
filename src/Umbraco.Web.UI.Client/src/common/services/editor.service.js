@@ -53,7 +53,7 @@
          * @methodOf umbraco.services.editorService
          *
          * @description
-         * Opens a media editor in infinite editing, the submit callback returns the updated content item
+         * Method to close the latest opened editor
          */
         function close() {
             var length = editors.length;
@@ -67,6 +67,26 @@
             };
 
             eventsService.emit("appState.editors.close", args);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#closeAll
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Method to close all open editors
+         */
+        function closeAll() {
+
+            editors = [];
+
+            var args = {
+                editors: editors,
+                editor: null
+            };
+
+            eventsService.emit("appState.editors.closeAll", args);
         }
 
         /**
@@ -454,6 +474,7 @@
             getEditors: getEditors,
             open: open,
             close: close,
+            closeAll: closeAll,
             mediaEditor: mediaEditor,
             contentEditor: contentEditor,
             contentPicker: contentPicker,

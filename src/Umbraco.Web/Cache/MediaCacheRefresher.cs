@@ -47,14 +47,16 @@ namespace Umbraco.Web.Cache
 
             if (anythingChanged)
             {
-                var mediaCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMedia>();
-
                 Current.ApplicationCache.ClearPartialViewCache();
+
+                var mediaCache = CacheHelper.IsolatedRuntimeCache.GetCache<IMedia>();
 
                 foreach (var payload in payloads)
                 {
                     if (payload.ChangeTypes == TreeChangeTypes.Remove)
                        _idkMap.ClearCache(payload.Id);
+
+                    if (!mediaCache) continue;
 
                     // repository cache
                     // it *was* done for each pathId but really that does not make sense

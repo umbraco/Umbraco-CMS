@@ -339,7 +339,7 @@ namespace Umbraco.Web.Services
                     var clrType = Type.GetType(type);
                     if (clrType == null)
                     {
-                        _logger.Warn<ApplicationTreeService>(() => $"The tree definition: {addElement} could not be resolved to a .Net object type");
+                        _logger.Warn<ApplicationTreeService>("The tree definition: {AddElement} could not be resolved to a .Net object type", addElement);
                         continue;
                     }
 

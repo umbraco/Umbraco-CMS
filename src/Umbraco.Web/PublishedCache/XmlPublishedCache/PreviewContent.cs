@@ -40,7 +40,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error<PreviewContent>($"Could not load preview set {_previewSet} for user {_userId}.", ex);
+                    Current.Logger.Error<PreviewContent>(ex, "Could not load preview set {PreviewSet} for user {UserId}.", _previewSet, _userId);
 
                     ClearPreviewSet();
 
@@ -146,7 +146,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<PreviewContent>($"Couldn't delete preview set {file.Name} for user {userId}", ex);
+                Current.Logger.Error<PreviewContent>(ex, "Couldn't delete preview set {FileName} for user {UserId}", file.Name, userId);
             }
         }
 

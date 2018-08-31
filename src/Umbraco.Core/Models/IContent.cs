@@ -87,6 +87,8 @@ namespace Umbraco.Core.Models
         /// <para>A culture becomes published whenever values for this culture are published,
         /// and the content published name for this culture is non-null. It becomes non-published
         /// whenever values for this culture are unpublished.</para>
+        /// <para>A culture becomes published as soon as PublishCulture has been invoked,
+        /// even though the document might now have been saved yet (and can have no identity).</para>
         /// </remarks>
         bool IsCulturePublished(string culture);
 
@@ -107,8 +109,9 @@ namespace Umbraco.Core.Models
         /// Gets a value indicated whether a given culture is edited.
         /// </summary>
         /// <remarks>
-        /// <para>A culture is edited when it is not published, or when it is published but
-        /// it has changes.</para>
+        /// <para>A culture is edited when it is available, and not published or published but
+        /// with changes.</para>
+        /// <para>A culture can be edited even though the document might now have been saved yet (and can have no identity).</para>
         /// </remarks>
         bool IsCultureEdited(string culture);
 
