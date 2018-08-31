@@ -1,7 +1,7 @@
 ﻿using Serilog.Core;
 using Serilog.Events;
 
-namespace Umbraco.Core.Logging.SerilogExtensions
+namespace Umbraco.Core.Logging.Serilog
 {
     /// <summary>
     /// This is used to create a new property in Logs called 'Log4NetLevel'

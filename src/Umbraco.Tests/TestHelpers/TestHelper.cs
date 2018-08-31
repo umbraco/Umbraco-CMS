@@ -127,6 +127,11 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (!(expected is string) && expected is IEnumerable)
             {
+                // sort property collection by alias, not by property ids
+                // on members, built-in properties don't have ids (always zero)
+                if (expected is PropertyCollection)
+                    sorter = e => ((PropertyCollection) e).OrderBy(x => x.Alias);
+
                 // compare lists
                 AssertListsAreEqual(property, (IEnumerable) actual, (IEnumerable) expected, sorter, dateDeltaMilliseconds);
             }
@@ -168,6 +173,8 @@ namespace Umbraco.Tests.TestHelpers
 
         private static void AssertListsAreEqual(PropertyInfo property, IEnumerable expected, IEnumerable actual, Func<IEnumerable, IEnumerable> sorter = null, int dateDeltaMilliseconds = 0)
         {
+
+
             if (sorter == null)
             {
                 // this is pretty hackerific but saves us some code to write

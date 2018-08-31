@@ -57,6 +57,7 @@ namespace Umbraco.Core.Composing
         // resets *everything* that is 'current'
         internal static void Reset()
         {
+            _container?.Dispose();
             _container = null;
 
             _shortStringHelper = null;

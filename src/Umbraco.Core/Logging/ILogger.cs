@@ -15,6 +15,13 @@ namespace Umbraco.Core.Logging
     public interface ILogger
     {
         /// <summary>
+        /// Determines if logging is enabled at a specified level, for a reporting type.
+        /// </summary>
+        /// <param name="reporting">The reporting type.</param>
+        /// <param name="level">The level.</param>
+        bool IsEnabled(Type reporting, LogLevel level);
+
+        /// <summary>
         /// Logs a fatal message with an exception.
         /// </summary>
         /// <param name="reporting">The reporting type.</param>
