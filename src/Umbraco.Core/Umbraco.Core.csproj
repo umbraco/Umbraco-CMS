@@ -340,6 +340,7 @@
     <Compile Include="Logging\Viewer\JsonLogViewer.cs" />
     <Compile Include="Logging\Viewer\LogMessage.cs" />
     <Compile Include="Logging\Viewer\LogViewerComponent.cs" />
+    <Compile Include="Logging\Viewer\LogViewerSourceBase.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\Upgrade\V_7_10_0\RenamePreviewFolder.cs" />
     <Compile Include="Migrations\Upgrade\V_7_12_0\AddRelationTypeForMediaFolderOnDelete.cs" />
