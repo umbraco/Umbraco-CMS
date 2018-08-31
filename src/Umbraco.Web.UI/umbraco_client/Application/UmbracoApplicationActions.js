@@ -59,7 +59,7 @@ Umbraco.Application.Actions = function() {
                 //raise beforeLogout event
                 jQuery(window.top).trigger("beforeLogout", []);
 
-                document.location.href = 'logout.aspx?t=' + t;
+                document.location.href = 'login';
             }
             return false;
         },
@@ -241,7 +241,7 @@ Umbraco.Application.Actions = function() {
             }
 
             if (confirm(uiKeys['defaultdialogs_confirmlogout'] + '\n\n'))
-                document.location.href = 'logout.aspx?t=' + t;
+                document.location.href = 'login';
         },
 
         actionRePublish: function() {
