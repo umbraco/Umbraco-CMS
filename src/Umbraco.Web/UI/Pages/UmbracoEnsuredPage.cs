@@ -116,7 +116,7 @@ namespace Umbraco.Web.UI.Pages
                 UmbracoContext.Current.Security.ClearCurrentLogin();
 
                 // Redirect to the login page
-                Response.Redirect(SystemDirectories.Umbraco + "#/login" + Security.GetSessionId(), true);
+                Response.Redirect(SystemDirectories.Umbraco + "#/login", true);
             }
         }
 
