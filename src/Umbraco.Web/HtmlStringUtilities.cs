@@ -20,9 +20,9 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns>The text with text line breaks replaced with html linebreaks (<br/>)</returns>
-        public string ReplaceLineBreaksForHtml(string text)
+        public HtmlString ReplaceLineBreaksForHtml(string text)
         {
-            return text.Replace("\r\n", @"<br />").Replace("\n", @"<br />").Replace("\r", @"<br />");
+            return new HtmlString(text.Replace("\r\n", @"<br />").Replace("\n", @"<br />").Replace("\r", @"<br />"));
         }
 
         public HtmlString StripHtmlTags(string html, params string[] tags)
