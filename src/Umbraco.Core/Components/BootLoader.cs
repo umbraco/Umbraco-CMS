@@ -46,8 +46,9 @@ namespace Umbraco.Core.Components
 
             var orderedComponentTypes = PrepareComponentTypes(componentTypes, level);
 
-            InstanciateComponents(orderedComponentTypes);
+            InstantiateComponents(orderedComponentTypes);
             ComposeComponents(level);
+            RegisterInitializers();
 
             using (var scope = _container.GetInstance<IScopeProvider>().CreateScope())
             {
@@ -278,7 +279,7 @@ namespace Umbraco.Core.Components
             }
         }
 
-        private void InstanciateComponents(IEnumerable<Type> types)
+        private void InstantiateComponents(IEnumerable<Type> types)
         {
             using (_proflog.DebugDuration<BootLoader>("Instanciating components.", "Instanciated components."))
             {
@@ -298,6 +299,17 @@ namespace Umbraco.Core.Components
                     {
                         component.Compose(composition);
                     }
+                }
+            }
+        }
+
+        private void RegisterInitializers()
+        {
+            foreach (var component in _components)
+            {
+                if (component.InitializerType != null)
+                {
+                    _container.Register(component.InitializerType);
                 }
             }
         }
@@ -322,6 +334,12 @@ namespace Umbraco.Core.Components
                                 .Select(x => GetParameter(componentType, x.ParameterType))
                                 .ToArray();
                             initializer.Invoke(component, parameters);
+                        }
+
+                        if (component.InitializerType != null)
+                        {
+                            var initializer = (IComponentInitializer) _container.GetInstance(component.InitializerType);
+                            initializer.Initialize();
                         }
                     }
                 }

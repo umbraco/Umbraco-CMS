@@ -37,6 +37,9 @@ namespace Umbraco.Tests.Components
             mock.Setup(x => x.GetInstance(typeof (ProfilingLogger))).Returns(new ProfilingLogger(Mock.Of<ILogger>(), Mock.Of<IProfiler>()));
             mock.Setup(x => x.GetInstance(typeof (IUmbracoDatabaseFactory))).Returns(f);
             mock.Setup(x => x.GetInstance(typeof (IScopeProvider))).Returns(p);
+
+
+
             setup?.Invoke(mock);
             return mock.Object;
         }
@@ -231,6 +234,24 @@ namespace Umbraco.Tests.Components
             Assert.AreEqual(typeof(Component8), Composed[1]);
         }
 
+        [Test]
+        public void Runs_Initializers_When_Defined()
+        {
+            var container = MockContainer();
+            Mock.Get(container).Setup(x => x.GetInstance(typeof(TestComponentWithInitializer.Initializer)))
+                .Returns(new TestComponentWithInitializer.Initializer());
+
+            var thing = new BootLoader(container);
+            Composed.Clear();
+            Initialized.Clear();
+            thing.Boot(new[] { typeof(TestComponentWithInitializer) }, RuntimeLevel.Unknown); // 8 disables 7 which is not in the list
+
+            Mock.Get(container).Verify(x => x.Register(typeof(TestComponentWithInitializer.Initializer), Lifetime.Transient));
+
+            Assert.AreEqual(1, Initialized.Count);
+            Assert.AreEqual("Initializer", Initialized[0]);
+        }
+
         #region Components
 
         public class TestComponentBase : UmbracoComponentBase
@@ -239,6 +260,19 @@ namespace Umbraco.Tests.Components
             {
                 base.Compose(composition);
                 Composed.Add(GetType());
+            }
+        }
+
+        public class TestComponentWithInitializer : TestComponentBase
+        {
+            public override Type InitializerType => typeof(Initializer);
+
+            public class Initializer : IComponentInitializer
+            {
+                public void Initialize()
+                {
+                    Initialized.Add(GetType().Name);
+                }
             }
         }
 
