@@ -1,4 +1,5 @@
-﻿using Umbraco.Core;
+﻿using AutoMapper;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -12,24 +13,24 @@ namespace Umbraco.Web.Composing.Composers
         public static IContainer ComposeWebMappingProfiles(this IContainer container)
         {
             //register the profiles
-            container.Register<AuditMapperProfile>();
-            container.Register<CodeFileMapperProfile>();
-            container.Register<ContentMapperProfile>();
-            container.Register<ContentPropertyMapperProfile>();
-            container.Register<ContentTypeMapperProfile>();
-            container.Register<DataTypeMapperProfile>();
-            container.Register<EntityMapperProfile>();
-            container.Register<DictionaryMapperProfile>();
-            container.Register<MacroMapperProfile>();
-            container.Register<MediaMapperProfile>();
-            container.Register<MemberMapperProfile>();
-            container.Register<RedirectUrlMapperProfile>();
-            container.Register<RelationMapperProfile>();
-            container.Register<SectionMapperProfile>();
-            container.Register<TagMapperProfile>();
-            container.Register<TemplateMapperProfile>();
-            container.Register<UserMapperProfile>();
-            container.Register<LanguageMapperProfile>();
+            container.Register<Profile, AuditMapperProfile>();
+            container.Register<Profile, CodeFileMapperProfile>();
+            container.Register<Profile, ContentMapperProfile>();
+            container.Register<Profile, ContentPropertyMapperProfile>();
+            container.Register<Profile, ContentTypeMapperProfile>();
+            container.Register<Profile, DataTypeMapperProfile>();
+            container.Register<Profile, EntityMapperProfile>();
+            container.Register<Profile, DictionaryMapperProfile>();
+            container.Register<Profile, MacroMapperProfile>();
+            container.Register<Profile, MediaMapperProfile>();
+            container.Register<Profile, MemberMapperProfile>();
+            container.Register<Profile, RedirectUrlMapperProfile>();
+            container.Register<Profile, RelationMapperProfile>();
+            container.Register<Profile, SectionMapperProfile>();
+            container.Register<Profile, TagMapperProfile>();
+            container.Register<Profile, TemplateMapperProfile>();
+            container.Register<Profile, UserMapperProfile>();
+            container.Register<Profile, LanguageMapperProfile>();
 
             //register any resolvers, etc.. that the profiles use
             container.Register<ContentUrlResolver>();
