@@ -70,14 +70,14 @@ namespace Umbraco.Core.Composing
         /// Creates an instance with arguments.
         /// </summary>
         /// <param name="type">The type of the instance.</param>
-        /// <param name="args">Arguments.</param>
+        /// <param name="args">Named arguments.</param>
         /// <returns>An instance of the specified type.</returns>
         /// <remarks>
         /// <para>The instance type does not need to be registered into the container.</para>
         /// <para>The arguments are used as dependencies by the container. Other dependencies
         /// are retrieved from the container.</para>
         /// </remarks>
-        object CreateInstance(Type type, params object[] args);
+        object CreateInstance(Type type, IDictionary<string, object> args);
 
         #endregion
 
@@ -103,6 +103,11 @@ namespace Umbraco.Core.Composing
         /// Registers a service with a named implementation type.
         /// </summary>
         void Register(Type serviceType, Type implementingType, string name, Lifetime lifetime = Lifetime.Transient);
+
+        /// <summary>
+        /// Registers a named service with an implementation factory.
+        /// </summary>
+        void Register<TService>(Func<IContainer, TService> factory, string name, Lifetime lifetime = Lifetime.Transient);
 
         /// <summary>
         /// Registers a service with an implementation factory.

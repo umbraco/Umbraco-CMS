@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 
@@ -16,9 +17,20 @@ namespace Umbraco.Web.Composing
         /// <inheritdoc />
         public void Init(HttpApplication context)
         {
-            // using the service locator here - no other way, really
-            Module = Current.Container.GetInstance<TModule>();
-            Module.Init(context);
+            try
+            {
+                // using the service locator here - no other way, really
+                Module = Current.Container.GetInstance<TModule>();
+                Module.Init(context);
+            }
+            catch
+            {
+                var runtimeState = Current.Container.GetInstance<IRuntimeState>();
+                if (runtimeState.BootFailedException != null)
+                {
+                    throw new Exception("Failed to boot", runtimeState.BootFailedException);
+                }
+            }
         }
 
         /// <inheritdoc />

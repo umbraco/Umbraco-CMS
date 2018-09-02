@@ -126,7 +126,7 @@ namespace Umbraco.Core.Composing.LightInject
             => Container.AvailableServices.Where(x => x.ServiceType == type).Select(x => new Registration(x.ServiceType, x.ServiceName));
 
         /// <inheritdoc />
-        public object CreateInstance(Type type, params object[] args)
+        public object CreateInstance(Type type, IDictionary<string, object> args)
         {
             // LightInject has this, but then it requires RegisterConstructorDependency etc and has various oddities
             // including the most annoying one, which is that it does not work on singletons (hard to fix)
@@ -146,7 +146,7 @@ namespace Umbraco.Core.Composing.LightInject
             {
                 // no! IsInstanceOfType is not ok here
                 // ReSharper disable once UseMethodIsInstanceOfType
-                var arg = args?.FirstOrDefault(a => parameter.ParameterType.IsAssignableFrom(a.GetType()));
+                var arg = args?.Values.FirstOrDefault(a => parameter.ParameterType.IsAssignableFrom(a.GetType()));
                 ctorArgs[i++] = arg ?? GetInstance(parameter.ParameterType);
             }
             return ctor.Invoke(ctorArgs);
@@ -228,6 +228,24 @@ namespace Umbraco.Core.Composing.LightInject
                     break;
                 case Lifetime.Singleton:
                     Container.RegisterSingleton(f => factory(this));
+                    break;
+                default:
+                    throw new NotSupportedException($"Lifetime {lifetime} is not supported.");
+            }
+        }
+
+        /// <inheritdoc />
+        public void Register<TService>(Func<IContainer, TService> factory, string name, Lifetime lifetime = Lifetime.Transient)
+        {
+            switch (lifetime)
+            {
+                case Lifetime.Transient:
+                case Lifetime.Request:
+                case Lifetime.Scope:
+                    Container.Register(f => factory(this), name, GetLifetime(lifetime));
+                    break;
+                case Lifetime.Singleton:
+                    Container.RegisterSingleton(f => factory(this), name);
                     break;
                 default:
                     throw new NotSupportedException($"Lifetime {lifetime} is not supported.");

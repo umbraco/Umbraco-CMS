@@ -20,6 +20,17 @@ namespace Umbraco.Core.Composing
             => (T) container.GetInstance(typeof(T));
 
         /// <summary>
+        /// Gets a named instance.
+        /// </summary>
+        /// <typeparam name="T">The type of the instance.</typeparam>
+        /// <param name="container">The container.</param>
+        /// <param name="name">The name of the instance.</typeparam>
+        /// <returns>An instance of the specified type and name.</returns>
+        /// <remarks>Throws an exception if the container failed to get an instance of the specified type.</remarks>
+        public static T GetInstance<T>(this IContainer container, string name)
+            => (T) container.GetInstance(typeof(T), name);
+
+        /// <summary>
         /// Tries to get an instance.
         /// </summary>
         /// <typeparam name="T">The type of the instance.</typeparam>
@@ -49,7 +60,7 @@ namespace Umbraco.Core.Composing
         /// <para>Throws an exception if the container failed to get an instance of the specified type.</para>
         /// <para>The arguments are used as dependencies by the container.</para>
         /// </remarks>
-        public static T CreateInstance<T>(this IContainer container, params object[] args)
+        public static T CreateInstance<T>(this IContainer container, IDictionary<string, object> args)
             => (T) container.CreateInstance(typeof(T), args);
 
         /// <summary>
@@ -63,6 +74,12 @@ namespace Umbraco.Core.Composing
         /// </summary>
         public static void Register<TService, TImplementing>(this IContainer container, string name, Lifetime lifetime = Lifetime.Transient)
             => container.Register(typeof(TService), typeof(TImplementing), name, lifetime);
+
+        /// <summary>
+        /// Registers a service with a named implementation type and factory.
+        /// </summary>
+        public static void Register<TService, TImplementing>(this IContainer container, string name, Func<IContainer, TService> factory, Lifetime lifetime = Lifetime.Transient)
+            => container.Register(factory, name, lifetime);
 
         /// <summary>
         /// Registers a service as its own implementation.
@@ -112,8 +129,8 @@ namespace Umbraco.Core.Composing
             if (container.GetRegistered<TBuilder>().Any())
                 throw new InvalidOperationException("Collection builders should be registered only once.");
 
-            // register the builder - passing the container as an arg to the factory
-            container.RegisterSingleton(c => c.CreateInstance<TBuilder>(container));
+            // register the builder
+            container.RegisterSingleton<TBuilder>();
 
             // initialize and return the builder
             return container.GetInstance<TBuilder>();
