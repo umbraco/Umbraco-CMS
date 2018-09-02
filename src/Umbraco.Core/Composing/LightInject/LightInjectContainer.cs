@@ -20,6 +20,8 @@ namespace Umbraco.Core.Composing.LightInject
         protected LightInjectContainer(ServiceContainer container)
         {
             Container = container;
+
+            container.RegisterSingleton<IContainer>(_ => this);
         }
 
         /// <summary>
