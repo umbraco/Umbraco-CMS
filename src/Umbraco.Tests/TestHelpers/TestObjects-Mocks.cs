@@ -151,7 +151,7 @@ namespace Umbraco.Tests.TestHelpers
             MockFs(fileSystems, x => x.ScriptsFileSystem);
             MockFs(fileSystems, x => x.StylesheetsFileSystem);
 
-            var mediaFs = new MediaFileSystem(Mock.Of<IFileSystem>(), Mock.Of<IContentSection>(), Mock.Of<IMediaPathScheme>(), Mock.Of<ILogger>());
+            var mediaFs = new MediaFileSystem(Mock.Of<IFileSystem>());
             Mock.Get(fileSystems).Setup(x => x.MediaFileSystem).Returns(mediaFs);
 
             return fileSystems;

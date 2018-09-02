@@ -12,10 +12,15 @@ namespace Umbraco.Core.Composing.Composers
             // register IFileSystems, which gives access too all filesystems
             container.RegisterSingleton<IFileSystems>(factory => factory.GetInstance<FileSystems>());
 
+
+            // fixme - review registering mediafilesystem. it seems to create cyclic dependencies for castle.
+            // let's try naming it so the default is overwritten...
+
             // register MediaFileSystem, which can be injected directly
             // note: the actual MediaFileSystem implementation is created by FileSystems directly,
             //       without being registered in the container - this just gives access to it
-            container.Register(factory => factory.GetInstance<IFileSystems>().MediaFileSystem);
+            container.Register(f => f.GetInstance<FileSystems>().MediaFileSystem);
+
 
             return container;
         }

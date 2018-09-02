@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
@@ -19,12 +20,12 @@ namespace Umbraco.Core.IO
     [FileSystemProvider("media")]
     public class MediaFileSystem : FileSystemWrapper
     {
-        public MediaFileSystem(IFileSystem wrapped, IContentSection contentConfig, IMediaPathScheme mediaPathScheme, ILogger logger)
+        public MediaFileSystem(IFileSystem wrapped)
             : base(wrapped)
         {
-            ContentConfig = contentConfig;
-            Logger = logger;
-            MediaPathScheme = mediaPathScheme;
+            ContentConfig = Current.Container.GetInstance<IContentSection>();
+            Logger = Current.Container.GetInstance<ILogger>();
+            MediaPathScheme = Current.Container.GetInstance<IMediaPathScheme>();
             MediaPathScheme.Initialize(this);
 
             UploadAutoFillProperties = new UploadAutoFillProperties(this, Logger, ContentConfig);
