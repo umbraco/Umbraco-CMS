@@ -16,10 +16,10 @@
         <tags>umbraco</tags>
         <dependencies>
             <!--
-        note: dependencies are specified as [x.y.z,x.999999) eg [2.1.0,2.999999) and NOT [2.1.0,3.0.0) because
-        the latter would pick anything below 3.0.0 and that includes prereleases such as 3.0.0-alpha, and we do
-        not want this to happen as the alpha of the next major is, really, the next major already.
-      -->
+              note: dependencies are specified as [x.y.z,x.999999) eg [2.1.0,2.999999) and NOT [2.1.0,3.0.0) because
+              the latter would pick anything below 3.0.0 and that includes prereleases such as 3.0.0-alpha, and we do
+              not want this to happen as the alpha of the next major is, really, the next major already.
+            -->
             <dependency id="UmbracoCms.Core" version="[$version$]" />
             <dependency id="AutoMapper" version="[7.0.1,7.999999)" />
             <dependency id="ClientDependency" version="[1.9.6,1.999999)" />
@@ -50,9 +50,6 @@
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.xml" target="lib\Umbraco.Web.xml" />
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Web.UI.xml" target="lib\Umbraco.Web.UI.xml" />
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Examine.xml" target="lib\Umbraco.Examine.xml" />
-
-        <!-- TOOD: Do I don't think we need this, seems to work fine without -->
-        <!--<file src="tools\install.core.ps1" target="tools\install.ps1" />-->
 
         <!-- symbols -->
         <file src="$BuildTmp$\bin\Umbraco.Web.pdb" target="lib" />
