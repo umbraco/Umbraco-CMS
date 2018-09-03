@@ -45,7 +45,8 @@ namespace Umbraco.Core.Logging.Viewer
         public PagedResult<LogMessage> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate,
             int pageNumber = 1, int pageSize = 100,
             Direction orderDirection = Direction.Descending,
-            string filterExpression = null)
+            string filterExpression = null,
+            string[] logLevels = null)
         {
             //Get all logs into memory (Not sure this good or not)
             var logs = GetAllLogs(startDate, endDate);
@@ -58,6 +59,18 @@ namespace Umbraco.Core.Logging.Viewer
                 filter = evt => true.Equals(eval(evt));
 
                 logs = logs.Where(filter);
+            }
+
+            //This is user used the checkbox UI to toggle which log levels they wish to see
+            //If an empty array - its implied all levels to be viewed
+            if(logLevels.Length > 0)
+            {
+                var logsAfterLevelFilters = new List<LogEvent>();
+                foreach (var level in logLevels)
+                {
+                    logsAfterLevelFilters.AddRange(logs.Where(x => x.Level.ToString() == level));
+                }
+                logs = logsAfterLevelFilters;
             }
 
             long totalRecords = logs.Count();

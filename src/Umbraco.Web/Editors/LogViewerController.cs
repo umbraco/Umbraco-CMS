@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web.Mvc;
+using System.Web.Http;
 using Umbraco.Core.Logging.Viewer;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -24,26 +24,26 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public int GetNumberOfErrors()
         {
-            return _logViewer.GetNumberOfErrors(startDate: DateTime.Now, endDate: DateTime.Now);
+            return _logViewer.GetNumberOfErrors(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
         }
         
         [HttpGet]
         public LogLevelCounts GetLogLevelCounts()
         {
-            return _logViewer.GetLogLevelCounts(startDate: DateTime.Now, endDate: DateTime.Now);
+            return _logViewer.GetLogLevelCounts(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
         }
 
         [HttpGet]
         public IEnumerable<CommonLogMessage> GetCommonLogMessages()
         {
-            return _logViewer.GetCommonLogMessages(startDate: DateTime.Now, endDate: DateTime.Now);
+            return _logViewer.GetCommonLogMessages(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
         }
 
         [HttpGet]
-        public PagedResult<LogMessage> GetLogs(string orderDirection = "Descending", int pageNumber = 1, string filterExpression = null)
+        public PagedResult<LogMessage> GetLogs(string orderDirection = "Descending", int pageNumber = 1, string filterExpression = null, [FromUri]string[] logLevels = null)
         {
             var direction = orderDirection == "Descending" ? Direction.Descending : Direction.Ascending;
-            return _logViewer.GetLogs(startDate: DateTime.Now, endDate: DateTime.Now, filterExpression: filterExpression, pageNumber: pageNumber, orderDirection: direction);
+            return _logViewer.GetLogs(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now, filterExpression: filterExpression, pageNumber: pageNumber, orderDirection: direction, logLevels: logLevels);
         }
 
     }

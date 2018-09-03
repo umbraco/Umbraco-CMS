@@ -36,7 +36,8 @@ namespace Umbraco.Core.Logging.Viewer
             int pageNumber = 1,
             int pageSize = 100,
             Direction orderDirection = Direction.Descending,
-            string filterExpression = null);
+            string filterExpression = null,
+            string[] logLevels = null);
 
     }
 }
