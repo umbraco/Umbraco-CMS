@@ -209,6 +209,11 @@ namespace Umbraco.Core
             /// </summary>
             public const string MediaPicker2Alias = "Umbraco.MediaPicker2";
 
+            /// <summary>
+            /// Alias for the Media Cropper datatype.
+            /// </summary>
+            public const string MediaCropperAlias = "Umbraco.MediaCropper";
+
             [Obsolete("This is an obsoleted picker, use MediaPicker2Alias instead")]
             public const string MultipleMediaPickerAlias = "Umbraco.MultipleMediaPicker";
 
