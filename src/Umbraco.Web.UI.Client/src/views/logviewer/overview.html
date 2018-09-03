@@ -29,6 +29,28 @@
                     Ascending <input type="radio" value="Ascending" ng-model="vm.logOptions.orderDirection" ng-change="vm.updateSort()" />
                     Descending <input type="radio" value="Descending" ng-model="vm.logOptions.orderDirection" ng-change="vm.updateSort()"/>
 
+                    <!-- Log Level filter -->
+                    <div style="position: relative;">
+                        <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.page.showLevelFilter = !vm.page.showLevelFilter">
+                            <span>Log Levels:</span>
+                            <span class="bold truncate dib" style="margin-left: 5px; margin-right: 3px; max-width: 150px;">{{ vm.getFilterName(vm.logLevels) }}</span>
+                            <span class="caret"></span>
+                        </a>
+                        <umb-dropdown class="pull-right" ng-if="vm.page.showLevelFilter" on-close="vm.page.showLevelFilter = false;">
+                            <umb-dropdown-item ng-repeat="level in vm.logLevels" style="padding: 8px 20px 8px 16px;">
+                                <div class="flex items-center">
+                                    <input
+                                        id="loglevel-{{$index}}"
+                                        type="checkbox"
+                                        ng-model="level.selected"
+                                        ng-change="vm.setLogLevelFilter(level)"
+                                        style="margin-right: 10px; margin-top: -3px;" />
+                                    <label for="loglevel-{{$index}}">{{ level.name }}</label>
+                                </div>
+                            </umb-dropdown-item>
+                        </umb-dropdown>
+                    </div>
+
                 </umb-editor-sub-header-content-left>
 
                 <umb-editor-sub-header-content-right>
@@ -53,15 +75,19 @@
             
 
             <div class="umb-package-details" ng-if="!vm.loading">
-
-                <!-- Empty states -->
-                <umb-empty-state ng-if="vm.logItems.totalItems === 0" position="center">
-                    <localize key="general_searchNoResult"></localize>
-                </umb-empty-state>
-
+                
                 <div class="umb-package-details__main-content">
             
-                    <umb-box data-element="node-info-history">
+                    <!-- Loader for the main logs content when paging -->
+                    <umb-load-indicator ng-if="vm.logsLoading"></umb-load-indicator>
+
+                    <!-- Empty states -->
+                    <umb-empty-state ng-if="vm.logItems.totalItems === 0" position="center">
+                        <localize key="general_searchNoResult"></localize>
+                    </umb-empty-state>
+
+
+                    <umb-box data-element="node-info-history" ng-if="!vm.logsLoading && vm.logItems.totalItems > 0">                        
                         <umb-box-content class="block-form">
                             <div ng-if="vm.logItems.totalItems > 0">
                                 Total Items: {{ vm.logItems.totalItems }}

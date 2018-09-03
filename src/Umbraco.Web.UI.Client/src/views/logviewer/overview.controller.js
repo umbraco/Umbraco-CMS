@@ -1,13 +1,36 @@
 (function () {
     "use strict";
 
-    function LogViewerOverviewController($scope, localizationService, logViewerResource) {
+    function LogViewerOverviewController($scope, $q, localizationService, logViewerResource) {
 
         var vm = this;
 
         vm.loading = false;
+        vm.logsLoading = false;
+
         vm.page = {};
         vm.labels = {};
+
+        vm.logLevels = [
+            {
+                name: 'Verbose'
+            },
+            {
+                name: 'Debug'
+            },
+            {
+                name: 'Information'
+            },
+            {
+                name: 'Warning'
+            },
+            {
+                name: 'Error'
+            },
+            {
+                name: 'Fatal'
+            }
+        ];
 
         vm.logItems = {};
         vm.numberOfErrors = 0;
@@ -58,15 +81,19 @@
         vm.changePageNumber = changePageNumber;
         vm.search = search;
         vm.updateSort = updateSort;
+        vm.getFilterName = getFilterName;
+        vm.setLogLevelFilter = setLogLevelFilter;
 
 
         function init() {
 
-            logViewerResource.getNumberOfErrors().then(function (data) {
+            vm.loading = true;
+
+            var numOfErrors = logViewerResource.getNumberOfErrors().then(function (data) {
                 vm.numberOfErrors = data;
             });
 
-            logViewerResource.getLogLevelCounts().then(function (data) {
+            var logCounts = logViewerResource.getLogLevelCounts().then(function (data) {
                 vm.logTypeData = [];
                 vm.logTypeData.push(data.Information);
                 vm.logTypeData.push(data.Debug);
@@ -75,9 +102,14 @@
                 vm.logTypeData.push(data.Fatal);
             });
 
-            logViewerResource.getCommonLogMessages().then(function(data){
+            var commonMsgs = logViewerResource.getCommonLogMessages().then(function(data){
                 vm.commonLogMessages = data;
             });
+
+            //Set loading indicatior to false when these 3 queries complete
+            $q.all([numOfErrors, logCounts, commonMsgs]).then(function(data) {
+                vm.loading = false; 
+              });
 
             //Get all logs on init load
             getLogs();
@@ -116,10 +148,13 @@
         }
 
         function getLogs(){
+            vm.logsLoading = true;
+
             logViewerResource.getLogs(vm.logOptions).then(function (data) {
                 vm.logItems = data;
+                vm.logsLoading = false;
 
-                setLogTypeColor( vm.logItems.items);
+                setLogTypeColor(vm.logItems.items);
             });
         }
 
@@ -143,6 +178,38 @@
                         log.logTypeColor = "gray";
                 }
             });
+        }
+
+        function getFilterName(array) {
+            var name = "All";
+            var found = false;
+            angular.forEach(array, function (item) {
+                if (item.selected) {
+                    if (!found) {
+                        name = item.name
+                        found = true;
+                    } else {
+                        name = name + ", " + item.name;
+                    }
+                }
+            });
+            return name;
+        }
+
+        function setLogLevelFilter(logLevel) {
+
+            if (!vm.logOptions.logLevels) {
+                vm.logOptions.logLevels = [];
+            }
+
+            if (logLevel.selected) {
+                vm.logOptions.logLevels.push(logLevel.name);
+            } else {
+                var index = vm.logOptions.logLevels.indexOf(logLevel.name);
+                vm.logOptions.logLevels.splice(index, 1);
+            }
+
+            getLogs();
         }
 
         init();
