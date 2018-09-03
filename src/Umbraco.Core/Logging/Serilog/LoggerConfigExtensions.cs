@@ -4,7 +4,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
 
-namespace Umbraco.Core.Logging.SerilogExtensions
+namespace Umbraco.Core.Logging.Serilog
 {
     public static class LoggerConfigExtensions
     {
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Logging.SerilogExtensions
         /// <param name="logConfig">A Serilog LoggerConfiguration</param>
         public static LoggerConfiguration MinimalConfiguration(this LoggerConfiguration logConfig)
         {
-            Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
+            global::Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
 
             //Set this environment variable - so that it can be used in external config file
             //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log.txt" />

@@ -682,7 +682,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 // /belle/#/content/edit/9876 (where 9876 is the new id)
 
                 //clear the query strings
-                navigationService.clearSearch();
+                navigationService.clearSearch(["cculture"]);
 
                 //change to new path
                 $location.path("/" + $routeParams.section + "/" + $routeParams.tree + "/" + $routeParams.method + "/" + id);

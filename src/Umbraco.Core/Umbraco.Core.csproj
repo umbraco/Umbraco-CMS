@@ -326,8 +326,10 @@
     <Compile Include="IO\MediaPathSchemes\OriginalMediaPathScheme.cs" />
     <Compile Include="IO\MediaPathSchemes\TwoGuidsMediaPathScheme.cs" />
     <Compile Include="KeyValuePairExtensions.cs" />
-    <Compile Include="Logging\SerilogExtensions\LoggerConfigExtensions.cs" />
-    <Compile Include="Logging\SerilogExtensions\Log4NetLevelMapperEnricher.cs" />
+    <Compile Include="Logging\LogLevel.cs" />
+    <Compile Include="Logging\MessageTemplates.cs" />
+    <Compile Include="Logging\Serilog\LoggerConfigExtensions.cs" />
+    <Compile Include="Logging\Serilog\Log4NetLevelMapperEnricher.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
     <Compile Include="Migrations\Upgrade\V_7_10_0\RenamePreviewFolder.cs" />
     <Compile Include="Migrations\Upgrade\V_7_12_0\AddRelationTypeForMediaFolderOnDelete.cs" />
@@ -565,7 +567,7 @@
     <Compile Include="Logging\DebugDiagnosticsLogger.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\IProfiler.cs" />
-    <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Logging\Serilog\SerilogLogger.cs" />
     <Compile Include="Logging\LoggerExtensions.cs" />
     <Compile Include="Logging\LoggingTaskExtension.cs" />
     <Compile Include="Logging\LogProfiler.cs" />

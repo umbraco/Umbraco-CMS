@@ -54,7 +54,7 @@ namespace umbraco.presentation.umbraco.translation {
 
 
             var umbHelper = new UmbracoHelper(Current.UmbracoContext, Current.Services, Current.ApplicationCache);
-            lt.Text = umbHelper.ReplaceLineBreaksForHtml(t.Comment);
+            lt.Text = umbHelper.ReplaceLineBreaksForHtml(t.Comment).ToString();
 
             pp_comment.Controls.Add(lt);
             pp_comment.Text = Services.TextService.Localize("comment");
