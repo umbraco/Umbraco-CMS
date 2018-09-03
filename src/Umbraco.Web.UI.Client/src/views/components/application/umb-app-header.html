@@ -9,7 +9,7 @@
 
         <div class="flex items-center">
             <ul class="umb-app-header__actions">
-                <li class="umb-app-header__action">
+                <li data-element="global-search" class="umb-app-header__action">
                     <a href="#" hotkey="ctrl+space" ng-click="searchClick()" prevent-default style="font-size: 20px;">
                         <i class="icon-search"></i>
                     </a>
@@ -20,7 +20,7 @@
                     </a>
                 </li>
             </ul>
-            <a ng-href="" href="" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}" prevent-default>
+            <a data-element="section-user" ng-href="" href="" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}" prevent-default>
                 <umb-avatar
                     size="xxs"
                     color="secondary"
