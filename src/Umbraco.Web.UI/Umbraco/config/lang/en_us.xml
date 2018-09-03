@@ -1396,12 +1396,15 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="dataTypeSaved">Datatype saved</key>
         <key alias="dictionaryItemSaved">Dictionary item saved</key>
         <key alias="editContentPublishedFailedByParent">Publishing failed because the parent page isn't published</key>
+        <key alias="editVariantContentPublishedHeader">%0% variant published</key>
         <key alias="editContentPublishedHeader">Content published</key>
         <key alias="editContentPublishedText">and visible on the website</key>
+        <key alias="editVariantSavedHeader">%0% variant saved</key>
         <key alias="editContentSavedHeader">Content saved</key>
         <key alias="editContentSavedText">Remember to publish to make changes visible</key>
         <key alias="editContentSendToPublish">Sent For Approval</key>
         <key alias="editContentSendToPublishText">Changes have been sent for approval</key>
+        <key alias="editVariantSendToPublishText">%0% variant changes have been sent for approval</key>
         <key alias="editMediaSaved">Media saved</key>
         <key alias="editMediaSavedText">Media saved without any errors</key>
         <key alias="editMemberSaved">Member saved</key>

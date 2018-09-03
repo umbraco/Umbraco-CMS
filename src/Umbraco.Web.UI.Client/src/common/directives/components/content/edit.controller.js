@@ -397,6 +397,7 @@
                 if (formHelper.submitForm({ scope: $scope, action: "save" })) {
 
                     var dialog = {
+                        parentScope: $scope,
                         view: "views/content/overlays/save.html",
                         variants: $scope.content.variants, //set a model property for the dialog
                         skipFormValidation: true, //when submitting the overlay form, skip any client side validation
