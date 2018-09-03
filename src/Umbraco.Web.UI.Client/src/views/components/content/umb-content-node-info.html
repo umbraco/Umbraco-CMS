@@ -171,7 +171,7 @@
                     </umb-badge>
                 </umb-control-group>
 
-                <umb-control-group data-element="node-info-create-date" label="@template_createdDate">
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-create-date" label="@template_createdDate">
                     {{node.createDateFormatted}} <localize key="general_by">by</localize> {{ node.owner.name }}
                 </umb-control-group>
 
