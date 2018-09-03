@@ -195,15 +195,7 @@ namespace Umbraco.Core.Runtime
 
             container.ComposeConfiguration();
 
-            // register caches
-            // need the deep clone runtime cache profiver to ensure entities are cached properly, ie
-            // are cloned in and cloned out - no request-based cache here since no web-based context,
-            // will be overriden later or
-            container.RegisterSingleton(_ => new CacheHelper(
-                new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
-                new StaticCacheProvider(),
-                NullCacheProvider.Instance,
-                new IsolatedRuntimeCache(type => new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
+            RegisterCacheHelper(container);
             container.RegisterSingleton(f => f.GetInstance<CacheHelper>().RuntimeCache);
 
             // register the plugin manager
@@ -234,6 +226,22 @@ namespace Umbraco.Core.Runtime
 
             // register MainDom
             container.RegisterSingleton<MainDom>();
+        }
+
+        protected virtual void RegisterCacheHelper(IContainer container)
+        {
+// register caches
+            // need the deep clone runtime cache profiver to ensure entities are cached properly, ie
+            // are cloned in and cloned out - no request-based cache here since no web-based context,
+            // will be overriden later or
+            container.RegisterSingleton(
+                "CacheHelper",
+                _ => new CacheHelper(
+                    new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()),
+                    new StaticCacheProvider(),
+                    NullCacheProvider.Instance,
+                    new IsolatedRuntimeCache(type =>
+                        new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
         }
 
         protected virtual void ComposeMapperCollection(MapperCollectionBuilder builder)

@@ -57,20 +57,25 @@ namespace Umbraco.Web.Runtime
             // replace CoreRuntime's IProfiler registration
             container.RegisterSingleton(_ => _webProfiler);
 
+            container.RegisterSingleton<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
+        }
+
+        protected override void RegisterCacheHelper(IContainer container)
+        {
             // replace CoreRuntime's CacheHelper registration
-            container.RegisterSingleton(_ => new CacheHelper(
-                // we need to have the dep clone runtime cache provider to ensure
-                // all entities are cached properly (cloned in and cloned out)
-                new DeepCloneRuntimeCacheProvider(new HttpRuntimeCacheProvider(HttpRuntime.Cache)),
-                new StaticCacheProvider(),
-                // we need request based cache when running in web-based context
-                new HttpRequestCacheProvider(),
-                new IsolatedRuntimeCache(type =>
+            container.RegisterSingleton(
+                "CacheHelper",
+                _ => new CacheHelper(
                     // we need to have the dep clone runtime cache provider to ensure
                     // all entities are cached properly (cloned in and cloned out)
-                    new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
-
-            container.RegisterSingleton<IHttpContextAccessor, AspNetHttpContextAccessor>(); // required for hybrid accessors
+                    new DeepCloneRuntimeCacheProvider(new HttpRuntimeCacheProvider(HttpRuntime.Cache)),
+                    new StaticCacheProvider(),
+                    // we need request based cache when running in web-based context
+                    new HttpRequestCacheProvider(),
+                    new IsolatedRuntimeCache(type =>
+                        // we need to have the dep clone runtime cache provider to ensure
+                        // all entities are cached properly (cloned in and cloned out)
+                        new DeepCloneRuntimeCacheProvider(new ObjectCacheRuntimeCacheProvider()))));
         }
 
         #region Getters
