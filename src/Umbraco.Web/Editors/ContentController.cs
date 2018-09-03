@@ -587,14 +587,14 @@ namespace Umbraco.Web.Editors
 
             //this a custom check for any variants not being flagged for Saving since we'll need to manually
             //remove the ModelState validation for the Name
-            var variantIndex = 0;
+            var variantCount = 0;
             foreach (var variant in contentItem.Variants)
             {
                 if (!variant.Save)
                 {
-                    ModelState.Remove($"Variants[{variantIndex}].Name");
+                    ModelState.Remove($"Variants[{variantCount}].Name");
                 }
-                variantIndex++;
+                variantCount++;
             }
 
             //We need to manually check the validation results here because:
@@ -621,16 +621,20 @@ namespace Umbraco.Web.Editors
                     }
                 }
 
-                //if the model state is not valid we cannot publish so change it to save
-                switch (contentItem.Action)
+                //if there's only one variant and the model state is not valid we cannot publish so change it to save
+                if (variantCount == 1)
                 {
-                    case ContentSaveAction.Publish:
-                        contentItem.Action = ContentSaveAction.Save;
-                        break;
-                    case ContentSaveAction.PublishNew:
-                        contentItem.Action = ContentSaveAction.SaveNew;
-                        break;
+                    switch (contentItem.Action)
+                    {
+                        case ContentSaveAction.Publish:
+                            contentItem.Action = ContentSaveAction.Save;
+                            break;
+                        case ContentSaveAction.PublishNew:
+                            contentItem.Action = ContentSaveAction.SaveNew;
+                            break;
+                    }
                 }
+               
             }
 
             //initialize this to successful
@@ -729,33 +733,26 @@ namespace Umbraco.Web.Editors
             }
             else
             {
-                var canPublish = true;
-
                 //All variants in this collection should have a culture if we get here! but we'll double check and filter here
                 var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
 
                 //check if we are publishing other variants and validate them
                 var allLangs = Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase);
-                
-                //validate any mandatory variants that are not in the list
-                var mandatoryLangs = Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLangs.Values).Where(x => x.Mandatory);
 
-                foreach (var lang in mandatoryLangs)
+                //validate if we can publish based on the mandatory language requirements
+                var canPublish = ValidatePublishingMandatoryLanguages(contentItem, allLangs, cultureVariants);
+
+                //Now check if there are validation errors on each variant.
+                //If validation errors are detected on a variant and it's state is set to 'publish', then we
+                //need to change it to 'save'.
+                //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.
+                var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
+                foreach (var variant in contentItem.Variants)
                 {
-                    //Check if a mandatory language is missing from being published
-
-                    var variant = cultureVariants.First(x => x.Culture == lang.IsoCode);
-                    var isPublished = contentItem.PersistedContent.IsCulturePublished(lang.IsoCode);
-                    var isPublishing = variant.Publish;
-
-                    if (!isPublished && !isPublishing)
-                    {
-                        //cannot continue publishing since a required language that is not currently being published isn't published
-                        AddCultureValidationError(lang.IsoCode, allLangs, "speechBubbles/contentReqCulturePublishError");
-                        canPublish = false;
-                    }
+                    if (cultureErrors.Contains(variant.Culture))
+                        variant.Publish = false;
                 }
-                
+
                 if (canPublish)
                 {
                     //try to publish all the values on the model
@@ -776,6 +773,38 @@ namespace Umbraco.Web.Editors
                     wasCancelled = saveResult.Result == OperationResultType.FailedCancelledByEvent;
                 }
             }
+        }
+
+        /// <summary>
+        /// Validate if publishing is possible based on the mandatory language requirements
+        /// </summary>
+        /// <param name="contentItem"></param>
+        /// <param name="allLangs"></param>
+        /// <param name="cultureVariants"></param>
+        /// <returns></returns>
+        private bool ValidatePublishingMandatoryLanguages(ContentItemSave contentItem, IDictionary<string, ILanguage> allLangs, IReadOnlyCollection<ContentVariantSave> cultureVariants)
+        {
+            var canPublish = true;
+
+            //validate any mandatory variants that are not in the list
+            var mandatoryLangs = Mapper.Map<IEnumerable<ILanguage>, IEnumerable<Language>>(allLangs.Values).Where(x => x.Mandatory);
+
+            foreach (var lang in mandatoryLangs)
+            {
+                //Check if a mandatory language is missing from being published
+
+                var variant = cultureVariants.First(x => x.Culture == lang.IsoCode);
+                var isPublished = contentItem.PersistedContent.IsCulturePublished(lang.IsoCode);
+                var isPublishing = variant.Publish;
+
+                if (isPublished || isPublishing) continue;
+
+                //cannot continue publishing since a required language that is not currently being published isn't published
+                AddCultureValidationError(lang.IsoCode, allLangs, "speechBubbles/contentReqCulturePublishError");
+                canPublish = false;
+            }
+
+            return canPublish;
         }
 
         /// <summary>
@@ -1194,13 +1223,7 @@ namespace Umbraco.Web.Editors
             if (!ModelState.IsValid)
             {
                 //Add any culture specific errors here
-                var cultureErrors = ModelState.Keys
-                    .Select(x => x.Split('.')) //split into parts
-                    .Where(x => x.Length >= 3 && x[0] == "_Properties") //only choose _Properties errors
-                    .Select(x => x[2]) //select the culture part
-                    .Where(x => !x.IsNullOrWhiteSpace()) //if it has a value
-                    .Distinct()
-                    .ToList();
+                var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
 
                 var allLangs = Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase);
 
