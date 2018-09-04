@@ -331,7 +331,7 @@
             {
                 "element": "[data-element='editor-templates'] [data-element='code-editor']",
                 "title": "Edit template",
-                "content": "<p>The template can be edited here or in your favorite code editor.</p><p>To render the field from the document type add the following to the template:<br/> <pre>&#60;h1&#62;@Model.Content.Name&#60;/h1&#62;<br>&#60;p&#62;@Model.Content.WelcomeText&#60;/p&#62;</pre></p>"
+                "content": "<p>The template can be edited here or in your favorite code editor.</p><p>To render the field from the document type add the following to the template:<br/> <pre>&#60;h1&#62;@Model.Name&#60;/h1&#62;<br>&#60;p&#62;@Model.WelcomeText&#60;/p&#62;</pre></p>"
             },
             {
                 "element": "[data-element='editor-templates'] [data-element='button-save']",
