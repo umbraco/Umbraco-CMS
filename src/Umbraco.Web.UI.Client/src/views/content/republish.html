@@ -1,0 +1,28 @@
+<div ng-controller="Umbraco.Editors.Content.RepublishController as vm" ng-cloak>
+    
+    <div class="umb-dialog-body with-footer">
+        
+        <div class="umb-pane">
+            <p><localize key="defaultdialogs_siterepublishHelp"></localize></p>
+        </div>
+
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+
+        <a class="btn btn-link" ng-click="nav.hideDialog()">
+            <localize key="general_cancel">Cancel</localize>
+        </a>
+
+        <umb-button
+            type="button" 
+            action="vm.republish()"
+            state="vm.republishButtonState"
+            button-style="success"
+            label-key="actions_republish">
+        </umb-button>
+
+    </div>
+
+</div>
+
