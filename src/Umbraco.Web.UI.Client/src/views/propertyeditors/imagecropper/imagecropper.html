@@ -19,7 +19,7 @@
             <div ng-if="currentCrop" class="umb-cropper-imageholder clearfix">
                 <div class="umb-cropper__container">
 
-                    <button ng-click="doneCropping()" class="icon icon-delete btn-round umb-close-cropper"></button>
+                    <button ng-click="done()" class="icon icon-delete btn-round umb-close-cropper"></button>
 
                     <div>
                         <umb-image-crop height="{{currentCrop.height}}"
@@ -32,7 +32,7 @@
                     </div>
 
                     <a href style="margin:auto; text-align: center; font-size: 11px;" class="btn btn-link red"
-                       ng-click="currentCrop.coordinates = undefined; doneCropping()">
+                       ng-click="currentCrop.coordinates = undefined; done()">
                         <localize key="imagecropper_reset">Reset</localize>
                     </a>
                 </div>
