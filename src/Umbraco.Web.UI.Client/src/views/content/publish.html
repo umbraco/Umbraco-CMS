@@ -1,0 +1,52 @@
+<div ng-controller="Umbraco.Editors.Content.PublishController as vm" ng-cloak>
+    
+    <div class="umb-dialog-body with-footer">
+        
+        <div class="umb-pane">
+
+            <umb-load-indicator
+                ng-show="vm.loading">
+            </umb-load-indicator>
+
+            <div ng-if="!vm.loading">
+
+                <p>Click Publish to publish {{ dialogOptions.currentNode }} and thereby making its content publicly available.</p>
+                <p>You can publish this page and all its subpages by checking Include unpublished subpages below.</p>
+
+                <div>
+                    <label>
+                        <input type="checkbox" ng-model="vm.publishAll" />
+                        Publish {{ dialogOptions.currentNode }} and all its subpages
+                    </label>
+                </div>
+
+                <div ng-class="{'o-60': !vm.publishAll }">
+                    <label>
+                        <input type="checkbox" ng-model="vm.includeUnpublished" ng-disabled="!vm.publishAll" />
+                        <localize key="publish_includeUnpublished"></localize>
+                    </label>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+        
+        <a class="btn btn-link" ng-click="nav.hideDialog()">
+            <localize key="general_cancel">Cancel</localize>
+        </a>
+
+        <umb-button
+            type="button" 
+            action="vm.publish()"
+            state="vm.publishButtonState"
+            button-style="success"
+            label-key="content_publish">
+        </umb-button>
+
+    </div>
+
+</div>
