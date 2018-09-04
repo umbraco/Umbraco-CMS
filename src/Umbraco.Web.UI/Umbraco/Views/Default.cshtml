@@ -43,7 +43,7 @@
         new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
         new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
 </head>
-<body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
+<body ng-class="{'touch':touchDevice, 'emptySection':emptySection, 'umb-drawer-is-visible':drawer.show, 'umb-tour-is-visible': tour.show}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
 
     <noscript>
         <div style="margin: 10px;">
@@ -77,8 +77,9 @@
 
             </div>
 
-            <umb-tour ng-if="tour.show"
-                      model="tour">
+            <umb-tour 
+                ng-if="tour.show"
+                model="tour">
             </umb-tour>
 
             <umb-notifications></umb-notifications>

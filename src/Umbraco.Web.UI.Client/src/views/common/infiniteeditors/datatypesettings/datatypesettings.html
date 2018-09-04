@@ -1,5 +1,5 @@
 <div ng-controller="Umbraco.Editors.DataTypeSettingsController as vm">
-<umb-editor-view>
+<umb-editor-view data-element="editor-data-type-settings">
 
     <form novalidate name="dataTypeSettingsForm" val-form-manager>
 
@@ -55,6 +55,7 @@
                     action="vm.close()">
                 </umb-button>
                 <umb-button
+                    alias="submit"
                     type="button"
                     button-style="success"
                     label-key="general_submit"
