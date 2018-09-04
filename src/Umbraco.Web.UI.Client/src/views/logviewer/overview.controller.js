@@ -80,9 +80,9 @@
         vm.getLogs = getLogs;
         vm.changePageNumber = changePageNumber;
         vm.search = search;
-        vm.updateSort = updateSort;
         vm.getFilterName = getFilterName;
         vm.setLogLevelFilter = setLogLevelFilter;
+        vm.toggleOrderBy = toggleOrderBy;
 
 
         function init() {
@@ -139,11 +139,6 @@
 
         function changePageNumber(pageNumber) {
             vm.logOptions.pageNumber = pageNumber;
-            getLogs();
-        }
-
-        function updateSort() {
-            //vm.logOptions.orderDirection
             getLogs();
         }
 
@@ -208,6 +203,12 @@
                 var index = vm.logOptions.logLevels.indexOf(logLevel.name);
                 vm.logOptions.logLevels.splice(index, 1);
             }
+
+            getLogs();
+        }
+
+        function toggleOrderBy(){
+            vm.logOptions.orderDirection = vm.logOptions.orderDirection === 'Descending' ? 'Ascending' : 'Descending';
 
             getLogs();
         }

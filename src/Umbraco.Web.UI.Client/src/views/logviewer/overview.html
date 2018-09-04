@@ -12,23 +12,10 @@
 
         <umb-editor-container>
             
-            <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+            <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>            
 
             <umb-editor-sub-header>
-
-                <umb-editor-sub-header-content-left>
-                    <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:850px;" />
-                    <umb-button
-                        button-style="button"
-                        type="button"
-                        action="vm.search()"
-                        label-key="general_search">
-                    </umb-button>
-
-                    <strong>Sort by timestamp</strong>
-                    Ascending <input type="radio" value="Ascending" ng-model="vm.logOptions.orderDirection" ng-change="vm.updateSort()" />
-                    Descending <input type="radio" value="Descending" ng-model="vm.logOptions.orderDirection" ng-change="vm.updateSort()"/>
-
+                <umb-editor-sub-header-content-left style="width:calc(100% - 350px - 20px);">
                     <!-- Log Level filter -->
                     <div style="position: relative;">
                         <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.page.showLevelFilter = !vm.page.showLevelFilter">
@@ -51,10 +38,7 @@
                         </umb-dropdown>
                     </div>
 
-                </umb-editor-sub-header-content-left>
-
-                <umb-editor-sub-header-content-right>
-
+                    <!-- Date Ranges -->
                     <span>From</span>
                     <umb-date-time-picker
                         options="vm.fromDatePickerConfig"
@@ -68,11 +52,21 @@
                         on-change="vm.datePickerChange(event)"
                         on-error="vm.datePickerError(event)">
                     </umb-date-time-picker>
+                </umb-editor-sub-header-content-left>
+            </umb-editor-sub-header>
 
-                </umb-editor-sub-header-content-right>
-
-            </umb-editor-sub-header>            
-            
+            <umb-editor-sub-header>
+                <umb-editor-sub-header-content-left style="width:calc(100% - 350px - 20px);">                    
+                    <!-- Search/expression filter -->
+                    <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:100%;" />
+                    <umb-button
+                        button-style="button"
+                        type="button"
+                        action="vm.search()"
+                        label-key="general_search">
+                    </umb-button>
+                </umb-editor-sub-header-content-left>
+            </umb-editor-sub-header>
 
             <div class="umb-package-details" ng-if="!vm.loading">
                 
@@ -86,7 +80,7 @@
                         <localize key="general_searchNoResult"></localize>
                     </umb-empty-state>
 
-
+                    <!-- Main Log Table -->
                     <umb-box data-element="node-info-history" ng-if="!vm.logsLoading && vm.logItems.totalItems > 0">                        
                         <umb-box-content class="block-form">
                             <div ng-if="vm.logItems.totalItems > 0">
@@ -96,7 +90,10 @@
                             <table class="table table-hover" ng-if="vm.logItems.totalItems > 0">
                                 <thead>
                                     <tr>
-                                        <th>Timestamp</th>
+                                        <th style="min-width:100px;" ng-click="vm.toggleOrderBy()">
+                                            Timestamp 
+                                            <ins class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</ins>
+                                        </th>
                                         <th>Level</th>
                                         <th>Machine Name</th>
                                         <th>Message</th>
@@ -109,6 +106,8 @@
                                         <td>{{ log.Properties.MachineName.Value }}</td>
                                         <td>{{ log.RenderedMessage }}</td>
                                     </tr>
+
+                                    <!-- Log Details (Exception & Properties) -->
                                     <tr ng-repeat-end ng-if="log.open">
                                         <td colspan="4">
                                             <div ng-if="log.Exception" style="background-color:#fe6561; color:#94100b; padding:10px;">
@@ -183,10 +182,8 @@
                                     </table>
                             </umb-box-content>
                         </umb-box>
-
                 </div>
-            </div>
-            
+            </div>            
 
         </umb-editor-container>
 
