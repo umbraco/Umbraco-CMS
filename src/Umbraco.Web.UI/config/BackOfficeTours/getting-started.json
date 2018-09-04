@@ -21,7 +21,7 @@
                 "type": "intro"
             },
             {
-                "element": "#applications",
+                "element": "[data-element='sections']",
                 "elementPreventClick": true,
                 "title": "Main Menu",
                 "content": "This is the main menu in Umbraco backoffice. Here you can navigate between the different sections, see your user profile and open the help drawer.",
@@ -52,7 +52,7 @@
                 "content": "The search allows you to quickly find whatever you're looking for across sections within Umbraco."
             },
             {
-                "element": "[data-element='section-user']",
+                "element": "[data-element='global-user']",
                 "title": "User profile",
                 "content": "Now click on your <b>user avatar</b> to open the user profile dialog.",
                 "event": "click",
@@ -71,7 +71,7 @@
                 "event": "click"
             },
             {
-                "element": "[data-element='section-help']",
+                "element": "[data-element='global-help']",
                 "title": "Help",
                 "content": "If you ever find yourself in trouble click here to open the Help drawer.",
                 "event": "click",
