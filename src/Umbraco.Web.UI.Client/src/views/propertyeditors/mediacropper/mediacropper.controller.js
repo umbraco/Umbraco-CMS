@@ -71,18 +71,18 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaCropperContro
                             // if there is no thumbnail, try getting one if the media is not a placeholder item
                             if (!media.thumbnail && media.id && media.metaData) {
                                 media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
+                                media.file = mediaHelper.resolveFileFromEntity(media, false);
                             }
 
                             $scope.images.push(media);
-
-                            if ($scope.model.config.idType === "udi") {
-                                $scope.ids.push(media.udi);
-                            } else {
-                                $scope.ids.push(media.id);
-                            }
+                            $scope.ids.push(media.udi);
                         });
 
                     $scope.sync();
+
+                    angular.forEach($scope.model.value, function (cropDataSet, i) {
+                        $scope.resetCropFromUdi(cropDataSet.udi, cropDataSet);
+                    });
                 });
             }
             else {
@@ -123,15 +123,14 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaCropperContro
 
                        $scope.images.push(media);
 
-                       if ($scope.model.config.idType === "udi") {
-                           $scope.ids.push(media.udi);
-                       }
-                       else {
-                           $scope.ids.push(media.id);
-                       }
+                       $scope.ids.push(media.udi);
                    });
 
                    $scope.sync();
+
+                   _.each(model.selectedImages, function (media, i) {
+                       $scope.resetCropFromMedia(media);
+                   });
 
                    $scope.mediaPickerOverlay.show = false;
                    $scope.mediaPickerOverlay = null;
@@ -142,7 +141,12 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaCropperContro
         $scope.cropItem = function (item) {
 
             var cropDataSet = $scope.model.value.filter(function (data) { return data.udi == item.udi });
-            cropDataSet[0].src = item.file;
+            if (angular.isString(item.file)) {
+                cropDataSet[0].src = item.file;
+            }
+            else {
+                cropDataSet[0].src = item.file.src;
+            }
 
             $scope.mediaPickerOverlay = {
                 view: "views/propertyeditors/imagecropper/imagecropper.html",
@@ -177,7 +181,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaCropperContro
                // watch do all the rest.
                 $timeout(function(){
                     angular.forEach($scope.images, function(value, key) {
-                        r.push($scope.model.config.idType === "udi" ? value.udi : value.id);
+                        r.push(value.udi);
                     });
                     $scope.ids = r;
                     $scope.sync();
@@ -185,14 +189,32 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaCropperContro
             }
         };
 
-        $scope.sync = function () {
-            var newValue = [];
-            angular.forEach($scope.ids, function (id, i) {
+        $scope.resetCropFromUdi = function (udi, cropDataSet) {
+            entityResource.getById(udi, "Media").then(function (media) {
+                $scope.resetCropFromMedia(media, cropDataSet);
+            });
+        };
 
-                foundCropDataSet = $scope.model.value.filter(function (value) { return value.udi == id; });
-                if (foundCropDataSet.length > 0) {
+        $scope.resetCropFromMedia = function (media, cropDataSet) {
+            if (cropDataSet === undefined) {
+                if (media.file === undefined) {
+                    var newCropDataSet = mediaHelper.resolveFileFromEntity(media, false);
+                    if (!angular.isString(newCropDataSet)) {
+                        cropDataSet = newCropDataSet;
+                    }
+                }
+                else if (!angular.isString(media.file)) {
+                    cropDataSet = media.file;
+                }
+            }
 
-                    var cropDataSet = foundCropDataSet[0];
+            if (cropDataSet !== undefined) {
+
+
+                var savedUdis = $scope.model.value.map(function (value) { return value.udi; });
+                var cropDataSetIndex = savedUdis.indexOf(media.udi);
+
+                if (cropDataSetIndex > -1) {
 
                     //sync any config changes with the editor and drop outdated crops
                     _.each(cropDataSet.crops, function (saved) {
@@ -209,7 +231,21 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaCropperContro
                         cropDataSet.focalPoint = config.focalPoint;
                     }
 
-                    newValue.push(cropDataSet);
+                    $scope.model.value[cropDataSetIndex] = cropDataSet;
+                    $scope.model.value[cropDataSetIndex].udi = media.udi;
+                }
+
+            }
+        }
+
+        $scope.sync = function () {
+            var newValue = [];
+            angular.forEach($scope.ids, function (id, i) {
+
+
+                foundCropDataSet = $scope.model.value.filter(function (value) { return value.udi == id; });
+                if (foundCropDataSet.length > 0) {
+                    newValue.push(foundCropDataSet[0]);
                 }
                 else {
                     var cropDataSet = {
@@ -217,7 +253,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaCropperContro
                         crops: config.crops,
                         focalPoint: config.focalPoint
                     }
-
                     newValue.push(cropDataSet);
                 }
 

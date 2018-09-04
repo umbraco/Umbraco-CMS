@@ -16,10 +16,10 @@
 
         <div class="imagecropper clearfix">
 
-            <div ng-if="currentCrop" style="float:left; max-width: 100%;" class="clearfix">
+            <div ng-if="currentCrop" class="umb-cropper-imageholder clearfix">
                 <div class="umb-cropper__container">
 
-                    <i ng-click="done()" class="icon icon-delete btn-round umb-close-cropper"></i>
+                    <button ng-click="doneCropping()" class="icon icon-delete btn-round umb-close-cropper"></button>
 
                     <div>
                         <umb-image-crop height="{{currentCrop.height}}"
@@ -32,7 +32,7 @@
                     </div>
 
                     <a href style="margin:auto; text-align: center; font-size: 11px;" class="btn btn-link red"
-                       ng-click="currentCrop.coordinates = undefined; done()">
+                       ng-click="currentCrop.coordinates = undefined; doneCropping()">
                         <localize key="imagecropper_reset">Reset</localize>
                     </a>
                 </div>
@@ -44,7 +44,7 @@
                     center="model.value.focalPoint"
                     on-image-loaded="imageLoaded">
                 </umb-image-gravity>
-                <a href class="btn btn-link btn-crop-delete" ng-click="clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
+                <a href class="btn btn-link btn-crop-delete" ng-click="clear()" ng-if="model.value.udi == null"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></a>
             </div>
 
             <ul class="umb-sortable-thumbnails cropList clearfix">
