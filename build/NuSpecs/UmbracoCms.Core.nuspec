@@ -10,7 +10,7 @@
         <projectUrl>http://umbraco.com/</projectUrl>
         <iconUrl>http://umbraco.com/media/357769/100px_transparent.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Contains the core assemblies needed to run Umbraco Cms. This package only contains assemblies and can be used for package development. Use the UmbracoCms-package to setup Umbraco in Visual Studio as an ASP.NET project.</description>
+        <description>Contains the core assemblies needed to run Umbraco Cms. This package only contains assemblies and can be used for package development. Use the UmbracoCms package to setup Umbraco in Visual Studio as an ASP.NET project.</description>
         <summary>Contains the core assemblies needed to run Umbraco Cms</summary>
         <language>en-US</language>
         <tags>umbraco</tags>
@@ -43,6 +43,7 @@
         </dependencies>
     </metadata>
     <files>
+        <!-- libs -->
         <file src="$BuildTmp$\WebApp\bin\Umbraco.Core.dll" target="lib\net472\Umbraco.Core.dll" />
 
         <!-- docs -->
