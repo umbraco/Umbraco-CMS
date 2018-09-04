@@ -467,7 +467,7 @@
                 "content": "<p>You will also find other details about the image, like the size.</p><p>Media items work in much the same way as content. So you can add extra properties to an image by creating or editing the <b>Media types</b> in the Settings section.</p>"
             },
             {
-                "element": "[data-element='editor-media'] [data-element='tab-_umb_infoTab']",
+                "element": "[data-element='editor-media'] [data-element='sub-view-info']",
                 "title": "Info",
                 "content": "Like the content section you can also find default information about the media item. You will find these under the info tab.",
                 "event": "click"
