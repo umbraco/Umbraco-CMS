@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
     /// Media picker property editors that stores crop data
     /// </summary>
+    [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
     [PropertyEditor(Constants.PropertyEditors.MediaCropperAlias, "Media Cropper", PropertyEditorValueTypes.Text, "mediacropper", IsParameterEditor = true, Group = "media", Icon = "icon-crop")]
     public class MediaCropperPropertyEditor : PropertyEditor
     {

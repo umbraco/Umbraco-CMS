@@ -46,6 +46,8 @@ namespace Umbraco.Web.Models
 
             var sb = new StringBuilder();
 
+            sb.Append(this.GetSrc());
+
             var cropBaseUrl = this.GetCropBaseUrl(alias, useFocalPoint);
             if (cropBaseUrl != null)
             {
@@ -79,12 +81,31 @@ namespace Umbraco.Web.Models
 
         public bool HasImage()
         {
-            return !string.IsNullOrEmpty(Src) || Udi != null;
+            return !string.IsNullOrEmpty(this.GetSrc());
+        }
+
+        public string GetSrc()
+        {
+            // if no cropdataset has udi, locate the src
+            if (this.Udi != null)
+            {
+                var mediaId = ApplicationContext.Current.Services.EntityService.GetIdForUdi(Udi);
+                if (mediaId.Success)
+                {
+                    var mediaItem = UmbracoContext.Current.MediaCache.GetById(mediaId.Result);
+                    if (mediaItem != null)
+                    {
+                        return mediaItem.Url;
+                    }
+                }
+            }
+
+            return this.Src;
         }
 
         public string ToHtmlString()
         {
-            return this.Src;
+            return this.GetSrc();
         }
 
         /// <summary>

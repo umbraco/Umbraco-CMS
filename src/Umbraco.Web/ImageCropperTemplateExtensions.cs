@@ -308,10 +308,16 @@ namespace Umbraco.Web
              ImageCropRatioMode? ratioMode = null,
              bool upScale = true)
         {
-            var mediaItem = UmbracoContext.Current.MediaCache.GetById(cropDataSet.Udi.AsGuid());
-            if (mediaItem == null) throw new ArgumentNullException("mediaItem");
+            if (cropDataSet.Udi == null) throw new ArgumentNullException("cropDataSet.Udi");
+
+            var mediaId = ApplicationContext.Current.Services.EntityService.GetIdForUdi(cropDataSet.Udi);
+            if (!mediaId.Success) return string.Empty;
+
+            var mediaItem = UmbracoContext.Current.MediaCache.GetById(mediaId.Result);
+            if (mediaItem == null) return string.Empty;
 
             var imageUrl = mediaItem.Url;
+            cropDataSet.Src = imageUrl;
 
             if (string.IsNullOrEmpty(imageUrl)) return string.Empty;
 
