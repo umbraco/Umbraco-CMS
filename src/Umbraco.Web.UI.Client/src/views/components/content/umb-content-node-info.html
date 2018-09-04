@@ -201,7 +201,7 @@
                     </div>
                 </umb-control-group>
 
-                <umb-control-group data-element="node-info-id" label="Id">
+                <umb-control-group ng-if="node.id !== 0" data-element="node-info-id" label="Id">
                     <div>{{ node.id }}</div>
                     <small>{{ node.key }}</small>
                 </umb-control-group>
