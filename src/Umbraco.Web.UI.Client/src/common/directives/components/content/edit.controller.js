@@ -252,6 +252,19 @@
                 });
         }
 
+        function clearNotifications(content) {
+            if (content.notifications) {
+                content.notifications = [];
+            }
+            if (content.variants) {
+                for (var i = 0; i < content.variants.length; i++) {
+                    if (content.variants[i].notifications) {
+                        content.variants[i].notifications = [];
+                    }
+                }
+            }
+        }
+
         function resetLastListPageNumber(content) {
             // We're using rootScope to store the page number for list views, so if returning to the list
             // we can restore the page.  If we've moved on to edit a piece of content that's not the list or it's children
@@ -341,7 +354,7 @@
         };
 
         $scope.saveAndPublish = function () {
-
+            clearNotifications($scope.content);
             // TODO: Add "..." to publish button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
             if (showSaveOrPublishDialog()) {
                 //before we launch the dialog we want to execute all client side validations first
@@ -355,13 +368,16 @@
                         submitButtonLabel: "Publish",
                         submit: function (model) {
                             model.submitButtonState = "busy";
-
+                            clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
                             return performSave({
                                 saveMethod: contentResource.publish,
                                 action: "publish",
                                 showNotifications: false
                             }).then(function (data) {
+                                //show all notifications manually here since we disabled showing them automatically in the save method
+                                formHelper.showNotifications(data);
+                                clearNotifications($scope.content);
                                 overlayService.close();
                                 return $q.when(data);
                             },
@@ -369,7 +385,6 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-
                                     //don't reject, we've handled the error
                                     return $q.when(err);
                                 });
@@ -390,7 +405,7 @@
         };
 
         $scope.save = function () {
-
+            clearNotifications($scope.content);
             // TODO: Add "..." to save button label if there are more than one variant to publish - currently it just adds the elipses if there's more than 1 variant
             if (showSaveOrPublishDialog()) {
                 //before we launch the dialog we want to execute all client side validations first
@@ -404,13 +419,16 @@
                         submitButtonLabel: "Save",
                         submit: function (model) {
                             model.submitButtonState = "busy";
-
+                            clearNotifications($scope.content);
                             //we need to return this promise so that the dialog can handle the result and wire up the validation response
                             return performSave({
                                 saveMethod: $scope.saveMethod(),
                                 action: "save",
                                 showNotifications: false
                             }).then(function (data) {
+                                //show all notifications manually here since we disabled showing them automatically in the save method
+                                formHelper.showNotifications(data);
+                                clearNotifications($scope.content);
                                 overlayService.close();
                                 return $q.when(data);
                             },
@@ -418,7 +436,6 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-
                                     //don't reject, we've handled the error
                                     return $q.when(err);
                                 });

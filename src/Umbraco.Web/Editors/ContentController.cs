@@ -8,6 +8,7 @@ using System.Text;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
+using System.Web.Http.ValueProviders;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -644,7 +645,12 @@ namespace Umbraco.Web.Editors
             bool wasCancelled;
 
             //used to track successful notifications
-            var notifications = new SimpleNotificationModel();
+            var globalNotifications = new SimpleNotificationModel();
+            var notifications = new Dictionary<string, SimpleNotificationModel>
+            {
+                //global (non variant specific) notifications
+                [string.Empty] = globalNotifications
+            };
 
             switch (contentItem.Action)
             {
@@ -659,14 +665,14 @@ namespace Umbraco.Web.Editors
                             var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
                             foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
                             {
-                                notifications.AddSuccessNotification(
-                                    Services.TextService.Localize("speechBubbles/editVariantSavedHeader", new[] {_allLangs.Value[c].CultureName}),
-                                    Services.TextService.Localize("speechBubbles/editContentSavedText"));
+                                AddSuccessNotification(notifications, c,
+                                    Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
+                                    Services.TextService.Localize("speechBubbles/editVariantSavedText", new[] {_allLangs.Value[c].CultureName}));
                             }
                         }
                         else if (ModelState.IsValid)
                         {
-                            notifications.AddSuccessNotification(
+                            globalNotifications.AddSuccessNotification(
                                 Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
                                 Services.TextService.Localize("speechBubbles/editContentSavedText"));
                         }
@@ -683,14 +689,14 @@ namespace Umbraco.Web.Editors
                             var cultureErrors = ModelState.GetCulturesWithPropertyErrors();
                             foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
                             {
-                                notifications.AddSuccessNotification(
+                                AddSuccessNotification(notifications, c,
                                     Services.TextService.Localize("speechBubbles/editContentSendToPublish"),
                                     Services.TextService.Localize("speechBubbles/editVariantSendToPublishText", new[] { _allLangs.Value[c].CultureName }));
                             }
                         }
                         else if (ModelState.IsValid)
                         {
-                            notifications.AddSuccessNotification(
+                            globalNotifications.AddSuccessNotification(
                                 Services.TextService.Localize("speechBubbles/editContentSendToPublish"),
                                 Services.TextService.Localize("speechBubbles/editContentSendToPublishText"));
                         }
@@ -699,7 +705,13 @@ namespace Umbraco.Web.Editors
                 case ContentSaveAction.Publish:
                 case ContentSaveAction.PublishNew:
                     PublishInternal(contentItem, ref publishStatus, out wasCancelled, out var successfulCultures);
-                    AddMessageForPublishStatus(publishStatus, notifications, successfulCultures);
+                    //global notifications
+                    AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
+                    //variant specific notifications
+                    foreach (var c in successfulCultures)
+                    {
+                        AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -709,7 +721,12 @@ namespace Umbraco.Web.Editors
             var display = MapToDisplay(contentItem.PersistedContent);
 
             //merge the tracked success messages with the outgoing model
-            display.Notifications.AddRange(notifications.Notifications);
+            display.Notifications.AddRange(globalNotifications.Notifications);
+            foreach (var v in display.Variants)
+            {
+                if (notifications.TryGetValue(v.Language.IsoCode, out var n))
+                    v.Notifications.AddRange(n.Notifications);
+            }
 
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
@@ -729,6 +746,25 @@ namespace Umbraco.Web.Editors
             display.PersistedContent = contentItem.PersistedContent;
 
             return display;
+        }
+
+        /// <summary>
+        /// Used to add success notifications globally and for the culture
+        /// </summary>
+        /// <param name="notifications"></param>
+        /// <param name="culture"></param>
+        /// <param name="header"></param>
+        /// <param name="msg"></param>
+        /// <remarks>
+        /// global notifications will be shown if all variant processing is successful and the save/publish dialog is closed, otherwise
+        /// variant specific notifications are used to show success messagse in the save/publish dialog.
+        /// </remarks>
+        private static void AddSuccessNotification(IDictionary<string, SimpleNotificationModel> notifications, string culture, string header, string msg)
+        {
+            //add the global notification (which will display globally if all variants are successfully processed)
+            notifications[string.Empty].AddSuccessNotification(header, msg);
+            //add the variant specific notification (which will display in the dialog if all variants are not successfully processed)
+            notifications.GetOrCreate(culture).AddSuccessNotification(header, msg);
         }
 
         /// <summary>
@@ -1412,8 +1448,8 @@ namespace Umbraco.Web.Editors
                         foreach (var c in successfulCultures)
                         {
                             display.AddSuccessNotification(
-                                Services.TextService.Localize("speechBubbles/editVariantContentPublishedHeader", new[]{ _allLangs.Value[c].CultureName}),
-                                Services.TextService.Localize("speechBubbles/editContentPublishedText"));
+                                Services.TextService.Localize("speechBubbles/editContentPublishedHeader"),
+                                Services.TextService.Localize("speechBubbles/editVariantPublishedText", new[] { _allLangs.Value[c].CultureName }));
                         }
                     }
                     break;

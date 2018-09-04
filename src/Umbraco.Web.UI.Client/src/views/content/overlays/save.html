@@ -27,14 +27,18 @@
                             <strong ng-if="variant.language.isMandatory" class="umb-control-required">*</strong>
                         </label>
 
-                        <div ng-if="!saveVariantSelectorForm.saveVariantSelector.$invalid">
+                        <div ng-if="!saveVariantSelectorForm.saveVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                             <umb-variant-state class="umb-permission__description" variant="variant"></umb-variant-state>
                         </div>
 
                         <div ng-messages="saveVariantSelectorForm.saveVariantSelector.$error" show-validation-on-submit>
                             <div class="umb-permission__description" style="color: #F02E28;" ng-message="valServerField">{{saveVariantSelectorForm.saveVariantSelector.errorMsg}}</div>
                         </div>
-                        
+
+                        <div ng-repeat="notification in variant.notifications">
+                            <div class="umb-permission__description" style="color: #1FB572;">{{notification.message}}</div>
+                        </div>
+
                     </div>
                 </div>
                 

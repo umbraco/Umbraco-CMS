@@ -66,7 +66,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
                 args.scope.busy = true;
 
-                return args.saveMethod(args.content, $routeParams.create, fileManager.getFiles())
+                return args.saveMethod(args.content, $routeParams.create, fileManager.getFiles(), args.showNotifications)
                     .then(function (data) {
 
                         formHelper.resetForm({ scope: args.scope });
@@ -439,8 +439,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             var shouldIgnore = function (propName) {
                 return _.some([
                     "variants",
-                    "notifications",
-                    "ModelState",
+                    
                     "tabs",
                     "properties",
                     "apps",
