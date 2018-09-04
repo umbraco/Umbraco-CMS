@@ -190,21 +190,33 @@
                 "event": "click"
             },
             {
-                "element": "[data-element~='overlay-editor-settings']",
+                "element": "[data-element~='editor-data-type-settings']",
                 "elementPreventClick": true,
                 "title": "Editor settings",
                 "content": "Each property editor can have individual settings. For the textarea editor you can set a character limit but in this case it is not needed."
             },
             {
-                "element": "[data-element~='overlay-editor-settings'] [data-element='button-overlaySubmit']",
+                "element": "[data-element~='editor-data-type-settings'] [data-element='button-submit']",
                 "title": "Save editor",
                 "content": "Click <b>Submit</b> to save the changes.",
                 "event": "click"
             },
             {
-                "element": "[data-element~='overlay-property-settings'] [data-element='button-overlaySubmit']",
+                "element": "[data-element~='editor-property-settings'] [data-element='button-submit']",
                 "title": "Add property to document type",
                 "content": "Click <b>Submit</b> to add the property to the document type.",
+                "event": "click"
+            },
+            {
+                "element": "[data-element~='sub-view-permissions']",
+                "title": "Check the document type permissions",
+                "content": "Click <b>Permissions</b> to view the permissions page.",
+                "event": "click"
+            },
+            {
+                "element": "[data-element~='permissions-allow-as-root']",
+                "title": "Allow this document type to work at the root of your site",
+                "content": "Toggle the switch <b>Allow as root</b> to allow new content pages based on this document type to be created at the root of your site",
                 "event": "click"
             },
             {
@@ -364,9 +376,9 @@
                 "eventElement": "#tree [data-element='tree-item-Home'] a.umb-tree-item__label"
             },
             {
-                "element": "[data-element='editor-content'] [data-element='tab-_umb_infoTab']",
+                "element": "[data-element='editor-content'] [data-element='sub-view-info']",
                 "title": "Info",
-                "content": "<p>Under the info tab you will find the default information about a content item.</p>",
+                "content": "<p>Under the Info-app you will find the default information about a content item.</p>",
                 "event": "click"
             },
             {
