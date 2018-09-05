@@ -6,6 +6,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
+    [DefaultPropertyValueConverter]
     public class NestedContentSingleValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
