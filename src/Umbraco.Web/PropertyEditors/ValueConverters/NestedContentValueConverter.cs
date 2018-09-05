@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
@@ -6,11 +7,12 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-    public class NestedContentSingleValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+    [DefaultPropertyValueConverter]
+    public class NestedContentValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.IsSingleNestedContentProperty();
+            return propertyType.IsNestedContentProperty();
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
@@ -21,18 +23,18 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
             catch (Exception e)
             {
-                LogHelper.Error<NestedContentSingleValueConverter>("Error converting value", e);
+                LogHelper.Error<NestedContentValueConverter>("Error converting value", e);
             }
 
             return null;
         }
 
-        public virtual Type GetPropertyValueType(PublishedPropertyType propertyType)
+        public Type GetPropertyValueType(PublishedPropertyType propertyType)
         {
-            return typeof(IPublishedContent);
+            return propertyType.IsSingleNestedContentProperty() ? typeof(IPublishedContent) : typeof(IEnumerable<IPublishedContent>);
         }
 
-        public virtual PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
+        public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
         {
             return PropertyCacheLevel.Content;
         }
