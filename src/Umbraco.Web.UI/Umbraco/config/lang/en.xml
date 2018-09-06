@@ -272,6 +272,7 @@
         <key alias="dropFilesHere">Drop your files here...</key>
         <key alias="urls">Link to media</key>
         <key alias="orClickHereToUpload">or click here to choose files</key>
+        <key alias="dragFilesHereToUpload">You can drag files here to upload</key>
         <key alias="onlyAllowedFiles">Only allowed file types are</key>
         <key alias="disallowedFileType">Cannot upload this file, it does not have an approved file type</key>
         <key alias="maxFileSize">Max file size is</key>
@@ -485,6 +486,7 @@
         <key alias="currentListViewDesc" version="7.2">The active list view data type</key>
         <key alias="createListView" version="7.2">Create custom list view</key>
         <key alias="removeListView" version="7.2">Remove custom list view</key>
+        <key alias="aliasAlreadyExists">A content type, media type or member type with this alias already exists</key>
     </area>
     <area alias="renamecontainer">
         <key alias="renamed">Renamed</key>

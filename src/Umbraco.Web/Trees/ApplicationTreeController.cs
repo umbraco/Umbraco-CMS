@@ -30,6 +30,8 @@ namespace Umbraco.Web.Trees
         [HttpQueryStringFilter("queryStrings")]
         public async Task<SectionRootNode> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings, bool onlyInitialized = true)
         {
+            application = application.CleanForXss();
+
             if (string.IsNullOrEmpty(application)) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
@@ -37,7 +39,7 @@ namespace Umbraco.Web.Trees
             //find all tree definitions that have the current application alias
             var appTrees = Services.ApplicationTreeService.GetApplicationTrees(application, onlyInitialized).ToArray();
 
-            if (appTrees.Length == 1 || string.IsNullOrEmpty(tree) == false )
+            if (string.IsNullOrEmpty(tree) == false || appTrees.Length <= 1)
             {
                 var apptree = string.IsNullOrEmpty(tree) == false
                     ? appTrees.SingleOrDefault(x => x.Alias == tree)

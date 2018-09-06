@@ -5,8 +5,9 @@ using System.Linq;
 using System.Web;
 using Examine;
 using Examine.LuceneEngine.SearchCriteria;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
@@ -82,6 +83,45 @@ namespace Umbraco.Web
             // return the corresponding url segment, or null if none
             var cultureInfo = content.GetCulture(culture);
             return cultureInfo?.UrlSegment;
+		}
+
+        public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
+        {
+            if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == true)
+                return content.TemplateId == templateId;
+
+            if (content.TemplateId != templateId && UmbracoConfig.For.UmbracoSettings().WebRouting.ValidateAlternativeTemplates == true)
+            {
+                // fixme - perfs? nothing cached here
+                var publishedContentContentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(content.ContentType.Id);
+                if (publishedContentContentType == null)
+                    throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
+
+                return publishedContentContentType.IsAllowedTemplate(templateId);
+            }
+
+            return true;
+        }
+        public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
+        {
+            // fixme - perfs? nothing cached here
+            var template = ApplicationContext.Current.Services.FileService.GetTemplate(templateAlias);
+            return = template == null ? false : content.IsAllowedTemplate(template.Id);
+        }
+
+        #endregion
+
+        #region IsComposedOf
+
+        /// <summary>
+        /// Gets a value indicating whether the content is of a content type composed of the given alias
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="alias">The content type alias.</param>
+        /// <returns>A value indicating whether the content is of a content type composed of a content type identified by the alias.</returns>
+        public static bool IsComposedOf(this IPublishedContent content, string alias)
+        {
+            return content.ContentType.CompositionAliases.Contains(alias);
         }
 
         #endregion

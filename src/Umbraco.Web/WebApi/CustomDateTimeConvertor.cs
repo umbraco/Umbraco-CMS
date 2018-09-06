@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Umbraco.Core;
@@ -21,7 +22,7 @@ namespace Umbraco.Web.WebApi
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            writer.WriteValue(((DateTime)value).ToString(_dateTimeFormat));
+            writer.WriteValue(((DateTime)value).ToString(_dateTimeFormat, CultureInfo.InvariantCulture));
         }
     }
 }

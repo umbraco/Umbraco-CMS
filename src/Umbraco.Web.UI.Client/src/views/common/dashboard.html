@@ -4,7 +4,7 @@
 
         <umb-load-indicator ng-show="page.loading"></umb-load-indicator>
 
-        <div class="umb-dashboard" ng-if="!page.loading">
+        <div class="umb-dashboard" ng-if="!page.loading" data-element='dashboard'>
 
             <div class="umb-dashboard__header" ng-show="dashboard.tabs.length > 1">
                 <umb-tabs-nav

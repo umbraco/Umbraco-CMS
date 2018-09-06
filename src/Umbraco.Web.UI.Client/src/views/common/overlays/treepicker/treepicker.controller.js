@@ -83,11 +83,11 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
         //if a alternative startnode is used, we need to check if it is a container
         if ($scope.enableSearh && dialogOptions.startNodeId && dialogOptions.startNodeId !== -1 && dialogOptions.startNodeId !== "-1") {
             entityResource.getById(dialogOptions.startNodeId, $scope.entityType).then(function(node) {
-                    if (node.metaData.IsContainer) {
-                        openMiniListView(node);
-                    }
-                    initTree();
-                });
+                if (node.metaData.IsContainer) {
+                    openMiniListView(node);
+                }
+                initTree();
+            });
         }
         else {
             initTree();
@@ -109,7 +109,10 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
             else {
                 if (dialogOptions.filter.startsWith("!")) {
                     dialogOptions.filterExclude = true;
-                    dialogOptions.filter = dialogOptions.filter.substring(1);
+                    dialogOptions.filterTypes = dialogOptions.filter.substring(1);
+                } else {
+                    dialogOptions.filterExclude = false;
+                    dialogOptions.filterTypes = dialogOptions.filter;
                 }
 
                 //used advanced filtering
@@ -119,6 +122,12 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     dialogOptions.filter = angular.fromJson(dialogOptions.filter);
                 }
             }
+
+            $scope.filter = {
+                filterAdvanced: dialogOptions.filterAdvanced,
+                filterExclude: dialogOptions.filterExclude,
+                filter: dialogOptions.filterTypes
+            };
         }
 
         function initTree() {
@@ -162,7 +171,9 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
 
             tree = args.tree;
 
-            if (node && node.path) {
+            var nodeHasPath = typeof node !== "undefined" && typeof node.path !== "undefined";
+            var startNodeNotDefined = typeof dialogOptions.startNodeId === "undefined" || dialogOptions.startNodeId === "" || dialogOptions.startNodeId === "-1";
+            if (startNodeNotDefined && nodeHasPath) {
                 $scope.dialogTreeEventHandler.syncTree({ path: node.path, activate: false });
             }
 
@@ -320,7 +331,7 @@ angular.module("umbraco").controller("Umbraco.Overlays.TreePickerController",
                     }
                 });
             } else {
-                var a = dialogOptions.filter.toLowerCase().replace(/\s/g, '').split(',');
+                var a = dialogOptions.filterTypes.toLowerCase().replace(/\s/g, '').split(',');
                 angular.forEach(nodes, function (value, key) {
 
                     var found = a.indexOf(value.metaData.contentType.toLowerCase()) >= 0;
