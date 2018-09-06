@@ -88,14 +88,14 @@
     <PackageReference Include="ClientDependency" Version="1.9.6" />
     <PackageReference Include="ClientDependency-Mvc5" Version="1.8.0.0" />
     <PackageReference Include="Examine" Version="1.0.0-beta025" />
-    <PackageReference Include="ImageProcessor.Web" Version="4.9.2.19" />
+    <PackageReference Include="ImageProcessor.Web" Version="4.9.3.25" />
     <PackageReference Include="ImageProcessor.Web.Config" Version="2.4.1.19" />
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
-    <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.1" />
+    <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.6" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.9.0" />
-    <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="1.0.8" />
+    <PackageReference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform" Version="2.0.0" />
     <PackageReference Include="Microsoft.Net.Compilers" Version="2.9.0">
       <PrivateAssets>all</PrivateAssets>
       <!-- development dependency -->
@@ -232,7 +232,6 @@
     <Content Include="Umbraco\Config\Lang\zh_tw.xml" />
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Developer\Packages\installer.aspx" />
-    <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco\umbraco.aspx" />
     <Compile Include="Umbraco\umbraco.aspx.cs">
       <DependentUpon>umbraco.aspx</DependentUpon>
@@ -290,9 +289,6 @@
     </None>
     <None Include="Config\scripting.Release.config">
       <DependentUpon>scripting.config</DependentUpon>
-    </None>
-    <None Include="Config\metablogConfig.Release.config">
-      <DependentUpon>metablogConfig.config</DependentUpon>
     </None>
     <None Include="Config\ExamineSettings.Release.config">
       <DependentUpon>ExamineSettings.config</DependentUpon>
@@ -483,7 +479,6 @@
     <Content Include="Config\Dashboard.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\metablogConfig.config" />
     <Content Include="Config\tinyMceConfig.config">
       <SubType>Designer</SubType>
     </Content>

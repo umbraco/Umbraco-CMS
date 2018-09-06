@@ -15,6 +15,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Models;
 using Umbraco.Web;
@@ -77,7 +78,7 @@ namespace Umbraco.Tests.PropertyEditors
                 var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>());
 
                 var dataTypeService = new TestObjects.TestDataTypeService(
-                    new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSection>())) { Id = 1 });
+                    new DataType(new ImageCropperPropertyEditor(Mock.Of<ILogger>(), mediaFileSystem, Mock.Of<IContentSection>(), Mock.Of<IDataTypeService>())) { Id = 1 });
 
                 var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
 

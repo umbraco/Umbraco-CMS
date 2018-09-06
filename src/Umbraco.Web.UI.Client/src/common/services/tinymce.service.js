@@ -761,13 +761,13 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 		 * @param {string} input the string to parse      
 		 */
 		getAnchorNames: function (input) {
-            var anchors = [];
-            if (!input) {
-                return anchors;
-            }
-                
+        var anchors = [];
+        if (!input) {
+            return anchors;
+        }
+
 		    var anchorPattern = /<a id=\\"(.*?)\\">/gi;
-			var matches = input.match(anchorPattern);
+  			var matches = input.match(anchorPattern);
 			
 
 			if (matches) {
@@ -776,7 +776,9 @@ function tinyMceService($log, imageHelper, $http, $timeout, macroResource, macro
 				});
 			}
 
-			return anchors;
+			return anchors.filter(function(val, i, self) {
+          return self.indexOf(val) === i;
+      });
 		},
 
 		insertLinkInEditor: function (editor, target, anchorElm) {

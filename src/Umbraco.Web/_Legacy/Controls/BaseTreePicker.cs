@@ -143,7 +143,7 @@ namespace Umbraco.Web._Legacy.Controls
         /// </summary>
         protected virtual void RenderJSComponents()
         {
-            const string BaseTreePickerScriptJs = @"/// <reference path=""/umbraco_client/Application/NamespaceManager.js"" />
+            const string BaseTreePickerScriptJs = @"/// <reference path=""/umbraco/lib/umbraco/NamespaceManager.js"" />
 (function ($) {
     $(document).ready(function () {
         // Tooltip only Text

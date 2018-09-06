@@ -10,7 +10,9 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
+using Umbraco.Web.Media;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -21,18 +23,22 @@ namespace Umbraco.Web.PropertyEditors
     public class ImageCropperPropertyEditor : DataEditor
     {
         private readonly MediaFileSystem _mediaFileSystem;
+        private readonly IContentSection _contentSettings;
+        private readonly IDataTypeService _dataTypeService;
         private readonly UploadAutoFillProperties _autoFillProperties;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
         /// </summary>
-        public ImageCropperPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSettings)
+        public ImageCropperPropertyEditor(ILogger logger, MediaFileSystem mediaFileSystem, IContentSection contentSettings, IDataTypeService dataTypeService)
             : base(logger)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
-            var contentSettings1 = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _dataTypeService = dataTypeService;
 
-            _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, Logger, contentSettings1);
+            //fixme: inject?
+            _autoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, _contentSettings);
         }
 
         /// <summary>
@@ -204,7 +210,7 @@ namespace Umbraco.Web.PropertyEditors
 
             foreach (var property in properties)
             {
-                var autoFillConfig = _autoFillProperties.GetConfig(property.Alias);
+                var autoFillConfig = _contentSettings.GetConfig(property.Alias);
                 if (autoFillConfig == null) continue;
 
                 foreach (var pvalue in property.Values)
@@ -213,40 +219,40 @@ namespace Umbraco.Web.PropertyEditors
                     if (string.IsNullOrWhiteSpace(svalue))
                     {
                         _autoFillProperties.Reset(model, autoFillConfig, pvalue.Culture, pvalue.Segment);
-                        continue;
-                    }
-
-                    // FIXME VERY TEMP
-                    // we should kill all auto-fill properties
-                    // BUT that being said what would be the right way to do this?
-                    /*
-                    var v = JsonConvert.DeserializeObject<ImageCropperValue>()
-
-                    var jo = GetJObject(svalue, false);
-                    string src;
-                    if (jo == null)
-                    {
-                        // so we have a non-empty string value that cannot be parsed into a json object
-                        // see http://issues.umbraco.org/issue/U4-4756
-                        // it can happen when an image is uploaded via the folder browser, in which case
-                        // the property value will be the file source eg '/media/23454/hello.jpg' and we
-                        // are fixing that anomaly here - does not make any sense at all but... bah...
-                        var config = _dataTypeService
-                            .GetPreValuesByDataTypeId(property.PropertyType.DataTypeDefinitionId).FirstOrDefault();
-                        var crops = string.IsNullOrWhiteSpace(config) ? "[]" : config;
-                        src = svalue;
-                        property.SetValue("{\"src\": \"" + svalue + "\", \"crops\": " + crops + "}");
                     }
                     else
                     {
-                        src = jo["src"]?.Value<string>();
-                    }
+                        var jo = GetJObject(svalue, false);
+                        string src;
+                        if (jo == null)
+                        {
+                            // so we have a non-empty string value that cannot be parsed into a json object
+                            // see http://issues.umbraco.org/issue/U4-4756
+                            // it can happen when an image is uploaded via the folder browser, in which case
+                            // the property value will be the file source eg '/media/23454/hello.jpg' and we
+                            // are fixing that anomaly here - does not make any sense at all but... bah...
 
-                    if (src == null)
-                        _autoFillProperties.Reset(model, autoFillConfig, pvalue.LanguageId, pvalue.Segment);
-                    else
-                        _autoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(src), pvalue.LanguageId, pvalue.Segment);
-                    */
+                            var dt = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
+                            var config = dt?.ConfigurationAs<ImageCropperConfiguration>();
+                            src = svalue;
+                            var json = new
+                            {
+                                src = svalue,
+                                crops = config == null ? Array.Empty<ImageCropperConfiguration.Crop>() : config.Crops
+                            };
+
+                            property.SetValue(JsonConvert.SerializeObject(json), pvalue.Culture, pvalue.Segment);
+                        }
+                        else
+                        {
+                            src = jo["src"]?.Value<string>();
+                        }
+
+                        if (src == null)
+                            _autoFillProperties.Reset(model, autoFillConfig, pvalue.Culture, pvalue.Segment);
+                        else
+                            _autoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(src), pvalue.Culture, pvalue.Segment);
+                    }
                 }
             }
         }

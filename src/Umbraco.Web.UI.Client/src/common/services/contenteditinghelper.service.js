@@ -66,7 +66,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
                 args.scope.busy = true;
 
-                return args.saveMethod(args.content, $routeParams.create, fileManager.getFiles())
+                return args.saveMethod(args.content, $routeParams.create, fileManager.getFiles(), args.showNotifications)
                     .then(function (data) {
 
                         formHelper.resetForm({ scope: args.scope });
@@ -262,7 +262,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 // if save button is alread the default don't change it just update the label
                 if (buttons.defaultButton && buttons.defaultButton.letter === "A") {
                     buttons.defaultButton.labelKey = "buttons_saveAndSchedule";
-                    return;
+                    return buttons;
                 }
 
                 if (buttons.defaultButton && buttons.subButtons && buttons.subButtons.length > 0) {
@@ -439,8 +439,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             var shouldIgnore = function (propName) {
                 return _.some([
                     "variants",
-                    "notifications",
-                    "ModelState",
+                    
                     "tabs",
                     "properties",
                     "apps",
@@ -599,8 +598,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
                     //add model state errors to notifications
                     if (args.showNotifications) {
-                        for (var e in modelState) {
-                            notificationsService.error("Validation", modelState[e][0]);
+                        for (var e in args.err.data.ModelState) {
+                            notificationsService.error("Validation", args.err.data.ModelState[e][0]);
                         }
                     }
 

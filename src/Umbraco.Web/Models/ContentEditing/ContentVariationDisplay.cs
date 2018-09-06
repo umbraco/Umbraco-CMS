@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -12,11 +13,12 @@ namespace Umbraco.Web.Models.ContentEditing
     /// Represents the variant info for a content item
     /// </summary>
     [DataContract(Name = "contentVariant", Namespace = "")]
-    public class ContentVariantDisplay : ITabbedContent<ContentPropertyDisplay>, IContentProperties<ContentPropertyDisplay>
+    public class ContentVariantDisplay : ITabbedContent<ContentPropertyDisplay>, IContentProperties<ContentPropertyDisplay>, INotificationModel
     {
         public ContentVariantDisplay()
         {
             Tabs = new List<Tab<ContentPropertyDisplay>>();
+            Notifications = new List<Notification>();
         }
 
         [DataMember(Name = "name", IsRequired = true)]
@@ -59,6 +61,16 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "publishDate")]
         public DateTime? PublishDate { get; set; }
-        
+
+        /// <summary>
+        /// This is used to add custom localized messages/strings to the response for the app to use for localized UI purposes.
+        /// </summary>
+        /// <remarks>
+        /// The notifications assigned to a variant are currently only used to show custom messagse in the save/publish dialogs.
+        /// </remarks>
+        [DataMember(Name = "notifications")]
+        [ReadOnly(true)]
+        public List<Notification> Notifications { get; private set; }
+
     }
 }

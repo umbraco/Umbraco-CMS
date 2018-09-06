@@ -40,34 +40,49 @@ namespace Umbraco.Web.Routing
             if (frequest.HasDomain)
                 path = DomainHelper.PathRelativeToDomain(frequest.Domain.Uri, path);
 
-            if (path != "/") // no template if "/"
-            {
-                var pos = path.LastIndexOf('/');
-                var templateAlias = path.Substring(pos + 1);
-                path = pos == 0 ? "/" : path.Substring(0, pos);
-
-                var template = _fileService.GetTemplate(templateAlias);
-                if (template != null)
-                {
-                    Logger.Debug<ContentFinderByUrlAndTemplate>("Valid template: '{TemplateAlias}'", templateAlias);
-
-                    var route = frequest.HasDomain ? (frequest.Domain.ContentId.ToString() + path) : path;
-                    node = FindContent(frequest, route);
-
-                    if (UmbracoConfig.For.UmbracoSettings().WebRouting.DisableAlternativeTemplates == false && node != null)
-                        frequest.TemplateModel = template;
-                }
-                else
-                {
-                    Logger.Debug<ContentFinderByUrlAndTemplate>("Not a valid template: '{TemplateAlias}'", templateAlias);
-                }
-            }
-            else
+            // no template if "/"
+            if (path == "/")
             {
                 Logger.Debug<ContentFinderByUrlAndTemplate>("No template in path '/'");
+                return false;
             }
 
-            return node != null;
+            // look for template in last position
+            var pos = path.LastIndexOf('/');
+            var templateAlias = path.Substring(pos + 1);
+            path = pos == 0 ? "/" : path.Substring(0, pos);
+
+            var template = _fileService.GetTemplate(templateAlias);
+
+            if (template == null)
+            {
+                Logger.Debug<ContentFinderByUrlAndTemplate>("Not a valid template: '{TemplateAlias}'", templateAlias);
+                return false;
+            }
+
+            Logger.Debug<ContentFinderByUrlAndTemplate>("Valid template: '{TemplateAlias}'", templateAlias);
+
+            // look for node corresponding to the rest of the route
+            var route = frequest.HasDomain ? (frequest.Domain.ContentId + path) : path;
+            node = FindContent(frequest, route); // also assigns to published request
+
+            if (node == null)
+            {
+                Logger.Debug<ContentFinderByUrlAndTemplate>("Not a valid route to node: '{Route}'", route);
+                return false;
+            }
+
+            // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
+            if (!node.IsAllowedTemplate(template.Id))
+            {
+                Logger.Warn<ContentFinderByUrlAndTemplate>("Alternative template '{TemplateAlias}' is not allowed on node {NodeId}.", template.Alias, node.Id);
+                frequest.PublishedContent = null; // clear
+                return false;
+            }
+
+            // got it
+            frequest.TemplateModel = template;
+            return true;
         }
     }
 }

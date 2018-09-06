@@ -280,26 +280,6 @@ namespace Umbraco.Core.Models
             Properties.Add(property);
         }
 
-        // HttpPostedFileBase is the base class that can be mocked
-        // HttpPostedFile is what we get in ASP.NET
-        // HttpPostedFileWrapper wraps sealed HttpPostedFile as HttpPostedFileBase
-
-        /// <summary>
-        /// Sets the posted file value of a property.
-        /// </summary>
-        public virtual void SetValue(string propertyTypeAlias, HttpPostedFile value, string culture = null, string segment = null)
-        {
-            ContentExtensions.SetValue(this, propertyTypeAlias, new HttpPostedFileWrapper(value), culture, segment);
-        }
-
-        /// <summary>
-        /// Sets the posted file value of a property.
-        /// </summary>
-        public virtual void SetValue(string propertyTypeAlias, HttpPostedFileBase value, string culture = null, string segment = null)
-        {
-            ContentExtensions.SetValue(this, propertyTypeAlias, value, culture, segment);
-        }
-
         #endregion
 
         #region Copy

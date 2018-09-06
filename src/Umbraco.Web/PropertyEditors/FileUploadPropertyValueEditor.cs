@@ -91,6 +91,7 @@ namespace Umbraco.Web.PropertyEditors
             // update json and return
             if (editorFile == null) return null;
             return filepath == null ? string.Empty : _mediaFileSystem.GetUrl(filepath);
+
             
         }
 
@@ -107,6 +108,9 @@ namespace Umbraco.Web.PropertyEditors
 
             using (var filestream = File.OpenRead(file.TempFilePath))
             {
+                //TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
+                // since we'd need to be able to return values for other properties from these methods
+
                 _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
             }
 

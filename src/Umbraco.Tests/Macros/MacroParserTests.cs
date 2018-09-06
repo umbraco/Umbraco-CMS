@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Core.Macros;
+using Umbraco.Web.Macros;
 
 namespace Umbraco.Tests.Macros
 {
