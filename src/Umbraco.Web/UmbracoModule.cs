@@ -561,7 +561,6 @@ namespace Umbraco.Web
                 //Create a new Request ID/GUID
                 requestId = Guid.NewGuid();
 
-                Logger.Verbose<UmbracoModule>("Begin request [{RequestId}]: {RequestUrl}", requestId, httpContext.Request.Url);
                 BeginRequest(new HttpContextWrapper(httpContext));
             };
 
@@ -605,8 +604,7 @@ namespace Umbraco.Web
                 if (UmbracoContext.Current != null)
                 {
                     Logger.Verbose<UmbracoModule>(
-                        "End Request [{RequestId}]: {RequestUrl} ({RequestTotalMilliseconds}ms)",
-                        requestId,
+                        "Request: {RequestUrl} ({RequestTotalMilliseconds}ms)",
                         httpContext.Request.Url,
                         DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
                 }
