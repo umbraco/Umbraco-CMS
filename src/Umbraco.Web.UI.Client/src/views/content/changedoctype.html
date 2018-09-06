@@ -1,0 +1,33 @@
+﻿<div ng-controller="Umbraco.Editors.Content.ChangeDocTypeController as vm" ng-cloak>
+    <div class="umb-dialog-body">
+        <umb-pane>
+            <p><localize key="changeDocType_changeDocTypeInstruction"></localize></p>
+        </umb-pane>
+        <!--LABEL ADD-->
+        <umb-pane>
+            <label for="changeDocType_selectedContent" class="control-label"><localize key="changeDocType_selectedContent"></localize></label>
+            <p>{{currentNode.name}}</p>
+        </umb-pane>
+        <umb-pane>
+            <label for="changeDocType_currentType" class="control-label"><localize key="changeDocType_currentType"></localize></label>
+            <p>{{currentNode.metaData.contentType}}</p>
+        </umb-pane>
+        <umb-pane>
+            <label for="changeDocType_newType" class="control-label"><localize key="changeDocType_newType"></localize></label>
+            <select class="umb-property-editor umb-dropdown" name="newDocument" id="changeDocType_newDocumentTypeList" ng-model="vm.docType" ng-options="docType.name for docType in vm.docTypes"></select>
+        </umb-pane>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+        <umb-button label-key="general_cancel"
+                    action="vm.closeDialog()"
+                    type="button"
+                    button-style="link">
+        </umb-button>
+
+        <umb-button label-key="buttons_save"
+                    type="button"
+                    button-style="success">
+        </umb-button>
+    </div>
+</div>
