@@ -34,7 +34,7 @@
                                ng-model="name"
                                ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}"
                                umb-auto-focus
-                               val-server-field="Name"
+                               val-server-field="{{serverValidationNameField}}"
                                required />
                     </ng-form>
 
@@ -44,7 +44,7 @@
                                         alias="$parent.alias"
                                         alias-from="$parent.name"
                                         enable-lock="true"
-                                        server-validation-field="Alias">
+                                        server-validation-field="{{serverValidationAliasField}}">
                     </umb-generate-alias>
 
                     <a ng-if="variants.length > 0 && hideChangeVariant !== true" class="umb-variant-switcher__toggle" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen">

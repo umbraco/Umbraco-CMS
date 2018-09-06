@@ -10,6 +10,7 @@
             content: "<",
             page: "<",
             editor: "<",
+            editorIndex: "<",
             editorCount: "<",
             onCloseSplitView: "&",
             onSelectVariant: "&",

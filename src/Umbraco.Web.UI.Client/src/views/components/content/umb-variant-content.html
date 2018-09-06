@@ -19,7 +19,8 @@
                                split-view-open="vm.editorCount > 1"
                                on-open-in-split-view="vm.openSplitView(variant)"
                                on-close-split-view="vm.onCloseSplitView()"
-                               on-select-variant="vm.selectVariant(variant)">
+                               on-select-variant="vm.selectVariant(variant)"
+                               server-validation-name-field="{{'Variants[' + vm.editorIndex + '].Name'}}">
             </umb-editor-header>
         </ng-form>
 

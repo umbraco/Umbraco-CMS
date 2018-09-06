@@ -588,14 +588,20 @@ namespace Umbraco.Web.Editors
             // * Permissions are valid
             MapValuesForPersistence(contentItem);
 
-            //this a custom check for any variants not being flagged for Saving since we'll need to manually
-            //remove the ModelState validation for the Name
+            //This a custom check for any variants not being flagged for Saving since we'll need to manually
+            //remove the ModelState validation for the Name.
+            //We are also tracking which cultures have an invalid Name
             var variantCount = 0;
+            var variantNameErrors = new List<string>();
             foreach (var variant in contentItem.Variants)
             {
-                if (!variant.Save)
+                var msKey = $"Variants[{variantCount}].Name";
+                if (ModelState.ContainsKey(msKey))
                 {
-                    ModelState.Remove($"Variants[{variantCount}].Name");
+                    if (!variant.Save)
+                        ModelState.Remove(msKey);
+                    else
+                        variantNameErrors.Add(variant.Culture);
                 }
                 variantCount++;
             }
@@ -608,6 +614,16 @@ namespace Umbraco.Web.Editors
             //      a message indicating this
             if (ModelState.IsValid == false)
             {
+                //another special case, if there's more than 1 variant, then we need to add the culture specific error
+                //messages based on the variants in error so that the messages show in the publish/save dialog
+                if (variantCount > 1)
+                {
+                    foreach (var c in variantNameErrors)
+                    {
+                        AddCultureValidationError(c, "speechBubbles/contentCultureValidationError");
+                    }
+                }
+
                 if (IsCreatingAction(contentItem.Action))
                 {
                     if (!RequiredForPersistenceAttribute.HasRequiredValuesForPersistence(contentItem)

@@ -29,6 +29,7 @@ using Umbraco.Web.PropertyEditors;
 using System;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.Trees;
+using System.Globalization;
 
 namespace Umbraco.Tests.Web.Controllers
 {
@@ -45,6 +46,8 @@ namespace Umbraco.Tests.Web.Controllers
             var userServiceMock = new Mock<IUserService>();
             userServiceMock.Setup(service => service.GetUserById(It.IsAny<int>()))
                 .Returns((int id) => id == 1234 ? new User(1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]) : null);
+            userServiceMock.Setup(x => x.GetProfileById(It.IsAny<int>()))
+                .Returns((int id) => id == 1234 ? new User(1234, "Test", "test@test.com", "test@test.com", "", new List<IReadOnlyUserGroup>(), new int[0], new int[0]) : null);
             userServiceMock.Setup(service => service.GetPermissionsForPath(It.IsAny<IUser>(), It.IsAny<string>()))
                 .Returns(new EntityPermissionSet(123, new EntityPermissionCollection(new[]
                 {
@@ -59,20 +62,30 @@ namespace Umbraco.Tests.Web.Controllers
 
             var entityService = new Mock<IEntityService>();
             entityService.Setup(x => x.GetAllPaths(UmbracoObjectTypes.Document, It.IsAny<int[]>()))
-                .Returns((UmbracoObjectTypes objType, int[] ids) => ids.Select(x => new TreeEntityPath {Path = $"-1,{x}", Id = x}).ToList());
+                .Returns((UmbracoObjectTypes objType, int[] ids) => ids.Select(x => new TreeEntityPath { Path = $"-1,{x}", Id = x }).ToList());
 
             var dataTypeService = new Mock<IDataTypeService>();
             dataTypeService.Setup(service => service.GetDataType(It.IsAny<int>()))
                 .Returns(Mock.Of<IDataType>(type => type.Id == 9876 && type.Name == "text"));
             dataTypeService.Setup(service => service.GetDataType(-87))  //the RTE
                 .Returns(Mock.Of<IDataType>(type => type.Id == -87 && type.Name == "Rich text" && type.Configuration == new RichTextConfiguration()));
-            
-            
+
+            var langService = new Mock<ILocalizationService>();
+            langService.Setup(x => x.GetAllLanguages()).Returns(new[] {
+                    Mock.Of<ILanguage>(x => x.IsoCode == "en-US"),
+                    Mock.Of<ILanguage>(x => x.IsoCode == "es-ES"),
+                    Mock.Of<ILanguage>(x => x.IsoCode == "fr-FR")
+                });
+
+            var textService = new Mock<ILocalizedTextService>();
+            textService.Setup(x => x.Localize(It.IsAny<string>(), It.IsAny<CultureInfo>(), It.IsAny<IDictionary<string, string>>())).Returns("");
 
             Container.RegisterSingleton(f => Mock.Of<IContentService>());
             Container.RegisterSingleton(f => userServiceMock.Object);
             Container.RegisterSingleton(f => entityService.Object);
             Container.RegisterSingleton(f => dataTypeService.Object);
+            Container.RegisterSingleton(f => langService.Object);
+            Container.RegisterSingleton(f => textService.Object);
             Container.RegisterSingleton(f => Mock.Of<ICultureDictionaryFactory>());
             Container.RegisterSingleton(f => new UmbracoApiControllerTypeCollection(new[] { typeof(ContentTreeController) }));
         }
@@ -144,7 +157,7 @@ namespace Umbraco.Tests.Web.Controllers
     ""action"": ""save"",
     ""variants"": [
         {
-            ""name"": null,
+            ""name"": ""asdf"",
             ""properties"": [
                 {
                     ""id"": 1,
@@ -152,10 +165,12 @@ namespace Umbraco.Tests.Web.Controllers
                     ""value"": ""asdf""
                 }
             ],
-            ""culture"": ""en-US""
+            ""culture"": ""en-US"",
+            ""save"": true,
+            ""publish"": true
         },
         {
-            ""name"": null,
+            ""name"": ""asdf"",
             ""properties"": [
                 {
                     ""id"": 1,
@@ -163,7 +178,9 @@ namespace Umbraco.Tests.Web.Controllers
                     ""value"": ""asdf""
                 }
             ],
-            ""culture"": ""fr-FR""
+            ""culture"": ""fr-FR"",
+            ""save"": true,
+            ""publish"": true
         },
         {
             ""name"": ""asdf"",
@@ -279,7 +296,7 @@ namespace Umbraco.Tests.Web.Controllers
 
             Assert.AreEqual(HttpStatusCode.NotFound, response.Item1.StatusCode);
         }
-        
+
         [Test]
         public async Task PostSave_Simple_Invariant()
         {
@@ -287,7 +304,7 @@ namespace Umbraco.Tests.Web.Controllers
 
             ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
             {
-                
+
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
                 contentServiceMock.Setup(x => x.GetById(123)).Returns(() => content);
                 contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
@@ -313,7 +330,81 @@ namespace Umbraco.Tests.Web.Controllers
             Assert.AreEqual(content.PropertyTypes.Count(), display.Variants.ElementAt(0).Tabs.ElementAt(0).Properties.Count());
         }
 
+        [Test]
+        public async Task PostSave_Validate_Empty_Name()
+        {
+            var content = GetMockedContent();
+
+            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
+            {
+
+                var contentServiceMock = Mock.Get(Current.Services.ContentService);
+                contentServiceMock.Setup(x => x.GetById(123)).Returns(() => content);
+                contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
+                    .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
+
+                var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
+                var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
+                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                Container.InjectProperties(usersController);
+                return usersController;
+            }
+
+            //clear out the name
+            var json = JsonConvert.DeserializeObject<JObject>(PublishJsonInvariant);
+            json["variants"].ElementAt(0)["name"] = null;
+
+            var runner = new TestRunner(Factory);
+            var response = await runner.Execute("Content", "PostSave", HttpMethod.Post,
+                content: GetMultiPartRequestContent(JsonConvert.SerializeObject(json)),
+                mediaTypeHeader: new MediaTypeWithQualityHeaderValue("multipart/form-data"),
+                assertOkResponse: false);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.Item1.StatusCode);
+            var display = JsonConvert.DeserializeObject<ContentItemDisplay>(response.Item2);
+            Assert.AreEqual(1, display.Errors.Count());
+            Assert.IsTrue(display.Errors.ContainsKey("Variants[0].Name"));
+            //ModelState":{"Variants[0].Name":["Required"]}
+        }
+
+        [Test]
+        public async Task PostSave_Validate_Variants_Empty_Name()
+        {
+            var content = GetMockedContent();
+
+            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
+            {
+
+                var contentServiceMock = Mock.Get(Current.Services.ContentService);
+                contentServiceMock.Setup(x => x.GetById(123)).Returns(() => content);
+                contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
+                    .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
+
+                var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
+                var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
+                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                Container.InjectProperties(usersController);
+                return usersController;
+            }
+
+            //clear out one of the names
+            var json = JsonConvert.DeserializeObject<JObject>(PublishJsonVariant);
+            json["variants"].ElementAt(0)["name"] = null;
+
+            var runner = new TestRunner(Factory);
+            var response = await runner.Execute("Content", "PostSave", HttpMethod.Post,
+                content: GetMultiPartRequestContent(JsonConvert.SerializeObject(json)),
+                mediaTypeHeader: new MediaTypeWithQualityHeaderValue("multipart/form-data"),
+                assertOkResponse: false);
+
+            Assert.AreEqual(HttpStatusCode.BadRequest, response.Item1.StatusCode);
+            var display = JsonConvert.DeserializeObject<ContentItemDisplay>(response.Item2);
+            Assert.AreEqual(2, display.Errors.Count());
+            Assert.IsTrue(display.Errors.ContainsKey("Variants[0].Name"));
+            Assert.IsTrue(display.Errors.ContainsKey("_content_variant_en-US_"));
+        }
+
         //TODO: There are SOOOOO many more tests we should write - a lot of them to do with validation
-    
+
     }
 }
