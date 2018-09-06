@@ -328,6 +328,9 @@
     <Compile Include="KeyValuePairExtensions.cs" />
     <Compile Include="Logging\LogLevel.cs" />
     <Compile Include="Logging\MessageTemplates.cs" />
+    <Compile Include="Logging\Serilog\Enrichers\HttpRequestIdEnricher.cs" />
+    <Compile Include="Logging\Serilog\Enrichers\HttpRequestNumberEnricher.cs" />
+    <Compile Include="Logging\Serilog\Enrichers\HttpSessionIdEnricher.cs" />
     <Compile Include="Logging\Serilog\LoggerConfigExtensions.cs" />
     <Compile Include="Logging\Serilog\Enrichers\Log4NetLevelMapperEnricher.cs" />
     <Compile Include="Migrations\MigrationBase_Extra.cs" />
