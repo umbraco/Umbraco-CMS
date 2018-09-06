@@ -26,6 +26,8 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
 
     $scope.showCreateDocTypeCollection = function () {
         $scope.model.creatingDoctypeCollection = true;
+        $scope.model.collectionCreateTemplate = true;
+        $scope.model.collectionItemCreateTemplate = true;
     };
 
     $scope.createContainer = function () {
@@ -74,7 +76,7 @@ function DocumentTypesCreateController($scope, $location, navigationService, con
                     }
                 }
 
-                contentTypeResource.createCollection(node.id, $scope.model.collectionName, $scope.model.collectionItemName, collectionIcon, collectionItemIcon).then(function (collectionData) {
+                contentTypeResource.createCollection(node.id, $scope.model.collectionName, $scope.model.collectionCreateTemplate, $scope.model.collectionItemName, $scope.model.collectionItemCreateTemplate, collectionIcon, collectionItemIcon).then(function (collectionData) {
 
                     navigationService.hideMenu();
                     $location.search('create', null);

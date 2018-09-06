@@ -47,9 +47,6 @@
       <CustomFilesToInclude Include=".\umbraco\**\*">
         <Dir>umbraco</Dir>
       </CustomFilesToInclude>
-      <CustomFilesToInclude Include=".\umbraco_client\**\*">
-        <Dir>umbraco_client</Dir>
-      </CustomFilesToInclude>
       <CustomFilesToInclude Include=".\Global.asax">
         <Dir>.</Dir>
       </CustomFilesToInclude>

@@ -7,6 +7,7 @@ using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.WebApi
 {
@@ -33,12 +34,10 @@ namespace Umbraco.Web.WebApi
             => _userManager ?? (_userManager = TryGetOwinContext().Result.GetBackOfficeUserManager());
 
         protected UmbracoAuthorizedApiController()
-        {
-        }
+        { }
 
         protected UmbracoAuthorizedApiController(IGlobalSettings globalSettings, UmbracoContext umbracoContext, ISqlContext sqlContext, ServiceContext services, CacheHelper applicationCache, ILogger logger, ProfilingLogger profilingLogger, IRuntimeState runtimeState)
             : base(globalSettings, umbracoContext, sqlContext, services, applicationCache, logger, profilingLogger, runtimeState)
-        {
-        }
+        { }
     }
 }

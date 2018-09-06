@@ -43,7 +43,7 @@ namespace Umbraco.Web.Routing
             ProfilingLogger proflog,
             Func<string, IEnumerable<string>> getRolesForLogin = null)
         {
-            _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection)); // fixme usage?
+            _webRoutingSection = webRoutingSection ?? throw new ArgumentNullException(nameof(webRoutingSection));
             _contentFinders = contentFinders ?? throw new ArgumentNullException(nameof(contentFinders));
             _contentLastChanceFinder = contentLastChanceFinder ?? throw new ArgumentNullException(nameof(contentLastChanceFinder));
             _services = services ?? throw new ArgumentNullException(nameof(services));
@@ -679,9 +679,8 @@ namespace Umbraco.Web.Routing
             // only if the published content is the initial once, else the alternate template
             // does not apply
             // + optionnally, apply the alternate template on internal redirects
-            var useAltTemplate = _webRoutingSection.DisableAlternativeTemplates == false
-                && (request.IsInitialPublishedContent
-                || (_webRoutingSection.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent));
+            var useAltTemplate = request.IsInitialPublishedContent
+                || (_webRoutingSection.InternalRedirectPreservesTemplate && request.IsInternalRedirectPublishedContent);
             var altTemplate = useAltTemplate
                 ? request.UmbracoContext.HttpContext.Request[Constants.Conventions.Url.AltTemplate]
                 : null;
@@ -694,28 +693,15 @@ namespace Umbraco.Web.Routing
 
                 if (request.HasTemplate)
                 {
-                    _logger.Debug<PublishedRequest>("{0}Has a template already, and no alternate template.");
+                    _logger.Debug<PublishedRequest>("FindTemplate: Has a template already, and no alternate template.");
                     return;
                 }
 
-                // TODO: When we remove the need for a database for templates, then this id should be irrelavent,
+                // TODO: When we remove the need for a database for templates, then this id should be irrelevant,
                 // not sure how were going to do this nicely.
 
                 var templateId = request.PublishedContent.TemplateId;
-
-                if (templateId > 0)
-                {
-                    _logger.Debug<PublishedRouter>("FindTemplate: Look for template id={TemplateId}", templateId);
-                    var template = _services.FileService.GetTemplate(templateId);
-                    if (template == null)
-                        throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render");
-                    request.TemplateModel = template;
-                    _logger.Debug<PublishedRouter>("FindTemplate: Got template id={TemplateId} alias='{TemplateAlias}'", template.Id, template.Alias);
-                }
-                else
-                {
-                    _logger.Debug<PublishedRouter>("FindTemplate: No specified template.");
-                }
+                request.TemplateModel = GetTemplateModel(templateId);
             }
             else
             {
@@ -726,18 +712,32 @@ namespace Umbraco.Web.Routing
                 // ignore if the alias does not match - just trace
 
                 if (request.HasTemplate)
-                    _logger.Debug<PublishedRouter>("FindTemplate: Has a template already, but also an alternate template.");
-                _logger.Debug<PublishedRouter>("FindTemplate: Look for alternate template alias='{AltTemplate}'", altTemplate);
+                    _logger.Debug<PublishedRouter>("FindTemplate: Has a template already, but also an alternative template.");
+                _logger.Debug<PublishedRouter>("FindTemplate: Look for alternative template alias='{AltTemplate}'", altTemplate);
 
-                var template = _services.FileService.GetTemplate(altTemplate);
-                if (template != null)
+                // IsAllowedTemplate deals both with DisableAlternativeTemplates and ValidateAlternativeTemplates settings
+                if (request.PublishedContent.IsAllowedTemplate(altTemplate))
                 {
-                    request.TemplateModel = template;
-                    _logger.Debug<PublishedRouter>("FindTemplate: Got template id={TemplateId} alias='{TemplateAlias}'", template.Id, template.Alias);
+                    // allowed, use
+                    var template = _services.FileService.GetTemplate(altTemplate);
+
+                    if (template != null)
+                    {
+                        request.TemplateModel = template;
+                        _logger.Debug<PublishedRouter>("FindTemplate: Got alternative template id={TemplateId} alias='{TemplateAlias}'", template.Id, template.Alias);
+                    }
+                    else
+                    {
+                        _logger.Debug<PublishedRouter>("FindTemplate: The alternative template with alias='{AltTemplate}' does not exist, ignoring.", altTemplate);
+                    }
                 }
                 else
                 {
-                    _logger.Debug<PublishedRouter>("FindTemplate: The template with alias='{AltTemplate}' does not exist, ignoring.", altTemplate);
+                    _logger.Warn<PublishedRouter>("FindTemplate: Alternative template '{TemplateAlias}' is not allowed on node {NodeId}, ignoring.", altTemplate, request.PublishedContent.Id);
+
+                    // no allowed, back to default
+                    var templateId = request.PublishedContent.TemplateId;
+                    request.TemplateModel = GetTemplateModel(templateId);
                 }
             }
 
@@ -758,6 +758,23 @@ namespace Umbraco.Web.Routing
             {
                 _logger.Debug<PublishedRouter>("FindTemplate: Running with template id={TemplateId} alias='{TemplateAlias}'", request.TemplateModel.Id, request.TemplateModel.Alias);
             }
+        }
+
+        private ITemplate GetTemplateModel(int templateId)
+        {
+            if (templateId <= 0)
+            {
+                _logger.Debug<PublishedRouter>("GetTemplateModel: No template.");
+                return null;
+            }
+
+            _logger.Debug<PublishedRouter>("GetTemplateModel: Get template id={TemplateId}", templateId);
+
+            var template = _services.FileService.GetTemplate(templateId);
+            if (template == null)
+                throw new InvalidOperationException("The template with Id " + templateId + " does not exist, the page cannot render.");
+            _logger.Debug<PublishedRouter>("GetTemplateModel: Got template id={TemplateId} alias=\"{TemplateAlias}\"", template.Id, template.Alias);
+            return template;
         }
 
         /// <summary>

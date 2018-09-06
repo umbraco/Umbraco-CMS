@@ -58,14 +58,14 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 var response = await server.HttpClient.SendAsync(request);
                 Console.WriteLine(response);
 
-                var json = "";
                 if (response.IsSuccessStatusCode == false)
                 {
                     WriteResponseError(response);
                 }
-                else
+
+                var json = (await ((StreamContent)response.Content).ReadAsStringAsync()).TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
+                if (!json.IsNullOrWhiteSpace())
                 {
-                    json = (await ((StreamContent) response.Content).ReadAsStringAsync()).TrimStart(AngularJsonMediaTypeFormatter.XsrfPrefix);
                     var deserialized = JsonConvert.DeserializeObject(json);
                     Console.Write(JsonConvert.SerializeObject(deserialized, Formatting.Indented));
                 }

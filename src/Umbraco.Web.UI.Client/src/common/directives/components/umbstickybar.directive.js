@@ -50,6 +50,11 @@ Use this directive make an element sticky and follow the page when scrolling.
 
             function activate() {
 
+                if (bar.parents(".umb-property").length > 1) {
+                    bar.addClass("nested");
+                    return;
+                }
+
                 if (attr.scrollableContainer) {
                     scrollableContainer = $(attr.scrollableContainer);
                 } else {
