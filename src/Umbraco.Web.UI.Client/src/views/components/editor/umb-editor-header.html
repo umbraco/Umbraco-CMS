@@ -35,7 +35,8 @@
                                ng-class="{'name-is-empty': $parent.name===null || $parent.name===''}"
                                umb-auto-focus
                                val-server-field="{{serverValidationNameField}}"
-                               required />
+                               required
+                               autocomplete="off" />
                     </ng-form>
 
                     <umb-generate-alias data-element="editor-alias"
