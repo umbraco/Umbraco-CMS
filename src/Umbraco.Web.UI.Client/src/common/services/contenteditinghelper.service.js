@@ -262,7 +262,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 // if save button is alread the default don't change it just update the label
                 if (buttons.defaultButton && buttons.defaultButton.letter === "A") {
                     buttons.defaultButton.labelKey = "buttons_saveAndSchedule";
-                    return;
+                    return buttons;
                 }
 
                 if (buttons.defaultButton && buttons.subButtons && buttons.subButtons.length > 0) {
