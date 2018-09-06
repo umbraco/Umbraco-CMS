@@ -722,7 +722,7 @@ namespace Umbraco.Web.Editors
 
             //merge the tracked success messages with the outgoing model
             display.Notifications.AddRange(globalNotifications.Notifications);
-            foreach (var v in display.Variants)
+            foreach (var v in display.Variants.Where(x => x.Language != null))
             {
                 if (notifications.TryGetValue(v.Language.IsoCode, out var n))
                     v.Notifications.AddRange(n.Notifications);
