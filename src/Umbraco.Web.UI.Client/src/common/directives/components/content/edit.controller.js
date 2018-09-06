@@ -79,18 +79,7 @@
                 $scope.content.variants[0].publish = false;
             }
         }
-
-        function countDirtyVariants() {
-            var count = 0;
-            for (var i = 0; i < $scope.content.variants.length; i++) {
-                var v = $scope.content.variants[i];
-                if (v.isDirty) {
-                    count++;
-                }
-            }
-            return count;
-        }
-
+        
         /** Returns true if the save/publish dialog should be shown when pressing the button */
         function showSaveOrPublishDialog() {
             return $scope.content.variants.length > 1;
@@ -274,6 +263,24 @@
             }
         }
 
+        /**
+         * Used to clear the dirty state for successfully saved variants when not all variant saving was successful
+         * @param {any} variants
+         */
+        function clearDirtyState(variants) {
+            for (var i = 0; i < variants.length; i++) {
+                var v = variants[i];
+                if (v.notifications) {
+                    var isSuccess = _.find(v.notifications, function (n) {
+                        return n.type === 3; //this is a success notification
+                    });
+                    if (isSuccess) {
+                        v.isDirty = false;
+                    }
+                }
+            }
+        }
+
         if ($scope.page.isNew) {
 
             $scope.page.loading = true;
@@ -382,6 +389,7 @@
                                 return $q.when(data);
                             },
                                 function (err) {
+                                    clearDirtyState($scope.content.variants);
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
@@ -433,6 +441,7 @@
                                 return $q.when(data);
                             },
                                 function (err) {
+                                    clearDirtyState($scope.content.variants);
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
