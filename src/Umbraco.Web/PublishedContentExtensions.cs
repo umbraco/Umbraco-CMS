@@ -93,7 +93,7 @@ namespace Umbraco.Web
             if (content.TemplateId != templateId && UmbracoConfig.For.UmbracoSettings().WebRouting.ValidateAlternativeTemplates == true)
             {
                 // fixme - perfs? nothing cached here
-                var publishedContentContentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(content.ContentType.Id);
+                var publishedContentContentType = Current.Services.ContentTypeService.Get(content.ContentType.Id);
                 if (publishedContentContentType == null)
                     throw new NullReferenceException("No content type returned for published content (contentType='" + content.ContentType.Id + "')");
 
@@ -105,8 +105,8 @@ namespace Umbraco.Web
         public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
         {
             // fixme - perfs? nothing cached here
-            var template = ApplicationContext.Current.Services.FileService.GetTemplate(templateAlias);
-            return = template == null ? false : content.IsAllowedTemplate(template.Id);
+            var template = Current.Services.FileService.GetTemplate(templateAlias);
+            return template != null && content.IsAllowedTemplate(template.Id);
         }
 
         #endregion

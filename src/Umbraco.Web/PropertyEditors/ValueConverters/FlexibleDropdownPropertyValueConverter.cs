@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
@@ -23,29 +22,27 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public override object ConvertIntermediateToObject(IPublishedElement owner, PublishedPropertyType propertyType, PropertyCacheLevel referenceCacheLevel, object inter, bool preview)
         {
             if (inter == null)
-            {
                 return null;
-            }
 
-            var selectedValues = (string[])inter;
-            if (selectedValues.Any())
+            var multiple = propertyType.DataType.ConfigurationAs<DropDownFlexibleConfiguration>().Multiple;
+            var selectedValues = (string[]) inter;
+            if (selectedValues.Length > 0)
             {
-                if (propertyType.DataType.ConfigurationAs<DropDownFlexibleConfiguration>().Multiple)
-                {
-                    return selectedValues;
-                }
-
-                return selectedValues.First();
+                return multiple
+                    ? (object) selectedValues
+                    : selectedValues[0];
             }
 
-            return inter;
+            return multiple
+                ? inter
+                : string.Empty;
         }
 
         public override Type GetPropertyValueType(PublishedPropertyType propertyType)
         {
             return propertyType.DataType.ConfigurationAs<DropDownFlexibleConfiguration>().Multiple
-                       ? typeof(IEnumerable<string>)
-                       : typeof(string);
-        }        
+               ? typeof(IEnumerable<string>)
+               : typeof(string);
+        }
     }
 }
