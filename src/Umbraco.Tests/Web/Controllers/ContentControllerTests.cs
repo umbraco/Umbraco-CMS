@@ -24,6 +24,11 @@ using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web._Legacy.Actions;
 using Task = System.Threading.Tasks.Task;
+using Umbraco.Core.Dictionary;
+using Umbraco.Web.PropertyEditors;
+using System;
+using Umbraco.Web.WebApi;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Tests.Web.Controllers
 {
@@ -58,19 +63,20 @@ namespace Umbraco.Tests.Web.Controllers
 
             var dataTypeService = new Mock<IDataTypeService>();
             dataTypeService.Setup(service => service.GetDataType(It.IsAny<int>()))
-                .Returns(MockedDataType());
+                .Returns(Mock.Of<IDataType>(type => type.Id == 9876 && type.Name == "text"));
+            dataTypeService.Setup(service => service.GetDataType(-87))  //the RTE
+                .Returns(Mock.Of<IDataType>(type => type.Id == -87 && type.Name == "Rich text" && type.Configuration == new RichTextConfiguration()));
+            
+            
 
             Container.RegisterSingleton(f => Mock.Of<IContentService>());
             Container.RegisterSingleton(f => userServiceMock.Object);
             Container.RegisterSingleton(f => entityService.Object);
             Container.RegisterSingleton(f => dataTypeService.Object);
+            Container.RegisterSingleton(f => Mock.Of<ICultureDictionaryFactory>());
+            Container.RegisterSingleton(f => new UmbracoApiControllerTypeCollection(new[] { typeof(ContentTreeController) }));
         }
 
-        private IDataType MockedDataType()
-        {
-            return Mock.Of<IDataType>(type => type.Id == 9876 && type.Name == "text");
-        }
-        
         private MultipartFormDataContent GetMultiPartRequestContent(string json)
         {
             var multiPartBoundary = "----WebKitFormBoundary123456789";
@@ -89,7 +95,49 @@ namespace Umbraco.Tests.Web.Controllers
             };
         }
 
-        private const string PublishJson1 = @"{
+        private IContent GetMockedContent()
+        {
+            var content = MockedContent.CreateSimpleContent(MockedContentTypes.CreateSimpleContentType());
+            content.Id = 123;
+            content.Path = "-1,123";
+            //ensure things have ids
+            var ids = 888;
+            foreach (var g in content.PropertyGroups)
+            {
+                g.Id = ids;
+                ids++;
+            }
+            foreach (var p in content.PropertyTypes)
+            {
+                p.Id = ids;
+                ids++;
+            }
+            return content;
+        }
+
+        private const string PublishJsonInvariant = @"{
+    ""id"": 123,
+    ""contentTypeAlias"": ""page"",
+    ""parentId"": -1,
+    ""action"": ""save"",
+    ""variants"": [
+        {
+            ""name"": ""asdf"",
+            ""properties"": [
+                {
+                    ""id"": 1,
+                    ""alias"": ""title"",
+                    ""value"": ""asdf""
+                }
+            ],
+            ""culture"": null,
+            ""save"": true,
+            ""publish"": true
+        }
+    ]
+}";
+
+        private const string PublishJsonVariant = @"{
     ""id"": 123,
     ""contentTypeAlias"": ""page"",
     ""parentId"": -1,
@@ -142,12 +190,8 @@ namespace Umbraco.Tests.Web.Controllers
         {
             ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
             {
-                //var content = MockedContent.CreateSimpleContent(MockedContentTypes.CreateSimpleContentType());
-                //content.Id = 999999999; //this will not be found
-                //content.Path = "-1,999999999";
-
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
-                contentServiceMock.Setup(x => x.GetById(123)).Returns(() => null);
+                contentServiceMock.Setup(x => x.GetById(123)).Returns(() => null); //do not find it
 
                 var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
@@ -158,7 +202,7 @@ namespace Umbraco.Tests.Web.Controllers
 
             var runner = new TestRunner(Factory);
             var response = await runner.Execute("Content", "PostSave", HttpMethod.Post,
-                content: GetMultiPartRequestContent(PublishJson1),
+                content: GetMultiPartRequestContent(PublishJsonInvariant),
                 mediaTypeHeader: new MediaTypeWithQualityHeaderValue("multipart/form-data"),
                 assertOkResponse: false);
 
@@ -175,7 +219,7 @@ namespace Umbraco.Tests.Web.Controllers
             ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
             {
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
-                contentServiceMock.Setup(x => x.GetById(123)).Returns(() => null);
+                contentServiceMock.Setup(x => x.GetById(123)).Returns(() => GetMockedContent());
 
                 var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
@@ -184,9 +228,9 @@ namespace Umbraco.Tests.Web.Controllers
                 return usersController;
             }
 
-            var json = JsonConvert.DeserializeObject<JObject>(PublishJson1);
+            var json = JsonConvert.DeserializeObject<JObject>(PublishJsonInvariant);
             //remove all save flaggs
-            ((JArray)json["variants"])[2]["save"] = false;
+            ((JArray)json["variants"])[0]["save"] = false;
 
             var runner = new TestRunner(Factory);
             var response = await runner.Execute("Content", "PostSave", HttpMethod.Post,
@@ -202,20 +246,52 @@ namespace Umbraco.Tests.Web.Controllers
         /// Returns 404 if any of the posted properties dont actually exist
         /// </summary>
         /// <returns></returns>
-        [Test, Ignore("Not implemented yet")]
+        [Test]
         public async Task PostSave_Validate_Properties_Exist()
         {
-            //TODO: Make this work! to finish it, we need to include a property in the POST data that doesn't exist on the content type
-            // or change the content type below to not include one of the posted ones
+            ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
+            {
+                var contentServiceMock = Mock.Get(Current.Services.ContentService);
+                contentServiceMock.Setup(x => x.GetById(123)).Returns(() => GetMockedContent());
+
+                var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
+                var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
+                var usersController = new ContentController(publishedSnapshot, propertyEditorCollection);
+                Container.InjectProperties(usersController);
+                return usersController;
+            }
+
+            var json = JsonConvert.DeserializeObject<JObject>(PublishJsonInvariant);
+            //add a non-existent property to a variant being saved
+            var variantProps = (JArray)json["variants"].ElementAt(0)["properties"];
+            variantProps.Add(JObject.FromObject(new
+            {
+                id = 2,
+                alias = "doesntExist",
+                value = "hello"
+            }));
+
+            var runner = new TestRunner(Factory);
+            var response = await runner.Execute("Content", "PostSave", HttpMethod.Post,
+                content: GetMultiPartRequestContent(JsonConvert.SerializeObject(json)),
+                mediaTypeHeader: new MediaTypeWithQualityHeaderValue("multipart/form-data"),
+                assertOkResponse: false);
+
+            Assert.AreEqual(HttpStatusCode.NotFound, response.Item1.StatusCode);
+        }
+        
+        [Test]
+        public async Task PostSave_Simple_Invariant()
+        {
+            var content = GetMockedContent();
 
             ApiController Factory(HttpRequestMessage message, UmbracoHelper helper)
             {
-                var content = MockedContent.CreateSimpleContent(MockedContentTypes.CreateSimpleContentType());
-                content.Id = 123;
-                content.Path = "-1,123";
-
+                
                 var contentServiceMock = Mock.Get(Current.Services.ContentService);
-                contentServiceMock.Setup(x => x.GetById(123)).Returns(() => null);
+                contentServiceMock.Setup(x => x.GetById(123)).Returns(() => content);
+                contentServiceMock.Setup(x => x.Save(It.IsAny<IContent>(), It.IsAny<int>(), It.IsAny<bool>()))
+                    .Returns(new OperationResult(OperationResultType.Success, new Core.Events.EventMessages())); //success
 
                 var publishedSnapshot = Mock.Of<IPublishedSnapshotService>();
                 var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<DataEditor>()));
@@ -226,14 +302,18 @@ namespace Umbraco.Tests.Web.Controllers
 
             var runner = new TestRunner(Factory);
             var response = await runner.Execute("Content", "PostSave", HttpMethod.Post,
-                content: GetMultiPartRequestContent(PublishJson1),
+                content: GetMultiPartRequestContent(PublishJsonInvariant),
                 mediaTypeHeader: new MediaTypeWithQualityHeaderValue("multipart/form-data"),
                 assertOkResponse: false);
 
-            Assert.AreEqual(HttpStatusCode.NotFound, response.Item1.StatusCode);
-
-            //var obj = JsonConvert.DeserializeObject<PagedResult<UserDisplay>>(response.Item2);
-            //Assert.AreEqual(0, obj.TotalItems);
+            Assert.AreEqual(HttpStatusCode.OK, response.Item1.StatusCode);
+            var display = JsonConvert.DeserializeObject<ContentItemDisplay>(response.Item2);
+            Assert.AreEqual(1, display.Variants.Count());
+            Assert.AreEqual(content.PropertyGroups.Count(), display.Variants.ElementAt(0).Tabs.Count());
+            Assert.AreEqual(content.PropertyTypes.Count(), display.Variants.ElementAt(0).Tabs.ElementAt(0).Properties.Count());
         }
+
+        //TODO: There are SOOOOO many more tests we should write - a lot of them to do with validation
+    
     }
 }
