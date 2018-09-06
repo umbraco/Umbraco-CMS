@@ -2,9 +2,11 @@
 using System.Web.UI;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
+using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web._Legacy.Controls;
 using Umbraco.Web.UI.Pages;
 
@@ -83,8 +85,9 @@ namespace umbraco.presentation.developer.packages
             _installer.InstallCleanUp(packageId, dir);
 
             // Update ClientDependency version
-            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration(Logger);
-            clientDependencyConfig.IncreaseVersionNumber();
+            var clientDependencyConfig = new ClientDependencyConfiguration(Logger);
+            var clientDependencyUpdated = clientDependencyConfig.UpdateVersionNumber(
+                UmbracoVersion.SemanticVersion, DateTime.UtcNow, "yyyyMMdd");
 
             //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.
             ClientTools.ClearClientTreeCache().RefreshTree("packager");

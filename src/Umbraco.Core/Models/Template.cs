@@ -1,14 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.IO;
-using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Models

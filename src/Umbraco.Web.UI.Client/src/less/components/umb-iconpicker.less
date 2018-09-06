@@ -27,10 +27,16 @@
 }
 
 .umb-iconpicker-item a:hover,
-.umb-iconpicker-item a:focus,
-.umb-iconpicker-item.-selected {
+.umb-iconpicker-item a:focus {
     background: @gray-10;
     outline: none;
+}
+
+.umb-iconpicker-item.-selected {
+    background: @gray-10;
+    border: solid 1px @turquoise-d1;
+    border-radius: @baseBorderRadius;
+    box-sizing: border-box;
 }
 
 .umb-iconpicker-item a:active {
@@ -52,11 +58,6 @@
         display: inline-block;
         margin: 5px;
         border-radius: 3px;
-    }
-
-    // Hide Circle when not active
-    i.small{
-    display: none;
     }
 
     // Circle behind the checkmark

@@ -160,7 +160,8 @@ namespace Umbraco.Web.Components
             var task = new InstructionProcessTask(_processTaskRunner,
                 60000, //delay before first execution
                 _messenger.Options.ThrottleSeconds*1000, //amount of ms between executions
-                _messenger);
+                _messenger,
+                _logger);
             _processTaskRunner.TryAdd(task);
             return task;
         }
@@ -178,12 +179,14 @@ namespace Umbraco.Web.Components
         private class InstructionProcessTask : RecurringTaskBase
         {
             private readonly DatabaseServerMessenger _messenger;
+            private readonly ILogger _logger;
 
             public InstructionProcessTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-                DatabaseServerMessenger messenger)
+                DatabaseServerMessenger messenger, ILogger logger)
                 : base(runner, delayMilliseconds, periodMilliseconds)
             {
                 _messenger = messenger;
+                _logger = logger;
             }
 
             public override bool IsAsync => false;
@@ -194,8 +197,14 @@ namespace Umbraco.Web.Components
             /// <returns>A value indicating whether to repeat the task.</returns>
             public override bool PerformRun()
             {
-                // TODO what happens in case of an exception?
-                _messenger.Sync();
+                try
+                {
+                    _messenger.Sync();
+                }
+                catch (Exception e)
+                {
+                    _logger.Error<InstructionProcessTask>("Failed (will repeat).", e);
+                }
                 return true; // repeat
             }
         }

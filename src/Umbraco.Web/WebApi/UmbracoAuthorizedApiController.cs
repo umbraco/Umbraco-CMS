@@ -1,6 +1,7 @@
 ﻿using Umbraco.Web.WebApi.Filters;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Security;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.WebApi
 {

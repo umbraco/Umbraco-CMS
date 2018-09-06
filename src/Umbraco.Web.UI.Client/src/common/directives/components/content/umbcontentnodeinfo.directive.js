@@ -13,7 +13,7 @@
             scope.disableTemplates = Umbraco.Sys.ServerVariables.features.disabledFeatures.disableTemplates;
             scope.allowChangeDocumentType = false;
             scope.allowChangeTemplate = false;
-            
+
             function onInit() {
 
                 userService.getCurrentUser().then(function(user){
@@ -71,10 +71,11 @@
 
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
-                
-                // Declare a fallback URL for the <umb-node-preview/> directive
-                scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
 
+                // Declare a fallback URL for the <umb-node-preview/> directive
+                if (scope.documentType !== null) {
+                    scope.previewOpenUrl = '#/settings/documenttypes/edit/' + scope.documentType.id;
+                }
             }
 
             scope.auditTrailPageChange = function (pageNumber) {
@@ -142,7 +143,7 @@
                                 item.timestampFormatted = dateHelper.getLocalDate(item.timestamp, currentUser.locale, 'LLL');
                             });
                         });
-                    
+
                         scope.auditTrail = data.items;
                         scope.auditTrailOptions.pageNumber = data.pageNumber;
                         scope.auditTrailOptions.pageSize = data.pageSize;
@@ -150,7 +151,7 @@
                         scope.auditTrailOptions.totalPages = data.totalPages;
 
                         setAuditTrailLogTypeColor(scope.auditTrail);
-                        
+
                         scope.loadingAuditTrail = false;
                     });
 
@@ -158,6 +159,7 @@
 
             function setAuditTrailLogTypeColor(auditTrail) {
                 angular.forEach(auditTrail, function (item) {
+
                     switch (item.logType) {
                         case "Publish":
                             item.logTypeColor = "success";
@@ -286,7 +288,7 @@
                 eventsService.emit("editors.content.changeUnpublishDate", args);
 
             }
-            
+
             function ucfirst(string) {
                 return string.charAt(0).toUpperCase() + string.slice(1);
             }
@@ -295,13 +297,13 @@
                 // get current backoffice user and format dates
                 userService.getCurrentUser().then(function (currentUser) {
                     scope.node.createDateFormatted = dateHelper.getLocalDate(scope.node.createDate, currentUser.locale, 'LLL');
-                    
+
                     scope.node.releaseDateYear = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'YYYY')) : null;
                     scope.node.releaseDateMonth = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'MMMM')) : null;
                     scope.node.releaseDateDayNumber = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'DD')) : null;
                     scope.node.releaseDateDay = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'dddd')) : null;
                     scope.node.releaseDateTime = scope.node.releaseDate ? ucfirst(dateHelper.getLocalDate(scope.node.releaseDate, currentUser.locale, 'HH:mm')) : null;
-                    
+
                     scope.node.removeDateYear = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'YYYY')) : null;
                     scope.node.removeDateMonth = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'MMMM')) : null;
                     scope.node.removeDateDayNumber = scope.node.removeDate ? ucfirst(dateHelper.getLocalDate(scope.node.removeDate, currentUser.locale, 'DD')) : null;
@@ -326,8 +328,8 @@
             scope.$watch('node.updateDate', function(newValue, oldValue){
 
                 if(!newValue) { return; }
-                if(newValue === oldValue) { return; }             
-                
+                if(newValue === oldValue) { return; }
+
                 if(isInfoTab) {
                     loadAuditTrail();
                     formatDatesToLocal();

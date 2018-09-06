@@ -77,7 +77,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 {
                     var strLinkId = linkData.Link;
                     var udiAttempt = strLinkId.TryConvertTo<GuidUdi>();
-                    if (udiAttempt.Success)
+                    if (udiAttempt.Success && udiAttempt.Result != null)
                     {
                         var content = _publishedSnapshotAccessor.PublishedSnapshot.Content.GetById(udiAttempt.Result.Guid);
                         if (content != null)
