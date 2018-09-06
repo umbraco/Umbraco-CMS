@@ -23,7 +23,8 @@ namespace Umbraco.Web.Models.Mapping
 
         public UserProfile Resolve(TPersisted source)
         {
-            return Mapper.Map<IProfile, UserProfile>(source.GetCreatorProfile(_userService));
+            var profile = source.GetCreatorProfile(_userService);
+            return profile == null ? null : Mapper.Map<IProfile, UserProfile>(profile);
         }
     }
 }

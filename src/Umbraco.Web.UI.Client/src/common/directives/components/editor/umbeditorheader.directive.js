@@ -209,6 +209,13 @@ Use this directive to construct a header inside the main editor window.
         function link(scope, el, attr, ctrl) {
 
 
+            if (!scope.serverValidationNameField) {
+                scope.serverValidationNameField = "Name";
+            }
+            if (!scope.serverValidationAliasField) {
+                scope.serverValidationAliasField = "Alias";
+            }
+
             scope.vm = {};
             scope.vm.dropdownOpen = false;
             scope.vm.currentVariant = "";
@@ -324,7 +331,9 @@ Use this directive to construct a header inside the main editor window.
                 splitViewOpen: "=?",
                 onOpenInSplitView: "&?",
                 onCloseSplitView: "&?",
-                onSelectVariant: "&?"
+                onSelectVariant: "&?",
+                serverValidationNameField: "@?",
+                serverValidationAliasField: "@?"
             },
             link: link
         };
