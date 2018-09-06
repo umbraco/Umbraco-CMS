@@ -84,15 +84,15 @@ namespace Umbraco.Core.Logging
             {
                 if (_failed)
                 {
-                    _logger.Error(_loggerType, _failException, "[Timing {TimingId}] {FailMessage} ({TimingDuration}ms)", _timingId, _failMessage, Stopwatch.ElapsedMilliseconds);
+                    _logger.Error(_loggerType, _failException, "[Timing {TimingId}] {FailMessage} ({Duration}ms)", _timingId, _failMessage, Stopwatch.ElapsedMilliseconds);
                 }
                 else switch (_level)
                 {
                     case LogLevel.Debug:
-                        _logger.Debug(_loggerType, "[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)", _timingId, _endMessage, Stopwatch.ElapsedMilliseconds);
+                        _logger.Debug(_loggerType, "[Timing {TimingId}] {EndMessage} ({Duration}ms)", _timingId, _endMessage, Stopwatch.ElapsedMilliseconds);
                         break;
                     case LogLevel.Information:
-                        _logger.Info(_loggerType, "[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)", _timingId, _endMessage, Stopwatch.ElapsedMilliseconds);
+                        _logger.Info(_loggerType, "[Timing {TimingId}] {EndMessage} ({Duration}ms)", _timingId, _endMessage, Stopwatch.ElapsedMilliseconds);
                         break;
                     // filtered in the ctor
                     //default:

@@ -604,7 +604,7 @@ namespace Umbraco.Web
                 if (UmbracoContext.Current != null)
                 {
                     Logger.Verbose<UmbracoModule>(
-                        "Request: {RequestUrl} ({RequestTotalMilliseconds}ms)",
+                        "Request: {RequestUrl} took {Duration}ms",
                         httpContext.Request.Url,
                         DateTime.Now.Subtract(UmbracoContext.Current.ObjectCreated).TotalMilliseconds);
                 }
