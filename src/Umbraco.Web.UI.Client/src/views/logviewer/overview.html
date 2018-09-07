@@ -11,8 +11,8 @@
         </umb-editor-header>
 
         <umb-editor-container>
-            
-            <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>            
+
+            <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
             <umb-editor-sub-header>
                 <umb-editor-sub-header-content-left style="width:calc(100% - 350px - 20px);">
@@ -56,7 +56,7 @@
             </umb-editor-sub-header>
 
             <umb-editor-sub-header>
-                <umb-editor-sub-header-content-left style="width:calc(100% - 350px - 20px);">                    
+                <umb-editor-sub-header-content-left style="width:calc(100% - 350px - 20px);">
                     <!-- Search/expression filter -->
                     <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:100%;" />
                     <umb-button
@@ -69,9 +69,9 @@
             </umb-editor-sub-header>
 
             <div class="umb-package-details" ng-if="!vm.loading">
-                
+
                 <div class="umb-package-details__main-content">
-            
+
                     <!-- Loader for the main logs content when paging -->
                     <umb-load-indicator ng-if="vm.logsLoading"></umb-load-indicator>
 
@@ -81,17 +81,17 @@
                     </umb-empty-state>
 
                     <!-- Main Log Table -->
-                    <umb-box data-element="node-info-history" ng-if="!vm.logsLoading && vm.logItems.totalItems > 0">                        
+                    <umb-box data-element="node-info-history" ng-if="!vm.logsLoading && vm.logItems.totalItems > 0">
                         <umb-box-content class="block-form">
                             <div ng-if="vm.logItems.totalItems > 0">
                                 Total Items: {{ vm.logItems.totalItems }}
                             </div>
-            
+
                             <table class="table table-hover" ng-if="vm.logItems.totalItems > 0">
                                 <thead>
                                     <tr>
                                         <th style="min-width:100px;" ng-click="vm.toggleOrderBy()">
-                                            Timestamp 
+                                            Timestamp
                                             <ins class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</ins>
                                         </th>
                                         <th>Level</th>
@@ -114,7 +114,7 @@
                                                 <h3>Exception</h3>
                                                 <p style="white-space: pre-wrap;">{{ log.Exception }}</p>
                                             </div>
-                                                                                        
+
                                             <h3>Properties</h3>
                                             <div ng-repeat="(key, val) in log.Properties">
                                                 <strong>{{ key }}</strong> {{ val.Value }}
@@ -123,7 +123,7 @@
                                     </tr>
                                 </tbody>
                             </table>
-            
+
                             <!-- Pagination -->
                             <div ng-if="!vm.loading" class="flex justify-center">
                                 <umb-pagination
@@ -137,7 +137,7 @@
                         </umb-box-content>
                     </umb-box>
                 </div>
-            
+
                 <div class="umb-package-details__sidebar">
 
                     <!-- No of Errors -->
@@ -153,11 +153,11 @@
                         <umb-box-header>Log Types</umb-box-header>
                         <umb-box-content class="block-form">
 
-                            <canvas 
-                                chart-doughnut 
-                                chart-data="vm.logTypeData" 
+                            <canvas
+                                chart-doughnut
+                                chart-data="vm.logTypeData"
                                 chart-labels="vm.logTypeLabels"
-                                chart-colors="vm.logTypeColors" 
+                                chart-colors="vm.logTypeColors"
                                 chart-options="vm.chartOptions"></canvas>
 
                         </umb-box-content>
@@ -167,13 +167,13 @@
                     <umb-box data-element="node-info-scheduled-publishing" ng-if="vm.commonLogMessages">
                             <umb-box-header>Common Log Messages</umb-box-header>
                             <umb-box-content class="block-form">
-
+                                <em>Total Unique Message types</em>: {{ vm.commonLogMessages.length }}
                                     <table class="table table-hover">
                                         <tbody>
-                                            <tr ng-repeat="template in vm.commonLogMessages">
+                                            <tr ng-repeat="template in vm.commonLogMessages | limitTo:10">
                                                 <td>
                                                     {{ template.MessageTemplate }}
-                                                </td>          
+                                                </td>
                                                 <td>
                                                     {{ template.Count }}
                                                 </td>
@@ -183,7 +183,7 @@
                             </umb-box-content>
                         </umb-box>
                 </div>
-            </div>            
+            </div>
 
         </umb-editor-container>
 

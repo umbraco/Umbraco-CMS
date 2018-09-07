@@ -334,7 +334,7 @@
     <Compile Include="KeyValuePairExtensions.cs" />
     <Compile Include="Logging\SerilogExtensions\LoggerConfigExtensions.cs" />
     <Compile Include="Logging\SerilogExtensions\Log4NetLevelMapperEnricher.cs" />
-    <Compile Include="Logging\Viewer\CommonLogMessage.cs" />
+    <Compile Include="Logging\Viewer\LogTemplate.cs" />
     <Compile Include="Logging\Viewer\ILogViewer.cs" />
     <Compile Include="Logging\Viewer\LogLevelCounts.cs" />
     <Compile Include="Logging\Viewer\JsonLogViewer.cs" />

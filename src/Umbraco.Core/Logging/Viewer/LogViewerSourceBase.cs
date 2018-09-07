@@ -31,13 +31,12 @@ namespace Umbraco.Core.Logging.Viewer
             };
         }
 
-        public IEnumerable<CommonLogMessage> GetCommonLogMessages(DateTimeOffset startDate, DateTimeOffset endDate, int numberOfResults)
+        public IEnumerable<LogTemplate> GetMessageTemplates(DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var logs = GetAllLogs(startDate, endDate);
             var templates = logs.GroupBy(x => x.MessageTemplate.Text)
-                .Select(g => new CommonLogMessage { MessageTemplate = g.Key, Count = g.Count() })
-                .OrderByDescending(x => x.Count)
-                .Take(numberOfResults);
+                .Select(g => new LogTemplate { MessageTemplate = g.Key, Count = g.Count() })
+                .OrderByDescending(x => x.Count);
 
             return templates;
         }

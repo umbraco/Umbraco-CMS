@@ -2,7 +2,7 @@
     * @ngdoc service
     * @name umbraco.resources.logViewerResource
     * @description Retrives Umbraco log items (by default from JSON files on disk)
-    * 
+    *
     *
     **/
    function logViewerResource($q, $http, umbRequestHelper) {
@@ -28,13 +28,13 @@
                 'Failed to retrieve log level counts');
         },
 
-        getCommonLogMessages: function(){
+        getMessageTemplates: function(){
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "logViewerApiBaseUrl",
-                        "GetCommonLogMessages")),
-                'Failed to retrieve common log messages');
+                        "GetMessageTemplates")),
+                'Failed to retrieve log templates');
         },
 
         getLogs: function(options){
@@ -65,7 +65,7 @@
                         options)),
                 'Failed to retrieve common log messages');
         }
-        
+
     };
 }
 

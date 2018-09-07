@@ -34,9 +34,9 @@ namespace Umbraco.Web.Editors
         }
 
         [HttpGet]
-        public IEnumerable<CommonLogMessage> GetCommonLogMessages()
+        public IEnumerable<LogTemplate> GetMessageTemplates()
         {
-            return _logViewer.GetCommonLogMessages(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
+            return _logViewer.GetMessageTemplates(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now);
         }
 
         [HttpGet]

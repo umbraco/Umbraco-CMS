@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LogViewerOverviewController($scope, $q, localizationService, logViewerResource) {
+    function LogViewerOverviewController($q, logViewerResource) {
 
         var vm = this;
 
@@ -102,34 +102,19 @@
                 vm.logTypeData.push(data.Fatal);
             });
 
-            var commonMsgs = logViewerResource.getCommonLogMessages().then(function(data){
+            var commonMsgs = logViewerResource.getMessageTemplates().then(function(data){
                 vm.commonLogMessages = data;
             });
 
             //Set loading indicatior to false when these 3 queries complete
             $q.all([numOfErrors, logCounts, commonMsgs]).then(function(data) {
-                vm.loading = false; 
+                vm.loading = false;
               });
 
             //Get all logs on init load
             getLogs();
+        }
 
-            // localize labels
-            var labelKeys = [
-                "treeHeaders_languages",
-                "general_mandatory",
-                "general_default"
-            ];
-
-            localizationService.localizeMany(labelKeys).then(function (values) {
-                vm.labels.languages = values[0];
-                vm.labels.mandatory = values[1];
-                vm.labels.general = values[2];
-                // set page name
-                vm.page.name = vm.labels.languages;
-            });            
-        }        
-       
 
         function search(){
             //Reset pagenumber back to 1

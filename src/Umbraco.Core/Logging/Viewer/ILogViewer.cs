@@ -25,9 +25,9 @@ namespace Umbraco.Core.Logging.Viewer
         LogLevelCounts GetLogLevelCounts(DateTimeOffset startDate, DateTimeOffset endDate);
 
         /// <summary>
-        /// Returns the top 10 common log message templates and their counts
+        /// Returns a list of all unique message templates and their counts
         /// </summary>
-        IEnumerable<CommonLogMessage> GetCommonLogMessages(DateTimeOffset startDate, DateTimeOffset endDate, int numberOfResults = 10);
+        IEnumerable<LogTemplate> GetMessageTemplates(DateTimeOffset startDate, DateTimeOffset endDate);
 
         /// <summary>
         /// Returns the collection of logs
