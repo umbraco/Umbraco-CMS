@@ -204,7 +204,7 @@ Use this directive to construct a header inside the main editor window.
 (function () {
     'use strict';
 
-    function EditorHeaderDirective(iconHelper, editorService, $location, $routeParams) {
+    function EditorHeaderDirective($timeout, editorService, $location, $routeParams) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -282,6 +282,16 @@ Use this directive to construct a header inside the main editor window.
                 }
             };
 
+            /**
+             * keep track of open variants - this is used to prevent the same variant to be open in more than one split view
+             * @param {any} culture
+             */
+            scope.variantIsOpen = function(culture) {
+                if(scope.openVariants.indexOf(culture) !== -1) {
+                    return true;
+                }
+            }
+
             onInit();
 
             //watch for the active culture changing, if it changes, update the current variant
@@ -323,6 +333,7 @@ Use this directive to construct a header inside the main editor window.
                 hideDescription: "@",
                 descriptionLocked: "@",
                 variants: "=",
+                openVariants: "<",
                 hideChangeVariant: "<?",
                 navigation: "=",
                 key: "=",
