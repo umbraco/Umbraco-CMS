@@ -49,7 +49,6 @@
     <RestorePackages>true</RestorePackages>
     <MvcProjectUpgradeChecked>true</MvcProjectUpgradeChecked>
     <UseGlobalApplicationHostFile />
-    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
@@ -488,39 +487,6 @@
     <Content Include="Config\Lang\ru-RU.user.xml" />
     <Content Include="Config\Lang\sv-SE.user.xml" />
     <Content Include="Config\Lang\zh-CN.user.xml" />
-    <Content Include="Umbraco\assets\css\canvasdesigner.css" />
-    <Content Include="Umbraco\assets\css\installer.css" />
-    <Content Include="Umbraco\assets\css\nonodes.style.min.css" />
-    <Content Include="Umbraco\assets\css\umbraco.css" />
-    <Content Include="Umbraco\assets\fonts\helveticons\helveticons.svg" />
-    <Content Include="Umbraco\assets\fonts\opensans\OpenSans-Regular-webfont.svg" />
-    <Content Include="Umbraco\assets\fonts\opensans\OpenSans-Semibold-webfont.svg" />
-    <Content Include="Umbraco\assets\img\applicationIcons\content.png" />
-    <Content Include="Umbraco\assets\img\applicationIcons\default.png" />
-    <Content Include="Umbraco\assets\img\applicationIcons\developer.png" />
-    <Content Include="Umbraco\assets\img\applicationIcons\help.svg" />
-    <Content Include="Umbraco\assets\img\applicationIcons\hlvticons-umbraco.svg" />
-    <Content Include="Umbraco\assets\img\applicationIcons\media.png" />
-    <Content Include="Umbraco\assets\img\applicationIcons\members.png" />
-    <Content Include="Umbraco\assets\img\applicationIcons\search.png" />
-    <Content Include="Umbraco\assets\img\applicationIcons\settings.png" />
-    <Content Include="Umbraco\assets\img\applicationIcons\tree-arrow.png" />
-    <Content Include="Umbraco\assets\img\applicationIcons\users.png" />
-    <Content Include="Umbraco\assets\img\application\logo%402x.png" />
-    <Content Include="Umbraco\assets\img\application\logo%403x.png" />
-    <Content Include="Umbraco\assets\img\application\logo.png" />
-    <Content Include="Umbraco\assets\img\application\logo_black.png" />
-    <Content Include="Umbraco\assets\img\application\logo_white.png" />
-    <Content Include="Umbraco\assets\img\checkered-background-20.png" />
-    <Content Include="Umbraco\assets\img\checkered-background.png" />
-    <Content Include="Umbraco\assets\img\forms\installer-background.png" />
-    <Content Include="Umbraco\assets\img\installer.jpg" />
-    <Content Include="Umbraco\assets\img\loader.gif" />
-    <Content Include="Umbraco\assets\img\logo.png" />
-    <Content Include="Umbraco\assets\img\nonodesbg.jpg" />
-    <Content Include="Umbraco\assets\img\transparent.png" />
-    <Content Include="Umbraco\assets\img\uploader\upload-illustration.png" />
-    <Content Include="Umbraco\assets\img\uploader\upload-illustration.svg" />
     <Content Include="Umbraco\Config\Lang\cs.xml" />
     <Content Include="Umbraco\ClientRedirect.aspx" />
     <Content Include="Umbraco\Config\Lang\tr.xml" />
@@ -618,60 +584,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </Content>
-    <Content Include="Umbraco\assets\fonts\helveticons\helveticons.eot" />
-    <Content Include="Umbraco\assets\fonts\helveticons\helveticons.ttf" />
-    <Content Include="Umbraco\assets\fonts\helveticons\helveticons.woff" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Black.eot" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Black.ttf" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Black.woff" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Black.woff2" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-BlackItalic.eot" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-BlackItalic.ttf" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-BlackItalic.woff" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-BlackItalic.woff2" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Bold.eot" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Bold.ttf" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Bold.woff" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Bold.woff2" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-BoldItalic.eot" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-BoldItalic.ttf" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-BoldItalic.woff" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-BoldItalic.woff2" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Italic.eot" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Italic.ttf" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Italic.woff" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Italic.woff2" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Light.eot" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Light.ttf" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Light.woff" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Light.woff2" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-LightItalic.eot" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-LightItalic.ttf" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-LightItalic.woff" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-LightItalic.woff2" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Regular.eot" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Regular.ttf" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Regular.woff" />
-    <Content Include="Umbraco\assets\fonts\lato\LatoLatin-Regular.woff2" />
-    <Content Include="Umbraco\assets\fonts\opensans\OpenSans-Regular-webfont.eot" />
-    <Content Include="Umbraco\assets\fonts\opensans\OpenSans-Regular-webfont.ttf" />
-    <Content Include="Umbraco\assets\fonts\opensans\OpenSans-Regular-webfont.woff" />
-    <Content Include="Umbraco\assets\fonts\opensans\OpenSans-Regular.ttf" />
-    <Content Include="Umbraco\assets\fonts\opensans\OpenSans-Semibold-webfont.eot" />
-    <Content Include="Umbraco\assets\fonts\opensans\OpenSans-Semibold-webfont.ttf" />
-    <Content Include="Umbraco\assets\fonts\opensans\OpenSans-Semibold-webfont.woff" />
-    <Content Include="Umbraco\assets\fonts\web.config" />
-    <Content Include="Umbraco\assets\less\background.less" />
-    <Content Include="Umbraco\assets\less\border.less" />
-    <Content Include="Umbraco\assets\less\color.less" />
-    <Content Include="Umbraco\assets\less\googlefontpicker.less" />
-    <Content Include="Umbraco\assets\less\gridRow.less" />
-    <Content Include="Umbraco\assets\less\layout.less" />
-    <Content Include="Umbraco\assets\less\margin.less" />
-    <Content Include="Umbraco\assets\less\padding.less" />
-    <Content Include="Umbraco\assets\less\radius.less" />
-    <Content Include="Umbraco\assets\less\shadow.less" />
-    <Content Include="Umbraco\assets\less\slider.less" />
     <None Include="Umbraco\Config\Create\UI.Release.xml">
       <DependentUpon>UI.xml</DependentUpon>
     </None>
