@@ -1574,5 +1574,29 @@ namespace Umbraco.Core
             guid[left] = guid[right];
             guid[right] = temp;
         }
+
+
+        /// <summary>
+        /// Converts a file name to a friendly name for a content item
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public static string friendlyNameFromFilename(this string fileName)
+        {
+            // strip the file extension
+            fileName = StripFileExtension(fileName);
+
+            // underscores and dashes to spaces
+            fileName = ReplaceMany(fileName, new char[] { '_', '-' }, ' ');
+
+            // any other conversions ?
+
+            // Pascalcase (to be done last)
+            fileName = System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(fileName);
+
+
+            return fileName;
+        }
+
     }
 }
