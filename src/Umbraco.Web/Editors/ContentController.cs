@@ -456,7 +456,8 @@ namespace Umbraco.Web.Editors
                 string orderBy = "SortOrder",
                 Direction orderDirection = Direction.Ascending,
                 bool orderBySystemField = true,
-                string filter = "")
+                string filter = "",
+                string cultureName = "")
         {
             long totalChildren;
             IContent[] children;
@@ -493,12 +494,18 @@ namespace Umbraco.Web.Editors
                 Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(content,
                     opts =>
                     {
+                        if(string.IsNullOrEmpty(cultureName) == false)
+                        {
+                            opts.AfterMap((source, target) => target.Name = source.GetCultureName(cultureName));
+                        }
+
                         // if there's a list of property aliases to map - we will make sure to store this in the mapping context.
                         if (String.IsNullOrWhiteSpace(includeProperties) == false)
                         {
                             opts.Items["IncludeProperties"] = includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries);
                         }
                     }));
+
 
             return pagedResult;
         }
