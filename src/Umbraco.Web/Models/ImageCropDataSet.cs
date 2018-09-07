@@ -31,6 +31,9 @@ namespace Umbraco.Web.Models
         [DataMember(Name = "crops")]
         public IEnumerable<ImageCropData> Crops { get; set; }
 
+        [DataMember(Name = "udi")]
+        public Udi Udi { get; set; }
+
         public string GetCropUrl(string alias, bool useCropDimensions = true, bool useFocalPoint = false, string cacheBusterValue = null)
         {
 
@@ -42,6 +45,8 @@ namespace Umbraco.Web.Models
             }
 
             var sb = new StringBuilder();
+
+            sb.Append(this.GetSrc());
 
             var cropBaseUrl = this.GetCropBaseUrl(alias, useFocalPoint);
             if (cropBaseUrl != null)
@@ -76,12 +81,31 @@ namespace Umbraco.Web.Models
 
         public bool HasImage()
         {
-            return ! string.IsNullOrEmpty(Src);
+            return !string.IsNullOrEmpty(this.GetSrc());
+        }
+
+        public string GetSrc()
+        {
+            // if no cropdataset has udi, locate the src
+            if (this.Udi != null)
+            {
+                var mediaId = ApplicationContext.Current.Services.EntityService.GetIdForUdi(Udi);
+                if (mediaId.Success)
+                {
+                    var mediaItem = UmbracoContext.Current.MediaCache.GetById(mediaId.Result);
+                    if (mediaItem != null)
+                    {
+                        return mediaItem.Url;
+                    }
+                }
+            }
+
+            return this.Src;
         }
 
         public string ToHtmlString()
         {
-            return this.Src;
+            return this.GetSrc();
         }
 
         /// <summary>
@@ -108,7 +132,7 @@ namespace Umbraco.Web.Models
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
             return string.Equals(Src, other.Src) && Equals(FocalPoint, other.FocalPoint) 
-                && Crops.SequenceEqual(other.Crops);
+                && Crops.SequenceEqual(other.Crops) && Udi.Equals(other.Udi);
         }
 
         /// <summary>
@@ -137,6 +161,7 @@ namespace Umbraco.Web.Models
             unchecked
             {
                 var hashCode = (Src != null ? Src.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Udi != null ? Udi.GetHashCode() : 0);
                 hashCode = (hashCode*397) ^ (FocalPoint != null ? FocalPoint.GetHashCode() : 0);
                 hashCode = (hashCode*397) ^ (Crops != null ? Crops.GetHashCode() : 0);
                 return hashCode;
