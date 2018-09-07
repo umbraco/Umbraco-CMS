@@ -717,7 +717,7 @@ namespace Umbraco.Web.Editors
                         mediaType = result.FormData["contentTypeAlias"];
                     }
 
-                    var mediaItemName = fileName.friendlyNameFromFilename();
+                    var mediaItemName = fileName.ToFriendlyName();
 
                     var f = mediaService.CreateMedia(mediaItemName, parentId, mediaType, Security.CurrentUser.Id);
 
