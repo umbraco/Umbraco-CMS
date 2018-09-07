@@ -242,7 +242,6 @@ namespace Umbraco.Core
 
         #region SetValue for setting file contents
 
-
         /// <summary>
         /// Sets the posted file value of a property.
         /// </summary>
