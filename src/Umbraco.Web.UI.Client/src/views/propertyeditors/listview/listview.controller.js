@@ -1,4 +1,4 @@
-function listViewController($scope, $routeParams, $injector, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $timeout, mediaResource, listViewHelper, navigationService, editorService) {
+function listViewController($scope, $routeParams, $injector, $location, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, mediaResource, listViewHelper, navigationService, editorService) {
 
    //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
    // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -74,7 +74,7 @@ function listViewController($scope, $routeParams, $injector, currentUserResource
                "canCopy": _.contains(currentUserPermissions, 'O'), //Magic Char = O
                "canCreate": _.contains(currentUserPermissions, 'C'), //Magic Char = C
                "canDelete": _.contains(currentUserPermissions, 'D'), //Magic Char = D
-               "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M                
+               "canMove": _.contains(currentUserPermissions, 'M'), //Magic Char = M
                "canPublish": _.contains(currentUserPermissions, 'U'), //Magic Char = U
                "canUnpublish": _.contains(currentUserPermissions, 'U') //Magic Char = Z (however UI says it can't be set, so if we can publish 'U' we can unpublish)
            };
@@ -136,6 +136,9 @@ function listViewController($scope, $routeParams, $injector, currentUserResource
 
    }
 
+   //Get the current culturename from the QueryString - to pass into the WebAPI call
+   var cultureNameQs = $location.search().mculture;
+
    $scope.options = {
       displayAtTabNumber: $scope.model.config.displayAtTabNumber ? $scope.model.config.displayAtTabNumber : 1,
       pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
@@ -156,7 +159,8 @@ function listViewController($scope, $routeParams, $injector, currentUserResource
       allowBulkUnpublish: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkUnpublish,
       allowBulkCopy: $scope.entityType === 'content' && $scope.model.config.bulkActionPermissions.allowBulkCopy,
       allowBulkMove: $scope.model.config.bulkActionPermissions.allowBulkMove,
-      allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete
+      allowBulkDelete: $scope.model.config.bulkActionPermissions.allowBulkDelete,
+      cultureName: cultureNameQs
    };
 
     // Check if selected order by field is actually custom field
