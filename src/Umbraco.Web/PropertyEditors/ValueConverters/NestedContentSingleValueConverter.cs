@@ -3,10 +3,11 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-    [DefaultPropertyValueConverter]
+    [DefaultPropertyValueConverter(typeof(JsonValueConverter))]
     [PropertyValueType(typeof(IPublishedContent))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     public class NestedContentSingleValueConverter : PropertyValueConverterBase
