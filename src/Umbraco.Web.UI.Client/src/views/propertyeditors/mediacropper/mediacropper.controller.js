@@ -3,7 +3,7 @@
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaCropperController",
     function ($scope, entityResource, mediaHelper, $timeout, userService, $location, localizationService) {
 
-        var config = angular.copy($scope.model.config);
+        var defaultConfig = angular.copy($scope.model.config);
 
         //check the pre-values for multi-picker
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
@@ -150,7 +150,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaCropperContro
             $scope.mediaPickerOverlay = {
                 view: "views/propertyeditors/imagecropper/imagecropper.html",
                 title: "Crop settings",
-                config: config,
+                config: $scope.model.config,
                 value: cropDataSet[0],
                 show: true,
                 submit: function (model) {
@@ -165,6 +165,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaCropperContro
 
                     $scope.mediaPickerOverlay.show = false;
                     $scope.mediaPickerOverlay = null;
+
+                    $scope.model.config = defaultConfig;
                 }
             };
         }
@@ -217,17 +219,17 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaCropperContro
 
                     //sync any config changes with the editor and drop outdated crops
                     _.each(cropDataSet.crops, function (saved) {
-                        var configured = _.find(config.crops, function (item) { return item.alias === saved.alias });
+                        var configured = _.find($scope.model.config.crops, function (item) { return item.alias === saved.alias });
 
                         if (configured && configured.height === saved.height && configured.width === saved.width) {
                             configured.coordinates = saved.coordinates;
                         }
                     });
-                    cropDataSet.crops = config.crops;
+                    cropDataSet.crops = $scope.model.config.crops;
 
                     //restore focalpoint if missing
                     if (!cropDataSet.focalPoint) {
-                        cropDataSet.focalPoint = config.focalPoint;
+                        cropDataSet.focalPoint = $scope.model.config.focalPoint;
                     }
 
                     $scope.model.value[cropDataSetIndex] = cropDataSet;
@@ -249,8 +251,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaCropperContro
                 else {
                     var cropDataSet = {
                         udi: id,
-                        crops: config.crops,
-                        focalPoint: config.focalPoint
+                        crops: $scope.model.config.crops,
+                        focalPoint: $scope.model.config.focalPoint
                     }
                     newValue.push(cropDataSet);
                 }
