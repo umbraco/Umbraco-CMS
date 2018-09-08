@@ -170,6 +170,8 @@ namespace Umbraco.Core.Composing.LightInject
             switch (lifetime)
             {
                 case Lifetime.Transient:
+                    Container.Register(serviceType);
+                    break;
                 case Lifetime.Request:
                 case Lifetime.Scope:
                     Container.Register(serviceType, GetLifetime(lifetime));
@@ -188,6 +190,8 @@ namespace Umbraco.Core.Composing.LightInject
             switch (lifetime)
             {
                 case Lifetime.Transient:
+                    Container.Register(serviceType, implementingType, implementingType.Name);
+                    break;
                 case Lifetime.Request:
                 case Lifetime.Scope:
                     Container.Register(serviceType, implementingType, GetLifetime(lifetime));
@@ -206,6 +210,8 @@ namespace Umbraco.Core.Composing.LightInject
             switch (lifetime)
             {
                 case Lifetime.Transient:
+                    Container.Register(serviceType, implementingType, name);
+                    break;
                 case Lifetime.Request:
                 case Lifetime.Scope:
                     Container.Register(serviceType, implementingType, name, GetLifetime(lifetime));
@@ -224,6 +230,8 @@ namespace Umbraco.Core.Composing.LightInject
             switch (lifetime)
             {
                 case Lifetime.Transient:
+                    Container.Register(f => factory(this));
+                    break;
                 case Lifetime.Request:
                 case Lifetime.Scope:
                     Container.Register(f => factory(this), GetLifetime(lifetime));
@@ -242,6 +250,8 @@ namespace Umbraco.Core.Composing.LightInject
             switch (lifetime)
             {
                 case Lifetime.Transient:
+                    Container.Register(f => factory(this), name);
+                    break;
                 case Lifetime.Request:
                 case Lifetime.Scope:
                     Container.Register(f => factory(this), name, GetLifetime(lifetime));
