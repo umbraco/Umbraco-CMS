@@ -1,12 +1,3 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MediaPickerPropertyConverter.cs" company="Umbraco">
-//   Umbraco
-// </copyright>
-// <summary>
-//  The media picker 2 value converter
-// </summary>
-// --------------------------------------------------------------------------------------------------------------------
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -20,6 +11,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
 using Umbraco.Web.Extensions;
 using Umbraco.Web.Models;
@@ -27,28 +19,36 @@ using Umbraco.Web.Models;
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
     /// <summary>
-    /// The media picker property value converter.
+    /// Used to strongly type the value for the media cropper
     /// </summary>
-    [DefaultPropertyValueConverter]
-    public class MediaCropperPropertyConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
+    [DefaultPropertyValueConverter(typeof(JsonValueConverter))] //this shadows the JsonValueConverter
+    public class MediaCropperValueConverter : PropertyValueConverterBase, IPropertyValueConverterMeta
     {
         private readonly IDataTypeService _dataTypeService;
+        private readonly IEntityService _entityService;
 
-        //TODO: Remove this ctor in v8 since the other one will use IoC
-        public MediaCropperPropertyConverter()
-            : this(ApplicationContext.Current.Services.DataTypeService)
+        public MediaCropperValueConverter()
         {
+            _dataTypeService = ApplicationContext.Current.Services.DataTypeService;
+            _entityService = ApplicationContext.Current.Services.EntityService;
         }
 
-        public MediaCropperPropertyConverter(IDataTypeService dataTypeService)
+        public MediaCropperValueConverter(IDataTypeService dataTypeService, IEntityService entityService)
         {
             if (dataTypeService == null) throw new ArgumentNullException("dataTypeService");
+            if (entityService == null) throw new ArgumentNullException("entityService");
             _dataTypeService = dataTypeService;
+            _entityService = entityService;
+        }
+
+        public override bool IsConverter(PublishedPropertyType propertyType)
+        {
+            return propertyType.PropertyEditorAlias.InvariantEquals(Constants.PropertyEditors.MediaCropperAlias);
         }
 
         public Type GetPropertyValueType(PublishedPropertyType propertyType)
         {
-            return IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias) ? typeof(IEnumerable<ImageCropDataSet>) : typeof(ImageCropDataSet);
+            return IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias) ? typeof(IEnumerable<MediaCropDataSet>) : typeof(MediaCropDataSet);
         }
 
         public PropertyCacheLevel GetPropertyCacheLevel(PublishedPropertyType propertyType, PropertyCacheValue cacheValue)
@@ -71,6 +71,146 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             }
 
             return returnLevel;
+        }
+
+        internal static void MergePreValues(JArray currentValues, IDataTypeService dataTypeService, int dataTypeId)
+        {
+            //need to lookup the pre-values for this data type
+            //TODO: Change all singleton access to use ctor injection in v8!!!
+            var dt = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeId);
+
+            if (dt != null && dt.IsDictionaryBased && dt.PreValuesAsDictionary.ContainsKey("crops"))
+            {
+                var cropsString = dt.PreValuesAsDictionary["crops"].Value;
+                JArray preValueCrops;
+                try
+                {
+                    preValueCrops = JsonConvert.DeserializeObject<JArray>(cropsString);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<MediaCropperValueConverter>("Could not parse the string " + cropsString + " to a json object", ex);
+                    return;
+                }
+
+                //now we need to merge the crop values - the alias + width + height comes from pre-configured pre-values,
+                // however, each crop can store it's own coordinates
+
+                JArray existingCropsArray;
+
+                foreach (var currentValue in currentValues)
+                {
+                    if (currentValue["crops"] != null)
+                    {
+                        existingCropsArray = (JArray)currentValue["crops"];
+                    }
+                    else
+                    {
+                        currentValue["crops"] = existingCropsArray = new JArray();
+                    }
+
+                    foreach (var preValueCrop in preValueCrops.Where(x => x.HasValues))
+                    {
+                        var found = existingCropsArray.FirstOrDefault(x =>
+                        {
+                            if (x.HasValues && x["alias"] != null)
+                            {
+                                return x["alias"].Value<string>() == preValueCrop["alias"].Value<string>();
+                            }
+                            return false;
+                        });
+                        if (found != null)
+                        {
+                            found["width"] = preValueCrop["width"];
+                            found["height"] = preValueCrop["height"];
+                        }
+                        else
+                        {
+                            existingCropsArray.Add(preValueCrop);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
+        {
+            if (source == null) return null;
+            var sourceString = source.ToString();
+
+            if (!sourceString.DetectIsJson()) return null;
+
+            JArray obj;
+            try
+            {
+                obj = JsonConvert.DeserializeObject<JArray>(sourceString, new JsonSerializerSettings
+                {
+                    Culture = CultureInfo.InvariantCulture,
+                    FloatParseHandling = FloatParseHandling.Decimal
+                });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<MediaCropperValueConverter>("Could not parse the string " + sourceString + " to a json object", ex);
+                return null;
+            }
+
+            MergePreValues(obj, _dataTypeService, propertyType.DataTypeId);
+
+            return obj;
+
+
+        }
+
+        /// <summary>
+        /// Convert the source nodeId into a IPublishedContent (or DynamicPublishedContent)
+        /// </summary>
+        /// <param name="propertyType">
+        /// The published property type.
+        /// </param>
+        /// <param name="source">
+        /// The value of the property
+        /// </param>
+        /// <param name="preview">
+        /// The preview.
+        /// </param>
+        /// <returns>
+        /// The <see cref="object"/>.
+        /// </returns>
+        public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            var cropDataSets = ((JArray)source).ToObject<IEnumerable<MediaCropDataSet>>();
+
+            cropDataSets = cropDataSets.Select(cropDataSet => AddMediaItemToCropDataSet(cropDataSet)).Where(cropDataSet => cropDataSet.MediaItem != null);
+
+            if (IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias))
+            {
+                return cropDataSets;
+            }
+            else
+            {
+                return cropDataSets.FirstOrDefault();
+            }
+        }
+
+        private MediaCropDataSet AddMediaItemToCropDataSet(MediaCropDataSet cropDataSet)
+        {
+            var mediaId = _entityService.GetIdForUdi(cropDataSet.Udi);
+            if (!mediaId.Success) return null;
+
+            var mediaItem = UmbracoContext.Current.MediaCache.GetById(mediaId.Result);
+            if (mediaItem == null) return null;
+
+            cropDataSet.Src = mediaItem.Url;
+            cropDataSet.MediaItem = mediaItem;
+
+            return cropDataSet;
         }
 
         /// <summary>
@@ -115,149 +255,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
                 return false;
             });
-        }
-
-        /// <summary>
-        /// Checks if this converter can convert the property editor and registers if it can.
-        /// </summary>
-        /// <param name="propertyType">
-        /// The published property type.
-        /// </param>
-        /// <returns>
-        /// The <see cref="bool"/>.
-        /// </returns>
-        public override bool IsConverter(PublishedPropertyType propertyType)
-        {
-            if (propertyType.PropertyEditorAlias.Equals(Constants.PropertyEditors.MediaCropperAlias))
-                return true;
-
-            return false;
-        }
-
-
-        internal static void MergePreValues(JArray currentValues, IDataTypeService dataTypeService, int dataTypeId)
-        {
-            //need to lookup the pre-values for this data type
-            //TODO: Change all singleton access to use ctor injection in v8!!!
-            var dt = dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeId);
-
-            if (dt != null && dt.IsDictionaryBased && dt.PreValuesAsDictionary.ContainsKey("crops"))
-            {
-                var cropsString = dt.PreValuesAsDictionary["crops"].Value;
-                JArray preValueCrops;
-                try
-                {
-                    preValueCrops = JsonConvert.DeserializeObject<JArray>(cropsString);
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<ImageCropperValueConverter>("Could not parse the string " + cropsString + " to a json object", ex);
-                    return;
-                }
-
-                //now we need to merge the crop values - the alias + width + height comes from pre-configured pre-values,
-                // however, each crop can store it's own coordinates
-
-                JArray existingCropsArray;
-
-                foreach (var currentValue in currentValues)
-                {
-                    if (currentValue["crops"] != null)
-                    {
-                        existingCropsArray = (JArray)currentValue["crops"];
-                    }
-                    else
-                    {
-                        currentValue["crops"] = existingCropsArray = new JArray();
-                    }
-
-                    foreach (var preValueCrop in preValueCrops.Where(x => x.HasValues))
-                    {
-                        var found = existingCropsArray.FirstOrDefault(x =>
-                        {
-                            if (x.HasValues && x["alias"] != null)
-                            {
-                                return x["alias"].Value<string>() == preValueCrop["alias"].Value<string>();
-                            }
-                            return false;
-                        });
-                        if (found != null)
-                        {
-                            found["width"] = preValueCrop["width"];
-                            found["height"] = preValueCrop["height"];
-                        }
-                        else
-                        {
-                            existingCropsArray.Add(preValueCrop);
-                        }
-                    }
-                }
-            }
-        }
-
-        public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)
-        {
-            if (source == null) return null;
-            var sourceString = source.ToString();
-
-            if (sourceString.DetectIsJson())
-            {
-                JArray obj;
-                try
-                {
-                    obj = JsonConvert.DeserializeObject<JArray>(sourceString, new JsonSerializerSettings
-                    {
-                        Culture = CultureInfo.InvariantCulture,
-                        FloatParseHandling = FloatParseHandling.Decimal
-                    });
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<MediaCropperPropertyConverter>("Could not parse the string " + sourceString + " to a json object", ex);
-                    return sourceString;
-                }
-
-                MergePreValues(obj, _dataTypeService, propertyType.DataTypeId);
-
-                return obj;
-            }
-
-            //it's not json, just return the string
-            return sourceString;
-        }
-
-        /// <summary>
-        /// Convert the source nodeId into a IPublishedContent (or DynamicPublishedContent)
-        /// </summary>
-        /// <param name="propertyType">
-        /// The published property type.
-        /// </param>
-        /// <param name="source">
-        /// The value of the property
-        /// </param>
-        /// <param name="preview">
-        /// The preview.
-        /// </param>
-        /// <returns>
-        /// The <see cref="object"/>.
-        /// </returns>
-        public override object ConvertSourceToObject(PublishedPropertyType propertyType, object source, bool preview)
-        {
-            if (source == null)
-            {
-                return null;
-            }
-
-            var cropDataSets = ((JArray)source).ToObject<IEnumerable<ImageCropDataSet>>();
-
-            if (IsMultipleDataType(propertyType.DataTypeId, propertyType.PropertyEditorAlias))
-            {
-                return cropDataSets;
-            }
-            else
-            {
-                return cropDataSets.FirstOrDefault();
-            }
         }
 
         private static readonly ConcurrentDictionary<int, bool> Storages = new ConcurrentDictionary<int, bool>();

@@ -31,7 +31,7 @@ namespace Umbraco.Web.Models
         [DataMember(Name = "crops")]
         public IEnumerable<ImageCropData> Crops { get; set; }
 
-        public string GetCropUrl(string alias, bool useCropDimensions = true, bool useFocalPoint = false, string cacheBusterValue = null)
+        public virtual string GetCropUrl(string alias, bool useCropDimensions = true, bool useFocalPoint = false, string cacheBusterValue = null)
         {
 
             var crop = Crops.GetCrop(alias);

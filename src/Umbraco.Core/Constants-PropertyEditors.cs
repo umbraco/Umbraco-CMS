@@ -196,6 +196,11 @@ namespace Umbraco.Core
             public const string MacroContainerAlias = "Umbraco.MacroContainer";
 
             /// <summary>
+            /// Alias for the Media Cropper datatype.
+            /// </summary>
+            public const string MediaCropperAlias = "Umbraco.MediaCropper";
+
+            /// <summary>
             /// Guid for the Media Picker datatype.
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
