@@ -58,8 +58,9 @@ namespace Umbraco.Core.Composing.Composers
 
             //TODO: These are replaced in the web project - we need to declare them so that
             // something is wired up, just not sure this is very nice but will work for now.
-            container.RegisterSingleton<IApplicationTreeService, EmptyApplicationTreeService>();
-            container.RegisterSingleton<ISectionService, EmptySectionService>();
+            // fixme - we need to get rid of re-registering, and I need this gone for now. ><
+            //container.RegisterSingleton<IApplicationTreeService, EmptyApplicationTreeService>();
+            //container.RegisterSingleton<ISectionService, EmptySectionService>();
 
             return container;
         }
