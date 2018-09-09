@@ -169,5 +169,7 @@ namespace Umbraco.Core.Composing
         IContainer EnablePerWebRequestScope();
 
         #endregion
+
+        void Release(object instance);
     }
 }

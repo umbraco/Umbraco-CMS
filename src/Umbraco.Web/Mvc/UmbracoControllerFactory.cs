@@ -65,8 +65,14 @@ namespace Umbraco.Web.Mvc
         /// this nested class changes the visibility of <see cref="DefaultControllerFactory"/>'s internal methods in order to not have to rely on a try-catch.
         /// </summary>
         /// <remarks></remarks>
-        internal class OverridenDefaultControllerFactory : DefaultControllerFactory
+        internal class OverridenDefaultControllerFactory : ContainerControllerFactory
+            // DefaultControllerFactory
         {
+            public OverridenDefaultControllerFactory()
+                : base(Current.Container)
+            {
+            }
+
             public new IController GetControllerInstance(RequestContext requestContext, Type controllerType)
             {
                 return base.GetControllerInstance(requestContext, controllerType);

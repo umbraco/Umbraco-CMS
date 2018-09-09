@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Mvc
 {
@@ -11,7 +12,7 @@ namespace Umbraco.Web.Mvc
     /// request. Allows circumvention of MVC3's singly registered IControllerFactory.
     /// </summary>
     /// <remarks></remarks>
-    internal class MasterControllerFactory : DefaultControllerFactory
+    internal class MasterControllerFactory : ContainerControllerFactory
     {
         private readonly Func<FilteredControllerFactoryCollection> _factoriesAccessor;
         private FilteredControllerFactoryCollection _factories;
@@ -21,6 +22,7 @@ namespace Umbraco.Web.Mvc
         /// </summary>
         /// <param name="factoriesAccessor">The factories accessor.</param>
         public MasterControllerFactory(Func<FilteredControllerFactoryCollection> factoriesAccessor)
+            : base(Current.Container)
         {
             // note
             // because the MasterControllerFactory needs to be ctored to be assigned to

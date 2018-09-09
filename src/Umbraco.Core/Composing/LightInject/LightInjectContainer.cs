@@ -314,6 +314,11 @@ namespace Umbraco.Core.Composing.LightInject
 
         #endregion
 
+        public void Release(object instance)
+        {
+            // fixme - no idea how to do this with LI
+        }
+
         #region Control
 
         /// <inheritdoc />
