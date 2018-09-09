@@ -34,6 +34,8 @@ namespace Umbraco.Tests.TestHelpers
 
             var container = Current.Container = ContainerFactory.Create();
 
+            PreSetUp();
+
             container.RegisterSingleton<ILogger>(factory => Mock.Of<ILogger>());
             container.RegisterSingleton<IProfiler>(factory => Mock.Of<IProfiler>());
 
@@ -54,6 +56,9 @@ namespace Umbraco.Tests.TestHelpers
 
             SetUp();
         }
+
+        public virtual void PreSetUp()
+        {}
 
         public virtual void SetUp()
         {}

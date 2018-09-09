@@ -37,7 +37,7 @@ namespace Umbraco.Core.Composing
         /// <summary>
         /// Gets or sets the DI container.
         /// </summary>
-        internal static IContainer Container
+        public static IContainer Container
         {
             get
             {

@@ -54,7 +54,7 @@ namespace Umbraco.Web.Composing
         /// <summary>
         /// Gets the DI container.
         /// </summary>
-        internal static IContainer Container
+        public static IContainer Container
             => CoreCurrent.Container;
 
         #region Temp & Special
