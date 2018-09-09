@@ -106,6 +106,13 @@ namespace Umbraco.Core.Composing
             => container.Register(factory, Lifetime.Singleton);
 
         /// <summary>
+        /// Registers a named singleton service with an implementation factory.
+        /// Note to implementors: The last registered component must be the default.
+        /// </summary>
+        public static void RegisterSingleton<TService>(this IContainer container, string name, Func<IContainer, TService> factory)
+            => container.Register(factory, name, Lifetime.Singleton);
+
+        /// <summary>
         /// Registers a service with an implementing instance.
         /// </summary>
         public static void RegisterInstance<TService>(this IContainer container, TService instance)
