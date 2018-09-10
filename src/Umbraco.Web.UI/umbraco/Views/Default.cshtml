@@ -17,14 +17,17 @@
         }
     }
 
+    var rtl = System.Globalization.CultureInfo.CurrentCulture.TextInfo.IsRightToLeft;
+    var language = System.Globalization.CultureInfo.CurrentCulture.Name;
+
     Html
-        .RequiresCss("assets/css/umbraco.css", "Umbraco")
+        .RequiresCss("assets/" + (rtl == true ? "rtl" : "css") + "/umbraco.css", "Umbraco")
         .RequiresCss("tree/treeicons.css", "UmbracoClient")
         .RequiresCss("lib/bootstrap-social/bootstrap-social.css", "Umbraco")
         .RequiresCss("lib/font-awesome/css/font-awesome.min.css", "Umbraco");
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@(language)">
 <head>
     <base href="@GlobalSettings.Path.EnsureEndsWith('/')" />
     <meta charset="utf-8">
