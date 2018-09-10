@@ -33,7 +33,7 @@ namespace Umbraco.Web.Scheduling
             switch (_appContext.GetCurrentServerRole())
             {
                 case ServerRole.Slave:
-                    Logger.Debug<ScheduledPublishing>("Does not run on slave servers.");
+                    Logger.Debug<ScheduledPublishing>("Does not run on replica servers.");
                     return true; // DO repeat, server role can change
                 case ServerRole.Unknown:
                     Logger.Debug<ScheduledPublishing>("Does not run on servers with unknown role.");
