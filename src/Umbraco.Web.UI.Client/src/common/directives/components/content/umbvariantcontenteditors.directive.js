@@ -32,6 +32,8 @@
 
         //Used to track how many content views there are (for split view there will be 2, it could support more in theory)
         vm.editors = [];
+        //Used to track the open variants across the split views
+        vm.openVariants = [];
 
         /** Called when the component initializes */
         function onInit() {
@@ -91,7 +93,7 @@
                 activeVariant = vm.content.variants[0];
             }
 
-            insertVariantEditor(0, initVariant(activeVariant));
+            insertVariantEditor(0, initVariant(activeVariant, 0));
 
             if (vm.editors.length > 1) {
                 //now re-sync any other editor content (i.e. if split view is open)
@@ -100,7 +102,7 @@
                     var variant = _.find(vm.content.variants, function (v) {
                         return v.language.culture === vm.editors[s].content.language.culture;
                     });
-                    vm.editors[s].content = initVariant(variant);
+                    vm.editors[s].content = initVariant(variant, s);
                 }
             }
 
@@ -134,7 +136,7 @@
             }
         }
 
-        function initVariant(variant) {
+        function initVariant(variant, editorIndex) {
             //The model that is assigned to the editor contains the current content variant along
             //with a copy of the contentApps. This is required because each editor renders it's own
             //header and content apps section and the content apps contains the view for editing content itself
@@ -180,6 +182,14 @@
                 return a.alias === "content";
             });
             contentApp.viewModel = variant;
+            
+            // keep track of the open variants across the different split views
+            // push the first variant then update the variant index based on the editor index
+            if(vm.openVariants && vm.openVariants.length === 0) {
+                vm.openVariants.push(variant.language.culture);
+            } else {
+                vm.openVariants[editorIndex] = variant.language.culture;
+            }
 
             return variant;
         }
@@ -211,7 +221,7 @@
                 return v.language.culture === selectedCulture;
             });
 
-            insertVariantEditor(vm.editors.length, initVariant(variant));
+            insertVariantEditor(vm.editors.length, initVariant(variant, vm.editors.length));
 
             //TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
             editor.collapsed = true;
@@ -231,6 +241,8 @@
             editor.collapsed = true;
             $timeout(function () {
                 vm.editors.splice(editorIndex, 1);
+                //remove variant from open variants
+                vm.openVariants.splice(editorIndex, 1);
                 splitViewChanged();
             }, 400);
         }
@@ -241,8 +253,11 @@
          * @param {any} editorIndex The index of the editor being changed
          */
         function selectVariant(variant, editorIndex) {
-
-            var variantCulture = variant.language ? variant.language.culture : "invariant";
+            
+            // prevent variants already open in a split view to be opened
+            if(vm.openVariants.indexOf(variant.language.culture) !== -1)  {
+                return;
+            }
             
             //if the editor index is zero, then update the query string to track the lang selection, otherwise if it's part
             //of a 2nd split view editor then update the model directly.
@@ -266,7 +281,7 @@
                     function (v) {
                         return v.language.culture === variant.language.culture;
                     });
-                editor.content = initVariant(contentVariant);
+                editor.content = initVariant(contentVariant, editorIndex);
 
                 //update the editors collection
                 insertVariantEditor(editorIndex, contentVariant);
