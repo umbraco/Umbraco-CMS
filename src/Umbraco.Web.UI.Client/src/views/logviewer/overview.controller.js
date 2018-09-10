@@ -120,6 +120,7 @@
         vm.findMessageTemplate = findMessageTemplate;
         vm.selectSearch = selectSearch;
         vm.resetSearch = resetSearch;
+        vm.findItem = findItem;
 
 
         function init() {
@@ -252,6 +253,17 @@
 
         function resetSearch(){
             vm.logOptions.filterExpression = '';
+            search();
+        }
+
+        function findItem(key, value){
+            if(isNaN(value)){
+                vm.logOptions.filterExpression = key + "='" + value + "'";
+            }
+            else {
+                vm.logOptions.filterExpression = key + "=" + value;
+            }
+
             search();
         }
 
