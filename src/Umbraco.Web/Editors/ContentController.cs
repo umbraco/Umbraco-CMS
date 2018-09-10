@@ -496,11 +496,11 @@ namespace Umbraco.Web.Editors
                     {
                         if(string.IsNullOrEmpty(cultureName) == false)
                         {
-                            opts.AfterMap((source, target) => target.Name = source.GetCultureName(cultureName));
+                            opts.Items[ResolutionContextExtensions.CultureKey] = cultureName;
                         }
 
                         // if there's a list of property aliases to map - we will make sure to store this in the mapping context.
-                        if (String.IsNullOrWhiteSpace(includeProperties) == false)
+                        if (string.IsNullOrWhiteSpace(includeProperties) == false)
                         {
                             opts.Items["IncludeProperties"] = includeProperties.Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries);
                         }
