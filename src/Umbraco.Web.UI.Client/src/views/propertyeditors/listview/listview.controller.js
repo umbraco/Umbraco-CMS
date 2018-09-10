@@ -137,7 +137,7 @@ function listViewController($scope, $routeParams, $injector, $location, $timeout
    }
 
    //Get the current culturename from the QueryString - to pass into the WebAPI call
-   var cultureNameQs = $location.search().mculture;
+   var cultureNameQs = $location.search().cculture ? $location.search().cculture : $location.search().mculture;
 
    $scope.options = {
       displayAtTabNumber: $scope.model.config.displayAtTabNumber ? $scope.model.config.displayAtTabNumber : 1,
