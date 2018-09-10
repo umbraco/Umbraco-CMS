@@ -7,19 +7,21 @@ var sort = require('gulp-sort');
 var connect = require('gulp-connect');
 var open = require('gulp-open');
 var runSequence = require('run-sequence');
-const imagemin = require('gulp-imagemin');
+var imagemin = require('gulp-imagemin');
 
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
 
 // js
-const eslint = require('gulp-eslint');
+var eslint = require('gulp-eslint');
 
 //Less + css
 var postcss = require('gulp-postcss');
 var less = require('gulp-less');
 var autoprefixer = require('autoprefixer');
 var cssnano = require('cssnano');
+
+var rtlcss = require('gulp-rtlcss');
 
 // Documentation
 var gulpDocs = require('gulp-ngdocs');
@@ -50,16 +52,18 @@ function processLess(files, out) {
 
     var processors = [
          autoprefixer,
-         cssnano({zindex: false}),
+         cssnano({zindex: false})
     ];
 
     return gulp.src(files)
         .pipe(less())
         .pipe(postcss(processors))
         .pipe(rename(out))
-        .pipe(gulp.dest(root + targets.css));
-    
-    console.log(out + " compiled");
+        .pipe(gulp.dest(root + targets.css))
+        .pipe(rtlcss()) // Convert to RTL.
+        .pipe(gulp.dest(root + targets.rtlcss));
+
+        console.log(out + " compiled");
 }
 
 /***************************************************************
@@ -114,6 +118,7 @@ var targets = {
     lib: "lib/",
     views: "views/",
     css: "assets/css/",
+    rtlcss: "assets/rtl/",
     assets: "assets/"
 };
 

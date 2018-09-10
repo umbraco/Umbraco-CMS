@@ -23,6 +23,7 @@
     "gulp-watch": "^4.3.10",
     "gulp-wrap": "^0.13.0",
     "gulp-wrap-js": "^0.4.1",
+    "gulp-rtlcss": "1.2.0",
     "jasmine-core": "2.5.2",
     "karma": "^1.7.0",
     "karma-jasmine": "^1.1.1",
