@@ -494,10 +494,7 @@ namespace Umbraco.Web.Editors
                 Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic>>(content,
                     opts =>
                     {
-                        if(string.IsNullOrEmpty(cultureName) == false)
-                        {
-                            opts.Items[ResolutionContextExtensions.CultureKey] = cultureName;
-                        }
+                        opts.Items[ResolutionContextExtensions.CultureKey] = cultureName;                        
 
                         // if there's a list of property aliases to map - we will make sure to store this in the mapping context.
                         if (string.IsNullOrWhiteSpace(includeProperties) == false)
