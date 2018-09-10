@@ -33,7 +33,6 @@
 
         vm.selectVariant = selectVariant;
         vm.openSplitView = openSplitView;
-        vm.backToListView = backToListView;
         vm.selectApp = selectApp;
         
         /** Called when the component has linked all elements, this is when the form controller is available */
@@ -52,10 +51,6 @@
                 unsubscribe[i]();
             }
         }
-
-        function backToListView() {
-            $location.path(vm.page.listViewPath);
-        };
 
         /**
          * Used to proxy a callback
