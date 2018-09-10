@@ -26,12 +26,14 @@
 function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
     /** internal method process the saving of data and post processing the result */
-    function saveContentItem(content, action, files, restApiUrl) {
+    function saveContentItem(content, action, files, restApiUrl, showNotifications) {
+
         return umbRequestHelper.postSaveContent({
             restApiUrl: restApiUrl,
             content: content,
             action: action,
             files: files,
+            showNotifications: showNotifications,
             dataFormatter: function (c, a) {
                 return umbDataFormatter.formatContentPostData(c, a);
             }
@@ -632,22 +634,23 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * 
           * @param {Object} content The content item object with changes applied
           * @param {Bool} isNew set to true to create a new item or to update an existing 
-          * @param {Array} files collection of files for the document      
+          * @param {Array} files collection of files for the document
+          * @param {Bool} showNotifications an option to disable/show notifications (default is true)
           * @returns {Promise} resourcePromise object containing the saved content item.
           *
           */
-        save: function (content, isNew, files) {
+        save: function (content, isNew, files, showNotifications) {
             var endpoint = umbRequestHelper.getApiUrl(
                 "contentApiBaseUrl",
                 "PostSave");
-            return saveContentItem(content, "save" + (isNew ? "New" : ""), files, endpoint);
+            return saveContentItem(content, "save" + (isNew ? "New" : ""), files, endpoint, showNotifications);
         },
 
-        saveBlueprint: function (content, isNew, files) {
+        saveBlueprint: function (content, isNew, files, showNotifications) {
             var endpoint = umbRequestHelper.getApiUrl(
                 "contentApiBaseUrl",
                 "PostSaveBlueprint");
-            return saveContentItem(content, "save" + (isNew ? "New" : ""), files, endpoint);
+            return saveContentItem(content, "save" + (isNew ? "New" : ""), files, endpoint, showNotifications);
         },
 
         /**
@@ -674,15 +677,16 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
           * 
           * @param {Object} content The content item object with changes applied
           * @param {Bool} isNew set to true to create a new item or to update an existing 
-          * @param {Array} files collection of files for the document      
+          * @param {Array} files collection of files for the document
+          * @param {Bool} showNotifications an option to disable/show notifications (default is true)
           * @returns {Promise} resourcePromise object containing the saved content item.
           *
           */
-        publish: function (content, isNew, files) {
+        publish: function (content, isNew, files, showNotifications) {
             var endpoint = umbRequestHelper.getApiUrl(
                 "contentApiBaseUrl",
                 "PostSave");
-            return saveContentItem(content, "publish" + (isNew ? "New" : ""), files, endpoint);
+            return saveContentItem(content, "publish" + (isNew ? "New" : ""), files, endpoint, showNotifications);
         },
 
 

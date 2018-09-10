@@ -5,19 +5,11 @@
     <form name="contentForm" ng-submit="save()" novalidate val-form-manager>
 
         <umb-editor-view ng-if="!page.loading">
-            
-            <div class="umb-split-views">
-                <div class="umb-split-view" ng-class="{'umb-split-view--collapsed': editor.collapsed}" ng-repeat="editor in editors">
-                    <umb-variant-content
-                        page="page"
-                        content="content"
-                        editor="editor"
-                        editors="editors"
-                        init-variant="initVariant(variant)"
-                        on-split-view-changed="splitViewChanged()">
-                    </umb-variant-content>
-                </div>
-            </div>
+
+            <umb-variant-content-editors page="page"
+                                         content="content"
+                                         culture="culture">
+            </umb-variant-content-editors>
 
             <umb-editor-footer>
 

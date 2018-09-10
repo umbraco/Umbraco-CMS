@@ -22,8 +22,10 @@
 
                 // get document type details
                 scope.mediaType = scope.node.contentType;
-                // get node url
-                scope.nodeUrl = scope.node.mediaLink;
+
+                // set the media link initially
+                setMediaLink();
+
                 // make sure dates are formatted to the user's locale
                 formatDatesToLocal();
             }
@@ -34,6 +36,10 @@
                     scope.node.createDateFormatted = dateHelper.getLocalDate(scope.node.createDate, currentUser.locale, 'LLL');
                     scope.node.updateDateFormatted = dateHelper.getLocalDate(scope.node.updateDate, currentUser.locale, 'LLL');
                 });
+            }
+
+            function setMediaLink(){
+                scope.nodeUrl = scope.node.mediaLink;
             }
 
             scope.openMediaType = function (mediaType) {
@@ -48,11 +54,16 @@
                 };
                 editorService.mediaTypeEditor(editor);
             };
-            
+
             // watch for content updates - reload content when node is saved, published etc.
             scope.$watch('node.updateDate', function(newValue, oldValue){
                 if(!newValue) { return; }
                 if(newValue === oldValue) { return; }
+
+                // Update the media link
+                setMediaLink();
+
+                // Update the create and update dates
                 formatDatesToLocal();
             });
 
@@ -64,7 +75,6 @@
             });
 
             onInit();
-
         }
 
         var directive = {

@@ -260,13 +260,17 @@ namespace Umbraco.Core.Models.Membership
         {
             get
             {
-                if (LastLoginDate == default(DateTime) && IsApproved == false && InvitedDate != null)
+                if (LastLoginDate == default && IsApproved == false && InvitedDate != null)
                     return UserState.Invited;
 
                 if (IsLockedOut)
                     return UserState.LockedOut;
                 if (IsApproved == false)
                     return UserState.Disabled;
+
+                // User is not disabled or locked and has never logged in before
+                if (LastLoginDate == default && IsApproved && IsLockedOut == false)
+                    return UserState.Inactive;
 
                 return UserState.Active;
             }

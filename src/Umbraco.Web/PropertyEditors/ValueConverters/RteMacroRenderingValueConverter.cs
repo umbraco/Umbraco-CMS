@@ -9,6 +9,7 @@ using System.Linq;
 using HtmlAgilityPack;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Services;
+using Umbraco.Web.Macros;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {

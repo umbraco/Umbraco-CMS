@@ -4,10 +4,9 @@ using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using LightInject;
-using Serilog;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
-using ILogger = Umbraco.Core.Logging.ILogger;
+using Umbraco.Core.Logging.Serilog;
 
 namespace Umbraco.Core
 {
@@ -28,7 +27,7 @@ namespace Umbraco.Core
         /// </summary>
         protected virtual ILogger GetLogger()
         {
-            return Logger.CreateWithDefaultConfiguration();
+            return SerilogLogger.CreateWithDefaultConfiguration();
         }
 
         // events - in the order they trigger
@@ -161,13 +160,6 @@ namespace Umbraco.Core
                 _runtime = null;
             }
 
-            // dispose the container and everything
-            // but first, capture the looger!
-            var logger = Current.Logger;
-            Current.Reset(); 
-
-            if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted) return;
-
             // try to log the detailed shutdown message (typical asp.net hack: http://weblogs.asp.net/scottgu/433194)
             try
             {
@@ -185,7 +177,7 @@ namespace Umbraco.Core
                     BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField,
                     null, runtime, null);
 
-                logger.Info<UmbracoApplicationBase>("Application shutdown. Details: {ShutdownReason}\r\n\r\n_shutDownMessage={ShutdownMessage}\r\n\r\n_shutDownStack={ShutdownStack}",
+                Current.Logger.Info<UmbracoApplicationBase>("Application shutdown. Details: {ShutdownReason}\r\n\r\n_shutDownMessage={ShutdownMessage}\r\n\r\n_shutDownStack={ShutdownStack}",
                     HostingEnvironment.ShutdownReason,
                     shutDownMessage,
                     shutDownStack);
@@ -193,20 +185,19 @@ namespace Umbraco.Core
             catch (Exception)
             {
                 //if for some reason that fails, then log the normal output
-                logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: {ShutdownReason}", HostingEnvironment.ShutdownReason);
+                Current.Logger.Info<UmbracoApplicationBase>("Application shutdown. Reason: {ShutdownReason}", HostingEnvironment.ShutdownReason);
             }
+
+            // dispose the container and everything
+            Current.Reset();
         }
 
         // called by ASP.NET (auto event wireup) once per app domain
         // sender is System.Web.HttpApplicationFactory, evargs is EventArgs.Empty
         protected void Application_End(object sender, EventArgs evargs)
         {
-            HandleApplicationEnd();
             OnApplicationEnd(sender, evargs);
-
-            //Not sure if we need to do this - as my POC approach I never had to deal with this
-            //As the LightInject container when tearing down will dispose of Serilog AFAIK
-            Log.CloseAndFlush();
+            HandleApplicationEnd();
         }
 
         #endregion

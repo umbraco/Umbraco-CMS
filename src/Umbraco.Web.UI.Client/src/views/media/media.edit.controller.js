@@ -45,6 +45,10 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
     /** Syncs the content item to it's tree node - this occurs on first load and after saving */
     function syncTreeNode(content, path, initialLoad) {
 
+        if (infiniteMode) {
+            return;
+        }
+
         if (!$scope.content.isChildOfListView) {
             navigationService.syncTree({ tree: "media", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
                 $scope.page.menu.currentNode = syncArgs.node;
@@ -147,11 +151,8 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
 
                     editorState.set($scope.content);
                     $scope.busy = false;
-
-                    // when don't want to sync the tree when the editor is open in infinite mode
-                    if(!infiniteMode) {
-                        syncTreeNode($scope.content, data.path);
-                    }
+                    
+                    syncTreeNode($scope.content, data.path);
 
                     init($scope.content);
 

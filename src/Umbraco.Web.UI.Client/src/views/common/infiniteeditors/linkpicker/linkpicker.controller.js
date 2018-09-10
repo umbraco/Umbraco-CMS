@@ -4,7 +4,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
         
         var vm = this;
         var dialogOptions = $scope.model;
-        var anchorPattern = /<a id=\\"(.*?)\\">/gi;
+
         var searchText = "Search...";
 
         vm.submit = submit;
@@ -60,8 +60,14 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                 });
             } else if ($scope.model.target.url.length) {
                 // a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
-                $scope.model.target.url = $scope.model.target.url.substring(0, $scope.model.target.url.search(/(#|\?)/));
-            }
+                // only do the substring if there's a # or a ?
+                var indexOfAnchor = $scope.model.target.url.search(/(#|\?)/);
+                if (indexOfAnchor > -1) {
+                    // populate the anchor
+                    $scope.model.target.anchor = $scope.model.target.url.substring(indexOfAnchor);
+                    // then rewrite the model and populate the link
+                    $scope.model.target.url = $scope.model.target.url.substring(0, indexOfAnchor);
+                }            }
         } else if (dialogOptions.anchors) {
             $scope.anchorValues = dialogOptions.anchors;
         }
