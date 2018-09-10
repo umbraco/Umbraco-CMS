@@ -482,8 +482,22 @@
                     previewWindow.location.href = redirect;
                 }
                 else {
-                    $scope.save().then(function (data) {
+                    var selectedVariant;
+                    if (!$scope.culture) {
+                        selectedVariant = $scope.content.variants[0];
+                    }
+                    else {
+                        selectedVariant = _.find($scope.content.variants, function (v) {
+                            return v.language.culture === $scope.culture;
+                        });
+                    }
+
+                    //ensure the save flag is set
+                    selectedVariant.save = true;
+                    performSave({ saveMethod: contentResource.publish, action: "save" }).then(function (data) {
                         previewWindow.location.href = redirect;
+                    }, function (err) {
+                        //validation issues ....
                     });
                 }
             }

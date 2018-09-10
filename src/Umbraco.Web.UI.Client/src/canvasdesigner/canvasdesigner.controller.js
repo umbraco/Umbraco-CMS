@@ -20,7 +20,7 @@ var app = angular.module("Umbraco.canvasdesigner", ['umbraco.resources', 'umbrac
     $scope.frameLoaded = false;
     var pageId = $location.search().id;    
     $scope.pageId = pageId;
-    $scope.pageUrl = "../dialogs/Preview.aspx?id=" + pageId;
+    $scope.pageUrl = "frame?id=" + pageId;
     $scope.valueAreLoaded = false;
     $scope.devices = [
         { name: "desktop", css: "desktop", icon: "icon-display", title: "Desktop" },
