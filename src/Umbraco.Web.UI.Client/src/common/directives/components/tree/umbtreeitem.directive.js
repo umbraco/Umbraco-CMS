@@ -65,6 +65,18 @@ angular.module("umbraco.directives")
                 }
             }
 
+            function isRtl()
+            {
+                var x = document.body;
+                var y = "";
+                if (x.currentStyle)
+                    y = x.currentStyle['direction'];
+                else if (window.getComputedStyle)
+                    y = document.defaultView.getComputedStyle(x,null).getPropertyValue('direction');
+                return y === "rtl" ? true : false;
+
+            }
+
             // updates the node's DOM/styles
             function setupNodeDom(node, tree) {
                 
