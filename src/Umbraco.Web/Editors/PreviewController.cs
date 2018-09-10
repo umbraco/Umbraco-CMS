@@ -68,6 +68,7 @@ namespace Umbraco.Web.Editors
             return null;
         }
 
+        //fixme: not sure we need this anymore since there is no canvas editing - then we can remove that route too
         public ActionResult Editors(string editor)
         {
             if (string.IsNullOrEmpty(editor)) throw new ArgumentNullException(nameof(editor));

@@ -18,8 +18,8 @@
         @Html.Partial(Model.PreviewExtendedHeaderView)
     }
 
-    <div id="demo-iframe-wrapper" ng-show="frameLoaded" class="{{previewDevice.css}}">
-        <iframe id="resultFrame" ng-src="{{pageUrl}}" frameborder="0" iframe-is-loaded></iframe>
+    <div id="demo-iframe-wrapper" ng-if="pageUrl" ng-show="frameLoaded" class="{{previewDevice.css}}">
+        <preview-i-frame src="{{pageUrl}}" on-loaded="onFrameLoaded()"></preview-i-frame>
     </div>
     <div class="canvasdesigner" ng-init="showDevicesPreview = true; showDevices = !@(disableDevicePreview);" ng-mouseenter="positionSelectedHide()">
         <div class="fix-left-menu selected">
