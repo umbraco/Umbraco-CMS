@@ -246,6 +246,12 @@ Use this directive to construct a header inside the main editor window.
                 }
             };
 
+            scope.selectNavigationItem = function(item) {
+                if(scope.onSelectNavigationItem) {
+                    scope.onSelectNavigationItem({"item": item});
+                }
+            }
+
             scope.openIconPicker = function () {
                 var iconPicker = {
                     icon: scope.icon.split(' ')[0],
@@ -336,6 +342,7 @@ Use this directive to construct a header inside the main editor window.
                 openVariants: "<",
                 hideChangeVariant: "<?",
                 navigation: "=",
+                onSelectNavigationItem: "&?",
                 key: "=",
                 onBack: "&?",
                 showBackButton: "<?",

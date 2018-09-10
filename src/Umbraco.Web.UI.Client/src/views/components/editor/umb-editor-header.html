@@ -92,15 +92,18 @@
         </div>
 
         <div ng-if="navigation && splitViewOpen !== true" style="margin-left: 20px;">
-            <umb-editor-navigation data-element="editor-sub-views"
-                                   navigation="navigation">
+            <umb-editor-navigation 
+                data-element="editor-sub-views"
+                navigation="navigation"
+                on-select="selectNavigationItem(item)">
             </umb-editor-navigation>
         </div>
 
         <div ng-if="menu.currentNode && splitViewOpen !== true && hideMenu !== true" style="margin-left: 20px;">
-            <umb-editor-menu data-element="editor-actions"
-                             current-node="menu.currentNode"
-                             current-section="{{menu.currentSection}}">
+            <umb-editor-menu 
+                data-element="editor-actions"
+                current-node="menu.currentNode"
+                current-section="{{menu.currentSection}}">
             </umb-editor-menu>
         </div>
 

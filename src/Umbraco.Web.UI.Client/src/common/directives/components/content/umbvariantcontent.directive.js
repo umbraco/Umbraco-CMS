@@ -15,7 +15,8 @@
             openVariants: "<",
             onCloseSplitView: "&",
             onSelectVariant: "&",
-            onOpenSplitView: "&"
+            onOpenSplitView: "&",
+            onSelectApp: "&"
         },
         controllerAs: 'vm',
         controller: umbVariantContentController
@@ -33,6 +34,7 @@
         vm.selectVariant = selectVariant;
         vm.openSplitView = openSplitView;
         vm.backToListView = backToListView;
+        vm.selectApp = selectApp;
         
         /** Called when the component has linked all elements, this is when the form controller is available */
         function postLink() {
@@ -62,6 +64,16 @@
         function selectVariant(variant) {
             if (vm.onSelectVariant) {
                 vm.onSelectVariant({ "variant": variant });
+            }
+        }
+
+        /**
+         * Used to proxy a callback
+         * @param {any} item
+         */
+        function selectApp(item) {
+            if(vm.onSelectApp) {
+                vm.onSelectApp({"app": item});
             }
         }
 

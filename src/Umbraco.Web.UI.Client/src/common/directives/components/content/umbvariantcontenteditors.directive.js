@@ -15,11 +15,12 @@
         controller: umbVariantContentEditorsController
     };
 
-    function umbVariantContentEditorsController($scope, $element, $location, $timeout) {
+    function umbVariantContentEditorsController($scope, $location, $timeout) {
 
         var prevContentDateUpdated = null;
 
         var vm = this;
+        var activeAppAlias = null;
 
         vm.$onInit = onInit;
         vm.$onChanges = onChanges;
@@ -29,6 +30,7 @@
         vm.openSplitView = openSplitView;
         vm.closeSplitView = closeSplitView;
         vm.selectVariant = selectVariant;
+        vm.selectApp = selectApp;
 
         //Used to track how many content views there are (for split view there will be 2, it could support more in theory)
         vm.editors = [];
@@ -37,6 +39,8 @@
 
         /** Called when the component initializes */
         function onInit() {
+            // set first app to active
+            vm.content.apps[0].active = true;
             prevContentDateUpdated = angular.copy(vm.content.updateDate);
             setActiveCulture();
         }
@@ -141,7 +145,7 @@
             //with a copy of the contentApps. This is required because each editor renders it's own
             //header and content apps section and the content apps contains the view for editing content itself
             //and we need to assign a view model to the subView so that it is scoped to the current
-            //editor so that split views work. 
+            //editor so that split views work.
 
             //copy the apps from the main model if not assigned yet to the variant
             if (!variant.apps) {
@@ -189,6 +193,16 @@
                 vm.openVariants.push(variant.language.culture);
             } else {
                 vm.openVariants[editorIndex] = variant.language.culture;
+            }
+
+            // make sure the same app it set to active in the new variant
+            if(activeAppAlias) {
+                angular.forEach(variant.apps, function(app) {
+                    app.active = false;
+                    if(app.alias === activeAppAlias) {
+                        app.active = true;
+                    }
+                });
             }
 
             return variant;
@@ -288,6 +302,17 @@
                 
             }
         }
+
+        /**
+         * Stores the active app in a variable so we can remember it when changing language
+         * @param {any} app This is the model of the selected app
+         */
+        function selectApp(app) {
+            if(app && app.alias) {
+                activeAppAlias = app.alias;
+            }
+        }
+
     }
 
     angular.module('umbraco.directives').component('umbVariantContentEditors', umbVariantContentEditors);

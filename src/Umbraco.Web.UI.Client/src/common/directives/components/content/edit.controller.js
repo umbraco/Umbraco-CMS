@@ -46,10 +46,6 @@
             }
 
             bindEvents();
-
-            // set first app to active
-            // We need to track active
-            $scope.content.apps[0].active = true;
             
             resetVariantFlags();            
         }
