@@ -6,7 +6,7 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, $q, appState, mediaResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper, editorState, umbRequestHelper, $http, eventsService) {
+function mediaEditController($scope, $routeParams, $q, appState, mediaResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, editorState, umbRequestHelper, $http, eventsService) {
     
     var evts = [];
     var nodeId = null;

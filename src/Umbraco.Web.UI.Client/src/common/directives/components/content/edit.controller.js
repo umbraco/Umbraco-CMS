@@ -1,10 +1,10 @@
 (function () {
     'use strict';
 
-    function ContentEditController($rootScope, $scope, $routeParams, $q, $timeout, $window, $location,
-        appState, contentResource, entityResource, navigationService, notificationsService, angularHelper,
-        serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper,
-        keyboardService, umbModelMapper, editorState, $http, eventsService, relationResource, overlayService, localizationService) {
+    function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
+        appState, contentResource, entityResource, navigationService, notificationsService,
+        serverValidationManager, contentEditingHelper, treeService, formHelper, umbRequestHelper, 
+        editorState, $http, eventsService, relationResource, overlayService) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
