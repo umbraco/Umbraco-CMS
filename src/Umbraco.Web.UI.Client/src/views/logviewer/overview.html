@@ -15,7 +15,7 @@
             <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
             <umb-editor-sub-header>
-                <umb-editor-sub-header-content-left style="width:calc(100% - 350px - 20px);">
+                <umb-editor-sub-header-content-left style="width:calc(100% - 350px - 20px); line-height:30px;">
                     <!-- Log Level filter -->
                     <div style="position: relative;">
                         <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.page.showLevelFilter = !vm.page.showLevelFilter">
@@ -32,21 +32,23 @@
                                         ng-model="level.selected"
                                         ng-change="vm.setLogLevelFilter(level)"
                                         style="margin-right: 10px; margin-top: -3px;" />
-                                    <label for="loglevel-{{$index}}">{{ level.name }}</label>
+                                    <label for="loglevel-{{$index}}">
+                                        <umb-badge size="s" color="{{ level.logTypeColor }}">{{ level.name }}</umb-badge>
+                                    </label>
                                 </div>
                             </umb-dropdown-item>
                         </umb-dropdown>
                     </div>
 
                     <!-- Date Ranges -->
-                    <span>From</span>
+                    <span>From&nbsp;</span>
                     <umb-date-time-picker
                         options="vm.fromDatePickerConfig"
                         on-change="vm.datePickerChange(event)"
                         on-error="vm.datePickerError(event)">
                     </umb-date-time-picker>
 
-                    <span>To</span>
+                    <span>To&nbsp;</span>
                     <umb-date-time-picker
                         options="vm.toDatePickerConfig"
                         on-change="vm.datePickerChange(event)"
@@ -61,6 +63,8 @@
                     <div style="position:relative; width:100%;">
                         <!-- Search/expression filter -->
                         <input class="form-control search-input" type="text" ng-model="vm.logOptions.filterExpression" style="width:100%;" />
+
+                        <ins class="icon-wrong" ng-if="vm.logOptions.filterExpression" ng-click="vm.resetSearch()" style="float: left; position: absolute; top: 0; line-height: 32px; right: 140px; color: #bbbabf; cursor: pointer;">&nbsp;</ins>
 
                         <a class="umb-variant-switcher__toggle ng-scope" href="" ng-click="vm.dropdownOpen = !vm.dropdownOpen" style="top:0;">
                             <span class="ng-binding">Example Searches</span>
@@ -137,9 +141,18 @@
                                             </div>
 
                                             <h3>Properties</h3>
-                                            <div ng-repeat="(key, val) in log.Properties">
-                                                <strong>{{ key }}</strong> {{ val.Value }}
-                                            </div>
+                                            <table class="table">
+                                                <tbody>
+                                                    <tr>
+                                                        <th>@MessageTemplate</th>
+                                                        <td>{{log.MessageTemplateText}}</td>
+                                                    </tr>
+                                                    <tr ng-repeat="(key, val) in log.Properties">
+                                                        <th>{{key}}</th>
+                                                        <td>{{val.Value}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </td>
                                     </tr>
                                 </tbody>

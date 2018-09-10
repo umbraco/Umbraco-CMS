@@ -13,22 +13,28 @@
 
         vm.logLevels = [
             {
-                name: 'Verbose'
+                name: 'Verbose',
+                logTypeColor: 'gray'
             },
             {
-                name: 'Debug'
+                name: 'Debug',
+                logTypeColor: 'secondary'
             },
             {
-                name: 'Information'
+                name: 'Information',
+                logTypeColor: 'primary'
             },
             {
-                name: 'Warning'
+                name: 'Warning',
+                logTypeColor: 'warning'
             },
             {
-                name: 'Error'
+                name: 'Error',
+                logTypeColor: 'danger'
             },
             {
-                name: 'Fatal'
+                name: 'Fatal',
+                logTypeColor: 'danger'
             }
         ];
 
@@ -113,6 +119,7 @@
         vm.toggleOrderBy = toggleOrderBy;
         vm.findMessageTemplate = findMessageTemplate;
         vm.selectSearch = selectSearch;
+        vm.resetSearch = resetSearch;
 
 
         function init() {
@@ -240,6 +247,11 @@
             vm.logOptions.filterExpression = searchItem.query;
             vm.dropdownOpen = false;
 
+            search();
+        }
+
+        function resetSearch(){
+            vm.logOptions.filterExpression = '';
             search();
         }
 
