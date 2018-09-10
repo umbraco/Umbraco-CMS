@@ -12,6 +12,7 @@
             editor: "<",
             editorIndex: "<",
             editorCount: "<",
+            openVariants: "<",
             onCloseSplitView: "&",
             onSelectVariant: "&",
             onOpenSplitView: "&"
