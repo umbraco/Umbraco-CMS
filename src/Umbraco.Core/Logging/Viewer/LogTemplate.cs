@@ -1,6 +1,6 @@
 ﻿namespace Umbraco.Core.Logging.Viewer
 {
-    public class CommonLogMessage
+    public class LogTemplate
     {
         public string MessageTemplate { get; set; }
 
