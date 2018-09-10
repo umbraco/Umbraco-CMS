@@ -62,6 +62,7 @@
         vm.logItems = {};
         vm.numberOfErrors = 0;
         vm.commonLogMessages = [];
+        vm.commonLogMessagesCount = 10;
         vm.logOptions = {};
         vm.logOptions.orderDirection = 'Descending';
 
@@ -110,6 +111,8 @@
         vm.getFilterName = getFilterName;
         vm.setLogLevelFilter = setLogLevelFilter;
         vm.toggleOrderBy = toggleOrderBy;
+        vm.findMessageTemplate = findMessageTemplate;
+        vm.selectSearch = selectSearch;
 
 
         function init() {
@@ -223,6 +226,21 @@
             vm.logOptions.orderDirection = vm.logOptions.orderDirection === 'Descending' ? 'Ascending' : 'Descending';
 
             getLogs();
+        }
+
+        function findMessageTemplate(template){
+
+            //Update search box input
+            vm.logOptions.filterExpression = "@MessageTemplate='" + template.MessageTemplate + "'";
+            search();
+        }
+
+        function selectSearch(searchItem){
+            //Update search box input
+            vm.logOptions.filterExpression = searchItem.query;
+            vm.dropdownOpen = false;
+
+            search();
         }
 
         init();
