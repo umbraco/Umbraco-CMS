@@ -79,11 +79,20 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Trashed, opt => opt.MapFrom(src => src.Trashed))
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
+                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<CultureNameResolver>());
 
             //FROM IContent TO ContentPropertyCollectionDto
             //NOTE: the property mapping for cultures relies on a culture being set in the mapping context
             CreateMap<IContent, ContentPropertyCollectionDto>();
+        }
+    }
+
+    internal class CultureNameResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, string>
+    {
+        public string Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, string destMember, ResolutionContext context)
+        {
+            return source.GetCultureName(context.GetCulture());
         }
     }
 }
