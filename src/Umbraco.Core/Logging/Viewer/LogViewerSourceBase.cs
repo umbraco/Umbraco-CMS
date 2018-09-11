@@ -54,15 +54,31 @@ namespace Umbraco.Core.Logging.Viewer
             if (string.IsNullOrEmpty(filterExpression) == false)
             {
                 Func<LogEvent, bool> filter = null;
-                var eval = FilterLanguage.CreateFilter(filterExpression);
-                filter = evt => true.Equals(eval(evt));
 
-                logs = logs.Where(filter);
+                // If the expression evaluates then make it into a filter
+                // TODO: Why does any single word evaluate?
+                if (FilterLanguage.TryCreateFilter(filterExpression, out Func<LogEvent, object> eval, out string error))
+                {
+                    filter = evt => true.Equals(eval(evt));
+                }
+                else // assume the expression was a search string and make a Like filter from that
+                {
+                    var filterSearch = $"@Message like '%{FilterLanguage.EscapeStringContent(filterExpression)}%'";
+                    if (FilterLanguage.TryCreateFilter(filterSearch, out eval, out error))
+                    {
+                        filter = evt => true.Equals(eval(evt));
+                    }
+                }
+                
+                if (filter != null)
+                {
+                    logs = logs.Where(filter);
+                }
             }
 
             //This is user used the checkbox UI to toggle which log levels they wish to see
             //If an empty array - its implied all levels to be viewed
-            if(logLevels.Length > 0)
+            if (logLevels.Length > 0)
             {
                 var logsAfterLevelFilters = new List<LogEvent>();
                 foreach (var level in logLevels)
