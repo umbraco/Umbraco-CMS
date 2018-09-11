@@ -27,10 +27,13 @@
 
         function init(content) {
 
+            // set first app to active
+            content.apps[0].active = true;
+
             if (infiniteMode) {
                 createInfiniteModeButtons(content);
             } else {
-                createButtons(content);
+                createButtons(content, content.apps[0]);
             }
 
             editorState.set($scope.content);
@@ -135,7 +138,22 @@
 
         }
 
-        function createButtons(content) {
+        /**
+         * Create the save/publish/preview buttons for the view
+         * @param {any} content the content node
+         * @param {any} app the active content app
+         */
+        function createButtons(content, app) {
+
+            // only create the save/publish/preview buttons if the 
+            // content app is "Conent"
+            if(app && app.alias !== "content") {
+                $scope.defaultButton = null;
+                $scope.subButtons = null;
+                $scope.page.showPreviewButton = false;
+                return;
+            }
+
             $scope.page.buttonGroupState = "init";
             var buttons = contentEditingHelper.configureContentEditorButtons({
                 create: $scope.page.isNew,
@@ -147,9 +165,10 @@
                     unPublish: $scope.unPublish
                 }
             });
-
+            
             $scope.defaultButton = buttons.defaultButton;
             $scope.subButtons = buttons.subButtons;
+            $scope.page.showPreviewButton = true;
 
         }
 
@@ -553,6 +572,14 @@
                 }
                 $scope.saveAndCloseButtonState = "success";
             });
+        };
+
+        /**
+         * Call back when a content app changes
+         * @param {any} app
+         */
+        $scope.appChanged = function(app) {
+            createButtons($scope.content, app);
         };
 
         function moveNode(node, target) {
