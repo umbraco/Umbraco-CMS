@@ -11,10 +11,8 @@
             </div>
 
             <div ng-if="notification.headline">
-                <a ng-href="{{notification.url}}" target="_blank">
                     <strong>{{notification.headline}}</strong>
                     <span ng-bind-html="notification.message"></span>
-                </a>
             </div>
         </li>
     </ul>
