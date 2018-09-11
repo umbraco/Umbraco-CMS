@@ -53,8 +53,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
     "contentResource",
     "localizationService",
     "iconHelper",
+    "notificationsService",
 
-    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper) {
+    function ($scope, $interpolate, $filter, $timeout, contentResource, localizationService, iconHelper, notificationsService) {
 
         //$scope.model.config.contentTypes;
         //$scope.model.config.minItems;
@@ -72,6 +73,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         $scope.editIconTitle = '';
         $scope.moveIconTitle = '';
         $scope.deleteIconTitle = '';
+        $scope.copyIconTitle = '';
+        $scope.addIconTitle = '';
 
         // localize the edit icon title
         localizationService.localize('general_edit').then(function (value) {
@@ -87,6 +90,16 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
         localizationService.localize('actions_move').then(function (value) {
             $scope.moveIconTitle = value;
         });
+
+        // localizer the copy icon title
+        localizationService.localize('general_copy').then(function (value) {
+            $scope.copyIconTitle = value;
+        });
+
+        // localizer the add icon title
+        localizationService.localize('general_add').then(function (value) {
+            $scope.addIconTitle = value;
+        });        
 
         $scope.nodes = [];
         $scope.currentNode = undefined;
@@ -266,6 +279,80 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.NestedContent.Prop
                 return contentType.ncAlias == alias;
             });
         }
+
+        var copyKey = "NestedContentCopy";
+        var canCopy = null;
+
+        $scope.canCopy = function () {
+            var test = "test";
+
+            if (canCopy != null) {
+                return canCopy;
+            }
+
+            try {
+                window.localStorage.setItem(test, test);
+                window.localStorage.removeItem(test);
+                canCopy = true;
+            } catch (e) {
+                canCopy = false;
+            }
+
+            return canCopy;
+        }
+
+        $scope.canPaste = function () {
+            var stackedContentItem = JSON.parse(window.localStorage.getItem(copyKey));
+            if (stackedContentItem && validateModel(stackedContentItem)) return true;
+            return false;
+        }
+
+        $scope.copyToLocalStorage = function (evt, idx) {
+
+            var stackedContentItem = JSON.parse(JSON.stringify($scope.model.value[idx]));
+
+            stackedContentItem.key = "";
+            delete stackedContentItem.$$hashKey;
+
+            if (validateModel(stackedContentItem)) {
+                window.localStorage.setItem(copyKey, JSON.stringify(stackedContentItem));
+                notificationsService.success("Nested Content", "Copied to clipboard.");
+                return;
+            } else {
+                notificationsService.error("Nested Content", "Sorry, something went wrong.");
+            }
+        }
+
+        $scope.pasteFromLocalStorage = function (evt, idx) {
+
+            var copiedItem = JSON.parse(window.localStorage.getItem(copyKey));
+
+            if (!copiedItem) {
+                notificationsService.error("Nested Content", "You need to copy content first.");
+                return;
+            }
+            if (validateModel(copiedItem)) {
+                copiedItem.id = guid();
+
+                var scaffold = $scope.getScaffold(copiedItem.ncContentTypeAlias);
+                var newNode = initNode(scaffold, copiedItem);
+
+                $scope.currentNode = newNode;
+                return;
+            } else {
+                notificationsService.error("Nested Content", "Sorry, this content is not allowed here.");
+            }
+        }
+
+        var validateModel = function (model) {
+            try {
+                if (!model || !model.ncContentTypeAlias) return false;
+                if (!$scope.model.config.contentTypes.filter(x => x.ncAlias === model.ncContentTypeAlias).length) return false;
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }        
 
         var notSupported = [
           "Umbraco.Tags",

@@ -21,6 +21,9 @@
                         <a class="umb-nested-content__icon umb-nested-content__icon--delete" title="{{deleteIconTitle}}" ng-class="{ 'umb-nested-content__icon--disabled': $parent.nodes.length <= $parent.minItems }" ng-click="$parent.deleteNode($index); $event.stopPropagation();" prevent-default>
                             <i class="icon icon-trash"></i>
                         </a>
+                        <a class="umb-nested-content__icon umb-nested-content__icon--copy" title="{{copyIconTitle}}" ng-click="copyToLocalStorage($event, $index); $event.stopPropagation();" ng-if="canCopy()" prevent-default>
+                            <i class="icon icon-documents"></i>
+                        </a>                        
                     </div>
 
                 </div>
@@ -40,6 +43,9 @@
             <a class="umb-nested-content__icon" ng-click="openNodeTypePicker($event)" prevent-default>
                 <i class="icon icon-add"></i>
             </a>
+            <a class="umb-nested-content__icon" ng-click="pasteFromLocalStorage($event, model.value.length)" title="Paste" ng-if="canPaste()" prevent-default>
+                <i class="icon icon-paste-in"></i>
+            </a>           
         </div>
 
         <div class="usky-grid umb-nested-content__node-type-picker" ng-if="overlayMenu.show">
