@@ -28,12 +28,23 @@
 
         var vm = this;
 
+        vm.$onInit = onInit;
         vm.$postLink = postLink;
         vm.$onDestroy = onDestroy;
 
         vm.selectVariant = selectVariant;
         vm.openSplitView = openSplitView;
         vm.selectApp = selectApp;
+
+        function onInit() {
+            // disable the name field if the active content app is not "Content"
+            vm.nameDisabled = false;
+            angular.forEach(vm.editor.content.apps, function(app){
+                if(app.active && app.alias !== "content") {
+                    vm.nameDisabled = true;
+                }
+            });
+        }
         
         /** Called when the component has linked all elements, this is when the form controller is available */
         function postLink() {
@@ -67,6 +78,12 @@
          * @param {any} item
          */
         function selectApp(item) {
+            // disable the name field if the active content app is not "Content"
+            vm.nameDisabled = false;
+            if(item && item.alias !== "content") {
+                vm.nameDisabled = true;
+            }
+            // call the callback if any is registered
             if(vm.onSelectApp) {
                 vm.onSelectApp({"app": item});
             }
