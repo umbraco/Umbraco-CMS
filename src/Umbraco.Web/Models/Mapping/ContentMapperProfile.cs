@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -80,11 +81,31 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdateDate, opt => opt.ResolveUsing<CultureUpdateDateResolver>())
+                .ForMember(dest => dest.Published, opt => opt.ResolveUsing<CulturePublishedResolver>())
                 .ForMember(dest => dest.Name, opt => opt.ResolveUsing<CultureNameResolver>());
 
             //FROM IContent TO ContentPropertyCollectionDto
             //NOTE: the property mapping for cultures relies on a culture being set in the mapping context
             CreateMap<IContent, ContentPropertyCollectionDto>();
+        }
+    }
+
+    internal class CultureUpdateDateResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, DateTime>
+    {
+        public DateTime Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, DateTime destMember, ResolutionContext context)
+        {
+            var culture = context.GetCulture();
+            return source.GetPublishDate(culture).HasValue ? source.GetPublishDate(culture).Value : source.UpdateDate;
+        }
+    }
+
+    internal class CulturePublishedResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, bool>
+    {
+        public bool Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, bool destMember, ResolutionContext context)
+        {
+            var culture = context.GetCulture();
+            return source.IsCulturePublished(culture);
         }
     }
 
