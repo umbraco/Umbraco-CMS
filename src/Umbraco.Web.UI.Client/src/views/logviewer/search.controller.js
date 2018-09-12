@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LogViewerOverviewController($q, logViewerResource, overlayService) {
+    function LogViewerSearchController($q, logViewerResource, overlayService) {
 
         var vm = this;
 
@@ -325,6 +325,6 @@
 
     }
 
-    angular.module("umbraco").controller("Umbraco.Editors.LogViewer.OverviewController", LogViewerOverviewController);
+    angular.module("umbraco").controller("Umbraco.Editors.LogViewer.SearchController", LogViewerSearchController);
 
 })();
