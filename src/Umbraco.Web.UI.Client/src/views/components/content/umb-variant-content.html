@@ -1,27 +1,27 @@
 ﻿<div>
-    <umb-load-indicator ng-if="vm.editor.loading">
+    <umb-load-indicator 
+        ng-if="vm.editor.loading">
     </umb-load-indicator>
 
     <div class="umb-split-view__content" ng-show="!vm.editor.loading">
 
         <ng-form name="contentHeaderForm">
-            <umb-editor-header menu="vm.page.menu"
-                               hide-menu="vm.page.hideActionsMenu"
-                               name="vm.editor.content.name"
-                               hide-icon="true"
-                               hide-description="true"
-                               hide-alias="true"
-                               navigation="vm.editor.content.apps"
-                               variants="vm.editor.content.variants"
-                               hide-change-variant="vm.page.hideChangeVariant"
-                               on-back="vm.backToListView()"
-                               show-back-button="vm.page.listViewPath !== null"
-                               split-view-open="vm.editorCount > 1"
-                               on-open-in-split-view="vm.openSplitView(variant)"
-                               on-close-split-view="vm.onCloseSplitView()"
-                               on-select-variant="vm.selectVariant(variant)"
-                               server-validation-name-field="{{'Variants[' + vm.editorIndex + '].Name'}}">
-            </umb-editor-header>
+            <umb-editor-content-header 
+                menu="vm.page.menu"
+                hide-menu="vm.page.hideActionsMenu"
+                name="vm.editor.content.name"
+                navigation="vm.editor.content.apps"
+                on-select-navigation-item="vm.selectApp(item)"
+                variants="vm.editor.content.variants"
+                open-variants="vm.openVariants"
+                hide-change-variant="vm.page.hideChangeVariant"
+                show-back-button="vm.page.listViewPath !== null"
+                split-view-open="vm.editorCount > 1"
+                on-open-in-split-view="vm.openSplitView(variant)"
+                on-close-split-view="vm.onCloseSplitView()"
+                on-select-variant="vm.selectVariant(variant)"
+                server-validation-name-field="{{'Variants[' + vm.editorIndex + '].Name'}}">
+            </umb-editor-content-header>
         </ng-form>
 
         <umb-editor-container>

@@ -144,7 +144,6 @@
     <Compile Include="Media\Exif\Utility.cs" />
     <Compile Include="Media\ImageHelper.cs" />
     <Compile Include="Media\UploadAutoFillProperties.cs" />
-    <Compile Include="ContentExtensions.cs" />
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeClaimsIdentityFactory.cs" />
     <Compile Include="Security\BackOfficeUserManagerMarker.cs" />

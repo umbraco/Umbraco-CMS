@@ -6,7 +6,7 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, $q, appState, mediaResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper, editorState, umbRequestHelper, $http, eventsService) {
+function mediaEditController($scope, $routeParams, $q, appState, mediaResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, editorState, umbRequestHelper, $http, eventsService) {
     
     var evts = [];
     var nodeId = null;
@@ -79,10 +79,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
 
                 editorState.set($scope.content);
 
-                // We don't get the info tab from the server from version 7.8 so we need to manually add it
-                //contentEditingHelper.addInfoTab($scope.content.tabs);
-
-                init($scope.content);
+                init();
 
                 $scope.page.loading = false;
 
@@ -96,29 +93,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
             });
     }
 
-    function init(content) {
-
-        // prototype content and info apps
-        var contentApp = {
-            "name": "Content",
-            "alias": "content",
-            "icon": "icon-document",
-            "view": "views/media/apps/content/content.html"
-        };
-
-        var infoApp = {
-            "name": "Info",
-            "alias": "info",
-            "icon": "icon-info",
-            "view": "views/media/apps/info/info.html"
-        };
-
-        var listview = {
-            "name": "Child items",
-            "alias": "childItems",
-            "icon": "icon-list",
-            "view": "views/media/apps/listview/listview.html"
-        };
+    function init() {
 
         // set first app to active
         $scope.content.apps[0].active = true;
@@ -154,7 +129,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
                     
                     syncTreeNode($scope.content, data.path);
 
-                    init($scope.content);
+                    init();
 
                     $scope.page.saveButtonState = "success";
 
@@ -216,10 +191,7 @@ function mediaEditController($scope, $routeParams, $q, appState, mediaResource, 
                         });
                 }
 
-                // We don't get the info tab from the server from version 7.8 so we need to manually add it
-                //contentEditingHelper.addInfoTab($scope.content.tabs);
-
-                init($scope.content);
+                init();
 
                 $scope.page.loading = false;
 

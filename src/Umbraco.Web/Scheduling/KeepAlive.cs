@@ -31,7 +31,7 @@ namespace Umbraco.Web.Scheduling
             // not on slaves nor unknown role servers
             switch (_runtime.ServerRole)
             {
-                case ServerRole.Slave:
+                case ServerRole.Replica:
                     _logger.Debug<KeepAlive>("Does not run on slave servers.");
                     return true; // role may change!
                 case ServerRole.Unknown:

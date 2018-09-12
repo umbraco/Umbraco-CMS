@@ -1,9 +1,7 @@
 ﻿using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
-using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Trees;
@@ -21,12 +19,9 @@ namespace Umbraco.Web.Models.Mapping
             TabsAndPropertiesResolver<IContent, ContentVariantDisplay> tabsAndPropertiesResolver,
             ContentAppResolver contentAppResolver,
             IUserService userService,
-            ILocalizedTextService textService,
             IContentService contentService,
             IContentTypeService contentTypeService,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILogger logger)
+            ILocalizationService localizationService)
         {
             // create, capture, cache
             var contentOwnerResolver = new OwnerResolver<IContent>(userService);
@@ -70,6 +65,7 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.PublishDate, opt => opt.MapFrom(src => src.PublishDate))
                 .ForMember(dest => dest.Segment, opt => opt.Ignore())
                 .ForMember(dest => dest.Language, opt => opt.Ignore())
+                .ForMember(dest => dest.Notifications, opt => opt.Ignore())
                 .ForMember(dest => dest.State, opt => opt.ResolveUsing(contentSavedStateResolver))
                 .ForMember(dest => dest.Tabs, opt => opt.ResolveUsing(tabsAndPropertiesResolver));
 
@@ -83,11 +79,20 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.Trashed, opt => opt.MapFrom(src => src.Trashed))
                 .ForMember(dest => dest.ContentTypeAlias, opt => opt.MapFrom(src => src.ContentType.Alias))
                 .ForMember(dest => dest.Alias, opt => opt.Ignore())
-                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore());
+                .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
+                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<CultureNameResolver>());
 
             //FROM IContent TO ContentPropertyCollectionDto
             //NOTE: the property mapping for cultures relies on a culture being set in the mapping context
             CreateMap<IContent, ContentPropertyCollectionDto>();
+        }
+    }
+
+    internal class CultureNameResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, string>
+    {
+        public string Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, string destMember, ResolutionContext context)
+        {
+            return source.GetCultureName(context.GetCulture());
         }
     }
 }
