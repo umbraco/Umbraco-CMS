@@ -51,10 +51,9 @@ namespace Umbraco.Core.Sync
             if (request != null)
             {
                 var applicationUrl = GetApplicationUrlFromRequest(request);
-                newApplicationUrl = !appContext._umbracoApplicationDomains.Contains(applicationUrl);
+                newApplicationUrl = appContext._umbracoApplicationDomains.TryAdd(applicationUrl, applicationUrl);
                 if (newApplicationUrl)
                 {
-                    appContext._umbracoApplicationDomains.Add(applicationUrl);
                     LogHelper.Info(typeof(ApplicationUrlHelper), string.Format("New ApplicationUrl detected: {0}", applicationUrl));
                 }
             }
@@ -156,7 +155,7 @@ namespace Umbraco.Core.Sync
             // otherwise,
             //  if non-standard ports used,
             //  user may need to set umbracoApplicationUrl manually per 
-            //  http://our.umbraco.org/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks
+            //  https://our.umbraco.com/documentation/Using-Umbraco/Config-files/umbracoSettings/#ScheduledTasks
             var port = (request.IsSecureConnection == false && GlobalSettings.UseSSL == false)
                         || (request.IsSecureConnection && GlobalSettings.UseSSL)
                 ? ":" + request.ServerVariables["SERVER_PORT"]

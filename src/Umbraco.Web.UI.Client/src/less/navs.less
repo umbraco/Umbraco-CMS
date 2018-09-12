@@ -126,6 +126,14 @@
 // Make the list-items overlay the bottom border
 .nav-tabs > li {
   margin-bottom: -1px;
+
+  &.dropdown {
+    margin-bottom: -3px;
+
+    >.dropdown-toggle {
+      padding-bottom: 2px;
+    }
+  }
 }
 // Actual tabs (as links)
 .nav-tabs > li > a {

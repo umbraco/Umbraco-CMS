@@ -1,59 +1,72 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
-	function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, userService, localizationService) {
-	    var dialogOptions = $scope.model;
+	function ($scope, eventsService, dialogService, entityResource, contentResource, mediaHelper, userService, localizationService, tinyMceService) {
+		var dialogOptions = $scope.model;
 
-	    var searchText = "Search...";
-	    localizationService.localize("general_search").then(function (value) {
-	        searchText = value + "...";
-	    });
+		var searchText = "Search...";
+		localizationService.localize("general_search").then(function (value) {
+			searchText = value + "...";
+		});
 
-		if(!$scope.model.title) {
-		    $scope.model.title = localizationService.localize("defaultdialogs_selectLink");
+		if (!$scope.model.title) {
+			$scope.model.title = localizationService.localize("defaultdialogs_selectLink");
 		}
 
-	    $scope.dialogTreeEventHandler = $({});
-	    $scope.model.target = {};
-	    $scope.searchInfo = {
-	        searchFromId: null,
-	        searchFromName: null,
-            showSearch: false,
-            bypassUserPermissions: dialogOptions.bypassUserPermissions,
-	        results: [],
-	        selectedSearchResults: []
-        };
-        
-        $scope.customTreeParams = dialogOptions.bypassUserPermissions ? "bypassUserPermissions=" + dialogOptions.bypassUserPermissions : "";
+		$scope.dialogTreeEventHandler = $({});
+		$scope.model.target = {};
+		$scope.searchInfo = {
+			searchFromId: null,
+			searchFromName: null,
+			showSearch: false,
+      bypassUserPermissions: dialogOptions.bypassUserPermissions,
+			results: [],
+			selectedSearchResults: []
+		};
+    $scope.customTreeParams = dialogOptions.bypassUserPermissions ? "bypassUserPermissions=" + dialogOptions.bypassUserPermissions : "";
+		$scope.showTarget = $scope.model.hideTarget !== true;
 
-            $scope.showTarget = $scope.model.hideTarget !== true;
+		if (dialogOptions.currentTarget) {
+			$scope.model.target = dialogOptions.currentTarget;
+			//if we have a node ID, we fetch the current node to build the form data
+			if ($scope.model.target.id || $scope.model.target.udi) {
 
-	    if (dialogOptions.currentTarget) {
-	        $scope.model.target = dialogOptions.currentTarget;
+				//will be either a udi or an int
+				var id = $scope.model.target.udi ? $scope.model.target.udi : $scope.model.target.id;
 
-	        //if we have a node ID, we fetch the current node to build the form data
-	        if ($scope.model.target.id || $scope.model.target.udi) {
+				if (!$scope.model.target.path) {
 
-                //will be either a udi or an int
-                var id = $scope.model.target.udi ? $scope.model.target.udi : $scope.model.target.id;
+					entityResource.getPath(id, "Document").then(function (path) {
+						$scope.model.target.path = path;
+						//now sync the tree to this path
+						$scope.dialogTreeEventHandler.syncTree({
+							path: $scope.model.target.path,
+							tree: "content"
+						});
+					});
+				}
 
-                if (!$scope.model.target.path) {
-                    
-                    entityResource.getPath(id, "Document").then(function (path) {
-	                    $scope.model.target.path = path;
-	                    //now sync the tree to this path
-	                    $scope.dialogTreeEventHandler.syncTree({ path: $scope.model.target.path, tree: "content" });
-	                });
-	            }
+				// if a link exists, get the properties to build the anchor name list
+				contentResource.getById(id).then(function (resp) {
+					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
+					$scope.model.target.url = resp.urls[0];
+				});
+			} else if ($scope.model.target.url.length) {
+			    // a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
+                // only do the substring if there's a # or a ?
+                var indexOfAnchor = $scope.model.target.url.search(/(#|\?)/);
+                if (indexOfAnchor > -1) {
+                    // populate the anchor
+                    $scope.model.target.anchor = $scope.model.target.url.substring(indexOfAnchor);
+                    // then rewrite the model and populate the link
+                    $scope.model.target.url = $scope.model.target.url.substring(0, indexOfAnchor);
+                }
+			}
+		} else if (dialogOptions.anchors) {
+			$scope.anchorValues = dialogOptions.anchors;
+		}
 
-                contentResource.getNiceUrl(id).then(function (url) {
-	                $scope.model.target.url = url;
-	            });
-	        }
-	    }
-
-	    function nodeSelectHandler(ev, args) {
-
-			if(args && args.event) {
+		function nodeSelectHandler(ev, args) {
+			if (args && args.event) {
 				args.event.preventDefault();
 				args.event.stopPropagation();
 			}
@@ -73,88 +86,94 @@ angular.module("umbraco").controller("Umbraco.Overlays.LinkPickerController",
 
 			if (args.node.id < 0) {
 				$scope.model.target.url = "/";
-			}
-			else {
-				contentResource.getNiceUrl(args.node.id).then(function (url) {
-					$scope.model.target.url = url;
+			} else {
+				contentResource.getById(args.node.id).then(function (resp) {
+					$scope.anchorValues = tinyMceService.getAnchorNames(JSON.stringify(resp.properties));
+					$scope.model.target.url = resp.urls[0];
 				});
 			}
 
 			if (!angular.isUndefined($scope.model.target.isMedia)) {
 				delete $scope.model.target.isMedia;
 			}
-	    }
+		}
 
-	    function nodeExpandedHandler(ev, args) {
+		function nodeExpandedHandler(ev, args) {
 			// open mini list view for list views
 			if (args.node.metaData.isContainer) {
 				openMiniListView(args.node);
 			}
-	    }
+		}
 
-	    $scope.switchToMediaPicker = function () {
-            userService.getCurrentUser().then(function (userData) {
-                var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
-                var startNodeIsVirtual = userData.startMediaIds.length !== 1;
+		$scope.switchToMediaPicker = function () {
+			userService.getCurrentUser().then(function (userData) {
+        var startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
+        var startNodeIsVirtual = userData.startMediaIds.length !== 1;
 
-                if (dialogOptions.bypassUserPermissions) {
-                    startNodeId = -1;
-                    startNodeIsVirtual = true;
-                }
+        if (dialogOptions.bypassUserPermissions) {
+            startNodeId = -1;
+            startNodeIsVirtual = true;
+        }
+				$scope.mediaPickerOverlay = {
+					view: "mediapicker",
+					startNodeId: startNodeId,
+					startNodeIsVirtual: startNodeIsVirtual,
+					show: true,
+          bypassUserPermissions: dialogOptions.bypassUserPermissions,  
+					submit: function (model) {
+						var media = model.selectedImages[0];
 
-	            $scope.mediaPickerOverlay = {
-	                view: "mediapicker",
-                    startNodeId: startNodeId,
-                    startNodeIsVirtual: startNodeIsVirtual,
-                    show: true,
-                    bypassUserPermissions: dialogOptions.bypassUserPermissions,
-	                submit: function(model) {
-	                    var media = model.selectedImages[0];
+						$scope.model.target.id = media.id;
+						$scope.model.target.udi = media.udi;
+						$scope.model.target.isMedia = true;
+						$scope.model.target.name = media.name;
+						$scope.model.target.url = mediaHelper.resolveFile(media);
+						
+						debugger;
 
-	                    $scope.model.target.id = media.id;
-	                    $scope.model.target.udi = media.udi;
-	                    $scope.model.target.isMedia = true;
-	                    $scope.model.target.name = media.name;
-	                    $scope.model.target.url = mediaHelper.resolveFile(media);
+						$scope.mediaPickerOverlay.show = false;
+						$scope.mediaPickerOverlay = null;
+					}
+				};
+			});
+		};
 
-	                    $scope.mediaPickerOverlay.show = false;
-	                    $scope.mediaPickerOverlay = null;
-	                }
-	            };
-	        });
-	    };
+		$scope.hideSearch = function () {
+			$scope.searchInfo.showSearch = false;
+			$scope.searchInfo.searchFromId = null;
+			$scope.searchInfo.searchFromName = null;
+			$scope.searchInfo.results = [];
+		}
 
-	    $scope.hideSearch = function () {
-	        $scope.searchInfo.showSearch = false;
-	        $scope.searchInfo.searchFromId = null;
-	        $scope.searchInfo.searchFromName = null;
-	        $scope.searchInfo.results = [];
-	    }
+		// method to select a search result
+		$scope.selectResult = function (evt, result) {
+			result.selected = result.selected === true ? false : true;
+			nodeSelectHandler(evt, {
+				event: evt,
+				node: result
+			});
+		};
 
-	    // method to select a search result
-	    $scope.selectResult = function (evt, result) {
-	        result.selected = result.selected === true ? false : true;
-	        nodeSelectHandler(evt, {event: evt, node: result});
-	    };
+		//callback when there are search results
+		$scope.onSearchResults = function (results) {
+			$scope.searchInfo.results = results;
+			$scope.searchInfo.showSearch = true;
+		};
 
-        //callback when there are search results
-	    $scope.onSearchResults = function (results) {
-	        $scope.searchInfo.results = results;
-            $scope.searchInfo.showSearch = true;
-	    };
+		$scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
+		$scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
 
-	    $scope.dialogTreeEventHandler.bind("treeNodeSelect", nodeSelectHandler);
-	    $scope.dialogTreeEventHandler.bind("treeNodeExpanded", nodeExpandedHandler);
-
-	    $scope.$on('$destroy', function () {
-	        $scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
-	        $scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
-	    });
+		$scope.$on('$destroy', function () {
+			$scope.dialogTreeEventHandler.unbind("treeNodeSelect", nodeSelectHandler);
+			$scope.dialogTreeEventHandler.unbind("treeNodeExpanded", nodeExpandedHandler);
+		});
 
 		// Mini list view
 		$scope.selectListViewNode = function (node) {
 			node.selected = node.selected === true ? false : true;
-			nodeSelectHandler({}, { node: node });
+			nodeSelectHandler({}, {
+				node: node
+			});
 		};
 
 		$scope.closeMiniListView = function () {

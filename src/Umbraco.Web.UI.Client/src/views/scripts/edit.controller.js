@@ -156,7 +156,7 @@
                                 });
                             },
                             readOnly: true
-                        },
+                        }
                     ]);
                     
                     // initial cursor placement

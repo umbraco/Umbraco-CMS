@@ -140,37 +140,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                             //Filter the path for root node ids (we don't want to pass in -1 or 'init')
 
                             args.path = _.filter(args.path, function (item) { return (item !== "init" && item !== "-1"); });
-
-                            //Once those are filtered we need to check if the current user has a special start node id,
-                            // if they do, then we're going to trim the start of the array for anything found from that start node
-                            // and previous so that the tree syncs properly. The tree syncs from the top down and if there are parts
-                            // of the tree's path in there that don't actually exist in the dom/model then syncing will not work.
-
-                            userService.getCurrentUser().then(function (userData) {
-
-                                var startNodes = [];
-                                for (var i = 0; i < userData.startContentIds; i++) {
-                                    startNodes.push(userData.startContentIds[i]);
-                                }
-                                for (var j = 0; j < userData.startMediaIds; j++) {
-                                    startNodes.push(userData.startMediaIds[j]);
-                                }
-
-                                _.each(startNodes, function (i) {
-                                    var found = _.find(args.path, function (p) {
-                                        return String(p) === String(i);
-                                    });
-                                    if (found) {
-                                        args.path = args.path.splice(_.indexOf(args.path, found));
-                                    }
-                                });
-
-
-                                loadPath(args.path, args.forceReload, args.activate);
-
-                            });
-
-
+                            loadPath(args.path, args.forceReload, args.activate);
 
                             return deferred.promise;
                         };

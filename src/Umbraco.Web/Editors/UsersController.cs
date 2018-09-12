@@ -219,6 +219,7 @@ namespace Umbraco.Web.Editors
             // so to do that here, we'll need to check if this current user is an admin and if not we should exclude all user who are
             // also admins
 
+            var hideDisabledUsers = UmbracoConfig.For.UmbracoSettings().Security.HideDisabledUsersInBackoffice;
             var excludeUserGroups = new string[0];
             var isAdmin = Security.CurrentUser.IsAdmin();
             if (isAdmin == false)
@@ -241,10 +242,18 @@ namespace Umbraco.Web.Editors
                 filterQuery.Where(x => x.Name.Contains(filter) || x.Username.Contains(filter));
             }
 
+            if (hideDisabledUsers)
+            {
+                if (userStates == null || userStates.Any() == false)
+                {
+                    userStates = new[] { UserState.Active, UserState.Invited, UserState.LockedOut, UserState.Inactive };
+                }
+            }
+
             long pageIndex = pageNumber - 1;
             long total;
             var result = Services.UserService.GetAll(pageIndex, pageSize, out total, orderBy, orderDirection, userStates, userGroups, excludeUserGroups, filterQuery);
-            
+
             var paged = new PagedUserResult(total, pageNumber, pageSize)
             {
                 Items = Mapper.Map<IEnumerable<UserBasic>>(result),
@@ -411,6 +420,8 @@ namespace Umbraco.Web.Editors
             //send the email
 
             await SendUserInviteEmailAsync(display, Security.CurrentUser.Name, Security.CurrentUser.Email, user, userSave.Message);
+
+            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles/resendInviteHeader"), Services.TextService.Localize("speechBubbles/resendInviteSuccess", new[] { user.Name }));
 
             return display;
         }
@@ -697,6 +708,36 @@ namespace Umbraco.Web.Editors
             Services.UserService.Save(users);
             return Request.CreateNotificationSuccessResponse(
                 Services.TextService.Localize("speechBubbles/setUserGroupOnUsersSuccess"));
+        }
+
+        /// <summary>
+        /// Deletes the non-logged in user provided id
+        /// </summary>
+        /// <param name="id">User Id</param>
+        /// <remarks>
+        /// Limited to users that haven't logged in to avoid issues with related records constrained
+        /// with a foreign key on the user Id
+        /// </remarks>
+        public async Task<HttpResponseMessage> PostDeleteNonLoggedInUser(int id)
+        {
+            var user = Services.UserService.GetUserById(id);
+            if (user == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            // Check user hasn't logged in.  If they have they may have made content changes which will mean
+            // the Id is associated with audit trails, versions etc. and can't be removed.
+            if (user.LastLoginDate != default(DateTime))
+            {
+                throw new HttpResponseException(HttpStatusCode.BadRequest);
+            }
+
+            var userName = user.Name;
+            Services.UserService.Delete(user, true);
+            
+            return Request.CreateNotificationSuccessResponse(
+                Services.TextService.Localize("speechBubbles/deleteUserSuccess", new[] { userName }));
         }
 
         public class PagedUserResult : PagedResult<UserBasic>

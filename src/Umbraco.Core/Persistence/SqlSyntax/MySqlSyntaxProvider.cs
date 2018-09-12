@@ -78,6 +78,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
+        /// <inheritdoc />
         public override IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db)
         {
             List<Tuple<string, string>> list;
@@ -100,6 +101,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
+        /// <inheritdoc />
         public override IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db)
         {
             List<Tuple<string, string, string>> list;
@@ -126,6 +128,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
+        /// <inheritdoc />
         public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db)
         {
             List<Tuple<string, string, string, bool>> list;
