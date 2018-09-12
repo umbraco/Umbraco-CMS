@@ -124,7 +124,7 @@
                                             <ins class="icon-navigation-down" ng-class="{'icon-navigation-down': vm.logOptions.orderDirection === 'Descending', 'icon-navigation-up': vm.logOptions.orderDirection !== 'Descending'}">&nbsp;</ins>
                                         </th>
                                         <th>Level</th>
-                                        <th>Machine Name</th>
+                                        <th>Machine</th>
                                         <th>Message</th>
                                     </tr>
                                 </thead>
@@ -132,7 +132,7 @@
                                     <tr ng-repeat-start="log in vm.logItems.items" ng-click="log.open = !log.open">
                                         <td>{{ log.Timestamp | date:'medium' }}</td>
                                         <td><umb-badge size="s" color="{{ log.logTypeColor }}">{{ log.Level }}</umb-badge></td>
-                                        <td>{{ log.Properties.MachineName.Value }}</td>
+                                        <td><small>{{ log.Properties.MachineName.Value }}</small></td>
                                         <td>{{ log.RenderedMessage }}</td>
                                     </tr>
 
