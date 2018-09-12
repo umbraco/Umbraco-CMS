@@ -8,12 +8,12 @@
     "query": "Has(@Exception)"
   },
   {
-    "name": "Find all logs that have the property 'TimingDuration'",
-    "query": "Has(TimingDuration)"
+    "name": "Find all logs that have the property 'Duration'",
+    "query": "Has(Duration)"
   },
   {
-    "name": "Find all logs that have the property 'TimingDuration' and the duration is greater than 1000ms",
-    "query": "Has(TimingDuration) and TimingDuration > 1000"
+    "name": "Find all logs that have the property 'Duration' and the duration is greater than 1000ms",
+    "query": "Has(Duration) and Duration > 1000"
   },
   {
     "name": "Find all logs that are from the namespace 'Umbraco.Core'",
