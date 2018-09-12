@@ -16,7 +16,7 @@
 
             <form ng-submit="vm.search()">
                 <umb-editor-sub-header>
-                    <umb-editor-sub-header-content-left style="width:calc(100% - 350px - 20px); line-height:30px;">
+                    <umb-editor-sub-header-content-left style="width:100%; line-height:30px;">
                         <!-- Log Level filter -->
                         <div style="position: relative;">
                             <a class="btn btn-link dropdown-toggle flex" href="" ng-click="vm.page.showLevelFilter = !vm.page.showLevelFilter">
@@ -59,7 +59,7 @@
                 </umb-editor-sub-header>
 
                 <umb-editor-sub-header>
-                    <umb-editor-sub-header-content-left style="width:calc(100% - 350px - 20px);">
+                    <umb-editor-sub-header-content-left style="width:100%">
 
                         <div style="position:relative; width:100%;">
                             <!-- Search/expression filter -->
@@ -97,9 +97,9 @@
                 </umb-editor-sub-header>
             </form>
 
-            <div class="umb-package-details" ng-if="!vm.loading">
+            <div class=" ng-if="!vm.loading">
 
-                <div class="umb-package-details__main-content">
+                <div class="">
 
                     <!-- Loader for the main logs content when paging -->
                     <umb-load-indicator ng-if="vm.logsLoading"></umb-load-indicator>
@@ -200,53 +200,6 @@
 
                         </umb-box-content>
                     </umb-box>
-                </div>
-
-                <div class="umb-package-details__sidebar">
-
-                    <!-- No of Errors -->
-                    <umb-box data-element="node-info-scheduled-publishing">
-                        <umb-box-header>Number of Errors</umb-box-header>
-                        <umb-box-content class="block-form" style="font-size: 40px; font-weight:900; text-align:center; color:#fe6561;">
-                            {{ vm.numberOfErrors }}
-                        </umb-box-content>
-                    </umb-box>
-
-                    <!-- Chart of diff log types -->
-                    <umb-box data-element="node-info-scheduled-publishing">
-                        <umb-box-header>Log Types</umb-box-header>
-                        <umb-box-content class="block-form">
-
-                            <canvas
-                                chart-doughnut
-                                chart-data="vm.logTypeData"
-                                chart-labels="vm.logTypeLabels"
-                                chart-colors="vm.logTypeColors"
-                                chart-options="vm.chartOptions"></canvas>
-
-                        </umb-box-content>
-                    </umb-box>
-
-                    <!-- List of top 5 common log messages -->
-                    <umb-box data-element="node-info-scheduled-publishing" ng-if="vm.commonLogMessages">
-                            <umb-box-header>Common Log Messages</umb-box-header>
-                            <umb-box-content class="block-form">
-                                <em>Total Unique Message types</em>: {{ vm.commonLogMessages.length }}
-                                    <table class="table table-hover">
-                                        <tbody>
-                                            <tr ng-repeat="template in vm.commonLogMessages | limitTo:vm.commonLogMessagesCount" ng-click="vm.findMessageTemplate(template)" style="cursor: pointer;">
-                                                <td>
-                                                    {{ template.MessageTemplate }}
-                                                </td>
-                                                <td>
-                                                    {{ template.Count }}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <a class="btn btn-primary" ng-if="vm.commonLogMessagesCount < vm.commonLogMessages.length" ng-click="vm.commonLogMessagesCount = vm.commonLogMessagesCount +10">Show More</a>
-                            </umb-box-content>
-                        </umb-box>
                 </div>
             </div>
 

@@ -9,7 +9,6 @@
         vm.logsLoading = false;
 
         vm.page = {};
-        vm.labels = {};
 
         vm.logLevels = [
             {
@@ -41,22 +40,8 @@
         vm.searches = [];
 
         vm.logItems = {};
-        vm.numberOfErrors = 0;
-        vm.commonLogMessages = [];
-        vm.commonLogMessagesCount = 10;
         vm.logOptions = {};
         vm.logOptions.orderDirection = 'Descending';
-
-        // ChartJS Options - for count/overview of log distribution
-        vm.logTypeLabels = ["Info", "Debug", "Warning", "Error", "Critical"];
-        vm.logTypeData = [0, 0, 0, 0, 0];
-        vm.logTypeColors = [ '#dcdcdc', '#97bbcd', '#46bfbd', '#fdb45c', '#f7464a'];
-        vm.chartOptions = {
-            legend: {
-                display: true,
-                position: 'left'
-            }
-        };
 
         vm.fromDatePickerConfig = {
             pickDate: true,
@@ -92,7 +77,6 @@
         vm.getFilterName = getFilterName;
         vm.setLogLevelFilter = setLogLevelFilter;
         vm.toggleOrderBy = toggleOrderBy;
-        vm.findMessageTemplate = findMessageTemplate;
         vm.selectSearch = selectSearch;
         vm.resetSearch = resetSearch;
         vm.findItem = findItem;
@@ -106,6 +90,7 @@
 
             var savedSearches = logViewerResource.getSavedSearches().then(function (data) {
                 vm.searches = data;
+                vm.loading = false;
             },
             // fallback to some defaults if error from API response
             function () {
@@ -136,29 +121,6 @@
                     }
                 ]
             });
-
-
-            var numOfErrors = logViewerResource.getNumberOfErrors().then(function (data) {
-                vm.numberOfErrors = data;
-            });
-
-            var logCounts = logViewerResource.getLogLevelCounts().then(function (data) {
-                vm.logTypeData = [];
-                vm.logTypeData.push(data.Information);
-                vm.logTypeData.push(data.Debug);
-                vm.logTypeData.push(data.Warning);
-                vm.logTypeData.push(data.Error);
-                vm.logTypeData.push(data.Fatal);
-            });
-
-            var commonMsgs = logViewerResource.getMessageTemplates().then(function(data){
-                vm.commonLogMessages = data;
-            });
-
-            //Set loading indicatior to false when these 3 queries complete
-            $q.all([savedSearches, numOfErrors, logCounts, commonMsgs]).then(function(data) {
-                vm.loading = false;
-              });
 
             //Get all logs on init load
             getLogs();
@@ -245,13 +207,6 @@
             vm.logOptions.orderDirection = vm.logOptions.orderDirection === 'Descending' ? 'Ascending' : 'Descending';
 
             getLogs();
-        }
-
-        function findMessageTemplate(template){
-
-            //Update search box input
-            vm.logOptions.filterExpression = "@MessageTemplate='" + template.MessageTemplate + "'";
-            search();
         }
 
         function selectSearch(searchItem){
