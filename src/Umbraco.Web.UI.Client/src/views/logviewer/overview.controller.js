@@ -106,10 +106,6 @@
 
             var savedSearches = logViewerResource.getSavedSearches().then(function (data) {
                 vm.searches = data;
-            });
-
-            var savedSearches = logViewerResource.getSavedSearches().then(function (data) {
-                vm.searches = data;
             },
             // fallback to some defaults if error from API response
             function () {
