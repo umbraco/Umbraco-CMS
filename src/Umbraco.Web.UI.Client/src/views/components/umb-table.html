@@ -15,6 +15,9 @@
                         <i class="umb-table-head__icon icon" ng-class="{'icon-navigation-up': isSortDirection('Name', 'asc'), 'icon-navigation-down': isSortDirection('Name', 'desc')}"></i>
                     </a>
                 </div>
+                <div class="umb-table-cell" ng-if="items[0].state">
+                    <localize key="general_status">Status</localize>
+                </div>
                 <div class="umb-table-cell" ng-repeat="column in itemProperties">
                     <a class="umb-table-head__link" title="Sort by {{ column.header }}" href="#"
                        ng-click="sort(column.alias, column.allowSorting, column.isSystem)"
@@ -45,6 +48,11 @@
                        ng-click="clickItem(item, $event)"
                        ng-bind="item.name">
                     </a>
+                </div>
+                <div class="umb-table-cell" ng-if="item.state">
+                    <umb-variant-state
+                        variant="item">
+                    </umb-variant-state>
                 </div>
                 <div class="umb-table-cell" ng-repeat="column in itemProperties">
                     <span title="{{column.header}}: {{item[column.alias]}}">
