@@ -54,16 +54,15 @@ namespace Umbraco.Core.Logging.Viewer
             if (string.IsNullOrEmpty(filterExpression) == false)
             {
                 Func<LogEvent, bool> filter = null;
-
+                
                 // If the expression evaluates then make it into a filter
-                // TODO: Why does any single word evaluate?
                 if (FilterLanguage.TryCreateFilter(filterExpression, out Func<LogEvent, object> eval, out string error))
                 {
                     filter = evt => true.Equals(eval(evt));
                 }
                 else // assume the expression was a search string and make a Like filter from that
                 {
-                    var filterSearch = $"@Message like '%{FilterLanguage.EscapeStringContent(filterExpression)}%'";
+                    var filterSearch = $"@Message like '%{FilterLanguage.EscapeLikeExpressionContent(filterExpression)}%'";
                     if (FilterLanguage.TryCreateFilter(filterSearch, out eval, out error))
                     {
                         filter = evt => true.Equals(eval(evt));
