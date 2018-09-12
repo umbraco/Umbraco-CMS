@@ -158,8 +158,10 @@
                                                     <tr ng-repeat="(key, val) in log.Properties">
                                                         <th>{{key}}</th>
                                                         <td ng-switch on="key">
-                                                            <button ng-switch-when="HttpRequestNumber" ng-click="vm.findItem(key, val.Value)" class="btn btn-info">Find Logs with Request ID {{val.Value}}</button>
-                                                            <button ng-switch-when="SourceContext" ng-click="vm.findItem(key, val.Value)" class="btn btn-info">Find Logs with Namespace {{val.Value}}</button>
+                                                            <a ng-switch-when="HttpRequestNumber" ng-click="vm.findItem(key, val.Value)" title="Find Logs with Request ID">{{val.Value}} <i class="icon-search"></i></a>
+                                                            <a ng-switch-when="SourceContext" ng-click="vm.findItem(key, val.Value)" title="Find Logs with Namespace">{{val.Value}} <i class="icon-search"></i></a>
+                                                            <a ng-switch-when="MachineName" ng-click="vm.findItem(key, val.Value)" title="Find Logs with Machine Name">{{val.Value}} <i class="icon-search"></i></a>
+                                                            <a ng-switch-when="RequestUrl" href="{{val.Value}}" target="_blank" rel="noopener" title="Open">{{val.Value}} <i class="icon-link"></i></a>
                                                             <span ng-switch-default>{{val.Value}}</span>
                                                         </td>
                                                     </tr>
