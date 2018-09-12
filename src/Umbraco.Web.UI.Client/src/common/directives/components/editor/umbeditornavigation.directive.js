@@ -20,8 +20,11 @@
             scope.clickNavigationItem = function (selectedItem) {
                 scope.showDropdown = false;
                 runItemAction(selectedItem);
-                eventsService.emit("app.tabChange", selectedItem);
                 setItemToActive(selectedItem);
+                if(scope.onSelect) {
+                    scope.onSelect({"item": selectedItem});
+                }
+                eventsService.emit("app.tabChange", selectedItem);
             };
 
             scope.toggleDropdown = function () {
@@ -124,7 +127,8 @@
             replace: true,
             templateUrl: 'views/components/editor/umb-editor-navigation.html',
             scope: {
-                navigation: "="
+                navigation: "=",
+                onSelect: "&"
             },
             link: link
         };
