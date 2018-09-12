@@ -83,11 +83,57 @@ namespace Umbraco.Web.Models.Mapping
                 .ForMember(dest => dest.AdditionalData, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdateDate, opt => opt.ResolveUsing<CultureUpdateDateResolver>())
                 .ForMember(dest => dest.Published, opt => opt.ResolveUsing<CulturePublishedResolver>())
-                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<CultureNameResolver>());
+                .ForMember(dest => dest.Name, opt => opt.ResolveUsing<CultureNameResolver>())
+                .ForMember(dest => dest.State, opt => opt.ResolveUsing<CultureStateResolver>());
 
             //FROM IContent TO ContentPropertyCollectionDto
             //NOTE: the property mapping for cultures relies on a culture being set in the mapping context
             CreateMap<IContent, ContentPropertyCollectionDto>();
+        }
+    }
+
+    internal class CultureStateResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, ContentSavedState>
+    {
+        //WB: Note this is same logic as ContentSavedStateResolver.cs
+        //But this is for ContentItemBasic instead of ContentVariantDisplay
+        public ContentSavedState Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, ContentSavedState destMember, ResolutionContext context)
+        {
+            PublishedState publishedState;
+            bool isEdited;
+
+            if (source.ContentType.VariesByCulture())
+            {
+                //Get the culture from the context which will be set during the mapping operation for each variant
+                var culture = context.GetCulture();
+
+                //a culture needs to be in the context for a variant content item
+                if (culture == null)
+                    throw new InvalidOperationException($"No culture found in mapping operation when one is required for a culture variant");
+
+                publishedState = source.PublishedState == PublishedState.Unpublished //if the entire document is unpublished, then flag every variant as unpublished
+                    ? PublishedState.Unpublished
+                    : source.IsCulturePublished(culture)
+                        ? PublishedState.Published
+                        : PublishedState.Unpublished;
+
+                isEdited = source.IsCultureEdited(culture);
+            }
+            else
+            {
+                publishedState = source.PublishedState == PublishedState.Unpublished
+                    ? PublishedState.Unpublished
+                    : PublishedState.Published;
+
+                isEdited = source.Edited;
+            }
+
+            if (publishedState == PublishedState.Unpublished)
+                return isEdited && source.Id > 0 ? ContentSavedState.Draft : ContentSavedState.NotCreated;
+
+            if (publishedState == PublishedState.Published)
+                return isEdited ? ContentSavedState.PublishedPendingChanges : ContentSavedState.Published;
+
+            throw new NotSupportedException($"PublishedState {publishedState} is not supported.");
         }
     }
 

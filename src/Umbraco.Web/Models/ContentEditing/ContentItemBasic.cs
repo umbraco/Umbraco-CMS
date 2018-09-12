@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Validation;
 using Umbraco.Web.WebApi;
@@ -43,6 +44,10 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "sortOrder")]
         public int SortOrder { get; set; }
+
+        [DataMember(Name = "state")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ContentSavedState State { get; set; }
 
         protected bool Equals(ContentItemBasic other)
         {
