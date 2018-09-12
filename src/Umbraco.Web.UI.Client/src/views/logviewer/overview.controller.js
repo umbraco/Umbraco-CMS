@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LogViewerOverviewController($q, logViewerResource) {
+    function LogViewerOverviewController($q, logViewerResource, overlayService) {
 
         var vm = this;
 
@@ -96,6 +96,8 @@
         vm.selectSearch = selectSearch;
         vm.resetSearch = resetSearch;
         vm.findItem = findItem;
+        vm.checkForSavedSearch = checkForSavedSearch;
+        vm.addToSavedSearches = addToSavedSearches;
 
 
         function init() {
@@ -279,6 +281,52 @@
 
             search();
         }
+
+        //Return a bool to toggle display of the star/fav
+        function checkForSavedSearch(){
+            //Check if we have a value in
+            if(!vm.logOptions.filterExpression){
+                return false;
+            }
+            else {
+                //Check what we have searched for is not an existing saved search
+                var findQuery = _.findWhere(vm.searches, {query: vm.logOptions.filterExpression});
+                return !findQuery ? true: false;
+            }
+        }
+
+        function addToSavedSearches(){
+
+            var overlay = {
+                title: "Save Search",
+                subtitle: "Enter a friendly name for your search query",
+                closeButtonLabel: "Cancel",
+                submitButtonLabel: "Save Search",
+                disableSubmitButton: true,
+                view: "logviewersearch",
+                queryToSave: vm.logOptions.filterExpression,
+                submit: function (model) {
+                    overlayService.close();
+
+                    //Resource call with two params (name & query)
+                    //API that opens the JSON and adds it to the bottom
+
+                    //model.queryName
+                    //model.queryToSave
+
+                    //Once OK from API - push it into existing vm.searches array
+                    vm.searches.push({'name': model.queryName, 'query': model.queryToSave});
+
+                },
+                close: function() {
+                    overlayService.close();
+                }
+            };
+
+            overlayService.open(overlay);
+
+        }
+
 
         init();
 
