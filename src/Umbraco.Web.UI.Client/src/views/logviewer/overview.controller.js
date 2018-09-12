@@ -38,32 +38,7 @@
             }
         ];
 
-        vm.searches = [
-            {
-                name: "Find all logs where the Level is NOT Verbose and NOT Debug",
-                query: "Not(@Level='Verbose') and Not(@Level='Debug')"
-            },
-            {
-                name: "Find all logs that has an exception property (Warning, Error & Critical with Exceptions)",
-                query: "Has(@Exception)"
-            },
-            {
-                name: "Find all logs that have the property 'TimingDuration'",
-                query: "Has(TimingDuration)"
-            },
-            {
-                name: "Find all logs that have the property 'TimingDuration' and the duration is greater than 1000ms",
-                query: "Has(TimingDuration) and TimingDuration > 1000"
-            },
-            {
-                name: "Find all logs that are from the namespace 'Umbraco.Core'",
-                query: "StartsWith(SourceContext, 'Umbraco.Core')"
-            },
-            {
-                name: "Find all logs that use a specific log message template",
-                query: "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'"
-            }
-        ]
+        vm.searches = [];
 
         vm.logItems = {};
         vm.numberOfErrors = 0;
@@ -127,6 +102,44 @@
 
             vm.loading = true;
 
+            var savedSearches = logViewerResource.getSavedSearches().then(function (data) {
+                vm.searches = data;
+            });
+
+            var savedSearches = logViewerResource.getSavedSearches().then(function (data) {
+                vm.searches = data;
+            },
+            // fallback to some defaults if error from API response
+            function () {
+                vm.searches = [
+                    {
+                        "name": "Find all logs where the Level is NOT Verbose and NOT Debug",
+                        "query": "Not(@Level='Verbose') and Not(@Level='Debug')"
+                    },
+                    {
+                        "name": "Find all logs that has an exception property (Warning, Error & Critical with Exceptions)",
+                        "query": "Has(@Exception)"
+                    },
+                    {
+                        "name": "Find all logs that have the property 'TimingDuration'",
+                        "query": "Has(TimingDuration)"
+                    },
+                    {
+                        "name": "Find all logs that have the property 'TimingDuration' and the duration is greater than 1000ms",
+                        "query": "Has(TimingDuration) and TimingDuration > 1000"
+                    },
+                    {
+                        "name": "Find all logs that are from the namespace 'Umbraco.Core'",
+                        "query": "StartsWith(SourceContext, 'Umbraco.Core')"
+                    },
+                    {
+                        "name": "Find all logs that use a specific log message template",
+                        "query": "@MessageTemplate = '[Timing {TimingId}] {EndMessage} ({TimingDuration}ms)'"
+                    }
+                ]
+            });
+
+
             var numOfErrors = logViewerResource.getNumberOfErrors().then(function (data) {
                 vm.numberOfErrors = data;
             });
@@ -145,7 +158,7 @@
             });
 
             //Set loading indicatior to false when these 3 queries complete
-            $q.all([numOfErrors, logCounts, commonMsgs]).then(function(data) {
+            $q.all([savedSearches, numOfErrors, logCounts, commonMsgs]).then(function(data) {
                 vm.loading = false;
               });
 

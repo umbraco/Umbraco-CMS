@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Logging.Viewer
 {
@@ -51,5 +53,17 @@ namespace Umbraco.Core.Logging.Viewer
             return logs;
         }
 
+        public override IEnumerable<SavedLogSearch> GetSavedSearches()
+        {
+            //Our default implementation 
+            //Open JSON file on disk and return serialize obj back
+            var path = IOHelper.MapPath("~/Config/logviewer.searches.config.js");
+
+            //If file does not exist - lets create it with an empty array
+            IOHelper.EnsureFileExists(path, "[]");
+
+            var rawJson = File.ReadAllText(path);
+            return JsonConvert.DeserializeObject<IEnumerable<SavedLogSearch>>(rawJson);
+        }
     }
 }

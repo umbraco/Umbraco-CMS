@@ -11,7 +11,9 @@ namespace Umbraco.Core.Logging.Viewer
     public abstract class LogViewerSourceBase : ILogViewer
     {
         public abstract IEnumerable<LogEvent> GetAllLogs(DateTimeOffset startDate, DateTimeOffset endDate);
-        
+
+        public abstract IEnumerable<SavedLogSearch> GetSavedSearches();
+
         public int GetNumberOfErrors(DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var logs = GetAllLogs(startDate, endDate);

@@ -16,7 +16,7 @@
                     umbRequestHelper.getApiUrl(
                         "logViewerApiBaseUrl",
                         "GetNumberOfErrors")),
-                'Failed to retrieve number of errors in logs')
+                'Failed to retrieve number of errors in logs');
         },
 
         getLogLevelCounts: function(){
@@ -35,6 +35,15 @@
                         "logViewerApiBaseUrl",
                         "GetMessageTemplates")),
                 'Failed to retrieve log templates');
+        },
+
+        getSavedSearches: function(){
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "logViewerApiBaseUrl",
+                        "GetSavedSearches")),
+                'Failed to retrieve saved searches');
         },
 
         getLogs: function(options){

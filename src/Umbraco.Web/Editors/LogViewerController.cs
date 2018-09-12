@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Web.Http;
 using Umbraco.Core.Logging.Viewer;
@@ -46,5 +47,10 @@ namespace Umbraco.Web.Editors
             return _logViewer.GetLogs(startDate: DateTime.Now.AddDays(-1), endDate: DateTime.Now, filterExpression: filterExpression, pageNumber: pageNumber, orderDirection: direction, logLevels: logLevels);
         }
 
+        [HttpGet]
+        public IEnumerable<SavedLogSearch> GetSavedSearches()
+        {
+            return _logViewer.GetSavedSearches();
+        }
     }
 }

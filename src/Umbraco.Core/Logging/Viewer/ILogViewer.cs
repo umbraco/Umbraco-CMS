@@ -14,6 +14,11 @@ namespace Umbraco.Core.Logging.Viewer
         IEnumerable<LogEvent> GetAllLogs(DateTimeOffset startDate, DateTimeOffset endDate);
 
         /// <summary>
+        /// Get all saved searches from your chosen datasource
+        /// </summary>
+        IEnumerable<SavedLogSearch> GetSavedSearches();
+
+        /// <summary>
         /// A count of number of errors
         /// By counting Warnings with Exceptions, Errors & Fatal messages
         /// </summary>
