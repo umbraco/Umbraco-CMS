@@ -30,5 +30,13 @@
   {
     "name": "Find logs where one of the items in the SortedComponentTypes property array contains",
     "query": "Contains(SortedComponentTypes[?], 'DatabaseServer')"
+  },
+  {
+    "name": "Find all logs that the message has localhost in it with SQL like",
+    "query": "@Message like '%localhost%'"
+  },
+  {
+    "name": "Find all logs that the message that starts with 'end' in it with SQL like",
+    "query": "@Message like 'end%'"
   }
 ]
