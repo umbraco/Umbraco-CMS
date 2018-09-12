@@ -92,14 +92,15 @@ namespace Umbraco.Web.Models.Mapping
         }
     }
 
-    internal class CultureStateResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, ContentSavedState>
+    internal class CultureStateResolver : IValueResolver<IContent, ContentItemBasic<ContentPropertyBasic>, ContentSavedState?>
     {
         //WB: Note this is same logic as ContentSavedStateResolver.cs
         //But this is for ContentItemBasic instead of ContentVariantDisplay
-        public ContentSavedState Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, ContentSavedState destMember, ResolutionContext context)
+        public ContentSavedState? Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, ContentSavedState? destMember, ResolutionContext context)
         {
             PublishedState publishedState;
             bool isEdited;
+            
 
             if (source.ContentType.VariesByCulture())
             {

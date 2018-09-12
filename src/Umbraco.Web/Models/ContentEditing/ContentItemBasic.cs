@@ -5,9 +5,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Validation;
-using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -47,7 +44,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "state")]
         [JsonConverter(typeof(StringEnumConverter))]
-        public ContentSavedState State { get; set; }
+        public ContentSavedState? State { get; set; } = null;
 
         protected bool Equals(ContentItemBasic other)
         {
