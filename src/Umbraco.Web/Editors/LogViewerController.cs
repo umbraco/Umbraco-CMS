@@ -52,5 +52,11 @@ namespace Umbraco.Web.Editors
         {
             return _logViewer.GetSavedSearches();
         }
+
+        [HttpPost]
+        public IEnumerable<SavedLogSearch> PostSavedSearch(SavedLogSearch item)
+        {
+            return _logViewer.AddSavedSearch(item.Name, item.Query);
+        }
     }
 }
