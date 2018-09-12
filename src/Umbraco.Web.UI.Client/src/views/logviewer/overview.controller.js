@@ -306,17 +306,14 @@
                 view: "logviewersearch",
                 queryToSave: vm.logOptions.filterExpression,
                 submit: function (model) {
-                    overlayService.close();
-
                     //Resource call with two params (name & query)
                     //API that opens the JSON and adds it to the bottom
+                    logViewerResource.postSavedSearch(model.queryName, model.queryToSave).then(function(data){
+                        console.log('search after add', data);
+                        vm.searches = data;
 
-                    //model.queryName
-                    //model.queryToSave
-
-                    //Once OK from API - push it into existing vm.searches array
-                    vm.searches.push({'name': model.queryName, 'query': model.queryToSave});
-
+                        overlayService.close();
+                    });
                 },
                 close: function() {
                     overlayService.close();

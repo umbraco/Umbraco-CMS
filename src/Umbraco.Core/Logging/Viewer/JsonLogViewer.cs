@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
@@ -64,6 +65,32 @@ namespace Umbraco.Core.Logging.Viewer
 
             var rawJson = File.ReadAllText(path);
             return JsonConvert.DeserializeObject<IEnumerable<SavedLogSearch>>(rawJson);
+        }
+
+        public override IEnumerable<SavedLogSearch> AddSavedSearch(string name, string query)
+        {
+            //Get the existing items
+            var searches = GetSavedSearches().ToList();
+
+            //Add the new item to the bottom of the list
+            searches.Add(new SavedLogSearch { Name = name, Query = query });
+
+            //Serilaize to JSON string
+            var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
+
+            //Open file & save contents
+            var path = IOHelper.MapPath("~/Config/logviewer.searches.config.js");
+
+            //If file does not exist - lets create it with an empty array
+            IOHelper.EnsureFileExists(path, "[]");
+
+            //Write it back down to file
+            File.WriteAllText(path, rawJson);
+
+            //Return the updated object - so we can instantly reset the entire array from the API response
+            //As opposed to push a new item into the array
+            return searches;
+            
         }
     }
 }

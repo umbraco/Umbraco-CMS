@@ -14,6 +14,8 @@ namespace Umbraco.Core.Logging.Viewer
 
         public abstract IEnumerable<SavedLogSearch> GetSavedSearches();
 
+        public abstract IEnumerable<SavedLogSearch> AddSavedSearch(string name, string query);
+
         public int GetNumberOfErrors(DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var logs = GetAllLogs(startDate, endDate);

@@ -46,6 +46,19 @@
                 'Failed to retrieve saved searches');
         },
 
+        postSavedSearch: function(name, query){
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "logViewerApiBaseUrl",
+                        "PostSavedSearch"), {'name': name, 'query': query }),
+                'Failed to add new saved search');
+
+                return umbRequestHelper.resourcePromise(
+                    $http.post(umbRequestHelper.getApiUrl("dataTypeApiBaseUrl", "PostSave"), saveModel),
+                    "Failed to save data for data type id " + dataType.id);
+        },
+
         getLogs: function(options){
 
             var defaults = {
