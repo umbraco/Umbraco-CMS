@@ -12,7 +12,7 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 CultureName = dto.CultureName,
                 Id = dto.Id,
-                IsDefault = dto.IsDefaultVariantLanguage,
+                IsDefault = dto.IsDefault,
                 IsMandatory = dto.IsMandatory,
                 FallbackLanguageId = dto.FallbackLanguageId
             };
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 CultureName = entity.CultureName,
                 IsoCode = entity.IsoCode,
-                IsDefaultVariantLanguage = entity.IsDefault,
+                IsDefault = entity.IsDefault,
                 IsMandatory = entity.IsMandatory,
                 FallbackLanguageId = entity.FallbackLanguageId
             };

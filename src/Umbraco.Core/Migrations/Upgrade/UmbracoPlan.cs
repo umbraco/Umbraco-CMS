@@ -118,17 +118,18 @@ namespace Umbraco.Core.Migrations.Upgrade
             Chain<IncreaseLanguageIsoCodeColumnLength>("{EB34B5DC-BB87-4005-985E-D983EA496C38}"); // from 7.12.0
             Chain<RenameTrueFalseField>("{517CE9EA-36D7-472A-BF4B-A0D6FB1B8F89}"); // from 7.12.0
             Chain<SetDefaultTagsStorageType>("{BBD99901-1545-40E4-8A5A-D7A675C7D2F2}"); // from 7.12.0
-
             //Chain<UpdateDefaultMandatoryLanguage>("{2C87AA47-D1BC-4ECB-8A73-2D8D1046C27F}"); // stephan added that one = merge conflict, remove
             
             Chain<FallbackLanguage>("{8B14CEBD-EE47-4AAD-A841-93551D917F11}"); // add andy's after others, with a new target state
             From("{CF51B39B-9B9A-4740-BB7C-EAF606A7BFBF}") // and provide a path out of andy's
-                .CopyChain("{39E5B1F7-A50B-437E-B768-1723AEC45B65}", "{BBD99901-1545-40E4-8A5A-D7A675C7D2F2}", "{8B14CEBD-EE47-4AAD-A841-93551D917F11}"); // to final
+                .CopyChain("{39E5B1F7-A50B-437E-B768-1723AEC45B65}", "{BBD99901-1545-40E4-8A5A-D7A675C7D2F2}", "{8B14CEBD-EE47-4AAD-A841-93551D917F11}"); // to next
             // resume at {8B14CEBD-EE47-4AAD-A841-93551D917F11} ...
-            Chain<UpdateDefaultMandatoryLanguage>("{guid1}"); // add stephan's after others, with a new target state
+
+            Chain<UpdateDefaultMandatoryLanguage>("{5F4597F4-A4E0-4AFE-90B5-6D2F896830EB}"); // add stephan's after others, with a new target state
             From("{2C87AA47-D1BC-4ECB-8A73-2D8D1046C27F}") // and provide a path out of stephan's
-                .Chain<FallbackLanguage>("{guid1}");
-                #error is this OK?
+                .Chain<FallbackLanguage>("{5F4597F4-A4E0-4AFE-90B5-6D2F896830EB}"); // to next
+            // resume at {5F4597F4-A4E0-4AFE-90B5-6D2F896830EB} ...
+
             //FINAL
 
 

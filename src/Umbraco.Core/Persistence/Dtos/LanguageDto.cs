@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Dtos
         /// </summary>
         [Column("isDefaultVariantLang")]
         [Constraint(Default = "0")]
-        public bool IsDefaultVariantLanguage { get; set; }
+        public bool IsDefault { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the language is mandatory.

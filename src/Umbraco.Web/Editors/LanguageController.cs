@@ -77,11 +77,8 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(message));
             }
 
-            if (langs.Any(x => x.FallbackLanguageId.HasValue && x.FallbackLanguageId.Value == language.Id))
-            {
-                var message = $"Language '{language.CultureName}' is defined as a fall-back language for one or more other languages, and so cannot be deleted.";
-                throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(message));
-            }
+            // service is happy deleting a language that's fallback for another language,
+            // will just remove it - so no need to check here
 
             Services.LocalizationService.Delete(language);
 
@@ -121,7 +118,7 @@ namespace Umbraco.Web.Editors
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
                 }
 
-                //create it
+                // create it (creating a new language cannot create a fallback cycle)
                 var newLang = new Core.Models.Language(culture.Name)
                 {
                     CultureName = culture.DisplayName,
@@ -147,46 +144,40 @@ namespace Umbraco.Web.Editors
             existing.IsDefault = language.IsDefault;
             existing.FallbackLanguageId = language.FallbackLanguageId;
 
-            string selectedFallbackLanguageCultureName;
-            if (DoesUpdatedFallbackLanguageCreateACircularPath(existing, out selectedFallbackLanguageCultureName))
+            // modifying an existing language can create a fallback, verify
+            // note that the service will check again, dealing with race conds
+            if (existing.FallbackLanguageId.HasValue)
             {
-                ModelState.AddModelError("FallbackLanguage", "The selected fall back language '" + selectedFallbackLanguageCultureName + "' would create a circular path.");
-                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+                var languages = Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.Id, x => x);
+                if (!languages.ContainsKey(existing.FallbackLanguageId.Value))
+                {
+                    ModelState.AddModelError("FallbackLanguage", "The selected fall back language does not exist.");
+                    throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+                }
+                if (CreatesCycle(existing, languages))
+                {
+                    ModelState.AddModelError("FallbackLanguage", $"The selected fall back language {languages[existing.FallbackLanguageId.Value].IsoCode} would create a circular path.");
+                    throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+                }
             }
 
             Services.LocalizationService.Save(existing);
             return Mapper.Map<Language>(existing);
-        }        
-        
-        private bool DoesUpdatedFallbackLanguageCreateACircularPath(ILanguage language, out string selectedFallbackLanguageCultureName)
-        {
-            if (language.FallbackLanguageId.HasValue == false)
-            {
-                selectedFallbackLanguageCultureName = string.Empty;
-                return false;
-            }
-
-            var languages = Services.LocalizationService.GetAllLanguages().ToArray();
-            var fallbackLanguageId = language.FallbackLanguageId;
-            while (fallbackLanguageId.HasValue)
-            {
-                if (fallbackLanguageId.Value == language.Id)
-                {
-                    // We've found the current language in the path of fall back languages, so we have a circular path.
-                    selectedFallbackLanguageCultureName = GetLanguageFromCollectionById(languages, fallbackLanguageId.Value).CultureName;
-                    return true;
-                }
-
-                fallbackLanguageId = GetLanguageFromCollectionById(languages, fallbackLanguageId.Value).FallbackLanguageId;
-            }
-
-            selectedFallbackLanguageCultureName = string.Empty;
-            return false;
         }
 
-        private static ILanguage GetLanguageFromCollectionById(IEnumerable<ILanguage> languages, int id)
+        // see LocalizationService
+        private bool CreatesCycle(ILanguage language, IDictionary<int, ILanguage> languages)
         {
-            return languages.Single(x => x.Id == id);
+            // a new language is not referenced yet, so cannot be part of a cycle
+            if (!language.HasIdentity) return false;
+
+            var id = language.FallbackLanguageId;
+            while (true) // assuming languages does not already contains a cycle, this must end
+            {
+                if (!id.HasValue) return false; // no fallback means no cycle
+                if (id.Value == language.Id) return true; // back to language = cycle!
+                id = languages[id.Value].FallbackLanguageId; // else keep chaining
+            }
         }
     }
 }

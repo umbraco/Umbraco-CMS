@@ -136,9 +136,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 // set all other entities to non-default
                 // safe (no race cond) because the service locks languages
                 var setAllDefaultToFalse = Sql()
-                    .Update<LanguageDto>(u => u.Set(x => x.IsDefaultVariantLanguage, false));
+                    .Update<LanguageDto>(u => u.Set(x => x.IsDefault, false));
                 Database.Execute(setAllDefaultToFalse);
             }
+
+            // fallback cycles are detected at service level
+
             // insert
             var dto = LanguageFactory.BuildDto(entity);
             var id = Convert.ToInt32(Database.Insert(dto));
@@ -178,6 +181,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     throw new InvalidOperationException($"Cannot save the default language ({entity.IsoCode}) as non-default. Make another language the default language instead.");
             }
 
+            // fallback cycles are detected at service level
+
             // update
             var dto = LanguageFactory.BuildDto(entity);
             Database.Update(dto);
@@ -199,8 +204,12 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 throw new InvalidOperationException($"Cannot delete the default language ({entity.IsoCode}).");
 
             // We need to remove any references to the language if it's being used as a fall-back from other ones
-            #error rewirte 
-            Database.Execute(Sql().Update<LanguageDto>(u => u.Set(x => x.FallbackLanguageId, null)).Where<LanguageDto>(x => x.FallbackLanguageId == entity.Id));
+            var clearFallbackLanguage = Sql()
+                .Update<LanguageDto>(u => u
+                    .Set(x => x.FallbackLanguageId, null))
+                .Where<LanguageDto>(x => x.FallbackLanguageId == entity.Id);
+
+            Database.Execute(clearFallbackLanguage);
 
             // delete
             base.PersistDeletedItem(entity);
