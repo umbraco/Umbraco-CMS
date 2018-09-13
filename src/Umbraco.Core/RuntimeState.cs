@@ -117,7 +117,7 @@ namespace Umbraco.Core
             var change = url != null && !_applicationUrls.Contains(url);
             if (change)
             {
-                _logger.Info(typeof(ApplicationUrlHelper), "New url '{Url}' detected, re-discovering application url.", url);
+                _logger.Info(typeof(ApplicationUrlHelper), "New url {Url} detected, re-discovering application url.", url);
                 _applicationUrls.Add(url);
             }
 
