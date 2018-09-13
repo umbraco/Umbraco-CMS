@@ -3,6 +3,7 @@ using System.Web;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
+using Umbraco.Core.Logging.Serilog.Enrichers;
 
 namespace Umbraco.Core.Logging.Serilog
 {
@@ -21,7 +22,7 @@ namespace Umbraco.Core.Logging.Serilog
             //Set this environment variable - so that it can be used in external config file
             //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log.txt" />
             Environment.SetEnvironmentVariable("BASEDIR", AppDomain.CurrentDomain.BaseDirectory, EnvironmentVariableTarget.Process);
-            
+
             logConfig.MinimumLevel.Verbose() //Set to highest level of logging (as any sinks may want to restrict it to Errors only)
                 .Enrich.WithProcessId()
                 .Enrich.WithProcessName()
@@ -29,8 +30,11 @@ namespace Umbraco.Core.Logging.Serilog
                 .Enrich.WithProperty("AppDomainId", AppDomain.CurrentDomain.Id)
                 .Enrich.WithProperty("AppDomainAppId", HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty))
                 .Enrich.WithProperty("MachineName", Environment.MachineName)
-                .Enrich.With<Log4NetLevelMapperEnricher>();
-
+                .Enrich.With<Log4NetLevelMapperEnricher>()
+                .Enrich.With<HttpSessionIdEnricher>()
+                .Enrich.With<HttpRequestNumberEnricher>()
+                .Enrich.With<HttpRequestIdEnricher>();
+            
             return logConfig;
         }
 

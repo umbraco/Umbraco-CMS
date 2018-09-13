@@ -46,7 +46,7 @@ namespace Umbraco.Web.Routing
         {
             if (docreq == null) throw new System.ArgumentNullException(nameof(docreq));
 
-            Logger.Debug<ContentFinderByUrl>("Test route '{Route}'", route);
+            Logger.Debug<ContentFinderByUrl>("Test route {Route}", route);
 
             var node = docreq.UmbracoContext.ContentCache.GetByRoute(route, culture: docreq.Culture?.Name);
             if (node != null)
