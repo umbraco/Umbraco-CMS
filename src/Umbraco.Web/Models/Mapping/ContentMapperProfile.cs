@@ -98,7 +98,7 @@ namespace Umbraco.Web.Models.Mapping
             var culture = context.GetCulture();
 
             //a culture needs to be in the context for a variant content item
-            if (culture == null)
+            if (culture == null || source.ContentType.VariesByCulture() == false)
                 return source.UpdateDate;
 
             var pubDate = source.GetPublishDate(culture);
@@ -113,7 +113,7 @@ namespace Umbraco.Web.Models.Mapping
             var culture = context.GetCulture();
 
             //a culture needs to be in the context for a variant content item
-            if (culture == null)
+            if (culture == null || source.ContentType.VariesByCulture() == false)
                 return source.Published;
 
             return source.IsCulturePublished(culture);
@@ -127,7 +127,7 @@ namespace Umbraco.Web.Models.Mapping
             var culture = context.GetCulture();
 
             //a culture needs to be in the context for a variant content item
-            if (culture == null)
+            if (culture == null || source.ContentType.VariesByCulture() == false)
                 return source.Name;
             
             if (source.CultureNames.TryGetValue(culture, out var name) && !string.IsNullOrWhiteSpace(name))
