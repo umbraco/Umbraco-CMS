@@ -53,26 +53,7 @@ namespace Umbraco.Web.Editors
             if (lang == null)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
 
-            var model = Mapper.Map<Language>(lang);
-
-            //if there's only one language, by default it is the default
-            var allLangs = Services.LocalizationService.GetAllLanguages().OrderBy(x => x.Id).ToList();
-            if (!lang.IsDefault)
-            {
-                if (allLangs.Count == 1)
-                {
-                    model.IsDefault = true;
-                    model.IsMandatory = true;
-                }   
-                else if (allLangs.All(x => !x.IsDefault))
-                {
-                    //if no language has the default flag, then the default language is the one with the lowest id
-                    model.IsDefault = allLangs[0].Id == lang.Id;
-                    model.IsMandatory = allLangs[0].Id == lang.Id;
-                }
-            }
-
-            return model;
+            return Mapper.Map<Language>(lang);
         }
 
         /// <summary>
@@ -89,12 +70,10 @@ namespace Umbraco.Web.Editors
                 return NotFound();
             }
 
-            var langs = Services.LocalizationService.GetAllLanguages().ToArray();
-            var totalLangs = langs.Length;
-
-            if (language.IsDefault || totalLangs == 1)
+            // the service would not let us do it, but test here nevertheless
+            if (language.IsDefault)
             {
-                var message = $"Language '{language.CultureName}' is currently set to 'default' or it is the only installed language and cannot be deleted.";
+                var message = $"Language '{language.IsoCode}' is currently set to 'default' and can not be deleted.";
                 throw new HttpResponseException(Request.CreateNotificationValidationErrorResponse(message));
             }
 
@@ -119,16 +98,17 @@ namespace Umbraco.Web.Editors
             if (!ModelState.IsValid)
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
 
-            var found = Services.LocalizationService.GetLanguageByIsoCode(language.IsoCode);
+            // this is prone to race conds but the service will not let us proceed anyways
+            var existing = Services.LocalizationService.GetLanguageByIsoCode(language.IsoCode);
 
-            if (found != null && language.Id != found.Id)
+            if (existing != null && language.Id != existing.Id)
             {
-                //someone is trying to create a language that alraedy exist
+                //someone is trying to create a language that already exist
                 ModelState.AddModelError("IsoCode", "The language " + language.IsoCode + " already exists");
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
 
-            if (found == null)
+            if (existing == null)
             {
                 CultureInfo culture;
                 try
@@ -154,21 +134,30 @@ namespace Umbraco.Web.Editors
                 return Mapper.Map<Language>(newLang);
             }
 
-            found.IsMandatory = language.IsMandatory;
-            found.IsDefault = language.IsDefault;
-            found.FallbackLanguageId = language.FallbackLanguageId;
+            existing.IsMandatory = language.IsMandatory;
+
+            // note that the service will prevent the default language from being "un-defaulted"
+            // but does not hurt to test here - though the UI should prevent it too
+            if (existing.IsDefault && !language.IsDefault)
+            {
+                ModelState.AddModelError("IsDefault", "Cannot un-default the default language.");
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+            }
+
+            existing.IsDefault = language.IsDefault;
+            existing.FallbackLanguageId = language.FallbackLanguageId;
 
             string selectedFallbackLanguageCultureName;
-            if (DoesUpdatedFallbackLanguageCreateACircularPath(found, out selectedFallbackLanguageCultureName))
+            if (DoesUpdatedFallbackLanguageCreateACircularPath(existing, out selectedFallbackLanguageCultureName))
             {
                 ModelState.AddModelError("FallbackLanguage", "The selected fall back language '" + selectedFallbackLanguageCultureName + "' would create a circular path.");
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
             }
 
-            Services.LocalizationService.Save(found);
-            return Mapper.Map<Language>(found);
-        }
-
+            Services.LocalizationService.Save(existing);
+            return Mapper.Map<Language>(existing);
+        }        
+        
         private bool DoesUpdatedFallbackLanguageCreateACircularPath(ILanguage language, out string selectedFallbackLanguageCultureName)
         {
             if (language.FallbackLanguageId.HasValue == false)

@@ -360,6 +360,9 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope())
             {
+                // write-lock languages to guard against race conds when dealing with default language
+                scope.WriteLock(Constants.Locks.Languages);
+
                 var saveEventArgs = new SaveEventArgs<ILanguage>(language);
                 if (scope.Events.DispatchCancelable(SavingLanguage, this, saveEventArgs))
                 {
@@ -386,6 +389,9 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope())
             {
+                // write-lock languages to guard against race conds when dealing with default language
+                scope.WriteLock(Constants.Locks.Languages);
+
                 var deleteEventArgs = new DeleteEventArgs<ILanguage>(language);
                 if (scope.Events.DispatchCancelable(DeletingLanguage, this, deleteEventArgs))
                 {

@@ -1708,7 +1708,7 @@ To manage your website, simply open the Umbraco back office and start adding con
         <key alias="mandatoryLanguage">Mandatory</key>
         <key alias="mandatoryLanguageHelp">Properties on this language have to be filled out before the node can be published.</key>
         <key alias="defaultLanguage">Default language</key>
-        <key alias="defaultLanguageHelp">An Umbraco site can only have one default langugae set.</key>
+        <key alias="defaultLanguageHelp">An Umbraco site can only have one default language set.</key>
         <key alias="changingDefaultLanguageWarning">Switching default language may result in default content missing.</key>
         <key alias="fallsbackToLabel">Falls back to</key>
         <key alias="noFallbackLanguageOption">No fall back language</key>

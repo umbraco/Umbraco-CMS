@@ -141,9 +141,7 @@
         }
 
         function toggleMandatory() {
-            if(!vm.language.isDefault) {
-                vm.language.isMandatory = !vm.language.isMandatory;
-            }
+            vm.language.isMandatory = !vm.language.isMandatory;
         }
 
         function toggleDefault() {
@@ -155,7 +153,6 @@
 
             vm.language.isDefault = !vm.language.isDefault;
             if(vm.language.isDefault) {
-                vm.language.isMandatory = true;
                 vm.showDefaultLanguageInfo = true;
             } else {
                 vm.showDefaultLanguageInfo = false;
