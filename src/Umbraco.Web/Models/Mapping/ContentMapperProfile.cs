@@ -99,7 +99,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //a culture needs to be in the context for a variant content item
             if (culture == null)
-                throw new InvalidOperationException($"No culture found in mapping operation when one is required for a culture variant");
+                return source.UpdateDate;
 
             var pubDate = source.GetPublishDate(culture);
             return pubDate.HasValue ? pubDate.Value : source.UpdateDate;
@@ -114,7 +114,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //a culture needs to be in the context for a variant content item
             if (culture == null)
-                throw new InvalidOperationException($"No culture found in mapping operation when one is required for a culture variant");
+                return source.Published;
 
             return source.IsCulturePublished(culture);
         }
@@ -128,7 +128,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //a culture needs to be in the context for a variant content item
             if (culture == null)
-                throw new InvalidOperationException($"No culture found in mapping operation when one is required for a culture variant");
+                return source.Name;
             
             if (source.CultureNames.TryGetValue(culture, out var name) && !string.IsNullOrWhiteSpace(name))
             {
