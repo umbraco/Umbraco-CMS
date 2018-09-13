@@ -81,8 +81,8 @@
                         </span>
                     </div>
 
-                    <ng-form name="groupSortOrderForm">
-                        <div class="umb-group-builder__group-sort-order" ng-if="sortingMode">
+                    <ng-form name="groupSortOrderForm" class="umb-group-builder__group-sort-order">
+                        <div ng-if="sortingMode">
                             <input name="groupSortOrder" type="number" class="umb-property-editor-tiny" style="margin-bottom: 0;" ng-model="tab.sortOrder" ng-disabled="tab.inherited" on-blur="changeSortOrderValue(tab)" required />
 
                             <!-- This is a manual validation message not bound to a validator -->
