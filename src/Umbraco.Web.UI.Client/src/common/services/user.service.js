@@ -156,8 +156,6 @@ angular.module('umbraco.services')
             var locales = locales.split(',');
             for (var i = 0; i < locales.length; i++) {
                 var locale = locales[i].toString().toLowerCase();
-                console.log("locale", locale);
-
                 if (locale !== 'en-us') {
 
                     if (supportedLocales.indexOf(locale + '.js') > -1) {
@@ -318,7 +316,6 @@ angular.module('umbraco.services')
             loadLocales: function (locales, supportedLocales) {
                 
                 var localeUrls = getMomentLocales(locales, supportedLocales);
-                console.log("localeUrls", localeUrls);
 
                 if (localeUrls.length >= 1) {
                     return assetsService.load(localeUrls, $rootScope);
