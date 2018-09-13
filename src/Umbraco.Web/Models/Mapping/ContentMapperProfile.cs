@@ -129,8 +129,15 @@ namespace Umbraco.Web.Models.Mapping
             //a culture needs to be in the context for a variant content item
             if (culture == null)
                 throw new InvalidOperationException($"No culture found in mapping operation when one is required for a culture variant");
-
-            return source.GetCultureName(culture);
+            
+            if (source.CultureNames.TryGetValue(culture, out var name) && !string.IsNullOrWhiteSpace(name))
+            {
+                return name;
+            }
+            else
+            {
+                return $"({ source.Name })";
+            }
         }
     }
 }
