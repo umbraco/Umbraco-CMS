@@ -170,9 +170,9 @@
                                 </ng-form>
 
                                 <div ng-if="sortingMode" class="flex items-center">
-                                    <i class="icon icon-navigation" ng-if="!property.inherited"></i>
+                                    <i class="icon icon-navigation" ng-if="!property.inherited" style="margin-right: 10px;"></i>
                                     <span class="umb-group-builder__property-meta-label">{{ property.label }}</span>
-                                    <span class="umb-group-builder__property-meta-alias">({{ property.alias }})</span>
+                                    <span class="umb-group-builder__property-meta-alias" style="margin-bottom: 0; margin-left: 5px; margin-top: 1px;">({{ property.alias }})</span>
                                     <input name="propertySortOrder" type="number" class="umb-group-builder__group-sort-value umb-property-editor-tiny" ng-model="property.sortOrder" ng-disabled="property.inherited" />
                                 </div>
 
