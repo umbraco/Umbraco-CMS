@@ -92,7 +92,16 @@ namespace Umbraco.Web.Models.Mapping
     {
         public string Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, string destMember, ResolutionContext context)
         {
-            return source.GetCultureName(context.GetCulture());
+            var culture = context.GetCulture();
+
+            if (source.CultureNames.TryGetValue(culture, out var name) && !string.IsNullOrWhiteSpace(name))
+            {
+                return name;
+            }
+            else
+            {
+                return $"({ source.Name })";
+            }
         }
     }
 }
