@@ -67,7 +67,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [UmbracoAuthorize]
-        public ActionResult Frame(int id)
+        public ActionResult Frame(int id, string culture)
         {
             var user = _umbracoContext.Security.CurrentUser;
 
@@ -76,7 +76,8 @@ namespace Umbraco.Web.Editors
             Response.Cookies.Set(new HttpCookie(Constants.Web.PreviewCookieName, previewToken));
 
             // use a numeric url because content may not be in cache and so .Url would fail
-            Response.Redirect($"../../{id}.aspx", true);
+            var query = culture.IsNullOrWhiteSpace() ? string.Empty : $"?culture={culture}";
+            Response.Redirect($"../../{id}.aspx{query}", true);
 
             return null;
         }

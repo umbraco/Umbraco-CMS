@@ -474,7 +474,11 @@
                 var previewWindow = $window.open('preview/?init=true', 'umbpreview');
 
                 // Build the correct path so both /#/ and #/ work.
-                var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?id=' + content.id;
+                var query = 'id=' + content.id;
+                if ($scope.culture) {
+                    query += "&culture=" + $scope.culture;
+                }
+                var redirect = Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath + '/preview/?' + query;
 
                 //The user cannot save if they don't have access to do that, in which case we just want to preview
                 //and that's it otherwise they'll get an unauthorized access message

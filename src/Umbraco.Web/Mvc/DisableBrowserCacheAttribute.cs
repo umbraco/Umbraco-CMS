@@ -25,6 +25,11 @@ namespace Umbraco.Web.Mvc
                 return;
             }
 
+            if (filterContext.HttpContext.Response.StatusCode != 200)
+            {
+                return;
+            }
+
             filterContext.HttpContext.Response.Cache.SetLastModified(DateTime.Now);
             filterContext.HttpContext.Response.Cache.SetValidUntilExpires(false);
             filterContext.HttpContext.Response.Cache.SetCacheability(HttpCacheability.NoCache);

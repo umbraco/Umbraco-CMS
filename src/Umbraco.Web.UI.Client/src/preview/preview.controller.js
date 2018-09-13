@@ -47,25 +47,19 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
             return;
         }
 
-        var pageId = $location.search().id;
-
-        //there is no page id query string hash so check if its part of a 'real' query string
-        //and if so, reload with the query string hash
-        if (!pageId) {
-            var queryStringPageId = getParameterByName("id");
-            if (queryStringPageId) {
-                $location.search("id", queryStringPageId);
-                $window.location.reload();
-                return;
+        $scope.pageId = $location.search().id || getParameterByName("id");
+        var culture = $location.search().culture || getParameterByName("culture");
+        
+        if ($scope.pageId) {
+            var query = 'id=' + $scope.pageId;
+            if (culture) {
+                query += "&culture=" + culture;
             }
+            $scope.pageUrl = "frame?" + query;
         }
-
 
         $scope.isOpen = false;
         $scope.frameLoaded = false;
-
-        $scope.pageId = pageId;
-        $scope.pageUrl = "frame?id=" + pageId;
 
         $scope.valueAreLoaded = false;
         $scope.devices = [
