@@ -96,7 +96,13 @@ namespace Umbraco.Web.Models.Mapping
         public DateTime Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, DateTime destMember, ResolutionContext context)
         {
             var culture = context.GetCulture();
-            return source.GetPublishDate(culture).HasValue ? source.GetPublishDate(culture).Value : source.UpdateDate;
+
+            //a culture needs to be in the context for a variant content item
+            if (culture == null)
+                throw new InvalidOperationException($"No culture found in mapping operation when one is required for a culture variant");
+
+            var pubDate = source.GetPublishDate(culture);
+            return pubDate.HasValue ? pubDate.Value : source.UpdateDate;
         }
     }
 
@@ -105,6 +111,11 @@ namespace Umbraco.Web.Models.Mapping
         public bool Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, bool destMember, ResolutionContext context)
         {
             var culture = context.GetCulture();
+
+            //a culture needs to be in the context for a variant content item
+            if (culture == null)
+                throw new InvalidOperationException($"No culture found in mapping operation when one is required for a culture variant");
+
             return source.IsCulturePublished(culture);
         }
     }
@@ -113,7 +124,13 @@ namespace Umbraco.Web.Models.Mapping
     {
         public string Resolve(IContent source, ContentItemBasic<ContentPropertyBasic> destination, string destMember, ResolutionContext context)
         {
-            return source.GetCultureName(context.GetCulture());
+            var culture = context.GetCulture();
+
+            //a culture needs to be in the context for a variant content item
+            if (culture == null)
+                throw new InvalidOperationException($"No culture found in mapping operation when one is required for a culture variant");
+
+            return source.GetCultureName(culture);
         }
     }
 }
