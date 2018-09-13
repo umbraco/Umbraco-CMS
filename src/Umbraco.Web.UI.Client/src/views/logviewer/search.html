@@ -3,8 +3,10 @@
     <umb-editor-view footer="false">
 
         <umb-editor-header
-            name="'Logs'"
+            name="'Log Search'"
             name-locked="true"
+            on-back="vm.back()"
+            show-back-button="vm.showBackButton"
             hide-icon="true"
             hide-description="true"
             hide-alias="true">
@@ -112,6 +114,7 @@
                     <!-- Main Log Table -->
                     <umb-box data-element="node-info-history" ng-if="!vm.logsLoading && vm.logItems.totalItems > 0">
                         <umb-box-content class="block-form">
+
                             <div ng-if="vm.logItems.totalItems > 0">
                                 Total Items: {{ vm.logItems.totalItems }}
                             </div>

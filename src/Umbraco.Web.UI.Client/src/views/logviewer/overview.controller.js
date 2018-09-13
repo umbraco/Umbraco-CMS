@@ -23,6 +23,7 @@
 
         //functions
         vm.searchLogQuery = searchLogQuery;
+        vm.findMessageTemplate = findMessageTemplate;
 
 
         function init() {
@@ -88,6 +89,11 @@
 
         function searchLogQuery(logQuery){
             $location.path("/developer/logViewer/search").search({lq: logQuery});
+        }
+
+        function findMessageTemplate(template){
+            var logQuery = "@MessageTemplate='" + template.MessageTemplate + "'";
+            searchLogQuery(logQuery);
         }
 
         init();

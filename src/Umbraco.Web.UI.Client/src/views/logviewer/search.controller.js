@@ -1,13 +1,14 @@
 (function () {
     "use strict";
 
-    function LogViewerSearchController($q, logViewerResource, overlayService) {
+    function LogViewerSearchController($location, logViewerResource, overlayService) {
 
         var vm = this;
 
         vm.loading = false;
         vm.logsLoading = false;
 
+        vm.showBackButton = true;
         vm.page = {};
 
         vm.logLevels = [
@@ -82,9 +83,17 @@
         vm.findItem = findItem;
         vm.checkForSavedSearch = checkForSavedSearch;
         vm.addToSavedSearches = addToSavedSearches;
+        vm.back = back;
 
 
         function init() {
+
+            //If we have a Querystring set for lq (log query)
+            //Then update vm.logOptions.filterExpression
+            var querystring = $location.search();
+            if(querystring.lq){
+                vm.logOptions.filterExpression = querystring.lq;
+            }
 
             vm.loading = true;
 
@@ -128,6 +137,9 @@
 
 
         function search(){
+            //Update the querystring lq (log query)
+            $location.search('lq', vm.logOptions.filterExpression);
+
             //Reset pagenumber back to 1
             vm.logOptions.pageNumber = 1;
             getLogs();
@@ -275,6 +287,9 @@
 
         }
 
+        function back() {
+            $location.path("developer/logViewer/overview");
+        }
 
         init();
 
