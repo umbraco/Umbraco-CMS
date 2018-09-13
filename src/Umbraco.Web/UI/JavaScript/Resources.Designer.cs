@@ -63,22 +63,22 @@ namespace Umbraco.Web.UI.JavaScript {
         /// <summary>
         ///   Looks up a localized string similar to [
         ///    &apos;lib/jquery/jquery.min.js&apos;,
-        ///    &apos;lib/angular/1.1.5/angular.min.js&apos;,
+        ///    &apos;lib/jquery-ui/jquery-ui.min.js&apos;,
+        ///    &apos;lib/jquery-ui-touch-punch/jquery.ui.touch-punch.js&apos;,
+        ///
+        ///    &apos;lib/angular/angular.js&apos;,
         ///    &apos;lib/underscore/underscore-min.js&apos;,
         ///
         ///    &apos;lib/moment/moment.min.js&apos;,
         ///
-        ///    &apos;lib/jquery-ui/jquery-ui.min.js&apos;,
-        ///    &apos;lib/jquery-ui-touch-punch/jquery.ui.touch-punch.js&apos;,
+        ///    &apos;lib/animejs/anime.min.js&apos;,
         ///
-        ///    &apos;lib/angular/1.1.5/angular-cookies.min.js&apos;,
-        ///    &apos;lib/angular/1.1.5/angular-mobile.js&apos;,
-        ///    &apos;lib/angular/1.1.5/angular-sanitize.min.js&apos;,
-        ///
-        ///    &apos;lib/angular/angular-ui-sortable.js&apos;,
-        ///
-        ///    &apos;lib/angular-dynamic-locale/tmhDynamicLocale.min.js&apos;,
-        ///    &apos;lib [rest of string was truncated]&quot;;.
+        ///    &apos;lib/angular-route/angular-route.js&apos;,
+        ///    &apos;lib/angular-cookies/angular-cookies.js&apos;,
+        ///    &apos;lib/angular-touch/angular-touch.js&apos;,
+        ///    &apos;lib/angular-sanitize/angular-sanitize.js&apos;,
+        ///    &apos;lib/angular-animate/angular-animate.js&apos;,
+        ///    [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string JsInitialize {
             get {
@@ -93,14 +93,38 @@ namespace Umbraco.Web.UI.JavaScript {
         ///
         ///    jQuery(document).ready(function () {
         ///
-        ///        angular.bootstrap(document, [&apos;umbraco&apos;]);
+        ///        angular.bootstrap(document, [&apos;##AngularModule##&apos;]);
         ///
         ///    });
-        ///});.
+        ///});
+        ///.
         /// </summary>
         internal static string Main {
             get {
                 return ResourceManager.GetString("Main", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [
+        ///    &apos;../lib/jquery/jquery.min.js&apos;,
+        ///    &apos;../lib/angular/angular.js&apos;,
+        ///    &apos;../lib/underscore/underscore-min.js&apos;,
+        ///    &apos;../lib/umbraco/Extensions.js&apos;,
+        ///    &apos;../js/app.js&apos;,
+        ///    &apos;../js/umbraco.resources.js&apos;,
+        ///    &apos;../js/umbraco.services.js&apos;,
+        ///    &apos;../js/umbraco.interceptors.js&apos;,
+        ///    &apos;../ServerVariables&apos;,
+        ///    &apos;../lib/signalr/jquery.signalR.js&apos;,
+        ///    &apos;../BackOffice/signalr/hubs&apos;,
+        ///    &apos;../js/umbraco.canvasdesigner.js&apos;
+        ///]
+        ///.
+        /// </summary>
+        internal static string PreviewInitialize {
+            get {
+                return ResourceManager.GetString("PreviewInitialize", resourceCulture);
             }
         }
         

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Composing;
@@ -8,6 +9,7 @@ using Umbraco.Web.Features;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
+using Umbraco.Web.UI.JavaScript;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -29,13 +31,10 @@ namespace Umbraco.Web.Editors
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
+        [DisableBrowserCache]
         public ActionResult Index()
         {
-            var model = new BackOfficePreview
-            {
-                DisableDevicePreview = _features.Disabled.DisableDevicePreview,
-                PreviewExtendedHeaderView = _features.Enabled.PreviewExtendedView
-            };
+            var model = new BackOfficePreviewModel(_features, _globalSettings);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {
@@ -47,6 +46,20 @@ namespace Umbraco.Web.Editors
             }
 
             return View(_globalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
+        }
+
+        /// <summary>
+        /// Returns the JavaScript file for preview
+        /// </summary>
+        /// <returns></returns>
+        [MinifyJavaScriptResult(Order = 0)]
+        [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Server, Duration = 5000)]
+        public JavaScriptResult Application()
+        {
+            var files = JsInitialization.OptimizeScriptFiles(HttpContext, JsInitialization.GetPreviewInitialization());
+            var result = JsInitialization.GetJavascriptInitialization(HttpContext, files, "umbraco.preview");
+
+            return JavaScript(result);
         }
 
         /// <summary>
@@ -68,11 +81,11 @@ namespace Umbraco.Web.Editors
             return null;
         }
 
-        //fixme: not sure we need this anymore since there is no canvas editing - then we can remove that route too
-        public ActionResult Editors(string editor)
-        {
-            if (string.IsNullOrEmpty(editor)) throw new ArgumentNullException(nameof(editor));
-            return View(_globalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + editor.Replace(".html", string.Empty) + ".cshtml");
-        }
+        ////fixme: not sure we need this anymore since there is no canvas editing - then we can remove that route too
+        //public ActionResult Editors(string editor)
+        //{
+        //    if (string.IsNullOrEmpty(editor)) throw new ArgumentNullException(nameof(editor));
+        //    return View(_globalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + editor.Replace(".html", string.Empty) + ".cshtml");
+        //}
     }
 }

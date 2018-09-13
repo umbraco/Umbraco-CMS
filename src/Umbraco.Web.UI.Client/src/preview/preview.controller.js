@@ -3,10 +3,10 @@
 /* Canvasdesigner panel app and controller */
 /*********************************************************************************************************/
 
-var app = angular.module("Umbraco.canvasdesigner", ['umbraco.resources', 'umbraco.services'])
+var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.services'])
 
-    .controller("Umbraco.canvasdesignerController", function ($scope, $http, $window, $timeout, $location, dialogService) {
-
+    .controller("previewController", function ($scope, $http, $window, $timeout, $location, dialogService) {
+        
         //gets a real query string value
         function getParameterByName(name, url) {
             if (!url) url = $window.location.href;
@@ -18,7 +18,28 @@ var app = angular.module("Umbraco.canvasdesigner", ['umbraco.resources', 'umbrac
             return decodeURIComponent(results[2].replace(/\+/g, ' '));
         }
 
-        var isInit = $location.search().init;
+        function configureSignalR(iframe) {
+            // signalr hub
+            var previewHub = $.connection.previewHub;
+
+            previewHub.client.refreshed = function (message, sender) {
+                console.log("Notified by SignalR preview hub (" + message + ").");
+
+                if ($scope.pageId != message) {
+                    console.log("Not a notification for us (" + $scope.pageId + ").");
+                    return;
+                }
+
+                var iframeDoc = (iframe.contentWindow || iframe.contentDocument);
+                iframeDoc.location.reload();
+            };
+
+            $.connection.hub.start()
+                .done(function () { console.log("Connected to SignalR preview hub (ID=" + $.connection.hub.id + ")"); })
+                .fail(function () { console.log("Could not connect to SignalR preview hub."); });
+        }
+
+        var isInit = getParameterByName("init");
         if (isInit === "true") {
             //do not continue, this is the first load of this new window, if this is passed in it means it's been
             //initialized by the content editor and then the content editor will actually re-load this window without
@@ -45,6 +66,7 @@ var app = angular.module("Umbraco.canvasdesigner", ['umbraco.resources', 'umbrac
 
         $scope.pageId = pageId;
         $scope.pageUrl = "frame?id=" + pageId;
+
         $scope.valueAreLoaded = false;
         $scope.devices = [
             { name: "desktop", css: "desktop", icon: "icon-display", title: "Desktop" },
@@ -73,8 +95,9 @@ var app = angular.module("Umbraco.canvasdesigner", ['umbraco.resources', 'umbrac
             window.top.location.href = "../endPreview.aspx?redir=%2f" + $scope.pageId;
         };
 
-        $scope.onFrameLoaded = function () {
+        $scope.onFrameLoaded = function (iframe) {
             $scope.frameLoaded = true;
+            configureSignalR(iframe);
         }
 
         /*****************************************************************************/
@@ -91,54 +114,35 @@ var app = angular.module("Umbraco.canvasdesigner", ['umbraco.resources', 'umbrac
 
     .component('previewIFrame', {
 
-        template: "<div><iframe id='resultFrame' ng-src=\"{{ vm.src }}\" frameborder='0'></iframe></div>",
-        controller: function ($element) {
+        template: "<div style='width:100%;height:100%;margin:0 auto;overflow:hidden;'><iframe id='resultFrame' src='about:blank' ng-src=\"{{vm.srcDelayed}}\" frameborder='0'></iframe></div>",
+        controller: function ($element, $scope, angularHelper) {
 
             var vm = this;
 
-            vm.$onInit = function () {
-                
-                ////TODO: Move this to the callback on the controller
-
-                //// signalr hub
-                //var previewHub = $.connection.previewHub;
-
-                //previewHub.client.refreshed = function (message, sender) {
-                //    console.log("Notified by SignalR preview hub (" + message + ").");
-
-                //    if ($scope.pageId != message) {
-                //        console.log("Not a notification for us (" + $scope.pageId + ").");
-                //        return;
-                //    }
-
-                //    var iframe = ($element.context.contentWindow || $element.context.contentDocument);
-                //    iframe.location.reload();
-                //};
-
-                //$.connection.hub.start()
-                //    .done(function () { console.log("Connected to SignalR preview hub (ID=" + $.connection.hub.id + ")"); })
-                //    .fail(function () { console.log("Could not connect to SignalR preview hub."); });
-            };
-
             vm.$postLink = function () {
-                $element.find("#resultFrame").on("load", function () {
-                    var iframe = $element.find("#resultFrame").get(0);
-                    hideUmbracoPreviewBadge(iframe);
-                    vm.onLoaded();
-                    scope.$apply();
-                });
+                var resultFrame = $element.find("#resultFrame");
+                resultFrame.on("load", iframeReady);
+                vm.srcDelayed = vm.src;
             };
+
+            function iframeReady() {
+                var iframe = $element.find("#resultFrame").get(0);
+                hideUmbracoPreviewBadge(iframe);
+                angularHelper.safeApply($scope, function () {
+                    vm.onLoaded({ iframe: iframe });
+                });
+            }
 
             function hideUmbracoPreviewBadge (iframe) {
-                if (iframe && iframe.document.getElementById("umbracoPreviewBadge")) {
-                    iframe.document.getElementById("umbracoPreviewBadge").style.display = "none";
+                if (iframe && iframe.contentDocument && iframe.contentDocument.getElementById("umbracoPreviewBadge")) {
+                    iframe.contentDocument.getElementById("umbracoPreviewBadge").style.display = "none";
                 }
             };
 
         },
         controllerAs: "vm",
         bindings: {
-            src: "@",
+            src: "<",
             onLoaded: "&"
         }
 

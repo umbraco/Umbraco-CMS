@@ -80,7 +80,7 @@ var sources = {
     //js files for backoffie
     //processed in the js task
     js: {
-        preview: { files: ["src/canvasdesigner/**/*.js"], out: "umbraco.canvasdesigner.js" },
+        preview: { files: ["src/preview/**/*.js"], out: "umbraco.preview.js" },
         installer: { files: ["src/installer/**/*.js"], out: "umbraco.installer.js" },
         controllers: { files: ["src/{views,controllers}/**/*.controller.js"], out: "umbraco.controllers.js" },
         directives: { files: ["src/common/directives/**/*.js"], out: "umbraco.directives.js" },
