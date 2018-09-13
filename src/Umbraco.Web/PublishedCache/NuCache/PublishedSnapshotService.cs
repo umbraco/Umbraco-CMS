@@ -303,7 +303,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var kits = _dataSource.GetAllContentSources(scope);
             _contentStore.SetAll(kits);
             sw.Stop();
-            _logger.Debug<PublishedSnapshotService>("Loaded content from database ({ElapsedMilliseconds}ms)", sw.ElapsedMilliseconds);
+            _logger.Debug<PublishedSnapshotService>("Loaded content from database ({Duration}ms)", sw.ElapsedMilliseconds);
         }
 
         private void LoadContentFromLocalDbLocked(IScope scope)
@@ -317,7 +317,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var kits = _localContentDb.Select(x => x.Value).OrderBy(x => x.Node.Level);
             _contentStore.SetAll(kits);
             sw.Stop();
-            _logger.Debug<PublishedSnapshotService>("Loaded content from local db ({ElapsedMilliseconds}ms)", sw.ElapsedMilliseconds);
+            _logger.Debug<PublishedSnapshotService>("Loaded content from local db ({Duration}ms)", sw.ElapsedMilliseconds);
         }
 
         // keep these around - might be useful
@@ -370,7 +370,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var kits = _dataSource.GetAllMediaSources(scope);
             _mediaStore.SetAll(kits);
             sw.Stop();
-            _logger.Debug<PublishedSnapshotService>("Loaded media from database ({ElapsedMilliseconds}ms)", sw.ElapsedMilliseconds);
+            _logger.Debug<PublishedSnapshotService>("Loaded media from database ({Duration}ms)", sw.ElapsedMilliseconds);
         }
 
         private void LoadMediaFromLocalDbLocked(IScope scope)
@@ -384,7 +384,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var kits = _localMediaDb.Select(x => x.Value);
             _mediaStore.SetAll(kits);
             sw.Stop();
-            _logger.Debug<PublishedSnapshotService>("Loaded media from local db ({ElapsedMilliseconds}ms)", sw.ElapsedMilliseconds);
+            _logger.Debug<PublishedSnapshotService>("Loaded media from local db ({Duration}ms)", sw.ElapsedMilliseconds);
         }
 
         // keep these around - might be useful

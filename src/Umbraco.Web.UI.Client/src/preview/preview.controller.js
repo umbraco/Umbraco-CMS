@@ -1,6 +1,6 @@
 
 /*********************************************************************************************************/
-/* Canvasdesigner panel app and controller */
+/* Preview app and controller */
 /*********************************************************************************************************/
 
 var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.services'])
@@ -100,7 +100,6 @@ var app = angular.module("umbraco.preview", ['umbraco.resources', 'umbraco.servi
 
         $scope.openPreviewDevice = function () {
             $scope.showDevicesPreview = true;
-            $scope.closeIntelCanvasdesigner();
         }
         
     })
